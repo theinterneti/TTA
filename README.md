@@ -65,6 +65,27 @@ Both repositories use their own devcontainer and docker-compose setup. The devco
 2. Use the "Reopen in Container" option when prompted
 3. The container will have access to the host's Docker daemon
 
+### Working with TTA.prototype
+
+The TTA.prototype repository is the active development environment. To use it:
+
+1. Open the TTA.prototype folder in VS Code
+2. When prompted, select "Reopen in Container"
+3. The devcontainer will start with the following features:
+   - Docker access via the host's Docker socket
+   - Neo4j database for graph storage
+   - Python environment with all dependencies
+   - Access to the shared data directory
+
+### Troubleshooting Devcontainer Issues
+
+If the devcontainer fails to start:
+
+1. Check the Docker logs: `docker logs tta-app`
+2. Verify the Docker socket is accessible: `ls -la /var/run/docker.sock`
+3. Make sure the init script has execute permissions: `chmod +x TTA.prototype/scripts/init_dev_environment.sh`
+4. Try rebuilding the container: VS Code > Command Palette > "Remote-Containers: Rebuild Container"
+
 ## Updating Submodules
 
 To update the submodules to their latest versions:
