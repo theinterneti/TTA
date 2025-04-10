@@ -101,6 +101,18 @@ If you need to update the Docker configuration:
 1. Modify the templates in the `templates/` directory
 2. Run the setup script to apply the changes to the submodules
 
+## Environment Variable Structure
+
+The TTA project uses a hierarchical .env file structure:
+
+1. **TTA.prototype/.env**: Development environment variables (active development)
+2. **TTA.dev/.env**: Stable environment variables (validated implementations)
+3. **TTA/.env**: Root-level connection variables (infrastructure)
+
+This structure aligns with the development workflow where changes bubble up from TTA.prototype to TTA.dev after validation and testing.
+
+See [ENV_STRUCTURE.md](ENV_STRUCTURE.md) for detailed documentation on the environment variable structure.
+
 ## Notes
 
 - The Docker socket mount allows containers to communicate with the host's Docker daemon
