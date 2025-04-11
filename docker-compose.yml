@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  neo4j:
+    container_name: tta-root-neo4j
+    ports:
+      - "7476:7474"
+      - "7689:7687"
+    volumes:
+      - tta-root-neo4j-data:/data
+      - ./neo4j/conf:/conf
+      - ./neo4j/logs:/logs
+      - ./neo4j/plugins:/plugins
+
+  app:
+    container_name: tta-root-app
+    volumes:
+      - .:/app:delegated
+      - tta-root-venv:/app/.venv
+      - tta-root-hf-cache:/root/.cache/huggingface
+      - tta-root-model-cache:/app/.model_cache
+      - ./data:/app/external_data:delegated
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+
+  basic-mcp-server:
+    container_name: tta-root-mcp
+    ports:
+      - "8002:8000"
+
+volumes:
+  tta-root-neo4j-data:
+  tta-root-venv:
+  tta-root-hf-cache:
+  tta-root-model-cache:

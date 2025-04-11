@@ -1,72 +1,64 @@
 # TTA Environment Variable Structure
 
-This document explains the hierarchical .env file structure used in the TTA project.
-
 ## Overview
 
-The TTA project uses a hierarchical .env file structure that aligns with the development workflow:
+The TTA project uses a hierarchical .env file structure that aligns with the separation of concerns:
 
-1. **TTA.prototype/.env**: Development environment variables (active development)
-2. **TTA.dev/.env**: Stable environment variables (validated implementations)
-3. **TTA/.env**: Root-level connection variables (infrastructure)
+TTA/.env: Infrastructure-level variables
+├── NEO4J_ROOT_PASSWORD
+├── DOCKER_HOST
+└── COMPOSE_PROJECT_NAME=tta-root
 
-## Workflow
+tta.dev/.env: AI Development variables
+├── NEO4J_PASSWORD
+├── AI_MODEL_SETTINGS
+├── DEVELOPMENT_TOOLS_CONFIG
+└── COMPOSE_PROJECT_NAME=tta-dev
 
-- New changes and experiments start in TTA.prototype
-- After validation and testing, changes bubble up to TTA.dev
-- The root TTA level provides the infrastructure to connect both repositories
+TTA.prototype/.env: Application variables
+├── NEO4J_PASSWORD
+├── TTA_CONTENT_SETTINGS
+├── USER_EXPERIENCE_CONFIG
+└── COMPOSE_PROJECT_NAME=tta-prototype
 
-## File Purposes
+## Purpose and Scope
+
+### tta.dev/.env
+- AI development configuration
+- Model integration settings
+- Development tool configurations
+- Testing and validation parameters
+- Referenced by tta.dev/docker-compose.yml
+
+### tta.dev/.env
+- AI model configurations
+- Machine learning parameters
+- Development tool settings
+- Technical integration variables
+- Model deployment settings
 
 ### TTA.prototype/.env
-- Contains all development variables
-- Most actively modified
-- Used for experimentation and new features
-- Referenced by TTA.prototype/docker-compose.yml
+- Narrative content settings
+- Therapeutic parameters
+- User experience variables
+- Content management settings
+- AI tool integration variables
 
-### TTA.dev/.env
-- Contains stable, validated variables
-- Updated only after changes in TTA.prototype are tested and approved
-- More stable, less frequently changed
-- Referenced by TTA.dev/docker-compose.yml
-
-### TTA/.env (root level)
-- Contains only essential connection variables needed for the meta-repository
-- Primarily focused on Docker and devcontainer configuration
-- Rarely changed
-- Used by the root docker-compose.yml
-
+### TTA/.env (root)
+- Infrastructure configuration
+- Cross-repository settings
+- Development environment setup
+- Resource allocation
 ## Variable Precedence
 
-When multiple .env files are specified in docker-compose.yml, variables are loaded in the order they appear. Later variables override earlier ones. The current precedence order is:
-
-1. Repository-specific .env file (e.g., TTA.prototype/.env)
-2. Root .env file (TTA/.env)
-3. Environment variables defined directly in docker-compose.yml
-
-This allows for repository-specific overrides while maintaining common infrastructure variables.
-
-## Updating Environment Variables
-
-### For Development (TTA.prototype)
-1. Make changes to TTA.prototype/.env
-2. Test thoroughly
-3. Document changes
-
-### For Stable Implementation (TTA.dev)
-1. Only after validation in TTA.prototype
-2. Copy validated variables from TTA.prototype/.env to TTA.dev/.env
-3. Document the migration
-
-### For Infrastructure (TTA/.env)
-1. Only update when changing core infrastructure
-2. Keep this file minimal
-3. Document any changes that might affect both repositories
+1. Repository-specific .env file
+2. Root .env file
+3. docker-compose.yml environment variables
 
 ## Best Practices
 
-1. Keep sensitive information (tokens, passwords) consistent across environments
-2. Document all non-obvious environment variables
-3. When adding new variables, consider which level they belong to
-4. Use comments to explain the purpose of variables
-5. Regularly review and clean up unused variables
+1. Keep AI development variables in tta.dev
+2. Keep TTA-specific variables in TTA.prototype
+3. Use root .env only for integration
+4. Document all variables and their purpose
+5. Consider cross-repository impacts when changing shared variables

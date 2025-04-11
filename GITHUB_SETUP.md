@@ -1,70 +1,66 @@
 # GitHub Repository Setup Instructions
 
-Follow these steps to push this repository to GitHub:
+## Repository Organization
 
-1. Create a new repository on GitHub:
-   - Go to https://github.com/new
-   - Name: `TTA`
-   - Description: `TTA meta-repository for managing tta.dev and TTA.prototype`
-   - Choose public or private as needed
-   - Do NOT initialize with README, .gitignore, or license
-   - Click "Create repository"
+The TTA project consists of three repositories:
 
-2. Add the remote and push:
+1. TTA (meta-repository)
+   - Purpose: Integration and deployment management
+   - Contains: Docker templates, setup scripts, documentation
+
+2. tta.dev (AI development framework)
+   - Purpose: Reusable AI development tools and patterns
+   - Focus: Technical implementation of AI features
+
+3. TTA.prototype (Therapeutic Text Adventure)
+   - Purpose: TTA-specific implementation
+   - Focus: Therapeutic content and user experience
+
+## Initial Setup
+
+1. Create repositories on GitHub:
    ```bash
+   # Create the main repository
    git remote add origin https://github.com/theinterneti/TTA.git
+   
+   # Create the AI development repository
+   cd tta.dev
+   git remote add origin https://github.com/theinterneti/tta.dev.git
+   
+   # Create the TTA implementation repository
+   cd ../TTA.prototype
+   git remote add origin https://github.com/theinterneti/TTA.prototype.git
+   ```
+
+2. Push initial code:
+   ```bash
+   # From the root directory
    git push -u origin main
-   ```
-
-3. Initialize the submodules:
-   ```bash
-   ./setup.sh
-   ```
-
-4. Push the submodules:
-   ```bash
    git push --recurse-submodules=on-demand
    ```
 
-## Working with Submodules
+## Development Workflow
 
-### Cloning the Repository with Submodules
+### AI Development (tta.dev)
+1. Focus on reusable components
+2. Document technical patterns
+3. Maintain backward compatibility
+4. Consider cross-project applicability
 
-To clone this repository with all submodules:
+### TTA Implementation (TTA.prototype)
+1. Focus on therapeutic content
+2. Implement user experience
+3. Use tools from tta.dev
+4. Document content decisions
 
-```bash
-git clone --recurse-submodules https://github.com/theinterneti/TTA.git
-```
+## Branching Strategy
 
-### Updating Submodules
+### tta.dev
+- main: Stable AI development tools
+- feature/*: New AI capabilities
+- fix/*: Technical fixes
 
-To update all submodules to their latest versions:
-
-```bash
-git submodule update --remote --merge
-git add .
-git commit -m "Update submodules"
-git push
-```
-
-### Making Changes to Submodules
-
-1. Navigate to the submodule directory:
-   ```bash
-   cd tta.dev  # or TTA.prototype
-   ```
-
-2. Make your changes and commit them:
-   ```bash
-   git add .
-   git commit -m "Your commit message"
-   git push
-   ```
-
-3. Return to the parent repository and update the submodule reference:
-   ```bash
-   cd ..
-   git add tta.dev  # or TTA.prototype
-   git commit -m "Update tta.dev submodule reference"
-   git push
-   ```
+### TTA.prototype
+- main: Production-ready TTA
+- content/*: New therapeutic content
+- feature/*: TTA-specific features

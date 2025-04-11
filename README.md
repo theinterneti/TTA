@@ -103,16 +103,60 @@ If you need to update the Docker configuration:
 
 ## Environment Variable Structure
 
-The TTA project uses a hierarchical .env file structure:
-
-1. **TTA.prototype/.env**: Development environment variables (active development)
-2. **TTA.dev/.env**: Stable environment variables (validated implementations)
-3. **TTA/.env**: Root-level connection variables (infrastructure)
-
-This structure aligns with the development workflow where changes bubble up from TTA.prototype to TTA.dev after validation and testing.
-
 See [ENV_STRUCTURE.md](ENV_STRUCTURE.md) for detailed documentation on the environment variable structure.
 
+## Port allocation strategy
+TTA.prototype (Development):
+- Neo4j Browser: 7474
+- Neo4j Bolt: 7687
+- MCP Server: 8000
+
+tta.dev (Stable):
+- Neo4j Browser: 7475
+- Neo4j Bolt: 7688
+- MCP Server: 8001
+
+Root TTA:
+- Neo4j Browser: 7476
+- Neo4j Bolt: 7689
+- MCP Server: 8002
+
+## Volume strategy
+version: '3.8'
+
+services:
+  neo4j:
+    container_name: tta-root-neo4j
+    ports:
+      - "7476:7474"
+      - "7689:7687"
+    volumes:
+      - tta-root-neo4j-data:/data
+      - ./neo4j/conf:/conf
+      - ./neo4j/logs:/logs
+      - ./neo4j/plugins:/plugins
+
+  app:
+    container_name: tta-root-app
+    volumes:
+      - .:/app:delegated
+      - tta-root-venv:/app/.venv
+      - tta-root-hf-cache:/root/.cache/huggingface
+      - tta-root-model-cache:/app/.model_cache
+      - ./data:/app/external_data:delegated
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+
+  basic-mcp-server:
+    container_name: tta-root-mcp
+    ports:
+      - "8002:8000"
+
+volumes:
+  tta-root-neo4j-data:
+  tta-root-venv:
+  tta-root-hf-cache:
+  tta-root-model-cache:
+  
 ## Notes
 
 - The Docker socket mount allows containers to communicate with the host's Docker daemon
