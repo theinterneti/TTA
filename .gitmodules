@@ -6,4 +6,4 @@
 [submodule "tta.dev"]
 	path = tta.dev
 	url = https://github.com/theinterneti/tta.dev.git
-	branch = MCP-integrations
+	branch = MCP-integrations
