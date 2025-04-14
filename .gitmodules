@@ -1,6 +1,6 @@
 [submodule "tta.dev"]
 	path = tta.dev
-	url = https://github.com/theinterneti/TTA.dev.git
+	url = https://github.com/theinterneti/tta.dev.git
 	branch = main
 [submodule "tta.prototype"]
 	path = tta.prototype
