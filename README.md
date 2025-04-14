@@ -1,121 +1,61 @@
-# TTA Project
+# TTA - Therapeutic Text Adventure
 
-This repository manages two sub-repositories as Git submodules:
-- `tta.dev`: For known working implementations
-- `TTA.prototype`: For active development
-
-This meta-repository provides consistent Docker configuration and development environment setup for both sub-repositories.
+This repository contains the code for the Therapeutic Text Adventure (TTA) project, which consists of two main components:
 
 ## Repository Structure
 
-```
-TTA/
-├── .gitmodules           # Submodule configuration
-├── README.md             # This file
-├── setup.sh              # Setup script
-├── templates/            # Template files for submodules
-│   ├── tta.dev/          # Templates for tta.dev
-│   └── TTA.prototype/    # Templates for TTA.prototype
-├── tta.dev/              # Submodule for stable implementations
-└── TTA.prototype/        # Submodule for active development
-```
+- **tta.dev**: Reusable AI components (agents, RAG, database integration), including MCP materials
+- **tta.prototype**: Narrative elements (worldbuilding, characters, storytelling)
 
-## Setup Instructions
+## Directory Structure
 
-### Initial Setup
+- **Documentation**: Project documentation
+- **config**: Configuration files
+- **scripts**: Utility scripts
+- **templates**: Template files for tta.dev and tta.prototype
+- **external_data**: External data files
+- **logs**: Log files
+- **notebooks**: Jupyter notebooks
 
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/theinterneti/TTA.git
-   cd TTA
-   ```
+## Getting Started
 
-2. Run the setup script to initialize submodules:
-   ```bash
-   ./setup.sh
-   ```
-
-3. The setup script will:
-   - Initialize the Git submodules
-   - Copy Docker configuration files if needed
-   - Set up the development environment
-
-### Docker Setup
-
-Both repositories use their own devcontainer and docker-compose setup. The devcontainers have been configured to have access to the host's Docker daemon, allowing you to run Docker commands from within the containers.
-
-#### Key Features
-
-1. **Docker-in-Docker Access**:
-   - The Docker socket is mounted from the host to the containers
-   - Docker CLI is installed in the containers
-   - The devcontainer.json files include the Docker-outside-of-Docker feature
-
-2. **Volume Mounts**:
-   - Host directories are mounted for data sharing
-   - Docker socket is mounted at `/var/run/docker.sock`
-
-3. **Development Environment**:
-   - VS Code extensions for Docker, Python, and other tools are pre-configured
-   - CUDA support for GPU acceleration
-
-## Development Workflow
-
-1. Open either `tta.dev` or `TTA.prototype` in VS Code
-2. Use the "Reopen in Container" option when prompted
-3. The container will have access to the host's Docker daemon
-
-### Working with TTA.prototype
-
-The TTA.prototype repository is the active development environment. To use it:
-
-1. Open the TTA.prototype folder in VS Code
-2. When prompted, select "Reopen in Container"
-3. The devcontainer will start with the following features:
-   - Docker access via the host's Docker socket
-   - Neo4j database for graph storage
-   - Python environment with all dependencies
-   - Access to the shared data directory
-
-### Troubleshooting Devcontainer Issues
-
-If the devcontainer fails to start:
-
-1. Check the Docker logs: `docker logs tta-app`
-2. Verify the Docker socket is accessible: `ls -la /var/run/docker.sock`
-3. Make sure the init script has execute permissions: `chmod +x TTA.prototype/scripts/init_dev_environment.sh`
-4. Try rebuilding the container: VS Code > Command Palette > "Remote-Containers: Rebuild Container"
-
-## Updating Submodules
-
-To update the submodules to their latest versions:
+To set up the project, run the following command:
 
 ```bash
-git submodule update --remote --merge
+./scripts/setup.sh
 ```
 
-## Adding New Docker Configuration
+## Docker and DevContainer
 
-If you need to update the Docker configuration:
+Both tta.dev and tta.prototype have Docker and DevContainer configurations. To use Docker, run:
 
-1. Modify the templates in the `templates/` directory
-2. Run the setup script to apply the changes to the submodules
+```bash
+cd tta.dev
+docker-compose up
+```
 
-## Environment Variable Structure
+or
 
-The TTA project uses a hierarchical .env file structure:
+```bash
+cd tta.prototype
+docker-compose up
+```
 
-1. **TTA.prototype/.env**: Development environment variables (active development)
-2. **TTA.dev/.env**: Stable environment variables (validated implementations)
-3. **TTA/.env**: Root-level connection variables (infrastructure)
+## Documentation
 
-This structure aligns with the development workflow where changes bubble up from TTA.prototype to TTA.dev after validation and testing.
+For more information, see the documentation in the `Documentation` directory:
 
-See [ENV_STRUCTURE.md](ENV_STRUCTURE.md) for detailed documentation on the environment variable structure.
+- [Environment Structure](Documentation/ENV_STRUCTURE.md)
+- [GitHub Setup](Documentation/GITHUB_SETUP.md)
+- [Docker Setup Guide](Documentation/docker/docker_setup_guide.md)
+- [DevContainer Troubleshooting Guide](Documentation/docker/devcontainer_troubleshooting_guide.md)
 
-## Notes
+## Organization Scripts
 
-- The Docker socket mount allows containers to communicate with the host's Docker daemon
-- This setup enables nested container creation and management
-- The Docker CLI is installed in the containers, but the Docker daemon runs on the host
-- Git submodules can be tricky to work with; always make sure you're in the right directory when making changes
+The repository includes several scripts to help organize the codebase:
+
+- `scripts/organize_tta.sh`: Main script to organize the TTA repository
+- `scripts/standardize_naming.sh`: Script to standardize naming conventions
+- `scripts/organize_files.sh`: Script to organize files in the TTA repository
+- `scripts/organize_documentation.sh`: Script to organize documentation in the TTA repository
+- `scripts/docker/ensure_docker_consistency.sh`: Script to ensure Docker and DevContainer consistency across repositories
