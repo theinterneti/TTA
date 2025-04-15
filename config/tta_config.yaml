@@ -1,6 +1,6 @@
-# TTA Configuration
+# TTA Configuration File
 
-# tta.dev configuration
+# TTA.dev Repository Configuration
 tta.dev:
   enabled: true
   components:
@@ -14,7 +14,7 @@ tta.dev:
       model: qwen2.5-7b-instruct
       api_base: http://localhost:1234/v1
 
-# tta.prototype configuration
+# TTA.prototype Repository Configuration
 tta.prototype:
   enabled: true
   components:
@@ -27,8 +27,27 @@ tta.prototype:
       enabled: true
       port: 8501
 
-# Docker configuration
+# Docker Configuration
 docker:
+  enabled: true
   use_gpu: false
   compose_profiles:
     - default
+  standardize_container_names: true
+  ensure_consistent_extensions: true
+  ensure_consistent_env_vars: true
+  ensure_consistent_services: true
+
+# Carbon Tracking Configuration
+carbon:
+  enabled: true
+  project_name: TTA
+  output_dir: logs/codecarbon
+  log_level: info
+  measurement_interval: 15
+  track_components: true
+
+# Environment Configuration
+environment:
+  name: development
+  log_level: info
