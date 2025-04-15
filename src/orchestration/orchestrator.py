@@ -3,6 +3,26 @@ TTA Orchestrator
 
 This module provides the main orchestration capabilities for the TTA project,
 coordinating both tta.dev and tta.prototype components.
+
+Classes:
+    TTAOrchestrator: Main orchestrator for the TTA project
+
+Example:
+    ```python
+    from src.orchestration import TTAOrchestrator
+    
+    # Create the orchestrator
+    orchestrator = TTAOrchestrator()
+    
+    # Start all components
+    orchestrator.start_all()
+    
+    # Start a specific component
+    orchestrator.start_component('neo4j')
+    
+    # Stop all components
+    orchestrator.stop_all()
+    ```
 """
 
 import os
@@ -11,14 +31,21 @@ import logging
 import importlib.util
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Optional, Union, Any
+from typing import Dict, List, Optional, Union, Any, Set, Tuple, cast
+
+from rich.console import Console
+from rich.table import Table
 
 from .config import TTAConfig
 from .component import Component, ComponentStatus
+from .decorators import log_entry_exit, timing_decorator, retry, validate_args
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Configure rich console
+console = Console()
 
 
 class TTAOrchestrator:
@@ -27,14 +54,24 @@ class TTAOrchestrator:
     
     This class coordinates the components from both tta.dev and tta.prototype,
     providing a unified interface for starting, stopping, and managing them.
+    
+    Attributes:
+        config: Configuration object
+        components: Dictionary of components
+        root_dir: Root directory of the project
+        tta_dev_path: Path to the tta.dev repository
+        tta_prototype_path: Path to the tta.prototype repository
     """
     
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[Union[str, Path]] = None):
         """
         Initialize the TTA Orchestrator.
         
         Args:
             config_path: Path to the configuration file. If None, uses default.
+            
+        Raises:
+            FileNotFoundError: If a repository path does not exist.
         """
         self.config = TTAConfig(config_path)
         self.components: Dict[str, Component] = {}
@@ -49,7 +86,10 @@ class TTAOrchestrator:
         
         # Import components
         self._import_components()
+        
+        logger.info(f"TTAOrchestrator initialized with {len(self.components)} components")
     
+    @log_entry_exit
     def _validate_repositories(self) -> None:
         """
         Validate that the repository paths exist and are properly structured.
@@ -66,9 +106,14 @@ class TTAOrchestrator:
         logger.info(f"Found tta.dev at {self.tta_dev_path}")
         logger.info(f"Found tta.prototype at {self.tta_prototype_path}")
     
+    @log_entry_exit
+    @timing_decorator
     def _import_components(self) -> None:
         """
         Import components from both repositories.
+        
+        This method scans both repositories for component definitions and
+        imports them into the orchestrator.
         """
         # Import tta.dev components
         self._import_repository_components(self.tta_dev_path, "tta.dev")
@@ -127,6 +172,8 @@ class TTAOrchestrator:
             except Exception as e:
                 logger.error(f"Error importing {component_file}: {e}")
     
+    @log_entry_exit
+    @validate_args
     def start_component(self, component_name: str) -> bool:
         """
         Start a specific component.
@@ -135,7 +182,7 @@ class TTAOrchestrator:
             component_name: Name of the component to start
             
         Returns:
-            True if the component was started successfully, False otherwise
+            bool: True if the component was started successfully, False otherwise
         """
         if component_name not in self.components:
             logger.error(f"Component {component_name} not found")
@@ -167,6 +214,8 @@ class TTAOrchestrator:
             logger.error(f"Error starting component {component_name}: {e}")
             return False
     
+    @log_entry_exit
+    @validate_args
     def stop_component(self, component_name: str) -> bool:
         """
         Stop a specific component.
@@ -175,7 +224,7 @@ class TTAOrchestrator:
             component_name: Name of the component to stop
             
         Returns:
-            True if the component was stopped successfully, False otherwise
+            bool: True if the component was stopped successfully, False otherwise
         """
         if component_name not in self.components:
             logger.error(f"Component {component_name} not found")
@@ -208,26 +257,41 @@ class TTAOrchestrator:
             logger.error(f"Error stopping component {component_name}: {e}")
             return False
     
+    @log_entry_exit
+    @timing_decorator
     def start_all(self) -> bool:
         """
         Start all components.
         
         Returns:
-            True if all components were started successfully, False otherwise
+            bool: True if all components were started successfully, False otherwise
         """
         success = True
-        for component_name in self.components:
+        
+        # Start components in dependency order
+        # First, build a dependency graph
+        dependency_graph = {}
+        for name, component in self.components.items():
+            dependency_graph[name] = component.dependencies
+        
+        # Then, determine the order to start components
+        start_order = self._topological_sort(dependency_graph)
+        
+        # Start components in the determined order
+        for component_name in start_order:
             if not self.start_component(component_name):
                 success = False
         
         return success
     
+    @log_entry_exit
+    @timing_decorator
     def stop_all(self) -> bool:
         """
         Stop all components.
         
         Returns:
-            True if all components were stopped successfully, False otherwise
+            bool: True if all components were stopped successfully, False otherwise
         """
         success = True
         
@@ -257,13 +321,19 @@ class TTAOrchestrator:
             graph: Dependency graph where keys are component names and values are lists of dependencies
             
         Returns:
-            List of component names in topological order
+            List[str]: List of component names in topological order
         """
-        visited = set()
-        temp = set()
-        order = []
+        visited: Set[str] = set()
+        temp: Set[str] = set()
+        order: List[str] = []
         
         def visit(node: str) -> None:
+            """
+            Visit a node in the dependency graph.
+            
+            Args:
+                node: Name of the node to visit
+            """
             if node in temp:
                 # Circular dependency detected
                 logger.warning(f"Circular dependency detected involving {node}")
@@ -285,6 +355,7 @@ class TTAOrchestrator:
         
         return order
     
+    @validate_args
     def get_component_status(self, component_name: str) -> Optional[ComponentStatus]:
         """
         Get the status of a specific component.
@@ -293,7 +364,7 @@ class TTAOrchestrator:
             component_name: Name of the component
             
         Returns:
-            Status of the component, or None if the component is not found
+            Optional[ComponentStatus]: Status of the component, or None if the component is not found
         """
         if component_name not in self.components:
             logger.error(f"Component {component_name} not found")
@@ -306,10 +377,48 @@ class TTAOrchestrator:
         Get the status of all components.
         
         Returns:
-            Dictionary mapping component names to their statuses
+            Dict[str, ComponentStatus]: Dictionary mapping component names to their statuses
         """
         return {name: component.status for name, component in self.components.items()}
     
+    def display_status(self) -> None:
+        """
+        Display the status of all components in a table.
+        
+        This method uses the rich library to display a formatted table
+        of component statuses.
+        """
+        table = Table(title="TTA Component Status")
+        
+        table.add_column("Component", style="cyan")
+        table.add_column("Status", style="green")
+        table.add_column("Repository", style="blue")
+        table.add_column("Dependencies", style="yellow")
+        
+        for name, component in sorted(self.components.items()):
+            repo = "tta.dev" if "tta.dev" in name.lower() else "tta.prototype"
+            status = component.status.value
+            status_style = {
+                "running": "green",
+                "stopped": "red",
+                "starting": "yellow",
+                "stopping": "yellow",
+                "error": "bold red"
+            }.get(status, "white")
+            
+            dependencies = ", ".join(component.dependencies) if component.dependencies else "None"
+            
+            table.add_row(
+                name,
+                f"[{status_style}]{status}[/{status_style}]",
+                repo,
+                dependencies
+            )
+        
+        console.print(table)
+    
+    @log_entry_exit
+    @retry(max_attempts=3, delay=1.0, backoff=2.0, exceptions=subprocess.SubprocessError)
     def run_docker_command(self, command: List[str]) -> subprocess.CompletedProcess:
         """
         Run a Docker command.
@@ -318,7 +427,10 @@ class TTAOrchestrator:
             command: Docker command to run
             
         Returns:
-            CompletedProcess instance with the command's output
+            subprocess.CompletedProcess: CompletedProcess instance with the command's output
+            
+        Raises:
+            subprocess.SubprocessError: If the Docker command fails
         """
         full_command = ["docker"] + command
         logger.info(f"Running Docker command: {' '.join(full_command)}")
@@ -333,9 +445,12 @@ class TTAOrchestrator:
         
         if result.returncode != 0:
             logger.error(f"Docker command failed: {result.stderr}")
+            raise subprocess.SubprocessError(f"Docker command failed: {result.stderr}")
         
         return result
     
+    @log_entry_exit
+    @retry(max_attempts=3, delay=1.0, backoff=2.0, exceptions=subprocess.SubprocessError)
     def run_docker_compose_command(self, 
                                   command: List[str], 
                                   repository: str = "both") -> Dict[str, subprocess.CompletedProcess]:
@@ -347,7 +462,10 @@ class TTAOrchestrator:
             repository: Which repository to run the command in ("tta.dev", "tta.prototype", or "both")
             
         Returns:
-            Dictionary mapping repository names to CompletedProcess instances
+            Dict[str, subprocess.CompletedProcess]: Dictionary mapping repository names to CompletedProcess instances
+            
+        Raises:
+            subprocess.SubprocessError: If the Docker Compose command fails
         """
         results = {}
         
@@ -367,6 +485,7 @@ class TTAOrchestrator:
             
             if result.returncode != 0:
                 logger.error(f"Docker Compose command failed in tta.dev: {result.stderr}")
+                raise subprocess.SubprocessError(f"Docker Compose command failed in tta.dev: {result.stderr}")
             
             results["tta.dev"] = result
         
@@ -386,6 +505,7 @@ class TTAOrchestrator:
             
             if result.returncode != 0:
                 logger.error(f"Docker Compose command failed in tta.prototype: {result.stderr}")
+                raise subprocess.SubprocessError(f"Docker Compose command failed in tta.prototype: {result.stderr}")
             
             results["tta.prototype"] = result
         

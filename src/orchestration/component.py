@@ -2,12 +2,35 @@
 TTA Component
 
 This module provides the base class for TTA components.
+
+Classes:
+    ComponentStatus: Enum representing the status of a component
+    Component: Base class for TTA components
+
+Example:
+    ```python
+    from src.orchestration.component import Component, ComponentStatus
+    
+    class MyComponent(Component):
+        def __init__(self, config):
+            super().__init__(config, name="my_component", dependencies=["neo4j"])
+        
+        def _start_impl(self) -> bool:
+            # Implement component-specific start logic
+            return True
+        
+        def _stop_impl(self) -> bool:
+            # Implement component-specific stop logic
+            return True
+    ```
 """
 
 import logging
 import subprocess
 from enum import Enum
-from typing import List, Optional, Dict, Any
+from typing import Any, Dict, List, Optional
+
+from .decorators import log_entry_exit, timing_decorator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +38,15 @@ logger = logging.getLogger(__name__)
 
 
 class ComponentStatus(Enum):
-    """Status of a component."""
+    """Status of a component.
+    
+    Attributes:
+        STOPPED: Component is stopped
+        STARTING: Component is in the process of starting
+        RUNNING: Component is running
+        STOPPING: Component is in the process of stopping
+        ERROR: Component encountered an error
+    """
     STOPPED = "stopped"
     STARTING = "starting"
     RUNNING = "running"
@@ -29,9 +60,16 @@ class Component:
     
     This class defines the interface for components that can be managed
     by the TTA Orchestrator.
+    
+    Attributes:
+        config: Configuration object
+        name: Name of the component
+        dependencies: List of component names that this component depends on
+        status: Current status of the component
+        process: Process object if the component is running as a subprocess
     """
     
-    def __init__(self, config, name: str = None, dependencies: List[str] = None):
+    def __init__(self, config: Any, name: Optional[str] = None, dependencies: Optional[List[str]] = None):
         """
         Initialize a component.
         
@@ -46,12 +84,20 @@ class Component:
         self.status = ComponentStatus.STOPPED
         self.process: Optional[subprocess.Popen] = None
     
+    @log_entry_exit
+    @timing_decorator
     def start(self) -> bool:
         """
         Start the component.
         
+        This method handles the component lifecycle and delegates to _start_impl
+        for component-specific start logic.
+        
         Returns:
-            True if the component was started successfully, False otherwise
+            bool: True if the component was started successfully, False otherwise
+        
+        Raises:
+            Exception: If an error occurs during startup
         """
         if self.status == ComponentStatus.RUNNING:
             logger.info(f"Component {self.name} is already running")
@@ -77,12 +123,20 @@ class Component:
             logger.error(f"Error starting component {self.name}: {e}")
             return False
     
+    @log_entry_exit
+    @timing_decorator
     def stop(self) -> bool:
         """
         Stop the component.
         
+        This method handles the component lifecycle and delegates to _stop_impl
+        for component-specific stop logic.
+        
         Returns:
-            True if the component was stopped successfully, False otherwise
+            bool: True if the component was stopped successfully, False otherwise
+        
+        Raises:
+            Exception: If an error occurs during shutdown
         """
         if self.status == ComponentStatus.STOPPED:
             logger.info(f"Component {self.name} is already stopped")
@@ -108,12 +162,15 @@ class Component:
             logger.error(f"Error stopping component {self.name}: {e}")
             return False
     
+    @log_entry_exit
     def restart(self) -> bool:
         """
         Restart the component.
         
+        This method stops the component if it's running and then starts it again.
+        
         Returns:
-            True if the component was restarted successfully, False otherwise
+            bool: True if the component was restarted successfully, False otherwise
         """
         logger.info(f"Restarting component {self.name}")
         
@@ -133,7 +190,10 @@ class Component:
         This method should be overridden by subclasses.
         
         Returns:
-            True if the component was started successfully, False otherwise
+            bool: True if the component was started successfully, False otherwise
+        
+        Raises:
+            NotImplementedError: If the subclass does not implement this method
         """
         raise NotImplementedError("Subclasses must implement _start_impl")
     
@@ -144,7 +204,10 @@ class Component:
         This method should be overridden by subclasses.
         
         Returns:
-            True if the component was stopped successfully, False otherwise
+            bool: True if the component was stopped successfully, False otherwise
+        
+        Raises:
+            NotImplementedError: If the subclass does not implement this method
         """
         raise NotImplementedError("Subclasses must implement _stop_impl")
     
@@ -153,7 +216,7 @@ class Component:
         Get the current status of the component.
         
         Returns:
-            Current status of the component
+            ComponentStatus: Current status of the component
         """
         return self.status
     
@@ -162,7 +225,7 @@ class Component:
         Get the configuration for this component.
         
         Returns:
-            Component configuration
+            Dict[str, Any]: Component configuration dictionary
         """
         # Get the repository-specific configuration
         repo = "tta.dev" if "tta.dev" in self.name.lower() else "tta.prototype"

@@ -2,6 +2,26 @@
 TTA Configuration
 
 This module provides configuration management for the TTA project.
+
+Classes:
+    TTAConfig: Configuration manager for the TTA project
+
+Example:
+    ```python
+    from src.orchestration.config import TTAConfig
+    
+    # Create a configuration object
+    config = TTAConfig()
+    
+    # Get a configuration value
+    value = config.get("tta.dev.enabled")
+    
+    # Set a configuration value
+    config.set("tta.dev.enabled", True)
+    
+    # Save the configuration
+    config.save()
+    ```
 """
 
 import os
@@ -9,22 +29,30 @@ import json
 import yaml
 import logging
 from pathlib import Path
-from typing import Dict, Any, Optional, Union
+from typing import Any, Dict, List, Optional, Union, cast
+
+from .decorators import log_entry_exit, timing_decorator, singleton
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+@singleton
 class TTAConfig:
     """
     Configuration manager for the TTA project.
     
     This class handles loading and managing configuration for both
     tta.dev and tta.prototype components.
+    
+    Attributes:
+        root_dir: Root directory of the project
+        config_path: Path to the configuration file
+        config: Configuration dictionary
     """
     
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[Union[str, Path]] = None):
         """
         Initialize the TTA Configuration.
         
@@ -47,10 +75,16 @@ class TTAConfig:
         
         # Load environment variables
         self._load_env_vars()
+        
+        logger.info(f"Configuration initialized from {self.config_path}")
     
+    @log_entry_exit
     def _load_config(self) -> None:
         """
         Load configuration from the config file.
+        
+        This method loads the configuration from the specified file,
+        or uses default configuration if the file is not found or invalid.
         """
         if not self.config_path.exists():
             logger.warning(f"Config file not found at {self.config_path}. Using default configuration.")
@@ -80,7 +114,7 @@ class TTAConfig:
         Get the default configuration.
         
         Returns:
-            Default configuration dictionary
+            Dict[str, Any]: Default configuration dictionary
         """
         return {
             "tta.dev": {
@@ -120,6 +154,7 @@ class TTAConfig:
             }
         }
     
+    @log_entry_exit
     def _load_env_vars(self) -> None:
         """
         Load configuration from environment variables.
@@ -136,19 +171,21 @@ class TTAConfig:
                     continue
                 
                 # Convert the value to the appropriate type
+                typed_value: Any = value
                 if value.lower() in ["true", "yes", "1"]:
-                    value = True
+                    typed_value = True
                 elif value.lower() in ["false", "no", "0"]:
-                    value = False
+                    typed_value = False
                 elif value.isdigit():
-                    value = int(value)
+                    typed_value = int(value)
                 elif value.replace(".", "", 1).isdigit() and value.count(".") == 1:
-                    value = float(value)
+                    typed_value = float(value)
                 
                 # Update the configuration
-                self._set_nested_config(parts, value)
+                self._set_nested_config(parts, typed_value)
+                logger.debug(f"Loaded environment variable {key}={typed_value}")
     
-    def _set_nested_config(self, keys: list, value: Any) -> None:
+    def _set_nested_config(self, keys: List[str], value: Any) -> None:
         """
         Set a nested configuration value.
         
@@ -184,7 +221,7 @@ class TTAConfig:
             default: Default value to return if the key is not found
             
         Returns:
-            Configuration value, or default if not found
+            Any: Configuration value, or default if not found
         """
         keys = key.split(".")
         value = self.config
@@ -207,8 +244,10 @@ class TTAConfig:
         """
         keys = key.split(".")
         self._set_nested_config(keys, value)
+        logger.debug(f"Set configuration {key}={value}")
     
-    def save(self, path: Optional[str] = None) -> bool:
+    @timing_decorator
+    def save(self, path: Optional[Union[str, Path]] = None) -> bool:
         """
         Save the configuration to a file.
         
@@ -216,7 +255,7 @@ class TTAConfig:
             path: Path to save the configuration to. If None, uses the current config path.
             
         Returns:
-            True if the configuration was saved successfully, False otherwise
+            bool: True if the configuration was saved successfully, False otherwise
         """
         if path is None:
             path = self.config_path
@@ -243,3 +282,21 @@ class TTAConfig:
         except Exception as e:
             logger.error(f"Error saving config file: {e}")
             return False
+    
+    def __str__(self) -> str:
+        """
+        Get a string representation of the configuration.
+        
+        Returns:
+            str: String representation of the configuration
+        """
+        return f"TTAConfig(path={self.config_path})"
+    
+    def __repr__(self) -> str:
+        """
+        Get a string representation of the configuration.
+        
+        Returns:
+            str: String representation of the configuration
+        """
+        return self.__str__()
