@@ -1,0 +1,153 @@
+"""
+App Component
+
+This module provides a component for managing the TTA.prototype app.
+"""
+
+import os
+import time
+import logging
+import subprocess
+import requests
+from pathlib import Path
+from typing import Optional
+
+from src.orchestration.component import Component, ComponentStatus
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
+class AppComponent(Component):
+    """
+    Component for managing the TTA.prototype app.
+    """
+    
+    def __init__(self, config):
+        """
+        Initialize the App component.
+        
+        Args:
+            config: Configuration object
+        """
+        super().__init__(config, name="tta.prototype_app", dependencies=["tta.prototype_neo4j"])
+        
+        self.root_dir = Path(__file__).parent.parent.parent
+        self.repo_dir = self.root_dir / "tta.prototype"
+        
+        # Get App configuration
+        self.port = self.config.get("tta.prototype.components.app.port", 8501)
+    
+    def _start_impl(self) -> bool:
+        """
+        Start the App component.
+        
+        Returns:
+            True if the component was started successfully, False otherwise
+        """
+        # Check if App is already running
+        if self._is_app_running():
+            logger.info(f"App is already running on port {self.port}")
+            return True
+        
+        # Start App using Docker Compose
+        try:
+            logger.info("Starting App using Docker Compose")
+            
+            # Run docker-compose up -d app
+            result = subprocess.run(
+                ["docker-compose", "up", "-d", "app"],
+                cwd=str(self.repo_dir),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False
+            )
+            
+            if result.returncode != 0:
+                logger.error(f"Failed to start App: {result.stderr}")
+                return False
+            
+            # Wait for App to start
+            logger.info("Waiting for App to start...")
+            for _ in range(30):  # Wait up to 30 seconds
+                if self._is_app_running():
+                    logger.info(f"App started successfully on port {self.port}")
+                    return True
+                time.sleep(1)
+            
+            logger.error(f"Timed out waiting for App to start on port {self.port}")
+            return False
+        
+        except Exception as e:
+            logger.error(f"Error starting App: {e}")
+            return False
+    
+    def _stop_impl(self) -> bool:
+        """
+        Stop the App component.
+        
+        Returns:
+            True if the component was stopped successfully, False otherwise
+        """
+        # Check if App is running
+        if not self._is_app_running():
+            logger.info(f"App is not running on port {self.port}")
+            return True
+        
+        # Stop App using Docker Compose
+        try:
+            logger.info("Stopping App using Docker Compose")
+            
+            # Run docker-compose stop app
+            result = subprocess.run(
+                ["docker-compose", "stop", "app"],
+                cwd=str(self.repo_dir),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False
+            )
+            
+            if result.returncode != 0:
+                logger.error(f"Failed to stop App: {result.stderr}")
+                return False
+            
+            # Wait for App to stop
+            logger.info("Waiting for App to stop...")
+            for _ in range(10):  # Wait up to 10 seconds
+                if not self._is_app_running():
+                    logger.info(f"App stopped successfully on port {self.port}")
+                    return True
+                time.sleep(1)
+            
+            logger.error(f"Timed out waiting for App to stop on port {self.port}")
+            return False
+        
+        except Exception as e:
+            logger.error(f"Error stopping App: {e}")
+            return False
+    
+    def _is_app_running(self) -> bool:
+        """
+        Check if App is running.
+        
+        Returns:
+            True if App is running, False otherwise
+        """
+        try:
+            # Check if the App port is open
+            result = subprocess.run(
+                ["docker", "ps", "--filter", f"publish={self.port}", "--format", "{{.Names}}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=False
+            )
+            
+            return bool(result.stdout.strip())
+        
+        except Exception as e:
+            logger.error(f"Error checking if App is running: {e}")
+            return False

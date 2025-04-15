@@ -1,0 +1,34 @@
+# TTA Configuration
+
+# tta.dev configuration
+tta.dev:
+  enabled: true
+  components:
+    neo4j:
+      enabled: true
+      port: 7687
+      username: neo4j
+      password: password
+    llm:
+      enabled: true
+      model: qwen2.5-7b-instruct
+      api_base: http://localhost:1234/v1
+
+# tta.prototype configuration
+tta.prototype:
+  enabled: true
+  components:
+    neo4j:
+      enabled: true
+      port: 7688
+      username: neo4j
+      password: password
+    app:
+      enabled: true
+      port: 8501
+
+# Docker configuration
+docker:
+  use_gpu: false
+  compose_profiles:
+    - default
