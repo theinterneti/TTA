@@ -30,11 +30,11 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.schema_manager = PlayerProfileSchemaManager()
-        self.mock_driver = Mock()
-        self.mock_session = Mock()
+        self.mock_driver = MagicMock()
+        self.mock_session = MagicMock()
         self.schema_manager.driver = self.mock_driver
+        # MagicMock provides __enter__/__exit__; we still set the session's __enter__ return
         self.mock_driver.session.return_value.__enter__.return_value = self.mock_session
-        self.mock_driver.session.return_value.__exit__.return_value = None
     
     def test_schema_manager_initialization(self):
         """Test schema manager initialization."""
@@ -53,11 +53,10 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
     @patch('src.player_experience.database.player_profile_schema.GraphDatabase')
     def test_connect_success(self, mock_graph_db):
         """Test successful database connection."""
-        mock_driver = Mock()
+        mock_driver = MagicMock()
         mock_graph_db.driver.return_value = mock_driver
-        mock_session = Mock()
+        mock_session = MagicMock()
         mock_driver.session.return_value.__enter__.return_value = mock_session
-        mock_driver.session.return_value.__exit__.return_value = None
         
         manager = PlayerProfileSchemaManager()
         manager.connect()
@@ -82,11 +81,11 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
     
     def test_disconnect(self):
         """Test database disconnection."""
-        mock_driver = Mock()
+        mock_driver = MagicMock()
         self.schema_manager.driver = mock_driver
-        
+
         self.schema_manager.disconnect()
-        
+
         mock_driver.close.assert_called_once()
         self.assertIsNone(self.schema_manager.driver)
     
@@ -264,11 +263,10 @@ class TestPlayerProfileRepository(unittest.TestCase):
     @patch('src.player_experience.database.player_profile_repository.GraphDatabase')
     def test_connect_success(self, mock_graph_db):
         """Test successful repository connection."""
-        mock_driver = Mock()
+        mock_driver = MagicMock()
         mock_graph_db.driver.return_value = mock_driver
-        mock_session = Mock()
+        mock_session = MagicMock()
         mock_driver.session.return_value.__enter__.return_value = mock_session
-        mock_driver.session.return_value.__exit__.return_value = None
         
         repo = PlayerProfileRepository()
         repo.connect()
