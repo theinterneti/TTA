@@ -29,6 +29,7 @@ import os
 import time
 import logging
 import subprocess
+from src.common.process_utils import run as safe_run
 import requests
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
@@ -192,14 +193,14 @@ class LLMComponent(Component):
         full_command = ["docker-compose", "-f", str(self.repo_dir / "docker-compose.yml")] + command
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
         
-        result = subprocess.run(
+        result = safe_run(
             full_command,
             cwd=str(self.repo_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             text=True,
+            timeout=180,
+            capture_output=True,
             check=False,
-            env=env
+            env=env,
         )
         
         return result

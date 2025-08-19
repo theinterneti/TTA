@@ -6,5 +6,5 @@
 # Get the directory of this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 
-# Run the main.py script with the provided arguments
-python "${SCRIPT_DIR}/src/main.py" "$@"
+# Run the main.py script with the provided arguments using UV
+uv run python "${SCRIPT_DIR}/src/main.py" "$@"

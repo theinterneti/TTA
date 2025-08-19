@@ -257,6 +257,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/docs",
         "/redoc",
         "/openapi.json",
+        "/metrics",  # gated by settings.debug inside the route
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/register",
@@ -281,8 +282,23 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         if request.method == "OPTIONS":
             return await call_next(request)
 
-        # Allow unauthenticated player creation explicitly (POST /api/v1/players/)
-        if request.method == "POST" and request.url.path == "/api/v1/players/":
+        # Allow unauthenticated player creation explicitly (POST /api/v1/players)
+        # BUT if an Authorization header is present, verify it and attach current_player to request.state
+        if request.method == "POST" and request.url.path.rstrip("/") == "/api/v1/players":
+            authorization = request.headers.get("Authorization")
+            if authorization:
+                try:
+                    scheme, token = authorization.split(" ", 1)
+                    if scheme.lower() == "bearer" and token:
+                        try:
+                            token_data = verify_token(token)
+                            request.state.current_player = token_data
+                        except AuthenticationError:
+                            # Ignore invalid token for this public endpoint; proceed unauthenticated
+                            pass
+                except ValueError:
+                    # Malformed Authorization header; ignore for public endpoint
+                    pass
             return await call_next(request)
 
         # Get authorization header

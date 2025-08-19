@@ -24,27 +24,29 @@ from .middleware import (
     SecurityHeadersMiddleware,
     TherapeuticSafetyMiddleware,
 )
-from .routers import auth, characters, players, worlds, chat, sessions
+from .routers import auth, characters, players, worlds, chat, sessions, progress
+from .routers import metrics as metrics_router
+
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Application lifespan manager.
-    
+
     Handles startup and shutdown events for the FastAPI application.
     """
     # Startup
     print("Starting Player Experience Interface API...")
-    
+
     # Initialize any required services here
     # e.g., database connections, cache connections, etc.
-    
+
     yield
-    
+
     # Shutdown
     print("Shutting down Player Experience Interface API...")
-    
+
     # Cleanup any resources here
     # e.g., close database connections, cache connections, etc.
 
@@ -52,10 +54,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 def create_app() -> FastAPI:
     """
     Create and configure the FastAPI application.
-    
+
     Returns:
         FastAPI: Configured FastAPI application instance
     """
+    import os
+
     app = FastAPI(
         title="Player Experience Interface API",
         description="API for the TTA Player Experience Interface",
@@ -65,7 +69,7 @@ def create_app() -> FastAPI:
         openapi_url="/openapi.json",
         lifespan=lifespan,
     )
-    
+
     # Configure CORS
     app.add_middleware(
         CORSMiddleware,
@@ -79,33 +83,42 @@ def create_app() -> FastAPI:
         allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
         allow_headers=["*"],
     )
-    
+
     # Add security middleware
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(TherapeuticSafetyMiddleware)
-    app.add_middleware(RateLimitMiddleware)
+
+    # Rate limiting (configurable via env for tests): PEI_RATE_LIMIT_CALLS/PEI_RATE_LIMIT_PERIOD
+    rl_calls = int(os.getenv("PEI_RATE_LIMIT_CALLS", "100"))
+    rl_period = int(os.getenv("PEI_RATE_LIMIT_PERIOD", "60"))
+    app.add_middleware(RateLimitMiddleware, calls=rl_calls, period=rl_period)
+
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(AuthenticationMiddleware)
-    
+
     # Include routers
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
     app.include_router(players.router, prefix="/api/v1/players", tags=["players"])
     app.include_router(characters.router, prefix="/api/v1/characters", tags=["characters"])
     app.include_router(worlds.router, prefix="/api/v1/worlds", tags=["worlds"])
     app.include_router(sessions.router, prefix="/api/v1/sessions", tags=["sessions"])
+    # Metrics (gated by settings.debug)
+    app.include_router(metrics_router.router, tags=["metrics"])
+    app.include_router(progress.router, prefix="/api/v1", tags=["progress"])
+
     # WebSocket endpoints (mounted under /ws)
     app.include_router(chat.router, prefix="/ws", tags=["chat"])
-    
+
     # Register exception handlers
     register_exception_handlers(app)
-    
+
     # Add root endpoints
     @app.get("/")
     async def root() -> dict[str, str]:
         """Root endpoint for health check."""
         return {"message": "Player Experience Interface API is running"}
-    
+
     @app.options("/")
     async def root_options() -> dict[str, str]:
         """OPTIONS handler for root endpoint."""
@@ -115,7 +128,7 @@ def create_app() -> FastAPI:
     async def health_check() -> dict[str, str]:
         """Health check endpoint."""
         return {"status": "healthy", "service": "player-experience-api"}
-    
+
     return app
 
 
@@ -143,12 +156,14 @@ def register_exception_handlers(app: FastAPI) -> None:
     async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
         """Handle request validation errors."""
         from fastapi.encoders import jsonable_encoder
+        errs = jsonable_encoder(exc.errors())
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "error": "Validation Error",
                 "message": "Invalid request data",
-                "details": jsonable_encoder(exc.errors()),
+                "details": errs,
+                "detail": errs,
             },
         )
 
@@ -189,11 +204,18 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle unexpected exceptions."""
+        # Log and include a minimal detail for easier test debugging
+        try:
+            import logging
+            logging.getLogger(__name__).error("Unhandled exception", exc_info=exc)
+        except Exception:
+            pass
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={
                 "error": "Internal Server Error",
                 "message": "An unexpected error occurred",
+                "detail": str(exc.__class__.__name__),
             },
         )
 

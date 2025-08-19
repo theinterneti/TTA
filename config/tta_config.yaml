@@ -26,6 +26,21 @@ tta.prototype:
     app:
       enabled: true
       port: 8501
+    narrative_arc_orchestrator:
+      enabled: true
+      port: 8502
+      max_concurrent_sessions: 100
+      narrative_scales:
+        short_term_window: 300  # 5 minutes
+        medium_term_window: 86400  # 1 day
+        long_term_window: 2592000  # 30 days
+        epic_term_window: 31536000  # 1 year
+      therapeutic_integration:
+        safety_check_interval: 60
+        therapeutic_weight: 0.3
+      emergent_generation:
+        probability_threshold: 0.7
+        complexity_limit: 5
 
 # Docker Configuration
 docker:
@@ -46,6 +61,38 @@ carbon:
   log_level: info
   measurement_interval: 15
   track_components: true
+
+# Player Experience Interface Configuration
+player_experience:
+  enabled: true
+  api:
+    host: "0.0.0.0"
+    port: 8080
+    cors_origins: 
+      - "http://localhost:3000"
+      - "https://localhost:3000"
+  web:
+    port: 3000
+    build_path: "build"
+  database:
+    redis_url: "redis://localhost:6379"
+    neo4j_url: "bolt://localhost:7687"
+    neo4j_username: "neo4j"
+    neo4j_password: "password"
+  security:
+    jwt_secret_key: "your-secret-key-change-in-production"
+    jwt_algorithm: "HS256"
+    jwt_expire_minutes: 30
+  therapeutic:
+    default_intensity: "medium"
+    crisis_detection_enabled: true
+    safety_monitoring_interval: 300
+  character_limits:
+    max_characters_per_player: 5
+    character_name_max_length: 50
+  world_management:
+    compatibility_threshold: 0.6
+    world_cache_ttl: 86400
 
 # Environment Configuration
 environment:
