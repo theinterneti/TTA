@@ -40,11 +40,12 @@ def neo4j_container(pytestconfig):
     # If CI provides a service, prefer it to avoid nested containers
     svc_uri = os.environ.get("TEST_NEO4J_URI")
     if svc_uri:
-        return {
+        yield {
             "uri": svc_uri,
             "username": os.environ.get("TEST_NEO4J_USERNAME", "neo4j"),
             "password": os.environ.get("TEST_NEO4J_PASSWORD", "testpassword"),
         }
+        return
 
     from testcontainers.neo4j import Neo4jContainer
     with (
@@ -75,9 +76,18 @@ def neo4j_driver(neo4j_container):
 def redis_container(pytestconfig):
     if not (pytestconfig.getoption("--redis") or os.environ.get("RUN_REDIS_TESTS") in {"1","true","True"}):
         pytest.skip("Redis container not requested; use --redis or RUN_REDIS_TESTS=1")
+
+    # Prefer CI-provided service if available
+    svc_uri = os.environ.get("TEST_REDIS_URI")
+    if svc_uri:
+        yield svc_uri
+        return
+
     from testcontainers.redis import RedisContainer
     with RedisContainer("redis:7") as rc:
-        yield rc.get_connection_url()
+        host = rc.get_container_host_ip()
+        port = rc.get_exposed_port(6379)
+        yield f"redis://{host}:{port}/0"
 
 
 import pytest_asyncio

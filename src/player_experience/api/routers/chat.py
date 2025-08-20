@@ -252,8 +252,19 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 # Recommendations
                 recs = psm.get_adaptive_recommendations(player_id, context={"session_id": session_id})
                 # Build assistant response with optional safety block and interactive resources
+                # Ensure metadata is JSON-serializable (avoid datetimes)
+                safe_recs: List[Dict[str, Any]] = [
+                    {
+                        "recommendation_id": getattr(r, "recommendation_id", getattr(r, "id", "")),
+                        "title": getattr(r, "title", ""),
+                        "description": getattr(r, "description", ""),
+                        "recommendation_type": getattr(r, "recommendation_type", getattr(r, "type", "")),
+                        "priority": int(getattr(r, "priority", 1)),
+                    }
+                    for r in (recs or [])
+                ]
                 reply_metadata: Dict[str, Any] = {
-                    "recommendations": [getattr(r, "__dict__", {}) for r in (recs or [])],
+                    "recommendations": safe_recs,
                     "safety": {"crisis": bool(crisis_detected), "types": [ct.value for ct in crisis_types] if crisis_detected else []},
                 }
                 reply_content: Dict[str, Any] = {"text": adapted.get("adapted_content", text)}
