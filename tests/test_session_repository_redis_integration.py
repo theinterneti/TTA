@@ -27,8 +27,7 @@ async def test_session_repository_redis_cache_roundtrip(redis_client):
         therapeutic_interventions_used=[],
         therapeutic_settings=TherapeuticSettings(
             preferred_approaches=[TherapeuticApproach.CBT],
-            intensity_level="medium",
-            session_duration_preference=30,
+            intensity_level=0.5,
         ),
     )
 

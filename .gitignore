@@ -1,9 +1,17 @@
-# Python
+# TTA .gitignore — curated for Python (uv), pytest, Neo4j, Redis, Docker, Nix, and common tooling
+
+# -------------------------------------------------
+# 1) Python bytecode and interpreter artifacts
+# -------------------------------------------------
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+
+# -------------------------------------------------
+# 2) Build, packaging, and distribution artifacts
+# -------------------------------------------------
 build/
 develop-eggs/
 dist/
@@ -20,7 +28,9 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual Environment
+# -------------------------------------------------
+# 3) Virtual environments (uv/venv/virtualenv/pyenv local)
+# -------------------------------------------------
 .env
 .venv
 env/
@@ -28,47 +38,130 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.python-version
 
-# Docker
-.docker/
+# -------------------------------------------------
+# 4) Testing & coverage outputs
+# -------------------------------------------------
+.pytest_cache/
+.nox/
+.hypothesis/
+.benchmarks/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+junit*.xml
+.tox/
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
+# -------------------------------------------------
+# 5) Tool caches (linters/type checkers/etc.)
+# -------------------------------------------------
+.mypy_cache/
+.ruff_cache/
+.pytype/
+.pyre/
+.pyright/
+.cache/
 
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# Logs
+# -------------------------------------------------
+# 6) Logs and temporary files
+# -------------------------------------------------
 logs/
 *.log
+*.tmp
+*.temp
+.tmp/
+.tmp/*
+tmp/
+temp/
 
-# Cache directories
-.cache/
-.model_cache/
-huggingface-cache/
-
-# Data
+# -------------------------------------------------
+# 7) Data & databases (local dev data only)
+#    NOTE: This ignores generic data directories and common local DB files.
+#    Adjust if you need to commit data samples.
+# -------------------------------------------------
 data/
 *.db
 *.sqlite3
 
-# Neo4j
+# Neo4j (root-level and dev environment)
 neo4j/data/
 neo4j/logs/
 neo4j/plugins/
+# tta.dev Neo4j mounts
+tta.dev/neo4j/data/
+tta.dev/neo4j/logs/
+tta.dev/neo4j/import/
+tta.dev/neo4j/plugins/
 
-# Temporary files
-tmp/
-temp/
+# Redis (common local data directories / dumps)
+redis/
+redis-data/
+dump.rdb
 
-# OS specific
+# -------------------------------------------------
+# 8) Environment & secrets (do NOT commit secrets)
+# -------------------------------------------------
+.env
+.env.*
+*.env
+*.env.*
+.secrets/
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.der
+*.jks
+
+# -------------------------------------------------
+# 9) IDE/editor project files
+# -------------------------------------------------
+.idea/
+.vscode/
+*.iml
+*.swp
+*.swo
+.history/
+*.code-workspace
+
+# -------------------------------------------------
+# 10) OS-specific noise
+# -------------------------------------------------
 .DS_Store
+._*
 Thumbs.db
+ehthumbs.db
+Icon?
+.AppleDouble
+.LSOverride
+
+# -------------------------------------------------
+# 11) Docker & containers
+# -------------------------------------------------
+.docker/
+# If you create local bind-mount directories for volumes, ignore them here:
+# docker-data/
+
+# -------------------------------------------------
+# 12) Nix & direnv (local dev tooling)
+# -------------------------------------------------
+result
+result-*
+.direnv/
+.envrc
+
+# -------------------------------------------------
+# 13) Project-specific caches and generated assets
+# -------------------------------------------------
+.model_cache/
+huggingface-cache/
 
 # Exclude specific directories that will be managed as submodules
-# We'll add these back as submodules
+# (These entries do not remove tracked files; they prevent new files from being added.)
 /tta.dev/*
+# Corrected prototype ignore (case-sensitive fix); keep the old line for safety below
+/tta.prototype/*
 /TTA.prototype/*

@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
 
 from src.player_experience.database.player_profile_schema import PlayerProfileSchemaManager
 from src.player_experience.database.player_profile_repository import PlayerProfileRepository
@@ -12,9 +12,9 @@ def test_schema_manager_setup_parametrized(mode, neo4j_container):
     if mode == "mock":
         mgr = PlayerProfileSchemaManager()
         # Inject mock driver
-        mock_driver = Mock()
-        mock_session_ctx = Mock()
-        mock_session = Mock()
+        mock_driver = MagicMock()
+        mock_session_ctx = MagicMock()
+        mock_session = MagicMock()
         mock_session_ctx.__enter__.return_value = mock_session
         mock_session_ctx.__exit__.return_value = None
         mock_driver.session.return_value = mock_session_ctx
@@ -38,9 +38,9 @@ def test_schema_manager_setup_parametrized(mode, neo4j_container):
 def test_repository_crud_parametrized(mode, neo4j_container):
     if mode == "mock":
         repo = PlayerProfileRepository()
-        mock_driver = Mock()
-        mock_session_ctx = Mock()
-        mock_session = Mock()
+        mock_driver = MagicMock()
+        mock_session_ctx = MagicMock()
+        mock_session = MagicMock()
         mock_session_ctx.__enter__.return_value = mock_session
         mock_session_ctx.__exit__.return_value = None
         mock_driver.session.return_value = mock_session_ctx
