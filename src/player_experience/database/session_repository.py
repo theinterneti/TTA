@@ -316,20 +316,22 @@ class SessionRepository:
             })
             """
             
+            # Use serializer to ensure enums and datetimes are converted
+            _data = self._serialize_session_context(session)
             await neo4j_session.run(query, {
-                'session_id': session.session_id,
-                'player_id': session.player_id,
-                'character_id': session.character_id,
-                'world_id': session.world_id,
-                'status': session.status.value,
-                'created_at': session.created_at.isoformat(),
-                'last_interaction': session.last_interaction.isoformat(),
-                'interaction_count': session.interaction_count,
-                'total_duration_minutes': session.total_duration_minutes,
-                'current_scene_id': session.current_scene_id,
-                'session_variables': json.dumps(session.session_variables),
-                'therapeutic_interventions_used': session.therapeutic_interventions_used,
-                'therapeutic_settings': json.dumps(asdict(session.therapeutic_settings))
+                'session_id': _data['session_id'],
+                'player_id': _data['player_id'],
+                'character_id': _data['character_id'],
+                'world_id': _data['world_id'],
+                'status': _data['status'],
+                'created_at': _data['created_at'],
+                'last_interaction': _data['last_interaction'],
+                'interaction_count': _data['interaction_count'],
+                'total_duration_minutes': _data['total_duration_minutes'],
+                'current_scene_id': _data['current_scene_id'],
+                'session_variables': json.dumps(_data['session_variables']),
+                'therapeutic_interventions_used': _data['therapeutic_interventions_used'],
+                'therapeutic_settings': json.dumps(_data['therapeutic_settings'])
             })
     
     async def _update_session_in_neo4j(self, session: SessionContext) -> None:
@@ -347,16 +349,17 @@ class SessionRepository:
                 s.therapeutic_settings = $therapeutic_settings
             """
             
+            _data = self._serialize_session_context(session)
             await neo4j_session.run(query, {
-                'session_id': session.session_id,
-                'status': session.status.value,
-                'last_interaction': session.last_interaction.isoformat(),
-                'interaction_count': session.interaction_count,
-                'total_duration_minutes': session.total_duration_minutes,
-                'current_scene_id': session.current_scene_id,
-                'session_variables': json.dumps(session.session_variables),
-                'therapeutic_interventions_used': session.therapeutic_interventions_used,
-                'therapeutic_settings': json.dumps(asdict(session.therapeutic_settings))
+                'session_id': _data['session_id'],
+                'status': _data['status'],
+                'last_interaction': _data['last_interaction'],
+                'interaction_count': _data['interaction_count'],
+                'total_duration_minutes': _data['total_duration_minutes'],
+                'current_scene_id': _data['current_scene_id'],
+                'session_variables': json.dumps(_data['session_variables']),
+                'therapeutic_interventions_used': _data['therapeutic_interventions_used'],
+                'therapeutic_settings': json.dumps(_data['therapeutic_settings'])
             })
     
     async def _get_session_from_neo4j(self, session_id: str) -> Optional[SessionContext]:
