@@ -28,11 +28,6 @@ class TestSessionRepository(unittest.TestCase):
         """Set up test fixtures."""
         self.mock_redis = AsyncMock()
         self.mock_neo4j_driver = MagicMock()
-        # Ensure async context manager is returned by driver.session()
-        _cm = AsyncMock()
-        _cm.__aenter__ = AsyncMock()
-        _cm.__aexit__ = AsyncMock(return_value=None)
-        self.mock_neo4j_driver.session.return_value = _cm
         self.repository = SessionRepository(
             redis_client=self.mock_redis,
             neo4j_driver=self.mock_neo4j_driver
@@ -508,11 +503,6 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         """Set up integration test fixtures."""
         self.mock_redis = AsyncMock()
         self.mock_neo4j_driver = MagicMock()
-        # Ensure async context manager is returned by driver.session()
-        _cm = AsyncMock()
-        _cm.__aenter__ = AsyncMock()
-        _cm.__aexit__ = AsyncMock(return_value=None)
-        self.mock_neo4j_driver.session.return_value = _cm
         self.mock_narrative_engine = AsyncMock()
 
         self.repository = SessionRepository(
