@@ -100,6 +100,7 @@ dependencies = [
     "sigopt>=8.8.0",
     "python-json-logger>=3.3.0",
     "bleach>=6.2.0",
+    "prometheus-client>=0.22.1",
 ]
 
 [project.optional-dependencies]

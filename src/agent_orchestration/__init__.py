@@ -14,7 +14,13 @@ from .models import (
     OrchestrationRequest,
     OrchestrationResponse,
 )
-from .messaging import MessageResult, MessageSubscription, QueueMessage
+from .messaging import (
+    MessageResult,
+    MessageSubscription,
+    QueueMessage,
+    ReceivedMessage,
+    FailureType,
+)
 from .interfaces import MessageCoordinator, AgentProxy
 from .state import AgentContext, AgentState, SessionContext, AgentRuntimeStatus
 from .workflow import (
@@ -37,6 +43,8 @@ __all__ = [
     "MessageResult",
     "MessageSubscription",
     "QueueMessage",
+    "ReceivedMessage",
+    "FailureType",
     "MessageCoordinator",
     "AgentProxy",
     "AgentContext",

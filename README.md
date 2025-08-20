@@ -86,3 +86,39 @@ To run the tests for the TTA project, use the following command:
 ```bash
 python -m unittest discover tests
 ```
+
+## Agent Orchestration Diagnostics (Local)
+
+Enable the diagnostics server for the Agent Orchestration component to inspect health and metrics locally.
+
+- Configuration keys (example values for local dev):
+
+  - `agent_orchestration.diagnostics.enabled = true`
+  - `agent_orchestration.port = 8503` # default if unset
+  - `player_experience.api.redis_url = redis://localhost:6379/0`
+
+- Start the Agent Orchestration component (via orchestrator):
+
+```bash
+# Enables diagnostics in memory; adjust your config source accordingly
+./tta.sh start agent_orchestration
+```
+
+- Endpoints (bound to 127.0.0.1):
+
+  - JSON snapshot: http://127.0.0.1:8503/metrics
+  - Prometheus format: http://127.0.0.1:8503/metrics-prom
+  - Health: http://127.0.0.1:8503/health
+
+- Notes:
+  - The server only starts if `agent_orchestration.diagnostics.enabled=true`
+  - Override the default port with `agent_orchestration.port`
+  - Prometheus endpoint requires `prometheus_client` (installed automatically in dev)
+
+## Admin: Manual Message Recovery
+
+Trigger global recovery and print per-agent stats using the CLI:
+
+```bash
+uv run python src/main.py admin recover redis://localhost:6379/0 --key-prefix ao
+```

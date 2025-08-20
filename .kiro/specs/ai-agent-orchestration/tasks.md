@@ -48,6 +48,7 @@
 
 - [ ] 4. Build message coordination system
 - [x] 4.1 Implement MessageCoordinator with Redis backend
+- [x] 4.2 Add message reliability and error handling
 
 - Testing/Verification
 
@@ -57,12 +58,17 @@
   - Warnings filters added for noise reduction
 
   - Implemented RedisMessageCoordinator (src/agent_orchestration/coordinators/redis_message_coordinator.py):
-    - send_message: enqueues QueueMessage to per-recipient Redis list (namespaced key)
+    - send_message: enqueue with priority and audit list; backpressure on overflow
     - broadcast_message: loops send over provided recipients
     - subscribe_to_messages: records subscribed message types in Redis set (best-effort)
+    - receive: reserves next message by priority then FIFO with visibility timeout
+    - ack: removes reservation and underlying message
+    - nack: supports transient/permanent failures; exponential backoff and DLQ
+    - recover_pending: reclaims timed-out reservations back to ready queues
   - Added tests in tests/agent_orchestration/test_redis_message_coordinator.py verifying enqueue, broadcast, and subscription storage using @redis fixtures
-  - Deferred reliability concerns (retries, ordering, recovery) to Task 4.2
-  - _Requirements: 2.1, 2.2, 2.3, 2.4_
+  - Added reliability tests in tests/agent_orchestration/test_redis_message_reliability.py for priority ordering, exponential backoff, visibility-timeout recovery, and overflow handling
+  - Added metrics and auto-recovery tests in tests/agent_orchestration/test_metrics_and_startup_recovery.py
+  - _Requirements: 2.2, 2.3, 2.4, 6.1, 6.2_
 
 - [ ] 4.2 Add message reliability and error handling
 
