@@ -27,7 +27,7 @@ class TestSessionRepository(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.mock_redis = AsyncMock()
-        self.mock_neo4j_driver = AsyncMock()
+        self.mock_neo4j_driver = MagicMock()
         self.repository = SessionRepository(
             redis_client=self.mock_redis,
             neo4j_driver=self.mock_neo4j_driver
@@ -502,7 +502,7 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
     def setUp(self):
         """Set up integration test fixtures."""
         self.mock_redis = AsyncMock()
-        self.mock_neo4j_driver = AsyncMock()
+        self.mock_neo4j_driver = MagicMock()
         self.mock_narrative_engine = AsyncMock()
 
         self.repository = SessionRepository(
