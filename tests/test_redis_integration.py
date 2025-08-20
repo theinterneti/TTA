@@ -1,3 +1,5 @@
+# CI retrigger: ensure sync Redis fixture is used consistently
+
 import os
 import pytest
 
