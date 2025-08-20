@@ -47,7 +47,7 @@
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
 - [ ] 4. Build message coordination system
-- [ ] 4.1 Implement MessageCoordinator with Redis backend
+- [x] 4.1 Implement MessageCoordinator with Redis backend
 
 - Testing/Verification
 
@@ -56,9 +56,12 @@
   - New marks available: @integration; use `-m "not integration"` to skip
   - Warnings filters added for noise reduction
 
-  - Write MessageCoordinator class with Redis message queue integration
-  - Implement message routing, delivery, and acknowledgment mechanisms
-  - Create message subscription and broadcasting functionality
+  - Implemented RedisMessageCoordinator (src/agent_orchestration/coordinators/redis_message_coordinator.py):
+    - send_message: enqueues QueueMessage to per-recipient Redis list (namespaced key)
+    - broadcast_message: loops send over provided recipients
+    - subscribe_to_messages: records subscribed message types in Redis set (best-effort)
+  - Added tests in tests/agent_orchestration/test_redis_message_coordinator.py verifying enqueue, broadcast, and subscription storage using @redis fixtures
+  - Deferred reliability concerns (retries, ordering, recovery) to Task 4.2
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
 - [ ] 4.2 Add message reliability and error handling
