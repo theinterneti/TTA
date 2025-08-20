@@ -523,7 +523,21 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         self.mock_redis.get = AsyncMock(return_value=None)
 
         mock_neo4j_session = AsyncMock()
-        mock_neo4j_session.run = AsyncMock()
+        # For retrieval during pause/resume/end, return a record-like mapping
+        neo4j_session_dict = {
+            'session_id': 'session_test',
+            'player_id': 'player_123',
+            'character_id': 'char_123',
+            'world_id': 'world_123',
+            'status': 'active',
+            'created_at': datetime.now().isoformat(),
+            'last_interaction': datetime.now().isoformat(),
+            'session_variables': '{}',
+            'therapeutic_settings': '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}'
+        }
+        mock_result = AsyncMock()
+        mock_result.single = AsyncMock(return_value={'s': neo4j_session_dict})
+        mock_neo4j_session.run = AsyncMock(return_value=mock_result)
 
         # Create a proper async context manager mock
         async_context_manager = AsyncMock()
