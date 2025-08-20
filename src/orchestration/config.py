@@ -95,7 +95,7 @@ class TTAConfig:
             # Determine file format based on extension
             if self.config_path.suffix.lower() in ['.yaml', '.yml']:
                 with open(self.config_path, 'r') as f:
-                    self.config = yaml.safe_load(f)
+                    self.config = yaml.safe_load(f) or {}
             elif self.config_path.suffix.lower() == '.json':
                 with open(self.config_path, 'r') as f:
                     self.config = json.load(f)
@@ -105,6 +105,8 @@ class TTAConfig:
                 return
 
             logger.info(f"Loaded configuration from {self.config_path}")
+            # Ensure agent_orchestration block exists for backward compatibility
+            self.config.setdefault("agent_orchestration", {"enabled": False, "port": 8503})
         except Exception as e:
             logger.error(f"Error loading config file: {e}")
             self.config = self._get_default_config()
@@ -147,6 +149,10 @@ class TTAConfig:
                         "port": 8501
                     }
                 }
+            },
+            "agent_orchestration": {
+                "enabled": False,
+                "port": 8503
             },
             "docker": {
                 "enabled": True,
@@ -234,20 +240,38 @@ class TTAConfig:
         Get a configuration value.
 
         Args:
-            key: Configuration key, can be nested using dots (e.g., "tta.dev.enabled")
+            key: Configuration key, can be nested using dots (e.g., "tta.dev.enabled").
+                 Supports repository keys that include a dot (e.g., "tta.dev", "tta.prototype").
             default: Default value to return if the key is not found
 
         Returns:
             Any: Configuration value, or default if not found
         """
         keys = key.split(".")
-        value = self.config
+        value: Any = self.config
 
-        for k in keys:
-            if isinstance(value, dict) and k in value:
-                value = value[k]
-            else:
+        i = 0
+        while i < len(keys):
+            if not isinstance(value, dict):
                 return default
+
+            # Direct key lookup
+            k = keys[i]
+            if k in value:
+                value = value[k]
+                i += 1
+                continue
+
+            # Support compound repository keys like "tta.dev" or "tta.prototype"
+            if i + 1 < len(keys):
+                compound = f"{keys[i]}.{keys[i+1]}"
+                if compound in value:
+                    value = value[compound]
+                    i += 2
+                    continue
+
+            # Not found
+            return default
 
         return value
 
@@ -408,6 +432,14 @@ class TTAConfig:
                 "schema": {
                     "enabled": {"type": "bool", "required": True},
                     "components": {"type": "dict", "required": True}
+                }
+            },
+            "agent_orchestration": {
+                "type": "dict",
+                "required": True,
+                "schema": {
+                    "enabled": {"type": "bool", "required": True},
+                    "port": {"type": "int", "required": True}
                 }
             },
             "docker": {

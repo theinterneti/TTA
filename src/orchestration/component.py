@@ -114,12 +114,16 @@ class Component:
                 self.status = ComponentStatus.RUNNING
                 logger.info(f"Component {self.name} started successfully")
             else:
-                self.status = ComponentStatus.ERROR
+                # Allow subclass to signal a graceful STOPPED state on failure
+                if self.status not in (ComponentStatus.STOPPED, ComponentStatus.RUNNING):
+                    self.status = ComponentStatus.ERROR
                 logger.error(f"Failed to start component {self.name}")
-            
+
             return success
         except Exception as e:
-            self.status = ComponentStatus.ERROR
+            # Allow subclass to pre-set STOPPED; otherwise mark as ERROR
+            if self.status not in (ComponentStatus.STOPPED, ComponentStatus.RUNNING):
+                self.status = ComponentStatus.ERROR
             logger.error(f"Error starting component {self.name}: {e}")
             return False
     

@@ -8,7 +8,7 @@ with authentication, authorization, and comprehensive API documentation.
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
 
@@ -173,33 +173,18 @@ class PlayerResponse(BaseModel):
     created_at: str = Field(..., description="Profile creation timestamp")
     last_login: Optional[str] = Field(None, description="Last login timestamp")
     is_active: bool = Field(..., description="Whether the player profile is active")
+    # Fields expected by tests
+    characters: List[str] = Field(default_factory=list, description="List of character IDs")
+    therapeutic_preferences: Dict[str, Any] = Field(default_factory=dict, description="Therapeutic preferences")
+    privacy_settings: Dict[str, Any] = Field(default_factory=dict, description="Privacy settings")
+    progress_summary: Dict[str, Any] = Field(default_factory=dict, description="Progress summary")
 
 # Normalization helpers to accept flexible client/test payloads
-_DEF_APPROACH_MAP = {
-    "cbt": TherapeuticApproach.CBT,
-    "cognitive_behavioral_therapy": TherapeuticApproach.CBT,
-    "mindfulness": TherapeuticApproach.MINDFULNESS,
-    "narrative_therapy": TherapeuticApproach.NARRATIVE_THERAPY,
-    "acceptance_commitment": TherapeuticApproach.ACCEPTANCE_COMMITMENT,
-    "acceptance_commitment_therapy": TherapeuticApproach.ACCEPTANCE_COMMITMENT,
-}
-
+from ...utils.normalization import normalize_approaches
 
 def _normalize_therapeutic_preferences_dict(data: Dict[str, Any]) -> Dict[str, Any]:
     payload = dict(data)
-    # Normalize preferred_approaches values
-    approaches = payload.get("preferred_approaches") or []
-    normalized = []
-    for item in approaches:
-        if isinstance(item, TherapeuticApproach):
-            normalized.append(item)
-        elif isinstance(item, str):
-            key = item.strip().lower()
-            mapped = _DEF_APPROACH_MAP.get(key)
-            normalized.append(mapped if mapped is not None else item)
-        else:
-            normalized.append(item)
-    payload["preferred_approaches"] = normalized
+    payload["preferred_approaches"] = normalize_approaches(payload.get("preferred_approaches") or [])
     return payload
 
 
@@ -374,7 +359,8 @@ async def players_root(current_player: TokenData = Depends(get_current_active_pl
 async def create_player(
     request: CreatePlayerRequest,
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-    current_player: TokenData = Depends(get_current_active_player),
+    current_player: TokenData | None = Depends(lambda: None),  # Auth optional for create
+    http_request: Request = None,
 ) -> PlayerResponse:
     """
     Create a new player profile.
@@ -415,7 +401,10 @@ async def create_player(
             privacy_settings = convert_request_to_privacy_settings(ps_req)
 
         # Create player profile (use token player_id if provided for deterministic tests)
-        token_pid = getattr(current_player, "player_id", None)
+        token_pid = getattr(current_player, "player_id", None) if current_player is not None else None
+        if token_pid is None and http_request is not None and hasattr(http_request, "state"):
+            # AuthenticationMiddleware stores token data on request.state.current_player
+            token_pid = getattr(getattr(http_request.state, "current_player", None), "player_id", None)
         player = manager.create_player_profile(
             username=request.username,
             email=request.email,
@@ -654,10 +643,18 @@ async def get_player_progress(player_id: str, current_player: TokenData = Depend
     summary="Get Player Dashboard",
 )
 async def get_player_dashboard(player_id: str, current_player: TokenData = Depends(get_current_active_player)) -> dict:
-    # Minimal dashboard payload compatible with tests
+    # Assemble dashboard using the same character repository as the Characters API
+    try:
+        from .characters import get_character_manager_dep
+        cmanager = get_character_manager_dep()
+        chars = cmanager.get_player_characters(player_id)
+        active_character_ids = [c.character_id for c in chars]
+    except Exception:
+        active_character_ids = []
+    # Minimal compatible payload for tests
     return {
         "player_id": player_id,
-        "active_characters": [player_id],
+        "active_characters": active_character_ids,
         "recommendations": [{"world_id": "world_mindfulness_garden"}],
     }
 

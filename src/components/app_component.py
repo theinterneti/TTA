@@ -29,6 +29,7 @@ import os
 import time
 import logging
 import subprocess
+from src.common.process_utils import run as safe_run
 import requests
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
@@ -175,13 +176,13 @@ class AppComponent(Component):
         full_command = ["docker-compose", "-f", str(self.repo_dir / "docker-compose.yml")] + command
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
         
-        result = subprocess.run(
+        result = safe_run(
             full_command,
             cwd=str(self.repo_dir),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
             text=True,
-            check=False
+            timeout=180,
+            capture_output=True,
+            check=False,
         )
         
         return result
@@ -195,12 +196,12 @@ class AppComponent(Component):
         """
         try:
             # Check if the App port is open
-            result = subprocess.run(
+            result = safe_run(
                 ["docker", "ps", "--filter", f"publish={self.port}", "--format", "{{.Names}}"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
                 text=True,
-                check=False
+                timeout=60,
+                capture_output=True,
+                check=False,
             )
             
             return bool(result.stdout.strip())

@@ -28,6 +28,7 @@ Example:
 import os
 import logging
 import subprocess
+from src.common.process_utils import run as safe_run
 import shutil
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union, cast
@@ -132,12 +133,12 @@ class DockerComponent(Component):
             RuntimeError: If Docker is not installed
         """
         try:
-            result = subprocess.run(
+            result = safe_run(
                 ["docker", "--version"],
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
                 text=True,
-                check=False
+                timeout=60,
+                capture_output=True,
+                check=False,
             )
 
             if result.returncode != 0:
