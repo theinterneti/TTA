@@ -523,8 +523,8 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         self.mock_redis.get = AsyncMock(return_value=None)
 
         mock_neo4j_session = AsyncMock()
-        # For retrieval during pause/resume/end, return a record-like mapping
-        neo4j_session_dict = {
+        # Maintain mutable 'node' state to reflect updates and retrievals
+        current_node = {
             'session_id': 'session_test',
             'player_id': 'player_123',
             'character_id': 'char_123',
@@ -535,9 +535,24 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
             'session_variables': '{}',
             'therapeutic_settings': '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}'
         }
-        mock_result = AsyncMock()
-        mock_result.single = AsyncMock(return_value={'s': neo4j_session_dict})
-        mock_neo4j_session.run = AsyncMock(return_value=mock_result)
+
+        async def run_side_effect(query, params=None):
+            if query and 'SET s.status' in query:
+                # Update path; persist new status and last_interaction if provided
+                if params and 'status' in params:
+                    current_node['status'] = params['status']
+                if params and 'last_interaction' in params:
+                    current_node['last_interaction'] = params['last_interaction']
+                m = AsyncMock()
+                return m
+            if query and 'RETURN s' in query:
+                m = AsyncMock()
+                m.single = AsyncMock(return_value={'s': current_node})
+                return m
+            # CREATE or other queries
+            return AsyncMock()
+
+        mock_neo4j_session.run = AsyncMock(side_effect=run_side_effect)
 
         # Create a proper async context manager mock
         async_context_manager = AsyncMock()
