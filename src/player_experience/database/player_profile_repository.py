@@ -348,27 +348,52 @@ class PlayerProfileRepository:
                     progress_summary.milestones_achieved = progress_summary_data.get("milestones_achieved", 0)
                     progress_summary.current_streak_days = progress_summary_data.get("current_streak_days", 0)
                     progress_summary.longest_streak_days = progress_summary_data.get("longest_streak_days", 0)
-                    
+
                     fav_approach = progress_summary_data.get("favorite_therapeutic_approach")
                     if fav_approach:
                         progress_summary.favorite_therapeutic_approach = TherapeuticApproach(fav_approach)
-                    
+
                     progress_summary.most_effective_world_type = progress_summary_data.get("most_effective_world_type")
-                    
-                    last_session_str = progress_summary_data.get("last_session_date")
-                    if last_session_str:
-                        progress_summary.last_session_date = datetime.fromisoformat(last_session_str)
-                    
-                    next_session_str = progress_summary_data.get("next_recommended_session")
-                    if next_session_str:
-                        progress_summary.next_recommended_session = datetime.fromisoformat(next_session_str)
-                
-                # Defensive parsing for datetimes and JSON
-                def _to_dt_profile(val):
-                    if val is None:
+
+                    def _to_datetime(val):
+                        if isinstance(val, datetime):
+                            return val
+                        if val is None:
+                            return None
+                        # Neo4j temporal objects often expose to_native()
+                        conv = getattr(val, "to_native", None)
+                        if callable(conv):
+                            try:
+                                return conv()
+                            except Exception:
+                                pass
+                        if isinstance(val, str):
+                            try:
+                                return datetime.fromisoformat(val)
+                            except Exception:
+                                return None
                         return None
+
+                    last_session_val = progress_summary_data.get("last_session_date")
+                    parsed_last = _to_datetime(last_session_val)
+                    if parsed_last:
+                        progress_summary.last_session_date = parsed_last
+
+                    next_session_val = progress_summary_data.get("next_recommended_session")
+                    parsed_next = _to_datetime(next_session_val)
+                    if parsed_next:
+                        progress_summary.next_recommended_session = parsed_next
+
+                # Reconstruct player profile
+                def _to_dt_profile(val):
                     if isinstance(val, datetime):
                         return val
+                    conv = getattr(val, "to_native", None)
+                    if callable(conv):
+                        try:
+                            return conv()
+                        except Exception:
+                            pass
                     if isinstance(val, str):
                         try:
                             return datetime.fromisoformat(val)
@@ -376,9 +401,12 @@ class PlayerProfileRepository:
                             return None
                     return None
 
-                created_at_dt = _to_dt_profile(player_data.get("created_at")) or datetime.utcnow()
-                last_login_dt = _to_dt_profile(player_data.get("last_login")) if player_data.get("last_login") else None
+                created_at_val = player_data.get("created_at")
+                created_at_dt = _to_dt_profile(created_at_val) or datetime.utcnow()
+                last_login_val = player_data.get("last_login")
+                last_login_dt = _to_dt_profile(last_login_val) if last_login_val else None
 
+                # Safely parse active_sessions whether stored as JSON string or already a dict
                 _active_raw = player_data.get("active_sessions", "{}")
                 if isinstance(_active_raw, str):
                     try:
@@ -388,7 +416,6 @@ class PlayerProfileRepository:
                 else:
                     _active_parsed = _active_raw or {}
 
-                # Reconstruct player profile
                 profile = PlayerProfile(
                     player_id=player_data["player_id"],
                     username=player_data["username"],
