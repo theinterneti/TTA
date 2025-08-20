@@ -16,7 +16,7 @@ graph TB
         UI[Web Chat Interface]
         API[REST/WebSocket API]
     end
-    
+
     subgraph "AI Agent Orchestration System"
         AOS[Agent Orchestration Service]
         WM[Workflow Manager]
@@ -24,43 +24,43 @@ graph TB
         RM[Resource Manager]
         PM[Performance Monitor]
     end
-    
+
     subgraph "AI Agents"
         IPA[Input Processor Agent]
         WBA[World Builder Agent]
         NGA[Narrative Generator Agent]
     end
-    
+
     subgraph "Supporting Systems"
         DTS[Dynamic Tool System]
         KG[Neo4j Knowledge Graph]
         VS[Validation System]
         CS[Configuration System]
     end
-    
+
     UI --> API
     API --> AOS
     AOS --> WM
     AOS --> MC
     AOS --> RM
     AOS --> PM
-    
+
     WM --> IPA
     WM --> WBA
     WM --> NGA
-    
+
     MC <--> IPA
     MC <--> WBA
     MC <--> NGA
-    
+
     IPA --> DTS
     WBA --> DTS
     NGA --> DTS
-    
+
     IPA --> KG
     WBA --> KG
     NGA --> KG
-    
+
     AOS --> VS
     AOS --> CS
 ```
@@ -80,6 +80,7 @@ The orchestration system integrates with existing TTA components:
 ### 1. Agent Orchestration Service (AOS)
 
 **Primary Interface:**
+
 ```python
 class AgentOrchestrationService(Component):
     def __init__(self, config: TTAConfig):
@@ -87,21 +88,22 @@ class AgentOrchestrationService(Component):
             name="agent_orchestration",
             dependencies=["neo4j", "llm", "redis"]
         )
-        
+
     async def process_user_input(
-        self, 
-        user_input: str, 
+        self,
+        user_input: str,
         session_context: SessionContext
     ) -> OrchestrationResponse
-    
+
     async def coordinate_agents(
-        self, 
+        self,
         workflow_type: WorkflowType,
         context: AgentContext
     ) -> WorkflowResult
 ```
 
 **Key Responsibilities:**
+
 - Route incoming requests to appropriate workflows
 - Coordinate agent execution sequences
 - Manage session state and context
@@ -111,6 +113,7 @@ class AgentOrchestrationService(Component):
 ### 2. Workflow Manager
 
 **Primary Interface:**
+
 ```python
 class WorkflowManager:
     async def execute_workflow(
@@ -118,13 +121,13 @@ class WorkflowManager:
         workflow_definition: WorkflowDefinition,
         initial_context: AgentContext
     ) -> WorkflowResult
-    
+
     def register_workflow(
         self,
         workflow_type: WorkflowType,
         definition: WorkflowDefinition
     ) -> None
-    
+
     async def get_workflow_status(
         self,
         workflow_id: str
@@ -132,6 +135,7 @@ class WorkflowManager:
 ```
 
 **Workflow Types:**
+
 - **Input Processing Workflow**: IPA → Context Analysis → Routing Decision
 - **World Building Workflow**: WBA → World State Update → Validation
 - **Narrative Generation Workflow**: NGA → Content Generation → Safety Check
@@ -140,6 +144,7 @@ class WorkflowManager:
 ### 3. Message Coordinator
 
 **Primary Interface:**
+
 ```python
 class MessageCoordinator:
     async def send_message(
@@ -148,22 +153,30 @@ class MessageCoordinator:
         recipient: AgentId,
         message: AgentMessage
     ) -> MessageResult
-    
+
     async def broadcast_message(
         self,
         sender: AgentId,
         message: AgentMessage,
         recipients: List[AgentId]
     ) -> List[MessageResult]
-    
+
     def subscribe_to_messages(
         self,
         agent_id: AgentId,
         message_types: List[MessageType]
     ) -> MessageSubscription
+
+    # Reliability extensions (Task 4.2)
+    async def receive(self, agent_id: AgentId, visibility_timeout: int = 5) -> Optional[ReceivedMessage]
+    async def ack(self, agent_id: AgentId, token: str) -> bool
+    async def nack(self, agent_id: AgentId, token: str, failure: FailureType = FailureType.TRANSIENT, error: Optional[str] = None) -> bool
+    async def recover_pending(self, agent_id: Optional[AgentId] = None) -> int
+    async def configure(self, *, queue_size: Optional[int] = None, retry_attempts: Optional[int] = None, backoff_base: Optional[float] = None, backoff_factor: Optional[float] = None, backoff_max: Optional[float] = None) -> None
 ```
 
 **Message Types:**
+
 - **ContextUpdate**: Shared context changes
 - **TaskRequest**: Agent task assignments
 - **TaskComplete**: Task completion notifications
@@ -173,6 +186,7 @@ class MessageCoordinator:
 ### 4. Resource Manager
 
 **Primary Interface:**
+
 ```python
 class ResourceManager:
     async def allocate_resources(
@@ -180,9 +194,9 @@ class ResourceManager:
         agent_id: AgentId,
         resource_requirements: ResourceRequirements
     ) -> ResourceAllocation
-    
+
     async def monitor_usage(self) -> ResourceUsageReport
-    
+
     async def optimize_allocation(
         self,
         current_workload: WorkloadMetrics
@@ -190,6 +204,7 @@ class ResourceManager:
 ```
 
 **Resource Types:**
+
 - **GPU Memory**: VRAM allocation for model inference
 - **CPU Threads**: Processing thread allocation
 - **Memory**: RAM allocation for agent operations
@@ -211,7 +226,7 @@ class AgentContext:
     conversation_history: List[ConversationTurn]
     world_state: WorldState
     agent_states: Dict[AgentId, AgentState]
-    
+
 @dataclass
 class WorkflowDefinition:
     workflow_type: WorkflowType
@@ -219,7 +234,7 @@ class WorkflowDefinition:
     parallel_steps: List[List[AgentStep]]
     error_handling: ErrorHandlingStrategy
     timeout_config: TimeoutConfiguration
-    
+
 @dataclass
 class AgentMessage:
     message_id: str
@@ -229,7 +244,7 @@ class AgentMessage:
     payload: Dict[str, Any]
     timestamp: datetime
     priority: MessagePriority
-    
+
 @dataclass
 class OrchestrationResponse:
     response_text: str
@@ -249,7 +264,7 @@ class AgentState(BaseModel):
     resource_usage: ResourceUsage
     performance_metrics: AgentPerformanceMetrics
     last_activity: datetime
-    
+
 class SessionContext(BaseModel):
     session_id: str
     user_id: str
@@ -265,16 +280,19 @@ class SessionContext(BaseModel):
 ### Error Categories and Strategies
 
 1. **Agent Failure**
+
    - **Detection**: Health checks, timeout monitoring, exception catching
    - **Response**: Automatic restart, fallback agent activation, graceful degradation
    - **Recovery**: State restoration, context preservation, user notification
 
 2. **Workflow Failure**
+
    - **Detection**: Step validation, dependency checking, output verification
    - **Response**: Workflow rollback, alternative path execution, manual intervention
    - **Recovery**: State consistency checks, context repair, workflow restart
 
 3. **Resource Exhaustion**
+
    - **Detection**: Resource monitoring, threshold alerts, performance degradation
    - **Response**: Load balancing, resource reallocation, request queuing
    - **Recovery**: Resource cleanup, optimization, capacity scaling
@@ -295,7 +313,7 @@ class ErrorHandler:
         context: AgentContext
     ) -> ErrorHandlingResult:
         """Handle agent-specific errors with appropriate recovery strategies."""
-        
+
     async def handle_workflow_error(
         self,
         workflow_id: str,
@@ -303,7 +321,7 @@ class ErrorHandler:
         context: AgentContext
     ) -> ErrorHandlingResult:
         """Handle workflow-level errors with rollback and recovery."""
-        
+
     async def handle_safety_violation(
         self,
         violation: SafetyViolation,
@@ -315,12 +333,14 @@ class ErrorHandler:
 ## Testing Strategy
 
 ### Unit Testing
+
 - **Agent Interface Testing**: Mock agent implementations for isolated testing
 - **Workflow Logic Testing**: Workflow definition validation and execution testing
 - **Message Passing Testing**: Message delivery, ordering, and reliability testing
 - **Resource Management Testing**: Allocation, monitoring, and optimization testing
 
 ### Integration Testing
+
 - **Multi-Agent Workflows**: End-to-end workflow execution with real agents
 - **Component Integration**: Integration with Neo4j, LLM, and other TTA components
 - **Performance Testing**: Load testing, resource utilization, and scalability testing
@@ -332,21 +352,22 @@ class ErrorHandler:
 class OrchestrationSystemTests:
     async def test_basic_workflow_execution(self):
         """Test basic agent workflow coordination."""
-        
+
     async def test_error_recovery(self):
         """Test error handling and recovery mechanisms."""
-        
+
     async def test_resource_management(self):
         """Test resource allocation and optimization."""
-        
+
     async def test_therapeutic_safety(self):
         """Test therapeutic content validation and safety."""
-        
+
     async def test_performance_under_load(self):
         """Test system performance under high load."""
 ```
 
 ### Performance Benchmarks
+
 - **Response Time**: < 2 seconds for standard interactions
 - **Throughput**: > 100 concurrent sessions
 - **Resource Efficiency**: < 80% GPU utilization under normal load
@@ -364,7 +385,7 @@ agent_orchestration:
   port: 8503
   max_concurrent_workflows: 50
   workflow_timeout: 30
-  
+
   # Agent Configuration
   agents:
     input_processor:
@@ -379,19 +400,19 @@ agent_orchestration:
       enabled: true
       max_instances: 3
       timeout: 20
-  
+
   # Resource Management
   resources:
-    gpu_memory_limit: 0.8  # 80% of available VRAM
+    gpu_memory_limit: 0.8 # 80% of available VRAM
     cpu_thread_limit: 8
     memory_limit: "4GB"
-    
+
   # Message Coordination
   messaging:
     queue_size: 1000
     message_timeout: 5
     retry_attempts: 3
-    
+
   # Performance Monitoring
   monitoring:
     metrics_interval: 30
@@ -410,7 +431,7 @@ class AgentOrchestrationComponent(Component):
             name="agent_orchestration",
             dependencies=["neo4j", "llm", "redis"]
         )
-        
+
     def _start_impl(self) -> bool:
         # Initialize orchestration service
         # Start workflow manager
@@ -418,7 +439,7 @@ class AgentOrchestrationComponent(Component):
         # Setup resource manager
         # Begin performance monitoring
         return True
-        
+
     def _stop_impl(self) -> bool:
         # Gracefully shutdown workflows
         # Save agent states
