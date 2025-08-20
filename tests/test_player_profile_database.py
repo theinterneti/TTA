@@ -163,7 +163,7 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
     
     def test_get_player_schema_version_success(self):
         """Test getting schema version successfully."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = "1.0.0"
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -233,8 +233,8 @@ class TestPlayerProfileRepository(unittest.TestCase):
     def setUp(self):
         """Set up test fixtures."""
         self.repository = PlayerProfileRepository()
-        self.mock_driver = Mock()
-        self.mock_session = Mock()
+        self.mock_driver = MagicMock()
+        self.mock_session = MagicMock()
         self.repository.driver = self.mock_driver
         self.mock_driver.session.return_value.__enter__.return_value = self.mock_session
         self.mock_driver.session.return_value.__exit__.return_value = None
@@ -327,7 +327,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_create_player_profile_success(self):
         """Test successful player profile creation."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         self.mock_session.run.return_value.single.return_value = mock_record
         
         result = self.repository.create_player_profile(self.test_profile)
@@ -361,7 +361,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     def test_get_player_profile_success(self):
         """Test successful player profile retrieval."""
         # Mock database response
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.side_effect = lambda key: {
             "p": {
                 "player_id": "test_player_123",
@@ -415,7 +415,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_update_player_profile_success(self):
         """Test successful player profile update."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         self.mock_session.run.return_value.single.return_value = mock_record
         
         result = self.repository.update_player_profile(self.test_profile)
@@ -433,7 +433,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_delete_player_profile_success(self):
         """Test successful player profile deletion."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = 1
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -444,7 +444,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_delete_player_profile_not_found(self):
         """Test player profile deletion when profile not found."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = 0
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -454,7 +454,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_username_exists_true(self):
         """Test username existence check when username exists."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = True
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -464,7 +464,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_username_exists_false(self):
         """Test username existence check when username doesn't exist."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = False
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -474,7 +474,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_email_exists_true(self):
         """Test email existence check when email exists."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = True
         self.mock_session.run.return_value.single.return_value = mock_record
         
@@ -484,7 +484,7 @@ class TestPlayerProfileRepository(unittest.TestCase):
     
     def test_email_exists_false(self):
         """Test email existence check when email doesn't exist."""
-        mock_record = Mock()
+        mock_record = MagicMock()
         mock_record.__getitem__.return_value = False
         self.mock_session.run.return_value.single.return_value = mock_record
         

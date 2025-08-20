@@ -35,14 +35,27 @@ def mock_neo4j_driver():
 @pytest.fixture(scope="session")
 def neo4j_container(pytestconfig):
     if not (pytestconfig.getoption("--neo4j") or os.environ.get("RUN_NEO4J_TESTS") in {"1","true","True"}):
-        pytest.skip("Neo4j container not requested; use --neo4j or RUN_NEO4J_TESTS=1")
+        pytest.skip("Neo4j not requested; use --neo4j or RUN_NEO4J_TESTS=1")
+
+    # If CI provides a service, prefer it to avoid nested containers
+    svc_uri = os.environ.get("TEST_NEO4J_URI")
+    if svc_uri:
+        return {
+            "uri": svc_uri,
+            "username": os.environ.get("TEST_NEO4J_USERNAME", "neo4j"),
+            "password": os.environ.get("TEST_NEO4J_PASSWORD", "testpassword"),
+        }
+
     from testcontainers.neo4j import Neo4jContainer
-    # Community image is sufficient for tests
-    with Neo4jContainer("neo4j:5-community").with_env("NEO4J_AUTH", "neo4j/test") as neo4j:
+    with (
+        Neo4jContainer("neo4j:5-community")
+        .with_env("NEO4J_AUTH", "neo4j/testpassword")
+        .with_env("NEO4J_ACCEPT_LICENSE_AGREEMENT", "yes")
+    ) as neo4j:
         yield {
             "uri": neo4j.get_connection_url(),
             "username": "neo4j",
-            "password": "test",
+            "password": "testpassword",
         }
 
 

@@ -28,7 +28,7 @@ jobs:
         ports:
           - 7687:7687
         options: >-
-          --health-cmd="/var/lib/neo4j/bin/cypher-shell -u neo4j -p test 'RETURN 1'"
+          --health-cmd="/var/lib/neo4j/bin/cypher-shell -u neo4j -p testpassword 'RETURN 1'"
           --health-interval=10s --health-timeout=5s --health-retries=10
       redis:
         image: redis:7
@@ -40,6 +40,9 @@ jobs:
     env:
       RUN_NEO4J_TESTS: "1"
       RUN_REDIS_TESTS: "1"
+      TEST_NEO4J_URI: "bolt://localhost:7687"
+      TEST_NEO4J_USERNAME: "neo4j"
+      TEST_NEO4J_PASSWORD: "testpassword"
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v1
