@@ -363,21 +363,46 @@ class PlayerProfileRepository:
                     if next_session_str:
                         progress_summary.next_recommended_session = datetime.fromisoformat(next_session_str)
                 
+                # Defensive parsing for datetimes and JSON
+                def _to_dt_profile(val):
+                    if val is None:
+                        return None
+                    if isinstance(val, datetime):
+                        return val
+                    if isinstance(val, str):
+                        try:
+                            return datetime.fromisoformat(val)
+                        except Exception:
+                            return None
+                    return None
+
+                created_at_dt = _to_dt_profile(player_data.get("created_at")) or datetime.utcnow()
+                last_login_dt = _to_dt_profile(player_data.get("last_login")) if player_data.get("last_login") else None
+
+                _active_raw = player_data.get("active_sessions", "{}")
+                if isinstance(_active_raw, str):
+                    try:
+                        _active_parsed = json.loads(_active_raw)
+                    except Exception:
+                        _active_parsed = {}
+                else:
+                    _active_parsed = _active_raw or {}
+
                 # Reconstruct player profile
                 profile = PlayerProfile(
                     player_id=player_data["player_id"],
                     username=player_data["username"],
                     email=player_data["email"],
-                    created_at=datetime.fromisoformat(player_data["created_at"]),
+                    created_at=created_at_dt,
                     therapeutic_preferences=therapeutic_prefs,
                     privacy_settings=privacy_settings,
                     characters=player_data.get("characters", []),
-                    active_sessions=json.loads(player_data.get("active_sessions", "{}")),
+                    active_sessions=_active_parsed,
                     progress_summary=progress_summary,
-                    last_login=datetime.fromisoformat(player_data["last_login"]) if player_data.get("last_login") else None,
+                    last_login=last_login_dt,
                     is_active=player_data.get("is_active", True)
                 )
-                
+
                 return profile
                 
         except Exception as e:
