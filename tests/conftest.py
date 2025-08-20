@@ -116,3 +116,22 @@ async def redis_client(redis_container):
     finally:
         await client.aclose()
 
+
+
+@pytest.fixture()
+def redis_client_sync(redis_container):
+    """Synchronous Redis client for simple integration tests.
+    Returns redis.Redis so .get/.exists return concrete results, not coroutines.
+    """
+    import redis
+    client = redis.from_url(redis_container)
+    try:
+        # Basic liveness check
+        client.ping()
+        yield client
+    finally:
+        try:
+            client.close()
+        except Exception:
+            pass
+

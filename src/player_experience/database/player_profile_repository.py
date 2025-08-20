@@ -429,7 +429,7 @@ class PlayerProfileRepository:
                     last_login=last_login_dt,
                     is_active=player_data.get("is_active", True)
                 )
-                
+
                 return profile
                 
         except Exception as e:
