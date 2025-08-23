@@ -109,9 +109,9 @@
 
 Summary of tests: Added unit tests for Agent lifecycle/timeouts/retry/cache/filtering and Redis-marked tests for RedisAgentRegistry, auto-registration, /agents diagnostics; all passing.
 
-- [ ] 7. Implement dynamic tool system integration
+- [x] 7. Implement dynamic tool system integration
 
-- [ ] 7.1 Create tool coordination and sharing mechanisms
+- [x] 7.1 Create tool coordination and sharing mechanisms
 
   - Design and implement ToolSpec (Pydantic) with: name, version, description, args_schema (JSON-schema or Pydantic model ref), returns_schema, capabilities (tags), safety_flags, created_at, last_used_at, owner (agent_id optional)
   - Implement comprehensive validation and safety checks:
@@ -130,7 +130,8 @@ Summary of tests: Added unit tests for Agent lifecycle/timeouts/retry/cache/filt
   - Ensure thread-safety and concurrent access patterns for multi-agent tool sharing
   - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 7.2 Add tool optimization and caching infrastructure
+- [x] 7.2 Add tool optimization and caching infrastructure
+
   - Implement in-memory LRU cache for ToolSpec lookups with configurable TTL and max_items to prevent redundant tool generation
   - Track tool performance metrics: execution time histogram, success/failure counts, error_rate; tie into existing metrics aggregation and diagnostics
   - Automated cleanup and resource management for unused/expired tools: background task scans last_used_at and deprecates or prunes Redis entries beyond max_idle_s (configurable)
@@ -138,6 +139,30 @@ Summary of tests: Added unit tests for Agent lifecycle/timeouts/retry/cache/filt
   - Implement tool versioning policy and backward compatibility checks when updating ToolSpec
   - Testing: unit tests for validation and caching; Redis-marked tests for registry lifecycle, deprecation, concurrent register/get, and cleanup using existing fixtures (@pytest.mark.redis, redis_client)
   - _Requirements: 3.2, 3.3, 3.4, 3.5_
+
+- [x] 7.3 Configuration-driven policy system and timeouts (Task 2)
+
+  - Implemented ToolPolicyConfig and load*tool_policy_config supporting YAML/JSON via TTA_TOOL_POLICY_CONFIG and environment fallbacks (TTA_ALLOWED_CALLABLES, TTA_ALLOW*\*, TTA_TOOL_TIMEOUT_MS, etc.)
+  - ToolPolicy accepts config; added get_timeout_ms, is_capability_allowed, validate_safety_flags; maintained validate_callable_allowed and schema depth checks
+  - Enforced timeouts in ToolCoordinator.run_tool (async via asyncio.wait_for; sync via thread join(timeout)); recorded metrics on timeouts
+  - InvocationService validates safety flags and callable allowlist before execution; BaseTool.execute wired to central policy loader
+  - Added docs/configs with README and sample YAML/JSON configurations
+
+- [x] 7.4 Advanced test coverage for policy, metrics, and registry (Task 3)
+
+  - KG-enabled tools testing with network policy enforcement (allow/deny)
+  - Metrics for failure scenarios: exceptions, timeouts, policy violations; keys as {tool}:{version}
+  - Registry idempotency with concurrent create_or_get and invocation
+  - Policy enforcement matrix across safety flag combinations and policy booleans
+  - All tests marked @pytest.mark.redis and aligned with project fixtures; execution times < 5s each
+
+- [ ] 7.5 Policy config live-reload and diagnostics
+
+  - Expose policy snapshot via diagnostics with redaction for sensitive fields
+  - Implement optional live-reload on file change (watcher) with safe application semantics and audit logs
+  - Add admin endpoint to trigger reload and validate config
+  - Tests for diagnostics exposure and live-reload safety/rollback
+  - _Requirements: 3.3, 4.5, 8.1_
 
 Note: Integrate with existing agent registry patterns and project configuration/testing conventions. Proposed config (to be wired in Task 7 implementation):
 
