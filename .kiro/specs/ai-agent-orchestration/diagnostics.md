@@ -7,8 +7,22 @@ A lightweight FastAPI-based server is started by the Agent Orchestration compone
 Endpoints:
 
 - GET /health: basic status for the component
-- GET /metrics: returns `MessageMetrics.snapshot()` from the RedisMessageCoordinator
-- GET /metrics-prom: Prometheus metrics export (requires prometheus_client)
+- GET /metrics: returns a JSON object including:
+  - messages: `MessageMetrics.snapshot()` from the RedisMessageCoordinator
+  - performance: per-agent step stats (p50, p95, avg, error_rate)
+  - resources: latest ResourceManager snapshot (CPU, memory, GPU when available)
+- GET /metrics-prom: Prometheus metrics export (requires prometheus_client), including:
+  - Counters: deliveries, delivery errors, retries, permanent failures
+  - Gauges: queue length (by agent, priority), DLQ length (by agent), step error rate (by agent)
+  - Summary: backoff seconds
+  - Histogram: step duration (ms) labeled by agent
+
+## Planned Enhancements
+
+- Configuration schema validation for agent_orchestration.resources and agent_orchestration.monitoring keys (High priority)
+- Test infrastructure tasks: introduce test markers and Testcontainers for Redis (High priority)
+- Resource-aware load balancing in MessageCoordinator (Medium priority)
+- Diagnostics ring-buffer for /metrics-history (Low priority)
 
 Notes:
 

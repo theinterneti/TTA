@@ -25,6 +25,8 @@ from .workflow import (
 from .state import AgentContext
 from .models import OrchestrationRequest
 from .langgraph_integration import LangGraphWorkflowBuilder, LangGraphExecutor
+from .performance import get_step_aggregator
+import time
 
 
 def _utc_now() -> str:
@@ -71,6 +73,8 @@ class WorkflowManager:
         self._runs: Dict[str, WorkflowRunState] = {}
         self._lg_builder = LangGraphWorkflowBuilder()
         self._lg_executor = LangGraphExecutor()
+        # Performance aggregator
+        self._aggregator = get_step_aggregator()
 
     # ---- Registration ----
     def register_workflow(self, name: str, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:
@@ -185,11 +189,26 @@ class WorkflowManager:
     def _execute_step(self, step: AgentStep, run_state: WorkflowRunState) -> StepResult:
         # In future tasks, invoke AgentProxy implementations and update context
         result = StepResult(step=step)
-        result.result = {
-            "agent": step.agent.value,
-            "note": "Executed step (stub)",
-        }
-        result.ended_at = _utc_now()
+        t0 = time.time()
+        error: Optional[str] = None
+        try:
+            # Placeholder processing logic
+            result.result = {
+                "agent": step.agent.value,
+                "note": "Executed step (stub)",
+            }
+        except Exception as e:
+            error = str(e)
+            result.error = error
+        finally:
+            t1 = time.time()
+            duration_ms = (t1 - t0) * 1000.0
+            # Record performance per agent type key
+            try:
+                self._aggregator.record(step.agent.value, duration_ms, success=(error is None))
+            except Exception:
+                pass
+            result.ended_at = _utc_now()
         return result
 
     def _validate_workflow_definition(self, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:

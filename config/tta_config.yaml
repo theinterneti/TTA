@@ -42,6 +42,59 @@ tta.prototype:
         probability_threshold: 0.7
         complexity_limit: 5
 
+# Agent Orchestration Configuration
+agent_orchestration:
+  enabled: true
+  port: 8503
+  max_concurrent_workflows: 50
+  workflow_timeout: 30
+
+  # Agent Configuration
+  agents:
+    input_processor:
+      enabled: true
+      max_instances: 3
+      timeout: 10
+    world_builder:
+      enabled: true
+      max_instances: 2
+      timeout: 15
+    narrative_generator:
+      enabled: true
+      max_instances: 3
+      timeout: 20
+
+  # Resource Management
+  resources:
+    gpu_memory_limit: 0.8 # 80% of available VRAM
+    cpu_thread_limit: 8
+    memory_limit: "4GB"
+
+  # Message Coordination
+  messaging:
+    queue_size: 1000
+    message_timeout: 5
+    retry_attempts: 3
+
+  # Performance Monitoring
+  monitoring:
+    metrics_interval: 30
+    health_check_interval: 10
+    performance_logging: true
+    cpu_warn: 85
+    cpu_crit: 95
+    mem_warn: 85
+    mem_crit: 95
+
+  # Diagnostics
+  diagnostics:
+    enabled: true
+
+  # Metrics thresholds
+  metrics:
+    dlq_warn_threshold: 10
+    retry_spike_warn_threshold: 20
+
 # Docker Configuration
 docker:
   enabled: true
