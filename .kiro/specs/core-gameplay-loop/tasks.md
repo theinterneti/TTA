@@ -184,6 +184,34 @@
 - **Event System**: Extended with consequence and emotional safety events
 - **Safety Validation**: Compatible with existing therapeutic safety content validation system
 
+### **Adaptive Difficulty Engine (Task 6) - Key Deliverables:**
+
+- **Core Architecture**: AdaptiveDifficultyEngine class with 6-level difficulty calibration (VERY_EASY to VERY_HARD)
+- **Performance Monitoring**: Real-time PerformanceSnapshot tracking with success rate, therapeutic progress, emotional stability, engagement level analysis
+- **Intelligent Adjustment**: 6 adaptation strategies (gradual increase/decrease, immediate adjustment, contextual support, alternative paths, skill building)
+- **User Preferences**: UserPreferences class with challenge tolerance, adaptation speed, and support preference configuration
+- **Story Integration**: Immersion-maintaining difficulty explanations that provide narrative context for adjustments
+- **Pattern Recognition**: Trend detection and performance pattern analysis for proactive difficulty optimization
+- **Testing**: 300+ test cases covering all adaptive difficulty scenarios and integration points
+
+### **Architectural Decisions - Task 6:**
+
+- **Performance-Based Adaptation**: Real-time monitoring of user performance metrics to trigger intelligent difficulty adjustments
+- **Story-Integrated Changes**: Difficulty adjustments explained through narrative context to maintain immersion
+- **User-Centric Design**: Comprehensive preference system allowing users to control adaptation behavior
+- **Multi-Metric Analysis**: Holistic performance assessment using success rates, engagement, emotional stability, and therapeutic progress
+- **Event-Driven Integration**: Difficulty adjustment events published to narrative event bus for system-wide awareness
+- **Gradual vs Immediate**: Flexible adjustment strategies based on user preferences and situation urgency
+
+### **Integration Points Established - Task 6:**
+
+- **Choice Processor**: Performance monitoring integrated into choice processing pipeline for real-time difficulty assessment
+- **Session Management**: Difficulty parameters, adjustment history, and user preferences stored in session context
+- **Event System**: Extended with adaptive difficulty events (DIFFICULTY_ADJUSTED, PERFORMANCE_MONITORED, USER_PREFERENCES_UPDATED)
+- **Narrative Engine**: Difficulty-aware content delivery with story-appropriate adjustment explanations
+- **Consequence System**: Performance metrics derived from consequence effectiveness and therapeutic outcomes
+- **Emotional Safety System**: Emotional stability metrics integrated into difficulty adjustment decisions
+
 - [ ] 8. Build therapeutic integration system
 - [ ] 8.1 Implement therapeutic concept embedding
 
