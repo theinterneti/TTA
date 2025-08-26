@@ -15,6 +15,7 @@ from src.components.gameplay_loop.models.core import UserChoice, ChoiceType, Con
 from src.components.gameplay_loop.services.session_state import SessionState
 from .events import EventType, create_choice_event
 from .consequence_system import ConsequenceSystem, ConsequenceGenerationContext
+from .adaptive_difficulty_engine import AdaptiveDifficultyEngine
 
 
 logger = logging.getLogger(__name__)
@@ -255,6 +256,9 @@ class ChoiceProcessor:
         # Consequence system integration
         self.consequence_system = ConsequenceSystem(narrative_engine.event_bus)
 
+        # Adaptive difficulty integration
+        self.difficulty_engine = AdaptiveDifficultyEngine(narrative_engine.event_bus)
+
         # Choice cache
         self.choice_cache: Dict[str, UserChoice] = {}
         self.consequence_cache: Dict[str, List[ChoiceConsequence]] = {}
@@ -269,6 +273,7 @@ class ChoiceProcessor:
             "validation_failures": 0,
             "consequences_applied": 0,
             "consequences_generated": 0,
+            "difficulty_adjustments": 0,
             "therapeutic_moments_triggered": 0
         }
     
@@ -386,6 +391,19 @@ class ChoiceProcessor:
             choice.consequences = consequence_set
 
             self.metrics["consequences_generated"] += 1
+
+            # Monitor performance for adaptive difficulty
+            choice_interaction_data = {
+                "response_time": context.processing_time.total_seconds() if context.processing_time else 30.0,
+                "choice_complexity": choice.difficulty_level,
+                "therapeutic_relevance": choice.therapeutic_relevance,
+                "emotional_weight": choice.emotional_weight,
+                "interaction_type": "choice_processed",
+                "choice_type": choice.choice_type.value,
+                "consequences_applied": len(context.consequences_applied)
+            }
+
+            await self.difficulty_engine.monitor_performance(session_state, choice_interaction_data)
 
             # Legacy consequence handling (for backward compatibility)
             legacy_consequences = await self._load_choice_consequences(choice_id)

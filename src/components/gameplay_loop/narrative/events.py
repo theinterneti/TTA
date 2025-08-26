@@ -34,6 +34,11 @@ class EventType(str, Enum):
     CONSEQUENCE_APPLIED = "consequence_applied"
     LEARNING_OPPORTUNITY_CREATED = "learning_opportunity_created"
     PATTERN_RECOGNIZED = "pattern_recognized"
+
+    # Adaptive difficulty events
+    DIFFICULTY_ADJUSTED = "difficulty_adjusted"
+    PERFORMANCE_MONITORED = "performance_monitored"
+    USER_PREFERENCES_UPDATED = "user_preferences_updated"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"
