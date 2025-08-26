@@ -1,0 +1,8 @@
+{
+  "callable_allowlist": ["my.package.safe_fn"],
+  "allow_network_tools": true,
+  "allow_filesystem_tools": false,
+  "allow_process_tools": false,
+  "default_timeout_ms": 500
+}
+

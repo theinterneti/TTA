@@ -60,17 +60,65 @@ class PlayerProfileRepository:
         self.driver: Optional[Driver] = None
     
     def connect(self) -> None:
-        """Establish connection to Neo4j database."""
+        """Establish connection to Neo4j database with retry/backoff for readiness races."""
         try:
-            self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
-            # Test connection
-            with self.driver.session() as session:
-                session.run("RETURN 1")
-            logger.info(f"PlayerProfileRepository connected to Neo4j at {self.uri}")
-        except ServiceUnavailable as e:
-            raise PlayerProfileRepositoryError(f"Failed to connect to Neo4j: {e}")
-        except Exception as e:
-            raise PlayerProfileRepositoryError(f"Unexpected error connecting to Neo4j: {e}")
+            from neo4j.exceptions import AuthError, ServiceUnavailable as _ServiceUnavailable, ClientError as _ClientError
+        except Exception:  # pragma: no cover - neo4j not installed path
+            AuthError = Exception  # type: ignore
+            _ServiceUnavailable = ServiceUnavailable  # type: ignore
+            _ClientError = Exception  # type: ignore
+        base_delay = 0.5
+        last_exc: Optional[Exception] = None
+        # Option B: increase attempts to 6 (0.5,1,2,4,8,8)
+        attempts = 6
+        for attempt in range(attempts):
+            try:
+                self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
+                with self.driver.session() as session:
+                    session.run("RETURN 1")
+                logger.info(f"PlayerProfileRepository connected to Neo4j at {self.uri}")
+                return
+            except (AuthError, _ServiceUnavailable) as e:
+                last_exc = e
+                delay = min(base_delay * (2 ** attempt), 8.0)
+                logger.debug(f"Neo4j connect attempt {attempt+1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s")
+                try:
+                    if self.driver:
+                        self.driver.close()
+                except Exception:
+                    pass
+                self.driver = None
+                import time as _t
+                if attempt < (attempts - 1):
+                    _t.sleep(delay)
+                else:
+                    if isinstance(e, AuthError):
+                        raise PlayerProfileRepositoryError(f"Failed to connect to Neo4j after retries: {e}")
+                    elif isinstance(e, _ServiceUnavailable):
+                        raise PlayerProfileRepositoryError(f"Failed to connect to Neo4j after retries: {e}")
+            except _ClientError as e:
+                emsg = str(e)
+                if ("AuthenticationRateLimit" in emsg) or ("authentication details too many times" in emsg):
+                    last_exc = e
+                    delay = min(base_delay * (2 ** attempt), 8.0)
+                    logger.debug(f"Neo4j connect attempt {attempt+1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s")
+                    try:
+                        if self.driver:
+                            self.driver.close()
+                    except Exception:
+                        pass
+                    self.driver = None
+                    import time as _t
+                    if attempt < (attempts - 1):
+                        _t.sleep(delay)
+                    else:
+                        raise PlayerProfileRepositoryError(f"Failed to connect to Neo4j after retries: {e}")
+                else:
+                    raise PlayerProfileRepositoryError(f"Unexpected error connecting to Neo4j: {e}")
+            except Exception as e:
+                raise PlayerProfileRepositoryError(f"Unexpected error connecting to Neo4j: {e}")
+        if last_exc is not None:
+            raise PlayerProfileRepositoryError(f"Failed to connect to Neo4j after retries: {last_exc}")
     
     def disconnect(self) -> None:
         """Close connection to Neo4j database."""

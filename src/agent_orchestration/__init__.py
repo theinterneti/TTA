@@ -13,6 +13,16 @@ from .models import (
     AgentMessage,
     OrchestrationRequest,
     OrchestrationResponse,
+    # Capability system models
+    CapabilityType,
+    CapabilityScope,
+    CapabilityStatus,
+    AgentCapability,
+    AgentCapabilitySet,
+    CapabilityMatchCriteria,
+    CapabilityMatchResult,
+    CapabilityDiscoveryRequest,
+    CapabilityDiscoveryResponse,
 )
 from .messaging import (
     MessageResult,
@@ -22,6 +32,17 @@ from .messaging import (
     FailureType,
 )
 from .interfaces import MessageCoordinator, AgentProxy
+from .agents import Agent, AgentRegistry
+from .proxies import (
+    InputProcessorAgentProxy,
+    WorldBuilderAgentProxy,
+    NarrativeGeneratorAgentProxy,
+)
+from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig, CircuitBreakerState, CircuitBreakerOpenError
+from .circuit_breaker_registry import CircuitBreakerRegistry
+from .circuit_breaker_metrics import CircuitBreakerMetricsCollector, CircuitBreakerLogger
+from .circuit_breaker_config import CircuitBreakerConfigManager, WorkflowErrorHandlingConfigSchema
+from .resource_exhaustion_detector import ResourceExhaustionDetector, ResourceThresholds, ResourceExhaustionEvent
 from .state import AgentContext, AgentState, SessionContext, AgentRuntimeStatus
 from .workflow import (
     WorkflowType,
@@ -31,6 +52,29 @@ from .workflow import (
     WorkflowDefinition,
 )
 from .workflow_manager import WorkflowManager, WorkflowRunState, WorkflowRunStatus
+from .resources import (
+    ResourceManager,
+    ResourceRequirements,
+    ResourceAllocation,
+    ResourceUsage,
+    ResourceUsageReport,
+    WorkloadMetrics,
+    OptimizationResult,
+)
+from .performance import get_step_aggregator
+from .therapeutic_safety import TherapeuticValidator, SafetyLevel, SafetyService, get_global_safety_service
+# main service
+from .service import AgentOrchestrationService
+# tools exports
+try:
+    from .tools.models import ToolSpec, ToolParameter, ToolRegistration, ToolInvocation, ToolPolicy, ToolStatus
+    from .tools.redis_tool_registry import RedisToolRegistry
+    from .tools.coordinator import ToolCoordinator
+    from .tools.invocation_service import ToolInvocationService
+except Exception:
+    # Tools package may be optional during partial builds/tests
+    ToolSpec = ToolParameter = ToolRegistration = ToolInvocation = ToolPolicy = ToolStatus = None
+    RedisToolRegistry = ToolCoordinator = None
 
 __all__ = [
     "AgentId",
@@ -40,6 +84,16 @@ __all__ = [
     "AgentMessage",
     "OrchestrationRequest",
     "OrchestrationResponse",
+    # Capability system models
+    "CapabilityType",
+    "CapabilityScope",
+    "CapabilityStatus",
+    "AgentCapability",
+    "AgentCapabilitySet",
+    "CapabilityMatchCriteria",
+    "CapabilityMatchResult",
+    "CapabilityDiscoveryRequest",
+    "CapabilityDiscoveryResponse",
     "MessageResult",
     "MessageSubscription",
     "QueueMessage",
@@ -47,17 +101,55 @@ __all__ = [
     "FailureType",
     "MessageCoordinator",
     "AgentProxy",
+    # new agent base + registry + proxies
+    "Agent",
+    "AgentRegistry",
+    "InputProcessorAgentProxy",
+    "WorldBuilderAgentProxy",
+    "NarrativeGeneratorAgentProxy",
+    # state
     "AgentContext",
     "AgentState",
     "SessionContext",
     "AgentRuntimeStatus",
+    # workflow
     "WorkflowType",
     "ErrorHandlingStrategy",
     "AgentStep",
     "TimeoutConfiguration",
     "WorkflowDefinition",
+    # workflow manager
     "WorkflowManager",
     "WorkflowRunState",
     "WorkflowRunStatus",
+    # resources + perf
+    "ResourceManager",
+    "ResourceRequirements",
+    "ResourceAllocation",
+    # circuit breaker
+    "CircuitBreaker",
+    "CircuitBreakerConfig",
+    "CircuitBreakerState",
+    "CircuitBreakerOpenError",
+    "CircuitBreakerRegistry",
+    "CircuitBreakerMetricsCollector",
+    "CircuitBreakerLogger",
+    "CircuitBreakerConfigManager",
+    "WorkflowErrorHandlingConfigSchema",
+    "ResourceExhaustionDetector",
+    "ResourceThresholds",
+    "ResourceExhaustionEvent",
+    "ResourceUsage",
+    "ResourceUsageReport",
+    "WorkloadMetrics",
+    "OptimizationResult",
+    "get_step_aggregator",
+    # safety exports
+    "TherapeuticValidator",
+    "SafetyLevel",
+    "SafetyService",
+    "get_global_safety_service",
+    # main service
+    "AgentOrchestrationService",
 ]
 

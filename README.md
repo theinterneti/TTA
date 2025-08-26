@@ -111,9 +111,15 @@ Enable the diagnostics server for the Agent Orchestration component to inspect h
   - Health: http://127.0.0.1:8503/health
 
 - Notes:
+
   - The server only starts if `agent_orchestration.diagnostics.enabled=true`
   - Override the default port with `agent_orchestration.port`
   - Prometheus endpoint requires `prometheus_client` (installed automatically in dev)
+
+- Tools Diagnostics:
+  - GET /tools — list tools with status/metadata and cache stats
+  - GET /tools/summary — paginated, filterable summary suitable for UI/CLI
+  - See Documentation/components/agent_orchestration_tools.md for configuration and security details
 
 ## Admin: Manual Message Recovery
 

@@ -60,17 +60,73 @@ class PlayerProfileSchemaManager:
         self.player_schema_version = "1.0.0"
     
     def connect(self) -> None:
-        """Establish connection to Neo4j database."""
+        """Establish connection to Neo4j database with retry/backoff for readiness races."""
+        # Import here to access specific exception types without changing module import surface
         try:
-            self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
-            # Test connection
-            with self.driver.session() as session:
-                session.run("RETURN 1")
-            logger.info(f"Connected to Neo4j at {self.uri}")
-        except ServiceUnavailable as e:
-            raise PlayerProfileSchemaError(f"Failed to connect to Neo4j: {e}")
-        except Exception as e:
-            raise PlayerProfileSchemaError(f"Unexpected error connecting to Neo4j: {e}")
+            from neo4j.exceptions import AuthError, ServiceUnavailable as _ServiceUnavailable, ClientError as _ClientError
+        except Exception:  # pragma: no cover - neo4j not installed path
+            AuthError = Exception  # type: ignore
+            _ServiceUnavailable = ServiceUnavailable  # type: ignore
+            _ClientError = Exception  # type: ignore
+        last_exc: Optional[Exception] = None
+        base_delay = 0.5
+        # Option B: increase attempts to 6 (0.5,1,2,4,8,8)
+        attempts = 6
+        for attempt in range(attempts):
+            try:
+                self.driver = GraphDatabase.driver(self.uri, auth=(self.username, self.password))
+                # Verify readiness
+                with self.driver.session() as session:
+                    session.run("RETURN 1")
+                logger.info(f"Connected to Neo4j at {self.uri}")
+                return
+            except (AuthError, _ServiceUnavailable) as e:
+                last_exc = e
+                delay = min(base_delay * (2 ** attempt), 8.0)
+                logger.debug(f"Neo4j connect attempt {attempt+1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s")
+                # Close any partially created driver before sleeping
+                try:
+                    if self.driver:
+                        self.driver.close()
+                except Exception:
+                    pass
+                self.driver = None
+                import time as _t
+                if attempt < (attempts - 1):
+                    _t.sleep(delay)
+                else:
+                    # Exhausted attempts: re-raise with original exception type
+                    if isinstance(e, AuthError):
+                        raise PlayerProfileSchemaError(f"Failed to connect to Neo4j after retries: {e}")
+                    elif isinstance(e, _ServiceUnavailable):
+                        raise PlayerProfileSchemaError(f"Failed to connect to Neo4j after retries: {e}")
+            except _ClientError as e:
+                # Retry only on AuthenticationRateLimit variant
+                emsg = str(e)
+                if ("AuthenticationRateLimit" in emsg) or ("authentication details too many times" in emsg):
+                    last_exc = e
+                    delay = min(base_delay * (2 ** attempt), 8.0)
+                    logger.debug(f"Neo4j connect attempt {attempt+1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s")
+                    try:
+                        if self.driver:
+                            self.driver.close()
+                    except Exception:
+                        pass
+                    self.driver = None
+                    import time as _t
+                    if attempt < (attempts - 1):
+                        _t.sleep(delay)
+                    else:
+                        raise PlayerProfileSchemaError(f"Failed to connect to Neo4j after retries: {e}")
+                else:
+                    # Other ClientErrors fail fast
+                    raise PlayerProfileSchemaError(f"Unexpected error connecting to Neo4j: {e}")
+            except Exception as e:
+                # Unexpected errors should fail fast per requirement
+                raise PlayerProfileSchemaError(f"Unexpected error connecting to Neo4j: {e}")
+        # Should not reach here; safety net
+        if last_exc is not None:
+            raise PlayerProfileSchemaError(f"Failed to connect to Neo4j after retries: {last_exc}")
     
     def disconnect(self) -> None:
         """Close connection to Neo4j database."""

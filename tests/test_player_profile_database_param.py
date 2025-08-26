@@ -8,7 +8,7 @@ from src.player_experience.models.player import PlayerProfile
 
 
 @pytest.mark.parametrize("mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)])
-def test_schema_manager_setup_parametrized(mode, neo4j_container):
+def test_schema_manager_setup_parametrized(mode, neo4j_container, request):
     if mode == "mock":
         mgr = PlayerProfileSchemaManager()
         # Inject mock driver
@@ -23,6 +23,8 @@ def test_schema_manager_setup_parametrized(mode, neo4j_container):
         assert mgr.create_player_profile_constraints() in {True, False}
         assert mgr.create_player_profile_indexes() in {True, False}
     else:
+        # Force authentication-ready driver before constructing manager
+        request.getfixturevalue("neo4j_driver")
         mgr = PlayerProfileSchemaManager(
             uri=neo4j_container["uri"],
             username=neo4j_container["username"],
@@ -35,7 +37,7 @@ def test_schema_manager_setup_parametrized(mode, neo4j_container):
 
 
 @pytest.mark.parametrize("mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)])
-def test_repository_crud_parametrized(mode, neo4j_container):
+def test_repository_crud_parametrized(mode, neo4j_container, request):
     if mode == "mock":
         repo = PlayerProfileRepository()
         mock_driver = MagicMock()
@@ -55,6 +57,8 @@ def test_repository_crud_parametrized(mode, neo4j_container):
         mock_session.run.return_value.single.return_value = Mock()
         assert repo.create_player_profile(profile) is True
     else:
+        # Force authentication-ready driver before constructing repository
+        request.getfixturevalue("neo4j_driver")
         repo = PlayerProfileRepository(
             uri=neo4j_container["uri"],
             username=neo4j_container["username"],

@@ -50,6 +50,9 @@ def _iso_now() -> str:
 
 class RedisMessageCoordinator(MessageCoordinator):
     def __init__(self, redis: Redis, key_prefix: str = "ao") -> None:
+        # Optional router attached by component for intelligent routing
+        self._agent_router = None
+
         self._redis = redis
         self._pfx = key_prefix.rstrip(":")
         # Defaults; configurable via configure()
@@ -242,13 +245,22 @@ class RedisMessageCoordinator(MessageCoordinator):
         agent_ids: List[AgentId]
         if agent_id is None:
             # Discover known agent queues by pattern (best-effort, cheap approach)
+            seen: set[str] = set()
             agent_ids = []
             for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
-                pattern = f"{self._pfx}:reserved_deadlines:{at.value}:*"
-                async for key in self._redis.scan_iter(match=pattern):
-                    parts = key.decode() if isinstance(key, (bytes, bytearray)) else key
-                    inst = parts.split(":")[-1]
-                    agent_ids.append(AgentId(type=at, instance=inst))
+                # Prefer deadlines keys
+                for pattern in (
+                    f"{self._pfx}:reserved_deadlines:{at.value}:*",
+                    f"{self._pfx}:reserved:{at.value}:*",
+                ):
+                    async for key in self._redis.scan_iter(match=pattern):
+                        parts = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                        inst = parts.split(":")[-1]
+                        sig = f"{at.value}:{inst}"
+                        if sig in seen:
+                            continue
+                        seen.add(sig)
+                        agent_ids.append(AgentId(type=at, instance=inst))
         else:
             agent_ids = [agent_id]
 
@@ -262,9 +274,11 @@ class RedisMessageCoordinator(MessageCoordinator):
                 payload = await self._redis.hget(self._reserved_hash(aid), token)
                 if payload:
                     try:
-                        data = json.loads(payload)
+                        pdata = payload if isinstance(payload, str) else payload.decode()
+                        data = json.loads(pdata)
                         qm = QueueMessage(**data)
                         score = _now_us()
+                        # Re-schedule using the original payload to preserve audit list matching
                         await self._redis.zadd(self._sched_key(aid, int(qm.priority)), {payload: score})
                         recovered_total += 1
                         recovered_for_agent += 1

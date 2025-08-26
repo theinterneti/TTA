@@ -152,7 +152,41 @@ class TTAConfig:
             },
             "agent_orchestration": {
                 "enabled": False,
-                "port": 8503
+                "port": 8503,
+                "realtime": {
+                    "enabled": False,
+                    "websocket": {
+                        "enabled": False,
+                        "path": "/ws",
+                        "heartbeat_interval": 30.0,
+                        "connection_timeout": 60.0,
+                        "max_connections": 1000,
+                        "auth_required": True
+                    },
+                    "events": {
+                        "enabled": False,
+                        "redis_channel_prefix": "ao:events",
+                        "buffer_size": 1000,
+                        "broadcast_agent_status": True,
+                        "broadcast_workflow_progress": True,
+                        "broadcast_system_metrics": False
+                    },
+                    "progressive_feedback": {
+                        "enabled": False,
+                        "update_interval": 1.0,
+                        "max_updates_per_workflow": 100,
+                        "stream_intermediate_results": True
+                    },
+                    "optimization": {
+                        "enabled": False,
+                        "response_time_monitoring": True,
+                        "statistical_analysis": True,
+                        "auto_parameter_adjustment": False,
+                        "speed_creativity_balance": 0.5,
+                        "optimization_interval": 60.0,
+                        "min_data_points": 10
+                    }
+                }
             },
             "docker": {
                 "enabled": True,
@@ -439,7 +473,61 @@ class TTAConfig:
                 "required": True,
                 "schema": {
                     "enabled": {"type": "bool", "required": True},
-                    "port": {"type": "int", "required": True}
+                    "port": {"type": "int", "required": True},
+                    "realtime": {
+                        "type": "dict",
+                        "required": False,
+                        "schema": {
+                            "enabled": {"type": "bool", "required": False},
+                            "websocket": {
+                                "type": "dict",
+                                "required": False,
+                                "schema": {
+                                    "enabled": {"type": "bool", "required": False},
+                                    "path": {"type": "str", "required": False},
+                                    "heartbeat_interval": {"type": "float", "required": False},
+                                    "connection_timeout": {"type": "float", "required": False},
+                                    "max_connections": {"type": "int", "required": False},
+                                    "auth_required": {"type": "bool", "required": False}
+                                }
+                            },
+                            "events": {
+                                "type": "dict",
+                                "required": False,
+                                "schema": {
+                                    "enabled": {"type": "bool", "required": False},
+                                    "redis_channel_prefix": {"type": "str", "required": False},
+                                    "buffer_size": {"type": "int", "required": False},
+                                    "broadcast_agent_status": {"type": "bool", "required": False},
+                                    "broadcast_workflow_progress": {"type": "bool", "required": False},
+                                    "broadcast_system_metrics": {"type": "bool", "required": False}
+                                }
+                            },
+                            "progressive_feedback": {
+                                "type": "dict",
+                                "required": False,
+                                "schema": {
+                                    "enabled": {"type": "bool", "required": False},
+                                    "update_interval": {"type": "float", "required": False},
+                                    "max_updates_per_workflow": {"type": "int", "required": False},
+                                    "stream_intermediate_results": {"type": "bool", "required": False}
+                                }
+                            },
+                            "optimization": {
+                                "type": "dict",
+                                "required": False,
+                                "schema": {
+                                    "enabled": {"type": "bool", "required": False},
+                                    "response_time_monitoring": {"type": "bool", "required": False},
+                                    "statistical_analysis": {"type": "bool", "required": False},
+                                    "auto_parameter_adjustment": {"type": "bool", "required": False},
+                                    "speed_creativity_balance": {"type": "float", "required": False},
+                                    "optimization_interval": {"type": "float", "required": False},
+                                    "min_data_points": {"type": "int", "required": False}
+                                }
+                            }
+                        }
+                    }
                 }
             },
             "docker": {

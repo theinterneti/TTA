@@ -413,7 +413,15 @@ agent_orchestration:
     message_timeout: 5
     retry_attempts: 3
 
-  # Performance Monitoring
+    # Performance Monitoring
+    # Resource/Monitoring thresholds (examples)
+    monitoring:
+      metrics_interval: 30
+      cpu_warn: 85
+      cpu_crit: 95
+      mem_warn: 85
+      mem_crit: 95
+
   monitoring:
     metrics_interval: 30
     health_check_interval: 10
