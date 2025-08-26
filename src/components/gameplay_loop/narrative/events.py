@@ -28,6 +28,12 @@ class EventType(str, Enum):
     CHOICE_MADE = "choice_made"
     CHOICE_VALIDATED = "choice_validated"
     CHOICE_PROCESSED = "choice_processed"
+
+    # Consequence events
+    CONSEQUENCE_GENERATED = "consequence_generated"
+    CONSEQUENCE_APPLIED = "consequence_applied"
+    LEARNING_OPPORTUNITY_CREATED = "learning_opportunity_created"
+    PATTERN_RECOGNIZED = "pattern_recognized"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"
@@ -327,4 +333,23 @@ def create_safety_event(event_type: EventType, session_id: str, user_id: str,
         protective_factors=protective_factors or [],
         intervention_needed=intervention_needed,
         **kwargs
+    )
+
+
+def create_consequence_event(event_type: EventType, session_id: str, user_id: str,
+                           consequence_id: str, choice_id: str = "",
+                           consequence_type: str = "",
+                           **kwargs) -> NarrativeEvent:
+    """Create a consequence event."""
+    return NarrativeEvent(
+        event_type=event_type,
+        session_id=session_id,
+        user_id=user_id,
+        context={
+            "consequence_id": consequence_id,
+            "choice_id": choice_id,
+            "consequence_type": consequence_type,
+            **kwargs.get("data", {})
+        },
+        **{k: v for k, v in kwargs.items() if k != "data"}
     )
