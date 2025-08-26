@@ -7,15 +7,11 @@ consequence systems, and adaptive difficulty management.
 """
 
 from .base import GameplayLoopComponent
-from .session_manager import SessionManager
-from .narrative_engine import NarrativeEngine
-from .choice_architecture import ChoiceArchitectureManager
-from .consequence_system import ConsequenceSystem
+
+# Import models
+from .models import *
 
 __all__ = [
     "GameplayLoopComponent",
-    "SessionManager", 
-    "NarrativeEngine",
-    "ChoiceArchitectureManager",
-    "ConsequenceSystem"
+    # Models will be added by the models.__init__.py
 ]

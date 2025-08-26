@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 
-from src.components.base import Component
+from src.orchestration.component import Component
 from src.agent_orchestration.service import AgentOrchestrationService
 
 logger = logging.getLogger(__name__)

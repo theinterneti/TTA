@@ -49,6 +49,51 @@ core_gameplay_loop:
   session_timeout_minutes: 30
   enable_performance_tracking: true
 
+# Therapeutic Safety Content Validation Configuration
+therapeutic_safety:
+  enabled: true
+  validation:
+    orchestrator:
+      timeout_ms: 200
+      max_concurrent: 100
+      enable_parallel_processing: true
+    components:
+      content_safety:
+        enabled: true
+        timeout_ms: 80
+        priority: 5
+        strict_mode: false
+      crisis_detection:
+        enabled: true
+        timeout_ms: 60
+        priority: 10 # Highest priority
+        immediate_intervention_threshold: 3 # CrisisLevel.HIGH
+      bias_detection:
+        enabled: true
+        timeout_ms: 40
+        priority: 3
+        bias_threshold: 0.7
+      therapeutic_alignment:
+        enabled: true
+        timeout_ms: 50
+        priority: 4
+        alignment_threshold: 0.5
+  cache:
+    enabled: true
+    key_prefix: "tta:safety:validation"
+    default_ttl_hours: 1
+    max_cache_size: 10000
+  safety_guidelines:
+    age_appropriate_content: true
+    therapeutic_framework_alignment: true
+    crisis_intervention_protocols: true
+    bias_detection_active: true
+  monitoring:
+    enable_metrics: true
+    log_validation_results: true
+    alert_on_high_risk: true
+    performance_tracking: true
+
   # Narrative Engine Configuration
   narrative_engine:
     enabled: true
