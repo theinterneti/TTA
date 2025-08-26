@@ -26,7 +26,12 @@ from .state import AgentContext
 from .models import OrchestrationRequest
 from .langgraph_integration import LangGraphWorkflowBuilder, LangGraphExecutor
 from .performance import get_step_aggregator
+from .circuit_breaker import CircuitBreakerOpenError
+from .circuit_breaker_registry import CircuitBreakerRegistry
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def _utc_now() -> str:
@@ -68,13 +73,15 @@ class WorkflowRunState(BaseModel):
 class WorkflowManager:
     """Registers and executes workflows with basic validation and state tracking."""
 
-    def __init__(self) -> None:
+    def __init__(self, circuit_breaker_registry: Optional[CircuitBreakerRegistry] = None) -> None:
         self._workflows: Dict[str, WorkflowDefinition] = {}
         self._runs: Dict[str, WorkflowRunState] = {}
         self._lg_builder = LangGraphWorkflowBuilder()
         self._lg_executor = LangGraphExecutor()
         # Performance aggregator
         self._aggregator = get_step_aggregator()
+        # Circuit breaker registry for graceful degradation
+        self._circuit_breaker_registry = circuit_breaker_registry
 
     # ---- Registration ----
     def register_workflow(self, name: str, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:
@@ -101,11 +108,15 @@ class WorkflowManager:
         """
         Execute a registered workflow in a minimal, synchronous manner.
 
+        Includes circuit breaker checks for graceful degradation.
+
         Returns: (response, run_id, error)
         """
         definition = self._workflows.get(name)
         if not definition:
             return None, None, f"Workflow '{name}' is not registered"
+
+        # Note: Circuit breaker integration available via execute_workflow_async method
 
         ok, err = self._validate_request_against_workflow(request, definition)
         if not ok:
@@ -145,6 +156,25 @@ class WorkflowManager:
             run_state.ended_at = _utc_now()
 
             # Compose response using context, history, and graph metadata
+            # Aggregate safety findings from step results (if present)
+            agg_safety: Dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
+            try:
+                levels = {"safe": 0, "warning": 1, "blocked": 2}
+                max_level = 0
+                for h in run_state.history:
+                    tv = h.result.get("therapeutic_validation") if isinstance(h.result, dict) else None
+                    if tv and isinstance(tv, dict):
+                        agg_safety["by_step"].append({"agent": h.step.agent.value, "validation": tv})
+                        lvl = str(tv.get("level") or "safe").lower()
+                        max_level = max(max_level, levels.get(lvl, 0))
+                        f = tv.get("findings") or []
+                        if isinstance(f, list):
+                            agg_safety["findings"].extend(f)
+                inv_levels = {0: "safe", 1: "warning", 2: "blocked"}
+                agg_safety["level"] = inv_levels.get(max_level, "safe")
+            except Exception:
+                agg_safety = None
+
             response = WorkflowOrchestrationResponse(
                 response_text="Workflow executed",
                 updated_context=run_state.context.model_dump(),
@@ -159,7 +189,7 @@ class WorkflowManager:
                     "started_at": run_state.started_at,
                     "ended_at": run_state.ended_at,
                 },
-                therapeutic_validation=None,
+                therapeutic_validation=agg_safety,
             )
             return response, run_id, None
         except Exception as e:
@@ -210,6 +240,204 @@ class WorkflowManager:
                 pass
             result.ended_at = _utc_now()
         return result
+
+    async def _execute_workflow_steps(
+        self,
+        definition: WorkflowDefinition,
+        run_state: WorkflowRunState
+    ) -> Optional[WorkflowOrchestrationResponse]:
+        """Execute workflow steps with error handling."""
+        # Sequentially process agent_sequence only (parallel steps may be handled by graph executor)
+        for idx, step in enumerate(definition.agent_sequence):
+            run_state.current_step_index = idx
+            step_result = self._execute_step(step, run_state)
+            run_state.history.append(step_result)
+            if step_result.error:
+                run_state.status = WorkflowRunStatus.FAILED
+                run_state.ended_at = _utc_now()
+                raise Exception(step_result.error)
+
+        # Optionally build/execute a graph (no-op if not available)
+        graph = self._lg_builder.build(definition)
+        graph_response = self._lg_executor.execute(graph, {"history": [h.step.agent.value for h in run_state.history]})
+
+        # Mark complete
+        run_state.status = WorkflowRunStatus.COMPLETED
+        run_state.ended_at = _utc_now()
+
+        # Compose response using context, history, and graph metadata
+        # Aggregate safety findings from step results (if present)
+        agg_safety: Dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
+        try:
+            for step_result in run_state.history:
+                if "safety" in step_result.result:
+                    agg_safety["by_step"].append(step_result.result["safety"])
+                    if step_result.result["safety"].get("level") == "warning":
+                        agg_safety["level"] = "warning"
+                        agg_safety["findings"].extend(step_result.result["safety"].get("findings", []))
+        except Exception:
+            pass
+
+        return WorkflowOrchestrationResponse(
+            response_text=f"Workflow '{run_state.workflow_name}' completed successfully",
+            updated_context=run_state.context.model_dump(),
+            workflow_metadata={
+                "run_id": run_state.run_id,
+                "workflow_name": run_state.workflow_name,
+                "steps_completed": len(run_state.history),
+                "total_duration": (
+                    (datetime.fromisoformat(run_state.ended_at.rstrip("Z")) -
+                     datetime.fromisoformat(run_state.started_at.rstrip("Z"))).total_seconds()
+                    if run_state.started_at and run_state.ended_at else None
+                ),
+                "graph_response": graph_response,
+            },
+            performance_metrics=self._aggregator.get_metrics() if self._aggregator else {},
+            therapeutic_validation=agg_safety,
+        )
+
+    def _execute_degraded_workflow(
+        self,
+        name: str,
+        request: OrchestrationRequest,
+        context: Optional[AgentContext] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[Optional[WorkflowOrchestrationResponse], Optional[str], Optional[str]]:
+        """Execute workflow in degraded mode when circuit breaker is open."""
+        logger.info(f"Executing workflow {name} in degraded mode")
+
+        run_id = uuid.uuid4().hex
+
+        # Create a simplified response for degraded mode
+        degraded_response = WorkflowOrchestrationResponse(
+            response_text=f"Workflow '{name}' executed in degraded mode due to service issues. Limited functionality available.",
+            updated_context=(context or AgentContext()).model_dump(),
+            workflow_metadata={
+                "run_id": run_id,
+                "workflow_name": name,
+                "degraded_mode": True,
+                "reason": "circuit_breaker_open",
+                "steps_completed": 0,
+            },
+            performance_metrics={},
+            therapeutic_validation={"level": "safe", "findings": [], "degraded": True},
+        )
+
+        return degraded_response, run_id, None
+
+    async def execute_workflow_async(
+        self,
+        name: str,
+        request: OrchestrationRequest,
+        context: Optional[AgentContext] = None,
+        metadata: Optional[Dict[str, Any]] = None,
+    ) -> Tuple[Optional[WorkflowOrchestrationResponse], Optional[str], Optional[str]]:
+        """
+        Execute a registered workflow asynchronously with circuit breaker support.
+
+        This is the async version that includes circuit breaker integration
+        for graceful degradation and error handling.
+
+        Returns: (response, run_id, error)
+        """
+        definition = self._workflows.get(name)
+        if not definition:
+            return None, None, f"Workflow '{name}' is not registered"
+
+        # Check circuit breaker state before execution
+        if self._circuit_breaker_registry:
+            try:
+                circuit_breaker = await self._circuit_breaker_registry.get_or_create(
+                    f"workflow:{name}"
+                )
+                if not await circuit_breaker.is_call_permitted():
+                    logger.warning(f"Circuit breaker open for workflow {name}, attempting degraded execution")
+                    return self._execute_degraded_workflow(name, request, context, metadata)
+            except Exception as e:
+                logger.warning(f"Circuit breaker check failed for workflow {name}: {e}")
+                # Continue with normal execution if circuit breaker check fails
+
+        ok, err = self._validate_request_against_workflow(request, definition)
+        if not ok:
+            return None, None, err
+
+        run_id = uuid.uuid4().hex
+        run_state = WorkflowRunState(
+            run_id=run_id,
+            workflow_name=name,
+            status=WorkflowRunStatus.RUNNING,
+            current_step_index=0,
+            started_at=_utc_now(),
+            metadata=metadata or {},
+            request=request,
+            context=context or AgentContext(),
+            definition=definition,
+        )
+        self._runs[run_id] = run_state
+
+        try:
+            # Execute workflow through circuit breaker if available
+            if self._circuit_breaker_registry:
+                circuit_breaker = await self._circuit_breaker_registry.get_or_create(
+                    f"workflow:{name}"
+                )
+                try:
+                    response = await circuit_breaker.call(
+                        lambda: self._execute_workflow_steps(definition, run_state)
+                    )
+                    if response:
+                        return response, run_id, None
+                except CircuitBreakerOpenError:
+                    logger.warning(f"Circuit breaker opened during workflow {name} execution")
+                    return self._execute_degraded_workflow(name, request, context, metadata)
+                except Exception as e:
+                    logger.error(f"Workflow {name} execution failed: {e}")
+                    run_state.status = WorkflowRunStatus.FAILED
+                    run_state.ended_at = _utc_now()
+                    return None, run_id, str(e)
+            else:
+                # Fallback to direct execution without circuit breaker
+                response = await self._execute_workflow_steps(definition, run_state)
+                if response:
+                    return response, run_id, None
+
+        except Exception as e:
+            run_state.status = WorkflowRunStatus.FAILED
+            run_state.ended_at = _utc_now()
+            return None, run_id, str(e)
+
+        # Should not reach here, but fallback
+        return None, run_id, "Workflow execution completed without response"
+
+    # ---- Circuit breaker management ----
+    async def get_circuit_breaker_status(self, workflow_name: str) -> Optional[Dict[str, Any]]:
+        """Get circuit breaker status for a workflow."""
+        if not self._circuit_breaker_registry:
+            return None
+
+        circuit_breaker = await self._circuit_breaker_registry.get(f"workflow:{workflow_name}")
+        if circuit_breaker:
+            return await circuit_breaker.get_metrics()
+        return None
+
+    async def reset_circuit_breaker(self, workflow_name: str) -> bool:
+        """Reset circuit breaker for a workflow."""
+        if not self._circuit_breaker_registry:
+            return False
+
+        circuit_breaker = await self._circuit_breaker_registry.get(f"workflow:{workflow_name}")
+        if circuit_breaker:
+            await circuit_breaker.reset()
+            logger.info(f"Reset circuit breaker for workflow {workflow_name}")
+            return True
+        return False
+
+    async def get_all_circuit_breaker_status(self) -> Dict[str, Any]:
+        """Get status of all workflow circuit breakers."""
+        if not self._circuit_breaker_registry:
+            return {}
+
+        return await self._circuit_breaker_registry.get_all_metrics()
 
     def _validate_workflow_definition(self, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:
         try:

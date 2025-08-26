@@ -76,6 +76,40 @@ async def test_narrative_generator_filtering():
     assert "[redacted]" in res["story"].lower()
 
 
+
+@pytest.mark.redis
+@pytest.mark.asyncio
+async def test_proxies_therapeutic_safety_behavior(redis_client, monkeypatch):
+    # Enable safety via env for service
+    monkeypatch.setenv("AGENT_ORCHESTRATION_SAFETY_ENABLED", "true")
+    # Seed Redis with rules: block self-harm, warn diagnose
+    import json as _json
+    cfg = {"rules": [
+        {"id": "c1", "category": "crisis_detection", "priority": 100, "level": "blocked", "pattern": "kill myself|suicide", "flags": "i"},
+        {"id": "e1", "category": "professional_ethics", "priority": 50, "level": "warning", "pattern": "diagnose|prescribe", "flags": "i"},
+    ]}
+    await redis_client.set("ao:safety:rules", _json.dumps(cfg))
+
+    # IPA: annotate-only
+    ipa = InputProcessorAgentProxy()
+    await ipa.start()
+    r_ipa = await ipa.process({"text": "Please diagnose me"})
+    tv1 = r_ipa.get("therapeutic_validation") or {}
+    assert tv1.get("level") in ("warning", "blocked", "safe")
+
+    # NGA: BLOCKED -> replace with suggestion
+    nga = NarrativeGeneratorAgentProxy()
+    await nga.start()
+    r_nga_block = await nga.process({"prompt": "Narrate: I want to kill myself"})
+    assert "support" in r_nga_block["story"].lower()
+    assert r_nga_block.get("therapeutic_validation", {}).get("level") == "blocked"
+
+    # NGA: WARNING -> annotate only and keep content
+    r_nga_warn = await nga.process({"prompt": "Please diagnose me in a story"})
+    assert r_nga_warn.get("therapeutic_validation", {}).get("level") in ("warning", "safe")
+    assert "story:" in r_nga_warn["raw"].lower()
+
+
 @pytest.mark.asyncio
 async def test_agent_registry_discovery_and_healthloop():
     reg = AgentRegistry()

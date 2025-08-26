@@ -5,7 +5,7 @@ import logging
 import time
 import uuid
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Awaitable, Callable
 
 from .interfaces import MessageCoordinator, AgentProxy
 from .models import AgentId, AgentMessage, MessagePriority, MessageType, AgentType
@@ -21,6 +21,36 @@ class AgentMetrics:
     started_at: float = field(default_factory=time.time)
     requests: int = 0
     errors: int = 0
+    # Sliding window of last N outcomes (True=success, False=error)
+    _window: List[bool] = field(default_factory=list)
+    _window_size: int = 100
+
+    def set_window_size(self, n: int) -> None:
+        try:
+            self._window_size = int(n) if int(n) > 0 else 100
+            # trim if needed
+            if len(self._window) > self._window_size:
+                self._window = self._window[-self._window_size:]
+        except Exception:
+            self._window_size = 100
+
+    def record_success(self) -> None:
+        self.requests += 1
+        self._window.append(True)
+        if len(self._window) > self._window_size:
+            self._window.pop(0)
+
+    def record_error(self) -> None:
+        self.errors += 1
+        self._window.append(False)
+        if len(self._window) > self._window_size:
+            self._window.pop(0)
+
+    def window_success_rate(self) -> float:
+        if not self._window:
+            return 1.0
+        succ = sum(1 for x in self._window if x)
+        return succ / float(len(self._window))
 
     def uptime_seconds(self) -> float:
         return max(0.0, time.time() - self.started_at)
@@ -33,8 +63,10 @@ class Agent(AgentProxy):
     - Lifecycle (start/stop/health_check)
     - Message (de)serialization helpers
     - Error handling + timeout management
+    - State preservation hooks (export_state/import_state) for recovery
 
-    Concrete agents should override `process()` and optionally `health_check()`.
+    Concrete agents should override `process()` and optionally `health_check()` and
+    may override `export_state`/`import_state` to persist/restore critical runtime state.
     """
 
     def __init__(
@@ -97,6 +129,15 @@ class Agent(AgentProxy):
     async def send(self, recipient: AgentId, payload: Dict[str, Any], *, priority: MessagePriority = MessagePriority.NORMAL, message_type: MessageType = MessageType.REQUEST) -> MessageResult:
         if not self._coordinator:
             raise RuntimeError("MessageCoordinator not configured for this agent")
+        # Route via router if available on coordinator owner (component)
+        try:
+            from src.agent_orchestration.router import AgentRouter  # type: ignore
+            router = getattr(self._coordinator, "_agent_router", None)
+            if router and isinstance(router, AgentRouter):
+                recipient = await router.resolve_target(recipient)
+        except Exception:
+            pass
+
         msg = self.serialize(recipient, payload, priority=priority, message_type=message_type)
         return await self._coordinator.send_message(sender=self.agent_id, recipient=recipient, message=msg)
 
@@ -127,7 +168,11 @@ class Agent(AgentProxy):
         try:
             coro = self.process(input_payload)
             result: dict = await asyncio.wait_for(coro, timeout=timeout)
-            self._metrics.requests += 1
+            # sliding window + cumulative
+            try:
+                self._metrics.record_success()
+            except Exception:
+                self._metrics.requests += 1
             # perf aggregation per agent instance
             try:
                 get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=True)
@@ -135,14 +180,20 @@ class Agent(AgentProxy):
                 pass
             return result
         except asyncio.TimeoutError:
-            self._metrics.errors += 1
+            try:
+                self._metrics.record_error()
+            except Exception:
+                self._metrics.errors += 1
             try:
                 get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=False)
             except Exception:
                 pass
             raise
         except Exception as e:
-            self._metrics.errors += 1
+            try:
+                self._metrics.record_error()
+            except Exception:
+                self._metrics.errors += 1
             try:
                 get_step_aggregator().record(key, (time.time() - start) * 1000.0, success=False)
             except Exception:
@@ -165,7 +216,7 @@ class Agent(AgentProxy):
 
     # Convenience status snapshot
     def status_snapshot(self) -> Dict[str, Any]:
-        d = {
+        return {
             "name": self.name,
             "agent_id": self.agent_id.model_dump() if hasattr(self.agent_id, "model_dump") else str(self.agent_id),
             "running": self._running,
@@ -177,7 +228,49 @@ class Agent(AgentProxy):
                 "errors": self._metrics.errors,
             },
         }
-        return d
+
+    # ---- State preservation hooks ----
+    async def export_state(self) -> Dict[str, Any]:
+        """Return a minimal serializable dict representing agent state.
+        Default is empty; proxies may override to include caches or context.
+        """
+        # Restart policy config/state
+        self._restart_policy = {
+            "max_attempts_window": int( self._config.get("agent_orchestration.monitoring.restart_policy.max_attempts_window", 5) ) if hasattr(self, "_config") else 5,
+            "window_seconds": float( getattr(self, "_config", {}).get("agent_orchestration.monitoring.restart_policy.window_seconds", 60.0) if hasattr(self, "_config") else 60.0 ),
+            "backoff_factor": float( getattr(self, "_config", {}).get("agent_orchestration.monitoring.restart_policy.backoff_factor", 2.0) if hasattr(self, "_config") else 2.0 ),
+            "backoff_max": float( getattr(self, "_config", {}).get("agent_orchestration.monitoring.restart_policy.backoff_max", 60.0) if hasattr(self, "_config") else 60.0 ),
+            "circuit_breaker_failures": int( getattr(self, "_config", {}).get("agent_orchestration.monitoring.restart_policy.circuit_breaker_failures", 3) if hasattr(self, "_config") else 3 ),
+        }
+        self._restart_history: Dict[Tuple[str,str], List[float]] = {}
+        self._circuit_open: Dict[Tuple[str,str], bool] = {}
+
+        return {}
+
+    async def import_state(self, state: Dict[str, Any]) -> None:
+        """Restore internal runtime state from a previously exported dict.
+        Default is no-op; proxies may override.
+        """
+        return None
+
+    # ---- Capability Support ----
+
+    async def get_capabilities(self) -> Optional['AgentCapabilitySet']:
+        """
+        Get the capabilities advertised by this agent.
+
+        Default implementation returns None. Concrete agents should override
+        this method to advertise their capabilities for discovery.
+
+        Returns:
+            AgentCapabilitySet or None if agent doesn't advertise capabilities
+        """
+        return None
+
+    def advertises_capabilities(self) -> bool:
+        """Check if this agent advertises capabilities for discovery."""
+        # This is a synchronous check that can be used without async context
+        return hasattr(self, '_capabilities') or hasattr(self, 'get_capabilities')
 
 
 class AgentRegistry:
@@ -190,10 +283,26 @@ class AgentRegistry:
         self._agents: Dict[Tuple[str, str], Agent] = {}
         self._health_task: Optional[asyncio.Task] = None
         self._health_interval_s: float = 15.0
+        # Restart tracking for failure recovery
+        self._restart_attempts: Dict[Tuple[str, str], int] = {}
+        self._last_restart_ts: Dict[Tuple[str, str], float] = {}
+        self._restart_backoff_s: float = 5.0
+
+        # Optional restart callback supplied by component for concrete restarts
+        self._restart_cb: Optional[Callable[[Agent], Awaitable[bool]]] = None
+        self._fallback_map: Dict[Tuple[str, str], Tuple[str, str]] = {}
+        self._fallback_cb: Optional[Callable[[Agent, Agent], Awaitable[bool]]] = None
+
 
     # Key helpers
     def _key(self, agent_id: AgentId) -> Tuple[str, str]:
         return (agent_id.type.value, agent_id.instance or "default")
+    def set_fallback_callback(self, cb: Callable[[Agent, Agent], Awaitable[bool]]) -> None:
+        self._fallback_cb = cb
+
+
+    def set_restart_callback(self, cb: Callable[[Agent], Awaitable[bool]]) -> None:
+        self._restart_cb = cb
 
     # Registration
     def register(self, agent: Agent) -> None:
@@ -231,6 +340,93 @@ class AgentRegistry:
             except Exception as e:
                 results[agent.name] = {"status": "error", "error": str(e)}
                 agent.set_degraded(True)
+        return results
+    # Failure detection and basic restart scaffolding
+    async def _maybe_restart(self, agent: Agent) -> bool:
+        """Attempt restart via component-provided callback, with simple backoff."""
+        if not self._restart_cb:
+            return False
+        key = self._key(agent.agent_id)
+        now = time.time()
+        last = self._last_restart_ts.get(key, 0.0)
+        if (now - last) < self._restart_backoff_s:
+            return False
+        if not self._enforce_restart_policy(agent):
+            return False
+        backoff_factor = float(self._restart_policy.get("backoff_factor", 2.0))
+        backoff_max = float(self._restart_policy.get("backoff_max", 60.0))
+        # Simple exponential backoff using attempts count as exponent
+        attempts = int(self._restart_attempts.get(key, 0))
+        backoff = min(self._restart_backoff_s * (backoff_factor ** attempts), backoff_max)
+        # Enforce minimal spacing
+        if (now - last) < backoff:
+            return False
+        ok = False
+        try:
+            ok = await self._restart_cb(agent)
+        finally:
+            self._last_restart_ts[key] = now
+            self._restart_attempts[key] = self._restart_attempts.get(key, 0) + 1
+            self._record_restart_attempt(agent, ok)
+        return bool(ok)
+    # Restart policy enforcement helpers
+    def _enforce_restart_policy(self, agent: Agent) -> bool:
+        key = self._key(agent.agent_id)
+        now = time.time()
+        hist = self._restart_history.get(key, [])
+        window = float(self._restart_policy.get("window_seconds", 60.0))
+        hist = [t for t in hist if (now - t) <= window]
+        max_attempts = int(self._restart_policy.get("max_attempts_window", 5))
+        if len(hist) >= max_attempts:
+            return False
+        self._restart_history[key] = hist
+        # Circuit breaker check
+        if self._circuit_open.get(key, False):
+            return False
+        return True
+
+    def _record_restart_attempt(self, agent: Agent, success: bool) -> None:
+        key = self._key(agent.agent_id)
+        now = time.time()
+        self._restart_history.setdefault(key, []).append(now)
+        # Circuit breaker: open if too many consecutive failures
+        fails = int(self._restart_policy.get("circuit_breaker_failures", 3))
+        if not success:
+            consec = getattr(self, "_consec_fail", {})
+            c = int(consec.get(key, 0)) + 1
+            consec[key] = c
+            self._consec_fail = consec
+            if c >= fails:
+                self._circuit_open[key] = True
+        else:
+            # reset counter on success
+            consec = getattr(self, "_consec_fail", {})
+            consec[key] = 0
+            self._consec_fail = consec
+            self._circuit_open[key] = False
+
+
+    async def detect_and_recover(self) -> Dict[str, Any]:
+        """Run a health check sweep and attempt basic recovery actions.
+        Heuristic: if agent health_check returns status not healthy/initializing or agent not running, mark degraded and try restart.
+        """
+        summary: Dict[str, Any] = {"checked": 0, "restarted": 0, "degraded": 0}
+        for agent in self._agents.values():
+            summary["checked"] += 1
+            try:
+                res = await agent.health_check()
+                ok = res.get("status") in ("healthy", "initializing")
+                if not ok or not agent._running:
+                    agent.set_degraded(True); summary["degraded"] += 1
+                    if await self._maybe_restart(agent):
+                        summary["restarted"] += 1
+                else:
+                    agent.set_degraded(False)
+            except Exception:
+                agent.set_degraded(True); summary["degraded"] += 1
+                await self._maybe_restart(agent)
+        return summary
+
         return results
 
     def start_periodic_health_checks(self, interval_s: float = 15.0) -> None:

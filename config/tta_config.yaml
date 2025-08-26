@@ -31,16 +31,53 @@ tta.prototype:
       port: 8502
       max_concurrent_sessions: 100
       narrative_scales:
-        short_term_window: 300  # 5 minutes
-        medium_term_window: 86400  # 1 day
-        long_term_window: 2592000  # 30 days
-        epic_term_window: 31536000  # 1 year
+        short_term_window: 300 # 5 minutes
+        medium_term_window: 86400 # 1 day
+        long_term_window: 2592000 # 30 days
+        epic_term_window: 31536000 # 1 year
       therapeutic_integration:
         safety_check_interval: 60
         therapeutic_weight: 0.3
       emergent_generation:
         probability_threshold: 0.7
         complexity_limit: 5
+
+# Core Gameplay Loop Configuration
+core_gameplay_loop:
+  enabled: true
+  max_concurrent_sessions: 100
+  session_timeout_minutes: 30
+  enable_performance_tracking: true
+
+  # Narrative Engine Configuration
+  narrative_engine:
+    enabled: true
+    complexity_adaptation: true
+    max_description_length: 2000
+    min_description_length: 100
+    immersion_tracking: true
+
+  # Choice Architecture Configuration
+  choice_architecture:
+    enabled: true
+    min_choices: 2
+    max_choices: 5
+    therapeutic_weighting: 0.4
+    consequence_preview: false
+
+  # Consequence System Configuration
+  consequence_system:
+    enabled: true
+    learning_emphasis: true
+    pattern_tracking: true
+    therapeutic_framing: true
+
+  # Session Management Configuration
+  session_manager:
+    enabled: true
+    auto_save_interval: 60 # seconds
+    context_preservation: true
+    therapeutic_goal_tracking: true
 
 # Agent Orchestration Configuration
 agent_orchestration:
@@ -51,18 +88,50 @@ agent_orchestration:
 
   # Agent Configuration
   agents:
+    # Global agent discovery and registration settings
+    auto_register: false # Global flag for automatic agent registration (default: false for security)
+    heartbeat_ttl: 30.0 # Agent heartbeat TTL in seconds
+    heartbeat_interval: null # Heartbeat interval (null = auto-calculate as ttl/3)
+
+    # Discovery system configuration
+    discovery:
+      enabled: true # Enable agent discovery system
+      cache_ttl: 300 # Discovery cache TTL in seconds
+      max_search_results: 50 # Maximum results for capability searches
+      capability_matching:
+        algorithm: "weighted_score" # Capability matching algorithm
+        score_threshold: 0.5 # Minimum match score threshold
+        prefer_exact_version: true # Prefer exact version matches
+        include_deprecated: false # Include deprecated capabilities
+
+    # Per-agent configuration
     input_processor:
       enabled: true
       max_instances: 3
       timeout: 10
+      auto_register_enabled: false # Per-agent auto-registration flag
+      instance: null # Explicit instance name (null = auto-generate)
+      capabilities:
+        advertise: true # Advertise capabilities for discovery
+        version: "1.0.0" # Capability set version
     world_builder:
       enabled: true
       max_instances: 2
       timeout: 15
+      auto_register_enabled: false
+      instance: null
+      capabilities:
+        advertise: true
+        version: "1.0.0"
     narrative_generator:
       enabled: true
       max_instances: 3
       timeout: 20
+      auto_register_enabled: false
+      instance: null
+      capabilities:
+        advertise: true
+        version: "1.0.0"
 
   # Resource Management
   resources:
@@ -89,6 +158,83 @@ agent_orchestration:
   # Diagnostics
   diagnostics:
     enabled: true
+
+  # Real-time Interaction Management
+  realtime:
+    enabled: true # Enabled by default for enhanced user experience
+    environment: development # development, testing, staging, production
+
+    # WebSocket Configuration
+    websocket:
+      enabled: true
+      path: "/ws"
+      heartbeat_interval: 30.0 # seconds
+      connection_timeout: 60.0 # seconds
+      max_connections: 1000
+      auth_required: true
+      cors_origins: ["*"] # Allow all origins in development
+
+    # Event Broadcasting
+    events:
+      enabled: true
+      redis_channel_prefix: "ao:events"
+      buffer_size: 1000
+      broadcast_agent_status: true
+      broadcast_workflow_progress: true
+      broadcast_system_metrics: true # Enable for real-time monitoring
+      event_retention_hours: 24
+
+    # Progressive Feedback
+    progressive_feedback:
+      enabled: true
+      update_interval: 1.0 # seconds
+      max_updates_per_workflow: 100
+      stream_intermediate_results: true
+      batch_updates: true
+      batch_size: 10
+
+    # Performance Optimization
+    optimization:
+      enabled: true # Enable for real-time performance monitoring
+      response_time_monitoring: true
+      statistical_analysis: true
+      auto_parameter_adjustment: false # Keep manual for safety
+      speed_creativity_balance: 0.5 # 0.0 = speed, 1.0 = creativity
+
+    # Connection Recovery
+    recovery:
+      enabled: true
+      timeout: 300.0 # 5 minutes
+      max_reconnect_attempts: 5
+      reconnect_interval: 5.0 # seconds
+      optimization_interval: 60.0 # seconds
+      min_data_points: 10
+
+  # Workflow Error Handling
+  workflow:
+    error_handling:
+      enabled: true
+      timeout_seconds: 300
+      step_timeout_seconds: 60
+      rollback_retention_days: 30
+      circuit_breaker:
+        enabled: true
+        failure_threshold: 5
+        timeout_seconds: 60
+        recovery_timeout_seconds: 300
+        half_open_max_calls: 3
+        success_threshold: 2
+      resource_monitoring:
+        enabled: true
+        memory_threshold_percent: 80
+        cpu_threshold_percent: 90
+        disk_threshold_percent: 90
+        early_warning_percent: 75
+      notifications:
+        enabled: true
+        websocket_enabled: true
+        redis_pubsub_enabled: true
+        log_notifications: true
 
   # Metrics thresholds
   metrics:
@@ -121,7 +267,7 @@ player_experience:
   api:
     host: "0.0.0.0"
     port: 8080
-    cors_origins: 
+    cors_origins:
       - "http://localhost:3000"
       - "https://localhost:3000"
   web:

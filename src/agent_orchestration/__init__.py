@@ -13,6 +13,16 @@ from .models import (
     AgentMessage,
     OrchestrationRequest,
     OrchestrationResponse,
+    # Capability system models
+    CapabilityType,
+    CapabilityScope,
+    CapabilityStatus,
+    AgentCapability,
+    AgentCapabilitySet,
+    CapabilityMatchCriteria,
+    CapabilityMatchResult,
+    CapabilityDiscoveryRequest,
+    CapabilityDiscoveryResponse,
 )
 from .messaging import (
     MessageResult,
@@ -28,6 +38,11 @@ from .proxies import (
     WorldBuilderAgentProxy,
     NarrativeGeneratorAgentProxy,
 )
+from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig, CircuitBreakerState, CircuitBreakerOpenError
+from .circuit_breaker_registry import CircuitBreakerRegistry
+from .circuit_breaker_metrics import CircuitBreakerMetricsCollector, CircuitBreakerLogger
+from .circuit_breaker_config import CircuitBreakerConfigManager, WorkflowErrorHandlingConfigSchema
+from .resource_exhaustion_detector import ResourceExhaustionDetector, ResourceThresholds, ResourceExhaustionEvent
 from .state import AgentContext, AgentState, SessionContext, AgentRuntimeStatus
 from .workflow import (
     WorkflowType,
@@ -47,6 +62,9 @@ from .resources import (
     OptimizationResult,
 )
 from .performance import get_step_aggregator
+from .therapeutic_safety import TherapeuticValidator, SafetyLevel, SafetyService, get_global_safety_service
+# main service
+from .service import AgentOrchestrationService
 # tools exports
 try:
     from .tools.models import ToolSpec, ToolParameter, ToolRegistration, ToolInvocation, ToolPolicy, ToolStatus
@@ -66,6 +84,16 @@ __all__ = [
     "AgentMessage",
     "OrchestrationRequest",
     "OrchestrationResponse",
+    # Capability system models
+    "CapabilityType",
+    "CapabilityScope",
+    "CapabilityStatus",
+    "AgentCapability",
+    "AgentCapabilitySet",
+    "CapabilityMatchCriteria",
+    "CapabilityMatchResult",
+    "CapabilityDiscoveryRequest",
+    "CapabilityDiscoveryResponse",
     "MessageResult",
     "MessageSubscription",
     "QueueMessage",
@@ -98,10 +126,30 @@ __all__ = [
     "ResourceManager",
     "ResourceRequirements",
     "ResourceAllocation",
+    # circuit breaker
+    "CircuitBreaker",
+    "CircuitBreakerConfig",
+    "CircuitBreakerState",
+    "CircuitBreakerOpenError",
+    "CircuitBreakerRegistry",
+    "CircuitBreakerMetricsCollector",
+    "CircuitBreakerLogger",
+    "CircuitBreakerConfigManager",
+    "WorkflowErrorHandlingConfigSchema",
+    "ResourceExhaustionDetector",
+    "ResourceThresholds",
+    "ResourceExhaustionEvent",
     "ResourceUsage",
     "ResourceUsageReport",
     "WorkloadMetrics",
     "OptimizationResult",
     "get_step_aggregator",
+    # safety exports
+    "TherapeuticValidator",
+    "SafetyLevel",
+    "SafetyService",
+    "get_global_safety_service",
+    # main service
+    "AgentOrchestrationService",
 ]
 

@@ -27,6 +27,21 @@ async def test_registry_ttl_and_interval_config_and_deregister(redis_client):
     reg.start_heartbeats()
     await asyncio.sleep(0.25)
 
+    # Ensure state persistence field appears and last_heartbeat updates
+    # (default export_state returns empty dict, so no 'state' key)
+    val1 = await redis_client.get(key)
+    data1 = json.loads(val1)
+    assert "status" in data1 and "last_heartbeat" in data1
+    t1 = float(data1["last_heartbeat"]) if isinstance(data1, dict) else 0.0
+
+    # Heartbeats
+    reg.start_heartbeats()
+    await asyncio.sleep(0.25)
+    val2 = await redis_client.get(key)
+    data2 = json.loads(val2)
+    assert float(data2["last_heartbeat"]) >= t1
+
+
     # Deregister should remove key and index
     reg.deregister(a.agent_id)
     await asyncio.sleep(0.05)

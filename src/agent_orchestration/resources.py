@@ -4,7 +4,7 @@ import asyncio
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Callable, Awaitable
 
 # Prefer psutil which is already used elsewhere in the repo
 try:
@@ -93,6 +93,7 @@ class ResourceManager:
         crit_mem_percent: float = 95.0,
         redis_client: Any = None,
         redis_prefix: str = "ao",
+        circuit_breaker_registry: Any = None,
     ) -> None:
         self.gpu_memory_limit_fraction = float(max(0.0, min(1.0, gpu_memory_limit_fraction)))
         self.cpu_thread_limit = cpu_thread_limit
@@ -108,6 +109,12 @@ class ResourceManager:
         self._monitoring_task: Optional[asyncio.Task] = None
         self._latest_report: Optional[ResourceUsageReport] = None
         self._emergency_active: bool = False
+
+        # Circuit breaker integration for workflow error handling
+        self._circuit_breaker_registry = circuit_breaker_registry
+        self._resource_exhaustion_callbacks: List[Callable[[ResourceUsageReport], Awaitable[None]]] = []
+        self._last_exhaustion_alert = 0.0
+        self._exhaustion_alert_cooldown = 60.0  # 1 minute cooldown
 
     # ---- Public API ----
     async def allocate_resources(
@@ -171,6 +178,10 @@ class ResourceManager:
         self._latest_report = report
         # Emergency mode flag
         self._emergency_active = any(v.get("level") == "critical" for v in thresholds.values())
+
+        # Check for resource exhaustion and trigger workflow error handling
+        await self._check_resource_exhaustion(report)
+
         return report
 
     async def optimize_allocation(self, current_workload: WorkloadMetrics) -> OptimizationResult:
@@ -361,4 +372,139 @@ class ResourceManager:
         if req.gpu_memory_bytes:
             return None, 0
         return None, 0
+
+    # ---- Resource exhaustion detection and workflow error handling ----
+    async def _check_resource_exhaustion(self, report: ResourceUsageReport) -> None:
+        """Check for resource exhaustion and trigger workflow error handling."""
+        current_time = time.time()
+
+        # Check if we're in cooldown period
+        if current_time - self._last_exhaustion_alert < self._exhaustion_alert_cooldown:
+            return
+
+        # Check for critical resource exhaustion
+        exhaustion_detected = False
+        exhaustion_reasons = []
+
+        for resource, threshold_info in report.thresholds_exceeded.items():
+            if threshold_info.get("level") == "critical":
+                exhaustion_detected = True
+                exhaustion_reasons.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+
+        if exhaustion_detected:
+            self._last_exhaustion_alert = current_time
+            logger.error(
+                "Resource exhaustion detected",
+                extra={
+                    "exhausted_resources": exhaustion_reasons,
+                    "timestamp": current_time,
+                    "event_type": "resource_exhaustion"
+                }
+            )
+
+            # Trigger circuit breakers for resource exhaustion
+            await self._trigger_resource_exhaustion_circuit_breakers(report, exhaustion_reasons)
+
+            # Call registered callbacks
+            for callback in self._resource_exhaustion_callbacks:
+                try:
+                    await callback(report)
+                except Exception as e:
+                    logger.warning(f"Resource exhaustion callback failed: {e}")
+
+    async def _trigger_resource_exhaustion_circuit_breakers(
+        self,
+        report: ResourceUsageReport,
+        exhaustion_reasons: List[str]
+    ) -> None:
+        """Trigger circuit breakers when resource exhaustion is detected."""
+        if not self._circuit_breaker_registry:
+            return
+
+        try:
+            # Get all workflow circuit breakers and trigger them
+            all_metrics = await self._circuit_breaker_registry.get_all_metrics()
+
+            for cb_name in all_metrics.keys():
+                if cb_name.startswith("workflow:"):
+                    circuit_breaker = await self._circuit_breaker_registry.get(cb_name)
+                    if circuit_breaker:
+                        # Force transition to open state due to resource exhaustion
+                        await circuit_breaker._transition_to_open()
+                        logger.warning(
+                            f"Opened circuit breaker {cb_name} due to resource exhaustion",
+                            extra={
+                                "circuit_breaker_name": cb_name,
+                                "exhaustion_reasons": exhaustion_reasons,
+                                "event_type": "circuit_breaker_resource_exhaustion"
+                            }
+                        )
+        except Exception as e:
+            logger.error(f"Failed to trigger resource exhaustion circuit breakers: {e}")
+
+    def register_resource_exhaustion_callback(
+        self,
+        callback: Callable[[ResourceUsageReport], Awaitable[None]]
+    ) -> None:
+        """Register a callback to be called when resource exhaustion is detected."""
+        self._resource_exhaustion_callbacks.append(callback)
+
+    def unregister_resource_exhaustion_callback(
+        self,
+        callback: Callable[[ResourceUsageReport], Awaitable[None]]
+    ) -> bool:
+        """Unregister a resource exhaustion callback."""
+        try:
+            self._resource_exhaustion_callbacks.remove(callback)
+            return True
+        except ValueError:
+            return False
+
+    async def check_resource_health_for_workflow(self, workflow_name: str) -> Dict[str, Any]:
+        """Check if resources are healthy enough to run a workflow."""
+        if not self._latest_report:
+            await self.monitor_usage()
+
+        if not self._latest_report:
+            return {"healthy": False, "reason": "no_resource_data"}
+
+        # Check if any critical thresholds are exceeded
+        critical_issues = []
+        for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
+            if threshold_info.get("level") == "critical":
+                critical_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+
+        if critical_issues:
+            return {
+                "healthy": False,
+                "reason": "resource_exhaustion",
+                "critical_issues": critical_issues,
+                "emergency_active": self._emergency_active
+            }
+
+        # Check for warning levels that might indicate impending issues
+        warning_issues = []
+        for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
+            if threshold_info.get("level") == "warning":
+                warning_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+
+        return {
+            "healthy": True,
+            "warning_issues": warning_issues,
+            "emergency_active": self._emergency_active,
+            "usage": {
+                "cpu_percent": self._latest_report.usage.cpu_percent,
+                "memory_percent": self._latest_report.usage.memory_percent
+            }
+        }
+
+    def get_resource_exhaustion_status(self) -> Dict[str, Any]:
+        """Get current resource exhaustion status."""
+        return {
+            "emergency_active": self._emergency_active,
+            "last_exhaustion_alert": self._last_exhaustion_alert,
+            "exhaustion_alert_cooldown": self._exhaustion_alert_cooldown,
+            "registered_callbacks": len(self._resource_exhaustion_callbacks),
+            "latest_report_timestamp": self._latest_report.timestamp if self._latest_report else None
+        }
 

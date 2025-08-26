@@ -19,6 +19,22 @@ except Exception:
 from pydantic import BaseModel, Field
 
 
+def _redact(obj: dict) -> dict:
+    """Redact sensitive-looking fields in a shallow dict copy."""
+    try:
+        SENSITIVE = {"secret", "password", "token", "key", "api_key", "auth"}
+        redacted = {}
+        for k, v in obj.items():
+            if any(s in str(k).lower() for s in SENSITIVE):
+                redacted[k] = "***REDACTED***"
+            else:
+                redacted[k] = v
+        return redacted
+    except Exception:
+        return obj
+
+
+
 class ToolPolicyConfig(BaseModel):
     callable_allowlist: List[str] = Field(default_factory=list)
     allow_network_tools: bool = True
@@ -119,4 +135,28 @@ def load_tool_policy_config() -> ToolPolicyConfig:
     except Exception:
         # if anything goes wrong, return permissive defaults
         return ToolPolicyConfig()
+
+
+def load_tool_policy_config_from(path: str) -> ToolPolicyConfig:
+    """Load policy config from a specific file path (YAML/JSON) without env overrides."""
+    try:
+        data = _load_from_file(path)
+        return ToolPolicyConfig(**data)
+    except Exception:
+        # fall back to permissive defaults on error
+        return ToolPolicyConfig()
+
+
+def validate_tool_policy_config(data: dict) -> tuple[bool, Optional[str]]:
+    """Validate a dict as ToolPolicyConfig. Returns (ok, error_message)."""
+    try:
+        ToolPolicyConfig(**data)
+        return True, None
+    except Exception as e:
+        return False, str(e)
+
+
+def redact_policy_config_dict(data: dict) -> dict:
+    """Return a redacted shallow copy of a tool policy dict."""
+    return _redact(dict(data or {}))
 
