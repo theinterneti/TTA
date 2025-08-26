@@ -52,6 +52,18 @@ from .therapeutic_integration_system import (
     ResistanceType
 )
 
+from .character_development_system import (
+    CharacterDevelopmentSystem,
+    CharacterAttribute,
+    CharacterMilestone,
+    DevelopmentTrigger,
+    AbilityType,
+    CharacterDevelopmentEvent,
+    CharacterMilestoneAchievement,
+    CharacterAbility,
+    CharacterAttributeLevel
+)
+
 from .narrative_loader import (
     NarrativeLoader,
     NarrativeDefinition,
@@ -120,5 +132,16 @@ __all__ = [
     "TherapeuticApproach",
     "IntegrationStrategy",
     "ProgressMilestone",
-    "ResistanceType"
+    "ResistanceType",
+
+    # Character Development System
+    "CharacterDevelopmentSystem",
+    "CharacterAttribute",
+    "CharacterMilestone",
+    "DevelopmentTrigger",
+    "AbilityType",
+    "CharacterDevelopmentEvent",
+    "CharacterMilestoneAchievement",
+    "CharacterAbility",
+    "CharacterAttributeLevel"
 ]

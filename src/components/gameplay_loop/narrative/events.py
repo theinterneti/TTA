@@ -45,6 +45,12 @@ class EventType(str, Enum):
     THERAPEUTIC_PROGRESS_UPDATED = "therapeutic_progress_updated"
     THERAPEUTIC_RESISTANCE_DETECTED = "therapeutic_resistance_detected"
     ADAPTIVE_INTERVENTION_TRIGGERED = "adaptive_intervention_triggered"
+
+    # Character development events
+    CHARACTER_DEVELOPED = "character_developed"
+    CHARACTER_MILESTONE_ACHIEVED = "character_milestone_achieved"
+    CHARACTER_ABILITY_UNLOCKED = "character_ability_unlocked"
+    CHARACTER_LEVEL_UP = "character_level_up"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"

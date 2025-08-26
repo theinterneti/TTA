@@ -17,6 +17,7 @@ from .events import EventType, create_choice_event
 from .consequence_system import ConsequenceSystem, ConsequenceGenerationContext
 from .adaptive_difficulty_engine import AdaptiveDifficultyEngine
 from .therapeutic_integration_system import TherapeuticIntegrationSystem, IntegrationStrategy
+from .character_development_system import CharacterDevelopmentSystem, DevelopmentTrigger
 
 
 logger = logging.getLogger(__name__)
@@ -263,6 +264,9 @@ class ChoiceProcessor:
         # Therapeutic integration system
         self.therapeutic_integration = TherapeuticIntegrationSystem(narrative_engine.event_bus)
 
+        # Character development system
+        self.character_development = CharacterDevelopmentSystem(narrative_engine.event_bus)
+
         # Choice cache
         self.choice_cache: Dict[str, UserChoice] = {}
         self.consequence_cache: Dict[str, List[ChoiceConsequence]] = {}
@@ -279,6 +283,7 @@ class ChoiceProcessor:
             "consequences_generated": 0,
             "difficulty_adjustments": 0,
             "therapeutic_integrations": 0,
+            "character_developments": 0,
             "therapeutic_moments_triggered": 0
         }
     
@@ -445,6 +450,27 @@ class ChoiceProcessor:
                     )
 
                     self.metrics["therapeutic_integrations"] += 1
+
+            # Process character development based on choice and consequences
+            character_development_context = {
+                "description": f"Character development from choice: {choice.text}",
+                "story_context": context.story_context,
+                "choice_type": choice.choice_type,
+                "therapeutic_relevance": choice.therapeutic_relevance,
+                "consequences_applied": len(context.consequences_applied),
+                "first_time": choice.choice_id not in session_state.context.get("previous_choices", []),
+                "therapeutic_aligned": choice.therapeutic_relevance > 0.6,
+                "milestone_related": any(
+                    consequence.therapeutic_outcomes_count > 0
+                    for consequence in context.consequences_applied
+                )
+            }
+
+            character_event = await self.character_development.process_character_development(
+                session_state, DevelopmentTrigger.CHOICE_CONSEQUENCE, character_development_context
+            )
+
+            self.metrics["character_developments"] += 1
 
             # Legacy consequence handling (for backward compatibility)
             legacy_consequences = await self._load_choice_consequences(choice_id)
