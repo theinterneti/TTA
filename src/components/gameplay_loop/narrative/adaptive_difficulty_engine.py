@@ -15,7 +15,7 @@ import statistics
 
 from src.components.gameplay_loop.services.session_state import SessionState
 from src.components.gameplay_loop.models.core import UserChoice, ChoiceType, ConsequenceSet
-from .events import EventBus, EventType, create_narrative_event
+from .events import EventBus, EventType, NarrativeEvent
 
 
 logger = logging.getLogger(__name__)
@@ -294,8 +294,16 @@ class AdaptiveDifficultyEngine:
                 await self._adjust_difficulty(session_state, snapshot)
             
             self.metrics["performance_snapshots_created"] += 1
-            
+
             return snapshot
+
+        except Exception as e:
+            logger.error(f"Failed to monitor performance for user {session_state.user_id}: {e}")
+            # Return minimal snapshot
+            return PerformanceSnapshot(
+                user_id=session_state.user_id,
+                session_id=session_state.session_id
+            )
 
     def _calculate_success_rate(self, session_state: SessionState) -> float:
         """Calculate success rate from recent choices and consequences."""
@@ -814,10 +822,10 @@ class AdaptiveDifficultyEngine:
     async def _publish_adjustment_event(self, session_state: SessionState,
                                       adjustment: DifficultyAdjustment) -> None:
         """Publish difficulty adjustment event."""
-        event = create_narrative_event(
-            EventType.DIFFICULTY_ADJUSTED,
-            session_state.session_id,
-            session_state.user_id,
+        event = NarrativeEvent(
+            event_type=EventType.DIFFICULTY_ADJUSTED,
+            session_id=session_state.session_id,
+            user_id=session_state.user_id,
             context={
                 "adjustment_id": adjustment.adjustment_id,
                 "from_difficulty": adjustment.from_difficulty.name,
@@ -1008,14 +1016,6 @@ class AdaptiveDifficultyEngine:
             "min_data_points": self.min_data_points,
             "metrics": self.get_metrics()
         }
-            
-        except Exception as e:
-            logger.error(f"Failed to monitor performance for user {session_state.user_id}: {e}")
-            # Return minimal snapshot
-            return PerformanceSnapshot(
-                user_id=session_state.user_id,
-                session_id=session_state.session_id
-            )
     
     async def _create_performance_snapshot(self, session_state: SessionState,
                                          interaction_data: Dict[str, Any]) -> PerformanceSnapshot:
