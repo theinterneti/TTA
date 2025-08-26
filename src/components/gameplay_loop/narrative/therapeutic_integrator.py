@@ -15,6 +15,7 @@ from src.components.therapeutic_safety import (
     ContentPayload, ValidationContext, ValidationResult,
     ContentType, ValidationScope, SafetyLevel, CrisisLevel, ValidationAction
 )
+from .emotional_safety_system import EmotionalSafetySystem, EmotionalState, DistressLevel
 
 
 logger = logging.getLogger(__name__)
@@ -53,6 +54,9 @@ class TherapeuticIntegrator:
         self.narrative_engine = narrative_engine
         self.safety_service = None  # Will be injected during initialization
 
+        # Emotional safety system integration
+        self.emotional_safety_system = EmotionalSafetySystem(narrative_engine.event_bus)
+
         # Therapeutic context tracking
         self.session_contexts: Dict[str, TherapeuticContext] = {}
         self.safety_monitors: Dict[str, SafetyMonitor] = {}
@@ -62,6 +66,7 @@ class TherapeuticIntegrator:
         self.validation_count = 0
         self.safety_violations = 0
         self.crisis_interventions = 0
+        self.emotional_interventions = 0
 
     async def initialize(self) -> None:
         """Initialize the therapeutic integrator."""
@@ -315,13 +320,109 @@ class TherapeuticIntegrator:
         else:
             safety_monitor.safety_level = "standard"
 
+    async def monitor_emotional_safety(self, session_state: SessionState,
+                                     interaction_data: Dict[str, Any]) -> None:
+        """Monitor emotional safety during narrative interactions."""
+        try:
+            # Monitor emotional state
+            snapshot = await self.emotional_safety_system.monitor_emotional_state(
+                session_state, interaction_data
+            )
+
+            # Check for emotional distress requiring intervention
+            if snapshot.is_distressed():
+                self.emotional_interventions += 1
+
+                # Update safety monitor if exists
+                if session_state.session_id in self.safety_monitors:
+                    safety_monitor = self.safety_monitors[session_state.session_id]
+                    safety_monitor.safety_level = f"emotional_distress_{snapshot.distress_level.name.lower()}"
+                    safety_monitor.risk_factors.extend(snapshot.trigger_indicators)
+                    safety_monitor.protective_factors.extend(snapshot.protective_factors)
+
+            # Detect triggers in content
+            if "content" in interaction_data:
+                triggers = await self.emotional_safety_system.detect_triggers(
+                    interaction_data["content"], interaction_data
+                )
+
+                # Store triggers in session context for awareness
+                if triggers:
+                    session_state.context["detected_triggers"] = [
+                        {
+                            "category": trigger.category.value,
+                            "intensity": trigger.intensity,
+                            "suggested_interventions": [i.value for i in trigger.suggested_interventions]
+                        }
+                        for trigger in triggers
+                    ]
+
+        except Exception as e:
+            logger.error(f"Failed to monitor emotional safety for session {session_state.session_id}: {e}")
+
+    async def provide_emotional_support(self, session_state: SessionState,
+                                      emotion: EmotionalState, intensity: float) -> Dict[str, Any]:
+        """Provide targeted emotional support."""
+        try:
+            support_response = await self.emotional_safety_system.provide_emotional_regulation_support(
+                session_state, emotion, intensity
+            )
+
+            # Update therapeutic context
+            if session_state.session_id in self.session_contexts:
+                context = self.session_contexts[session_state.session_id]
+                context.current_focus = f"emotional_support_{emotion.value}"
+
+            return support_response
+
+        except Exception as e:
+            logger.error(f"Failed to provide emotional support for session {session_state.session_id}: {e}")
+            return {"error": "Unable to provide emotional support"}
+
+    def get_emotional_safety_status(self, session_state: SessionState) -> Dict[str, Any]:
+        """Get current emotional safety status for a session."""
+        try:
+            # Get recent emotional history
+            emotional_history = self.emotional_safety_system.get_emotional_history(
+                session_state.user_id, hours=2
+            )
+
+            # Get trigger history
+            trigger_history = self.emotional_safety_system.get_trigger_history(
+                session_state.user_id, hours=2
+            )
+
+            # Calculate current safety status
+            current_distress = DistressLevel.NONE
+            if emotional_history:
+                latest_snapshot = emotional_history[-1]
+                current_distress = latest_snapshot.distress_level
+
+            return {
+                "current_distress_level": current_distress.name,
+                "recent_snapshots_count": len(emotional_history),
+                "recent_triggers_count": len(trigger_history),
+                "monitoring_active": self.emotional_safety_system.monitoring_enabled,
+                "intervention_threshold": self.emotional_safety_system.intervention_threshold.name,
+                "support_available": session_state.context.get("coping_support_offered", False),
+                "crisis_protocol_active": session_state.context.get("crisis_intervention_active", False)
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to get emotional safety status for session {session_state.session_id}: {e}")
+            return {"error": "Unable to get safety status"}
+
     def get_metrics(self) -> Dict[str, Any]:
         """Get therapeutic integrator metrics."""
+        emotional_metrics = self.emotional_safety_system.get_metrics()
+
         return {
             "validation_count": self.validation_count,
             "safety_violations": self.safety_violations,
             "crisis_interventions": self.crisis_interventions,
+            "emotional_interventions": self.emotional_interventions,
             "active_sessions": len(self.session_contexts),
             "safety_monitors": len(self.safety_monitors),
-            "progress_trackers": len(self.progress_trackers)
+            "progress_trackers": len(self.progress_trackers),
+            "emotional_safety_metrics": emotional_metrics
         }

@@ -297,7 +297,16 @@ class NarrativeEngine:
                 if not await self.therapeutic_integrator.validate_scene_safety(session_state, scene):
                     logger.warning(f"Scene {scene_id} failed safety validation")
                     return False
-                
+
+                # Monitor emotional safety for scene content
+                scene_interaction_data = {
+                    "content": scene.description,
+                    "scene_id": scene_id,
+                    "scene_type": scene.scene_type.value if hasattr(scene, 'scene_type') else "narrative",
+                    "interaction_type": "scene_entry"
+                }
+                await self.therapeutic_integrator.monitor_emotional_safety(session_state, scene_interaction_data)
+
                 # Enter scene
                 success = await self.scene_manager.enter_scene(session_state, scene)
                 if success:
@@ -320,12 +329,27 @@ class NarrativeEngine:
             
             async with self.session_locks[session_id]:
                 session_state = self.active_sessions[session_id]
-                
+
+                # Load choice for emotional safety monitoring
+                choice = await self.choice_processor.load_choice(choice_id)
+                if choice:
+                    # Monitor emotional safety for choice content
+                    choice_interaction_data = {
+                        "content": choice.text,
+                        "choice_id": choice_id,
+                        "choice_type": choice.choice_type.value,
+                        "therapeutic_relevance": choice.therapeutic_relevance,
+                        "emotional_weight": choice.emotional_weight,
+                        "interaction_type": "choice_made",
+                        "recent_choice": choice.text
+                    }
+                    await self.therapeutic_integrator.monitor_emotional_safety(session_state, choice_interaction_data)
+
                 # Process choice
                 success = await self.choice_processor.process_choice(
                     session_state, choice_id
                 )
-                
+
                 if success:
                     session_state.add_choice(choice_id)
                     await self.session_manager.update_session(session_state)
