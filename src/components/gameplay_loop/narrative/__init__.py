@@ -40,6 +40,18 @@ from .therapeutic_integrator import (
     ProgressTracker
 )
 
+from .therapeutic_integration_system import (
+    TherapeuticIntegrationSystem,
+    TherapeuticConcept,
+    TherapeuticProgress,
+    ResistancePattern,
+    TherapeuticIntegration,
+    TherapeuticApproach,
+    IntegrationStrategy,
+    ProgressMilestone,
+    ResistanceType
+)
+
 from .narrative_loader import (
     NarrativeLoader,
     NarrativeDefinition,
@@ -97,5 +109,16 @@ __all__ = [
     "SceneEvent",
     "ChoiceEvent",
     "ProgressEvent",
-    "SafetyEvent"
+    "SafetyEvent",
+
+    # Therapeutic Integration System
+    "TherapeuticIntegrationSystem",
+    "TherapeuticConcept",
+    "TherapeuticProgress",
+    "ResistancePattern",
+    "TherapeuticIntegration",
+    "TherapeuticApproach",
+    "IntegrationStrategy",
+    "ProgressMilestone",
+    "ResistanceType"
 ]

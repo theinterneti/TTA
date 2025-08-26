@@ -39,6 +39,12 @@ class EventType(str, Enum):
     DIFFICULTY_ADJUSTED = "difficulty_adjusted"
     PERFORMANCE_MONITORED = "performance_monitored"
     USER_PREFERENCES_UPDATED = "user_preferences_updated"
+
+    # Therapeutic integration events
+    THERAPEUTIC_CONCEPT_INTEGRATED = "therapeutic_concept_integrated"
+    THERAPEUTIC_PROGRESS_UPDATED = "therapeutic_progress_updated"
+    THERAPEUTIC_RESISTANCE_DETECTED = "therapeutic_resistance_detected"
+    ADAPTIVE_INTERVENTION_TRIGGERED = "adaptive_intervention_triggered"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"

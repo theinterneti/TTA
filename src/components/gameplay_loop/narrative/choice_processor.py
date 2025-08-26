@@ -16,6 +16,7 @@ from src.components.gameplay_loop.services.session_state import SessionState
 from .events import EventType, create_choice_event
 from .consequence_system import ConsequenceSystem, ConsequenceGenerationContext
 from .adaptive_difficulty_engine import AdaptiveDifficultyEngine
+from .therapeutic_integration_system import TherapeuticIntegrationSystem, IntegrationStrategy
 
 
 logger = logging.getLogger(__name__)
@@ -259,6 +260,9 @@ class ChoiceProcessor:
         # Adaptive difficulty integration
         self.difficulty_engine = AdaptiveDifficultyEngine(narrative_engine.event_bus)
 
+        # Therapeutic integration system
+        self.therapeutic_integration = TherapeuticIntegrationSystem(narrative_engine.event_bus)
+
         # Choice cache
         self.choice_cache: Dict[str, UserChoice] = {}
         self.consequence_cache: Dict[str, List[ChoiceConsequence]] = {}
@@ -274,6 +278,7 @@ class ChoiceProcessor:
             "consequences_applied": 0,
             "consequences_generated": 0,
             "difficulty_adjustments": 0,
+            "therapeutic_integrations": 0,
             "therapeutic_moments_triggered": 0
         }
     
@@ -404,6 +409,42 @@ class ChoiceProcessor:
             }
 
             await self.difficulty_engine.monitor_performance(session_state, choice_interaction_data)
+
+            # Integrate therapeutic concepts if relevant
+            if choice.therapeutic_relevance > 0.5:  # High therapeutic relevance
+                therapeutic_concept = self._identify_therapeutic_concept(choice, session_state)
+                if therapeutic_concept:
+                    story_context = f"Through your choice of '{choice.text}', you encounter an opportunity to explore {therapeutic_concept}"
+
+                    integration = await self.therapeutic_integration.integrate_therapeutic_concept(
+                        session_state, therapeutic_concept, story_context, IntegrationStrategy.EXPERIENTIAL_LEARNING
+                    )
+
+                    # Track therapeutic progress
+                    progress_data = {
+                        "skill_demonstration": choice.therapeutic_relevance,
+                        "practice_attempt": True,
+                        "successful": len(context.consequences_applied) > 0,
+                        "story_context": story_context
+                    }
+
+                    await self.therapeutic_integration.track_therapeutic_progress(
+                        session_state, therapeutic_concept, progress_data
+                    )
+
+                    # Check for resistance patterns
+                    resistance_data = {
+                        "engagement_level": choice_interaction_data.get("choice_complexity", 0.5),
+                        "skill_demonstration": choice.therapeutic_relevance,
+                        "emotional_response": session_state.emotional_state.get("primary_emotion", "neutral"),
+                        "choice_pattern": "engaged" if choice.therapeutic_relevance > 0.7 else "hesitant"
+                    }
+
+                    await self.therapeutic_integration.detect_therapeutic_resistance(
+                        session_state, therapeutic_concept, resistance_data
+                    )
+
+                    self.metrics["therapeutic_integrations"] += 1
 
             # Legacy consequence handling (for backward compatibility)
             legacy_consequences = await self._load_choice_consequences(choice_id)
@@ -641,6 +682,48 @@ class ChoiceProcessor:
         """Handle choice made events."""
         logger.debug(f"Choice made: {event.context.get('choice_id')} in session {event.session_id}")
     
+    def _identify_therapeutic_concept(self, choice: UserChoice, session_state: SessionState) -> Optional[str]:
+        """Identify relevant therapeutic concept based on choice and session context."""
+        # Map choice types to therapeutic concepts
+        concept_mapping = {
+            ChoiceType.EMOTIONAL_REGULATION: "emotional_regulation",
+            ChoiceType.COMMUNICATION: "communication_skills",
+            ChoiceType.PROBLEM_SOLVING: "problem_solving",
+            ChoiceType.SELF_REFLECTION: "self_awareness",
+            ChoiceType.RELATIONSHIP: "relationship_skills",
+            ChoiceType.COPING_STRATEGY: "coping_strategies"
+        }
+
+        # Check choice type mapping
+        if choice.choice_type in concept_mapping:
+            return concept_mapping[choice.choice_type]
+
+        # Check therapeutic goals
+        therapeutic_goals = session_state.therapeutic_goals
+
+        # Map common therapeutic goals to concepts
+        goal_mapping = {
+            "anxiety_management": "anxiety_management",
+            "depression_recovery": "depression_recovery",
+            "emotional_regulation": "emotional_regulation",
+            "communication_skills": "communication_skills",
+            "thought_challenging": "thought_challenging",
+            "behavioral_activation": "behavioral_activation",
+            "mindfulness_practice": "present_moment_awareness",
+            "distress_tolerance": "distress_tolerance"
+        }
+
+        # Find matching therapeutic goal
+        for goal in therapeutic_goals:
+            if goal in goal_mapping:
+                return goal_mapping[goal]
+
+        # Default based on high therapeutic relevance
+        if choice.therapeutic_relevance > 0.8:
+            return "general_therapeutic_skills"
+
+        return None
+
     def get_metrics(self) -> Dict[str, Any]:
         """Get choice processor metrics."""
         return {
