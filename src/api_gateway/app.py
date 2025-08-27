@@ -24,6 +24,7 @@ from .middleware.therapeutic_safety import TherapeuticSafetyMiddleware
 from .monitoring.health import health_router
 from .monitoring.metrics import metrics_router
 from .services import ServiceDiscoveryManager, AutoRegistrationService
+from .websocket import WebSocketConnectionManager, create_websocket_router
 
 
 @asynccontextmanager
@@ -48,10 +49,22 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     auto_registration = AutoRegistrationService(discovery_manager)
     await auto_registration.register_tta_services()
 
+    # Initialize WebSocket connection manager
+    websocket_manager = WebSocketConnectionManager()
+
+    # Create and include WebSocket router
+    websocket_router = create_websocket_router(
+        websocket_manager,
+        gateway_core.service_router,
+        discovery_manager
+    )
+    app.include_router(websocket_router, tags=["websocket"])
+
     # Store instances in app state for access in routes
     app.state.discovery_manager = discovery_manager
     app.state.gateway_core = gateway_core
     app.state.auto_registration = auto_registration
+    app.state.websocket_manager = websocket_manager
 
     print(f"🚀 TTA API Gateway starting on {settings.host}:{settings.port}")
 
@@ -61,6 +74,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     print("🛑 TTA API Gateway shutting down")
 
     # Cleanup resources
+    await websocket_manager.shutdown()
     await auto_registration.deregister_all_services()
     await gateway_core.close()
     await discovery_manager.close()

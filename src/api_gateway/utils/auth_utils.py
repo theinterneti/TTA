@@ -361,3 +361,23 @@ def role_required(*roles: UserRole):
         
         return wrapper
     return decorator
+
+
+async def get_websocket_auth_context(token: str) -> Optional[AuthContext]:
+    """
+    Get authentication context for WebSocket connections.
+
+    Args:
+        token: JWT token
+
+    Returns:
+        AuthContext if token is valid
+    """
+    try:
+        # This would integrate with your JWT validation service
+        # For now, return None to indicate authentication integration needed
+        # TODO: Implement JWT token validation for WebSocket connections
+        return None
+    except Exception as e:
+        logger.error(f"Error validating WebSocket token: {e}")
+        return None
