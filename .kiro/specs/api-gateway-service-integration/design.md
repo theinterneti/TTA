@@ -112,6 +112,31 @@ The API Gateway is structured as a modular system with the following core compon
   - Sensitive data masking for PII, SSN, credit cards, and medical data
   - Rule-based transformation system with path pattern matching
 
+#### Service Routing and Load Balancing (`src/api_gateway/core/`) ✅ **IMPLEMENTED**
+
+- **LoadBalancer** (`load_balancer.py`): Advanced load balancing algorithms with therapeutic awareness
+
+  - Multiple strategies: Round-robin, weighted round-robin, least connections, health-based, therapeutic priority
+  - ServiceMetrics tracking: Active connections, response times, health scores, therapeutic/crisis load
+  - Therapeutic priority boosting: 1.5x weight for therapeutic requests, 2x for crisis mode
+  - Health-based filtering: Automatic exclusion of services below 30% health score
+  - Factory pattern: `create_load_balancer()` for strategy selection and configuration
+
+- **CircuitBreaker** (`circuit_breaker.py`): Circuit breaker pattern for service protection
+
+  - State management: Full state machine (closed → open → half-open → closed) with automatic transitions
+  - Configurable thresholds: 5 failures for regular services, 3 for therapeutic services
+  - Recovery logic: 60s timeout for regular, 30s for therapeutic services with automatic testing
+  - Crisis bypass: Emergency requests can bypass open circuits when `crisis_bypass=True`
+  - CircuitBreakerManager: Centralized management with health summaries and service filtering
+
+- **ServiceRouter** (`service_router.py`): Intelligent service routing with failover and resilience
+  - Load balancing integration: Seamless integration with all load balancing strategies
+  - Failover mechanisms: Automatic retry with different services and exponential backoff
+  - Request type awareness: 3/5/10 retries for regular/therapeutic/crisis requests
+  - Service caching: 30s TTL with error fallback to cached data
+  - Health monitoring: Real-time health assessment through circuit breaker integration
+
 ### Technology Stack
 
 - **Core Framework**: FastAPI (Python) for high-performance async API handling
