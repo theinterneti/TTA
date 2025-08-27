@@ -94,6 +94,16 @@ class EventType(str, Enum):
     BACKUP_CREATED = "backup_created"
     BACKUP_RESTORED = "backup_restored"
     ERROR_ESCALATED = "error_escalated"
+
+    # TTA system integration events
+    SYSTEM_INTEGRATION_CONNECTED = "system_integration_connected"
+    SYSTEM_INTEGRATION_DISCONNECTED = "system_integration_disconnected"
+    CHARACTER_DEVELOPMENT_SYNCED = "character_development_synced"
+    THERAPEUTIC_CONTENT_RETRIEVED = "therapeutic_content_retrieved"
+    SAFETY_VALIDATION_COMPLETED = "safety_validation_completed"
+    PROGRESS_TRACKING_UPDATED = "progress_tracking_updated"
+    INTEGRATION_HEALTH_CHECK = "integration_health_check"
+    INTEGRATION_ERROR = "integration_error"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"

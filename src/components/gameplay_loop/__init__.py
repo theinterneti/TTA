@@ -14,6 +14,16 @@ from .models import *
 # Import social and collaborative features
 from . import social
 
+# Import TTA system integration
+from .integration import (
+    TTASystemIntegration,
+    IntegrationEndpoint,
+    IntegrationRequest,
+    IntegrationResponse,
+    IntegrationType,
+    IntegrationStatus
+)
+
 __all__ = [
     "GameplayLoopComponent",
     # Models will be added by the models.__init__.py
