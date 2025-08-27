@@ -51,6 +51,16 @@ class EventType(str, Enum):
     CHARACTER_MILESTONE_ACHIEVED = "character_milestone_achieved"
     CHARACTER_ABILITY_UNLOCKED = "character_ability_unlocked"
     CHARACTER_LEVEL_UP = "character_level_up"
+
+    # Session management events
+    SESSION_MANAGEMENT = "session_management"
+    SESSION_STARTED = "session_started"
+    SESSION_PAUSED = "session_paused"
+    SESSION_RESUMED = "session_resumed"
+    SESSION_ENDED = "session_ended"
+    BREAK_POINT_DETECTED = "break_point_detected"
+    BREAK_POINT_OFFERED = "break_point_offered"
+    BREAK_POINT_ACCEPTED = "break_point_accepted"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"
