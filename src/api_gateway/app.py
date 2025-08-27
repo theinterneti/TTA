@@ -8,12 +8,14 @@ for the TTA API Gateway & Service Integration system.
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
 
 from .config import GatewaySettings, get_gateway_settings
+from .core import GatewayCore, create_gateway_router
 from .middleware.auth import AuthenticationMiddleware
 from .middleware.logging import LoggingMiddleware
 from .middleware.rate_limiting import RateLimitingMiddleware
@@ -21,38 +23,47 @@ from .middleware.security import SecurityHeadersMiddleware
 from .middleware.therapeutic_safety import TherapeuticSafetyMiddleware
 from .monitoring.health import health_router
 from .monitoring.metrics import metrics_router
+from .services import ServiceDiscoveryManager, AutoRegistrationService
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     Application lifespan manager.
-    
+
     Handles startup and shutdown events for the API Gateway.
     """
     # Startup
     settings = get_gateway_settings()
-    
+
     # Initialize service discovery
-    # TODO: Initialize service registry and discovery
-    
-    # Initialize monitoring
-    # TODO: Initialize metrics collection and health monitoring
-    
-    # Initialize authentication integration
-    # TODO: Initialize JWT validation and user management integration
-    
+    discovery_manager = ServiceDiscoveryManager()
+    await discovery_manager.initialize()
+
+    # Initialize gateway core
+    gateway_core = GatewayCore(discovery_manager)
+    await gateway_core.initialize()
+
+    # Initialize auto-registration service
+    auto_registration = AutoRegistrationService(discovery_manager)
+    await auto_registration.register_tta_services()
+
+    # Store instances in app state for access in routes
+    app.state.discovery_manager = discovery_manager
+    app.state.gateway_core = gateway_core
+    app.state.auto_registration = auto_registration
+
     print(f"🚀 TTA API Gateway starting on {settings.host}:{settings.port}")
-    
+
     yield
-    
+
     # Shutdown
     print("🛑 TTA API Gateway shutting down")
-    
+
     # Cleanup resources
-    # TODO: Cleanup service discovery connections
-    # TODO: Cleanup monitoring resources
-    # TODO: Cleanup authentication resources
+    await auto_registration.deregister_all_services()
+    await gateway_core.close()
+    await discovery_manager.close()
 
 
 def create_gateway_app() -> FastAPI:
@@ -106,9 +117,6 @@ def create_gateway_app() -> FastAPI:
     app.include_router(health_router, prefix="/health", tags=["health"])
     app.include_router(metrics_router, prefix="/metrics", tags=["metrics"])
     
-    # TODO: Add service routing
-    # app.include_router(gateway_router, prefix="/api", tags=["gateway"])
-    
     return app
 
 
@@ -125,6 +133,32 @@ async def root():
         "status": "operational",
         "description": "Unified entry point for all TTA services"
     }
+
+
+@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
+async def gateway_route(request: Request, path: str) -> Response:
+    """
+    Main gateway route handler for all API requests.
+
+    Args:
+        request: FastAPI request
+        path: Request path
+
+    Returns:
+        Response: Processed response from target service
+    """
+    if hasattr(request.app.state, 'gateway_core'):
+        return await request.app.state.gateway_core.process_request(request)
+    else:
+        # Fallback if gateway core is not initialized
+        return JSONResponse(
+            status_code=503,
+            content={
+                "error": "Gateway not ready",
+                "message": "Gateway core is not initialized",
+                "code": "GATEWAY_NOT_READY"
+            }
+        )
 
 
 if __name__ == "__main__":
