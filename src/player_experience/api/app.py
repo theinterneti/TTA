@@ -24,8 +24,9 @@ from .middleware import (
     SecurityHeadersMiddleware,
     TherapeuticSafetyMiddleware,
 )
-from .routers import auth, characters, players, worlds, chat, sessions, progress, health
+from .routers import auth, characters, players, worlds, chat, sessions, progress, health, services
 from .routers import metrics as metrics_router
+from .services.connection_manager import initialize_services, close_services
 
 
 
@@ -39,16 +40,27 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # Startup
     print("Starting Player Experience Interface API...")
 
-    # Initialize any required services here
-    # e.g., database connections, cache connections, etc.
+    # Initialize service connections
+    try:
+        success = await initialize_services()
+        if success:
+            print("✅ All services initialized successfully")
+        else:
+            print("⚠️  Some services failed to initialize - check service health")
+    except Exception as e:
+        print(f"❌ Failed to initialize services: {e}")
 
     yield
 
     # Shutdown
     print("Shutting down Player Experience Interface API...")
 
-    # Cleanup any resources here
-    # e.g., close database connections, cache connections, etc.
+    # Cleanup service connections
+    try:
+        await close_services()
+        print("✅ All services closed successfully")
+    except Exception as e:
+        print(f"❌ Error closing services: {e}")
 
 
 def create_app() -> FastAPI:
@@ -99,6 +111,7 @@ def create_app() -> FastAPI:
 
     # Include routers
     app.include_router(health.router, prefix="/api/v1", tags=["health"])
+    app.include_router(services.router, prefix="/api/v1/services", tags=["services"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
     app.include_router(players.router, prefix="/api/v1/players", tags=["players"])
     app.include_router(characters.router, prefix="/api/v1/characters", tags=["characters"])

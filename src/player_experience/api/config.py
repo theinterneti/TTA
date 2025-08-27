@@ -7,7 +7,7 @@ This module provides configuration management for the FastAPI application.
 import os
 from typing import List, Optional
 
-from pydantic import field_validator, ConfigDict
+from pydantic import field_validator, ConfigDict, Field
 from pydantic_settings import BaseSettings
 
 
@@ -66,10 +66,18 @@ class APISettings(BaseSettings):
     
     # Database settings
     database_url: Optional[str] = None
-    redis_url: str = "redis://localhost:6379"
-    neo4j_url: str = "bolt://localhost:7687"
-    neo4j_username: str = "neo4j"
-    neo4j_password: str = "password"
+    redis_url: str = Field(default="redis://localhost:6379", description="Redis connection URL")
+    redis_password: Optional[str] = Field(default=None, description="Redis password")
+    redis_db: int = Field(default=0, description="Redis database number")
+    redis_max_connections: int = Field(default=20, description="Maximum Redis connections")
+
+    # Neo4j settings
+    neo4j_url: str = Field(default="bolt://localhost:7687", description="Neo4j connection URL")
+    neo4j_username: str = Field(default="neo4j", description="Neo4j username")
+    neo4j_password: str = Field(default="password", description="Neo4j password")
+    neo4j_database: str = Field(default="neo4j", description="Neo4j database name")
+    neo4j_max_connection_pool_size: int = Field(default=50, description="Neo4j max connection pool size")
+    neo4j_connection_timeout: int = Field(default=60, description="Neo4j connection timeout in seconds")
     
     # Logging settings
     log_level: str = "INFO"
@@ -83,6 +91,34 @@ class APISettings(BaseSettings):
     enable_docs: bool = True
     enable_redoc: bool = True
     enable_openapi: bool = True
+
+    # Service Connection Settings
+    service_connection_timeout: int = Field(default=30, description="Service connection timeout in seconds")
+    service_retry_attempts: int = Field(default=5, description="Number of retry attempts for service connections")
+    service_retry_base_delay: float = Field(default=0.5, description="Base delay for exponential backoff")
+    service_retry_max_delay: float = Field(default=8.0, description="Maximum delay for exponential backoff")
+
+    # Health Check Settings
+    health_check_interval: int = Field(default=60, description="Health check interval in seconds")
+    health_check_timeout: int = Field(default=10, description="Health check timeout in seconds")
+
+    # Environment Detection
+    environment: str = Field(default="development", description="Environment name (development, production, test)")
+
+    @property
+    def is_production(self) -> bool:
+        """Check if running in production environment."""
+        return self.environment.lower() == "production"
+
+    @property
+    def is_development(self) -> bool:
+        """Check if running in development environment."""
+        return self.environment.lower() == "development"
+
+    @property
+    def is_testing(self) -> bool:
+        """Check if running in test environment."""
+        return self.environment.lower() in ("test", "testing")
     
     @field_validator("cors_origins", mode="after")
     @classmethod

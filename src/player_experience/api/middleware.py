@@ -261,6 +261,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         "/api/v1/auth/login",
         "/api/v1/auth/refresh",
         "/api/v1/auth/register",
+        "/api/v1/health",
+        "/api/v1/services/health",
     }
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -276,6 +278,10 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         """
         # Check if route is public
         if request.url.path in self.PUBLIC_ROUTES:
+            return await call_next(request)
+
+        # Check for service health endpoints (allow individual service health checks)
+        if request.url.path.startswith("/api/v1/services/health/"):
             return await call_next(request)
         
         # Check for OPTIONS requests (CORS preflight)
