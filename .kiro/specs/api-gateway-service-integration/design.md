@@ -137,6 +137,34 @@ The API Gateway is structured as a modular system with the following core compon
   - Service caching: 30s TTL with error fallback to cached data
   - Health monitoring: Real-time health assessment through circuit breaker integration
 
+#### WebSocket Proxying and Real-Time Communication (`src/api_gateway/websocket/`) ✅ **IMPLEMENTED**
+
+- **WebSocketConnectionManager** (`connection_manager.py`): Comprehensive WebSocket connection lifecycle management
+
+  - Connection types: Chat, narrative, therapeutic sessions, crisis support, admin, monitoring
+  - User and session indexing: Efficient O(1) lookups by user ID, session ID, and service
+  - Connection limits: 10,000 total connections, 5 per user with overflow protection
+  - Idle connection cleanup: Automatic cleanup with different timeouts (5min/30min/1hr)
+  - Activity tracking: Real-time monitoring of connection duration and idle time
+  - Broadcasting: Message broadcasting to users, therapeutic sessions, and service groups
+
+- **WebSocketProxy** (`proxy.py`): Bidirectional WebSocket message routing and backend integration
+
+  - Service discovery integration: Intelligent backend service selection using service router
+  - Authentication context propagation: Full user context forwarded to backend services
+  - Message transformation: Gateway metadata injection and request/response processing
+  - Gateway message handling: Special handling for ping/pong, session management, therapeutic events
+  - Backend connection management: Efficient connection pooling with automatic cleanup
+  - Error handling: Comprehensive error recovery with automatic connection cleanup
+
+- **WebSocketRouter** (`router.py`): FastAPI WebSocket endpoints with authentication and role-based access
+  - Multiple endpoints: 6 specialized endpoints for different use cases and access levels
+  - Authentication integration: JWT token validation from query params, headers, or WebSocket headers
+  - HTTP management endpoints: REST API for statistics, broadcasting, and connection management
+  - Therapeutic session management: Special handling with session ID validation and tracking
+  - Crisis mode support: Dedicated crisis endpoint with enhanced logging and emergency response
+  - Role-based access control: Different permission levels for admin, therapist, and patient access
+
 ### Technology Stack
 
 - **Core Framework**: FastAPI (Python) for high-performance async API handling
