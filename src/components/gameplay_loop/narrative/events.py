@@ -70,6 +70,18 @@ class EventType(str, Enum):
     ALTERNATIVE_PATH_CREATED = "alternative_path_created"
     ALTERNATIVE_PATH_COMPLETED = "alternative_path_completed"
     PATH_COMPARISON_GENERATED = "path_comparison_generated"
+
+    # Social and collaborative events
+    COLLABORATIVE_EVENT = "collaborative_event"
+    COLLABORATIVE_SESSION_CREATED = "collaborative_session_created"
+    COLLABORATIVE_SESSION_STARTED = "collaborative_session_started"
+    PARTICIPANT_JOINED = "participant_joined"
+    PARTICIPANT_LEFT = "participant_left"
+    GROUP_CHOICE_PROPOSED = "group_choice_proposed"
+    GROUP_CHOICE_DECIDED = "group_choice_decided"
+    SUPPORT_MESSAGE_SENT = "support_message_sent"
+    CONFLICT_REPORTED = "conflict_reported"
+    MODERATION_ACTION_APPLIED = "moderation_action_applied"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"
