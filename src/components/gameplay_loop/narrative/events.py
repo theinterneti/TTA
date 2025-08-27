@@ -82,6 +82,18 @@ class EventType(str, Enum):
     SUPPORT_MESSAGE_SENT = "support_message_sent"
     CONFLICT_REPORTED = "conflict_reported"
     MODERATION_ACTION_APPLIED = "moderation_action_applied"
+
+    # Error handling and recovery events
+    ERROR_EVENT = "error_event"
+    ERROR_HANDLED = "error_handled"
+    RECOVERY_ATTEMPTED = "recovery_attempted"
+    RECOVERY_SUCCESSFUL = "recovery_successful"
+    RECOVERY_FAILED = "recovery_failed"
+    SYSTEM_DEGRADED = "system_degraded"
+    SYSTEM_RECOVERED = "system_recovered"
+    BACKUP_CREATED = "backup_created"
+    BACKUP_RESTORED = "backup_restored"
+    ERROR_ESCALATED = "error_escalated"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"

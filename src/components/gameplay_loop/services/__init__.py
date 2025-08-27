@@ -28,6 +28,16 @@ from .session_state import (
     StateValidator
 )
 
+from .error_recovery_manager import (
+    ErrorRecoveryManager,
+    ErrorContext,
+    RecoveryResult,
+    SystemBackup,
+    ErrorSeverity,
+    ErrorCategory,
+    RecoveryStrategy
+)
+
 __all__ = [
     # Redis managers
     "RedisSessionManager",
@@ -47,5 +57,14 @@ __all__ = [
     "SessionState",
     "SessionStateManager",
     "StateTransition",
-    "StateValidator"
+    "StateValidator",
+
+    # Error handling and recovery
+    "ErrorRecoveryManager",
+    "ErrorContext",
+    "RecoveryResult",
+    "SystemBackup",
+    "ErrorSeverity",
+    "ErrorCategory",
+    "RecoveryStrategy"
 ]
