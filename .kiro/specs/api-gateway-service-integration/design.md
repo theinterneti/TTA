@@ -84,6 +84,34 @@ The API Gateway is structured as a modular system with the following core compon
 - **GatewaySettings**: Environment-based configuration with TTA config integration
 - **Production-ready defaults**: Security settings and therapeutic safety configuration
 
+#### Core Request Processing Engine (`src/api_gateway/core/`) ✅ **IMPLEMENTED**
+
+- **GatewayCore** (`gateway_core.py`): Main request processing engine with async pipeline
+
+  - Async request processing with correlation IDs and performance tracking
+  - Service discovery integration with health-based routing and failover
+  - Request/response transformation with therapeutic safety integration
+  - HTTP session management with connection pooling and timeout handling
+  - Comprehensive error handling with standardized responses
+  - Authentication context propagation and therapeutic session handling
+
+- **RequestRouter** (`request_router.py`): Dynamic routing and rule management
+
+  - Default route configuration for all TTA services (auth, players, sessions, agents, WebSocket)
+  - Dynamic route management with runtime addition/removal capabilities
+  - Service-based route discovery with automatic route creation
+  - Therapeutic prioritization and crisis bypass routing
+  - Path rewriting with regex-based pattern matching
+  - WebSocket proxy route configuration with extended timeouts
+
+- **RequestTransformer** (`request_transformer.py`): Request/response transformation service
+  - Header transformation with hop-by-hop header filtering
+  - Body transformation for JSON and text content with configurable rules
+  - Request/response validation framework with schema support
+  - Therapeutic safety processing with crisis detection and content scanning
+  - Sensitive data masking for PII, SSN, credit cards, and medical data
+  - Rule-based transformation system with path pattern matching
+
 ### Technology Stack
 
 - **Core Framework**: FastAPI (Python) for high-performance async API handling

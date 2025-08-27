@@ -22,6 +22,8 @@ from ..models import (
 )
 from ..services import ServiceDiscoveryManager
 from ..monitoring.metrics import metrics_collector
+from .service_router import ServiceRouter
+from .service_router import ServiceRouter
 
 
 logger = logging.getLogger(__name__)
@@ -38,7 +40,7 @@ class GatewayCore:
     def __init__(self, discovery_manager: ServiceDiscoveryManager):
         """
         Initialize the gateway core.
-        
+
         Args:
             discovery_manager: Service discovery manager instance
         """
@@ -47,6 +49,9 @@ class GatewayCore:
         self.routing_config = RoutingConfig()
         self._http_session: Optional[aiohttp.ClientSession] = None
         self._active_requests: Dict[str, GatewayRequest] = {}
+
+        # Initialize service router with load balancing and circuit breakers
+        self.service_router = ServiceRouter(discovery_manager)
         
     async def initialize(self) -> None:
         """Initialize the gateway core."""
@@ -124,11 +129,13 @@ class GatewayCore:
                 target_service.name
             )
             
-            # Update service metrics
-            await self.discovery_manager.update_service_metrics(
-                target_service.id,
+            # Update service metrics through service router
+            await self.service_router.update_service_metrics(
+                str(target_service.id),
                 processing_time,
-                response.status_code < 400
+                response.status_code < 400,
+                therapeutic=gateway_request.is_therapeutic,
+                crisis=gateway_request.crisis_mode
             )
             
             return response
@@ -281,7 +288,7 @@ class GatewayCore:
 
     async def _get_target_service(self, route_rule: RouteRule, gateway_request: GatewayRequest) -> Optional[ServiceInfo]:
         """
-        Get target service for the route.
+        Get target service for the route using service router with load balancing.
 
         Args:
             route_rule: Route rule
@@ -290,10 +297,10 @@ class GatewayCore:
         Returns:
             Optional[ServiceInfo]: Target service if available
         """
-        # Get service based on therapeutic priority
-        service = await self.discovery_manager.get_service_for_request(
+        # Use service router for intelligent service selection with load balancing
+        service = await self.service_router.select_service(
             service_name=route_rule.target_service,
-            therapeutic_priority=route_rule.therapeutic_priority or gateway_request.is_therapeutic
+            gateway_request=gateway_request
         )
 
         return service
@@ -301,12 +308,49 @@ class GatewayCore:
     async def _route_request(self, gateway_request: GatewayRequest,
                            route_rule: RouteRule, target_service: ServiceInfo) -> Response:
         """
-        Route request to target service.
+        Route request to target service with failover and circuit breaker protection.
 
         Args:
             gateway_request: Gateway request
             route_rule: Route rule
             target_service: Target service
+
+        Returns:
+            Response: Service response
+        """
+        # Use service router for request routing with failover
+        try:
+            response = await self.service_router.route_request_with_failover(
+                service_name=route_rule.target_service,
+                gateway_request=gateway_request,
+                request_func=self._make_http_request,
+                route_rule=route_rule,
+                gateway_request=gateway_request
+            )
+            return response
+
+        except Exception as e:
+            logger.error(
+                f"Failed to route request after all retries: {e}",
+                extra={
+                    "correlation_id": gateway_request.correlation_id,
+                    "service": route_rule.target_service,
+                    "error": str(e)
+                }
+            )
+            return self._create_error_response(
+                503, "Service unavailable after retries", gateway_request.correlation_id
+            )
+
+    async def _make_http_request(self, target_service: ServiceInfo, route_rule: RouteRule,
+                               gateway_request: GatewayRequest) -> Response:
+        """
+        Make HTTP request to target service.
+
+        Args:
+            target_service: Target service
+            route_rule: Route rule
+            gateway_request: Gateway request
 
         Returns:
             Response: Service response
@@ -348,9 +392,7 @@ class GatewayCore:
                     "timeout": route_rule.timeout
                 }
             )
-            return self._create_error_response(
-                504, "Service timeout", gateway_request.correlation_id
-            )
+            raise Exception(f"Service timeout: {target_service.name}")
 
         except aiohttp.ClientError as e:
             logger.error(
@@ -361,9 +403,7 @@ class GatewayCore:
                     "error": str(e)
                 }
             )
-            return self._create_error_response(
-                502, "Service connection error", gateway_request.correlation_id
-            )
+            raise Exception(f"Service connection error: {target_service.name}")
 
     def _transform_request_path(self, original_path: str, route_rule: RouteRule) -> str:
         """
