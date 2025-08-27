@@ -18,6 +18,11 @@ class APISettings(BaseSettings):
     app_name: str = "Player Experience Interface API"
     app_version: str = "1.0.0"
     debug: bool = False
+
+    # Development and Mock Settings
+    development_mode: bool = os.getenv("TTA_DEVELOPMENT_MODE", "false").lower() in ("true", "1", "yes")
+    use_mocks: bool = os.getenv("TTA_USE_MOCKS", "false").lower() in ("true", "1", "yes")
+    use_neo4j: bool = os.getenv("TTA_USE_NEO4J", "0") == "1"
     
     # Server settings
     host: str = "0.0.0.0"
@@ -50,15 +55,10 @@ class APISettings(BaseSettings):
     mfa_email_enabled: bool = False
     
     # CORS settings
-    cors_origins: List[str] = [
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "https://localhost:3000",
-        "https://localhost:8080",
-    ]
+    cors_origins: Optional[str] = None
     cors_allow_credentials: bool = True
-    cors_allow_methods: List[str] = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
-    cors_allow_headers: List[str] = ["*"]
+    cors_allow_methods: Optional[str] = None
+    cors_allow_headers: Optional[str] = None
     
     # Rate limiting settings
     rate_limit_calls: int = 100
@@ -78,35 +78,57 @@ class APISettings(BaseSettings):
     # Therapeutic safety settings
     crisis_detection_enabled: bool = True
     crisis_hotline: str = "988"  # National Suicide Prevention Lifeline
+
+    # Development Features
+    enable_docs: bool = True
+    enable_redoc: bool = True
+    enable_openapi: bool = True
     
-    @field_validator("cors_origins", mode="before")
+    @field_validator("cors_origins", mode="after")
     @classmethod
-    def assemble_cors_origins(cls, v):
+    def parse_cors_origins(cls, v):
         """Parse CORS origins from environment variable."""
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
+        if v is None or v == "":
+            return [
+                "http://localhost:3000",
+                "http://localhost:8080",
+                "https://localhost:3000",
+                "https://localhost:8080",
+            ]
+        if isinstance(v, str) and v.strip():
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return [
+            "http://localhost:3000",
+            "http://localhost:8080",
+            "https://localhost:3000",
+            "https://localhost:8080",
+        ]
     
-    @field_validator("cors_allow_methods", mode="before")
+    @field_validator("cors_allow_methods", mode="after")
     @classmethod
-    def assemble_cors_methods(cls, v):
+    def parse_cors_methods(cls, v):
         """Parse CORS methods from environment variable."""
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
-    
-    @field_validator("cors_allow_headers", mode="before")
+        if v is None or v == "":
+            return ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+        if isinstance(v, str) and v.strip():
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
+
+    @field_validator("cors_allow_headers", mode="after")
     @classmethod
-    def assemble_cors_headers(cls, v):
+    def parse_cors_headers(cls, v):
         """Parse CORS headers from environment variable."""
-        if isinstance(v, str):
-            return [i.strip() for i in v.split(",")]
-        return v
+        if v is None or v == "":
+            return ["*"]
+        if isinstance(v, str) and v.strip():
+            return [i.strip() for i in v.split(",") if i.strip()]
+        return ["*"]
     
     model_config = ConfigDict(
         env_file=".env",
         env_prefix="API_",
         case_sensitive=False,
+        extra="ignore",  # Ignore extra fields from environment
     )
 
 
