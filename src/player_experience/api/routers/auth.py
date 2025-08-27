@@ -26,6 +26,8 @@ from ...models.auth import (
     PasswordReset, SecuritySettings, MFAConfig
 )
 from ...services.auth_service import EnhancedAuthService, AuthenticationError, AuthorizationError, MFAError
+from ...database.user_repository import UserRepository
+from ...database.user_auth_schema import UserAuthSchemaManager
 
 router = APIRouter()
 
@@ -39,8 +41,40 @@ if not _AUTH_SECRET:
     import secrets
     _AUTH_SECRET = secrets.token_urlsafe(32)
 
+# Initialize user repository and schema (with fallback for testing)
+user_repository = None
+try:
+    # Try to initialize database components
+    from ...api.config import get_settings
+    settings = get_settings()
+
+    # Setup user authentication schema
+    schema_manager = UserAuthSchemaManager(
+        uri=settings.neo4j_url,
+        username=settings.neo4j_username,
+        password=settings.neo4j_password
+    )
+    schema_manager.connect()
+    schema_manager.setup_user_auth_schema()
+    schema_manager.disconnect()
+
+    # Initialize user repository
+    user_repository = UserRepository(
+        uri=settings.neo4j_url,
+        username=settings.neo4j_username,
+        password=settings.neo4j_password
+    )
+    user_repository.connect()
+
+except Exception as e:
+    # In development/testing, continue without database
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"Failed to initialize user database components: {e}")
+
 auth_service = EnhancedAuthService(
     secret_key=_AUTH_SECRET,
+    user_repository=user_repository,
     security_settings=SecuritySettings(),
     mfa_config=MFAConfig(enabled=True, email_enabled=True)
 )

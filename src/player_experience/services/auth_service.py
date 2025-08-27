@@ -26,6 +26,7 @@ from ..models.auth import (
     UserRegistration, PasswordResetRequest, PasswordReset
 )
 from ..models.player import PlayerProfile
+from ..database.user_repository import UserRepository, User
 
 
 class AuthenticationError(Exception):
@@ -227,24 +228,38 @@ class MFAService:
 class EnhancedAuthService:
     """Enhanced authentication service with MFA and RBAC."""
     
-    def __init__(self, 
+    def __init__(self,
                  secret_key: str,
+                 user_repository: Optional[UserRepository] = None,
                  algorithm: str = "HS256",
                  access_token_expire_minutes: int = 30,
                  refresh_token_expire_days: int = 7,
                  security_settings: Optional[SecuritySettings] = None,
                  mfa_config: Optional[MFAConfig] = None):
+        """
+        Initialize the Enhanced Authentication Service.
+
+        Args:
+            secret_key: Secret key for JWT token signing
+            user_repository: User repository for database operations
+            algorithm: JWT algorithm to use
+            access_token_expire_minutes: Access token expiration time
+            refresh_token_expire_days: Refresh token expiration time
+            security_settings: Security configuration settings
+            mfa_config: Multi-factor authentication configuration
+        """
         self.secret_key = secret_key
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_token_expire_minutes
         self.refresh_token_expire_days = refresh_token_expire_days
-        
+        self.user_repository = user_repository
+
         self.security_settings = security_settings or SecuritySettings()
         self.mfa_config = mfa_config or MFAConfig()
-        
+
         self.security_service = SecurityService(self.security_settings)
         self.mfa_service = MFAService(self.mfa_config)
-        
+
         # In-memory stores (in production, use Redis or database)
         self.active_sessions: Dict[str, SessionInfo] = {}
         self.failed_login_attempts: Dict[str, List[datetime]] = {}
@@ -268,15 +283,43 @@ class EnhancedAuthService:
         if not is_valid:
             errors.extend(password_errors)
         
-        # TODO: Check if username/email already exists in database
-        
+        # Check if username/email already exists in database
+        if self.user_repository:
+            if self.user_repository.username_exists(registration.username):
+                errors.append("Username already exists")
+            if self.user_repository.email_exists(registration.email):
+                errors.append("Email already exists")
+
         if errors:
             return False, errors
-        
+
         # Hash password
         hashed_password = self.security_service.hash_password(registration.password)
-        
-        # TODO: Store user in database with hashed password
+
+        # Store user in database with hashed password
+        if self.user_repository:
+            from uuid import uuid4
+            user = User(
+                user_id=str(uuid4()),
+                username=registration.username,
+                email=registration.email,
+                password_hash=hashed_password,
+                role=registration.role,
+                email_verified=False,
+                created_at=datetime.utcnow(),
+                account_status="active",
+                failed_login_attempts=0
+            )
+
+            try:
+                success = self.user_repository.create_user(user)
+                if not success:
+                    errors.append("Failed to create user account")
+                    return False, errors
+            except Exception as e:
+                logger.error(f"Error creating user in database: {e}")
+                errors.append("Failed to create user account")
+                return False, errors
         
         # Log security event
         self.log_security_event(SecurityEvent(
@@ -307,10 +350,15 @@ class EnhancedAuthService:
             ))
             raise AuthenticationError("Account is temporarily locked due to too many failed attempts")
         
-        # TODO: Retrieve user from database
-        # For now, return None to indicate authentication failure
-        user = None  # This would be the database lookup result
-        
+        # Retrieve user from database
+        user = None
+        if self.user_repository:
+            try:
+                user = self.user_repository.get_user_by_username(credentials.username)
+            except Exception as e:
+                logger.error(f"Error retrieving user from database: {e}")
+                raise AuthenticationError("Authentication service temporarily unavailable")
+
         if not user:
             self.record_failed_login(credentials.username)
             self.log_security_event(SecurityEvent(
@@ -320,18 +368,33 @@ class EnhancedAuthService:
                 severity="warning"
             ))
             return None
-        
-        # TODO: Verify password against stored hash
-        # if not self.security_service.verify_password(credentials.password, user.password_hash):
-        #     self.record_failed_login(credentials.username)
-        #     return None
+
+        # Verify password against stored hash
+        if not self.security_service.verify_password(credentials.password, user.password_hash):
+            self.record_failed_login(credentials.username)
+            self.log_security_event(SecurityEvent(
+                event_type="login_failed",
+                details={"username": credentials.username, "reason": "invalid_password"},
+                ip_address=ip_address,
+                severity="warning"
+            ))
+            return None
         
         # Clear failed login attempts on successful authentication
         self.clear_failed_login_attempts(credentials.username)
-        
+
+        # Update user's last login timestamp in database
+        if self.user_repository:
+            try:
+                user.last_login = datetime.utcnow()
+                user.failed_login_attempts = 0  # Reset failed attempts
+                self.user_repository.update_user(user)
+            except Exception as e:
+                logger.warning(f"Failed to update user last login: {e}")
+
         # Create authenticated user object
         role_permissions = DEFAULT_ROLE_PERMISSIONS.get(user.role, DEFAULT_ROLE_PERMISSIONS[UserRole.PLAYER])
-        
+
         authenticated_user = AuthenticatedUser(
             user_id=user.user_id,
             username=user.username,
@@ -339,7 +402,7 @@ class EnhancedAuthService:
             role=user.role,
             permissions=role_permissions.permissions,
             mfa_enabled=self.is_mfa_enabled(user.user_id),
-            last_login=datetime.utcnow()
+            last_login=user.last_login
         )
         
         self.log_security_event(SecurityEvent(
@@ -502,8 +565,16 @@ class EnhancedAuthService:
             Dict with setup information (e.g., QR code for TOTP)
         """
         if method == MFAMethod.TOTP:
-            # TODO: Get username from database
-            username = "user"  # Placeholder
+            # Get username from database
+            username = "user"  # Default fallback
+            if self.user_repository:
+                try:
+                    user = self.user_repository.get_user_by_id(user_id)
+                    if user:
+                        username = user.username
+                except Exception as e:
+                    logger.warning(f"Failed to get username for MFA setup: {e}")
+
             secret, qr_code = self.mfa_service.generate_totp_secret(user_id, username)
             
             # Store encrypted secret (in production, encrypt before storing)
@@ -532,26 +603,57 @@ class EnhancedAuthService:
     
     def is_account_locked(self, username: str) -> bool:
         """Check if account is locked due to failed login attempts."""
+        # Check database first for persistent lockout status
+        if self.user_repository:
+            try:
+                user = self.user_repository.get_user_by_username(username)
+                if user and user.locked_until:
+                    if datetime.utcnow() < user.locked_until:
+                        return True
+                    else:
+                        # Lockout period expired, clear it
+                        user.locked_until = None
+                        user.failed_login_attempts = 0
+                        self.user_repository.update_user(user)
+                        return False
+            except Exception as e:
+                logger.warning(f"Failed to check account lockout status in database: {e}")
+
+        # Fallback to in-memory tracking
         if username not in self.failed_login_attempts:
             return False
-        
+
         attempts = self.failed_login_attempts[username]
         recent_attempts = [
             attempt for attempt in attempts
             if datetime.utcnow() - attempt < timedelta(minutes=self.security_settings.lockout_duration_minutes)
         ]
-        
+
         return len(recent_attempts) >= self.security_settings.max_login_attempts
     
     def record_failed_login(self, username: str):
         """Record a failed login attempt."""
+        now = datetime.utcnow()
         if username not in self.failed_login_attempts:
             self.failed_login_attempts[username] = []
-        
-        self.failed_login_attempts[username].append(datetime.utcnow())
-        
+
+        self.failed_login_attempts[username].append(now)
+
+        # Update failed login attempts in database
+        if self.user_repository:
+            try:
+                user = self.user_repository.get_user_by_username(username)
+                if user:
+                    user.failed_login_attempts += 1
+                    # Lock account if max attempts reached
+                    if user.failed_login_attempts >= self.security_settings.max_login_attempts:
+                        user.locked_until = now + timedelta(minutes=self.security_settings.lockout_duration_minutes)
+                    self.user_repository.update_user(user)
+            except Exception as e:
+                logger.warning(f"Failed to update failed login attempts in database: {e}")
+
         # Clean up old attempts
-        cutoff = datetime.utcnow() - timedelta(minutes=self.security_settings.lockout_duration_minutes)
+        cutoff = now - timedelta(minutes=self.security_settings.lockout_duration_minutes)
         self.failed_login_attempts[username] = [
             attempt for attempt in self.failed_login_attempts[username]
             if attempt > cutoff
@@ -561,6 +663,17 @@ class EnhancedAuthService:
         """Clear failed login attempts for a user."""
         if username in self.failed_login_attempts:
             del self.failed_login_attempts[username]
+
+        # Clear failed login attempts in database
+        if self.user_repository:
+            try:
+                user = self.user_repository.get_user_by_username(username)
+                if user:
+                    user.failed_login_attempts = 0
+                    user.locked_until = None
+                    self.user_repository.update_user(user)
+            except Exception as e:
+                logger.warning(f"Failed to clear failed login attempts in database: {e}")
     
     def log_security_event(self, event: SecurityEvent):
         """Log a security event."""

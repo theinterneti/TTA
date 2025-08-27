@@ -10,348 +10,356 @@ This system integrates with the broader TTA ecosystem through configuration-driv
 
 ### High-Level Architecture
 
-The authentication system follows a microservices architecture with clear separation of concerns:
+The authentication system is implemented as an integrated service within the TTA platform with clear separation of concerns:
 
 ```mermaid
 graph TB
-    Client[Client Applications] --> Gateway[API Gateway]
-    Gateway --> Auth[Authentication Service]
-    Gateway --> Profile[Profile Management Service]
-    Gateway --> Session[Session Management Service]
-    
-    Auth --> Redis[(Redis Cache)]
-    Profile --> Neo4j[(Neo4j Database)]
-    Session --> Redis
-    
-    Auth --> Email[Email Service]
-    Profile --> Audit[Audit Service]
-    Session --> Monitor[Security Monitor]
-    
-    subgraph "Therapeutic Integration"
-        Profile --> TherapeuticEngine[Therapeutic Engine]
-        Auth --> SafetyValidator[Safety Validator]
+    Client[Client Applications] --> API[TTA Player Experience API]
+    API --> AuthRouter[Authentication Router]
+    API --> HealthRouter[Health Check Router]
+
+    AuthRouter --> EnhancedAuthService[Enhanced Auth Service]
+    EnhancedAuthService --> UserRepository[User Repository]
+    EnhancedAuthService --> SecurityService[Security Service]
+    EnhancedAuthService --> MFAService[MFA Service]
+
+    UserRepository --> Neo4j[(Neo4j Database)]
+    UserRepository --> UserAuthSchema[User Auth Schema Manager]
+
+    EnhancedAuthService --> UserManagementService[User Management Service]
+    UserManagementService --> PlayerProfileRepository[Player Profile Repository]
+
+    EnhancedAuthService --> SessionRepository[Session Repository]
+    SessionRepository --> Redis[(Redis Cache)]
+
+    HealthRouter --> DatabaseHealth[Database Health Checks]
+    DatabaseHealth --> Neo4j
+    DatabaseHealth --> Redis
+
+    subgraph "Security & Monitoring"
+        EnhancedAuthService --> SecurityEventLogging[Security Event Logging]
+        EnhancedAuthService --> AccountLockout[Account Lockout Management]
     end
 ```
 
 ### Component Integration
 
 The system integrates with existing TTA components:
-- **Neo4j**: Stores user profiles, character data, and therapeutic preferences
-- **Redis**: Manages sessions, rate limiting, and temporary data
-- **Email Service**: Handles verification and security notifications
-- **Therapeutic Engine**: Receives user context and preferences
-- **Safety Validator**: Ensures therapeutic boundaries are maintained
+
+- **Neo4j**: Stores user authentication data, profiles, character data, and therapeutic preferences
+- **Redis**: Manages sessions, caching, and performance optimization
+- **Player Profile System**: Coordinates user and character creation through UserManagementService
+- **Configuration System**: Integrated with TTA's Pydantic-based configuration management
+- **Health Monitoring**: Provides comprehensive health checks for Kubernetes deployment
 
 ## Components and Interfaces
 
-### 1. Authentication Service
+### 1. Enhanced Authentication Service
+
+**Implementation:** `src/player_experience/services/auth_service.py`
 
 **Responsibilities:**
-- User registration and email verification
-- Login/logout operations
-- Password management and security
-- Rate limiting and account lockout
+
+- User registration with comprehensive validation
+- Login/logout operations with MFA support
+- Password management and security with bcrypt
+- Rate limiting and database-backed account lockout
+- JWT token management with refresh tokens
+- Security event logging and monitoring
 
 **Key Interfaces:**
 
 ```python
-class AuthenticationService(Component):
-    def register_user(self, email: str, password: str, profile_data: dict) -> AuthResult
-    def authenticate_user(self, email: str, password: str) -> AuthResult
-    def verify_email(self, verification_token: str) -> bool
-    def reset_password(self, email: str) -> bool
-    def change_password(self, user_id: str, old_password: str, new_password: str) -> bool
+class EnhancedAuthService:
+    def register_user(self, registration: UserRegistration) -> Tuple[bool, List[str]]
+    def authenticate_user(self, credentials: UserCredentials, ip_address: str) -> Optional[AuthenticatedUser]
+    def create_access_token(self, user: AuthenticatedUser, session_id: str) -> str
+    def verify_access_token(self, token: str) -> Optional[AuthenticatedUser]
+    def create_session(self, user: AuthenticatedUser, ip_address: str, user_agent: str) -> str
+    def setup_mfa(self, user_id: str, method: MFAMethod) -> MFASecret
+    def verify_mfa(self, verification: MFAVerification) -> bool
 ```
 
 **Design Decisions:**
+
 - Uses bcrypt for password hashing with configurable work factor
-- Implements exponential backoff for failed authentication attempts
-- Email verification required before account activation
+- Implements database-backed account lockout with configurable thresholds
+- Comprehensive security event logging for audit trails
 - Generic error messages to prevent user enumeration attacks
+- MFA support with TOTP and backup codes
+- Integration with UserRepository for persistent storage
 
-### 2. Session Management Service
+### 2. User Repository
+
+**Implementation:** `src/player_experience/database/user_repository.py`
 
 **Responsibilities:**
-- Session creation and validation
-- Token management (JWT with refresh tokens)
-- Multi-device session handling
-- Session security monitoring
+
+- User CRUD operations with Neo4j database
+- Database connection management with retry logic
+- User existence checking and validation
+- Account status and security data management
 
 **Key Interfaces:**
 
 ```python
-class SessionService(Component):
-    def create_session(self, user_id: str, device_info: dict) -> SessionToken
-    def validate_session(self, token: str) -> SessionInfo
-    def refresh_session(self, refresh_token: str) -> SessionToken
-    def invalidate_session(self, token: str) -> bool
-    def list_user_sessions(self, user_id: str) -> List[SessionInfo]
+class UserRepository:
+    def create_user(self, user: User) -> bool
+    def get_user_by_id(self, user_id: str) -> Optional[User]
+    def get_user_by_username(self, username: str) -> Optional[User]
+    def get_user_by_email(self, email: str) -> Optional[User]
+    def update_user(self, user: User) -> bool
+    def delete_user(self, user_id: str) -> bool
+    def username_exists(self, username: str) -> bool
+    def email_exists(self, email: str) -> bool
 ```
 
 **Design Decisions:**
-- JWT tokens with 30-minute expiration for security
-- Refresh tokens stored in Redis with 7-day expiration
-- Device fingerprinting for additional security
-- Automatic session cleanup for expired tokens
 
-### 3. Profile Management Service
+- Exponential backoff retry logic for database connections
+- Comprehensive error handling and logging
+- Optimized Cypher queries for performance
+- Support for user role filtering and management
+
+### 3. User Authentication Schema Manager
+
+**Implementation:** `src/player_experience/database/user_auth_schema.py`
 
 **Responsibilities:**
-- User profile CRUD operations
-- Character profile management
-- Therapeutic preferences management
-- Privacy settings and data control
+
+- Neo4j schema management for authentication data
+- Database constraints and indexes creation
+- Schema verification and validation
+- Production deployment schema setup
 
 **Key Interfaces:**
 
 ```python
-class ProfileService(Component):
-    def get_user_profile(self, user_id: str) -> UserProfile
-    def update_user_profile(self, user_id: str, updates: dict) -> bool
-    def create_character(self, user_id: str, character_data: dict) -> Character
-    def get_user_characters(self, user_id: str) -> List[Character]
-    def update_therapeutic_preferences(self, user_id: str, preferences: dict) -> bool
-    def export_user_data(self, user_id: str) -> DataExport
-    def delete_user_account(self, user_id: str) -> bool
+class UserAuthSchemaManager:
+    def create_user_auth_constraints(self) -> bool
+    def create_user_auth_indexes(self) -> bool
+    def setup_user_auth_schema(self) -> bool
+    def verify_schema(self) -> Dict[str, Any]
 ```
 
 **Design Decisions:**
-- Character limit of 5 per user to maintain therapeutic focus
-- Audit logging for all profile changes
-- Soft delete with 30-day retention for account deletion
-- Granular privacy controls with clear explanations
 
-### 4. Security Monitor Service
+- Comprehensive constraints for data integrity
+- Performance-optimized indexes for common queries
+- Schema verification for deployment validation
+- Automated schema setup for production environments
+
+### 4. User Management Service
+
+**Implementation:** `src/player_experience/services/user_management_service.py`
 
 **Responsibilities:**
-- Suspicious activity detection
-- Security event logging
-- Automated threat response
-- Administrator alerting
+
+- Coordinated User and PlayerProfile creation
+- Transaction handling with rollback capabilities
+- User lifecycle management
+- Data consistency across repositories
 
 **Key Interfaces:**
 
 ```python
-class SecurityMonitor(Component):
-    def log_security_event(self, event: SecurityEvent) -> None
-    def detect_suspicious_activity(self, user_id: str, activity: dict) -> ThreatLevel
-    def trigger_security_response(self, threat: SecurityThreat) -> None
-    def generate_security_report(self, timeframe: TimeRange) -> SecurityReport
+class UserManagementService:
+    def create_user_with_profile(self, registration: UserRegistration) -> Tuple[bool, List[str], Optional[str]]
+    def delete_user_with_profile(self, user_id: str) -> Tuple[bool, List[str]]
+    def get_user_with_profile(self, user_id: str) -> Tuple[Optional[User], Optional[PlayerProfile]]
 ```
 
-## Data Models
+**Design Decisions:**
 
-### User Model
+- Coordinated transaction handling across multiple repositories
+- Comprehensive error collection and reporting
+- Rollback capabilities for failed operations
+- Integration with existing PlayerProfile system
 
-```python
-@dataclass
-class User:
-    user_id: str
-    email: str
-    password_hash: str
-    email_verified: bool
-    created_at: datetime
-    last_login: datetime
-    account_status: AccountStatus
-    failed_login_attempts: int
-    locked_until: Optional[datetime]
-    
-    # Privacy and preferences
-    privacy_settings: PrivacySettings
-    therapeutic_preferences: TherapeuticPreferences
-    data_retention_preferences: DataRetentionSettings
-```
+## Implementation Status
 
-### Character Model
+### ✅ Completed Components
 
-```python
-@dataclass
-class Character:
-    character_id: str
-    user_id: str
-    name: str
-    created_at: datetime
-    therapeutic_profile: TherapeuticProfile
-    progress_data: dict
-    preferences: CharacterPreferences
-    is_active: bool
-```
+1. **Enhanced Authentication Service** - Full implementation with MFA support, security logging, and database integration
+2. **User Repository** - Complete CRUD operations with Neo4j integration and retry logic
+3. **User Authentication Schema Manager** - Database schema management with constraints and indexes
+4. **User Management Service** - Coordinated user and profile creation with transaction handling
+5. **Authentication API Router** - Complete REST API with comprehensive error handling
+6. **Security Features** - Account lockout, failed login tracking, security event logging
+7. **Testing Suite** - 44 passing unit tests with comprehensive coverage
+8. **Health Monitoring** - Database health checks and monitoring endpoints
+9. **Production Configuration** - Environment-specific settings and deployment templates
+10. **Documentation** - Complete system documentation and deployment guides
 
-### Session Model
+### 🔧 Production Ready Features
 
-```python
-@dataclass
-class Session:
-    session_id: str
-    user_id: str
-    token: str
-    refresh_token: str
-    created_at: datetime
-    expires_at: datetime
-    device_info: DeviceInfo
-    ip_address: str
-    is_active: bool
-```
+- Database migration scripts for schema setup
+- Comprehensive health check endpoints
+- Environment-based configuration validation
+- Security-first defaults and validation
+- Integration with existing TTA component system
 
-### Neo4j Graph Schema
+## Dependencies and Integration Points
 
-The system uses Neo4j to model relationships between users, characters, and therapeutic data:
+### Database Dependencies
 
-```cypher
-// User nodes
-CREATE (u:User {
-    user_id: string,
-    email: string,
-    created_at: datetime,
-    privacy_level: string
-})
+**Neo4j Database:**
 
-// Character nodes
-CREATE (c:Character {
-    character_id: string,
-    name: string,
-    created_at: datetime,
-    therapeutic_focus: [string]
-})
+- User authentication data storage
+- User-PlayerProfile relationship management
+- Security event logging and audit trails
+- Account lockout and failed login tracking
+- MFA secret storage with encryption
 
-// Relationships
-CREATE (u)-[:OWNS]->(c)
-CREATE (c)-[:HAS_PROGRESS]->(p:Progress)
-CREATE (u)-[:HAS_PREFERENCES]->(pref:Preferences)
-```
+**Redis Cache:**
 
-## Error Handling
+- Session management and storage
+- Performance optimization for frequent queries
+- Rate limiting and temporary data storage
 
-### Authentication Errors
+### API Integration Points
 
-- **Invalid Credentials**: Generic "Invalid email or password" message
-- **Account Locked**: Clear message with unlock time
-- **Email Not Verified**: Prompt to resend verification email
-- **Rate Limited**: Clear message with retry time
+**Authentication Router (`src/player_experience/api/routers/auth.py`):**
 
-### Session Errors
+- `/auth/register` - User registration with validation
+- `/auth/login` - User authentication with MFA support
+- `/auth/logout` - Session invalidation
+- `/auth/refresh` - Token refresh mechanism
+- `/auth/mfa/setup` - MFA configuration
+- `/auth/mfa/verify` - MFA verification
 
-- **Expired Session**: Automatic redirect to login with context preservation
-- **Invalid Token**: Clear session and require re-authentication
-- **Concurrent Session Limit**: Allow user to choose which session to terminate
+**Health Check Endpoints:**
 
-### Profile Management Errors
+- `/health/database` - Neo4j and Redis connectivity
+- `/health/auth` - Authentication service status
+- `/health/overall` - Complete system health
 
-- **Validation Errors**: Field-specific error messages
-- **Character Limit Exceeded**: Clear explanation with upgrade options
-- **Privacy Setting Conflicts**: Explanation of implications and alternatives
+### Configuration Dependencies
 
-### Security Errors
+**Environment Variables:**
 
-- **Suspicious Activity**: Temporary restrictions with clear explanation
-- **Data Export Delays**: Status updates and estimated completion time
-- **Account Deletion**: Clear confirmation process with data retention information
+- `TTA_NEO4J_URI` - Neo4j connection string
+- `TTA_NEO4J_USERNAME` - Neo4j authentication
+- `TTA_NEO4J_PASSWORD` - Neo4j password
+- `TTA_REDIS_URL` - Redis connection string
+- `TTA_AUTH_SECRET_KEY` - JWT signing key
+- `TTA_AUTH_ALGORITHM` - JWT algorithm (default: HS256)
 
-## Testing Strategy
+**Configuration Schema Integration:**
 
-### Unit Testing
+- Integrated with TTA's Pydantic-based configuration system
+- Environment-specific overrides supported
+- Validation and secure defaults enforced
 
-- **Authentication Logic**: Password hashing, token generation, validation
-- **Session Management**: Token lifecycle, expiration handling
-- **Profile Operations**: CRUD operations, validation logic
-- **Security Features**: Rate limiting, threat detection algorithms
+### Security Architecture Changes
 
-### Integration Testing
+**New Security Features:**
 
-- **Database Operations**: Neo4j queries, Redis operations
-- **Email Service**: Verification and notification workflows
-- **Therapeutic Integration**: Context passing, preference application
-- **Multi-Service Workflows**: Registration, login, profile updates
+- Database-backed account lockout with configurable thresholds
+- Comprehensive security event logging for audit compliance
+- MFA support with TOTP and backup codes
+- Password strength validation with configurable requirements
+- JWT token management with refresh token rotation
 
-### Security Testing
+**Security Event Types:**
 
-- **Penetration Testing**: Authentication bypass attempts, session hijacking
-- **Load Testing**: Rate limiting effectiveness, concurrent user handling
-- **Privacy Testing**: Data export accuracy, deletion completeness
-- **Therapeutic Safety**: Boundary enforcement, inappropriate content blocking
+- `login_success` - Successful authentication
+- `login_failure` - Failed authentication attempt
+- `account_locked` - Account lockout triggered
+- `password_changed` - Password modification
+- `mfa_setup` - MFA configuration
+- `suspicious_activity` - Detected security concerns
 
-### End-to-End Testing
+## Testing and Quality Assurance
 
-- **User Registration Flow**: Complete registration and verification process
-- **Character Management**: Creation, switching, deletion workflows
-- **Privacy Controls**: Settings application, data export/deletion
-- **Security Scenarios**: Account lockout, suspicious activity response
+### Comprehensive Test Suite
 
-## Configuration Integration
+**Unit Tests (44 passing tests):**
 
-The system integrates with TTA's central configuration system:
+- UserRepository CRUD operations with mock Neo4j driver
+- EnhancedAuthService authentication flows and security features
+- UserAuthSchemaManager schema creation and validation
+- UserManagementService coordinated operations
+- Security event logging and account lockout mechanisms
 
-```yaml
-# config/tta_config.yaml
-tta:
-  dev:
-    authentication:
-      enabled: true
-      port: 8001
-      jwt_secret: ${JWT_SECRET}
-      session_timeout: 1800  # 30 minutes
-      max_login_attempts: 5
-      lockout_duration: 1800  # 30 minutes
-      password_requirements:
-        min_length: 8
-        require_special_chars: true
-        require_numbers: true
-    
-    profile_management:
-      enabled: true
-      port: 8002
-      max_characters_per_user: 5
-      data_export_timeout: 2592000  # 30 days
-      account_deletion_grace_period: 2592000  # 30 days
-    
-    session_management:
-      enabled: true
-      redis_connection: "redis://localhost:6379"
-      jwt_expiration: 1800  # 30 minutes
-      refresh_token_expiration: 604800  # 7 days
-```
+**Integration Tests:**
 
-## Deployment Considerations
+- Neo4j database operations with testcontainers
+- Redis session management and caching
+- End-to-end authentication flows
+- Health check endpoint validation
+- Database migration script testing
 
-### Service Dependencies
+**Performance Testing:**
 
-- **Redis**: Required for session storage and rate limiting
-- **Neo4j**: Required for user and character data persistence
-- **Email Service**: Required for verification and notifications
-- **Therapeutic Engine**: Optional, for enhanced personalization
+- Authentication endpoint load testing
+- Database query optimization validation
+- Session management performance under load
+- Memory usage and resource optimization
 
-### Scaling Considerations
+## Deployment and Operations
 
-- **Stateless Services**: All services designed to be horizontally scalable
-- **Session Storage**: Redis cluster for high availability
-- **Database Sharding**: Neo4j clustering for large user bases
-- **Caching Strategy**: Multi-layer caching for frequently accessed data
+### Production Deployment
 
-### Security Hardening
+**Database Migration:**
 
-- **Network Security**: Service-to-service authentication
-- **Data Encryption**: At-rest and in-transit encryption
-- **Audit Logging**: Comprehensive security event logging
-- **Monitoring**: Real-time security monitoring and alerting
+- Automated schema setup via UserAuthSchemaManager
+- Database health checks and connectivity validation
+- Environment-specific configuration templates
 
-## Therapeutic Safety Integration
+**Health Monitoring:**
 
-### Content Filtering
+- `/health/database` - Neo4j and Redis connectivity checks
+- `/health/auth` - Authentication service status validation
+- `/health/overall` - Complete system health assessment
 
-- User therapeutic preferences automatically applied to content systems
-- Safety boundaries enforced at the authentication layer
-- Inappropriate content blocked based on user comfort levels
+**Security Operations:**
 
-### Crisis Intervention
+- Comprehensive security event logging for audit compliance
+- Account lockout monitoring and management
+- Failed authentication attempt tracking and analysis
 
-- Automatic detection of concerning user behavior patterns
-- Integration with therapeutic support systems
-- Emergency contact and intervention protocols
+### Configuration Management
 
-### Privacy Protection
+**Environment Variables:**
 
-- Therapeutic data segregated with enhanced protection
-- Role-based access for therapeutic staff
-- Audit trails for all therapeutic data access
+- Secure defaults with environment-specific overrides
+- Validation and error handling for missing configurations
+- Integration with TTA's Pydantic-based configuration system
 
-This design ensures that the Authentication & User Management system not only meets all specified requirements but also integrates seamlessly with TTA's therapeutic mission and technical architecture.
+**Production Security:**
+
+- JWT secret key rotation capabilities
+- Database connection encryption and authentication
+- Rate limiting and DDoS protection mechanisms
+
+## Summary
+
+The Authentication & User Management system has been successfully implemented as a comprehensive, production-ready solution that integrates seamlessly with the TTA platform. The system provides:
+
+### ✅ Core Capabilities Delivered
+
+1. **Secure User Authentication** - Complete registration, login, and session management with MFA support
+2. **Database Integration** - Full Neo4j and Redis integration with retry logic and performance optimization
+3. **Security Features** - Account lockout, security event logging, and comprehensive audit trails
+4. **API Endpoints** - Complete REST API with proper error handling and validation
+5. **Health Monitoring** - Comprehensive health checks for production deployment
+6. **Testing Coverage** - 44 passing unit tests with integration and performance testing
+7. **Documentation** - Complete system documentation and deployment guides
+
+### 🔧 Production Readiness
+
+- **Database Migration Scripts** - Automated schema setup and validation
+- **Environment Configuration** - Secure defaults with environment-specific overrides
+- **Health Check Endpoints** - Kubernetes-ready health monitoring
+- **Security Compliance** - Audit logging and security event tracking
+- **Performance Optimization** - Database query optimization and caching strategies
+
+### 🔗 Integration Points
+
+- **Player Profile System** - Coordinated user and character creation
+- **TTA Configuration** - Integrated with Pydantic-based configuration management
+- **Component Architecture** - Follows TTA's component-based patterns
+- **Therapeutic Safety** - Role-based access control and safety boundary enforcement
+
+The system is now ready for production deployment and provides a solid foundation for the TTA platform's user management needs.

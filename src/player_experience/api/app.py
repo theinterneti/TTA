@@ -24,7 +24,7 @@ from .middleware import (
     SecurityHeadersMiddleware,
     TherapeuticSafetyMiddleware,
 )
-from .routers import auth, characters, players, worlds, chat, sessions, progress
+from .routers import auth, characters, players, worlds, chat, sessions, progress, health
 from .routers import metrics as metrics_router
 
 
@@ -98,6 +98,7 @@ def create_app() -> FastAPI:
     app.add_middleware(AuthenticationMiddleware)
 
     # Include routers
+    app.include_router(health.router, prefix="/api/v1", tags=["health"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
     app.include_router(players.router, prefix="/api/v1/players", tags=["players"])
     app.include_router(characters.router, prefix="/api/v1/characters", tags=["characters"])

@@ -29,6 +29,25 @@ class APISettings(BaseSettings):
     jwt_algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
+
+    # Authentication database settings
+    neo4j_url: str = "bolt://localhost:7687"
+    neo4j_username: str = "neo4j"
+    neo4j_password: str = "password"
+
+    # Security policy settings
+    max_login_attempts: int = 5
+    lockout_duration_minutes: int = 15
+    password_min_length: int = 8
+    password_require_uppercase: bool = True
+    password_require_lowercase: bool = True
+    password_require_numbers: bool = True
+    password_require_special: bool = True
+
+    # MFA settings
+    mfa_enabled: bool = False
+    mfa_issuer_name: str = "TTA Platform"
+    mfa_email_enabled: bool = False
     
     # CORS settings
     cors_origins: List[str] = [
@@ -104,11 +123,16 @@ class DevelopmentSettings(APISettings):
 
 class ProductionSettings(APISettings):
     """Production environment settings."""
-    
+
     debug: bool = False
     reload: bool = False
     log_level: str = "WARNING"
-    
+
+    # Production security defaults
+    max_login_attempts: int = 3
+    lockout_duration_minutes: int = 30
+    mfa_enabled: bool = True
+
     # Require strong security settings in production
     @field_validator("jwt_secret_key")
     @classmethod
@@ -120,17 +144,45 @@ class ProductionSettings(APISettings):
             raise ValueError("JWT secret key must be at least 32 characters long")
         return v
 
+    @field_validator("neo4j_password")
+    @classmethod
+    def validate_neo4j_password(cls, v):
+        """Ensure Neo4j password is set in production."""
+        if v == "password":
+            raise ValueError("Must set a strong Neo4j password in production")
+        if len(v) < 8:
+            raise ValueError("Neo4j password must be at least 8 characters long")
+        return v
+
+    @field_validator("cors_origins")
+    @classmethod
+    def validate_cors_origins(cls, v):
+        """Ensure CORS origins are properly configured for production."""
+        if any("localhost" in origin for origin in v):
+            raise ValueError("Remove localhost from CORS origins in production")
+        return v
+
 
 class TestingSettings(APISettings):
     """Test environment settings."""
-    
+
     debug: bool = True
     log_level: str = "DEBUG"
-    
+
     # Use in-memory databases for testing
     database_url: str = "sqlite:///:memory:"
     redis_url: str = "redis://localhost:6379/1"  # Use different Redis DB for tests
-    
+
+    # Use test Neo4j database
+    neo4j_url: str = "bolt://localhost:7687"
+    neo4j_username: str = "neo4j"
+    neo4j_password: str = "testpassword"
+
+    # Relaxed security for testing
+    max_login_attempts: int = 10
+    lockout_duration_minutes: int = 1
+    password_min_length: int = 6
+
     # Disable rate limiting for tests
     rate_limit_calls: int = 10000
     rate_limit_period: int = 1
