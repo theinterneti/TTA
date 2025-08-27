@@ -61,6 +61,15 @@ class EventType(str, Enum):
     BREAK_POINT_DETECTED = "break_point_detected"
     BREAK_POINT_OFFERED = "break_point_offered"
     BREAK_POINT_ACCEPTED = "break_point_accepted"
+
+    # Replayability and exploration events
+    EXPLORATION_EVENT = "exploration_event"
+    SNAPSHOT_CREATED = "snapshot_created"
+    SNAPSHOT_RESTORED = "snapshot_restored"
+    EXPLORATION_STARTED = "exploration_started"
+    ALTERNATIVE_PATH_CREATED = "alternative_path_created"
+    ALTERNATIVE_PATH_COMPLETED = "alternative_path_completed"
+    PATH_COMPARISON_GENERATED = "path_comparison_generated"
     
     # Progress events
     PROGRESS_UPDATED = "progress_updated"

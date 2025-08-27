@@ -64,6 +64,17 @@ from .character_development_system import (
     CharacterAttributeLevel
 )
 
+from .replayability_system import (
+    ReplayabilitySystem,
+    ExplorationSnapshot,
+    AlternativePath,
+    PathComparison,
+    ExplorationSession,
+    ExplorationMode,
+    PathType,
+    ComparisonMetric
+)
+
 from .narrative_loader import (
     NarrativeLoader,
     NarrativeDefinition,
@@ -143,5 +154,15 @@ __all__ = [
     "CharacterDevelopmentEvent",
     "CharacterMilestoneAchievement",
     "CharacterAbility",
-    "CharacterAttributeLevel"
+    "CharacterAttributeLevel",
+
+    # Replayability and Exploration System
+    "ReplayabilitySystem",
+    "ExplorationSnapshot",
+    "AlternativePath",
+    "PathComparison",
+    "ExplorationSession",
+    "ExplorationMode",
+    "PathType",
+    "ComparisonMetric"
 ]
