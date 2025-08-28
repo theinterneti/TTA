@@ -136,15 +136,17 @@ async def test_world_creation_endpoint(token):
     
     headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
     
-    # Test world data - send directly as the request body with correct enum values
+    # Test world data - wrap in world_request field as expected by the API
     world_data = {
-        "title": "API Test World",
-        "description": "A test world created via API endpoint testing",
-        "genre": "fantasy",  # This should match GenreType.FANTASY.value
-        "therapeutic_focus": ["api_testing", "endpoint_validation"],
-        "difficulty_level": "intermediate",  # This should match DifficultyLevel.INTERMEDIATE.value
-        "estimated_duration": 30,
-        "is_public": True
+        "world_request": {
+            "title": "API Test World",
+            "description": "A test world created via API endpoint testing",
+            "genre": "fantasy",  # This should match GenreType.FANTASY.value
+            "therapeutic_focus": ["api_testing", "endpoint_validation"],
+            "difficulty_level": "intermediate",  # This should match DifficultyLevel.INTERMEDIATE.value
+            "estimated_duration": 30,
+            "is_public": True
+        }
     }
     
     async with aiohttp.ClientSession() as session:

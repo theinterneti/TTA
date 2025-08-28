@@ -8,7 +8,7 @@ including world management, story weaver profiles, and community features.
 import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Path, Body
 from fastapi.responses import JSONResponse
 
 from ..auth import TokenData, get_current_active_player
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/nexus", tags=["nexus"])
 
 @router.get("/state", response_model=NexusStateResponse)
 async def get_nexus_state(
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ) -> NexusStateResponse:
     """
     Get current state of the Nexus Codex.
@@ -94,7 +94,7 @@ async def get_story_spheres(
     genre: Optional[GenreType] = Query(None, description="Filter spheres by genre"),
     threat_level: Optional[str] = Query(None, description="Filter by threat level"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ):
     """
     Get visual data for story spheres in the Nexus.
@@ -164,9 +164,9 @@ async def get_story_spheres(
 
 @router.post("/worlds", status_code=status.HTTP_201_CREATED)
 async def create_world(
-    world_request: WorldCreationRequest,
+    world_request: WorldCreationRequest = Body(...),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ):
     """
     Create a new therapeutic world.
@@ -264,7 +264,7 @@ async def search_worlds(
     limit: int = Query(20, ge=1, le=100, description="Maximum results"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ):
     """
     Search for worlds based on criteria.
@@ -353,8 +353,18 @@ async def search_worlds(
             worlds = [record["world_summary"] async for record in result]
 
         # Get total count for pagination
-        count_query = " ".join(query_parts[:-2])  # Remove ORDER BY and pagination
-        count_query += " RETURN count(world) as total"
+        # Build count query with MATCH and WHERE clauses only
+        count_parts = []
+        count_parts.append("MATCH (world:StoryWorld)")
+
+        # Add the same WHERE conditions
+        if where_conditions:
+            count_parts.append("WHERE " + " AND ".join(where_conditions))
+        else:
+            count_parts.append("WHERE world.is_public = true")
+
+        count_parts.append("RETURN count(world) as total")
+        count_query = " ".join(count_parts)
 
         async with service_manager.neo4j.driver.session() as session:
             result = await session.run(count_query, {k: v for k, v in params.items() if k not in ["offset", "limit"]})
@@ -381,7 +391,7 @@ async def search_worlds(
 async def get_world(
     world_id: str = Path(..., description="World ID"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ):
     """
     Get detailed information about a specific world.
@@ -456,7 +466,7 @@ async def get_world(
 async def enter_world(
     world_id: str = Path(..., description="World ID"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager)
 ):
     """
     Enter a world and start therapeutic journey.
