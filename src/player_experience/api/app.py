@@ -24,9 +24,10 @@ from .middleware import (
     SecurityHeadersMiddleware,
     TherapeuticSafetyMiddleware,
 )
-from .routers import auth, characters, players, worlds, chat, sessions, progress, health, services
+from .routers import auth, characters, players, worlds, chat, sessions, progress, health, services, nexus
 from .routers import metrics as metrics_router
 from .services.connection_manager import initialize_services, close_services
+from ..database.nexus_schema import NexusSchemaManager, validate_nexus_schema
 
 
 
@@ -45,6 +46,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         success = await initialize_services()
         if success:
             print("✅ All services initialized successfully")
+
+            # Initialize Nexus Codex schema
+            from .services.connection_manager import get_service_manager
+            service_manager = get_service_manager()
+
+            if service_manager and service_manager.neo4j:
+                nexus_manager = NexusSchemaManager(service_manager.neo4j.driver)
+                schema_created = await nexus_manager.create_nexus_schema()
+
+                if schema_created:
+                    print("✅ Nexus Codex schema initialized successfully")
+                else:
+                    print("⚠️ Failed to initialize Nexus Codex schema")
         else:
             print("⚠️  Some services failed to initialize - check service health")
     except Exception as e:
@@ -72,13 +86,60 @@ def create_app() -> FastAPI:
     """
     import os
 
+    # Define API tags for organized documentation
+    tags_metadata = [
+        {
+            "name": "health",
+            "description": "Health check endpoints for monitoring system status and service availability.",
+        },
+        {
+            "name": "services",
+            "description": "Service management endpoints for monitoring and controlling external service connections.",
+        },
+        {
+            "name": "authentication",
+            "description": "User authentication and authorization endpoints including login, registration, and token management.",
+        },
+        {
+            "name": "players",
+            "description": "Player management endpoints for creating, updating, and retrieving player profiles and data.",
+        },
+        {
+            "name": "characters",
+            "description": "Character management endpoints for game character creation, customization, and progression.",
+        },
+        {
+            "name": "worlds",
+            "description": "Game world management endpoints for creating and managing virtual environments and scenarios.",
+        },
+        {
+            "name": "sessions",
+            "description": "Game session management endpoints for starting, monitoring, and controlling gameplay sessions.",
+        },
+        {
+            "name": "progress",
+            "description": "Player progress tracking endpoints for monitoring achievements, milestones, and therapeutic outcomes.",
+        },
+        {
+            "name": "chat",
+            "description": "Real-time chat and communication endpoints using WebSocket connections for interactive gameplay.",
+        },
+        {
+            "name": "metrics",
+            "description": "System metrics and monitoring endpoints for performance analysis and debugging (development only).",
+        },
+    ]
+
     app = FastAPI(
         title="Player Experience Interface API",
-        description="API for the TTA Player Experience Interface",
+        description="API for the TTA (Therapeutic Technology Applications) Player Experience Interface - "
+                   "A comprehensive system for AI-driven therapeutic gaming experiences with real-time "
+                   "monitoring, personalized content delivery, and integrated health tracking.",
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
         openapi_url="/openapi.json",
+        openapi_tags=tags_metadata,
         lifespan=lifespan,
     )
 
@@ -120,6 +181,8 @@ def create_app() -> FastAPI:
     # Metrics (gated by settings.debug)
     app.include_router(metrics_router.router, tags=["metrics"])
     app.include_router(progress.router, prefix="/api/v1", tags=["progress"])
+    # Nexus Codex endpoints
+    app.include_router(nexus.router, prefix="/api/v1", tags=["nexus"])
 
     # WebSocket endpoints (mounted under /ws)
     app.include_router(chat.router, prefix="/ws", tags=["chat"])
