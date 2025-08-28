@@ -1,0 +1,258 @@
+[
+  {
+    "turn": 1,
+    "description": "User Registration",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.097983",
+    "response_data": {
+      "message": "User registered successfully",
+      "username": "validation_user_00ca7475",
+      "email": "validation_00ca7475@therapeutic.example",
+      "role": "player"
+    },
+    "error": null
+  },
+  {
+    "turn": 2,
+    "description": "User Login & JWT Token",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.438603",
+    "response_data": {
+      "token_received": true,
+      "user_info": {
+        "user_id": "09d45460-1461-4da3-96bb-2eb45cd42299",
+        "username": "validation_user_00ca7475",
+        "email": "validation_00ca7475@therapeutic.example",
+        "role": "player",
+        "permissions": [
+          "create_character",
+          "manage_own_characters",
+          "access_therapeutic_content",
+          "manage_own_profile",
+          "export_own_data",
+          "delete_own_data"
+        ]
+      }
+    },
+    "error": null
+  },
+  {
+    "turn": 3,
+    "description": "Character Creation",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.498211",
+    "response_data": {
+      "character_id": "b2fe2d53-9f76-4188-83fa-77f0fbb64a99",
+      "player_id": "09d45460-1461-4da3-96bb-2eb45cd42299",
+      "name": "Alex Journey",
+      "appearance": {
+        "age_range": "adult",
+        "gender_identity": "non-binary",
+        "physical_description": "Thoughtful individual with expressive eyes",
+        "clothing_style": "casual_comfortable",
+        "distinctive_features": [
+          "expressive_eyes",
+          "calm_presence"
+        ],
+        "avatar_image_url": null
+      },
+      "background": {
+        "name": "Alex Journey",
+        "backstory": "Graduate student working through anxiety while helping others",
+        "personality_traits": [
+          "introspective",
+          "empathetic",
+          "curious"
+        ],
+        "core_values": [
+          "authenticity",
+          "personal_growth",
+          "helping_others"
+        ],
+        "fears_and_anxieties": [
+          "social_judgment",
+          "public_speaking"
+        ],
+        "strengths_and_skills": [
+          "active_listening",
+          "emotional_intelligence"
+        ],
+        "life_goals": [
+          "overcome_social_anxiety",
+          "help_others_heal"
+        ],
+        "relationships": {}
+      },
+      "therapeutic_profile": {
+        "primary_concerns": [
+          "social anxiety"
+        ],
+        "therapeutic_goals": [],
+        "preferred_intensity": "medium",
+        "comfort_zones": [
+          "one_on_one_conversations",
+          "helping_others",
+          "helping others"
+        ],
+        "readiness_level": 0.55,
+        "therapeutic_approaches": [
+          "cognitive_behavioral_therapy",
+          "mindfulness"
+        ]
+      },
+      "created_at": "2025-08-28T10:24:00.444819",
+      "last_active": "2025-08-28T10:24:00.444822",
+      "is_active": true
+    },
+    "error": null
+  },
+  {
+    "turn": 4,
+    "description": "Browse Therapeutic Worlds",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.558496",
+    "response_data": {
+      "worlds_count": 2,
+      "selected_world": "world_mindfulness_garden"
+    },
+    "error": null
+  },
+  {
+    "turn": 5,
+    "description": "World-Character Compatibility",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.618288",
+    "response_data": {
+      "character_id": "b2fe2d53-9f76-4188-83fa-77f0fbb64a99",
+      "world_id": "world_mindfulness_garden",
+      "overall_score": 0.8200000000000001,
+      "is_compatible": true,
+      "compatibility_factors": [
+        {
+          "factor_name": "Difficulty Level",
+          "score": 0.8,
+          "explanation": "World difficulty is beginner",
+          "weight": 0.3
+        },
+        {
+          "factor_name": "Therapeutic Approaches",
+          "score": 0.7,
+          "explanation": "Therapeutic approaches align with character needs",
+          "weight": 0.4
+        },
+        {
+          "factor_name": "Content Safety",
+          "score": 1.0,
+          "explanation": "Content safety assessment based on warnings",
+          "weight": 0.3
+        }
+      ],
+      "recommendations": [],
+      "warnings": [],
+      "prerequisites_met": true,
+      "unmet_prerequisites": []
+    },
+    "error": null
+  },
+  {
+    "turn": 6,
+    "description": "World Customization",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.668571",
+    "response_data": {
+      "world_id": "world_mindfulness_garden",
+      "character_id": "",
+      "customized_parameters": {
+        "therapeutic_intensity": 0.5,
+        "narrative_pace": "medium",
+        "interaction_frequency": "balanced",
+        "challenge_level": "INTERMEDIATE",
+        "focus_areas": [],
+        "avoid_topics": [],
+        "session_length_preference": 30
+      },
+      "compatibility": {
+        "overall_score": 0.8
+      }
+    },
+    "error": null
+  },
+  {
+    "turn": 7,
+    "description": "Session Creation",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.718500",
+    "response_data": {
+      "session_id": "b760c30d-0e67-4635-b6af-1fa1fbe6257d",
+      "character_id": "b2fe2d53-9f76-4188-83fa-77f0fbb64a99",
+      "world_id": "world_mindfulness_garden",
+      "status": "active",
+      "created_at": "2025-08-28T17:24:00.673968"
+    },
+    "error": null
+  },
+  {
+    "turn": 8,
+    "description": "Session Progress Update",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:00.768478",
+    "response_data": {
+      "session_id": "b760c30d-0e67-4635-b6af-1fa1fbe6257d",
+      "message": "Progress updated successfully",
+      "progress": {
+        "therapeutic_progress": {
+          "anxiety_level_reduction": 0.3,
+          "confidence_increase": 0.25,
+          "coping_skills_practiced": [
+            "deep_breathing",
+            "cognitive_reframing"
+          ],
+          "milestones_achieved": [
+            "first_social_interaction",
+            "anxiety_management_technique"
+          ]
+        },
+        "session_metrics": {
+          "engagement_level": 0.85,
+          "completion_percentage": 0.75,
+          "therapeutic_goals_progress": {
+            "anxiety_management": 0.4,
+            "social_confidence": 0.3
+          }
+        },
+        "notes": "Significant progress in anxiety management techniques"
+      },
+      "updated_at": "2025-08-28T17:24:00.721734"
+    },
+    "error": null
+  },
+  {
+    "turn": 9,
+    "description": "Session Pause/Resume",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:01.833476",
+    "response_data": {
+      "pause_success": true,
+      "resume_data": {
+        "session_id": "b760c30d-0e67-4635-b6af-1fa1fbe6257d",
+        "status": "active",
+        "message": "Session resumed successfully",
+        "resumed_at": "2025-08-28T17:24:01.831821"
+      }
+    },
+    "error": null
+  },
+  {
+    "turn": 10,
+    "description": "Character Data Export",
+    "success": true,
+    "timestamp": "2025-08-28T10:24:01.878728",
+    "response_data": {
+      "export_size": 1608,
+      "has_character_data": true,
+      "has_session_data": true,
+      "complete_journey": true
+    },
+    "error": null
+  }
+]

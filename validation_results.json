@@ -1,0 +1,128 @@
+[
+  {
+    "turn": 1,
+    "description": "User Registration",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:20.708384",
+    "response_data": {
+      "error": "HTTP Exception",
+      "message": {
+        "message": "Registration failed",
+        "errors": [
+          "Username already exists",
+          "Email already exists"
+        ]
+      },
+      "status_code": 400
+    },
+    "error": "HTTP 400"
+  },
+  {
+    "turn": 2,
+    "description": "User Login & JWT Token",
+    "success": true,
+    "timestamp": "2025-08-28T10:03:21.084320",
+    "response_data": {
+      "token_received": true,
+      "user_info": {
+        "user_id": "41c49e2e-e47f-482f-92de-ff94464372b3",
+        "username": "therapeutic_tester_validation",
+        "email": "validation@therapeutic.example",
+        "role": "player",
+        "permissions": [
+          "create_character",
+          "manage_own_characters",
+          "access_therapeutic_content",
+          "manage_own_profile",
+          "export_own_data",
+          "delete_own_data"
+        ]
+      }
+    },
+    "error": null
+  },
+  {
+    "turn": 3,
+    "description": "Character Creation",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.134058",
+    "response_data": {
+      "detail": "Age range must be one of: ['child', 'teen', 'adult', 'elder']"
+    },
+    "error": "HTTP 400"
+  },
+  {
+    "turn": 4,
+    "description": "Browse Therapeutic Worlds",
+    "success": true,
+    "timestamp": "2025-08-28T10:03:21.184404",
+    "response_data": {
+      "worlds_count": 2,
+      "selected_world": "world_mindfulness_garden"
+    },
+    "error": null
+  },
+  {
+    "turn": 5,
+    "description": "World-Character Compatibility",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.184561",
+    "response_data": null,
+    "error": "Missing world_id or character_id"
+  },
+  {
+    "turn": 6,
+    "description": "World Customization",
+    "success": true,
+    "timestamp": "2025-08-28T10:03:21.234177",
+    "response_data": {
+      "world_id": "world_mindfulness_garden",
+      "character_id": "",
+      "customized_parameters": {
+        "therapeutic_intensity": 0.5,
+        "narrative_pace": "medium",
+        "interaction_frequency": "balanced",
+        "challenge_level": "INTERMEDIATE",
+        "focus_areas": [],
+        "avoid_topics": [],
+        "session_length_preference": 30
+      },
+      "compatibility": {
+        "overall_score": 0.8
+      }
+    },
+    "error": null
+  },
+  {
+    "turn": 7,
+    "description": "Session Creation",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.234257",
+    "response_data": null,
+    "error": "Missing character_id or world_id"
+  },
+  {
+    "turn": 8,
+    "description": "Session Progress Update",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.234297",
+    "response_data": null,
+    "error": "Missing session_id"
+  },
+  {
+    "turn": 9,
+    "description": "Session Pause/Resume",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.234329",
+    "response_data": null,
+    "error": "Missing session_id"
+  },
+  {
+    "turn": 10,
+    "description": "Character Data Export",
+    "success": false,
+    "timestamp": "2025-08-28T10:03:21.234359",
+    "response_data": null,
+    "error": "Missing character_id"
+  }
+]

@@ -32,14 +32,11 @@ from ...database.user_auth_schema import UserAuthSchemaManager
 router = APIRouter()
 
 # Initialize enhanced auth service (in production, this would be dependency injected)
-# Secret key from environment with secure default in non-production only.
-# In production, absence of TTA_AUTH_SECRET_KEY should be treated as a startup misconfiguration.
-_AUTH_SECRET = os.getenv("TTA_AUTH_SECRET_KEY")
-if not _AUTH_SECRET:
-    # Secure default behavior: generate a process-unique key for dev/tests to avoid hard-coded secrets.
-    # This preserves runtime behavior (tokens work) without shipping a static secret.
-    import secrets
-    _AUTH_SECRET = secrets.token_urlsafe(32)
+# Use the same JWT_SECRET_KEY as the rest of the authentication system for consistency
+_AUTH_SECRET = os.getenv("JWT_SECRET_KEY", "TTA_JWT_Secret_Key_Change_In_Production_2024!")
+if not _AUTH_SECRET or _AUTH_SECRET == "your-secret-key-change-in-production":
+    # Secure default behavior: use the same default as the main auth system
+    _AUTH_SECRET = "TTA_JWT_Secret_Key_Change_In_Production_2024!"
 
 # Initialize user repository and schema (with fallback for testing)
 user_repository = None

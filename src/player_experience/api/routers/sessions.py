@@ -99,8 +99,8 @@ async def get_session_progress(
     s = _SESSIONS.get(session_id)
     if not s:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
-    # Minimal placeholder progress structure compatible with tests' basic checks
-    return {
+    # Return current progress data
+    return s.get("progress", {
         "session_id": session_id,
         "character_id": s["character_id"],
         "world_id": s["world_id"],
@@ -108,5 +108,86 @@ async def get_session_progress(
             "completed_steps": 1,
             "total_steps": 1,
         },
+    })
+
+
+@router.put("/{session_id}/progress")
+async def update_session_progress(
+    session_id: str,
+    progress_data: Dict[str, Any],
+    current_player: TokenData = Depends(get_current_active_player),
+) -> Dict[str, Any]:
+    """Update session progress with therapeutic metrics."""
+    s = _SESSIONS.get(session_id)
+    if not s:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    # Verify session ownership
+    if s.get("owner") != getattr(current_player, "player_id", None):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    # Update progress data
+    s["progress"] = progress_data
+    s["updated_at"] = datetime.utcnow().isoformat()
+
+    return {
+        "session_id": session_id,
+        "message": "Progress updated successfully",
+        "progress": progress_data,
+        "updated_at": s["updated_at"]
+    }
+
+
+@router.post("/{session_id}/pause")
+async def pause_session(
+    session_id: str,
+    current_player: TokenData = Depends(get_current_active_player),
+) -> Dict[str, Any]:
+    """Pause an active session."""
+    s = _SESSIONS.get(session_id)
+    if not s:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    # Verify session ownership
+    if s.get("owner") != getattr(current_player, "player_id", None):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    # Update session status
+    s["status"] = "paused"
+    s["paused_at"] = datetime.utcnow().isoformat()
+    s["updated_at"] = datetime.utcnow().isoformat()
+
+    return {
+        "session_id": session_id,
+        "status": "paused",
+        "message": "Session paused successfully",
+        "paused_at": s["paused_at"]
+    }
+
+
+@router.post("/{session_id}/resume")
+async def resume_session(
+    session_id: str,
+    current_player: TokenData = Depends(get_current_active_player),
+) -> Dict[str, Any]:
+    """Resume a paused session."""
+    s = _SESSIONS.get(session_id)
+    if not s:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+
+    # Verify session ownership
+    if s.get("owner") != getattr(current_player, "player_id", None):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Access denied")
+
+    # Update session status
+    s["status"] = "active"
+    s["resumed_at"] = datetime.utcnow().isoformat()
+    s["updated_at"] = datetime.utcnow().isoformat()
+
+    return {
+        "session_id": session_id,
+        "status": "active",
+        "message": "Session resumed successfully",
+        "resumed_at": s["resumed_at"]
     }
 

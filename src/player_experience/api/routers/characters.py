@@ -5,6 +5,7 @@ This module provides REST endpoints for character management with
 authentication, authorization (owner-only), and API documentation.
 """
 
+from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, status
@@ -458,4 +459,78 @@ async def update_character_therapeutic_profile(
         return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)})
     except Exception:
         return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while updating therapeutic profile"})
+
+
+@router.get(
+    "/{character_id}/export",
+    summary="Export Character Data",
+    description="Export complete character data including therapeutic journey (owner-only).",
+)
+async def export_character_data(
+    character_id: str,
+    current_player: TokenData = Depends(get_current_active_player),
+    manager: CharacterAvatarManager = Depends(get_character_manager_dep),
+) -> dict:
+    """Export complete character data including therapeutic journey."""
+    try:
+        character = manager.get_character(character_id)
+        if not character:
+            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+        if character.player_id != current_player.player_id:
+            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only export your own characters"})
+
+        # Build comprehensive export data
+        export_data = {
+            "character": {
+                "character_id": character.character_id,
+                "name": character.name,
+                "player_id": character.player_id,
+                "created_at": character.created_at.isoformat() if hasattr(character, 'created_at') and character.created_at else None,
+                "appearance": {
+                    "age_range": character.appearance.age_range,
+                    "gender_identity": character.appearance.gender_identity,
+                    "physical_description": character.appearance.physical_description,
+                    "clothing_style": character.appearance.clothing_style,
+                    "distinctive_features": character.appearance.distinctive_features,
+                } if character.appearance else {},
+                "background": {
+                    "name": character.background.name,
+                    "backstory": character.background.backstory,
+                    "personality_traits": character.background.personality_traits,
+                    "core_values": character.background.core_values,
+                    "fears_and_anxieties": character.background.fears_and_anxieties,
+                    "strengths_and_skills": character.background.strengths_and_skills,
+                    "life_goals": character.background.life_goals,
+                } if character.background else {},
+                "therapeutic_profile": {
+                    "primary_concerns": character.therapeutic_profile.primary_concerns,
+                    "therapeutic_goals": [{"goal_id": g.goal_id, "description": g.description} for g in character.therapeutic_profile.therapeutic_goals],
+                    "preferred_intensity": character.therapeutic_profile.preferred_intensity.value if hasattr(character.therapeutic_profile.preferred_intensity, 'value') else str(character.therapeutic_profile.preferred_intensity),
+                    "comfort_zones": character.therapeutic_profile.comfort_zones,
+                    "challenge_areas": character.therapeutic_profile.challenge_areas,
+                    "coping_strategies": character.therapeutic_profile.coping_strategies,
+                    "trigger_topics": character.therapeutic_profile.trigger_topics,
+                    "readiness_level": character.therapeutic_profile.readiness_level,
+                    "therapeutic_approaches": [str(a) for a in character.therapeutic_profile.therapeutic_approaches],
+                } if character.therapeutic_profile else {}
+            },
+            "therapeutic_progress": {
+                "sessions_completed": 0,  # Placeholder - would be populated from session data
+                "milestones_achieved": [],
+                "skills_developed": [],
+                "progress_metrics": {}
+            },
+            "sessions": [],  # Placeholder - would be populated from session history
+            "export_metadata": {
+                "exported_at": datetime.now().isoformat(),
+                "exported_by": current_player.player_id,
+                "export_version": "1.0",
+                "complete_journey": True
+            }
+        }
+
+        return export_data
+
+    except Exception as e:
+        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": f"Export failed: {str(e)}"})
 

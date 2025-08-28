@@ -1,0 +1,299 @@
+[
+  {
+    "endpoint": "/health",
+    "method": "GET",
+    "success": true,
+    "status_code": 200,
+    "timestamp": "2025-08-28T09:47:55.784205",
+    "response_data": {
+      "status": "healthy",
+      "timestamp": "2025-08-28T16:47:55.781906+00:00",
+      "version": "1.0.0",
+      "uptime_seconds": 50.93378
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/services/health",
+    "method": "GET",
+    "success": true,
+    "status_code": 200,
+    "timestamp": "2025-08-28T09:47:55.849600",
+    "response_data": {
+      "timestamp": "2025-08-28T09:47:55.789288",
+      "using_mocks": true,
+      "overall_status": "healthy",
+      "services": {
+        "neo4j": {
+          "service": "neo4j",
+          "status": "mock",
+          "last_check": null,
+          "last_error": null,
+          "connection_attempts": 0,
+          "successful_operations": 0,
+          "failed_operations": 0,
+          "success_rate": 0.0,
+          "average_response_time_ms": 0.0,
+          "uptime_seconds": 0.0,
+          "mock_metrics": {
+            "service": "neo4j",
+            "state": "healthy",
+            "metrics": {
+              "total_operations": 0,
+              "successful_operations": 0,
+              "failed_operations": 0,
+              "success_rate": 1.0,
+              "average_latency_ms": 0.0,
+              "state_changes": 0,
+              "cache_hits": 0,
+              "cache_misses": 0,
+              "uptime_seconds": 50.817679
+            },
+            "data_stats": {
+              "nodes": 0,
+              "relationships": 0,
+              "indexes": 0
+            }
+          }
+        },
+        "redis": {
+          "service": "redis",
+          "status": "mock",
+          "last_check": null,
+          "last_error": null,
+          "connection_attempts": 0,
+          "successful_operations": 0,
+          "failed_operations": 0,
+          "success_rate": 0.0,
+          "average_response_time_ms": 0.0,
+          "uptime_seconds": 0.0,
+          "mock_metrics": {
+            "service": "redis",
+            "state": "healthy",
+            "metrics": {
+              "total_operations": 0,
+              "successful_operations": 0,
+              "failed_operations": 0,
+              "success_rate": 1.0,
+              "average_latency_ms": 0.0,
+              "state_changes": 0,
+              "cache_hits": 0,
+              "cache_misses": 0,
+              "uptime_seconds": 50.81768
+            },
+            "data_stats": {
+              "keys": 0,
+              "expired_keys": 0,
+              "channels": 0
+            }
+          }
+        }
+      },
+      "summary": {
+        "total_services": 2,
+        "healthy_services": 2,
+        "degraded_services": 0,
+        "health_percentage": 100.0
+      }
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/auth/register",
+    "method": "GET",
+    "success": true,
+    "status_code": 405,
+    "timestamp": "2025-08-28T09:47:55.909150",
+    "response_data": {
+      "error": "HTTP Exception",
+      "message": "Method Not Allowed",
+      "status_code": 405
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/auth/register",
+    "method": "POST",
+    "success": false,
+    "status_code": 422,
+    "timestamp": "2025-08-28T09:47:55.969079",
+    "response_data": {
+      "error": "Validation Error",
+      "message": "Invalid request data",
+      "details": [
+        {
+          "type": "string_too_short",
+          "loc": [
+            "body",
+            "password"
+          ],
+          "msg": "String should have at least 8 characters",
+          "input": "test123",
+          "ctx": {
+            "min_length": 8
+          }
+        }
+      ],
+      "detail": [
+        {
+          "type": "string_too_short",
+          "loc": [
+            "body",
+            "password"
+          ],
+          "msg": "String should have at least 8 characters",
+          "input": "test123",
+          "ctx": {
+            "min_length": 8
+          }
+        }
+      ]
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/auth/login",
+    "method": "POST",
+    "success": false,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.129567",
+    "response_data": {
+      "error": "HTTP Exception",
+      "message": "Invalid username or password",
+      "status_code": 401
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/characters/",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.189028",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/characters/",
+    "method": "POST",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.249119",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/worlds/",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.299531",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/sessions/",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.349522",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/sessions/",
+    "method": "POST",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.399504",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/worlds/therapeutic_world_001",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.449475",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/worlds/therapeutic_world_001/compatibility/test-char-id",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.499263",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/worlds/therapeutic_world_001/customize",
+    "method": "POST",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.549553",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/sessions/test-session-id/progress",
+    "method": "PUT",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.599527",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/sessions/test-session-id/pause",
+    "method": "POST",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.649550",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/sessions/test-session-id/resume",
+    "method": "POST",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.699506",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  },
+  {
+    "endpoint": "/characters/test-char-id/export",
+    "method": "GET",
+    "success": true,
+    "status_code": 401,
+    "timestamp": "2025-08-28T09:47:56.749529",
+    "response_data": {
+      "auth_required": true
+    },
+    "error": null
+  }
+]

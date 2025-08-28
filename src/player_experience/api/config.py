@@ -7,8 +7,12 @@ This module provides configuration management for the FastAPI application.
 import os
 from typing import List, Optional
 
+from dotenv import load_dotenv
 from pydantic import field_validator, ConfigDict, Field
 from pydantic_settings import BaseSettings
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 class APISettings(BaseSettings):

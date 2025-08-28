@@ -119,7 +119,7 @@ class Neo4jConnectionManager:
                         max_connection_pool_size=50,
                         connection_acquisition_timeout=60,
                         encrypted=self.settings.neo4j_url.startswith("neo4j+s://"),
-                        trust=True if not self.settings.neo4j_url.startswith("neo4j+s://") else None
+                        trust="TRUST_ALL_CERTIFICATES" if not self.settings.neo4j_url.startswith("neo4j+s://") else "TRUST_SYSTEM_CA_SIGNED_CERTIFICATES"
                     )
                     
                     # Test connection

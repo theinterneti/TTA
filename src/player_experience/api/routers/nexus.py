@@ -253,6 +253,126 @@ async def create_world(
         )
 
 
+@router.get("/worlds/search")
+async def search_worlds(
+    query: Optional[str] = Query(None, description="Text search in title, description, tags"),
+    genre: Optional[GenreType] = Query(None, description="Filter by genre"),
+    therapeutic_focus: Optional[List[str]] = Query(None, description="Filter by therapeutic goals"),
+    difficulty: Optional[DifficultyLevel] = Query(None, description="Filter by difficulty level"),
+    rating_min: Optional[float] = Query(None, ge=0.0, le=5.0, description="Minimum rating"),
+    sort_by: str = Query("rating", description="Sort criteria"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum results"),
+    offset: int = Query(0, ge=0, description="Pagination offset"),
+    current_player: TokenData = Depends(get_current_active_player),
+    service_manager = Depends(get_service_manager)
+):
+    """
+    Search for worlds based on criteria.
+
+    Provides comprehensive search functionality with filtering, sorting,
+    and pagination. Results include compatibility scores when possible.
+    """
+    try:
+        # Build search query
+        query_parts = ["MATCH (world:StoryWorld)"]
+        where_conditions = ["world.is_public = true"]
+        params = {}
+
+        if genre:
+            where_conditions.append("world.genre = $genre")
+            params["genre"] = genre.value
+
+        if difficulty:
+            where_conditions.append("world.difficulty_level = $difficulty")
+            params["difficulty"] = difficulty.value
+
+        if rating_min is not None:
+            where_conditions.append("world.rating >= $rating_min")
+            params["rating_min"] = rating_min
+
+        if therapeutic_focus:
+            where_conditions.append("ANY(focus IN $therapeutic_focus WHERE focus IN world.therapeutic_focus)")
+            params["therapeutic_focus"] = therapeutic_focus
+
+        if query:
+            where_conditions.append("""
+                (toLower(world.title) CONTAINS toLower($search_query) OR
+                 toLower(world.description) CONTAINS toLower($search_query) OR
+                 ANY(tag IN world.tags WHERE toLower(tag) CONTAINS toLower($search_query)))
+            """)
+            params["search_query"] = query
+
+        if where_conditions:
+            query_parts.append("WHERE " + " AND ".join(where_conditions))
+
+        # Add sorting
+        sort_mapping = {
+            "rating": "world.rating DESC",
+            "popularity": "world.player_count DESC",
+            "recent": "world.created_at DESC",
+            "therapeutic_efficacy": "world.therapeutic_efficacy DESC",
+            "title": "world.title ASC"
+        }
+
+        order_by = sort_mapping.get(sort_by, "world.rating DESC")
+        query_parts.append(f"ORDER BY {order_by}")
+
+        # Add pagination
+        query_parts.append("SKIP $offset LIMIT $limit")
+        params["offset"] = offset
+        params["limit"] = limit
+
+        # Return results
+        query_parts.append("""
+        RETURN {
+            world_id: world.world_id,
+            title: world.title,
+            description: world.description,
+            genre: world.genre,
+            therapeutic_focus: world.therapeutic_focus,
+            difficulty_level: world.difficulty_level,
+            estimated_duration: world.estimated_duration,
+            player_count: world.player_count,
+            rating: world.rating,
+            therapeutic_efficacy: world.therapeutic_efficacy,
+            strength_level: world.strength_level,
+            tags: world.tags,
+            is_featured: world.is_featured,
+            created_at: world.created_at
+        } as world_summary
+        """)
+
+        search_query = " ".join(query_parts)
+
+        async with service_manager.neo4j.driver.session() as session:
+            result = await session.run(search_query, params)
+            worlds = [record["world_summary"] async for record in result]
+
+        # Get total count for pagination
+        count_query = " ".join(query_parts[:-2])  # Remove ORDER BY and pagination
+        count_query += " RETURN count(world) as total"
+
+        async with service_manager.neo4j.driver.session() as session:
+            result = await session.run(count_query, {k: v for k, v in params.items() if k not in ["offset", "limit"]})
+            record = await result.single()
+            total_count = record["total"] if record else 0
+
+        return {
+            "results": worlds,
+            "total_count": total_count,
+            "limit": limit,
+            "offset": offset,
+            "has_more": offset + len(worlds) < total_count
+        }
+
+    except Exception as e:
+        logger.error(f"Failed to search worlds: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to search worlds: {str(e)}"
+        )
+
+
 @router.get("/worlds/{world_id}")
 async def get_world(
     world_id: str = Path(..., description="World ID"),
@@ -415,121 +535,4 @@ async def enter_world(
         )
 
 
-@router.get("/worlds/search")
-async def search_worlds(
-    query: Optional[str] = Query(None, description="Text search in title, description, tags"),
-    genre: Optional[GenreType] = Query(None, description="Filter by genre"),
-    therapeutic_focus: Optional[List[str]] = Query(None, description="Filter by therapeutic goals"),
-    difficulty: Optional[DifficultyLevel] = Query(None, description="Filter by difficulty level"),
-    rating_min: Optional[float] = Query(None, ge=0.0, le=5.0, description="Minimum rating"),
-    sort_by: str = Query("rating", description="Sort criteria"),
-    limit: int = Query(20, ge=1, le=100, description="Maximum results"),
-    offset: int = Query(0, ge=0, description="Pagination offset"),
-    current_player: TokenData = Depends(get_current_active_player),
-    service_manager = Depends(get_service_manager)
-):
-    """
-    Search for worlds based on criteria.
-    
-    Provides comprehensive search functionality with filtering, sorting,
-    and pagination. Results include compatibility scores when possible.
-    """
-    try:
-        # Build search query
-        query_parts = ["MATCH (world:StoryWorld)"]
-        where_conditions = ["world.is_public = true"]
-        params = {}
-        
-        if genre:
-            where_conditions.append("world.genre = $genre")
-            params["genre"] = genre.value
-        
-        if difficulty:
-            where_conditions.append("world.difficulty_level = $difficulty")
-            params["difficulty"] = difficulty.value
-        
-        if rating_min is not None:
-            where_conditions.append("world.rating >= $rating_min")
-            params["rating_min"] = rating_min
-        
-        if therapeutic_focus:
-            where_conditions.append("ANY(focus IN $therapeutic_focus WHERE focus IN world.therapeutic_focus)")
-            params["therapeutic_focus"] = therapeutic_focus
-        
-        if query:
-            where_conditions.append("""
-                (toLower(world.title) CONTAINS toLower($search_query) OR 
-                 toLower(world.description) CONTAINS toLower($search_query) OR
-                 ANY(tag IN world.tags WHERE toLower(tag) CONTAINS toLower($search_query)))
-            """)
-            params["search_query"] = query
-        
-        if where_conditions:
-            query_parts.append("WHERE " + " AND ".join(where_conditions))
-        
-        # Add sorting
-        sort_mapping = {
-            "rating": "world.rating DESC",
-            "popularity": "world.player_count DESC",
-            "recent": "world.created_at DESC",
-            "therapeutic_efficacy": "world.therapeutic_efficacy DESC",
-            "title": "world.title ASC"
-        }
-        
-        order_by = sort_mapping.get(sort_by, "world.rating DESC")
-        query_parts.append(f"ORDER BY {order_by}")
-        
-        # Add pagination
-        query_parts.append("SKIP $offset LIMIT $limit")
-        params["offset"] = offset
-        params["limit"] = limit
-        
-        # Return results
-        query_parts.append("""
-        RETURN {
-            world_id: world.world_id,
-            title: world.title,
-            description: world.description,
-            genre: world.genre,
-            therapeutic_focus: world.therapeutic_focus,
-            difficulty_level: world.difficulty_level,
-            estimated_duration: world.estimated_duration,
-            player_count: world.player_count,
-            rating: world.rating,
-            therapeutic_efficacy: world.therapeutic_efficacy,
-            strength_level: world.strength_level,
-            tags: world.tags,
-            is_featured: world.is_featured,
-            created_at: world.created_at
-        } as world_summary
-        """)
-        
-        search_query = " ".join(query_parts)
-        
-        async with service_manager.neo4j.driver.session() as session:
-            result = await session.run(search_query, params)
-            worlds = [record["world_summary"] async for record in result]
-        
-        # Get total count for pagination
-        count_query = " ".join(query_parts[:-2])  # Remove ORDER BY and pagination
-        count_query += " RETURN count(world) as total"
-        
-        async with service_manager.neo4j.driver.session() as session:
-            result = await session.run(count_query, {k: v for k, v in params.items() if k not in ["offset", "limit"]})
-            record = await result.single()
-            total_count = record["total"] if record else 0
-        
-        return {
-            "results": worlds,
-            "total_count": total_count,
-            "limit": limit,
-            "offset": offset,
-            "has_more": offset + len(worlds) < total_count
-        }
-        
-    except Exception as e:
-        logger.error(f"Failed to search worlds: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to search worlds: {str(e)}"
-        )
+

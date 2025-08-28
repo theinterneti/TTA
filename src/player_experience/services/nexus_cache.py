@@ -21,10 +21,14 @@ logger = logging.getLogger(__name__)
 
 class NexusCacheService:
     """Redis caching service for Nexus Codex real-time features."""
-    
-    def __init__(self, redis_client: redis.Redis):
+
+    def __init__(self, redis_client):
         """Initialize with Redis client."""
-        self.redis = redis_client
+        # Handle both direct Redis client and connection manager
+        if hasattr(redis_client, 'client'):
+            self.redis = redis_client.client
+        else:
+            self.redis = redis_client
         self.default_ttl = 3600  # 1 hour default TTL
     
     # World State Management
