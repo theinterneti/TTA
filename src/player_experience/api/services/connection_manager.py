@@ -223,14 +223,27 @@ class RedisConnectionManager:
                         await self.client.close()
                     
                     # Create new Redis client with production-ready settings
-                    self.client = redis.from_url(
-                        self.settings.redis_url,
-                        decode_responses=True,
-                        retry_on_timeout=True,
-                        socket_connect_timeout=5,
-                        socket_timeout=5,
-                        max_connections=20
-                    )
+                    # For Redis 7.2+, we need to specify both username and password for ACL authentication
+                    redis_kwargs = {
+                        "decode_responses": True,
+                        "retry_on_timeout": True,
+                        "socket_connect_timeout": 5,
+                        "socket_timeout": 5,
+                        "max_connections": 20
+                    }
+
+                    # Add authentication if password is configured
+                    if self.settings.redis_password and self.settings.redis_password.strip():
+                        redis_kwargs["username"] = "default"  # Use default user for Redis 7.2+ ACL
+                        redis_kwargs["password"] = self.settings.redis_password
+
+                    # Parse host and port from URL
+                    from urllib.parse import urlparse
+                    parsed = urlparse(self.settings.redis_url)
+                    redis_kwargs["host"] = parsed.hostname or "localhost"
+                    redis_kwargs["port"] = parsed.port or 6379
+
+                    self.client = redis.Redis(**redis_kwargs)
                     
                     # Test connection
                     if await self._test_connection():

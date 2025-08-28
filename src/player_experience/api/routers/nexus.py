@@ -302,27 +302,14 @@ async def search_worlds(
             """)
             params["search_query"] = query
 
+        # Always add WHERE clause, even if it's just the default condition
         if where_conditions:
             query_parts.append("WHERE " + " AND ".join(where_conditions))
+        else:
+            # Add default WHERE clause to make query valid
+            query_parts.append("WHERE world.is_public = true")
 
-        # Add sorting
-        sort_mapping = {
-            "rating": "world.rating DESC",
-            "popularity": "world.player_count DESC",
-            "recent": "world.created_at DESC",
-            "therapeutic_efficacy": "world.therapeutic_efficacy DESC",
-            "title": "world.title ASC"
-        }
-
-        order_by = sort_mapping.get(sort_by, "world.rating DESC")
-        query_parts.append(f"ORDER BY {order_by}")
-
-        # Add pagination
-        query_parts.append("SKIP $offset LIMIT $limit")
-        params["offset"] = offset
-        params["limit"] = limit
-
-        # Return results
+        # Add RETURN clause (must come before ORDER BY)
         query_parts.append("""
         RETURN {
             world_id: world.world_id,
@@ -341,6 +328,23 @@ async def search_worlds(
             created_at: world.created_at
         } as world_summary
         """)
+
+        # Add sorting
+        sort_mapping = {
+            "rating": "world_summary.rating DESC",
+            "popularity": "world_summary.player_count DESC",
+            "recent": "world_summary.created_at DESC",
+            "therapeutic_efficacy": "world_summary.therapeutic_efficacy DESC",
+            "title": "world_summary.title ASC"
+        }
+
+        order_by = sort_mapping.get(sort_by, "world_summary.rating DESC")
+        query_parts.append(f"ORDER BY {order_by}")
+
+        # Add pagination
+        query_parts.append("SKIP $offset LIMIT $limit")
+        params["offset"] = offset
+        params["limit"] = limit
 
         search_query = " ".join(query_parts)
 

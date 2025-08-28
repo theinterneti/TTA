@@ -60,8 +60,8 @@ class NexusCacheService:
             if not state_data:
                 return None
             
-            # Convert bytes to strings
-            return {k.decode(): v.decode() for k, v in state_data.items()}
+            # Data is already decoded due to decode_responses=True
+            return dict(state_data)
             
         except Exception as e:
             logger.error(f"Failed to get world state for {world_id}: {e}")
@@ -109,7 +109,7 @@ class NexusCacheService:
             if not session_data:
                 return None
             
-            return {k.decode(): v.decode() for k, v in session_data.items()}
+            return dict(session_data)
             
         except Exception as e:
             logger.error(f"Failed to get player session for {player_id}: {e}")
@@ -156,7 +156,7 @@ class NexusCacheService:
             if not state_data:
                 return None
             
-            return {k.decode(): v.decode() for k, v in state_data.items()}
+            return dict(state_data)
             
         except Exception as e:
             logger.error(f"Failed to get nexus realtime state: {e}")
@@ -226,7 +226,7 @@ class NexusCacheService:
             top_worlds = []
             for world_id, score in results:
                 top_worlds.append({
-                    "world_id": world_id.decode(),
+                    "world_id": world_id,  # Already decoded
                     "score": score,
                     "category": category
                 })
@@ -265,8 +265,8 @@ class NexusCacheService:
             
             recent_events = []
             for event_id, event_data in events:
-                event_dict = {k.decode(): v.decode() for k, v in event_data.items()}
-                event_dict["event_id"] = event_id.decode()
+                event_dict = dict(event_data)  # Already decoded
+                event_dict["event_id"] = event_id  # Already decoded
                 recent_events.append(event_dict)
             
             return recent_events
@@ -298,7 +298,7 @@ class NexusCacheService:
             if not results_json:
                 return None
             
-            return json.loads(results_json.decode())
+            return json.loads(results_json)  # Already decoded
             
         except Exception as e:
             logger.error(f"Failed to get cached search results: {e}")
@@ -326,7 +326,7 @@ class NexusCacheService:
             if not recommendations_json:
                 return None
             
-            return json.loads(recommendations_json.decode())
+            return json.loads(recommendations_json)  # Already decoded
             
         except Exception as e:
             logger.error(f"Failed to get cached user recommendations: {e}")

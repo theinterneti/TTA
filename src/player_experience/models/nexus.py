@@ -11,6 +11,7 @@ from typing import List, Dict, Optional, Any, Union
 from enum import Enum
 import uuid
 
+from pydantic import BaseModel, Field
 from .enums import DifficultyLevel, TherapeuticApproach
 
 
@@ -361,8 +362,7 @@ class NexusStateResponse:
     timestamp: datetime = field(default_factory=datetime.now)
 
 
-@dataclass
-class WorldCreationRequest:
+class WorldCreationRequest(BaseModel):
     """Request model for creating a new world."""
     title: str
     description: str
@@ -372,8 +372,8 @@ class WorldCreationRequest:
     estimated_duration: int = 45
     is_public: bool = True
     template_id: Optional[str] = None
-    world_parameters: Dict[str, Any] = field(default_factory=dict)
-    narrative_structure: Dict[str, Any] = field(default_factory=dict)
+    world_parameters: Dict[str, Any] = Field(default_factory=dict)
+    narrative_structure: Dict[str, Any] = Field(default_factory=dict)
 
 
 @dataclass
