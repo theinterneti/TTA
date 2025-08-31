@@ -33,7 +33,7 @@ const ProgressFeedback: React.FC<ProgressFeedbackProps> = ({
   useEffect(() => {
     // Trigger entrance animation
     const timer = setTimeout(() => setIsVisible(true), 100);
-    
+
     // Trigger celebration animation for milestones and achievements
     if ((type === 'milestone' || type === 'achievement') && showAnimation) {
       const celebrationTimer = setTimeout(() => setShowCelebration(true), 500);
@@ -128,7 +128,7 @@ const ProgressFeedback: React.FC<ProgressFeedbackProps> = ({
     <div className={`relative overflow-hidden rounded-lg border p-4 my-3 transition-all duration-500 transform ${
       isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
     } ${styles.container}`}>
-      
+
       {/* Celebration particles for milestones and achievements */}
       {showCelebration && (type === 'milestone' || type === 'achievement') && (
         <div className="absolute inset-0 pointer-events-none">
@@ -197,7 +197,7 @@ const ProgressFeedback: React.FC<ProgressFeedbackProps> = ({
             </span>
           </div>
           <div className="w-full bg-white bg-opacity-50 rounded-full h-2">
-            <div 
+            <div
               className={`${styles.accent} h-2 rounded-full transition-all duration-1000 ease-out`}
               style={{ width: `${(progress.current / progress.total) * 100}%` }}
             />

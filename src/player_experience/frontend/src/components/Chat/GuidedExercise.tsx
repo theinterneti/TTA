@@ -12,10 +12,10 @@ interface GuidedExerciseProps {
   onProgress?: (step: number, completed: boolean) => void;
 }
 
-const GuidedExercise: React.FC<GuidedExerciseProps> = ({ 
-  exercise, 
-  onComplete, 
-  onProgress 
+const GuidedExercise: React.FC<GuidedExerciseProps> = ({
+  exercise,
+  onComplete,
+  onProgress
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [isActive, setIsActive] = useState(false);
@@ -28,7 +28,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
   // Timer effect for timed exercises
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    
+
     if (isTimerRunning && timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => {
@@ -58,7 +58,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
     const newCompletedSteps = [...completedSteps];
     newCompletedSteps[currentStep] = true;
     setCompletedSteps(newCompletedSteps);
-    
+
     onProgress?.(currentStep, true);
 
     if (currentStep < exercise.steps.length - 1) {
@@ -145,7 +145,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
             {exercise.type}
           </h4>
         </div>
-        
+
         {/* Timer display */}
         {exercise.duration && isActive && (
           <div className="flex items-center space-x-2">
@@ -178,7 +178,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
         <div className="mb-4">
           {/* Progress bar */}
           <div className="w-full bg-blue-100 rounded-full h-2 mb-4">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-out"
               style={{ width: `${((currentStep + 1) / exercise.steps.length) * 100}%` }}
             />
@@ -197,10 +197,10 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
                 {exercise.duration && (
                   <div className="mt-2 flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-1">
-                      <div 
+                      <div
                         className="bg-blue-500 h-1 rounded-full transition-all duration-1000 ease-linear"
-                        style={{ 
-                          width: exercise.duration ? `${((exercise.duration - timer) / exercise.duration) * 100}%` : '0%' 
+                        style={{
+                          width: exercise.duration ? `${((exercise.duration - timer) / exercise.duration) * 100}%` : '0%'
                         }}
                       />
                     </div>
@@ -256,7 +256,7 @@ const GuidedExercise: React.FC<GuidedExerciseProps> = ({
                 <span>Complete Step</span>
               </button>
             )}
-            
+
             <button
               onClick={handleStepSkip}
               className="flex items-center space-x-2 bg-gray-500 hover:bg-gray-600 text-white px-3 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500"

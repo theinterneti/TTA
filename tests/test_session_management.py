@@ -5,20 +5,27 @@ Tests session creation, lifecycle management, context switching,
 and integration with the Interactive Narrative Engine.
 """
 
-import unittest
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 import asyncio
-from datetime import datetime, timedelta
+import unittest
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock
 
-from src.player_experience.models.session import (
-    SessionContext, TherapeuticSettings, ProgressMarker, SessionSummary
+import pytest
+
+from src.player_experience.database.session_repository import SessionRepository
+from src.player_experience.managers.session_integration_manager import (
+    SessionIntegrationManager,
 )
 from src.player_experience.models.enums import (
-    SessionStatus, TherapeuticApproach, ProgressMarkerType
+    ProgressMarkerType,
+    SessionStatus,
+    TherapeuticApproach,
 )
-from src.player_experience.database.session_repository import SessionRepository
-from src.player_experience.managers.session_integration_manager import SessionIntegrationManager
+from src.player_experience.models.session import (
+    ProgressMarker,
+    SessionContext,
+    TherapeuticSettings,
+)
 
 
 class TestSessionRepository(unittest.TestCase):
@@ -29,15 +36,14 @@ class TestSessionRepository(unittest.TestCase):
         self.mock_redis = AsyncMock()
         self.mock_neo4j_driver = MagicMock()
         self.repository = SessionRepository(
-            redis_client=self.mock_redis,
-            neo4j_driver=self.mock_neo4j_driver
+            redis_client=self.mock_redis, neo4j_driver=self.mock_neo4j_driver
         )
 
         # Create test session context
         self.test_settings = TherapeuticSettings(
             intensity_level=0.6,
             preferred_approaches=[TherapeuticApproach.CBT],
-            intervention_frequency="balanced"
+            intervention_frequency="balanced",
         )
 
         self.test_session = SessionContext(
@@ -45,18 +51,18 @@ class TestSessionRepository(unittest.TestCase):
             player_id="player_123",
             character_id="char_123",
             world_id="world_123",
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
     def test_serialize_session_context(self):
         """Test serializing session context for storage."""
         serialized = self.repository._serialize_session_context(self.test_session)
 
-        self.assertEqual(serialized['session_id'], "test_session_123")
-        self.assertEqual(serialized['player_id'], "player_123")
-        self.assertEqual(serialized['status'], SessionStatus.ACTIVE.value)
-        self.assertIsInstance(serialized['created_at'], str)
-        self.assertIsInstance(serialized['last_interaction'], str)
+        self.assertEqual(serialized["session_id"], "test_session_123")
+        self.assertEqual(serialized["player_id"], "player_123")
+        self.assertEqual(serialized["status"], SessionStatus.ACTIVE.value)
+        self.assertIsInstance(serialized["created_at"], str)
+        self.assertIsInstance(serialized["last_interaction"], str)
 
     def test_deserialize_session_context(self):
         """Test deserializing session context from storage."""
@@ -71,7 +77,7 @@ class TestSessionRepository(unittest.TestCase):
         self.assertEqual(deserialized.status, self.test_session.status)
         self.assertEqual(
             deserialized.therapeutic_settings.intensity_level,
-            self.test_session.therapeutic_settings.intensity_level
+            self.test_session.therapeutic_settings.intensity_level,
         )
 
     async def _async_create_session(self):
@@ -100,6 +106,7 @@ class TestSessionRepository(unittest.TestCase):
         # Mock Redis response
         serialized_data = self.repository._serialize_session_context(self.test_session)
         import json
+
         self.mock_redis.get = AsyncMock(return_value=json.dumps(serialized_data))
 
         # Test session retrieval
@@ -117,19 +124,19 @@ class TestSessionRepository(unittest.TestCase):
         mock_neo4j_session = AsyncMock()
         # Return a plain dict compatible with dict(record['s']) access
         neo4j_session_dict = {
-            'session_id': 'test_session_123',
-            'player_id': 'player_123',
-            'character_id': 'char_123',
-            'world_id': 'world_123',
-            'status': 'active',
-            'created_at': datetime.now().isoformat(),
-            'last_interaction': datetime.now().isoformat(),
-            'session_variables': '{}',
-            'therapeutic_settings': '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}'
+            "session_id": "test_session_123",
+            "player_id": "player_123",
+            "character_id": "char_123",
+            "world_id": "world_123",
+            "status": "active",
+            "created_at": datetime.now().isoformat(),
+            "last_interaction": datetime.now().isoformat(),
+            "session_variables": "{}",
+            "therapeutic_settings": '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}',
         }
 
         mock_result = AsyncMock()
-        mock_result.single = AsyncMock(return_value={'s': neo4j_session_dict})
+        mock_result.single = AsyncMock(return_value={"s": neo4j_session_dict})
         mock_neo4j_session.run = AsyncMock(return_value=mock_result)
 
         # Create a proper async context manager mock
@@ -150,19 +157,19 @@ class TestSessionRepository(unittest.TestCase):
 
         mock_neo4j_session = AsyncMock()
         neo4j_session_dict = {
-            'session_id': 'test_session_123',
-            'player_id': 'player_123',
-            'character_id': 'char_123',
-            'world_id': 'world_123',
-            'status': 'active',
-            'created_at': datetime.now().isoformat(),
-            'last_interaction': datetime.now().isoformat(),
-            'session_variables': '{}',
-            'therapeutic_settings': '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}'
+            "session_id": "test_session_123",
+            "player_id": "player_123",
+            "character_id": "char_123",
+            "world_id": "world_123",
+            "status": "active",
+            "created_at": datetime.now().isoformat(),
+            "last_interaction": datetime.now().isoformat(),
+            "session_variables": "{}",
+            "therapeutic_settings": '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}',
         }
 
         mock_result = AsyncMock()
-        mock_result.single = AsyncMock(return_value={'s': neo4j_session_dict})
+        mock_result.single = AsyncMock(return_value={"s": neo4j_session_dict})
         mock_neo4j_session.run = AsyncMock(return_value=mock_result)
 
         # Create a proper async context manager mock
@@ -187,7 +194,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
 
         self.manager = SessionIntegrationManager(
             session_repository=self.mock_repository,
-            interactive_narrative_engine=self.mock_narrative_engine
+            interactive_narrative_engine=self.mock_narrative_engine,
         )
 
         # Test data
@@ -196,8 +203,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
         self.test_world_id = "world_123"
 
         self.test_settings = TherapeuticSettings(
-            intensity_level=0.6,
-            preferred_approaches=[TherapeuticApproach.CBT]
+            intensity_level=0.6, preferred_approaches=[TherapeuticApproach.CBT]
         )
 
     async def _async_create_session(self):
@@ -211,7 +217,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             self.test_player_id,
             self.test_character_id,
             self.test_world_id,
-            self.test_settings
+            self.test_settings,
         )
 
         self.assertIsNotNone(result)
@@ -233,9 +239,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
 
         # Test context switching
         result = await self.manager.switch_character_world_context(
-            self.test_player_id,
-            "new_char_456",
-            "new_world_456"
+            self.test_player_id, "new_char_456", "new_world_456"
         )
 
         self.assertIsNotNone(result)
@@ -251,7 +255,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             character_id="new_char_456",
             world_id="new_world_456",
             therapeutic_settings=self.test_settings,
-            status=SessionStatus.PAUSED
+            status=SessionStatus.PAUSED,
         )
 
         # Mock finding existing session
@@ -264,9 +268,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
 
         # Test context switching
         result = await self.manager.switch_character_world_context(
-            self.test_player_id,
-            "new_char_456",
-            "new_world_456"
+            self.test_player_id, "new_char_456", "new_world_456"
         )
 
         self.assertIsNotNone(result)
@@ -281,7 +283,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Set up manager state
@@ -310,9 +312,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
             character_id=self.test_character_id,
             world_id=self.test_world_id,
             therapeutic_settings=self.test_settings,
-            status=SessionStatus.PAUSED
+            status=SessionStatus.PAUSED,
         )
-        paused_session.session_variables['narrative_state'] = {"current_scene": "scene_1"}
+        paused_session.session_variables["narrative_state"] = {
+            "current_scene": "scene_1"
+        }
 
         # Mock repository and narrative engine
         self.mock_repository.get_session = AsyncMock(return_value=paused_session)
@@ -336,7 +340,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Set up manager state
@@ -363,7 +367,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Set up manager state
@@ -374,23 +378,26 @@ class TestSessionIntegrationManager(unittest.TestCase):
 
         # Test interaction data
         interaction_data = {
-            'therapeutic_intervention': 'mindfulness_exercise',
-            'emotional_state': {'mood': 'calm', 'anxiety_level': 0.3},
-            'session_variables': {'current_exercise': 'breathing'},
-            'current_scene_id': 'scene_2'
+            "therapeutic_intervention": "mindfulness_exercise",
+            "emotional_state": {"mood": "calm", "anxiety_level": 0.3},
+            "session_variables": {"current_exercise": "breathing"},
+            "current_scene_id": "scene_2",
         }
 
         # Test updating interaction
         result = await self.manager.update_session_interaction(
-            self.test_player_id,
-            interaction_data
+            self.test_player_id, interaction_data
         )
 
         self.assertTrue(result)
         self.assertEqual(active_session.interaction_count, 1)
-        self.assertIn('mindfulness_exercise', active_session.therapeutic_interventions_used)
-        self.assertEqual(active_session.current_scene_id, 'scene_2')
-        self.assertEqual(active_session.session_variables['current_exercise'], 'breathing')
+        self.assertIn(
+            "mindfulness_exercise", active_session.therapeutic_interventions_used
+        )
+        self.assertEqual(active_session.current_scene_id, "scene_2")
+        self.assertEqual(
+            active_session.session_variables["current_exercise"], "breathing"
+        )
 
     async def _async_add_progress_marker(self):
         """Test adding progress marker to session."""
@@ -400,7 +407,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Set up manager state
@@ -415,7 +422,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             marker_type=ProgressMarkerType.MILESTONE,
             description="Completed first exercise",
             achieved_at=datetime.now(),
-            therapeutic_value=0.8
+            therapeutic_value=0.8,
         )
 
         # Test adding progress marker
@@ -433,7 +440,7 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Set up manager state
@@ -447,20 +454,19 @@ class TestSessionIntegrationManager(unittest.TestCase):
         new_settings = TherapeuticSettings(
             intensity_level=0.8,
             preferred_approaches=[TherapeuticApproach.MINDFULNESS],
-            intervention_frequency="frequent"
+            intervention_frequency="frequent",
         )
 
         # Test updating settings
         result = await self.manager.update_therapeutic_settings(
-            self.test_player_id,
-            new_settings
+            self.test_player_id, new_settings
         )
 
         self.assertTrue(result)
         self.assertEqual(active_session.therapeutic_settings.intensity_level, 0.8)
         self.assertEqual(
             active_session.therapeutic_settings.preferred_approaches[0],
-            TherapeuticApproach.MINDFULNESS
+            TherapeuticApproach.MINDFULNESS,
         )
         self.mock_narrative_engine.update_therapeutic_settings.assert_called_once()
 
@@ -472,12 +478,12 @@ class TestSessionIntegrationManager(unittest.TestCase):
             player_id=self.test_player_id,
             character_id=self.test_character_id,
             world_id=self.test_world_id,
-            therapeutic_settings=self.test_settings
+            therapeutic_settings=self.test_settings,
         )
 
         # Add some data
-        session.session_variables = {'key': 'value'}
-        session.therapeutic_interventions_used = ['intervention1']
+        session.session_variables = {"key": "value"}
+        session.therapeutic_interventions_used = ["intervention1"]
         session.interaction_count = 5
         session.total_duration_minutes = 30
 
@@ -488,11 +494,11 @@ class TestSessionIntegrationManager(unittest.TestCase):
         async def run_test():
             result = await self.manager.get_session_continuity_data("test_session")
 
-            self.assertIn('therapeutic_settings', result)
-            self.assertIn('session_variables', result)
-            self.assertIn('therapeutic_interventions_used', result)
-            self.assertEqual(result['interaction_count'], 5)
-            self.assertEqual(result['total_duration_minutes'], 30)
+            self.assertIn("therapeutic_settings", result)
+            self.assertIn("session_variables", result)
+            self.assertIn("therapeutic_interventions_used", result)
+            self.assertEqual(result["interaction_count"], 5)
+            self.assertEqual(result["total_duration_minutes"], 30)
 
         asyncio.run(run_test())
 
@@ -507,13 +513,12 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         self.mock_narrative_engine = AsyncMock()
 
         self.repository = SessionRepository(
-            redis_client=self.mock_redis,
-            neo4j_driver=self.mock_neo4j_driver
+            redis_client=self.mock_redis, neo4j_driver=self.mock_neo4j_driver
         )
 
         self.manager = SessionIntegrationManager(
             session_repository=self.repository,
-            interactive_narrative_engine=self.mock_narrative_engine
+            interactive_narrative_engine=self.mock_narrative_engine,
         )
 
     async def _async_complete_session_lifecycle(self):
@@ -525,29 +530,29 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         mock_neo4j_session = AsyncMock()
         # Maintain mutable 'node' state to reflect updates and retrievals
         current_node = {
-            'session_id': 'session_test',
-            'player_id': 'player_123',
-            'character_id': 'char_123',
-            'world_id': 'world_123',
-            'status': 'active',
-            'created_at': datetime.now().isoformat(),
-            'last_interaction': datetime.now().isoformat(),
-            'session_variables': '{}',
-            'therapeutic_settings': '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}'
+            "session_id": "session_test",
+            "player_id": "player_123",
+            "character_id": "char_123",
+            "world_id": "world_123",
+            "status": "active",
+            "created_at": datetime.now().isoformat(),
+            "last_interaction": datetime.now().isoformat(),
+            "session_variables": "{}",
+            "therapeutic_settings": '{"intensity_level": 0.6, "preferred_approaches": [], "intervention_frequency": "balanced", "feedback_sensitivity": 0.5, "crisis_monitoring_enabled": true, "adaptive_difficulty": true}',
         }
 
         async def run_side_effect(query, params=None):
-            if query and 'SET s.status' in query:
+            if query and "SET s.status" in query:
                 # Update path; persist new status and last_interaction if provided
-                if params and 'status' in params:
-                    current_node['status'] = params['status']
-                if params and 'last_interaction' in params:
-                    current_node['last_interaction'] = params['last_interaction']
+                if params and "status" in params:
+                    current_node["status"] = params["status"]
+                if params and "last_interaction" in params:
+                    current_node["last_interaction"] = params["last_interaction"]
                 m = AsyncMock()
                 return m
-            if query and 'RETURN s' in query:
+            if query and "RETURN s" in query:
                 m = AsyncMock()
-                m.single = AsyncMock(return_value={'s': current_node})
+                m.single = AsyncMock(return_value={"s": current_node})
                 return m
             # CREATE or other queries
             return AsyncMock()
@@ -573,8 +578,7 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
 
         # 2. Update with interaction
         interaction_result = await self.manager.update_session_interaction(
-            "player_123",
-            {'therapeutic_intervention': 'test_intervention'}
+            "player_123", {"therapeutic_intervention": "test_intervention"}
         )
         self.assertTrue(interaction_result)
 
@@ -583,7 +587,7 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
             marker_id="test_marker",
             marker_type=ProgressMarkerType.MILESTONE,
             description="Test milestone",
-            achieved_at=datetime.now()
+            achieved_at=datetime.now(),
         )
         marker_result = await self.manager.add_progress_marker("player_123", marker)
         self.assertTrue(marker_result)
@@ -606,9 +610,8 @@ class TestSessionLifecycleIntegration(unittest.TestCase):
         self.mock_narrative_engine.finalize_session.assert_called_once()
 
 
-
-
 # --- Pytest-style async tests converted from unittest async methods ---
+
 
 @pytest.mark.asyncio
 async def test_repo_create_session_pytest():

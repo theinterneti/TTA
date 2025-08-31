@@ -1,0 +1,724 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.api.routers.nexus &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.api.routers.nexus</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.api.routers.nexus</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Nexus Codex API Router.</span>
+
+<span class="sd">This module provides API endpoints for The Nexus Codex therapeutic gaming platform,</span>
+<span class="sd">including world management, story weaver profiles, and community features.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Body</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Query</span><span class="p">,</span> <span class="n">status</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...database.nexus_schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">NexusSchemaManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.nexus</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ActivityEvent</span><span class="p">,</span>
+    <span class="n">DifficultyLevel</span><span class="p">,</span>
+    <span class="n">GenreType</span><span class="p">,</span>
+    <span class="n">NarrativeState</span><span class="p">,</span>
+    <span class="n">NexusStateResponse</span><span class="p">,</span>
+    <span class="n">WorldCreationRequest</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...services.nexus_cache</span><span class="w"> </span><span class="kn">import</span> <span class="n">NexusCacheService</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">TokenData</span><span class="p">,</span> <span class="n">get_current_active_player</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..services.connection_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_service_manager</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/nexus&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;nexus&quot;</span><span class="p">])</span>
+
+
+<div class="viewcode-block" id="get_nexus_state">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.get_nexus_state">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/state&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">NexusStateResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_nexus_state</span><span class="p">(</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NexusStateResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get current state of the Nexus Codex.</span>
+
+<span class="sd">    Returns comprehensive information about the central hub including</span>
+<span class="sd">    world count, active users, threat levels, and recent activity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Get Neo4j connection</span>
+        <span class="n">neo4j_manager</span> <span class="o">=</span> <span class="n">NexusSchemaManager</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">nexus_state</span> <span class="o">=</span> <span class="k">await</span> <span class="n">neo4j_manager</span><span class="o">.</span><span class="n">get_nexus_state</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">nexus_state</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Failed to retrieve Nexus state&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Get real-time data from cache</span>
+        <span class="n">cache_service</span> <span class="o">=</span> <span class="n">NexusCacheService</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">redis</span><span class="p">)</span>
+        <span class="n">realtime_state</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">get_nexus_realtime_state</span><span class="p">()</span>
+
+        <span class="c1"># Get recent activity</span>
+        <span class="n">recent_events</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">get_recent_events</span><span class="p">(</span><span class="s2">&quot;world_activity&quot;</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">activity_events</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">ActivityEvent</span><span class="p">(</span>
+                <span class="n">event_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;event_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;event_type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="n">user_name</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_name&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="n">world_id</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_id&quot;</span><span class="p">),</span>
+                <span class="n">world_title</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_title&quot;</span><span class="p">),</span>
+                <span class="n">description</span><span class="o">=</span><span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">())</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">recent_events</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Get featured worlds</span>
+        <span class="n">featured_worlds</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">get_top_worlds</span><span class="p">(</span><span class="s2">&quot;featured&quot;</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">NexusStateResponse</span><span class="p">(</span>
+            <span class="n">codex_id</span><span class="o">=</span><span class="n">nexus_state</span><span class="p">[</span><span class="s2">&quot;codex_id&quot;</span><span class="p">],</span>
+            <span class="n">total_worlds</span><span class="o">=</span><span class="n">nexus_state</span><span class="p">[</span><span class="s2">&quot;total_worlds&quot;</span><span class="p">],</span>
+            <span class="n">active_story_weavers</span><span class="o">=</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">realtime_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;active_players&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span> <span class="k">if</span> <span class="n">realtime_state</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">),</span>
+            <span class="n">silence_threat_level</span><span class="o">=</span><span class="n">nexus_state</span><span class="p">[</span><span class="s2">&quot;silence_threat_level&quot;</span><span class="p">],</span>
+            <span class="n">narrative_strength</span><span class="o">=</span><span class="n">nexus_state</span><span class="p">[</span><span class="s2">&quot;narrative_strength&quot;</span><span class="p">],</span>
+            <span class="n">featured_worlds</span><span class="o">=</span><span class="n">featured_worlds</span><span class="p">,</span>
+            <span class="n">recent_activity</span><span class="o">=</span><span class="n">activity_events</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get Nexus state: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve Nexus state: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_story_spheres">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.get_story_spheres">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/spheres&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_story_spheres</span><span class="p">(</span>
+    <span class="n">genre</span><span class="p">:</span> <span class="n">GenreType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter spheres by genre&quot;</span><span class="p">),</span>
+    <span class="n">threat_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter by threat level&quot;</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get visual data for story spheres in the Nexus.</span>
+
+<span class="sd">    Returns positioning, visual state, and metadata for all story spheres</span>
+<span class="sd">    that the user can see, with optional filtering by genre or threat level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Build Neo4j query with filters</span>
+        <span class="n">query_parts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;MATCH (world:StoryWorld)-[:VISUALIZED_BY]-&gt;(sphere:StorySphere)&quot;</span>
+        <span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">genre</span><span class="p">:</span>
+            <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WHERE world.genre = $genre&quot;</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;genre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">threat_level</span><span class="p">:</span>
+            <span class="n">threat_filter</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="s2">&quot;world.silence_threat &lt; 0.3&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;medium&quot;</span><span class="p">:</span> <span class="s2">&quot;world.silence_threat &gt;= 0.3 AND world.silence_threat &lt; 0.7&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="s2">&quot;world.silence_threat &gt;= 0.7&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">threat_level</span> <span class="ow">in</span> <span class="n">threat_filter</span><span class="p">:</span>
+                <span class="n">filter_clause</span> <span class="o">=</span> <span class="n">threat_filter</span><span class="p">[</span><span class="n">threat_level</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;WHERE&quot;</span> <span class="ow">in</span> <span class="n">query_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;AND </span><span class="si">{</span><span class="n">filter_clause</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WHERE </span><span class="si">{</span><span class="n">filter_clause</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        RETURN {</span>
+<span class="sd">            sphere_id: sphere.sphere_id,</span>
+<span class="sd">            world_id: sphere.world_id,</span>
+<span class="sd">            world_title: world.title,</span>
+<span class="sd">            visual_state: sphere.visual_state,</span>
+<span class="sd">            pulse_frequency: sphere.pulse_frequency,</span>
+<span class="sd">            position: {</span>
+<span class="sd">                x: sphere.position_x,</span>
+<span class="sd">                y: sphere.position_y,</span>
+<span class="sd">                z: sphere.position_z</span>
+<span class="sd">            },</span>
+<span class="sd">            color_primary: sphere.color_primary,</span>
+<span class="sd">            color_secondary: sphere.color_secondary,</span>
+<span class="sd">            size_scale: sphere.size_scale,</span>
+<span class="sd">            connection_strength: sphere.connection_strength,</span>
+<span class="sd">            world_genre: world.genre,</span>
+<span class="sd">            world_rating: world.rating,</span>
+<span class="sd">            world_player_count: world.player_count</span>
+<span class="sd">        } as sphere_data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query_parts</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="n">spheres</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;sphere_data&quot;</span><span class="p">]</span> <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;spheres&quot;</span><span class="p">:</span> <span class="n">spheres</span><span class="p">,</span> <span class="s2">&quot;total_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">spheres</span><span class="p">)}</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get story spheres: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve story spheres: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_world">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.create_world">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/worlds&quot;</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_world</span><span class="p">(</span>
+    <span class="n">world_request</span><span class="p">:</span> <span class="n">WorldCreationRequest</span> <span class="o">=</span> <span class="n">Body</span><span class="p">(</span><span class="o">...</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a new therapeutic world.</span>
+
+<span class="sd">    Creates a new StoryWorld with the specified parameters, connects it to</span>
+<span class="sd">    the Nexus Codex, and creates a corresponding StorySphere for visualization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Validate user permissions (basic check - can be extended)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;User authentication required&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Prepare world data</span>
+        <span class="n">world_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;world_</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">_%H%M%S&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="s2">&quot;genre&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">genre</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">therapeutic_focus</span><span class="p">,</span>
+            <span class="s2">&quot;narrative_state&quot;</span><span class="p">:</span> <span class="n">NarrativeState</span><span class="o">.</span><span class="n">ACTIVE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;creator_id&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="s2">&quot;strength_level&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>  <span class="c1"># Default starting strength</span>
+            <span class="s2">&quot;silence_threat&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># Low initial threat</span>
+            <span class="s2">&quot;completion_rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_efficacy&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">difficulty_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;estimated_duration&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">estimated_duration</span><span class="p">,</span>
+            <span class="s2">&quot;player_count&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;tags&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;is_public&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">is_public</span><span class="p">,</span>
+            <span class="s2">&quot;is_featured&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Create world in Neo4j</span>
+        <span class="n">neo4j_manager</span> <span class="o">=</span> <span class="n">NexusSchemaManager</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">world_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">neo4j_manager</span><span class="o">.</span><span class="n">create_story_world</span><span class="p">(</span><span class="n">world_data</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">world_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Failed to create world in database&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Cache initial world state</span>
+        <span class="n">cache_service</span> <span class="o">=</span> <span class="n">NexusCacheService</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">redis</span><span class="p">)</span>
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">set_world_state</span><span class="p">(</span>
+            <span class="n">world_id</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;narrative_strength&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">world_data</span><span class="p">[</span><span class="s2">&quot;strength_level&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;player_count&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;current_events&quot;</span><span class="p">:</span> <span class="s2">&quot;[]&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;creation_status&quot;</span><span class="p">:</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Update world rankings</span>
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">update_world_ranking</span><span class="p">(</span>
+            <span class="n">world_id</span><span class="p">,</span> <span class="s2">&quot;recent&quot;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Publish creation event</span>
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span>
+            <span class="s2">&quot;world_created&quot;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+                <span class="s2">&quot;world_title&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="s2">&quot;creator_id&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="s2">&quot;creator_name&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">username</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;genre&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">genre</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">world_request</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;creator_id&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="s2">&quot;creation_status&quot;</span><span class="p">:</span> <span class="s2">&quot;ready&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;World created successfully&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create world: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to create world: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="search_worlds">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.search_worlds">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/worlds/search&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">search_worlds</span><span class="p">(</span>
+    <span class="n">query</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Text search in title, description, tags&quot;</span>
+    <span class="p">),</span>
+    <span class="n">genre</span><span class="p">:</span> <span class="n">GenreType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter by genre&quot;</span><span class="p">),</span>
+    <span class="n">therapeutic_focus</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter by therapeutic goals&quot;</span>
+    <span class="p">),</span>
+    <span class="n">difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter by difficulty level&quot;</span>
+    <span class="p">),</span>
+    <span class="n">rating_min</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Minimum rating&quot;</span>
+    <span class="p">),</span>
+    <span class="n">sort_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Sort criteria&quot;</span><span class="p">),</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum results&quot;</span><span class="p">),</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Query</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Pagination offset&quot;</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Search for worlds based on criteria.</span>
+
+<span class="sd">    Provides comprehensive search functionality with filtering, sorting,</span>
+<span class="sd">    and pagination. Results include compatibility scores when possible.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Build search query</span>
+        <span class="n">query_parts</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MATCH (world:StoryWorld)&quot;</span><span class="p">]</span>
+        <span class="n">where_conditions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;world.is_public = true&quot;</span><span class="p">]</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">genre</span><span class="p">:</span>
+            <span class="n">where_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;world.genre = $genre&quot;</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;genre&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">genre</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">difficulty</span><span class="p">:</span>
+            <span class="n">where_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;world.difficulty_level = $difficulty&quot;</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;difficulty&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">difficulty</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="k">if</span> <span class="n">rating_min</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">where_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;world.rating &gt;= $rating_min&quot;</span><span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;rating_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating_min</span>
+
+        <span class="k">if</span> <span class="n">therapeutic_focus</span><span class="p">:</span>
+            <span class="n">where_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;ANY(focus IN $therapeutic_focus WHERE focus IN world.therapeutic_focus)&quot;</span>
+            <span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">therapeutic_focus</span>
+
+        <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+            <span class="n">where_conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<span class="w">                </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">                (toLower(world.title) CONTAINS toLower($search_query) OR</span>
+<span class="sd">                 toLower(world.description) CONTAINS toLower($search_query) OR</span>
+<span class="sd">                 ANY(tag IN world.tags WHERE toLower(tag) CONTAINS toLower($search_query)))</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="n">params</span><span class="p">[</span><span class="s2">&quot;search_query&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">query</span>
+
+        <span class="c1"># Always add WHERE clause, even if it&#39;s just the default condition</span>
+        <span class="k">if</span> <span class="n">where_conditions</span><span class="p">:</span>
+            <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WHERE &quot;</span> <span class="o">+</span> <span class="s2">&quot; AND &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">where_conditions</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Add default WHERE clause to make query valid</span>
+            <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WHERE world.is_public = true&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add RETURN clause (must come before ORDER BY)</span>
+        <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        RETURN {</span>
+<span class="sd">            world_id: world.world_id,</span>
+<span class="sd">            title: world.title,</span>
+<span class="sd">            description: world.description,</span>
+<span class="sd">            genre: world.genre,</span>
+<span class="sd">            therapeutic_focus: world.therapeutic_focus,</span>
+<span class="sd">            difficulty_level: world.difficulty_level,</span>
+<span class="sd">            estimated_duration: world.estimated_duration,</span>
+<span class="sd">            player_count: world.player_count,</span>
+<span class="sd">            rating: world.rating,</span>
+<span class="sd">            therapeutic_efficacy: world.therapeutic_efficacy,</span>
+<span class="sd">            strength_level: world.strength_level,</span>
+<span class="sd">            tags: world.tags,</span>
+<span class="sd">            is_featured: world.is_featured,</span>
+<span class="sd">            created_at: world.created_at</span>
+<span class="sd">        } as world_summary</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add sorting</span>
+        <span class="n">sort_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;rating&quot;</span><span class="p">:</span> <span class="s2">&quot;world_summary.rating DESC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;popularity&quot;</span><span class="p">:</span> <span class="s2">&quot;world_summary.player_count DESC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;recent&quot;</span><span class="p">:</span> <span class="s2">&quot;world_summary.created_at DESC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_efficacy&quot;</span><span class="p">:</span> <span class="s2">&quot;world_summary.therapeutic_efficacy DESC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;world_summary.title ASC&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">order_by</span> <span class="o">=</span> <span class="n">sort_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sort_by</span><span class="p">,</span> <span class="s2">&quot;world_summary.rating DESC&quot;</span><span class="p">)</span>
+        <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;ORDER BY </span><span class="si">{</span><span class="n">order_by</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add pagination</span>
+        <span class="n">query_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SKIP $offset LIMIT $limit&quot;</span><span class="p">)</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+        <span class="n">params</span><span class="p">[</span><span class="s2">&quot;limit&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">limit</span>
+
+        <span class="n">search_query</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">query_parts</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">search_query</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+            <span class="n">worlds</span> <span class="o">=</span> <span class="p">[</span><span class="n">record</span><span class="p">[</span><span class="s2">&quot;world_summary&quot;</span><span class="p">]</span> <span class="k">async</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">result</span><span class="p">]</span>
+
+        <span class="c1"># Get total count for pagination</span>
+        <span class="c1"># Build count query with MATCH and WHERE clauses only</span>
+        <span class="n">count_parts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">count_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;MATCH (world:StoryWorld)&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Add the same WHERE conditions</span>
+        <span class="k">if</span> <span class="n">where_conditions</span><span class="p">:</span>
+            <span class="n">count_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WHERE &quot;</span> <span class="o">+</span> <span class="s2">&quot; AND &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">where_conditions</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">count_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;WHERE world.is_public = true&quot;</span><span class="p">)</span>
+
+        <span class="n">count_parts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;RETURN count(world) as total&quot;</span><span class="p">)</span>
+        <span class="n">count_query</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">count_parts</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">count_query</span><span class="p">,</span>
+                <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;offset&quot;</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">]},</span>
+            <span class="p">)</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="k">await</span> <span class="n">result</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+            <span class="n">total_count</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;total&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="n">record</span> <span class="k">else</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">worlds</span><span class="p">,</span>
+            <span class="s2">&quot;total_count&quot;</span><span class="p">:</span> <span class="n">total_count</span><span class="p">,</span>
+            <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="n">limit</span><span class="p">,</span>
+            <span class="s2">&quot;offset&quot;</span><span class="p">:</span> <span class="n">offset</span><span class="p">,</span>
+            <span class="s2">&quot;has_more&quot;</span><span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">worlds</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">total_count</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to search worlds: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to search worlds: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_world">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.get_world">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/worlds/</span><span class="si">{world_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_world</span><span class="p">(</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;World ID&quot;</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get detailed information about a specific world.</span>
+
+<span class="sd">    Returns comprehensive world data including narrative structure,</span>
+<span class="sd">    therapeutic elements, statistics, and user-specific compatibility.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        MATCH (world:StoryWorld {world_id: $world_id})</span>
+<span class="s2">        OPTIONAL MATCH (world)&lt;-[:CREATED_BY]-(creator:StoryWeaver)</span>
+<span class="s2">        OPTIONAL MATCH (creator)&lt;-[:STORY_WEAVER]-(creator_player:Player)</span>
+
+<span class="s2">        RETURN {</span>
+<span class="s2">            world_id: world.world_id,</span>
+<span class="s2">            title: world.title,</span>
+<span class="s2">            description: world.description,</span>
+<span class="s2">            genre: world.genre,</span>
+<span class="s2">            therapeutic_focus: world.therapeutic_focus,</span>
+<span class="s2">            creator_id: world.creator_id,</span>
+<span class="s2">            creator_name: COALESCE(creator_player.username, &#39;Unknown&#39;),</span>
+<span class="s2">            strength_level: world.strength_level,</span>
+<span class="s2">            completion_rate: world.completion_rate,</span>
+<span class="s2">            therapeutic_efficacy: world.therapeutic_efficacy,</span>
+<span class="s2">            difficulty_level: world.difficulty_level,</span>
+<span class="s2">            estimated_duration: world.estimated_duration,</span>
+<span class="s2">            player_count: world.player_count,</span>
+<span class="s2">            rating: world.rating,</span>
+<span class="s2">            tags: world.tags,</span>
+<span class="s2">            is_public: world.is_public,</span>
+<span class="s2">            is_featured: world.is_featured,</span>
+<span class="s2">            narrative_state: world.narrative_state,</span>
+<span class="s2">            silence_threat: world.silence_threat,</span>
+<span class="s2">            created_at: world.created_at,</span>
+<span class="s2">            last_updated: world.last_updated</span>
+<span class="s2">        } as world_data</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">})</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="k">await</span> <span class="n">result</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">record</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;World </span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">world_data</span> <span class="o">=</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;world_data&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Get real-time state from cache</span>
+        <span class="n">cache_service</span> <span class="o">=</span> <span class="n">NexusCacheService</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">redis</span><span class="p">)</span>
+        <span class="n">cached_state</span> <span class="o">=</span> <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">get_world_state</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">cached_state</span><span class="p">:</span>
+            <span class="n">world_data</span><span class="p">[</span><span class="s2">&quot;current_players&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">cached_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">world_data</span><span class="p">[</span><span class="s2">&quot;last_activity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cached_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;last_interaction&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">world_data</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get world </span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve world: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="enter_world">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.nexus.html#src.player_experience.api.routers.nexus.enter_world">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/worlds/</span><span class="si">{world_id}</span><span class="s2">/enter&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">enter_world</span><span class="p">(</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;World ID&quot;</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">service_manager</span><span class="p">:</span> <span class="nb">object</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_service_manager</span><span class="p">),</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enter a world and start therapeutic journey.</span>
+
+<span class="sd">    Initializes a new session in the specified world, sets up player state,</span>
+<span class="sd">    and returns initial world context and available actions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Verify world exists and is accessible</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        MATCH (world:StoryWorld {world_id: $world_id})</span>
+<span class="s2">        WHERE world.is_public = true OR world.creator_id = $user_id</span>
+<span class="s2">        RETURN world.title as title, world.narrative_state as state</span>
+<span class="s2">        &quot;&quot;&quot;</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">query</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="k">await</span> <span class="n">result</span><span class="o">.</span><span class="n">single</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">record</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;World not found or not accessible&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Create or get StoryWeaver profile</span>
+        <span class="n">neo4j_manager</span> <span class="o">=</span> <span class="n">NexusSchemaManager</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">neo4j</span><span class="o">.</span><span class="n">driver</span><span class="p">)</span>
+        <span class="n">weaver_id</span> <span class="o">=</span> <span class="k">await</span> <span class="n">neo4j_manager</span><span class="o">.</span><span class="n">create_story_weaver</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="c1"># Set up player session</span>
+        <span class="n">cache_service</span> <span class="o">=</span> <span class="n">NexusCacheService</span><span class="p">(</span><span class="n">service_manager</span><span class="o">.</span><span class="n">redis</span><span class="p">)</span>
+        <span class="n">session_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;current_world&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;world_title&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;session_start&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;world_progress&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_state&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;achievements_pending&quot;</span><span class="p">:</span> <span class="s2">&quot;[]&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">set_player_session</span><span class="p">(</span><span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span> <span class="n">session_data</span><span class="p">)</span>
+
+        <span class="c1"># Update world active player count</span>
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">increment_active_players</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+
+        <span class="c1"># Publish enter event</span>
+        <span class="k">await</span> <span class="n">cache_service</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span>
+            <span class="s2">&quot;player_entered&quot;</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+                <span class="s2">&quot;world_title&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;player_id&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="s2">&quot;player_name&quot;</span><span class="p">:</span> <span class="n">current_player</span><span class="o">.</span><span class="n">username</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;world_title&quot;</span><span class="p">:</span> <span class="n">record</span><span class="p">[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;world_state&quot;</span><span class="p">:</span> <span class="s2">&quot;initialized&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;available_actions&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span><span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;explore&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Begin exploring the world&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Set therapeutic intentions&quot;</span><span class="p">},</span>
+                <span class="p">{</span><span class="s2">&quot;action&quot;</span><span class="p">:</span> <span class="s2">&quot;customize&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Adjust world parameters&quot;</span><span class="p">},</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;therapeutic_guidance&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;welcome_message&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Welcome to </span><span class="si">{</span><span class="n">record</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">! Take a moment to set your therapeutic intentions for this journey.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;suggested_focus&quot;</span><span class="p">:</span> <span class="s2">&quot;Consider what you hope to learn or practice in this world.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span><span class="p">:</span>
+        <span class="k">raise</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to enter world </span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Failed to enter world: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

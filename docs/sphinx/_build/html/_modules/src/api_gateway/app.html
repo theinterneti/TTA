@@ -1,0 +1,318 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.app &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.app</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.app</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Main API Gateway application.</span>
+
+<span class="sd">This module contains the FastAPI application instance and configuration</span>
+<span class="sd">for the TTA API Gateway &amp; Service Integration system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncGenerator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.middleware.cors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CORSMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.middleware.gzip</span><span class="w"> </span><span class="kn">import</span> <span class="n">GZipMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.middleware.trustedhost</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrustedHostMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayCore</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.middleware.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthenticationMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.middleware.logging</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoggingMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.middleware.rate_limiting</span><span class="w"> </span><span class="kn">import</span> <span class="n">RateLimitingMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.middleware.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityHeadersMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.middleware.therapeutic_safety</span><span class="w"> </span><span class="kn">import</span> <span class="n">TherapeuticSafetyMiddleware</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.monitoring.health</span><span class="w"> </span><span class="kn">import</span> <span class="n">health_router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.monitoring.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics_router</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.services</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoRegistrationService</span><span class="p">,</span> <span class="n">ServiceDiscoveryManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.websocket</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketConnectionManager</span><span class="p">,</span> <span class="n">create_websocket_router</span>
+
+
+<div class="viewcode-block" id="lifespan">
+<a class="viewcode-back" href="../../../api/src.api_gateway.app.html#src.api_gateway.app.lifespan">[docs]</a>
+<span class="nd">@asynccontextmanager</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">lifespan</span><span class="p">(</span><span class="n">app</span><span class="p">:</span> <span class="n">FastAPI</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AsyncGenerator</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Application lifespan manager.</span>
+
+<span class="sd">    Handles startup and shutdown events for the API Gateway.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Startup</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+    <span class="c1"># Initialize service discovery</span>
+    <span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">ServiceDiscoveryManager</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">discovery_manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+    <span class="c1"># Initialize gateway core</span>
+    <span class="n">gateway_core</span> <span class="o">=</span> <span class="n">GatewayCore</span><span class="p">(</span><span class="n">discovery_manager</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">gateway_core</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+    <span class="c1"># Initialize auto-registration service</span>
+    <span class="n">auto_registration</span> <span class="o">=</span> <span class="n">AutoRegistrationService</span><span class="p">(</span><span class="n">discovery_manager</span><span class="p">)</span>
+    <span class="k">await</span> <span class="n">auto_registration</span><span class="o">.</span><span class="n">register_tta_services</span><span class="p">()</span>
+
+    <span class="c1"># Initialize WebSocket connection manager</span>
+    <span class="n">websocket_manager</span> <span class="o">=</span> <span class="n">WebSocketConnectionManager</span><span class="p">()</span>
+
+    <span class="c1"># Create and include WebSocket router</span>
+    <span class="n">websocket_router</span> <span class="o">=</span> <span class="n">create_websocket_router</span><span class="p">(</span>
+        <span class="n">websocket_manager</span><span class="p">,</span> <span class="n">gateway_core</span><span class="o">.</span><span class="n">service_router</span><span class="p">,</span> <span class="n">discovery_manager</span>
+    <span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">websocket_router</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;websocket&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Store instances in app state for access in routes</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">discovery_manager</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">gateway_core</span> <span class="o">=</span> <span class="n">gateway_core</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">auto_registration</span> <span class="o">=</span> <span class="n">auto_registration</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">websocket_manager</span> <span class="o">=</span> <span class="n">websocket_manager</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;🚀 TTA API Gateway starting on </span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">settings</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">yield</span>
+
+    <span class="c1"># Shutdown</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;🛑 TTA API Gateway shutting down&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Cleanup resources</span>
+    <span class="k">await</span> <span class="n">websocket_manager</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">auto_registration</span><span class="o">.</span><span class="n">deregister_all_services</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">gateway_core</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">await</span> <span class="n">discovery_manager</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="create_gateway_app">
+<a class="viewcode-back" href="../../../api/src.api_gateway.app.html#src.api_gateway.app.create_gateway_app">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_gateway_app</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">FastAPI</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create and configure the API Gateway FastAPI application.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        FastAPI: Configured API Gateway application</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+    <span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;TTA API Gateway&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unified entry point for all TTA services with centralized routing, &quot;</span>
+        <span class="s2">&quot;authentication, rate limiting, and therapeutic safety monitoring.&quot;</span><span class="p">,</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+        <span class="n">docs_url</span><span class="o">=</span><span class="s2">&quot;/docs&quot;</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">redoc_url</span><span class="o">=</span><span class="s2">&quot;/redoc&quot;</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">openapi_url</span><span class="o">=</span><span class="s2">&quot;/openapi.json&quot;</span> <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">lifespan</span><span class="o">=</span><span class="n">lifespan</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Add security middleware</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">trusted_hosts</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">TrustedHostMiddleware</span><span class="p">,</span> <span class="n">allowed_hosts</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">trusted_hosts</span><span class="p">)</span>
+
+    <span class="c1"># Add CORS middleware</span>
+    <span class="k">if</span> <span class="n">settings</span><span class="o">.</span><span class="n">cors_origins</span><span class="p">:</span>
+        <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span>
+            <span class="n">CORSMiddleware</span><span class="p">,</span>
+            <span class="n">allow_origins</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">cors_origins</span><span class="p">,</span>
+            <span class="n">allow_credentials</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">allow_methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+            <span class="n">allow_headers</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Add compression middleware</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">GZipMiddleware</span><span class="p">,</span> <span class="n">minimum_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+    <span class="c1"># Add custom middleware (order matters - last added runs first)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">TherapeuticSafetyMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">SecurityHeadersMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">RateLimitingMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">AuthenticationMiddleware</span><span class="p">)</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">add_middleware</span><span class="p">(</span><span class="n">LoggingMiddleware</span><span class="p">)</span>
+
+    <span class="c1"># Include routers</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">health_router</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;health&quot;</span><span class="p">])</span>
+    <span class="n">app</span><span class="o">.</span><span class="n">include_router</span><span class="p">(</span><span class="n">metrics_router</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;/metrics&quot;</span><span class="p">,</span> <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">app</span></div>
+
+
+
+<span class="c1"># Create the application instance</span>
+<span class="n">app</span> <span class="o">=</span> <span class="n">create_gateway_app</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="root">
+<a class="viewcode-back" href="../../../api/src.api_gateway.app.html#src.api_gateway.app.root">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">root</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Root endpoint for the API Gateway.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="s2">&quot;TTA API Gateway&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;operational&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Unified entry point for all TTA services&quot;</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="gateway_route">
+<a class="viewcode-back" href="../../../api/src.api_gateway.app.html#src.api_gateway.app.gateway_route">[docs]</a>
+<span class="nd">@app</span><span class="o">.</span><span class="n">api_route</span><span class="p">(</span>
+    <span class="s2">&quot;/api/{path:path}&quot;</span><span class="p">,</span>
+    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span> <span class="s2">&quot;OPTIONS&quot;</span><span class="p">],</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">gateway_route</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main gateway route handler for all API requests.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: FastAPI request</span>
+<span class="sd">        path: Request path</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Response: Processed response from target service</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;gateway_core&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">gateway_core</span><span class="o">.</span><span class="n">process_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Fallback if gateway core is not initialized</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="mi">503</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Gateway not ready&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Gateway core is not initialized&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;GATEWAY_NOT_READY&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">uvicorn</span>
+
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+    <span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+        <span class="s2">&quot;src.api_gateway.app:app&quot;</span><span class="p">,</span>
+        <span class="n">host</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">host</span><span class="p">,</span>
+        <span class="n">port</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">port</span><span class="p">,</span>
+        <span class="n">reload</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">debug</span><span class="p">,</span>
+        <span class="n">log_level</span><span class="o">=</span><span class="s2">&quot;info&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">settings</span><span class="o">.</span><span class="n">debug</span> <span class="k">else</span> <span class="s2">&quot;debug&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

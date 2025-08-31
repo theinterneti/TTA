@@ -17,12 +17,7 @@ def run_command(command, cwd=None, check=True):
     print(f"Running: {command}")
     try:
         result = subprocess.run(
-            command,
-            shell=True,
-            cwd=cwd,
-            check=check,
-            capture_output=True,
-            text=True
+            command, shell=True, cwd=cwd, check=check, capture_output=True, text=True
         )
         if result.stdout:
             print(result.stdout)
@@ -39,19 +34,23 @@ def run_command(command, cwd=None, check=True):
 def check_prerequisites():
     """Check if required tools are installed."""
     print("🔍 Checking prerequisites...")
-    
+
     # Check Node.js
     try:
         result = run_command("node --version", check=False)
         if result.returncode == 0:
             print(f"✅ Node.js: {result.stdout.strip()}")
         else:
-            print("❌ Node.js not found. Please install Node.js 16+ from https://nodejs.org/")
+            print(
+                "❌ Node.js not found. Please install Node.js 16+ from https://nodejs.org/"
+            )
             return False
     except FileNotFoundError:
-        print("❌ Node.js not found. Please install Node.js 16+ from https://nodejs.org/")
+        print(
+            "❌ Node.js not found. Please install Node.js 16+ from https://nodejs.org/"
+        )
         return False
-    
+
     # Check npm
     try:
         result = run_command("npm --version", check=False)
@@ -63,16 +62,16 @@ def check_prerequisites():
     except FileNotFoundError:
         print("❌ npm not found. Please install npm.")
         return False
-    
+
     return True
 
 
 def create_project_structure():
     """Create the React project structure."""
     print("📁 Creating project structure...")
-    
+
     frontend_dir = Path("frontend")
-    
+
     # Create directories
     directories = [
         "src/components/auth",
@@ -91,7 +90,7 @@ def create_project_structure():
         "src/assets/icons",
         "public",
     ]
-    
+
     for directory in directories:
         dir_path = frontend_dir / directory
         dir_path.mkdir(parents=True, exist_ok=True)
@@ -101,19 +100,21 @@ def create_project_structure():
 def install_dependencies():
     """Install npm dependencies."""
     print("📦 Installing dependencies...")
-    
+
     frontend_dir = Path("frontend")
-    
+
     if not (frontend_dir / "package.json").exists():
-        print("❌ package.json not found. Please ensure the frontend directory is set up correctly.")
+        print(
+            "❌ package.json not found. Please ensure the frontend directory is set up correctly."
+        )
         return False
-    
+
     # Install dependencies
     result = run_command("npm install", cwd=frontend_dir, check=False)
     if result.returncode != 0:
         print("❌ Failed to install dependencies")
         return False
-    
+
     print("✅ Dependencies installed successfully")
     return True
 
@@ -121,9 +122,9 @@ def install_dependencies():
 def create_missing_files():
     """Create essential missing files."""
     print("📄 Creating essential files...")
-    
+
     frontend_dir = Path("frontend")
-    
+
     # Create public/index.html
     index_html = """<!DOCTYPE html>
 <html lang="en">
@@ -143,11 +144,11 @@ def create_missing_files():
     <div id="root"></div>
   </body>
 </html>"""
-    
+
     with open(frontend_dir / "public/index.html", "w") as f:
         f.write(index_html)
     print("✅ Created public/index.html")
-    
+
     # Create src/index.tsx
     index_tsx = """import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -162,11 +163,11 @@ root.render(
     <App />
   </React.StrictMode>
 );"""
-    
+
     with open(frontend_dir / "src/index.tsx", "w") as f:
         f.write(index_tsx)
     print("✅ Created src/index.tsx")
-    
+
     # Create placeholder components
     placeholder_files = [
         ("src/pages/LoginPage.tsx", "LoginPage"),
@@ -180,7 +181,7 @@ root.render(
         ("src/components/common/CrisisSupport.tsx", "CrisisSupport"),
         ("src/components/common/LoadingScreen.tsx", "LoadingScreen"),
     ]
-    
+
     for file_path, component_name in placeholder_files:
         placeholder_content = f"""import React from 'react';
 import {{ Box, Typography }} from '@mui/material';
@@ -199,19 +200,19 @@ const {component_name}: React.FC<any> = (props) => {{
 }};
 
 export default {component_name};"""
-        
+
         with open(frontend_dir / file_path, "w") as f:
             f.write(placeholder_content)
         print(f"✅ Created placeholder: {file_path}")
-    
+
     # Create remaining Redux slices
     slice_files = [
         "charactersSlice.ts",
-        "worldsSlice.ts", 
+        "worldsSlice.ts",
         "sessionsSlice.ts",
-        "uiSlice.ts"
+        "uiSlice.ts",
     ]
-    
+
     for slice_file in slice_files:
         slice_name = slice_file.replace("Slice.ts", "")
         slice_content = f"""import {{ createSlice }} from '@reduxjs/toolkit';
@@ -233,7 +234,7 @@ const {slice_name}Slice = createSlice({{
 }});
 
 export default {slice_name}Slice.reducer;"""
-        
+
         with open(frontend_dir / f"src/store/slices/{slice_file}", "w") as f:
             f.write(slice_content)
         print(f"✅ Created Redux slice: {slice_file}")
@@ -242,7 +243,7 @@ export default {slice_name}Slice.reducer;"""
 def create_start_script():
     """Create a convenient start script."""
     print("🚀 Creating start script...")
-    
+
     start_script = """#!/bin/bash
 # TTA Therapeutic Gaming Experience - Development Start Script
 
@@ -268,10 +269,10 @@ echo "🚀 Starting frontend development server..."
 cd frontend
 npm start
 """
-    
+
     with open("start_frontend.sh", "w") as f:
         f.write(start_script)
-    
+
     # Make script executable
     os.chmod("start_frontend.sh", 0o755)
     print("✅ Created start_frontend.sh script")
@@ -281,26 +282,26 @@ def main():
     """Main setup function."""
     print("🎮 TTA Therapeutic Gaming Frontend Setup")
     print("=" * 50)
-    
+
     # Check prerequisites
     if not check_prerequisites():
         print("❌ Prerequisites not met. Please install required tools and try again.")
         sys.exit(1)
-    
+
     # Create project structure
     create_project_structure()
-    
+
     # Install dependencies
     if not install_dependencies():
         print("❌ Failed to install dependencies")
         sys.exit(1)
-    
+
     # Create missing files
     create_missing_files()
-    
+
     # Create start script
     create_start_script()
-    
+
     print("\n🎉 Frontend setup completed successfully!")
     print("\n📋 Next steps:")
     print("1. Start the TTA API backend:")

@@ -7,7 +7,7 @@ This directory contains comprehensive integration tests for the AI Agent Orchest
 The integration test suite validates complete IPA → WBA → NGA workflows, including:
 
 - **End-to-end workflow testing**: Complete agent orchestration workflows
-- **Error handling and recovery**: Failover mechanisms and graceful degradation  
+- **Error handling and recovery**: Failover mechanisms and graceful degradation
 - **Performance and concurrency**: Load testing and resource management
 - **State persistence**: Neo4j and Redis data consistency
 - **Message routing**: Agent communication and coordination
@@ -118,7 +118,7 @@ uv run pytest tests/agent_orchestration/test_*integration*.py
 # Tier 2: Include Redis integration tests
 uv run pytest tests/agent_orchestration/test_*integration*.py --redis
 
-# Tier 3: Include Neo4j integration tests  
+# Tier 3: Include Neo4j integration tests
 uv run pytest tests/agent_orchestration/test_*integration*.py --neo4j
 
 # Full integration: Redis + Neo4j
@@ -164,7 +164,7 @@ The tests use realistic therapeutic text adventure scenarios:
 ### Performance Test Scenarios
 
 - **Low Load**: 3 concurrent workflows, 30s duration
-- **Medium Load**: 10 concurrent workflows, 60s duration  
+- **Medium Load**: 10 concurrent workflows, 60s duration
 - **High Load**: 25 concurrent workflows, 120s duration
 - **Stress Test**: 50 concurrent workflows, 180s duration
 

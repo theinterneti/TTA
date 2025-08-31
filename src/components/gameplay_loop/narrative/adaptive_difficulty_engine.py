@@ -6,23 +6,23 @@ and adaptive challenge adjustment for therapeutic text adventures.
 """
 
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any, Tuple, Set
-from dataclasses import dataclass, field
-from enum import Enum, IntEnum
-from uuid import uuid4
 import statistics
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum, IntEnum
+from typing import Any
+from uuid import uuid4
 
 from src.components.gameplay_loop.services.session_state import SessionState
-from src.components.gameplay_loop.models.core import UserChoice, ChoiceType, ConsequenceSet
-from .events import EventBus, EventType, NarrativeEvent
 
+from .events import EventBus, EventType, NarrativeEvent
 
 logger = logging.getLogger(__name__)
 
 
 class DifficultyLevel(IntEnum):
     """Difficulty levels for adaptive calibration."""
+
     VERY_EASY = 1
     EASY = 2
     MODERATE = 3
@@ -33,6 +33,7 @@ class DifficultyLevel(IntEnum):
 
 class PerformanceMetric(str, Enum):
     """Performance metrics for difficulty assessment."""
+
     CHOICE_SUCCESS_RATE = "choice_success_rate"
     THERAPEUTIC_PROGRESS = "therapeutic_progress"
     EMOTIONAL_STABILITY = "emotional_stability"
@@ -44,6 +45,7 @@ class PerformanceMetric(str, Enum):
 
 class AdjustmentTrigger(str, Enum):
     """Triggers for difficulty adjustment."""
+
     POOR_PERFORMANCE = "poor_performance"
     EXCELLENT_PERFORMANCE = "excellent_performance"
     EMOTIONAL_DISTRESS = "emotional_distress"
@@ -54,6 +56,7 @@ class AdjustmentTrigger(str, Enum):
 
 class AdaptationStrategy(str, Enum):
     """Strategies for difficulty adaptation."""
+
     GRADUAL_INCREASE = "gradual_increase"
     GRADUAL_DECREASE = "gradual_decrease"
     IMMEDIATE_ADJUSTMENT = "immediate_adjustment"
@@ -65,10 +68,11 @@ class AdaptationStrategy(str, Enum):
 @dataclass
 class PerformanceSnapshot:
     """Snapshot of user performance at a point in time."""
+
     snapshot_id: str = field(default_factory=lambda: str(uuid4()))
     user_id: str = ""
     session_id: str = ""
-    
+
     # Performance metrics
     success_rate: float = 0.0
     therapeutic_progress: float = 0.0
@@ -77,12 +81,12 @@ class PerformanceSnapshot:
     completion_rate: float = 0.0
     average_decision_time: float = 0.0
     help_requests: int = 0
-    
+
     # Context
     current_difficulty: DifficultyLevel = DifficultyLevel.MODERATE
-    recent_choices: List[str] = field(default_factory=list)
-    therapeutic_goals: List[str] = field(default_factory=list)
-    
+    recent_choices: list[str] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
+
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
     confidence: float = 0.0
@@ -91,84 +95,88 @@ class PerformanceSnapshot:
 @dataclass
 class DifficultyAdjustment:
     """Record of a difficulty adjustment."""
+
     adjustment_id: str = field(default_factory=lambda: str(uuid4()))
     user_id: str = ""
     session_id: str = ""
-    
+
     # Adjustment details
     from_difficulty: DifficultyLevel = DifficultyLevel.MODERATE
     to_difficulty: DifficultyLevel = DifficultyLevel.MODERATE
     trigger: AdjustmentTrigger = AdjustmentTrigger.POOR_PERFORMANCE
     strategy: AdaptationStrategy = AdaptationStrategy.GRADUAL_INCREASE
-    
+
     # Reasoning
-    performance_indicators: Dict[str, float] = field(default_factory=dict)
+    performance_indicators: dict[str, float] = field(default_factory=dict)
     adjustment_reason: str = ""
     expected_impact: str = ""
-    
+
     # Implementation
     story_explanation: str = ""
-    support_provided: List[str] = field(default_factory=list)
-    
+    support_provided: list[str] = field(default_factory=list)
+
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
-    effectiveness_score: Optional[float] = None
+    effectiveness_score: float | None = None
 
 
 @dataclass
 class UserPreferences:
     """User preferences for difficulty and challenge."""
+
     user_id: str = ""
-    
+
     # Difficulty preferences
     preferred_difficulty: DifficultyLevel = DifficultyLevel.MODERATE
     challenge_tolerance: float = 0.5  # 0.0 = low tolerance, 1.0 = high tolerance
     adaptation_speed: float = 0.5  # 0.0 = slow adaptation, 1.0 = fast adaptation
-    
+
     # Support preferences
     wants_hints: bool = True
     wants_explanations: bool = True
     wants_encouragement: bool = True
     wants_alternative_paths: bool = True
-    
+
     # Therapeutic preferences
-    therapeutic_focus: List[str] = field(default_factory=list)
+    therapeutic_focus: list[str] = field(default_factory=list)
     learning_style: str = "balanced"  # visual, auditory, kinesthetic, balanced
-    
+
     # Metadata
     last_updated: datetime = field(default_factory=datetime.utcnow)
 
 
 class AdaptiveDifficultyEngine:
     """Main engine for adaptive difficulty calibration and adjustment."""
-    
+
     def __init__(self, event_bus: EventBus):
         self.event_bus = event_bus
-        
+
         # Performance tracking
-        self.performance_history: Dict[str, List[PerformanceSnapshot]] = {}
-        self.adjustment_history: Dict[str, List[DifficultyAdjustment]] = {}
-        self.user_preferences: Dict[str, UserPreferences] = {}
-        
+        self.performance_history: dict[str, list[PerformanceSnapshot]] = {}
+        self.adjustment_history: dict[str, list[DifficultyAdjustment]] = {}
+        self.user_preferences: dict[str, UserPreferences] = {}
+
         # Calibration parameters
-        self.performance_window = timedelta(minutes=15)  # Window for performance analysis
+        self.performance_window = timedelta(
+            minutes=15
+        )  # Window for performance analysis
         self.adjustment_threshold = 0.2  # Threshold for triggering adjustments
         self.min_data_points = 3  # Minimum data points before adjustment
-        
+
         # Difficulty mapping
         self.difficulty_parameters = self._load_difficulty_parameters()
         self.adaptation_strategies = self._load_adaptation_strategies()
-        
+
         # Metrics
         self.metrics = {
             "performance_snapshots_created": 0,
             "difficulty_adjustments_made": 0,
             "user_preferences_updated": 0,
             "successful_adaptations": 0,
-            "failed_adaptations": 0
+            "failed_adaptations": 0,
         }
-    
-    def _load_difficulty_parameters(self) -> Dict[DifficultyLevel, Dict[str, Any]]:
+
+    def _load_difficulty_parameters(self) -> dict[DifficultyLevel, dict[str, Any]]:
         """Load difficulty parameters for each level."""
         return {
             DifficultyLevel.VERY_EASY: {
@@ -178,7 +186,7 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.0,
                 "support_availability": 1.0,
                 "hint_frequency": 0.8,
-                "explanation_detail": 0.9
+                "explanation_detail": 0.9,
             },
             DifficultyLevel.EASY: {
                 "choice_complexity": 0.3,
@@ -187,7 +195,7 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.1,
                 "support_availability": 0.8,
                 "hint_frequency": 0.6,
-                "explanation_detail": 0.7
+                "explanation_detail": 0.7,
             },
             DifficultyLevel.MODERATE: {
                 "choice_complexity": 0.5,
@@ -196,7 +204,7 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.3,
                 "support_availability": 0.6,
                 "hint_frequency": 0.4,
-                "explanation_detail": 0.5
+                "explanation_detail": 0.5,
             },
             DifficultyLevel.CHALLENGING: {
                 "choice_complexity": 0.7,
@@ -205,7 +213,7 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.5,
                 "support_availability": 0.4,
                 "hint_frequency": 0.2,
-                "explanation_detail": 0.3
+                "explanation_detail": 0.3,
             },
             DifficultyLevel.HARD: {
                 "choice_complexity": 0.8,
@@ -214,7 +222,7 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.7,
                 "support_availability": 0.2,
                 "hint_frequency": 0.1,
-                "explanation_detail": 0.2
+                "explanation_detail": 0.2,
             },
             DifficultyLevel.VERY_HARD: {
                 "choice_complexity": 0.9,
@@ -223,86 +231,91 @@ class AdaptiveDifficultyEngine:
                 "time_pressure": 0.8,
                 "support_availability": 0.1,
                 "hint_frequency": 0.0,
-                "explanation_detail": 0.1
-            }
+                "explanation_detail": 0.1,
+            },
         }
-    
-    def _load_adaptation_strategies(self) -> Dict[AdaptationStrategy, Dict[str, Any]]:
+
+    def _load_adaptation_strategies(self) -> dict[AdaptationStrategy, dict[str, Any]]:
         """Load adaptation strategies and their implementations."""
         return {
             AdaptationStrategy.GRADUAL_INCREASE: {
                 "description": "Gradually increase difficulty over multiple interactions",
                 "adjustment_rate": 0.1,
                 "story_integration": "natural_progression",
-                "support_reduction": "gradual"
+                "support_reduction": "gradual",
             },
             AdaptationStrategy.GRADUAL_DECREASE: {
                 "description": "Gradually decrease difficulty to build confidence",
                 "adjustment_rate": -0.1,
                 "story_integration": "supportive_context",
-                "support_increase": "gradual"
+                "support_increase": "gradual",
             },
             AdaptationStrategy.IMMEDIATE_ADJUSTMENT: {
                 "description": "Make immediate difficulty adjustment for urgent situations",
                 "adjustment_rate": 0.3,
                 "story_integration": "contextual_explanation",
-                "support_change": "immediate"
+                "support_change": "immediate",
             },
             AdaptationStrategy.CONTEXTUAL_SUPPORT: {
                 "description": "Provide additional support without changing core difficulty",
                 "adjustment_rate": 0.0,
                 "story_integration": "helper_character",
-                "support_increase": "contextual"
+                "support_increase": "contextual",
             },
             AdaptationStrategy.ALTERNATIVE_PATH: {
                 "description": "Offer alternative path with different difficulty profile",
                 "adjustment_rate": "variable",
                 "story_integration": "branching_narrative",
-                "support_change": "path_specific"
+                "support_change": "path_specific",
             },
             AdaptationStrategy.SKILL_BUILDING: {
                 "description": "Focus on building specific skills before increasing difficulty",
                 "adjustment_rate": 0.0,
                 "story_integration": "training_scenario",
-                "support_increase": "skill_focused"
-            }
+                "support_increase": "skill_focused",
+            },
         }
-    
-    async def monitor_performance(self, session_state: SessionState, 
-                                interaction_data: Dict[str, Any]) -> PerformanceSnapshot:
+
+    async def monitor_performance(
+        self, session_state: SessionState, interaction_data: dict[str, Any]
+    ) -> PerformanceSnapshot:
         """Monitor user performance and create performance snapshot."""
         try:
             # Create performance snapshot
-            snapshot = await self._create_performance_snapshot(session_state, interaction_data)
-            
+            snapshot = await self._create_performance_snapshot(
+                session_state, interaction_data
+            )
+
             # Store snapshot
             user_id = session_state.user_id
             if user_id not in self.performance_history:
                 self.performance_history[user_id] = []
-            
+
             self.performance_history[user_id].append(snapshot)
-            
+
             # Keep only recent snapshots
             cutoff_time = datetime.utcnow() - timedelta(hours=2)
             self.performance_history[user_id] = [
-                s for s in self.performance_history[user_id] 
+                s
+                for s in self.performance_history[user_id]
                 if s.created_at > cutoff_time
             ]
-            
+
             # Check if adjustment is needed
             if await self._should_adjust_difficulty(session_state, snapshot):
                 await self._adjust_difficulty(session_state, snapshot)
-            
+
             self.metrics["performance_snapshots_created"] += 1
 
             return snapshot
 
         except Exception as e:
-            logger.error(f"Failed to monitor performance for user {session_state.user_id}: {e}")
+            logger.error(
+                f"Failed to monitor performance for user {session_state.user_id}: {e}"
+            )
             # Return minimal snapshot
             return PerformanceSnapshot(
-                user_id=session_state.user_id,
-                session_id=session_state.session_id
+                user_id=session_state.user_id, session_id=session_state.session_id
             )
 
     def _calculate_success_rate(self, session_state: SessionState) -> float:
@@ -352,8 +365,12 @@ class AdaptiveDifficultyEngine:
         positive_emotions = ["calm", "hopeful", "confident", "excited"]
         negative_emotions = ["anxious", "depressed", "angry", "fearful", "overwhelmed"]
 
-        positive_score = sum(emotional_state.get(emotion, 0) for emotion in positive_emotions)
-        negative_score = sum(emotional_state.get(emotion, 0) for emotion in negative_emotions)
+        positive_score = sum(
+            emotional_state.get(emotion, 0) for emotion in positive_emotions
+        )
+        negative_score = sum(
+            emotional_state.get(emotion, 0) for emotion in negative_emotions
+        )
 
         # Stability is higher when positive emotions dominate and negative emotions are low
         if positive_score + negative_score == 0:
@@ -362,8 +379,9 @@ class AdaptiveDifficultyEngine:
         stability = positive_score / (positive_score + negative_score)
         return max(0.0, min(1.0, stability))
 
-    def _calculate_engagement_level(self, session_state: SessionState,
-                                  interaction_data: Dict[str, Any]) -> float:
+    def _calculate_engagement_level(
+        self, session_state: SessionState, interaction_data: dict[str, Any]
+    ) -> float:
         """Calculate user engagement level."""
         engagement_indicators = []
 
@@ -376,7 +394,9 @@ class AdaptiveDifficultyEngine:
             elif response_time < 5:
                 engagement_indicators.append(0.6)  # Too fast might indicate rushing
             else:
-                engagement_indicators.append(0.3)  # Too slow might indicate disengagement
+                engagement_indicators.append(
+                    0.3
+                )  # Too slow might indicate disengagement
 
         # Check choice complexity (choosing complex options indicates engagement)
         if "choice_complexity" in interaction_data:
@@ -399,7 +419,11 @@ class AdaptiveDifficultyEngine:
             else:
                 engagement_indicators.append(0.7)  # Long sessions still show engagement
 
-        return sum(engagement_indicators) / len(engagement_indicators) if engagement_indicators else 0.5
+        return (
+            sum(engagement_indicators) / len(engagement_indicators)
+            if engagement_indicators
+            else 0.5
+        )
 
     def _calculate_completion_rate(self, session_state: SessionState) -> float:
         """Calculate completion rate for scenes and choices."""
@@ -410,15 +434,18 @@ class AdaptiveDifficultyEngine:
         # Estimate expected completions based on session duration
         session_duration = session_state.context.get("session_duration_minutes", 1)
         expected_scenes = max(1, session_duration // 5)  # Expect 1 scene per 5 minutes
-        expected_choices = max(1, session_duration // 2)  # Expect 1 choice per 2 minutes
+        expected_choices = max(
+            1, session_duration // 2
+        )  # Expect 1 choice per 2 minutes
 
         scene_completion_rate = min(1.0, scenes_entered / expected_scenes)
         choice_completion_rate = min(1.0, choices_made / expected_choices)
 
         return (scene_completion_rate + choice_completion_rate) / 2
 
-    def _calculate_decision_time(self, session_state: SessionState,
-                               interaction_data: Dict[str, Any]) -> float:
+    def _calculate_decision_time(
+        self, session_state: SessionState, interaction_data: dict[str, Any]
+    ) -> float:
         """Calculate average decision time."""
         if "response_time" in interaction_data:
             return interaction_data["response_time"]
@@ -437,10 +464,12 @@ class AdaptiveDifficultyEngine:
 
     def _get_current_difficulty(self, session_state: SessionState) -> DifficultyLevel:
         """Get current difficulty level."""
-        difficulty_value = session_state.context.get("current_difficulty", DifficultyLevel.MODERATE.value)
+        difficulty_value = session_state.context.get(
+            "current_difficulty", DifficultyLevel.MODERATE.value
+        )
         return DifficultyLevel(difficulty_value)
 
-    def _get_recent_choices(self, session_state: SessionState) -> List[str]:
+    def _get_recent_choices(self, session_state: SessionState) -> list[str]:
         """Get recent choice IDs."""
         choices_made = session_state.context.get("choices_made", [])
         return choices_made[-5:]  # Last 5 choices
@@ -460,7 +489,7 @@ class AdaptiveDifficultyEngine:
         # Lower confidence with extreme values (might be outliers)
         extreme_values = [
             snapshot.success_rate < 0.1 or snapshot.success_rate > 0.9,
-            snapshot.engagement_level < 0.1 or snapshot.engagement_level > 0.9
+            snapshot.engagement_level < 0.1 or snapshot.engagement_level > 0.9,
         ]
 
         if any(extreme_values):
@@ -468,8 +497,9 @@ class AdaptiveDifficultyEngine:
 
         return max(0.0, min(1.0, confidence))
 
-    async def _should_adjust_difficulty(self, session_state: SessionState,
-                                      snapshot: PerformanceSnapshot) -> bool:
+    async def _should_adjust_difficulty(
+        self, session_state: SessionState, snapshot: PerformanceSnapshot
+    ) -> bool:
         """Determine if difficulty should be adjusted."""
         user_id = session_state.user_id
 
@@ -477,27 +507,35 @@ class AdaptiveDifficultyEngine:
         if user_id not in self.performance_history:
             return False
 
-        recent_snapshots = self.performance_history[user_id][-self.min_data_points:]
+        recent_snapshots = self.performance_history[user_id][-self.min_data_points :]
 
         if len(recent_snapshots) < self.min_data_points:
             return False
 
         # Calculate performance trends
-        success_trend = self._calculate_trend([s.success_rate for s in recent_snapshots])
-        engagement_trend = self._calculate_trend([s.engagement_level for s in recent_snapshots])
-        stability_trend = self._calculate_trend([s.emotional_stability for s in recent_snapshots])
+        success_trend = self._calculate_trend(
+            [s.success_rate for s in recent_snapshots]
+        )
+        engagement_trend = self._calculate_trend(
+            [s.engagement_level for s in recent_snapshots]
+        )
+        stability_trend = self._calculate_trend(
+            [s.emotional_stability for s in recent_snapshots]
+        )
 
         # Check for adjustment triggers
         triggers = []
 
         # Poor performance trigger
-        if (snapshot.success_rate < 0.3 and success_trend < -0.1) or \
-           (snapshot.engagement_level < 0.3 and engagement_trend < -0.1):
+        if (snapshot.success_rate < 0.3 and success_trend < -0.1) or (
+            snapshot.engagement_level < 0.3 and engagement_trend < -0.1
+        ):
             triggers.append(AdjustmentTrigger.POOR_PERFORMANCE)
 
         # Excellent performance trigger
-        if (snapshot.success_rate > 0.8 and success_trend > 0.1) and \
-           (snapshot.engagement_level > 0.7):
+        if (snapshot.success_rate > 0.8 and success_trend > 0.1) and (
+            snapshot.engagement_level > 0.7
+        ):
             triggers.append(AdjustmentTrigger.EXCELLENT_PERFORMANCE)
 
         # Emotional distress trigger
@@ -510,7 +548,7 @@ class AdaptiveDifficultyEngine:
 
         return len(triggers) > 0
 
-    def _calculate_trend(self, values: List[float]) -> float:
+    def _calculate_trend(self, values: list[float]) -> float:
         """Calculate trend in a series of values."""
         if len(values) < 2:
             return 0.0
@@ -528,7 +566,7 @@ class AdaptiveDifficultyEngine:
         slope = (n * xy_sum - x_sum * y_sum) / (n * x2_sum - x_sum * x_sum)
         return slope
 
-    def _detect_performance_pattern(self, snapshots: List[PerformanceSnapshot]) -> bool:
+    def _detect_performance_pattern(self, snapshots: list[PerformanceSnapshot]) -> bool:
         """Detect patterns in performance that warrant adjustment."""
         if len(snapshots) < 3:
             return False
@@ -540,28 +578,38 @@ class AdaptiveDifficultyEngine:
 
         # Check for consistent excellent performance
         excellent_performance_count = sum(1 for s in snapshots if s.success_rate > 0.8)
-        if excellent_performance_count >= len(snapshots) * 0.7:  # 70% excellent performance
+        if (
+            excellent_performance_count >= len(snapshots) * 0.7
+        ):  # 70% excellent performance
             return True
 
         # Check for declining engagement
         engagement_values = [s.engagement_level for s in snapshots]
-        if all(engagement_values[i] > engagement_values[i+1] for i in range(len(engagement_values)-1)):
+        if all(
+            engagement_values[i] > engagement_values[i + 1]
+            for i in range(len(engagement_values) - 1)
+        ):
             return True  # Consistently declining engagement
 
         return False
 
-    async def _adjust_difficulty(self, session_state: SessionState,
-                               snapshot: PerformanceSnapshot) -> None:
+    async def _adjust_difficulty(
+        self, session_state: SessionState, snapshot: PerformanceSnapshot
+    ) -> None:
         """Adjust difficulty based on performance analysis."""
         try:
             # Determine adjustment trigger
             trigger = self._determine_adjustment_trigger(session_state, snapshot)
 
             # Select adaptation strategy
-            strategy = self._select_adaptation_strategy(session_state, snapshot, trigger)
+            strategy = self._select_adaptation_strategy(
+                session_state, snapshot, trigger
+            )
 
             # Calculate new difficulty level
-            new_difficulty = self._calculate_new_difficulty(session_state, snapshot, strategy)
+            new_difficulty = self._calculate_new_difficulty(
+                session_state, snapshot, strategy
+            )
 
             # Create adjustment record
             adjustment = DifficultyAdjustment(
@@ -575,11 +623,15 @@ class AdaptiveDifficultyEngine:
                     "success_rate": snapshot.success_rate,
                     "engagement_level": snapshot.engagement_level,
                     "emotional_stability": snapshot.emotional_stability,
-                    "therapeutic_progress": snapshot.therapeutic_progress
+                    "therapeutic_progress": snapshot.therapeutic_progress,
                 },
                 adjustment_reason=self._generate_adjustment_reason(trigger, snapshot),
-                expected_impact=self._generate_expected_impact(strategy, new_difficulty),
-                story_explanation=self._generate_story_explanation(strategy, new_difficulty)
+                expected_impact=self._generate_expected_impact(
+                    strategy, new_difficulty
+                ),
+                story_explanation=self._generate_story_explanation(
+                    strategy, new_difficulty
+                ),
             )
 
             # Apply the adjustment
@@ -598,10 +650,13 @@ class AdaptiveDifficultyEngine:
             self.metrics["difficulty_adjustments_made"] += 1
 
         except Exception as e:
-            logger.error(f"Failed to adjust difficulty for user {session_state.user_id}: {e}")
+            logger.error(
+                f"Failed to adjust difficulty for user {session_state.user_id}: {e}"
+            )
 
-    def _determine_adjustment_trigger(self, session_state: SessionState,
-                                    snapshot: PerformanceSnapshot) -> AdjustmentTrigger:
+    def _determine_adjustment_trigger(
+        self, session_state: SessionState, snapshot: PerformanceSnapshot
+    ) -> AdjustmentTrigger:
         """Determine the primary trigger for difficulty adjustment."""
         # Check emotional distress first (highest priority)
         if snapshot.emotional_stability < 0.3:
@@ -626,9 +681,12 @@ class AdaptiveDifficultyEngine:
         # Default to pattern recognition
         return AdjustmentTrigger.PATTERN_RECOGNITION
 
-    def _select_adaptation_strategy(self, session_state: SessionState,
-                                  snapshot: PerformanceSnapshot,
-                                  trigger: AdjustmentTrigger) -> AdaptationStrategy:
+    def _select_adaptation_strategy(
+        self,
+        session_state: SessionState,
+        snapshot: PerformanceSnapshot,
+        trigger: AdjustmentTrigger,
+    ) -> AdaptationStrategy:
         """Select appropriate adaptation strategy."""
         # Get user preferences
         user_preferences = self._get_user_preferences(session_state.user_id)
@@ -660,9 +718,12 @@ class AdaptiveDifficultyEngine:
             else:
                 return AdaptationStrategy.GRADUAL_INCREASE
 
-    def _calculate_new_difficulty(self, session_state: SessionState,
-                                snapshot: PerformanceSnapshot,
-                                strategy: AdaptationStrategy) -> DifficultyLevel:
+    def _calculate_new_difficulty(
+        self,
+        session_state: SessionState,
+        snapshot: PerformanceSnapshot,
+        strategy: AdaptationStrategy,
+    ) -> DifficultyLevel:
         """Calculate new difficulty level based on strategy."""
         current_difficulty = snapshot.current_difficulty
         strategy_config = self.adaptation_strategies[strategy]
@@ -691,81 +752,78 @@ class AdaptiveDifficultyEngine:
 
         return DifficultyLevel(int(new_value))
 
-    def _generate_adjustment_reason(self, trigger: AdjustmentTrigger,
-                                  snapshot: PerformanceSnapshot) -> str:
+    def _generate_adjustment_reason(
+        self, trigger: AdjustmentTrigger, snapshot: PerformanceSnapshot
+    ) -> str:
         """Generate human-readable reason for adjustment."""
         reasons = {
-            AdjustmentTrigger.POOR_PERFORMANCE:
-                f"User showing difficulty with current challenges (success rate: {snapshot.success_rate:.1%})",
-            AdjustmentTrigger.EXCELLENT_PERFORMANCE:
-                f"User excelling at current level (success rate: {snapshot.success_rate:.1%})",
-            AdjustmentTrigger.EMOTIONAL_DISTRESS:
-                f"User experiencing emotional distress (stability: {snapshot.emotional_stability:.1%})",
-            AdjustmentTrigger.USER_REQUEST:
-                "User requested difficulty adjustment",
-            AdjustmentTrigger.THERAPEUTIC_GOAL_CHANGE:
-                "Therapeutic goals have changed, requiring difficulty recalibration",
-            AdjustmentTrigger.PATTERN_RECOGNITION:
-                "Performance patterns indicate need for difficulty adjustment"
+            AdjustmentTrigger.POOR_PERFORMANCE: f"User showing difficulty with current challenges (success rate: {snapshot.success_rate:.1%})",
+            AdjustmentTrigger.EXCELLENT_PERFORMANCE: f"User excelling at current level (success rate: {snapshot.success_rate:.1%})",
+            AdjustmentTrigger.EMOTIONAL_DISTRESS: f"User experiencing emotional distress (stability: {snapshot.emotional_stability:.1%})",
+            AdjustmentTrigger.USER_REQUEST: "User requested difficulty adjustment",
+            AdjustmentTrigger.THERAPEUTIC_GOAL_CHANGE: "Therapeutic goals have changed, requiring difficulty recalibration",
+            AdjustmentTrigger.PATTERN_RECOGNITION: "Performance patterns indicate need for difficulty adjustment",
         }
-        return reasons.get(trigger, "Difficulty adjustment needed based on performance analysis")
+        return reasons.get(
+            trigger, "Difficulty adjustment needed based on performance analysis"
+        )
 
-    def _generate_expected_impact(self, strategy: AdaptationStrategy,
-                                new_difficulty: DifficultyLevel) -> str:
+    def _generate_expected_impact(
+        self, strategy: AdaptationStrategy, new_difficulty: DifficultyLevel
+    ) -> str:
         """Generate expected impact description."""
         impacts = {
-            AdaptationStrategy.GRADUAL_INCREASE:
-                f"Gradually increase challenge to {new_difficulty.name} level for continued growth",
-            AdaptationStrategy.GRADUAL_DECREASE:
-                f"Reduce challenge to {new_difficulty.name} level to build confidence",
-            AdaptationStrategy.IMMEDIATE_ADJUSTMENT:
-                f"Immediate adjustment to {new_difficulty.name} level for optimal experience",
-            AdaptationStrategy.CONTEXTUAL_SUPPORT:
-                "Provide additional support while maintaining current challenge level",
-            AdaptationStrategy.ALTERNATIVE_PATH:
-                f"Offer alternative approach at {new_difficulty.name} difficulty level",
-            AdaptationStrategy.SKILL_BUILDING:
-                "Focus on skill development before increasing difficulty"
+            AdaptationStrategy.GRADUAL_INCREASE: f"Gradually increase challenge to {new_difficulty.name} level for continued growth",
+            AdaptationStrategy.GRADUAL_DECREASE: f"Reduce challenge to {new_difficulty.name} level to build confidence",
+            AdaptationStrategy.IMMEDIATE_ADJUSTMENT: f"Immediate adjustment to {new_difficulty.name} level for optimal experience",
+            AdaptationStrategy.CONTEXTUAL_SUPPORT: "Provide additional support while maintaining current challenge level",
+            AdaptationStrategy.ALTERNATIVE_PATH: f"Offer alternative approach at {new_difficulty.name} difficulty level",
+            AdaptationStrategy.SKILL_BUILDING: "Focus on skill development before increasing difficulty",
         }
-        return impacts.get(strategy, f"Adjust to {new_difficulty.name} difficulty level")
+        return impacts.get(
+            strategy, f"Adjust to {new_difficulty.name} difficulty level"
+        )
 
-    def _generate_story_explanation(self, strategy: AdaptationStrategy,
-                                  new_difficulty: DifficultyLevel) -> str:
+    def _generate_story_explanation(
+        self, strategy: AdaptationStrategy, new_difficulty: DifficultyLevel
+    ) -> str:
         """Generate story-appropriate explanation for difficulty change."""
         explanations = {
             AdaptationStrategy.GRADUAL_INCREASE: [
                 "As you grow stronger and more confident, new challenges naturally present themselves.",
                 "Your developing skills open doors to more complex situations.",
-                "The world around you responds to your growing capabilities."
+                "The world around you responds to your growing capabilities.",
             ],
             AdaptationStrategy.GRADUAL_DECREASE: [
                 "You find yourself in a more supportive environment where you can build confidence.",
                 "A helpful mentor appears to guide you through these challenges.",
-                "The situation becomes more manageable as you find your footing."
+                "The situation becomes more manageable as you find your footing.",
             ],
             AdaptationStrategy.IMMEDIATE_ADJUSTMENT: [
                 "The situation suddenly shifts, requiring a different approach.",
                 "New circumstances call for adapted strategies.",
-                "The environment changes to better match your current needs."
+                "The environment changes to better match your current needs.",
             ],
             AdaptationStrategy.CONTEXTUAL_SUPPORT: [
                 "A wise companion joins you to offer guidance and support.",
                 "You discover helpful resources that make the journey easier.",
-                "The community around you rallies to provide assistance."
+                "The community around you rallies to provide assistance.",
             ],
             AdaptationStrategy.ALTERNATIVE_PATH: [
                 "You discover an alternative route that better suits your style.",
                 "A different approach becomes available that matches your strengths.",
-                "New possibilities open up that align with your preferences."
+                "New possibilities open up that align with your preferences.",
             ],
             AdaptationStrategy.SKILL_BUILDING: [
                 "You find an opportunity to practice and develop your abilities.",
                 "A training ground appears where you can hone your skills.",
-                "Time is available to strengthen your foundation before moving forward."
-            ]
+                "Time is available to strengthen your foundation before moving forward.",
+            ],
         }
 
-        strategy_explanations = explanations.get(strategy, ["The path ahead adjusts to your journey."])
+        strategy_explanations = explanations.get(
+            strategy, ["The path ahead adjusts to your journey."]
+        )
         return strategy_explanations[0]  # Return first explanation for now
 
     def _get_user_preferences(self, user_id: str) -> UserPreferences:
@@ -775,8 +833,9 @@ class AdaptiveDifficultyEngine:
 
         return self.user_preferences[user_id]
 
-    async def _apply_difficulty_adjustment(self, session_state: SessionState,
-                                         adjustment: DifficultyAdjustment) -> None:
+    async def _apply_difficulty_adjustment(
+        self, session_state: SessionState, adjustment: DifficultyAdjustment
+    ) -> None:
         """Apply difficulty adjustment to session state."""
         # Update current difficulty in session
         session_state.context["current_difficulty"] = adjustment.to_difficulty.value
@@ -789,23 +848,29 @@ class AdaptiveDifficultyEngine:
         support_provided = []
 
         if adjustment.strategy == AdaptationStrategy.CONTEXTUAL_SUPPORT:
-            support_provided.extend([
-                "Additional hints available",
-                "Detailed explanations provided",
-                "Encouragement and validation"
-            ])
+            support_provided.extend(
+                [
+                    "Additional hints available",
+                    "Detailed explanations provided",
+                    "Encouragement and validation",
+                ]
+            )
         elif adjustment.strategy == AdaptationStrategy.SKILL_BUILDING:
-            support_provided.extend([
-                "Skill-building exercises available",
-                "Practice scenarios provided",
-                "Progress tracking enabled"
-            ])
+            support_provided.extend(
+                [
+                    "Skill-building exercises available",
+                    "Practice scenarios provided",
+                    "Progress tracking enabled",
+                ]
+            )
         elif adjustment.strategy == AdaptationStrategy.ALTERNATIVE_PATH:
-            support_provided.extend([
-                "Alternative approaches available",
-                "Multiple solution paths",
-                "Flexible goal achievement"
-            ])
+            support_provided.extend(
+                [
+                    "Alternative approaches available",
+                    "Multiple solution paths",
+                    "Flexible goal achievement",
+                ]
+            )
 
         # Store support information
         adjustment.support_provided = support_provided
@@ -819,8 +884,9 @@ class AdaptiveDifficultyEngine:
         session_state.context.pop("requested_strategy", None)
         session_state.context.pop("therapeutic_goals_changed", None)
 
-    async def _publish_adjustment_event(self, session_state: SessionState,
-                                      adjustment: DifficultyAdjustment) -> None:
+    async def _publish_adjustment_event(
+        self, session_state: SessionState, adjustment: DifficultyAdjustment
+    ) -> None:
         """Publish difficulty adjustment event."""
         event = NarrativeEvent(
             event_type=EventType.DIFFICULTY_ADJUSTED,
@@ -833,13 +899,15 @@ class AdaptiveDifficultyEngine:
                 "trigger": adjustment.trigger.value,
                 "strategy": adjustment.strategy.value,
                 "performance_indicators": adjustment.performance_indicators,
-                "story_explanation": adjustment.story_explanation
-            }
+                "story_explanation": adjustment.story_explanation,
+            },
         )
 
         await self.event_bus.publish(event)
 
-    async def update_user_preferences(self, user_id: str, preferences: Dict[str, Any]) -> None:
+    async def update_user_preferences(
+        self, user_id: str, preferences: dict[str, Any]
+    ) -> None:
         """Update user preferences for difficulty adaptation."""
         try:
             user_prefs = self._get_user_preferences(user_id)
@@ -867,10 +935,14 @@ class AdaptiveDifficultyEngine:
                 user_prefs.wants_explanations = bool(preferences["wants_explanations"])
 
             if "wants_encouragement" in preferences:
-                user_prefs.wants_encouragement = bool(preferences["wants_encouragement"])
+                user_prefs.wants_encouragement = bool(
+                    preferences["wants_encouragement"]
+                )
 
             if "wants_alternative_paths" in preferences:
-                user_prefs.wants_alternative_paths = bool(preferences["wants_alternative_paths"])
+                user_prefs.wants_alternative_paths = bool(
+                    preferences["wants_alternative_paths"]
+                )
 
             if "therapeutic_focus" in preferences:
                 user_prefs.therapeutic_focus = preferences["therapeutic_focus"]
@@ -884,16 +956,21 @@ class AdaptiveDifficultyEngine:
         except Exception as e:
             logger.error(f"Failed to update user preferences for {user_id}: {e}")
 
-    async def request_difficulty_adjustment(self, session_state: SessionState,
-                                          requested_difficulty: Optional[DifficultyLevel] = None,
-                                          strategy: Optional[AdaptationStrategy] = None) -> bool:
+    async def request_difficulty_adjustment(
+        self,
+        session_state: SessionState,
+        requested_difficulty: DifficultyLevel | None = None,
+        strategy: AdaptationStrategy | None = None,
+    ) -> bool:
         """Request manual difficulty adjustment."""
         try:
             # Set adjustment request flags
             session_state.context["difficulty_adjustment_requested"] = True
 
             if requested_difficulty:
-                session_state.context["requested_difficulty"] = requested_difficulty.value
+                session_state.context["requested_difficulty"] = (
+                    requested_difficulty.value
+                )
 
             if strategy:
                 session_state.context["requested_strategy"] = strategy.value
@@ -901,8 +978,10 @@ class AdaptiveDifficultyEngine:
             # Trigger immediate performance monitoring to process the request
             interaction_data = {
                 "interaction_type": "difficulty_adjustment_request",
-                "requested_difficulty": requested_difficulty.value if requested_difficulty else None,
-                "requested_strategy": strategy.value if strategy else None
+                "requested_difficulty": (
+                    requested_difficulty.value if requested_difficulty else None
+                ),
+                "requested_strategy": strategy.value if strategy else None,
             }
 
             await self.monitor_performance(session_state, interaction_data)
@@ -910,10 +989,14 @@ class AdaptiveDifficultyEngine:
             return True
 
         except Exception as e:
-            logger.error(f"Failed to request difficulty adjustment for user {session_state.user_id}: {e}")
+            logger.error(
+                f"Failed to request difficulty adjustment for user {session_state.user_id}: {e}"
+            )
             return False
 
-    def get_current_difficulty_info(self, session_state: SessionState) -> Dict[str, Any]:
+    def get_current_difficulty_info(
+        self, session_state: SessionState
+    ) -> dict[str, Any]:
         """Get current difficulty information and parameters."""
         current_difficulty = self._get_current_difficulty(session_state)
         difficulty_params = self.difficulty_parameters[current_difficulty]
@@ -924,18 +1007,19 @@ class AdaptiveDifficultyEngine:
             "parameters": difficulty_params,
             "support_available": session_state.context.get("current_support", []),
             "explanation": session_state.context.get("difficulty_explanation", ""),
-            "user_preferences": self._get_user_preferences(session_state.user_id).__dict__
+            "user_preferences": self._get_user_preferences(
+                session_state.user_id
+            ).__dict__,
         }
 
-    def get_performance_summary(self, user_id: str, hours: int = 2) -> Dict[str, Any]:
+    def get_performance_summary(self, user_id: str, hours: int = 2) -> dict[str, Any]:
         """Get performance summary for a user."""
         if user_id not in self.performance_history:
             return {"error": "No performance data available"}
 
         cutoff_time = datetime.utcnow() - timedelta(hours=hours)
         recent_snapshots = [
-            s for s in self.performance_history[user_id]
-            if s.created_at > cutoff_time
+            s for s in self.performance_history[user_id] if s.created_at > cutoff_time
         ]
 
         if not recent_snapshots:
@@ -952,30 +1036,33 @@ class AdaptiveDifficultyEngine:
             "success_rate": {
                 "current": success_rates[-1],
                 "average": statistics.mean(success_rates),
-                "trend": self._calculate_trend(success_rates)
+                "trend": self._calculate_trend(success_rates),
             },
             "engagement_level": {
                 "current": engagement_levels[-1],
                 "average": statistics.mean(engagement_levels),
-                "trend": self._calculate_trend(engagement_levels)
+                "trend": self._calculate_trend(engagement_levels),
             },
             "emotional_stability": {
                 "current": stability_levels[-1],
                 "average": statistics.mean(stability_levels),
-                "trend": self._calculate_trend(stability_levels)
+                "trend": self._calculate_trend(stability_levels),
             },
             "current_difficulty": recent_snapshots[-1].current_difficulty.name,
-            "therapeutic_progress": recent_snapshots[-1].therapeutic_progress
+            "therapeutic_progress": recent_snapshots[-1].therapeutic_progress,
         }
 
-    def get_adjustment_history(self, user_id: str, hours: int = 24) -> List[Dict[str, Any]]:
+    def get_adjustment_history(
+        self, user_id: str, hours: int = 24
+    ) -> list[dict[str, Any]]:
         """Get difficulty adjustment history for a user."""
         if user_id not in self.adjustment_history:
             return []
 
         cutoff_time = datetime.utcnow() - timedelta(hours=hours)
         recent_adjustments = [
-            adj for adj in self.adjustment_history[user_id]
+            adj
+            for adj in self.adjustment_history[user_id]
             if adj.created_at > cutoff_time
         ]
 
@@ -990,22 +1077,26 @@ class AdaptiveDifficultyEngine:
                 "expected_impact": adj.expected_impact,
                 "story_explanation": adj.story_explanation,
                 "created_at": adj.created_at.isoformat(),
-                "effectiveness_score": adj.effectiveness_score
+                "effectiveness_score": adj.effectiveness_score,
             }
             for adj in recent_adjustments
         ]
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get adaptive difficulty engine metrics."""
         return {
             **self.metrics,
             "active_users_monitored": len(self.performance_history),
-            "total_performance_snapshots": sum(len(snapshots) for snapshots in self.performance_history.values()),
-            "total_adjustments": sum(len(adjustments) for adjustments in self.adjustment_history.values()),
-            "user_preferences_configured": len(self.user_preferences)
+            "total_performance_snapshots": sum(
+                len(snapshots) for snapshots in self.performance_history.values()
+            ),
+            "total_adjustments": sum(
+                len(adjustments) for adjustments in self.adjustment_history.values()
+            ),
+            "user_preferences_configured": len(self.user_preferences),
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of adaptive difficulty engine."""
         return {
             "status": "healthy",
@@ -1014,48 +1105,56 @@ class AdaptiveDifficultyEngine:
             "performance_window_minutes": self.performance_window.total_seconds() / 60,
             "adjustment_threshold": self.adjustment_threshold,
             "min_data_points": self.min_data_points,
-            "metrics": self.get_metrics()
+            "metrics": self.get_metrics(),
         }
-    
-    async def _create_performance_snapshot(self, session_state: SessionState,
-                                         interaction_data: Dict[str, Any]) -> PerformanceSnapshot:
+
+    async def _create_performance_snapshot(
+        self, session_state: SessionState, interaction_data: dict[str, Any]
+    ) -> PerformanceSnapshot:
         """Create performance snapshot from session data."""
         snapshot = PerformanceSnapshot(
-            user_id=session_state.user_id,
-            session_id=session_state.session_id
+            user_id=session_state.user_id, session_id=session_state.session_id
         )
-        
+
         # Calculate success rate from recent choices
         snapshot.success_rate = self._calculate_success_rate(session_state)
-        
+
         # Get therapeutic progress
-        snapshot.therapeutic_progress = self._calculate_therapeutic_progress(session_state)
-        
+        snapshot.therapeutic_progress = self._calculate_therapeutic_progress(
+            session_state
+        )
+
         # Get emotional stability
-        snapshot.emotional_stability = self._calculate_emotional_stability(session_state)
-        
+        snapshot.emotional_stability = self._calculate_emotional_stability(
+            session_state
+        )
+
         # Calculate engagement level
-        snapshot.engagement_level = self._calculate_engagement_level(session_state, interaction_data)
-        
+        snapshot.engagement_level = self._calculate_engagement_level(
+            session_state, interaction_data
+        )
+
         # Calculate completion rate
         snapshot.completion_rate = self._calculate_completion_rate(session_state)
-        
+
         # Get average decision time
-        snapshot.average_decision_time = self._calculate_decision_time(session_state, interaction_data)
-        
+        snapshot.average_decision_time = self._calculate_decision_time(
+            session_state, interaction_data
+        )
+
         # Count help requests
         snapshot.help_requests = self._count_help_requests(session_state)
-        
+
         # Get current difficulty
         snapshot.current_difficulty = self._get_current_difficulty(session_state)
-        
+
         # Store recent choices
         snapshot.recent_choices = self._get_recent_choices(session_state)
-        
+
         # Get therapeutic goals
         snapshot.therapeutic_goals = session_state.therapeutic_goals
-        
+
         # Calculate confidence
         snapshot.confidence = self._calculate_snapshot_confidence(snapshot)
-        
+
         return snapshot

@@ -10,6 +10,7 @@ from enum import Enum, IntEnum
 
 class CrisisLevel(IntEnum):
     """Crisis severity levels for content assessment."""
+
     NONE = 0
     LOW = 1
     MODERATE = 2
@@ -20,6 +21,7 @@ class CrisisLevel(IntEnum):
 
 class BiasType(str, Enum):
     """Types of bias that can be detected in content."""
+
     GENDER = "gender"
     RACIAL = "racial"
     CULTURAL = "cultural"
@@ -34,6 +36,7 @@ class BiasType(str, Enum):
 
 class ContentType(str, Enum):
     """Types of content that can be validated."""
+
     NARRATIVE_SCENE = "narrative_scene"
     USER_CHOICE = "user_choice"
     CONSEQUENCE = "consequence"
@@ -46,6 +49,7 @@ class ContentType(str, Enum):
 
 class ValidationAction(str, Enum):
     """Actions that can be taken based on validation results."""
+
     APPROVE = "approve"
     REJECT = "reject"
     MODIFY = "modify"
@@ -58,6 +62,7 @@ class ValidationAction(str, Enum):
 
 class SafetyLevel(str, Enum):
     """Overall safety levels for content and users."""
+
     SAFE = "safe"
     CAUTION = "caution"
     WARNING = "warning"
@@ -67,6 +72,7 @@ class SafetyLevel(str, Enum):
 
 class TherapeuticFramework(str, Enum):
     """Therapeutic frameworks for content alignment."""
+
     CBT = "cognitive_behavioral_therapy"
     DBT = "dialectical_behavior_therapy"
     ACT = "acceptance_commitment_therapy"
@@ -81,6 +87,7 @@ class TherapeuticFramework(str, Enum):
 
 class ValidationStatus(str, Enum):
     """Status of validation process."""
+
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
     COMPLETED = "completed"
@@ -92,6 +99,7 @@ class ValidationStatus(str, Enum):
 
 class RiskCategory(str, Enum):
     """Categories of risk in therapeutic content."""
+
     SELF_HARM = "self_harm"
     SUICIDE = "suicide"
     VIOLENCE = "violence"
@@ -106,6 +114,7 @@ class RiskCategory(str, Enum):
 
 class ProtectiveFactor(str, Enum):
     """Protective factors that can mitigate risks."""
+
     SOCIAL_SUPPORT = "social_support"
     COPING_SKILLS = "coping_skills"
     PROFESSIONAL_HELP = "professional_help"
@@ -120,6 +129,7 @@ class ProtectiveFactor(str, Enum):
 
 class ValidationPriority(IntEnum):
     """Priority levels for validation processing."""
+
     LOW = 1
     NORMAL = 2
     HIGH = 3
@@ -129,6 +139,7 @@ class ValidationPriority(IntEnum):
 
 class ContentSource(str, Enum):
     """Source of content being validated."""
+
     USER_GENERATED = "user_generated"
     AI_GENERATED = "ai_generated"
     TEMPLATE_BASED = "template_based"
@@ -139,6 +150,7 @@ class ContentSource(str, Enum):
 
 class ValidationScope(str, Enum):
     """Scope of validation to be performed."""
+
     BASIC = "basic"
     STANDARD = "standard"
     COMPREHENSIVE = "comprehensive"
@@ -148,15 +160,17 @@ class ValidationScope(str, Enum):
 
 class AgeGroup(str, Enum):
     """Age groups for content appropriateness."""
-    CHILD = "child"          # Under 13
-    TEEN = "teen"            # 13-17
+
+    CHILD = "child"  # Under 13
+    TEEN = "teen"  # 13-17
     YOUNG_ADULT = "young_adult"  # 18-25
-    ADULT = "adult"          # 26-64
-    SENIOR = "senior"        # 65+
+    ADULT = "adult"  # 26-64
+    SENIOR = "senior"  # 65+
 
 
 class MaturityLevel(IntEnum):
     """Content maturity levels."""
+
     ALL_AGES = 0
     TEEN = 1
     MATURE_TEEN = 2
@@ -166,6 +180,7 @@ class MaturityLevel(IntEnum):
 
 class TherapeuticGoalCategory(str, Enum):
     """Categories of therapeutic goals."""
+
     ANXIETY_MANAGEMENT = "anxiety_management"
     DEPRESSION_SUPPORT = "depression_support"
     TRAUMA_RECOVERY = "trauma_recovery"
@@ -185,6 +200,7 @@ class TherapeuticGoalCategory(str, Enum):
 
 class InterventionType(str, Enum):
     """Types of therapeutic interventions."""
+
     IMMEDIATE = "immediate"
     SCHEDULED = "scheduled"
     PREVENTIVE = "preventive"
@@ -196,6 +212,7 @@ class InterventionType(str, Enum):
 
 class ValidationComponent(str, Enum):
     """Components involved in validation pipeline."""
+
     CONTENT_SAFETY = "content_safety"
     CRISIS_DETECTION = "crisis_detection"
     BIAS_DETECTION = "bias_detection"

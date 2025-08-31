@@ -1,31 +1,33 @@
-import os
-import time
 import json
+import os
 import tempfile
-import pytest
+import time
 
+import pytest
 from starlette.testclient import TestClient
 
-from src.components.agent_orchestration_component import AgentOrchestrationComponent
 from src.agent_orchestration.tools.policy_config import redact_policy_config_dict
+from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_policy_snapshot_and_redaction(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8620,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.tools": {
-            "redis_key_prefix": "ao",
-            "cache_ttl_s": 0.5,
-            "cache_max_items": 16,
-            "allowed_callables": [],
-            "max_schema_depth": 5,
-        },
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8620,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.tools": {
+                "redis_key_prefix": "ao",
+                "cache_ttl_s": 0.5,
+                "cache_max_items": 16,
+                "allowed_callables": [],
+                "max_schema_depth": 5,
+            },
+        }
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     client = TestClient(app)
@@ -53,22 +55,27 @@ async def test_manual_reload_and_status(redis_client, monkeypatch):
     fd, path = tempfile.mkstemp(suffix=".json")
     os.close(fd)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({
-            "allow_network_tools": False,
-            "allow_filesystem_tools": False,
-            "callable_allowlist": [],
-            "default_timeout_ms": 111
-        }, f)
+        json.dump(
+            {
+                "allow_network_tools": False,
+                "allow_filesystem_tools": False,
+                "callable_allowlist": [],
+                "default_timeout_ms": 111,
+            },
+            f,
+        )
     monkeypatch.setenv("TTA_TOOL_POLICY_CONFIG", path)
 
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8621,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.diagnostics.admin_api_key": "adminkey",
-        "agent_orchestration.tools": {"redis_key_prefix": "ao"},
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8621,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.diagnostics.admin_api_key": "adminkey",
+            "agent_orchestration.tools": {"redis_key_prefix": "ao"},
+        }
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     client = TestClient(app)
@@ -79,12 +86,15 @@ async def test_manual_reload_and_status(redis_client, monkeypatch):
 
     # Change file and trigger manual reload
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({
-            "allow_network_tools": True,
-            "allow_filesystem_tools": True,
-            "callable_allowlist": ["x.y.z"],
-            "default_timeout_ms": 222
-        }, f)
+        json.dump(
+            {
+                "allow_network_tools": True,
+                "allow_filesystem_tools": True,
+                "callable_allowlist": ["x.y.z"],
+                "default_timeout_ms": 222,
+            },
+            f,
+        )
     os.utime(path, None)
 
     r = client.post("/policy/reload", headers={"X-AO-DIAG-KEY": "adminkey"}).json()
@@ -103,33 +113,41 @@ async def test_live_reload_applies_and_rollback(redis_client, monkeypatch):
     fd, path = tempfile.mkstemp(suffix=".json")
     os.close(fd)
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({
-            "allow_network_tools": False,
-            "allow_filesystem_tools": False,
-            "callable_allowlist": [],
-        }, f)
+        json.dump(
+            {
+                "allow_network_tools": False,
+                "allow_filesystem_tools": False,
+                "callable_allowlist": [],
+            },
+            f,
+        )
     monkeypatch.setenv("TTA_TOOL_POLICY_CONFIG", path)
 
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8622,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.diagnostics.policy_live_reload_enabled": True,
-        "agent_orchestration.diagnostics.policy_live_reload_interval_s": 0.2,
-        "agent_orchestration.tools": {"redis_key_prefix": "ao"},
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8622,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.diagnostics.policy_live_reload_enabled": True,
+            "agent_orchestration.diagnostics.policy_live_reload_interval_s": 0.2,
+            "agent_orchestration.tools": {"redis_key_prefix": "ao"},
+        }
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     client = TestClient(app)
 
     # Update to a valid config and wait for watcher
     with open(path, "w", encoding="utf-8") as f:
-        json.dump({
-            "allow_network_tools": True,
-            "allow_filesystem_tools": False,
-            "callable_allowlist": [],
-        }, f)
+        json.dump(
+            {
+                "allow_network_tools": True,
+                "allow_filesystem_tools": False,
+                "callable_allowlist": [],
+            },
+            f,
+        )
     os.utime(path, None)
     time.sleep(0.6)  # allow 3x interval
 
@@ -148,4 +166,3 @@ async def test_live_reload_applies_and_rollback(redis_client, monkeypatch):
     # audit should include an error entry
     audit = snap2.get("reload_audit", [])
     assert any((not e.get("ok") and e.get("source") == path) for e in audit)
-

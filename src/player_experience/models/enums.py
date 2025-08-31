@@ -2,11 +2,12 @@
 Enumerations used throughout the Player Experience Interface.
 """
 
-from enum import Enum, auto
+from enum import Enum
 
 
 class IntensityLevel(Enum):
     """Therapeutic intensity levels for personalized experiences."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -14,6 +15,7 @@ class IntensityLevel(Enum):
 
 class TherapeuticApproach(Enum):
     """Available therapeutic approaches in the system."""
+
     CBT = "cognitive_behavioral_therapy"
     NARRATIVE_THERAPY = "narrative_therapy"
     MINDFULNESS = "mindfulness"
@@ -28,6 +30,7 @@ class TherapeuticApproach(Enum):
 
 class DifficultyLevel(Enum):
     """Difficulty levels for worlds and therapeutic content."""
+
     BEGINNER = "beginner"
     INTERMEDIATE = "intermediate"
     ADVANCED = "advanced"
@@ -36,6 +39,7 @@ class DifficultyLevel(Enum):
 
 class CrisisType(Enum):
     """Types of crisis situations that may require intervention."""
+
     SUICIDAL_IDEATION = "suicidal_ideation"
     SELF_HARM = "self_harm"
     PANIC_ATTACK = "panic_attack"
@@ -47,6 +51,7 @@ class CrisisType(Enum):
 
 class SessionStatus(Enum):
     """Status of therapeutic sessions."""
+
     ACTIVE = "active"
     PAUSED = "paused"
     COMPLETED = "completed"
@@ -55,6 +60,7 @@ class SessionStatus(Enum):
 
 class ProgressMarkerType(Enum):
     """Types of progress markers for tracking therapeutic advancement."""
+
     MILESTONE = "milestone"
     BREAKTHROUGH = "breakthrough"
     SKILL_ACQUIRED = "skill_acquired"

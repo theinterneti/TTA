@@ -1,21 +1,24 @@
 """
 Tests for WebSocket Chat Interface Backend (Task 8).
 """
+
 from __future__ import annotations
 
 import json
+
 import pytest
 from fastapi.testclient import TestClient
 from jose import jwt
 
 from src.player_experience.api.app import create_app
-from src.player_experience.api.auth import SECRET_KEY, ALGORITHM
+from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 
 
 @pytest.fixture
 def client() -> TestClient:
     import src.player_experience.api.config as config_module
+
     config_module.settings = TestingSettings()
     app = create_app()
     return TestClient(app)
@@ -70,4 +73,3 @@ def test_feedback_processing_ack(client: TestClient) -> None:
         note = json.loads(ws.receive_text())
         assert note["role"] == "system"
         assert "Feedback processed" in note["content"]["text"]
-

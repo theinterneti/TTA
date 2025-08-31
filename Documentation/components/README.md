@@ -131,11 +131,11 @@ from src.orchestration.component import Component, ComponentStatus
 class MyComponent(Component):
     def __init__(self, config):
         super().__init__(config, name="my_component", dependencies=["neo4j"])
-    
+
     def _start_impl(self) -> bool:
         # Implement component-specific start logic
         return True
-    
+
     def _stop_impl(self) -> bool:
         # Implement component-specific stop logic
         return True

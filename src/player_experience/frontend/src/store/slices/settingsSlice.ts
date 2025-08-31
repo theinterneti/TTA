@@ -1,8 +1,8 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { settingsAPI } from '../../services/api';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { settingsAPI } from "../../services/api";
 
 interface TherapeuticSettings {
-  intensity_level: 'LOW' | 'MEDIUM' | 'HIGH';
+  intensity_level: "LOW" | "MEDIUM" | "HIGH";
   preferred_approaches: string[];
   trigger_warnings: string[];
   comfort_topics: string[];
@@ -51,7 +51,7 @@ interface SettingsState {
 
 const initialState: SettingsState = {
   therapeutic: {
-    intensity_level: 'MEDIUM',
+    intensity_level: "MEDIUM",
     preferred_approaches: [],
     trigger_warnings: [],
     comfort_topics: [],
@@ -85,7 +85,7 @@ const initialState: SettingsState = {
 };
 
 export const fetchSettings = createAsyncThunk(
-  'settings/fetchSettings',
+  "settings/fetchSettings",
   async (playerId: string) => {
     const response = await settingsAPI.getSettings(playerId);
     return response;
@@ -93,23 +93,41 @@ export const fetchSettings = createAsyncThunk(
 );
 
 export const updateTherapeuticSettings = createAsyncThunk(
-  'settings/updateTherapeutic',
-  async ({ playerId, settings }: { playerId: string; settings: Partial<TherapeuticSettings> }) => {
-    const response = await settingsAPI.updateTherapeuticSettings(playerId, settings);
+  "settings/updateTherapeutic",
+  async ({
+    playerId,
+    settings,
+  }: {
+    playerId: string;
+    settings: Partial<TherapeuticSettings>;
+  }) => {
+    const response = await settingsAPI.updateTherapeuticSettings(
+      playerId,
+      settings
+    );
     return response;
   }
 );
 
 export const updatePrivacySettings = createAsyncThunk(
-  'settings/updatePrivacy',
-  async ({ playerId, settings }: { playerId: string; settings: Partial<PrivacySettings> }) => {
-    const response = await settingsAPI.updatePrivacySettings(playerId, settings);
+  "settings/updatePrivacy",
+  async ({
+    playerId,
+    settings,
+  }: {
+    playerId: string;
+    settings: Partial<PrivacySettings>;
+  }) => {
+    const response = await settingsAPI.updatePrivacySettings(
+      playerId,
+      settings
+    );
     return response;
   }
 );
 
 export const exportPlayerData = createAsyncThunk(
-  'settings/exportData',
+  "settings/exportData",
   async (playerId: string) => {
     const response = await settingsAPI.exportPlayerData(playerId);
     return response;
@@ -117,7 +135,7 @@ export const exportPlayerData = createAsyncThunk(
 );
 
 export const deletePlayerData = createAsyncThunk(
-  'settings/deleteData',
+  "settings/deleteData",
   async (playerId: string) => {
     const response = await settingsAPI.deletePlayerData(playerId);
     return response;
@@ -125,25 +143,37 @@ export const deletePlayerData = createAsyncThunk(
 );
 
 const settingsSlice = createSlice({
-  name: 'settings',
+  name: "settings",
   initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
-    updateTherapeuticLocal: (state, action: PayloadAction<Partial<TherapeuticSettings>>) => {
+    updateTherapeuticLocal: (
+      state,
+      action: PayloadAction<Partial<TherapeuticSettings>>
+    ) => {
       state.therapeutic = { ...state.therapeutic, ...action.payload };
       state.hasUnsavedChanges = true;
     },
-    updatePrivacyLocal: (state, action: PayloadAction<Partial<PrivacySettings>>) => {
+    updatePrivacyLocal: (
+      state,
+      action: PayloadAction<Partial<PrivacySettings>>
+    ) => {
       state.privacy = { ...state.privacy, ...action.payload };
       state.hasUnsavedChanges = true;
     },
-    updateNotificationsLocal: (state, action: PayloadAction<Partial<NotificationSettings>>) => {
+    updateNotificationsLocal: (
+      state,
+      action: PayloadAction<Partial<NotificationSettings>>
+    ) => {
       state.notifications = { ...state.notifications, ...action.payload };
       state.hasUnsavedChanges = true;
     },
-    updateAccessibilityLocal: (state, action: PayloadAction<Partial<AccessibilitySettings>>) => {
+    updateAccessibilityLocal: (
+      state,
+      action: PayloadAction<Partial<AccessibilitySettings>>
+    ) => {
       state.accessibility = { ...state.accessibility, ...action.payload };
       state.hasUnsavedChanges = true;
     },
@@ -151,7 +181,11 @@ const settingsSlice = createSlice({
       state.hasUnsavedChanges = false;
     },
     resetToDefaults: (state) => {
-      return { ...initialState, isLoading: state.isLoading, error: state.error };
+      return {
+        ...initialState,
+        isLoading: state.isLoading,
+        error: state.error,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -162,22 +196,23 @@ const settingsSlice = createSlice({
       })
       .addCase(fetchSettings.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.therapeutic = action.payload.therapeutic;
-        state.privacy = action.payload.privacy;
-        state.notifications = action.payload.notifications;
-        state.accessibility = action.payload.accessibility;
+        const payload = action.payload as any;
+        state.therapeutic = payload.therapeutic;
+        state.privacy = payload.privacy;
+        state.notifications = payload.notifications;
+        state.accessibility = payload.accessibility;
         state.hasUnsavedChanges = false;
       })
       .addCase(fetchSettings.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch settings';
+        state.error = action.error.message || "Failed to fetch settings";
       })
       .addCase(updateTherapeuticSettings.fulfilled, (state, action) => {
-        state.therapeutic = action.payload;
+        state.therapeutic = action.payload as any;
         state.hasUnsavedChanges = false;
       })
       .addCase(updatePrivacySettings.fulfilled, (state, action) => {
-        state.privacy = action.payload;
+        state.privacy = action.payload as any;
         state.hasUnsavedChanges = false;
       });
   },

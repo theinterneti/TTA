@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { RootState } from '../store/store';
-import { verifyToken, clearAuth } from '../store/slices/authSlice';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { clearAuth, verifyToken } from "../store/slices/authSlice";
+import { RootState } from "../store/store";
 
 interface AuthGuardOptions {
   requiredRole?: string;
@@ -25,26 +25,28 @@ interface AuthGuardResult {
 
 /**
  * useAuthGuard Hook
- * 
+ *
  * Provides authentication and authorization utilities for components.
  * Automatically handles token verification and permission checking.
  */
-export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult => {
+export const useAuthGuard = (
+  options: AuthGuardOptions = {}
+): AuthGuardResult => {
   const {
     requiredRole,
     requiredPermissions = [],
-    redirectTo = '/auth/login',
+    redirectTo = "/auth/login",
     autoRedirect = true,
   } = options;
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const { isAuthenticated, user, accessToken, isLoading } = useSelector(
     (state: RootState) => state.auth
   );
-  
+
   const [isVerifying, setIsVerifying] = useState(false);
 
   // Verify token on mount if we have one but no user data
@@ -55,11 +57,11 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
         try {
           await dispatch(verifyToken() as any);
         } catch (error) {
-          console.error('Token verification failed:', error);
+          console.error("Token verification failed:", error);
           if (autoRedirect) {
-            navigate(redirectTo, { 
+            navigate(redirectTo, {
               state: { from: location.pathname },
-              replace: true 
+              replace: true,
             });
           }
         } finally {
@@ -69,7 +71,16 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
     };
 
     verifyAuthentication();
-  }, [dispatch, accessToken, user, isLoading, navigate, redirectTo, location.pathname, autoRedirect]);
+  }, [
+    dispatch,
+    accessToken,
+    user,
+    isLoading,
+    navigate,
+    redirectTo,
+    location.pathname,
+    autoRedirect,
+  ]);
 
   // Check if user has specific role
   const hasRole = (role: string): boolean => {
@@ -84,13 +95,17 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
   // Check if user has any of the specified permissions
   const hasAnyPermission = (permissions: string[]): boolean => {
     if (!user?.permissions) return false;
-    return permissions.some(permission => user.permissions.includes(permission));
+    return permissions.some((permission) =>
+      user.permissions!.includes(permission)
+    );
   };
 
   // Check if user has all of the specified permissions
   const hasAllPermissions = (permissions: string[]): boolean => {
     if (!user?.permissions) return false;
-    return permissions.every(permission => user.permissions.includes(permission));
+    return permissions.every((permission) =>
+      user.permissions!.includes(permission)
+    );
   };
 
   // Logout function
@@ -104,17 +119,20 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
   // Check authorization based on requirements
   const isAuthorized = (() => {
     if (!isAuthenticated) return false;
-    
+
     // Check role requirement
     if (requiredRole && !hasRole(requiredRole)) {
       return false;
     }
-    
+
     // Check permission requirements
-    if (requiredPermissions.length > 0 && !hasAllPermissions(requiredPermissions)) {
+    if (
+      requiredPermissions.length > 0 &&
+      !hasAllPermissions(requiredPermissions)
+    ) {
       return false;
     }
-    
+
     return true;
   })();
 
@@ -122,15 +140,24 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
   useEffect(() => {
     if (!isLoading && !isVerifying && autoRedirect) {
       if (!isAuthenticated) {
-        navigate(redirectTo, { 
+        navigate(redirectTo, {
           state: { from: location.pathname },
-          replace: true 
+          replace: true,
         });
       } else if (!isAuthorized) {
-        navigate('/unauthorized', { replace: true });
+        navigate("/unauthorized", { replace: true });
       }
     }
-  }, [isAuthenticated, isAuthorized, isLoading, isVerifying, autoRedirect, navigate, redirectTo, location.pathname]);
+  }, [
+    isAuthenticated,
+    isAuthorized,
+    isLoading,
+    isVerifying,
+    autoRedirect,
+    navigate,
+    redirectTo,
+    location.pathname,
+  ]);
 
   return {
     isAuthenticated,
@@ -147,34 +174,44 @@ export const useAuthGuard = (options: AuthGuardOptions = {}): AuthGuardResult =>
 
 /**
  * useRequireAuth Hook
- * 
+ *
  * Simplified hook that requires authentication and redirects if not authenticated.
  */
-export const useRequireAuth = (redirectTo: string = '/auth/login') => {
+export const useRequireAuth = (redirectTo: string = "/auth/login") => {
   return useAuthGuard({ autoRedirect: true, redirectTo });
 };
 
 /**
  * useRequireRole Hook
- * 
+ *
  * Hook that requires a specific role and redirects if not authorized.
  */
-export const useRequireRole = (role: string, redirectTo: string = '/auth/login') => {
+export const useRequireRole = (
+  role: string,
+  redirectTo: string = "/auth/login"
+) => {
   return useAuthGuard({ requiredRole: role, autoRedirect: true, redirectTo });
 };
 
 /**
  * useRequirePermissions Hook
- * 
+ *
  * Hook that requires specific permissions and redirects if not authorized.
  */
-export const useRequirePermissions = (permissions: string[], redirectTo: string = '/auth/login') => {
-  return useAuthGuard({ requiredPermissions: permissions, autoRedirect: true, redirectTo });
+export const useRequirePermissions = (
+  permissions: string[],
+  redirectTo: string = "/auth/login"
+) => {
+  return useAuthGuard({
+    requiredPermissions: permissions,
+    autoRedirect: true,
+    redirectTo,
+  });
 };
 
 /**
  * useOptionalAuth Hook
- * 
+ *
  * Hook that provides auth state without automatic redirects.
  */
 export const useOptionalAuth = () => {

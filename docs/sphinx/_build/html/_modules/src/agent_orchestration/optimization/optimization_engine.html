@@ -1,0 +1,682 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.optimization.optimization_engine &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.optimization.optimization_engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.optimization.optimization_engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Optimization algorithm engine for agent orchestration performance tuning.</span>
+
+<span class="sd">This module provides adaptive algorithms that automatically adjust system</span>
+<span class="sd">parameters based on performance metrics to optimize response times.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.response_time_monitor</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ResponseTimeCategory</span><span class="p">,</span>
+    <span class="n">ResponseTimeCollector</span><span class="p">,</span>
+    <span class="n">ResponseTimeStats</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OptimizationStrategy">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Available optimization strategies.&quot;&quot;&quot;</span>
+
+    <span class="n">CONSERVATIVE</span> <span class="o">=</span> <span class="s2">&quot;conservative&quot;</span>  <span class="c1"># Small, safe adjustments</span>
+    <span class="n">AGGRESSIVE</span> <span class="o">=</span> <span class="s2">&quot;aggressive&quot;</span>  <span class="c1"># Larger adjustments for faster optimization</span>
+    <span class="n">ADAPTIVE</span> <span class="o">=</span> <span class="s2">&quot;adaptive&quot;</span>  <span class="c1"># Adjusts strategy based on results</span>
+    <span class="n">STATISTICAL</span> <span class="o">=</span> <span class="s2">&quot;statistical&quot;</span>  <span class="c1"># Uses statistical analysis for decisions</span></div>
+
+
+
+<div class="viewcode-block" id="OptimizationTarget">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationTarget">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationTarget</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Optimization targets.&quot;&quot;&quot;</span>
+
+    <span class="n">RESPONSE_TIME</span> <span class="o">=</span> <span class="s2">&quot;response_time&quot;</span>
+    <span class="n">THROUGHPUT</span> <span class="o">=</span> <span class="s2">&quot;throughput&quot;</span>
+    <span class="n">SUCCESS_RATE</span> <span class="o">=</span> <span class="s2">&quot;success_rate&quot;</span>
+    <span class="n">RESOURCE_UTILIZATION</span> <span class="o">=</span> <span class="s2">&quot;resource_utilization&quot;</span>
+    <span class="n">COST_EFFICIENCY</span> <span class="o">=</span> <span class="s2">&quot;cost_efficiency&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="OptimizationParameter">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationParameter">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationParameter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a system parameter that can be optimized.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">current_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">min_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">max_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">parameter_type</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &#39;int&#39;, &#39;float&#39;, &#39;bool&#39;</span>
+    <span class="n">component</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># Which component owns this parameter</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">last_adjusted</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">adjustment_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="OptimizationParameter.adjust">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationParameter.adjust">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adjust</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adjust parameter value within bounds.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_type</span> <span class="o">==</span> <span class="s2">&quot;int&quot;</span><span class="p">:</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">,</span> <span class="n">new_value</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">+</span> <span class="n">delta</span><span class="p">)</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_value</span><span class="p">,</span> <span class="n">new_value</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">=</span> <span class="n">new_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_adjusted</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">new_value</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OptimizationResult">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of an optimization attempt.&quot;&quot;&quot;</span>
+
+    <span class="n">optimization_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">parameter_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">old_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">new_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">OptimizationStrategy</span>
+    <span class="n">target</span><span class="p">:</span> <span class="n">OptimizationTarget</span>
+    <span class="n">improvement_expected</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">confidence_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OptimizationAlgorithm">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationAlgorithm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationAlgorithm</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base class for optimization algorithms.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="OptimizationAlgorithm.analyze_performance">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationAlgorithm.analyze_performance">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyze_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ResponseTimeStats</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptimizationParameter</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze performance and suggest parameter adjustments.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="OptimizationAlgorithm.get_strategy">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationAlgorithm.get_strategy">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the optimization strategy.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ConservativeOptimizer">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.ConservativeOptimizer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConservativeOptimizer</span><span class="p">(</span><span class="n">OptimizationAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Conservative optimization algorithm with small, safe adjustments.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adjustment_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_factor</span> <span class="o">=</span> <span class="n">adjustment_factor</span>
+
+<div class="viewcode-block" id="ConservativeOptimizer.get_strategy">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.ConservativeOptimizer.get_strategy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationStrategy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">CONSERVATIVE</span></div>
+
+
+<div class="viewcode-block" id="ConservativeOptimizer.analyze_performance">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.ConservativeOptimizer.analyze_performance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyze_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ResponseTimeStats</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptimizationParameter</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Conservative analysis focusing on gradual improvements.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Analyze message processing performance</span>
+        <span class="n">message_stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">category</span> <span class="o">==</span> <span class="n">ResponseTimeCategory</span><span class="o">.</span><span class="n">MESSAGE_PROCESSING</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">stat_key</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">message_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># If P95 response time is high, suggest reducing queue size or increasing timeout</span>
+            <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">p95_duration</span> <span class="o">&gt;</span> <span class="mf">5.0</span><span class="p">:</span>  <span class="c1"># 5 seconds threshold</span>
+                <span class="c1"># Look for queue size parameter</span>
+                <span class="n">queue_param</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;message_queue_size&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">queue_param</span> <span class="ow">and</span> <span class="n">queue_param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">&gt;</span> <span class="n">queue_param</span><span class="o">.</span><span class="n">min_value</span><span class="p">:</span>
+                    <span class="n">adjustment</span> <span class="o">=</span> <span class="o">-</span><span class="nb">max</span><span class="p">(</span>
+                        <span class="mi">1</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">queue_param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_factor</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">OptimizationResult</span><span class="p">(</span>
+                        <span class="n">optimization_id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+                        <span class="n">parameter_name</span><span class="o">=</span><span class="s2">&quot;message_queue_size&quot;</span><span class="p">,</span>
+                        <span class="n">old_value</span><span class="o">=</span><span class="n">queue_param</span><span class="o">.</span><span class="n">current_value</span><span class="p">,</span>
+                        <span class="n">new_value</span><span class="o">=</span><span class="n">queue_param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">+</span> <span class="n">adjustment</span><span class="p">,</span>
+                        <span class="n">strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(),</span>
+                        <span class="n">target</span><span class="o">=</span><span class="n">OptimizationTarget</span><span class="o">.</span><span class="n">RESPONSE_TIME</span><span class="p">,</span>
+                        <span class="n">improvement_expected</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>  <span class="c1"># 10% improvement expected</span>
+                        <span class="n">confidence_score</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;High P95 response time in message processing&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;current_p95&quot;</span><span class="p">:</span> <span class="n">stat</span><span class="o">.</span><span class="n">p95_duration</span><span class="p">,</span>
+                            <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AggressiveOptimizer">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.AggressiveOptimizer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AggressiveOptimizer</span><span class="p">(</span><span class="n">OptimizationAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggressive optimization algorithm with larger adjustments.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">adjustment_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.25</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_factor</span> <span class="o">=</span> <span class="n">adjustment_factor</span>
+
+<div class="viewcode-block" id="AggressiveOptimizer.get_strategy">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.AggressiveOptimizer.get_strategy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationStrategy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">AGGRESSIVE</span></div>
+
+
+<div class="viewcode-block" id="AggressiveOptimizer.analyze_performance">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.AggressiveOptimizer.analyze_performance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyze_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ResponseTimeStats</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptimizationParameter</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Aggressive analysis with larger parameter adjustments.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># More aggressive timeout adjustments</span>
+        <span class="k">for</span> <span class="n">stat_key</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.9</span><span class="p">:</span>  <span class="c1"># Less than 90% success rate</span>
+                <span class="c1"># Increase timeout parameters</span>
+                <span class="n">timeout_params</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="s2">&quot;timeout&quot;</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">timeout_params</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">&lt;</span> <span class="n">param</span><span class="o">.</span><span class="n">max_value</span><span class="p">:</span>
+                        <span class="n">adjustment</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                            <span class="n">param</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span>
+                            <span class="n">param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_factor</span><span class="p">,</span>
+                        <span class="p">)</span>
+
+                        <span class="n">result</span> <span class="o">=</span> <span class="n">OptimizationResult</span><span class="p">(</span>
+                            <span class="n">optimization_id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+                            <span class="n">parameter_name</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                            <span class="n">old_value</span><span class="o">=</span><span class="n">param</span><span class="o">.</span><span class="n">current_value</span><span class="p">,</span>
+                            <span class="n">new_value</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span>
+                                <span class="n">param</span><span class="o">.</span><span class="n">max_value</span><span class="p">,</span> <span class="n">param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">+</span> <span class="n">adjustment</span>
+                            <span class="p">),</span>
+                            <span class="n">strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(),</span>
+                            <span class="n">target</span><span class="o">=</span><span class="n">OptimizationTarget</span><span class="o">.</span><span class="n">SUCCESS_RATE</span><span class="p">,</span>
+                            <span class="n">improvement_expected</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>  <span class="c1"># 20% improvement expected</span>
+                            <span class="n">confidence_score</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+                            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                                <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Low success rate detected&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;current_success_rate&quot;</span><span class="p">:</span> <span class="n">stat</span><span class="o">.</span><span class="n">success_rate</span><span class="p">,</span>
+                                <span class="s2">&quot;threshold&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+                            <span class="p">},</span>
+                        <span class="p">)</span>
+                        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StatisticalOptimizer">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.StatisticalOptimizer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StatisticalOptimizer</span><span class="p">(</span><span class="n">OptimizationAlgorithm</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Statistical optimization algorithm using data analysis.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">min_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span> <span class="n">confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_samples</span> <span class="o">=</span> <span class="n">min_samples</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">confidence_threshold</span> <span class="o">=</span> <span class="n">confidence_threshold</span>
+
+<div class="viewcode-block" id="StatisticalOptimizer.get_strategy">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.StatisticalOptimizer.get_strategy">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_strategy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OptimizationStrategy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">STATISTICAL</span></div>
+
+
+<div class="viewcode-block" id="StatisticalOptimizer.analyze_performance">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.StatisticalOptimizer.analyze_performance">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">analyze_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stats</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ResponseTimeStats</span><span class="p">],</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptimizationParameter</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Statistical analysis based on data trends.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Only make suggestions if we have enough data</span>
+        <span class="n">high_confidence_stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">stats</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">sample_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_samples</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">stat_key</span><span class="p">,</span> <span class="n">stat</span> <span class="ow">in</span> <span class="n">high_confidence_stats</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Calculate coefficient of variation (CV) to assess consistency</span>
+            <span class="n">cv</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">stat</span><span class="o">.</span><span class="n">p95_duration</span> <span class="o">-</span> <span class="n">stat</span><span class="o">.</span><span class="n">median_duration</span><span class="p">)</span> <span class="o">/</span> <span class="n">stat</span><span class="o">.</span><span class="n">median_duration</span>
+                <span class="k">if</span> <span class="n">stat</span><span class="o">.</span><span class="n">median_duration</span> <span class="o">&gt;</span> <span class="mi">0</span>
+                <span class="k">else</span> <span class="mi">0</span>
+            <span class="p">)</span>
+
+            <span class="c1"># High variability suggests need for optimization</span>
+            <span class="k">if</span> <span class="n">cv</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>  <span class="c1"># High variability threshold</span>
+                <span class="c1"># Suggest heartbeat interval adjustment for better monitoring</span>
+                <span class="n">heartbeat_param</span> <span class="o">=</span> <span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;heartbeat_interval&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">heartbeat_param</span><span class="p">:</span>
+                    <span class="c1"># Reduce heartbeat interval for better monitoring</span>
+                    <span class="n">adjustment</span> <span class="o">=</span> <span class="o">-</span><span class="nb">max</span><span class="p">(</span>
+                        <span class="n">heartbeat_param</span><span class="o">.</span><span class="n">step_size</span><span class="p">,</span> <span class="n">heartbeat_param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">*</span> <span class="mf">0.1</span>
+                    <span class="p">)</span>
+
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">OptimizationResult</span><span class="p">(</span>
+                        <span class="n">optimization_id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">,</span>
+                        <span class="n">parameter_name</span><span class="o">=</span><span class="s2">&quot;heartbeat_interval&quot;</span><span class="p">,</span>
+                        <span class="n">old_value</span><span class="o">=</span><span class="n">heartbeat_param</span><span class="o">.</span><span class="n">current_value</span><span class="p">,</span>
+                        <span class="n">new_value</span><span class="o">=</span><span class="nb">max</span><span class="p">(</span>
+                            <span class="n">heartbeat_param</span><span class="o">.</span><span class="n">min_value</span><span class="p">,</span>
+                            <span class="n">heartbeat_param</span><span class="o">.</span><span class="n">current_value</span> <span class="o">+</span> <span class="n">adjustment</span><span class="p">,</span>
+                        <span class="p">),</span>
+                        <span class="n">strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_strategy</span><span class="p">(),</span>
+                        <span class="n">target</span><span class="o">=</span><span class="n">OptimizationTarget</span><span class="o">.</span><span class="n">RESPONSE_TIME</span><span class="p">,</span>
+                        <span class="n">improvement_expected</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+                        <span class="n">confidence_score</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">stat</span><span class="o">.</span><span class="n">sample_count</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">),</span>
+                        <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;High response time variability detected&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;coefficient_of_variation&quot;</span><span class="p">:</span> <span class="n">cv</span><span class="p">,</span>
+                            <span class="s2">&quot;sample_count&quot;</span><span class="p">:</span> <span class="n">stat</span><span class="o">.</span><span class="n">sample_count</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="OptimizationEngine">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OptimizationEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main optimization engine that coordinates different algorithms.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">response_time_collector</span><span class="p">:</span> <span class="n">ResponseTimeCollector</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>  <span class="c1"># 5 minutes</span>
+        <span class="n">enabled_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationStrategy</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_adjustments_per_cycle</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">response_time_collector</span> <span class="o">=</span> <span class="n">response_time_collector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span> <span class="o">=</span> <span class="n">event_publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_interval</span> <span class="o">=</span> <span class="n">optimization_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustments_per_cycle</span> <span class="o">=</span> <span class="n">max_adjustments_per_cycle</span>
+
+        <span class="c1"># Available optimization algorithms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithms</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">OptimizationStrategy</span><span class="p">,</span> <span class="n">OptimizationAlgorithm</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">CONSERVATIVE</span><span class="p">:</span> <span class="n">ConservativeOptimizer</span><span class="p">(),</span>
+            <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">AGGRESSIVE</span><span class="p">:</span> <span class="n">AggressiveOptimizer</span><span class="p">(),</span>
+            <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">STATISTICAL</span><span class="p">:</span> <span class="n">StatisticalOptimizer</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Enabled strategies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled_strategies</span> <span class="o">=</span> <span class="n">enabled_strategies</span> <span class="ow">or</span> <span class="p">[</span>
+            <span class="n">OptimizationStrategy</span><span class="o">.</span><span class="n">CONSERVATIVE</span>
+        <span class="p">]</span>
+
+        <span class="c1"># System parameters that can be optimized</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OptimizationParameter</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Optimization history</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Component callbacks for parameter updates</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameter_callbacks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimization_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;OptimizationEngine initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OptimizationEngine.start">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine.start">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the optimization engine.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_optimization_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_optimization_loop</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;OptimizationEngine started&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OptimizationEngine.stop">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine.stop">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the optimization engine.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimization_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_optimization_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_optimization_task</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;OptimizationEngine stopped&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OptimizationEngine.register_parameter">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine.register_parameter">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_parameter</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">current_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">min_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">max_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">parameter_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">component</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a parameter for optimization.&quot;&quot;&quot;</span>
+        <span class="n">parameter</span> <span class="o">=</span> <span class="n">OptimizationParameter</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">current_value</span><span class="o">=</span><span class="n">current_value</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="n">min_value</span><span class="p">,</span>
+            <span class="n">max_value</span><span class="o">=</span><span class="n">max_value</span><span class="p">,</span>
+            <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span>
+            <span class="n">parameter_type</span><span class="o">=</span><span class="n">parameter_type</span><span class="p">,</span>
+            <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">parameter</span>
+
+        <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">parameter_callbacks</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">callback</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Registered optimization parameter: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OptimizationEngine.run_optimization_cycle">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine.run_optimization_cycle">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run_optimization_cycle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">OptimizationResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Run a single optimization cycle.&quot;&quot;&quot;</span>
+        <span class="c1"># Get current performance statistics</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_time_collector</span><span class="o">.</span><span class="n">get_all_stats</span><span class="p">(</span><span class="n">force_refresh</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">stats</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No performance statistics available for optimization&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Run enabled optimization algorithms</span>
+        <span class="n">all_results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled_strategies</span><span class="p">:</span>
+            <span class="n">algorithm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">algorithm</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">algorithm</span><span class="o">.</span><span class="n">analyze_performance</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">)</span>
+                    <span class="n">all_results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in </span><span class="si">{</span><span class="n">strategy</span><span class="si">}</span><span class="s2"> optimization algorithm: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Sort results by confidence score and limit adjustments</span>
+        <span class="n">all_results</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">confidence_score</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">selected_results</span> <span class="o">=</span> <span class="n">all_results</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustments_per_cycle</span><span class="p">]</span>
+
+        <span class="c1"># Apply optimizations</span>
+        <span class="n">applied_results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">selected_results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_optimization</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+                <span class="n">applied_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optimization_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Applied </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">applied_results</span><span class="p">)</span><span class="si">}</span><span class="s2"> optimizations out of </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">all_results</span><span class="p">)</span><span class="si">}</span><span class="s2"> suggestions&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">applied_results</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_optimization</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">result</span><span class="p">:</span> <span class="n">OptimizationResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply an optimization result.&quot;&quot;&quot;</span>
+        <span class="n">parameter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parameter</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parameter not found: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Apply the parameter adjustment</span>
+            <span class="n">old_value</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">current_value</span>
+            <span class="n">new_value</span> <span class="o">=</span> <span class="n">parameter</span><span class="o">.</span><span class="n">adjust</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">new_value</span> <span class="o">-</span> <span class="n">result</span><span class="o">.</span><span class="n">old_value</span><span class="p">)</span>
+
+            <span class="c1"># Call component callback if available</span>
+            <span class="n">callback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parameter_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">callback</span><span class="p">:</span>
+                <span class="n">callback</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
+
+            <span class="c1"># Publish optimization event</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_optimization_event</span><span class="p">(</span>
+                    <span class="n">optimization_type</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">parameter_name</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="p">,</span>
+                    <span class="n">old_value</span><span class="o">=</span><span class="n">old_value</span><span class="p">,</span>
+                    <span class="n">new_value</span><span class="o">=</span><span class="n">new_value</span><span class="p">,</span>
+                    <span class="n">improvement_metric</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">target</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">improvement_value</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">improvement_expected</span><span class="p">,</span>
+                    <span class="n">confidence_score</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">confidence_score</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Applied optimization: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">old_value</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">new_value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to apply optimization for </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">parameter_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_optimization_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background optimization loop.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimization_interval</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_optimization_cycle</span><span class="p">()</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in optimization loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OptimizationEngine.get_statistics">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.optimization.optimization_engine.html#src.agent_orchestration.optimization.OptimizationEngine.get_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get optimization engine statistics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;is_running&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">,</span>
+            <span class="s2">&quot;enabled_strategies&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">enabled_strategies</span><span class="p">],</span>
+            <span class="s2">&quot;registered_parameters&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parameters</span><span class="p">),</span>
+            <span class="s2">&quot;optimization_history&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimization_history</span><span class="p">),</span>
+            <span class="s2">&quot;recent_optimizations&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="n">r</span>
+                    <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimization_history</span>
+                    <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">r</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;</span> <span class="mi">3600</span>
+                <span class="p">]</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;optimization_interval&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimization_interval</span><span class="p">,</span>
+                <span class="s2">&quot;max_adjustments_per_cycle&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_adjustments_per_cycle</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

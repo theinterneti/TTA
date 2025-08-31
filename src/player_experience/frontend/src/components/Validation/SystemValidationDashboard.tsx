@@ -27,19 +27,19 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
     setIsRunning(true);
     try {
       console.log('🚀 Starting comprehensive system validation...');
-      
+
       // Run system validation
       const systemReport = await validateSystem();
       setValidationReport(systemReport);
-      
+
       // Generate performance report
       const perfReport = performanceOptimizer.generateReport();
       setPerformanceReport(perfReport);
-      
+
       console.log('✅ System validation completed');
       console.log('📊 Validation Report:', systemReport);
       console.log('⚡ Performance Report:', perfReport);
-      
+
     } catch (error) {
       console.error('❌ Validation failed:', error);
     } finally {
@@ -96,7 +96,7 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
               Comprehensive end-to-end functionality and performance testing
             </p>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <button
               onClick={() => setShowDetails(!showDetails)}
@@ -104,7 +104,7 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
             >
               {showDetails ? 'Hide Details' : 'Show Details'}
             </button>
-            
+
             <button
               onClick={runValidation}
               disabled={isRunning}
@@ -150,8 +150,8 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
             {/* Overall Status */}
             {validationReport && (
               <div className={`p-6 rounded-lg border-2 ${
-                validationReport.overall_status === 'healthy' 
-                  ? 'border-green-200 bg-green-50' 
+                validationReport.overall_status === 'healthy'
+                  ? 'border-green-200 bg-green-50'
                   : validationReport.overall_status === 'degraded'
                   ? 'border-yellow-200 bg-yellow-50'
                   : 'border-red-200 bg-red-50'
@@ -163,8 +163,8 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
                     </div>
                     <div>
                       <h3 className={`text-xl font-semibold ${
-                        validationReport.overall_status === 'healthy' 
-                          ? 'text-green-800' 
+                        validationReport.overall_status === 'healthy'
+                          ? 'text-green-800'
                           : validationReport.overall_status === 'degraded'
                           ? 'text-yellow-800'
                           : 'text-red-800'
@@ -172,8 +172,8 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
                         System Status: {validationReport.overall_status.toUpperCase()}
                       </h3>
                       <p className={`text-sm ${
-                        validationReport.overall_status === 'healthy' 
-                          ? 'text-green-600' 
+                        validationReport.overall_status === 'healthy'
+                          ? 'text-green-600'
                           : validationReport.overall_status === 'degraded'
                           ? 'text-yellow-600'
                           : 'text-red-600'
@@ -184,7 +184,7 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
                       </p>
                     </div>
                   </div>
-                  
+
                   {performanceReport && (
                     <div className="text-right">
                       <div className={`text-3xl font-bold ${getScoreColor(performanceReport.score)}`}>
@@ -206,21 +206,21 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
                   </div>
                   <div className="text-sm text-blue-800">Total Tests</div>
                 </div>
-                
+
                 <div className="bg-green-50 rounded-lg p-4">
                   <div className="text-2xl font-bold text-green-600">
                     {validationReport.passed_tests}
                   </div>
                   <div className="text-sm text-green-800">Passed</div>
                 </div>
-                
+
                 <div className="bg-yellow-50 rounded-lg p-4">
                   <div className="text-2xl font-bold text-yellow-600">
                     {validationReport.warning_tests}
                   </div>
                   <div className="text-sm text-yellow-800">Warnings</div>
                 </div>
-                
+
                 <div className="bg-red-50 rounded-lg p-4">
                   <div className="text-2xl font-bold text-red-600">
                     {validationReport.failed_tests}
@@ -241,17 +241,17 @@ const SystemValidationDashboard: React.FC<SystemValidationDashboardProps> = ({
                     </div>
                     <div className="text-sm text-gray-600">FPS</div>
                   </div>
-                  
+
                   <div className="text-center">
                     <div className="text-xl font-bold text-gray-900">
-                      {performanceReport.metrics.memory_usage 
+                      {performanceReport.metrics.memory_usage
                         ? `${(performanceReport.metrics.memory_usage * 100).toFixed(1)}%`
                         : 'N/A'
                       }
                     </div>
                     <div className="text-sm text-gray-600">Memory Usage</div>
                   </div>
-                  
+
                   <div className="text-center">
                     <div className="text-xl font-bold text-gray-900">
                       {validationReport?.average_response_time || 'N/A'}ms

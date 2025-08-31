@@ -41,7 +41,7 @@ class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log the error to console and external service
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
+
     this.setState({
       error,
       errorInfo,
@@ -218,7 +218,7 @@ export const withErrorBoundary = <P extends object>(
   );
 
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 };
 

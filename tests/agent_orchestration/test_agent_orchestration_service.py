@@ -6,43 +6,47 @@ coordinate_agents, error handling, and integration with all orchestration compon
 """
 
 import asyncio
-import pytest
 import time
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from typing import Dict, Any, Optional
+from unittest.mock import AsyncMock, Mock, patch
 
+import pytest
+
+from src.agent_orchestration import (
+    AgentContext,
+    AgentId,
+    AgentType,
+    OrchestrationResponse,
+    SessionContext,
+    WorkflowType,
+)
 from src.agent_orchestration.service import (
     AgentOrchestrationService,
     ServiceError,
     TherapeuticSafetyError,
     WorkflowExecutionError,
-    SessionContextError
 )
-from src.agent_orchestration import (
-    WorkflowType, WorkflowDefinition, AgentStep, ErrorHandlingStrategy,
-    AgentType, OrchestrationRequest, OrchestrationResponse,
-    AgentContext, SessionContext, AgentId
-)
-
 
 # ============================================================================
 # Test Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 def mock_workflow_manager():
     """Mock WorkflowManager for testing."""
     manager = Mock()
     manager.register_workflow = Mock(return_value=(True, None))
-    manager.execute_workflow = Mock(return_value=(
-        OrchestrationResponse(
-            response_text="Test response",
-            updated_context={"memory": {"test": "data"}},
-            workflow_metadata={"workflow_name": "test", "run_id": "test-123"}
-        ),
-        "test-run-123",
-        None
-    ))
+    manager.execute_workflow = Mock(
+        return_value=(
+            OrchestrationResponse(
+                response_text="Test response",
+                updated_context={"memory": {"test": "data"}},
+                workflow_metadata={"workflow_name": "test", "run_id": "test-123"},
+            ),
+            "test-run-123",
+            None,
+        )
+    )
     return manager
 
 
@@ -59,7 +63,9 @@ def mock_message_coordinator():
 def mock_agent_registry():
     """Mock AgentRegistry for testing."""
     registry = Mock()
-    registry.get_agent = Mock(return_value=Mock(agent_id=AgentId(type=AgentType.IPA, instance="test")))
+    registry.get_agent = Mock(
+        return_value=Mock(agent_id=AgentId(type=AgentType.IPA, instance="test"))
+    )
     registry.all = Mock(return_value=[])
     return registry
 
@@ -68,11 +74,9 @@ def mock_agent_registry():
 def mock_therapeutic_validator():
     """Mock therapeutic validator for testing."""
     validator = Mock()
-    validator.validate_text = AsyncMock(return_value=Mock(
-        safe=True,
-        level="safe",
-        reason="Content appears safe"
-    ))
+    validator.validate_text = AsyncMock(
+        return_value=Mock(safe=True, level="safe", reason="Content appears safe")
+    )
     return validator
 
 
@@ -104,8 +108,8 @@ def sample_session_context():
             session_id="test-session-123",
             memory={"previous_interaction": "Hello"},
             world_state={"location": "forest"},
-            metadata={"test": True}
-        )
+            metadata={"test": True},
+        ),
     )
 
 
@@ -116,7 +120,7 @@ def orchestration_service(
     mock_agent_registry,
     mock_therapeutic_validator,
     mock_resource_manager,
-    mock_optimization_engine
+    mock_optimization_engine,
 ):
     """Create AgentOrchestrationService with mocked dependencies."""
     return AgentOrchestrationService(
@@ -126,7 +130,7 @@ def orchestration_service(
         therapeutic_validator=mock_therapeutic_validator,
         resource_manager=mock_resource_manager,
         optimization_engine=mock_optimization_engine,
-        neo4j_manager=None
+        neo4j_manager=None,
     )
 
 
@@ -134,14 +138,15 @@ def orchestration_service(
 # Service Initialization Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_service_initialization_success(orchestration_service):
     """Test successful service initialization."""
     result = await orchestration_service.initialize()
-    
+
     assert result is True
     assert orchestration_service._initialized is True
-    
+
     # Verify workflow registration was called
     assert orchestration_service.workflow_manager.register_workflow.call_count >= 4
 
@@ -154,9 +159,9 @@ async def test_service_initialization_failure():
         message_coordinator=Mock(),
         agent_registry=Mock(),
     )
-    
+
     result = await service.initialize()
-    
+
     assert result is False
     assert service._initialized is False
 
@@ -167,9 +172,9 @@ def test_service_status_reporting(orchestration_service):
     orchestration_service._request_count = 10
     orchestration_service._error_count = 2
     orchestration_service._total_processing_time = 5.0
-    
+
     status = orchestration_service.get_service_status()
-    
+
     assert status["initialized"] is False  # Not initialized yet
     assert status["active_sessions"] == 0
     assert status["active_workflows"] == 0
@@ -177,7 +182,7 @@ def test_service_status_reporting(orchestration_service):
     assert status["metrics"]["error_count"] == 2
     assert status["metrics"]["error_rate"] == 0.2
     assert status["metrics"]["avg_processing_time"] == 0.5
-    
+
     # Check component availability
     assert status["components"]["workflow_manager"] is True
     assert status["components"]["message_coordinator"] is True
@@ -192,20 +197,23 @@ def test_service_status_reporting(orchestration_service):
 # Process User Input Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
-async def test_process_user_input_success(orchestration_service, sample_session_context):
+async def test_process_user_input_success(
+    orchestration_service, sample_session_context
+):
     """Test successful user input processing."""
     await orchestration_service.initialize()
-    
+
     response = await orchestration_service.process_user_input(
         user_input="Hello, I need help with anxiety",
-        session_context=sample_session_context
+        session_context=sample_session_context,
     )
-    
+
     assert isinstance(response, OrchestrationResponse)
     assert response.response_text == "Test response"
     assert "memory" in response.updated_context
-    
+
     # Verify metrics were updated
     assert orchestration_service._request_count == 1
     assert orchestration_service._error_count == 0
@@ -213,69 +221,82 @@ async def test_process_user_input_success(orchestration_service, sample_session_
 
 
 @pytest.mark.asyncio
-async def test_process_user_input_not_initialized(orchestration_service, sample_session_context):
+async def test_process_user_input_not_initialized(
+    orchestration_service, sample_session_context
+):
     """Test process_user_input fails when service not initialized."""
     with pytest.raises(ServiceError, match="Service not initialized"):
         await orchestration_service.process_user_input(
-            user_input="Hello",
-            session_context=sample_session_context
+            user_input="Hello", session_context=sample_session_context
         )
 
 
 @pytest.mark.asyncio
-async def test_process_user_input_therapeutic_safety_error(orchestration_service, sample_session_context):
+async def test_process_user_input_therapeutic_safety_error(
+    orchestration_service, sample_session_context
+):
     """Test process_user_input handles therapeutic safety errors."""
     await orchestration_service.initialize()
-    
+
     # Mock therapeutic validator to return unsafe content
-    orchestration_service.therapeutic_validator.validate_text = AsyncMock(return_value=Mock(
-        safe=False,
-        level="high_risk",
-        reason="Contains harmful content"
-    ))
-    
-    with patch.object(orchestration_service, '_call_therapeutic_validator', 
-                     return_value={"safe": False, "level": "high_risk", "reason": "Test error"}):
-        with pytest.raises(TherapeuticSafetyError, match="Content blocked due to safety concerns"):
+    orchestration_service.therapeutic_validator.validate_text = AsyncMock(
+        return_value=Mock(
+            safe=False, level="high_risk", reason="Contains harmful content"
+        )
+    )
+
+    with patch.object(
+        orchestration_service,
+        "_call_therapeutic_validator",
+        return_value={"safe": False, "level": "high_risk", "reason": "Test error"},
+    ):
+        with pytest.raises(
+            TherapeuticSafetyError, match="Content blocked due to safety concerns"
+        ):
             await orchestration_service.process_user_input(
                 user_input="I want to hurt myself",
-                session_context=sample_session_context
+                session_context=sample_session_context,
             )
-    
+
     # Verify error metrics were updated
     assert orchestration_service._error_count == 1
 
 
 @pytest.mark.asyncio
-async def test_process_user_input_workflow_execution_error(orchestration_service, sample_session_context):
+async def test_process_user_input_workflow_execution_error(
+    orchestration_service, sample_session_context
+):
     """Test process_user_input handles workflow execution errors."""
     await orchestration_service.initialize()
-    
+
     # Mock workflow manager to return error
-    orchestration_service.workflow_manager.execute_workflow = Mock(return_value=(None, None, "Workflow failed"))
-    
+    orchestration_service.workflow_manager.execute_workflow = Mock(
+        return_value=(None, None, "Workflow failed")
+    )
+
     with pytest.raises(WorkflowExecutionError, match="Workflow execution failed"):
         await orchestration_service.process_user_input(
-            user_input="Hello",
-            session_context=sample_session_context
+            user_input="Hello", session_context=sample_session_context
         )
-    
+
     # Verify error metrics were updated
     assert orchestration_service._error_count == 1
 
 
 @pytest.mark.asyncio
-async def test_process_user_input_workflow_type_determination(orchestration_service, sample_session_context):
+async def test_process_user_input_workflow_type_determination(
+    orchestration_service, sample_session_context
+):
     """Test workflow type determination based on user input."""
     await orchestration_service.initialize()
-    
+
     test_cases = [
         ("help", WorkflowType.INPUT_PROCESSING),
         ("look around", WorkflowType.WORLD_BUILDING),
         ("tell me a story", WorkflowType.NARRATIVE_GENERATION),
         ("I'm feeling anxious", WorkflowType.COLLABORATIVE),
     ]
-    
+
     for user_input, expected_workflow in test_cases:
         determined_type = await orchestration_service._determine_workflow_type(
             user_input, sample_session_context
@@ -287,26 +308,24 @@ async def test_process_user_input_workflow_type_determination(orchestration_serv
 # Coordinate Agents Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_coordinate_agents_success(orchestration_service):
     """Test successful agent coordination."""
     await orchestration_service.initialize()
-    
+
     context = AgentContext(
-        user_id="test-user",
-        session_id="test-session",
-        memory={"test": "data"}
+        user_id="test-user", session_id="test-session", memory={"test": "data"}
     )
-    
+
     response, run_id, error = await orchestration_service.coordinate_agents(
-        workflow_type=WorkflowType.COLLABORATIVE,
-        context=context
+        workflow_type=WorkflowType.COLLABORATIVE, context=context
     )
-    
+
     assert response is not None
     assert run_id == "test-run-123"
     assert error is None
-    
+
     # Verify workflow manager was called
     orchestration_service.workflow_manager.execute_workflow.assert_called_once()
 
@@ -315,11 +334,10 @@ async def test_coordinate_agents_success(orchestration_service):
 async def test_coordinate_agents_not_initialized(orchestration_service):
     """Test coordinate_agents fails when service not initialized."""
     context = AgentContext(session_id="test")
-    
+
     with pytest.raises(ServiceError, match="Service not initialized"):
         await orchestration_service.coordinate_agents(
-            workflow_type=WorkflowType.COLLABORATIVE,
-            context=context
+            workflow_type=WorkflowType.COLLABORATIVE, context=context
         )
 
 
@@ -327,16 +345,17 @@ async def test_coordinate_agents_not_initialized(orchestration_service):
 async def test_coordinate_agents_workflow_error(orchestration_service):
     """Test coordinate_agents handles workflow execution errors."""
     await orchestration_service.initialize()
-    
+
     # Mock workflow manager to return error
-    orchestration_service.workflow_manager.execute_workflow = Mock(return_value=(None, None, "Execution failed"))
-    
+    orchestration_service.workflow_manager.execute_workflow = Mock(
+        return_value=(None, None, "Execution failed")
+    )
+
     context = AgentContext(session_id="test")
-    
+
     with pytest.raises(WorkflowExecutionError, match="Workflow execution failed"):
         await orchestration_service.coordinate_agents(
-            workflow_type=WorkflowType.COLLABORATIVE,
-            context=context
+            workflow_type=WorkflowType.COLLABORATIVE, context=context
         )
 
 
@@ -344,17 +363,18 @@ async def test_coordinate_agents_workflow_error(orchestration_service):
 # Service Shutdown Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_service_shutdown_success(orchestration_service):
     """Test successful service shutdown."""
     await orchestration_service.initialize()
-    
+
     # Add some active workflows
     orchestration_service._active_workflows["session1"] = "run1"
     orchestration_service._active_workflows["session2"] = "run2"
-    
+
     result = await orchestration_service.shutdown()
-    
+
     assert result is True
     assert orchestration_service._initialized is False
     assert len(orchestration_service._session_contexts) == 0
@@ -365,22 +385,28 @@ async def test_service_shutdown_success(orchestration_service):
 # Therapeutic Safety Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
-async def test_therapeutic_safety_validation_success(orchestration_service, sample_session_context):
+async def test_therapeutic_safety_validation_success(
+    orchestration_service, sample_session_context
+):
     """Test successful therapeutic safety validation."""
     await orchestration_service._validate_therapeutic_safety(
-        "I'm feeling a bit sad today",
-        sample_session_context
+        "I'm feeling a bit sad today", sample_session_context
     )
     # Should not raise any exception
 
 
 @pytest.mark.asyncio
-async def test_therapeutic_safety_validation_high_risk(orchestration_service, sample_session_context):
+async def test_therapeutic_safety_validation_high_risk(
+    orchestration_service, sample_session_context
+):
     """Test therapeutic safety validation with high-risk content."""
     # The service uses basic safety checks when no validator is configured properly
     # Let's test with the actual basic safety check method
-    with pytest.raises(TherapeuticSafetyError, match="Content contains potentially harmful language"):
+    with pytest.raises(
+        TherapeuticSafetyError, match="Content contains potentially harmful language"
+    ):
         await orchestration_service._basic_safety_checks("I want to kill myself")
 
 
@@ -391,34 +417,39 @@ async def test_therapeutic_safety_validation_no_validator(sample_session_context
         workflow_manager=Mock(),
         message_coordinator=Mock(),
         agent_registry=Mock(),
-        therapeutic_validator=None  # No validator
+        therapeutic_validator=None,  # No validator
     )
 
     # Should use basic safety checks
     with pytest.raises(TherapeuticSafetyError):
         await service._validate_therapeutic_safety(
-            "I want to hurt myself",
-            sample_session_context
+            "I want to hurt myself", sample_session_context
         )
 
 
 @pytest.mark.asyncio
-async def test_therapeutic_safety_validation_error_handling(orchestration_service, sample_session_context):
+async def test_therapeutic_safety_validation_error_handling(
+    orchestration_service, sample_session_context
+):
     """Test therapeutic safety validation error handling."""
     # Mock validator to raise exception
     orchestration_service.therapeutic_validator = Mock()
 
-    with patch.object(orchestration_service, '_call_therapeutic_validator', side_effect=Exception("Validator error")):
+    with patch.object(
+        orchestration_service,
+        "_call_therapeutic_validator",
+        side_effect=Exception("Validator error"),
+    ):
         # Should not raise exception, but log warning and continue
         await orchestration_service._validate_therapeutic_safety(
-            "Hello world",
-            sample_session_context
+            "Hello world", sample_session_context
         )
 
 
 # ============================================================================
 # Session Context Management Tests
 # ============================================================================
+
 
 @pytest.mark.asyncio
 async def test_session_context_update(orchestration_service, sample_session_context):
@@ -428,11 +459,13 @@ async def test_session_context_update(orchestration_service, sample_session_cont
         updated_context={
             "memory": {"new_memory": "test"},
             "world_state": {"new_location": "cave"},
-            "metadata": {"updated": True}
-        }
+            "metadata": {"updated": True},
+        },
     )
 
-    await orchestration_service._update_session_context(sample_session_context, response)
+    await orchestration_service._update_session_context(
+        sample_session_context, response
+    )
 
     # Verify context was updated
     assert sample_session_context.context.memory["new_memory"] == "test"
@@ -441,49 +474,65 @@ async def test_session_context_update(orchestration_service, sample_session_cont
 
 
 @pytest.mark.asyncio
-async def test_session_context_persistence_with_neo4j(orchestration_service, sample_session_context):
+async def test_session_context_persistence_with_neo4j(
+    orchestration_service, sample_session_context
+):
     """Test session context persistence with Neo4j manager."""
     # Mock Neo4j manager
     neo4j_manager = Mock()
     orchestration_service.neo4j_manager = neo4j_manager
 
     response = OrchestrationResponse(
-        response_text="Test response",
-        updated_context={"memory": {"test": "data"}}
+        response_text="Test response", updated_context={"memory": {"test": "data"}}
     )
 
-    await orchestration_service._update_session_context(sample_session_context, response)
+    await orchestration_service._update_session_context(
+        sample_session_context, response
+    )
 
     # Should call persist method (currently just logs)
 
 
 @pytest.mark.asyncio
-async def test_session_context_update_error_handling(orchestration_service, sample_session_context):
+async def test_session_context_update_error_handling(
+    orchestration_service, sample_session_context
+):
     """Test session context update error handling."""
     # Create response with empty context data (valid but might cause issues in processing)
     response = OrchestrationResponse(
         response_text="Test response",
-        updated_context={}  # Empty dict instead of None
+        updated_context={},  # Empty dict instead of None
     )
 
     # Should not raise exception even if update fails
-    await orchestration_service._update_session_context(sample_session_context, response)
+    await orchestration_service._update_session_context(
+        sample_session_context, response
+    )
 
 
 # ============================================================================
 # Workflow Type Determination Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
-async def test_workflow_type_determination_edge_cases(orchestration_service, sample_session_context):
+async def test_workflow_type_determination_edge_cases(
+    orchestration_service, sample_session_context
+):
     """Test workflow type determination with edge cases."""
     test_cases = [
         ("", WorkflowType.COLLABORATIVE),  # Empty input
         ("   ", WorkflowType.COLLABORATIVE),  # Whitespace only
         ("HELP", WorkflowType.INPUT_PROCESSING),  # Uppercase
         ("Look Around The Room", WorkflowType.WORLD_BUILDING),  # Mixed case
-        ("Tell me what happens next in the story", WorkflowType.NARRATIVE_GENERATION),  # Long input
-        ("Complex therapeutic scenario with multiple elements", WorkflowType.COLLABORATIVE),  # Default case
+        (
+            "Tell me what happens next in the story",
+            WorkflowType.NARRATIVE_GENERATION,
+        ),  # Long input
+        (
+            "Complex therapeutic scenario with multiple elements",
+            WorkflowType.COLLABORATIVE,
+        ),  # Default case
     ]
 
     for user_input, expected_workflow in test_cases:
@@ -494,14 +543,15 @@ async def test_workflow_type_determination_edge_cases(orchestration_service, sam
 
 
 @pytest.mark.asyncio
-async def test_workflow_type_determination_error_handling(orchestration_service, sample_session_context):
+async def test_workflow_type_determination_error_handling(
+    orchestration_service, sample_session_context
+):
     """Test workflow type determination error handling."""
     # Mock to raise exception during processing
-    with patch('src.agent_orchestration.service.logger') as mock_logger:
+    with patch("src.agent_orchestration.service.logger") as mock_logger:
         # Should return collaborative workflow as fallback
         result = await orchestration_service._determine_workflow_type(
-            "test input",
-            sample_session_context
+            "test input", sample_session_context
         )
         assert result == WorkflowType.COLLABORATIVE
 
@@ -510,6 +560,7 @@ async def test_workflow_type_determination_error_handling(orchestration_service,
 # Resource Management Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_resource_allocation_success(orchestration_service):
     """Test successful resource allocation."""
@@ -517,8 +568,7 @@ async def test_resource_allocation_success(orchestration_service):
 
     # Should not raise exception
     await orchestration_service._allocate_workflow_resources(
-        WorkflowType.COLLABORATIVE,
-        context
+        WorkflowType.COLLABORATIVE, context
     )
 
 
@@ -529,16 +579,13 @@ async def test_resource_allocation_no_manager(sample_session_context):
         workflow_manager=Mock(),
         message_coordinator=Mock(),
         agent_registry=Mock(),
-        resource_manager=None  # No resource manager
+        resource_manager=None,  # No resource manager
     )
 
     context = AgentContext(session_id="test")
 
     # Should not raise exception
-    await service._allocate_workflow_resources(
-        WorkflowType.COLLABORATIVE,
-        context
-    )
+    await service._allocate_workflow_resources(WorkflowType.COLLABORATIVE, context)
 
 
 @pytest.mark.asyncio
@@ -546,20 +593,22 @@ async def test_resource_allocation_error_handling(orchestration_service):
     """Test resource allocation error handling."""
     # Mock resource manager to raise exception
     orchestration_service.resource_manager = Mock()
-    orchestration_service.resource_manager.allocate_resources = Mock(side_effect=Exception("Resource error"))
+    orchestration_service.resource_manager.allocate_resources = Mock(
+        side_effect=Exception("Resource error")
+    )
 
     context = AgentContext(session_id="test")
 
     # Should not raise exception, just log warning
     await orchestration_service._allocate_workflow_resources(
-        WorkflowType.COLLABORATIVE,
-        context
+        WorkflowType.COLLABORATIVE, context
     )
 
 
 # ============================================================================
 # Workflow Name Mapping Tests
 # ============================================================================
+
 
 def test_workflow_name_mapping(orchestration_service):
     """Test workflow type to name mapping."""
@@ -589,29 +638,33 @@ def test_workflow_name_mapping_unknown_type(orchestration_service):
 # Performance and Load Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
-async def test_service_performance_metrics(orchestration_service, sample_session_context):
+async def test_service_performance_metrics(
+    orchestration_service, sample_session_context
+):
     """Test service performance metrics tracking."""
     await orchestration_service.initialize()
 
     # Mock workflow execution to be fast
-    with patch.object(orchestration_service.workflow_manager, 'execute_workflow') as mock_execute:
+    with patch.object(
+        orchestration_service.workflow_manager, "execute_workflow"
+    ) as mock_execute:
         mock_execute.return_value = (
             OrchestrationResponse(
                 response_text="Fast response",
                 updated_context={"memory": {"test": "data"}},
-                workflow_metadata={"test": "performance"}
+                workflow_metadata={"test": "performance"},
             ),
             "perf-run-123",
-            None
+            None,
         )
 
         # Process multiple requests
         start_time = time.time()
         for i in range(5):
             await orchestration_service.process_user_input(
-                user_input=f"Test request {i}",
-                session_context=sample_session_context
+                user_input=f"Test request {i}", session_context=sample_session_context
             )
         end_time = time.time()
 
@@ -628,20 +681,24 @@ async def test_service_performance_metrics(orchestration_service, sample_session
 
 
 @pytest.mark.asyncio
-async def test_concurrent_request_handling(orchestration_service, sample_session_context):
+async def test_concurrent_request_handling(
+    orchestration_service, sample_session_context
+):
     """Test service handling of concurrent requests."""
     await orchestration_service.initialize()
 
     # Mock workflow execution
-    with patch.object(orchestration_service.workflow_manager, 'execute_workflow') as mock_execute:
+    with patch.object(
+        orchestration_service.workflow_manager, "execute_workflow"
+    ) as mock_execute:
         mock_execute.return_value = (
             OrchestrationResponse(
                 response_text="Concurrent response",
                 updated_context={"memory": {"concurrent": "test"}},
-                workflow_metadata={"test": "concurrent"}
+                workflow_metadata={"test": "concurrent"},
             ),
             "concurrent-run-123",
-            None
+            None,
         )
 
         # Create multiple concurrent requests
@@ -655,13 +712,12 @@ async def test_concurrent_request_handling(orchestration_service, sample_session
                 context=AgentContext(
                     user_id=f"concurrent-user-{i}",
                     session_id=f"concurrent-session-{i}",
-                    memory={"concurrent_test": i}
-                )
+                    memory={"concurrent_test": i},
+                ),
             )
 
             task = orchestration_service.process_user_input(
-                user_input=f"Concurrent request {i}",
-                session_context=session_context
+                user_input=f"Concurrent request {i}", session_context=session_context
             )
             tasks.append(task)
 
@@ -692,28 +748,32 @@ async def test_error_recovery_scenarios(orchestration_service, sample_session_co
     await orchestration_service.initialize()
 
     # Test recovery from workflow execution error
-    with patch.object(orchestration_service.workflow_manager, 'execute_workflow') as mock_execute:
+    with patch.object(
+        orchestration_service.workflow_manager, "execute_workflow"
+    ) as mock_execute:
         # First call fails, second succeeds
         mock_execute.side_effect = [
             (None, None, "Workflow failed"),  # First call fails
-            (OrchestrationResponse(
-                response_text="Recovery successful",
-                updated_context={"memory": {"recovered": True}},
-                workflow_metadata={"test": "recovery"}
-            ), "recovery-run-123", None)  # Second call succeeds
+            (
+                OrchestrationResponse(
+                    response_text="Recovery successful",
+                    updated_context={"memory": {"recovered": True}},
+                    workflow_metadata={"test": "recovery"},
+                ),
+                "recovery-run-123",
+                None,
+            ),  # Second call succeeds
         ]
 
         # First request should fail
         with pytest.raises(WorkflowExecutionError):
             await orchestration_service.process_user_input(
-                user_input="First request",
-                session_context=sample_session_context
+                user_input="First request", session_context=sample_session_context
             )
 
         # Service should still be functional for second request
         response = await orchestration_service.process_user_input(
-            user_input="Second request",
-            session_context=sample_session_context
+            user_input="Second request", session_context=sample_session_context
         )
 
         assert response.response_text == "Recovery successful"
@@ -736,12 +796,12 @@ async def test_service_shutdown_with_active_workflows(orchestration_service):
     orchestration_service._session_contexts["session1"] = SessionContext(
         session_id="session1",
         user_id="user1",
-        context=AgentContext(session_id="session1")
+        context=AgentContext(session_id="session1"),
     )
     orchestration_service._session_contexts["session2"] = SessionContext(
         session_id="session2",
         user_id="user2",
-        context=AgentContext(session_id="session2")
+        context=AgentContext(session_id="session2"),
     )
 
     # Shutdown should handle active workflows gracefully

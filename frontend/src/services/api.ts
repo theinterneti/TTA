@@ -1,6 +1,6 @@
 /**
  * TTA API Client Service
- * 
+ *
  * Provides a comprehensive client for all 46 TTA API endpoints
  * with proper TypeScript typing and error handling.
  */

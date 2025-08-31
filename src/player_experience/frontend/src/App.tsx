@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "./store/store";
+import { fetchPlayerProfile } from "./store/slices/playerSlice";
 import Layout from "./components/Layout/Layout";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import CharacterManagement from "./pages/CharacterManagement/CharacterManagement";
@@ -16,9 +17,45 @@ import { StatusMonitoringDisplay } from "./components/Status";
 import "./App.css";
 
 function App() {
-  const isAuthenticated = useSelector(
-    (state: RootState) => state.auth.isAuthenticated
+  const renderCount = useRef(0);
+  renderCount.current += 1;
+
+  // Debug logging to track re-renders
+  console.log(`🔄 App render #${renderCount.current}`, {
+    timestamp: new Date().toISOString(),
+  });
+
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth
   );
+  const { profile, isLoading: profileLoading } = useSelector(
+    (state: RootState) => state.player
+  );
+
+  // Debug state changes
+  useEffect(() => {
+    console.log("🔍 App auth state changed:", {
+      isAuthenticated,
+      userId: user?.user_id,
+    });
+  }, [isAuthenticated, user?.user_id]);
+
+  useEffect(() => {
+    console.log("🔍 App profile state changed:", {
+      profile: profile?.player_id,
+      profileLoading,
+    });
+  }, [profile, profileLoading]);
+
+  // Load player profile when user is authenticated
+  useEffect(() => {
+    console.log("🔍 App fetchPlayerProfile effect triggered");
+    if (isAuthenticated && user?.user_id && !profile && !profileLoading) {
+      console.log("🚀 Dispatching fetchPlayerProfile for:", user.user_id);
+      dispatch(fetchPlayerProfile(user.user_id) as any);
+    }
+  }, [dispatch, isAuthenticated, user?.user_id, profile, profileLoading]);
 
   if (!isAuthenticated) {
     return (

@@ -22,7 +22,7 @@ describe('useMobile', () => {
       writable: true,
       value: undefined,
     });
-    
+
     Object.defineProperty(navigator, 'maxTouchPoints', {
       writable: true,
       value: 0,

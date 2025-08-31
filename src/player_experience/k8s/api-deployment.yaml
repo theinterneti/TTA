@@ -19,40 +19,40 @@ spec:
         app.kubernetes.io/component: api
     spec:
       containers:
-      - name: player-experience-api
-        image: tta-player-experience-api:latest
-        ports:
-        - containerPort: 8080
-        envFrom:
-        - configMapRef:
-            name: player-experience-config
-        - secretRef:
-            name: player-experience-secrets
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "200m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 30
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 5
-        volumeMounts:
-        - name: logs
-          mountPath: /app/logs
+        - name: player-experience-api
+          image: tta-player-experience-api:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: player-experience-config
+            - secretRef:
+                name: player-experience-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: logs
+              mountPath: /app/logs
       volumes:
-      - name: logs
-        emptyDir: {}
+        - name: logs
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: Service
@@ -67,8 +67,8 @@ spec:
     app.kubernetes.io/name: tta-player-experience
     app.kubernetes.io/component: api
   ports:
-  - port: 8080
-    targetPort: 8080
+    - port: 8080
+      targetPort: 8080
   type: ClusterIP
 ---
 apiVersion: networking.k8s.io/v1
@@ -86,13 +86,13 @@ metadata:
     nginx.ingress.kubernetes.io/cors-allow-headers: "DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization"
 spec:
   rules:
-  - host: api.tta-player-experience.local
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: player-experience-api-service
-            port:
-              number: 8080
+    - host: api.tta-player-experience.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: player-experience-api-service
+                port:
+                  number: 8080

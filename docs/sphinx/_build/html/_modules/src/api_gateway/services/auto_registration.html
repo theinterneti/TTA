@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.services.auto_registration &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.services.auto_registration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.services.auto_registration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Automatic service registration for TTA components.</span>
+
+<span class="sd">This module provides automatic discovery and registration of TTA services</span>
+<span class="sd">based on configuration and component startup detection.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span><span class="p">,</span> <span class="n">load_tta_config_integration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceEndpoint</span><span class="p">,</span> <span class="n">ServiceHealthCheck</span><span class="p">,</span> <span class="n">ServiceInfo</span><span class="p">,</span> <span class="n">ServiceType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.discovery_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceDiscoveryManager</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AutoRegistrationService">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.services.auto_registration.html#src.api_gateway.services.AutoRegistrationService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AutoRegistrationService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Automatic service registration for TTA components.</span>
+
+<span class="sd">    Features:</span>
+<span class="sd">    - Automatic discovery of TTA services</span>
+<span class="sd">    - Registration based on configuration</span>
+<span class="sd">    - Integration with existing TTA components</span>
+<span class="sd">    - Health check configuration</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discovery_manager</span><span class="p">:</span> <span class="n">ServiceDiscoveryManager</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the auto-registration service.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            discovery_manager: Service discovery manager instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">discovery_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tta_config</span> <span class="o">=</span> <span class="n">load_tta_config_integration</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ServiceInfo</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="AutoRegistrationService.register_tta_services">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.services.auto_registration.html#src.api_gateway.services.AutoRegistrationService.register_tta_services">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register_tta_services</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register all configured TTA services.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting automatic registration of TTA services&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Register Player Experience Interface</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_player_experience_service</span><span class="p">()</span>
+
+        <span class="c1"># Register Authentication Service</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_authentication_service</span><span class="p">()</span>
+
+        <span class="c1"># Register Agent Orchestration Service</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_agent_orchestration_service</span><span class="p">()</span>
+
+        <span class="c1"># Register Core Gameplay Loop Service</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_gameplay_loop_service</span><span class="p">()</span>
+
+        <span class="c1"># Register Database Services</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_database_services</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Registered </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">)</span><span class="si">}</span><span class="s2"> TTA services&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AutoRegistrationService.deregister_all_services">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.services.auto_registration.html#src.api_gateway.services.AutoRegistrationService.deregister_all_services">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">deregister_all_services</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deregister all auto-registered services.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">service_name</span><span class="p">,</span> <span class="n">service</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">deregister_service</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deregistered service: </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_player_experience_service</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the Player Experience Interface service.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Default configuration for Player Experience Interface</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">API</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+                    <span class="n">port</span><span class="o">=</span><span class="mi">8080</span><span class="p">,</span>  <span class="c1"># Default port for Player Experience Interface</span>
+                    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/api/v1&quot;</span><span class="p">,</span>
+                    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;api&quot;</span><span class="p">,</span> <span class="s2">&quot;player&quot;</span><span class="p">,</span> <span class="s2">&quot;experience&quot;</span><span class="p">,</span> <span class="s2">&quot;therapeutic&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player Experience Interface API&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;player_experience&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;endpoints&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;/api/v1/auth&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/players&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/characters&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/worlds&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/sessions&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="mi">3</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;player-experience-interface&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Player Experience Interface service&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register Player Experience Interface: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_authentication_service</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the Authentication &amp; User Management service.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;authentication-service&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">AUTHENTICATION</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+                    <span class="n">port</span><span class="o">=</span><span class="mi">8081</span><span class="p">,</span>  <span class="c1"># Default port for Authentication service</span>
+                    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/auth/v1&quot;</span><span class="p">,</span>
+                    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span>  <span class="c1"># Higher weight for critical service</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>  <span class="c1"># Higher priority</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;auth&quot;</span><span class="p">,</span> <span class="s2">&quot;authentication&quot;</span><span class="p">,</span> <span class="s2">&quot;jwt&quot;</span><span class="p">,</span> <span class="s2">&quot;security&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication &amp; User Management Service&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;endpoints&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;/auth/v1/login&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/auth/v1/logout&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/auth/v1/refresh&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/auth/v1/users&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/auth/v1/roles&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span>
+                    <span class="n">interval</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>  <span class="c1"># More frequent health checks</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                    <span class="n">retries</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;authentication-service&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Authentication service&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register Authentication service: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_agent_orchestration_service</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the Agent Orchestration service if enabled.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">tta_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_orchestration_enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Agent Orchestration service not enabled, skipping registration&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="n">port</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tta_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_orchestration_port&quot;</span><span class="p">,</span> <span class="mi">8503</span><span class="p">)</span>
+
+            <span class="n">service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;agent-orchestration&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">API</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/api/v1&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;http&quot;</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">80</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ai&quot;</span><span class="p">,</span> <span class="s2">&quot;agents&quot;</span><span class="p">,</span> <span class="s2">&quot;orchestration&quot;</span><span class="p">,</span> <span class="s2">&quot;therapeutic&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;AI Agent Orchestration Service&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;agent_orchestration&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;endpoints&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;/api/v1/agents&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/workflows&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/api/v1/capabilities&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="mi">3</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;agent-orchestration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Agent Orchestration service&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register Agent Orchestration service: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_gameplay_loop_service</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register the Core Gameplay Loop service.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">THERAPEUTIC</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+                    <span class="n">port</span><span class="o">=</span><span class="mi">8082</span><span class="p">,</span>  <span class="c1"># Default port for Gameplay Loop</span>
+                    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/gameplay/v1&quot;</span><span class="p">,</span>
+                    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">130</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;gameplay&quot;</span><span class="p">,</span> <span class="s2">&quot;therapeutic&quot;</span><span class="p">,</span> <span class="s2">&quot;sessions&quot;</span><span class="p">,</span> <span class="s2">&quot;progress&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Core Gameplay Loop Service&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;gameplay_loop&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;endpoints&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;/gameplay/v1/sessions&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/gameplay/v1/progress&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;/gameplay/v1/therapeutic&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                <span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/health&quot;</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">retries</span><span class="o">=</span><span class="mi">3</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">crisis_support</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span><span class="n">service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Core Gameplay Loop service&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register Core Gameplay Loop service: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_database_services</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register database services (Redis, Neo4j).&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Register Redis service</span>
+            <span class="n">redis_service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;redis-cache&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">CACHE</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">6379</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;redis&quot;</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cache&quot;</span><span class="p">,</span> <span class="s2">&quot;redis&quot;</span><span class="p">,</span> <span class="s2">&quot;storage&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Redis Cache Service&quot;</span><span class="p">,</span> <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;redis&quot;</span><span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span>  <span class="c1"># Redis doesn&#39;t have HTTP health endpoint</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span>
+                <span class="n">redis_service</span><span class="p">,</span> <span class="n">start_health_monitoring</span><span class="o">=</span><span class="kc">False</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;redis-cache&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">redis_service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Redis cache service&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Register Neo4j service</span>
+            <span class="n">neo4j_service</span> <span class="o">=</span> <span class="n">ServiceInfo</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="n">uuid4</span><span class="p">(),</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;neo4j-database&quot;</span><span class="p">,</span>
+                <span class="n">version</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="n">service_type</span><span class="o">=</span><span class="n">ServiceType</span><span class="o">.</span><span class="n">DATABASE</span><span class="p">,</span>
+                <span class="n">endpoint</span><span class="o">=</span><span class="n">ServiceEndpoint</span><span class="p">(</span>
+                    <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">,</span>
+                    <span class="n">port</span><span class="o">=</span><span class="mi">7474</span><span class="p">,</span>  <span class="c1"># HTTP port for Neo4j</span>
+                    <span class="n">path</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                    <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;http&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">weight</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;database&quot;</span><span class="p">,</span> <span class="s2">&quot;neo4j&quot;</span><span class="p">,</span> <span class="s2">&quot;graph&quot;</span><span class="p">],</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Neo4j Graph Database&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="s2">&quot;neo4j&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;bolt_port&quot;</span><span class="p">:</span> <span class="mi">7687</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">health_check</span><span class="o">=</span><span class="n">ServiceHealthCheck</span><span class="p">(</span>
+                    <span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">endpoint</span><span class="o">=</span><span class="s2">&quot;/&quot;</span><span class="p">,</span>
+                    <span class="n">interval</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>  <span class="c1"># Less frequent for database</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="n">retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">safety_validated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span><span class="n">neo4j_service</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="s2">&quot;neo4j-database&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">neo4j_service</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Registered Neo4j database service&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register database services: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AutoRegistrationService.get_registered_services">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.services.auto_registration.html#src.api_gateway.services.AutoRegistrationService.get_registered_services">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_registered_services</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ServiceInfo</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all registered services.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="AutoRegistrationService.refresh_service_registration">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.services.auto_registration.html#src.api_gateway.services.AutoRegistrationService.refresh_service_registration">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">refresh_service_registration</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Refresh registration for a specific service.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_name: Name of the service to refresh</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if refresh successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">service_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2"> not found for refresh&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_registered_services</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span>
+
+        <span class="c1"># Update last_seen timestamp</span>
+        <span class="n">service</span><span class="o">.</span><span class="n">last_seen</span> <span class="o">=</span> <span class="n">service</span><span class="o">.</span><span class="n">last_seen</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="c1"># Re-register the service</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">register_service</span><span class="p">(</span>
+            <span class="n">service</span><span class="p">,</span> <span class="n">start_health_monitoring</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Refreshed registration for service: </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to refresh registration for service: </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">success</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

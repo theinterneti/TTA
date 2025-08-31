@@ -4,9 +4,9 @@ Neo4j Manager for the TTA Project.
 This module provides a manager for interacting with the Neo4j database.
 """
 
-import os
 import logging
-from typing import Dict, Any, List, Optional, Union
+import os
+from typing import Any
 
 try:
     from neo4j import GraphDatabase
@@ -15,6 +15,7 @@ except ImportError:
 
 try:
     from dotenv import load_dotenv
+
     # Load environment variables from .env file
     load_dotenv()
 except ImportError:
@@ -49,7 +50,7 @@ class Neo4jManager:
         self,
         uri: str = NEO4J_URI,
         username: str = NEO4J_USERNAME,
-        password: str = NEO4J_PASSWORD
+        password: str = NEO4J_PASSWORD,
     ):
         """
         Initialize the Neo4j manager.
@@ -60,7 +61,12 @@ class Neo4jManager:
             password: Neo4j password
         """
         self._driver = None
-        self._mock_db = {"locations": {}, "items": {}, "characters": {}, "relationships": []}
+        self._mock_db = {
+            "locations": {},
+            "items": {},
+            "characters": {},
+            "relationships": [],
+        }
         self._using_mock_db = False
 
         if GraphDatabase is None:
@@ -93,7 +99,7 @@ class Neo4jManager:
         if self._driver:
             self._driver.close()
 
-    def query(self, query: str, parameters: Optional[Dict[str, Any]] = None) -> List[Any]:
+    def query(self, query: str, parameters: dict[str, Any] | None = None) -> list[Any]:
         """
         Execute a query against the Neo4j database.
 
@@ -120,7 +126,9 @@ class Neo4jManager:
             logger.warning("Switching to mock database mode for testing")
             return self._mock_query(query, parameters)
 
-    def _mock_query(self, query: str, parameters: Optional[Dict[str, Any]] = None) -> List[Any]:
+    def _mock_query(
+        self, query: str, parameters: dict[str, Any] | None = None
+    ) -> list[Any]:
         """
         Execute a query against the mock database.
 
@@ -131,6 +139,7 @@ class Neo4jManager:
         Returns:
             List of mock records
         """
+
         # Create a mock record class for returning data
         class MockRecord:
             def __init__(self, data):
@@ -158,14 +167,19 @@ class Neo4jManager:
                 return str(self.data_dict)
 
         # For create operations
-        if query.strip().upper().startswith("CREATE") or query.strip().upper().startswith("MERGE"):
+        if query.strip().upper().startswith(
+            "CREATE"
+        ) or query.strip().upper().startswith("MERGE"):
             # Just return an empty success result
             return []
 
         # For match operations
         elif query.strip().upper().startswith("MATCH"):
             # Special case for get_current_location
-            if "MATCH (p:Character {id: $player_id})-[:LOCATED_AT]->(l:Location)" in query:
+            if (
+                "MATCH (p:Character {id: $player_id})-[:LOCATED_AT]->(l:Location)"
+                in query
+            ):
                 # Return a mock forest edge location
                 return [
                     MockRecord(
@@ -178,7 +192,11 @@ class Neo4jManager:
                 ]
 
             # Special case for get_items_at_location
-            elif "MATCH (l:Location {id: $location_id})-[:CONTAINS]->(i:Item)" in query or "MATCH (l:Location {name: $location_id})-[:CONTAINS]->(i:Item)" in query:
+            elif (
+                "MATCH (l:Location {id: $location_id})-[:CONTAINS]->(i:Item)" in query
+                or "MATCH (l:Location {name: $location_id})-[:CONTAINS]->(i:Item)"
+                in query
+            ):
                 # Return mock items
                 return [
                     MockRecord(
@@ -198,7 +216,12 @@ class Neo4jManager:
                 ]
 
             # Special case for get_characters_at_location
-            elif "MATCH (l:Location {id: $location_id})-[:CONTAINS]->(c:Character)" in query or "MATCH (l:Location {name: $location_id})-[:CONTAINS]->(c:Character)" in query:
+            elif (
+                "MATCH (l:Location {id: $location_id})-[:CONTAINS]->(c:Character)"
+                in query
+                or "MATCH (l:Location {name: $location_id})-[:CONTAINS]->(c:Character)"
+                in query
+            ):
                 # Return mock characters
                 return [
                     MockRecord(
@@ -250,7 +273,10 @@ class Neo4jManager:
                     ]
 
             # Special case for get_exits
-            elif "MATCH (l:Location {name: $location_name})-[r:EXITS_TO]->(destination:Location)" in query:
+            elif (
+                "MATCH (l:Location {name: $location_name})-[r:EXITS_TO]->(destination:Location)"
+                in query
+            ):
                 location_name = parameters.get("location_name", "Unknown")
                 if location_name == "Forest Clearing":
                     return [
@@ -267,7 +293,7 @@ class Neo4jManager:
                                 "target": "River Bank",
                                 "description": "A narrow trail leading to a river.",
                             }
-                        )
+                        ),
                     ]
                 elif location_name == "Forest Edge":
                     return [
@@ -286,7 +312,7 @@ class Neo4jManager:
         # Default case
         return []
 
-    def get_location_details(self, location_name: str) -> Optional[Dict[str, Any]]:
+    def get_location_details(self, location_name: str) -> dict[str, Any] | None:
         """
         Get details for a location.
 
@@ -322,7 +348,8 @@ class Neo4jManager:
         """
 
         characters = self.query(
-            characters_query, {"location_id": location_name, "player_id": PLAYER_CHARACTER_ID}
+            characters_query,
+            {"location_id": location_name, "player_id": PLAYER_CHARACTER_ID},
         )
 
         # Combine all data
@@ -332,7 +359,7 @@ class Neo4jManager:
 
         return location_data
 
-    def get_exits(self, location_name: str) -> List[Dict[str, Any]]:
+    def get_exits(self, location_name: str) -> list[dict[str, Any]]:
         """
         Get exits from a location.
 
@@ -351,7 +378,7 @@ class Neo4jManager:
 
         return [dict(exit) for exit in result]
 
-    def get_items_at_location(self, location_name: str) -> List[Dict[str, Any]]:
+    def get_items_at_location(self, location_name: str) -> list[dict[str, Any]]:
         """
         Get items at a location.
 
@@ -370,7 +397,7 @@ class Neo4jManager:
 
         return [dict(item) for item in result]
 
-    def get_npcs_at_location(self, location_name: str) -> List[Dict[str, Any]]:
+    def get_npcs_at_location(self, location_name: str) -> list[dict[str, Any]]:
         """
         Get NPCs at a location.
 
@@ -392,7 +419,7 @@ class Neo4jManager:
 
         return [dict(npc) for npc in result]
 
-    def get_player_inventory(self, player_id: str) -> List[Dict[str, Any]]:
+    def get_player_inventory(self, player_id: str) -> list[dict[str, Any]]:
         """
         Get the player's inventory.
 
@@ -428,7 +455,9 @@ class Neo4jManager:
         RETURN i.name AS name, i.description AS description
         """
 
-        result = self.query(check_query, {"location_name": location_name, "item_name": item_name})
+        result = self.query(
+            check_query, {"location_name": location_name, "item_name": item_name}
+        )
 
         if not result:
             logger.warning(f"Item {item_name} not found at {location_name}")
@@ -440,7 +469,9 @@ class Neo4jManager:
         DELETE r
         """
 
-        self.query(remove_query, {"location_name": location_name, "item_name": item_name})
+        self.query(
+            remove_query, {"location_name": location_name, "item_name": item_name}
+        )
 
         # Create a HAS_ITEM relationship between the player and the item
         add_to_inventory_query = """
@@ -448,12 +479,19 @@ class Neo4jManager:
         CREATE (c)-[:HAS_ITEM]->(i)
         """
 
-        self.query(add_to_inventory_query, {"player_id": PLAYER_CHARACTER_ID, "item_name": item_name})
+        self.query(
+            add_to_inventory_query,
+            {"player_id": PLAYER_CHARACTER_ID, "item_name": item_name},
+        )
 
-        logger.info(f"Item {item_name} removed from {location_name} and added to player inventory")
+        logger.info(
+            f"Item {item_name} removed from {location_name} and added to player inventory"
+        )
         return True
 
-    def create_item(self, name: str, description: str, location_name: Optional[str] = None) -> bool:
+    def create_item(
+        self, name: str, description: str, location_name: str | None = None
+    ) -> bool:
         """
         Create a new item.
 
@@ -483,7 +521,9 @@ class Neo4jManager:
 
         return True
 
-    def create_character(self, name: str, description: str, location_name: Optional[str] = None) -> bool:
+    def create_character(
+        self, name: str, description: str, location_name: str | None = None
+    ) -> bool:
         """
         Create a new character.
 
@@ -505,7 +545,7 @@ class Neo4jManager:
 
         self.query(
             query,
-            {"character_id": character_id, "name": name, "description": description}
+            {"character_id": character_id, "name": name, "description": description},
         )
 
         # If a location is specified, place the character there
@@ -515,7 +555,10 @@ class Neo4jManager:
             CREATE (l)-[:CONTAINS]->(c)
             """
 
-            self.query(place_query, {"character_id": character_id, "location_name": location_name})
+            self.query(
+                place_query,
+                {"character_id": character_id, "location_name": location_name},
+            )
 
         return True
 
@@ -527,20 +570,20 @@ class Neo4jManager:
         locations = [
             {
                 "name": "Forest Clearing",
-                "description": "A peaceful clearing in the forest. Sunlight filters through the canopy above."
+                "description": "A peaceful clearing in the forest. Sunlight filters through the canopy above.",
             },
             {
                 "name": "Forest Edge",
-                "description": "The edge of a mysterious forest. Tall trees loom ahead, while a meadow stretches behind you."
+                "description": "The edge of a mysterious forest. Tall trees loom ahead, while a meadow stretches behind you.",
             },
             {
                 "name": "River Bank",
-                "description": "A serene river bank. The water flows gently, and fish can be seen swimming beneath the surface."
+                "description": "A serene river bank. The water flows gently, and fish can be seen swimming beneath the surface.",
             },
             {
                 "name": "Cave Entrance",
-                "description": "A dark cave entrance. Stalactites hang from the ceiling, and the air feels cool and damp."
-            }
+                "description": "A dark cave entrance. Stalactites hang from the ceiling, and the air feels cool and damp.",
+            },
         ]
 
         for location in locations:
@@ -555,38 +598,38 @@ class Neo4jManager:
                 "from": "Forest Clearing",
                 "to": "Forest Edge",
                 "direction": "north",
-                "description": "A path leading deeper into the forest."
+                "description": "A path leading deeper into the forest.",
             },
             {
                 "from": "Forest Edge",
                 "to": "Forest Clearing",
                 "direction": "south",
-                "description": "A path leading back to the clearing."
+                "description": "A path leading back to the clearing.",
             },
             {
                 "from": "Forest Clearing",
                 "to": "River Bank",
                 "direction": "east",
-                "description": "A narrow trail leading to a river."
+                "description": "A narrow trail leading to a river.",
             },
             {
                 "from": "River Bank",
                 "to": "Forest Clearing",
                 "direction": "west",
-                "description": "A trail leading back to the forest clearing."
+                "description": "A trail leading back to the forest clearing.",
             },
             {
                 "from": "River Bank",
                 "to": "Cave Entrance",
                 "direction": "north",
-                "description": "A rocky path leading to a cave."
+                "description": "A rocky path leading to a cave.",
             },
             {
                 "from": "Cave Entrance",
                 "to": "River Bank",
                 "direction": "south",
-                "description": "A path leading back to the river bank."
-            }
+                "description": "A path leading back to the river bank.",
+            },
         ]
 
         for exit in exits:
@@ -601,23 +644,23 @@ class Neo4jManager:
             {
                 "name": "Old Map",
                 "description": "A weathered map showing the forest and surrounding areas.",
-                "location": "Forest Clearing"
+                "location": "Forest Clearing",
             },
             {
                 "name": "Glowing Berries",
                 "description": "Small berries that emit a soft blue glow. They look edible.",
-                "location": "Forest Edge"
+                "location": "Forest Edge",
             },
             {
                 "name": "Fishing Rod",
                 "description": "A simple fishing rod. Perfect for catching fish in the river.",
-                "location": "River Bank"
+                "location": "River Bank",
             },
             {
                 "name": "Torch",
                 "description": "An unlit torch. It could be useful in dark places.",
-                "location": "Cave Entrance"
-            }
+                "location": "Cave Entrance",
+            },
         ]
 
         for item in items:
@@ -634,20 +677,20 @@ class Neo4jManager:
                 "id": "char_guardian",
                 "name": "Forest Guardian",
                 "description": "A mysterious figure who protects the forest.",
-                "location": "Forest Edge"
+                "location": "Forest Edge",
             },
             {
                 "id": "char_fisherman",
                 "name": "Old Fisherman",
                 "description": "An elderly man who spends his days fishing by the river.",
-                "location": "River Bank"
+                "location": "River Bank",
             },
             {
                 "id": PLAYER_CHARACTER_ID,
                 "name": "Player",
                 "description": "You, the player character.",
-                "location": "Forest Clearing"
-            }
+                "location": "Forest Clearing",
+            },
         ]
 
         for character in characters:
@@ -664,7 +707,9 @@ class Neo4jManager:
                 MATCH (c:Character {character_id: $id}), (l:Location {name: $location})
                 CREATE (c)-[:LOCATED_AT]->(l)
                 """
-                self.query(query, {"id": character["id"], "location": character["location"]})
+                self.query(
+                    query, {"id": character["id"], "location": character["location"]}
+                )
 
         # Give the player an initial inventory item
         query = """
@@ -679,6 +724,7 @@ class Neo4jManager:
 
 # Singleton instance
 _NEO4J_MANAGER = None
+
 
 def get_neo4j_manager() -> Neo4jManager:
     """

@@ -113,11 +113,11 @@ const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
               <h2 className="text-xl font-bold mb-2">Congratulations!</h2>
               <p className="text-purple-100">{celebrationData.title}</p>
             </div>
-            
+
             <div className="p-6">
               <div className="text-center mb-4">
                 <p className="text-gray-700 mb-3">{celebrationData.celebration_message}</p>
-                
+
                 {celebrationData.reward_unlocked && (
                   <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
                     <div className="flex items-center justify-center text-yellow-800">
@@ -129,7 +129,7 @@ const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
                     </p>
                   </div>
                 )}
-                
+
                 <div className="flex items-center justify-center space-x-4 text-sm text-gray-600">
                   <div className="flex items-center">
                     <SparklesIcon className="h-4 w-4 mr-1" />
@@ -137,14 +137,14 @@ const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
                   </div>
                 </div>
               </div>
-              
+
               {celebrationData.suggested_next_milestone && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                   <h4 className="font-medium text-blue-900 mb-1">Next Challenge:</h4>
                   <p className="text-blue-700 text-sm">{celebrationData.suggested_next_milestone}</p>
                 </div>
               )}
-              
+
               <div className="flex justify-center">
                 <button
                   onClick={handleCelebrationDismiss}
@@ -176,7 +176,7 @@ const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
                     <p className="text-sm text-gray-600 mb-2">
                       {highlight.description}
                     </p>
-                    
+
                     <div className="flex items-center space-x-3 text-xs">
                       <span className="text-gray-500">
                         {new Date(highlight.achieved_at).toLocaleDateString()}
@@ -194,7 +194,7 @@ const AchievementCelebration: React.FC<AchievementCelebrationProps> = ({
                     </div>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => onDismiss(highlight.highlight_id)}
                   className="text-gray-400 hover:text-gray-600 transition-colors"

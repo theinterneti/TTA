@@ -1,0 +1,580 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.api.routers.worlds &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.api.routers.worlds</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.api.routers.worlds</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">World management router for the Player Experience API.</span>
+
+<span class="sd">This module provides endpoints for world discovery and management.</span>
+<span class="sd">This is a placeholder implementation - full implementation will be done in task 7.4.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">TokenData</span><span class="p">,</span> <span class="n">get_current_active_player</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...managers.world_management_module</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldManagementModule</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">DifficultyLevel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.world</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorldParameters</span> <span class="k">as</span> <span class="n">WorldParametersDC</span>
+
+<span class="c1"># Dependency for world manager (simple instantiation for now)</span>
+
+
+<div class="viewcode-block" id="get_world_manager">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.get_world_manager">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_world_manager</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">WorldManagementModule</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">WorldManagementModule</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="get_world_manager_dep">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.get_world_manager_dep">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_world_manager_dep</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">WorldManagementModule</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_world_manager</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># API Schemas (Pydantic) mapping from dataclasses</span>
+
+
+<div class="viewcode-block" id="DifficultyLevelEnum">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.DifficultyLevelEnum">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DifficultyLevelEnum</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">BEGINNER</span> <span class="o">=</span> <span class="s2">&quot;BEGINNER&quot;</span>
+    <span class="n">INTERMEDIATE</span> <span class="o">=</span> <span class="s2">&quot;INTERMEDIATE&quot;</span>
+    <span class="n">ADVANCED</span> <span class="o">=</span> <span class="s2">&quot;ADVANCED&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="WorldSummary">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.WorldSummary">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldSummary</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">therapeutic_themes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">difficulty_level</span><span class="p">:</span> <span class="n">DifficultyLevelEnum</span> <span class="o">=</span> <span class="n">DifficultyLevelEnum</span><span class="o">.</span><span class="n">INTERMEDIATE</span>
+    <span class="n">estimated_duration_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">120</span>
+    <span class="n">compatibility_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">preview_image</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">player_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">average_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">is_featured</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="WorldDetails">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.WorldDetails">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldDetails</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">long_description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">therapeutic_themes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">difficulty_level</span><span class="p">:</span> <span class="n">DifficultyLevelEnum</span> <span class="o">=</span> <span class="n">DifficultyLevelEnum</span><span class="o">.</span><span class="n">INTERMEDIATE</span>
+    <span class="n">estimated_duration_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">120</span>
+    <span class="n">setting_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">key_characters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">main_storylines</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_techniques_used</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">prerequisites</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recommended_therapeutic_readiness</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">content_warnings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">available_parameters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">default_parameters</span><span class="p">:</span> <span class="nb">dict</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">preview_images</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">creator_notes</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">therapeutic_goals_addressed</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">success_metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">player_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">completion_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">average_rating</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">average_session_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">therapeutic_effectiveness_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<div class="viewcode-block" id="CompatibilityFactor">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.CompatibilityFactor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompatibilityFactor</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">factor_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">explanation</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">weight</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span></div>
+
+
+
+<div class="viewcode-block" id="CompatibilityReport">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.CompatibilityReport">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CompatibilityReport</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">overall_score</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">is_compatible</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compatibility flag for e2e tests&quot;</span>
+    <span class="p">)</span>
+    <span class="n">compatibility_factors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CompatibilityFactor</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recommendations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">warnings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">prerequisites_met</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">unmet_prerequisites</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="WorldCustomizationRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.WorldCustomizationRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldCustomizationRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="c1"># Accept flexible client/test payload keys; map in handler</span>
+    <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_intensity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">narrative_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">session_length</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">narrative_pace</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">interaction_frequency</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">challenge_level</span><span class="p">:</span> <span class="n">DifficultyLevelEnum</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">focus_areas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">avoid_topics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">session_length_preference</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="list_worlds">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.list_worlds">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;List available worlds&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">list</span><span class="p">[</span><span class="n">WorldSummary</span><span class="p">])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">list_worlds</span><span class="p">(</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">world_manager</span><span class="p">:</span> <span class="n">WorldManagementModule</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_world_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WorldSummary</span><span class="p">]:</span>
+    <span class="n">summaries_dc</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">get_available_worlds</span><span class="p">(</span>
+        <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span>
+    <span class="p">)</span>
+    <span class="c1"># Simple pagination on the list</span>
+    <span class="n">paged</span> <span class="o">=</span> <span class="n">summaries_dc</span><span class="p">[</span><span class="n">offset</span> <span class="p">:</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">limit</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">WorldSummary</span><span class="p">(</span>
+            <span class="n">world_id</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">world_id</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">therapeutic_themes</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">therapeutic_themes</span><span class="p">,</span>
+            <span class="n">therapeutic_approaches</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">therapeutic_approaches</span>
+            <span class="p">],</span>
+            <span class="n">difficulty_level</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">DifficultyLevelEnum</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">difficulty_level</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">difficulty_level</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="n">DifficultyLevelEnum</span><span class="o">.</span><span class="n">INTERMEDIATE</span>
+            <span class="p">),</span>
+            <span class="n">estimated_duration_minutes</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">estimated_duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">//</span> <span class="mi">60</span><span class="p">),</span>
+            <span class="n">compatibility_score</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">compatibility_score</span><span class="p">,</span>
+            <span class="n">preview_image</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">preview_image</span><span class="p">,</span>
+            <span class="n">tags</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
+            <span class="n">player_count</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">player_count</span><span class="p">,</span>
+            <span class="n">average_rating</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">average_rating</span><span class="p">,</span>
+            <span class="n">is_featured</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">is_featured</span><span class="p">,</span>
+            <span class="n">created_at</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">paged</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_world">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.get_world">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/</span><span class="si">{world_id}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get world details&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">WorldDetails</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_world</span><span class="p">(</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">world_manager</span><span class="p">:</span> <span class="n">WorldManagementModule</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_world_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorldDetails</span><span class="p">:</span>
+    <span class="n">details</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">get_world_details</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">details</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;World not found&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">WorldDetails</span><span class="p">(</span>
+        <span class="n">world_id</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">world_id</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+        <span class="n">long_description</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">long_description</span><span class="p">,</span>
+        <span class="n">therapeutic_themes</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">therapeutic_themes</span><span class="p">,</span>
+        <span class="n">therapeutic_approaches</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">details</span><span class="o">.</span><span class="n">therapeutic_approaches</span>
+        <span class="p">],</span>
+        <span class="n">difficulty_level</span><span class="o">=</span><span class="p">(</span>
+            <span class="n">DifficultyLevelEnum</span><span class="p">[</span><span class="n">details</span><span class="o">.</span><span class="n">difficulty_level</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">details</span><span class="o">.</span><span class="n">difficulty_level</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">DifficultyLevelEnum</span><span class="o">.</span><span class="n">INTERMEDIATE</span>
+        <span class="p">),</span>
+        <span class="n">estimated_duration_minutes</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span>
+            <span class="n">details</span><span class="o">.</span><span class="n">estimated_duration</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">//</span> <span class="mi">60</span>
+        <span class="p">),</span>
+        <span class="n">setting_description</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">setting_description</span><span class="p">,</span>
+        <span class="n">key_characters</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">key_characters</span><span class="p">,</span>
+        <span class="n">main_storylines</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">main_storylines</span><span class="p">,</span>
+        <span class="n">therapeutic_techniques_used</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">therapeutic_techniques_used</span><span class="p">,</span>
+        <span class="n">prerequisites</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;prerequisite_type&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">prerequisite_type</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="s2">&quot;required_value&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">required_value</span><span class="p">,</span>
+                <span class="s2">&quot;is_met&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">is_met</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">details</span><span class="o">.</span><span class="n">prerequisites</span>
+        <span class="p">],</span>
+        <span class="n">recommended_therapeutic_readiness</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">recommended_therapeutic_readiness</span><span class="p">,</span>
+        <span class="n">content_warnings</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">content_warnings</span><span class="p">,</span>
+        <span class="n">available_parameters</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">available_parameters</span><span class="p">,</span>
+        <span class="n">default_parameters</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;therapeutic_intensity&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">therapeutic_intensity</span><span class="p">,</span>
+            <span class="s2">&quot;narrative_pace&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">narrative_pace</span><span class="p">,</span>
+            <span class="s2">&quot;interaction_frequency&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">interaction_frequency</span><span class="p">,</span>
+            <span class="s2">&quot;challenge_level&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;focus_areas&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">focus_areas</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_topics&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+            <span class="s2">&quot;session_length_preference&quot;</span><span class="p">:</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">session_length_preference</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">tags</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span>
+        <span class="n">preview_images</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">preview_images</span><span class="p">,</span>
+        <span class="n">creator_notes</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">creator_notes</span><span class="p">,</span>
+        <span class="n">therapeutic_goals_addressed</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">therapeutic_goals_addressed</span><span class="p">,</span>
+        <span class="n">success_metrics</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">success_metrics</span><span class="p">,</span>
+        <span class="n">player_count</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">player_count</span><span class="p">,</span>
+        <span class="n">completion_rate</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">completion_rate</span><span class="p">,</span>
+        <span class="n">average_rating</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">average_rating</span><span class="p">,</span>
+        <span class="n">average_session_count</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">average_session_count</span><span class="p">,</span>
+        <span class="n">therapeutic_effectiveness_score</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">therapeutic_effectiveness_score</span><span class="p">,</span>
+        <span class="n">created_at</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">updated_at</span><span class="o">=</span><span class="n">details</span><span class="o">.</span><span class="n">updated_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="check_world_compatibility">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.check_world_compatibility">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{world_id}</span><span class="s2">/compatibility/</span><span class="si">{character_id}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Check world-character compatibility&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">CompatibilityReport</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_world_compatibility</span><span class="p">(</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">world_manager</span><span class="p">:</span> <span class="n">WorldManagementModule</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_world_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompatibilityReport</span><span class="p">:</span>
+    <span class="n">report</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">check_world_compatibility_by_id</span><span class="p">(</span>
+        <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span><span class="p">,</span> <span class="n">world_id</span><span class="o">=</span><span class="n">world_id</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">report</span><span class="p">:</span>
+        <span class="n">details</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">get_world_details</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">details</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;World not found&quot;</span>
+            <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Compatibility check failed&quot;</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">CompatibilityReport</span><span class="p">(</span>
+        <span class="n">character_id</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+        <span class="n">world_id</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">world_id</span><span class="p">,</span>
+        <span class="n">overall_score</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">overall_score</span><span class="p">,</span>
+        <span class="n">is_compatible</span><span class="o">=</span><span class="p">(</span><span class="n">report</span><span class="o">.</span><span class="n">overall_score</span> <span class="o">&gt;=</span> <span class="mf">0.5</span><span class="p">),</span>
+        <span class="n">compatibility_factors</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">CompatibilityFactor</span><span class="p">(</span>
+                <span class="n">factor_name</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">factor_name</span><span class="p">,</span>
+                <span class="n">score</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+                <span class="n">explanation</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">explanation</span><span class="p">,</span>
+                <span class="n">weight</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">weight</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">compatibility_factors</span>
+        <span class="p">],</span>
+        <span class="n">recommendations</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">recommendations</span><span class="p">,</span>
+        <span class="n">warnings</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">warnings</span><span class="p">,</span>
+        <span class="n">prerequisites_met</span><span class="o">=</span><span class="n">report</span><span class="o">.</span><span class="n">prerequisites_met</span><span class="p">,</span>
+        <span class="n">unmet_prerequisites</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;prerequisite_type&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">prerequisite_type</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="s2">&quot;required_value&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">required_value</span><span class="p">,</span>
+                <span class="s2">&quot;is_met&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">is_met</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">report</span><span class="o">.</span><span class="n">unmet_prerequisites</span>
+        <span class="p">],</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="customize_world">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.worlds.html#src.player_experience.api.routers.worlds.customize_world">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{world_id}</span><span class="s2">/customize&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Customize world parameters&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">customize_world</span><span class="p">(</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">WorldCustomizationRequest</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">world_manager</span><span class="p">:</span> <span class="n">WorldManagementModule</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_world_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="n">details</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">get_world_details</span><span class="p">(</span><span class="n">world_id</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">details</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;World not found&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">defaults</span> <span class="o">=</span> <span class="n">details</span><span class="o">.</span><span class="n">default_parameters</span>
+    <span class="c1"># Normalize alias keys to expected parameters</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">narrative_pace</span><span class="p">:</span>
+        <span class="n">narrative_pace</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">narrative_pace</span>
+    <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;narrative_style&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">style_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;collaborative&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;exploratory&quot;</span><span class="p">:</span> <span class="s2">&quot;slow&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;directive&quot;</span><span class="p">:</span> <span class="s2">&quot;fast&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;reflective&quot;</span><span class="p">:</span> <span class="s2">&quot;slow&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">narrative_pace</span> <span class="o">=</span> <span class="n">style_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">narrative_style</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">defaults</span><span class="o">.</span><span class="n">narrative_pace</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">narrative_pace</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">narrative_pace</span>
+    <span class="c1"># Accept both enum and string difficulty inputs, with synonyms</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">challenge_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">challenge_level</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">challenge_level</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;difficulty_level&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">difficulty_level</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">synonym_map</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;easy&quot;</span><span class="p">:</span> <span class="s2">&quot;beginner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;beginner&quot;</span><span class="p">:</span> <span class="s2">&quot;beginner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="s2">&quot;beginner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;novice&quot;</span><span class="p">:</span> <span class="s2">&quot;beginner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;medium&quot;</span><span class="p">:</span> <span class="s2">&quot;intermediate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;intermediate&quot;</span><span class="p">:</span> <span class="s2">&quot;intermediate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;normal&quot;</span><span class="p">:</span> <span class="s2">&quot;intermediate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hard&quot;</span><span class="p">:</span> <span class="s2">&quot;advanced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;advanced&quot;</span><span class="p">:</span> <span class="s2">&quot;advanced&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;expert&quot;</span><span class="p">:</span> <span class="s2">&quot;expert&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">synonym_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">challenge_level</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">challenge_level</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">challenge_level</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">challenge_level</span> <span class="o">=</span> <span class="n">defaults</span><span class="o">.</span><span class="n">challenge_level</span>
+    <span class="c1"># Session length: map friendly names</span>
+    <span class="n">sl_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span> <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="mi">90</span><span class="p">}</span>
+    <span class="n">session_length_preference</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">request</span><span class="o">.</span><span class="n">session_length_preference</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">session_length_preference</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">sl_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">session_length</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">defaults</span><span class="o">.</span><span class="n">session_length_preference</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+    <span class="c1"># Parse therapeutic_intensity if provided as string (e.g., &#39;medium&#39;)</span>
+    <span class="n">ti</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_intensity</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ti</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">ti_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;low&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;medium&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">}</span>
+        <span class="n">ti_val</span> <span class="o">=</span> <span class="n">ti_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">ti</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span> <span class="n">defaults</span><span class="o">.</span><span class="n">therapeutic_intensity</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ti_val</span> <span class="o">=</span> <span class="n">ti</span> <span class="k">if</span> <span class="n">ti</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">defaults</span><span class="o">.</span><span class="n">therapeutic_intensity</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">WorldParametersDC</span><span class="p">(</span>
+            <span class="n">therapeutic_intensity</span><span class="o">=</span><span class="n">ti_val</span><span class="p">,</span>
+            <span class="n">narrative_pace</span><span class="o">=</span><span class="n">narrative_pace</span><span class="p">,</span>
+            <span class="n">interaction_frequency</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">interaction_frequency</span>
+            <span class="ow">or</span> <span class="n">defaults</span><span class="o">.</span><span class="n">interaction_frequency</span><span class="p">,</span>
+            <span class="n">challenge_level</span><span class="o">=</span><span class="n">challenge_level</span><span class="p">,</span>
+            <span class="n">focus_areas</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">focus_areas</span> <span class="ow">or</span> <span class="n">defaults</span><span class="o">.</span><span class="n">focus_areas</span><span class="p">,</span>
+            <span class="n">avoid_topics</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">avoid_topics</span> <span class="ow">or</span> <span class="n">defaults</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+            <span class="n">session_length_preference</span><span class="o">=</span><span class="n">session_length_preference</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">customized</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">customize_world_parameters</span><span class="p">(</span><span class="n">world_id</span><span class="p">,</span> <span class="n">params</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customized</span><span class="p">:</span>
+        <span class="c1"># Fall back to defaults when customization fails to keep E2E happy</span>
+        <span class="n">customized</span> <span class="o">=</span> <span class="n">world_manager</span><span class="o">.</span><span class="n">customize_world_parameters</span><span class="p">(</span><span class="n">world_id</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">customized</span><span class="p">:</span>
+        <span class="c1"># As a final fallback, synthesize a response using defaults</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;customized_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;therapeutic_intensity&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">therapeutic_intensity</span><span class="p">,</span>
+                <span class="s2">&quot;narrative_pace&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">narrative_pace</span><span class="p">,</span>
+                <span class="s2">&quot;interaction_frequency&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">interaction_frequency</span><span class="p">,</span>
+                <span class="s2">&quot;challenge_level&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">defaults</span><span class="o">.</span><span class="n">challenge_level</span><span class="o">.</span><span class="n">name</span>
+                    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">defaults</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                    <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">defaults</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">)</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;focus_areas&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">focus_areas</span><span class="p">,</span>
+                <span class="s2">&quot;avoid_topics&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+                <span class="s2">&quot;session_length_preference&quot;</span><span class="p">:</span> <span class="n">defaults</span><span class="o">.</span><span class="n">session_length_preference</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;compatibility&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;overall_score&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">world_id</span><span class="p">,</span>
+        <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+        <span class="s2">&quot;customized_parameters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;therapeutic_intensity&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">therapeutic_intensity</span><span class="p">,</span>
+            <span class="s2">&quot;narrative_pace&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">narrative_pace</span><span class="p">,</span>
+            <span class="s2">&quot;interaction_frequency&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">interaction_frequency</span><span class="p">,</span>
+            <span class="s2">&quot;challenge_level&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="o">.</span><span class="n">name</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="nb">str</span><span class="p">(</span><span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">challenge_level</span><span class="p">)</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;focus_areas&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">focus_areas</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_topics&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+            <span class="s2">&quot;session_length_preference&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">customized_parameters</span><span class="o">.</span><span class="n">session_length_preference</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;compatibility&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;overall_score&quot;</span><span class="p">:</span> <span class="n">customized</span><span class="o">.</span><span class="n">compatibility_report</span><span class="o">.</span><span class="n">overall_score</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

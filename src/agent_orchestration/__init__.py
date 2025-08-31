@@ -5,75 +5,105 @@ This package provides the foundational data models and interfaces used by the
 Agent Orchestration Component to coordinate specialized AI agents.
 """
 
-from .models import (
-    AgentId,
-    AgentType,
-    MessageType,
-    MessagePriority,
-    AgentMessage,
-    OrchestrationRequest,
-    OrchestrationResponse,
-    # Capability system models
-    CapabilityType,
-    CapabilityScope,
-    CapabilityStatus,
-    AgentCapability,
-    AgentCapabilitySet,
-    CapabilityMatchCriteria,
-    CapabilityMatchResult,
-    CapabilityDiscoveryRequest,
-    CapabilityDiscoveryResponse,
+from .agents import Agent, AgentRegistry
+from .circuit_breaker import (
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    CircuitBreakerOpenError,
+    CircuitBreakerState,
 )
+from .circuit_breaker_config import (
+    CircuitBreakerConfigManager,
+    WorkflowErrorHandlingConfigSchema,
+)
+from .circuit_breaker_metrics import (
+    CircuitBreakerLogger,
+    CircuitBreakerMetricsCollector,
+)
+from .circuit_breaker_registry import CircuitBreakerRegistry
+from .interfaces import AgentProxy, MessageCoordinator
 from .messaging import (
+    FailureType,
     MessageResult,
     MessageSubscription,
     QueueMessage,
     ReceivedMessage,
-    FailureType,
 )
-from .interfaces import MessageCoordinator, AgentProxy
-from .agents import Agent, AgentRegistry
+from .models import (  # Capability system models
+    AgentCapability,
+    AgentCapabilitySet,
+    AgentId,
+    AgentMessage,
+    AgentType,
+    CapabilityDiscoveryRequest,
+    CapabilityDiscoveryResponse,
+    CapabilityMatchCriteria,
+    CapabilityMatchResult,
+    CapabilityScope,
+    CapabilityStatus,
+    CapabilityType,
+    MessagePriority,
+    MessageType,
+    OrchestrationRequest,
+    OrchestrationResponse,
+)
+from .performance import get_step_aggregator
 from .proxies import (
     InputProcessorAgentProxy,
-    WorldBuilderAgentProxy,
     NarrativeGeneratorAgentProxy,
+    WorldBuilderAgentProxy,
 )
-from .circuit_breaker import CircuitBreaker, CircuitBreakerConfig, CircuitBreakerState, CircuitBreakerOpenError
-from .circuit_breaker_registry import CircuitBreakerRegistry
-from .circuit_breaker_metrics import CircuitBreakerMetricsCollector, CircuitBreakerLogger
-from .circuit_breaker_config import CircuitBreakerConfigManager, WorkflowErrorHandlingConfigSchema
-from .resource_exhaustion_detector import ResourceExhaustionDetector, ResourceThresholds, ResourceExhaustionEvent
-from .state import AgentContext, AgentState, SessionContext, AgentRuntimeStatus
-from .workflow import (
-    WorkflowType,
-    ErrorHandlingStrategy,
-    AgentStep,
-    TimeoutConfiguration,
-    WorkflowDefinition,
+from .resource_exhaustion_detector import (
+    ResourceExhaustionDetector,
+    ResourceExhaustionEvent,
+    ResourceThresholds,
 )
-from .workflow_manager import WorkflowManager, WorkflowRunState, WorkflowRunStatus
 from .resources import (
+    OptimizationResult,
+    ResourceAllocation,
     ResourceManager,
     ResourceRequirements,
-    ResourceAllocation,
     ResourceUsage,
     ResourceUsageReport,
     WorkloadMetrics,
-    OptimizationResult,
 )
-from .performance import get_step_aggregator
-from .therapeutic_safety import TherapeuticValidator, SafetyLevel, SafetyService, get_global_safety_service
+
 # main service
 from .service import AgentOrchestrationService
+from .state import AgentContext, AgentRuntimeStatus, AgentState, SessionContext
+from .therapeutic_safety import (
+    SafetyLevel,
+    SafetyService,
+    TherapeuticValidator,
+    get_global_safety_service,
+)
+from .workflow import (
+    AgentStep,
+    ErrorHandlingStrategy,
+    TimeoutConfiguration,
+    WorkflowDefinition,
+    WorkflowType,
+)
+from .workflow_manager import WorkflowManager, WorkflowRunState, WorkflowRunStatus
+
 # tools exports
 try:
-    from .tools.models import ToolSpec, ToolParameter, ToolRegistration, ToolInvocation, ToolPolicy, ToolStatus
-    from .tools.redis_tool_registry import RedisToolRegistry
     from .tools.coordinator import ToolCoordinator
     from .tools.invocation_service import ToolInvocationService
+    from .tools.models import (
+        ToolInvocation,
+        ToolParameter,
+        ToolPolicy,
+        ToolRegistration,
+        ToolSpec,
+        ToolStatus,
+    )
+    from .tools.redis_tool_registry import RedisToolRegistry
 except Exception:
     # Tools package may be optional during partial builds/tests
-    ToolSpec = ToolParameter = ToolRegistration = ToolInvocation = ToolPolicy = ToolStatus = None
+    ToolSpec = ToolParameter = ToolRegistration = ToolInvocation = ToolPolicy = (
+        ToolStatus
+    ) = None
     RedisToolRegistry = ToolCoordinator = None
 
 __all__ = [
@@ -152,4 +182,3 @@ __all__ = [
     # main service
     "AgentOrchestrationService",
 ]
-

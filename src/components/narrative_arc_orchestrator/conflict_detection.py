@@ -2,29 +2,30 @@
 Conflict detection helpers extracted from ScaleManager.
 These are simple, testable utilities for finding cross-scale issues.
 """
+
 from __future__ import annotations
 
-from typing import Dict, List
-
-from .models import NarrativeScale, NarrativeEvent, ScaleConflict
+from .models import NarrativeEvent, ScaleConflict
 
 
-def detect_temporal_conflicts(all_events: List[NarrativeEvent]) -> List[ScaleConflict]:
+def detect_temporal_conflicts(all_events: list[NarrativeEvent]) -> list[ScaleConflict]:
     # Placeholder: real logic could compare timestamps and sequences across scales
     return []
 
 
-def detect_character_conflicts(all_events: List[NarrativeEvent]) -> List[ScaleConflict]:
+def detect_character_conflicts(all_events: list[NarrativeEvent]) -> list[ScaleConflict]:
     # Placeholder: real logic would group by character and analyze trajectories
     return []
 
 
-def detect_thematic_conflicts(all_events: List[NarrativeEvent]) -> List[ScaleConflict]:
+def detect_thematic_conflicts(all_events: list[NarrativeEvent]) -> list[ScaleConflict]:
     # Placeholder: real logic would inspect metadata/themes
     return []
 
 
-def detect_therapeutic_conflicts(all_events: List[NarrativeEvent]) -> List[ScaleConflict]:
+def detect_therapeutic_conflicts(
+    all_events: list[NarrativeEvent],
+) -> list[ScaleConflict]:
     return []
 
 
@@ -35,4 +36,3 @@ __all__ = [
     "detect_thematic_conflicts",
     "detect_therapeutic_conflicts",
 ]
-

@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import json
 import time
-from typing import Any, Optional, List, Dict, Tuple
+from typing import Any
 
-from .models import AgentType, AgentId
+from .models import AgentId, AgentType
 
 
 class AgentRouter:
@@ -82,7 +82,7 @@ class AgentRouter:
             return 1.0
 
     @staticmethod
-    def _normalize(values: List[float]) -> List[float]:
+    def _normalize(values: list[float]) -> list[float]:
         # Min-max normalize to [0,1]; if all equal, return zeros
         if not values:
             return []
@@ -92,12 +92,14 @@ class AgentRouter:
             return [0.0 for _ in values]
         return [(v - vmin) / (vmax - vmin) for v in values]
 
-    async def _score_candidates(self, candidates: List[Any]) -> Tuple[List[Dict[str, Any]], Optional[Any]]:
+    async def _score_candidates(
+        self, candidates: list[Any]
+    ) -> tuple[list[dict[str, Any]], Any | None]:
         # Gather raw metrics
-        queues: List[float] = []
-        hb_ages: List[float] = []
-        succs: List[float] = []
-        raw: List[Dict[str, Any]] = []
+        queues: list[float] = []
+        hb_ages: list[float] = []
+        succs: list[float] = []
+        raw: list[dict[str, Any]] = []
         for a in candidates:
             q = await self._measure_queue_length(a)
             h = await self._measure_heartbeat_age(a)
@@ -105,21 +107,28 @@ class AgentRouter:
             queues.append(float(q))
             hb_ages.append(float(h))
             succs.append(float(s))
-            raw.append({
-                "agent": a,
-                "instance": a.agent_id.instance or "default",
-                "queue_length": int(q),
-                "heartbeat_age_s": float(h),
-                "success_rate": float(s),
-            })
+            raw.append(
+                {
+                    "agent": a,
+                    "instance": a.agent_id.instance or "default",
+                    "queue_length": int(q),
+                    "heartbeat_age_s": float(h),
+                    "success_rate": float(s),
+                }
+            )
         # Normalize: lower is better for q and h; higher is better for s
         nq = self._normalize(queues)
-        nh = [min(1.0, (h / self._hb_fresh) if self._hb_fresh > 0 else 1.0) for h in hb_ages]
+        nh = [
+            min(1.0, (h / self._hb_fresh) if self._hb_fresh > 0 else 1.0)
+            for h in hb_ages
+        ]
         ns = succs  # already in [0,1]
         # Compute weighted score: lower is better (penalize low success)
         for i, entry in enumerate(raw):
-            penalty_success = (1.0 - ns[i])
-            score = (self._wq * nq[i]) + (self._wh * nh[i]) + (self._ws * penalty_success)
+            penalty_success = 1.0 - ns[i]
+            score = (
+                (self._wq * nq[i]) + (self._wh * nh[i]) + (self._ws * penalty_success)
+            )
             entry["score"] = float(score)
         # Choose best (min score)
         best = None
@@ -127,12 +136,18 @@ class AgentRouter:
             best = min(raw, key=lambda d: d.get("score", 1e9)).get("agent")
         return raw, best
 
-    async def resolve_healthy_instance(self, agent_type: AgentType, exclude_degraded: bool = True) -> Optional[AgentId]:
+    async def resolve_healthy_instance(
+        self, agent_type: AgentType, exclude_degraded: bool = True
+    ) -> AgentId | None:
         candidates = []
         try:
             for a in self._registry.all():
                 try:
-                    if a.agent_id.type == agent_type and a._running and (not exclude_degraded or not a._degraded):
+                    if (
+                        a.agent_id.type == agent_type
+                        and a._running
+                        and (not exclude_degraded or not a._degraded)
+                    ):
                         candidates.append(a)
                 except Exception:
                     continue
@@ -142,49 +157,72 @@ class AgentRouter:
             return None
         scored, best_agent = await self._score_candidates(candidates)
         if best_agent is not None:
-            return AgentId(type=best_agent.agent_id.type, instance=best_agent.agent_id.instance)
+            return AgentId(
+                type=best_agent.agent_id.type, instance=best_agent.agent_id.instance
+            )
         # Fallback: first candidate
         a0 = candidates[0]
         return AgentId(type=a0.agent_id.type, instance=a0.agent_id.instance)
 
-    async def resolve_target(self, recipient: AgentId, exclude_degraded: bool = True) -> AgentId:
+    async def resolve_target(
+        self, recipient: AgentId, exclude_degraded: bool = True
+    ) -> AgentId:
         """Return an AgentId with instance resolved to a healthy one when possible.
         Honors explicit instance when healthy; otherwise picks another healthy instance of the same type.
         """
         try:
             if recipient.instance:
                 for a in self._registry.all():
-                    if a.agent_id.type == recipient.type and a.agent_id.instance == recipient.instance:
+                    if (
+                        a.agent_id.type == recipient.type
+                        and a.agent_id.instance == recipient.instance
+                    ):
                         if a._running and (not exclude_degraded or not a._degraded):
                             return recipient
                         break
         except Exception:
             pass
-        resolved = await self.resolve_healthy_instance(recipient.type, exclude_degraded=exclude_degraded)
+        resolved = await self.resolve_healthy_instance(
+            recipient.type, exclude_degraded=exclude_degraded
+        )
         return resolved or recipient
 
-    async def preview(self, agent_type: AgentType, exclude_degraded: bool = True, show_all_candidates: bool = False) -> Dict[str, Any]:
+    async def preview(
+        self,
+        agent_type: AgentType,
+        exclude_degraded: bool = True,
+        show_all_candidates: bool = False,
+    ) -> dict[str, Any]:
         """Compute routing preview with scores, metrics, and exclusions for transparency."""
-        out: Dict[str, Any] = {
+        out: dict[str, Any] = {
             "agent_type": agent_type.value,
             "weights": {"queue": self._wq, "heartbeat": self._wh, "success": self._ws},
             "heartbeat_fresh_s": self._hb_fresh,
             # Explicitly include configured_* keys for ops-facing consumers
-            "configured_weights": {"queue": self._wq, "heartbeat": self._wh, "success": self._ws},
+            "configured_weights": {
+                "queue": self._wq,
+                "heartbeat": self._wh,
+                "success": self._ws,
+            },
             "configured_heartbeat_fresh_seconds": self._hb_fresh,
             "candidates": [],
             "selected": None,
             "reason": "",
             "excluded": [],
-            "summary": {"total_agents": 0, "healthy_candidates": 0, "excluded_count": 0, "exclusion_reasons": {}},
+            "summary": {
+                "total_agents": 0,
+                "healthy_candidates": 0,
+                "excluded_count": 0,
+                "exclusion_reasons": {},
+            },
         }
-        all_agents: List[Any] = []
+        all_agents: list[Any] = []
         try:
             all_agents = list(self._registry.all())
         except Exception:
             all_agents = []
         out["summary"]["total_agents"] = len(all_agents)
-        candidates: List[Any] = []
+        candidates: list[Any] = []
         # Build exclusions
         for a in all_agents:
             reason = None
@@ -198,23 +236,32 @@ class AgentRouter:
             except Exception:
                 reason = "unhealthy"
             if reason:
-                out["excluded"].append({"instance": getattr(a.agent_id, "instance", None) or "default", "reason": reason})
-                out["summary"]["exclusion_reasons"][reason] = out["summary"]["exclusion_reasons"].get(reason, 0) + 1
+                out["excluded"].append(
+                    {
+                        "instance": getattr(a.agent_id, "instance", None) or "default",
+                        "reason": reason,
+                    }
+                )
+                out["summary"]["exclusion_reasons"][reason] = (
+                    out["summary"]["exclusion_reasons"].get(reason, 0) + 1
+                )
                 if show_all_candidates and a.agent_id.type == agent_type:
                     # Include excluded candidate in candidates with marking
                     try:
                         q = await self._measure_queue_length(a)
                         h = await self._measure_heartbeat_age(a)
                         s = self._measure_success_rate(a)
-                        out["candidates"].append({
-                            "instance": a.agent_id.instance or "default",
-                            "queue_length": int(q),
-                            "heartbeat_age_s": float(h),
-                            "success_rate": float(s),
-                            "score": None,
-                            "excluded": True,
-                            "exclusion_reason": reason,
-                        })
+                        out["candidates"].append(
+                            {
+                                "instance": a.agent_id.instance or "default",
+                                "queue_length": int(q),
+                                "heartbeat_age_s": float(h),
+                                "success_rate": float(s),
+                                "score": None,
+                                "excluded": True,
+                                "exclusion_reason": reason,
+                            }
+                        )
                     except Exception:
                         pass
             else:
@@ -229,14 +276,16 @@ class AgentRouter:
         if show_all_candidates:
             # Keep previously appended excluded entries; append healthy scored entries
             for d in scored_sorted:
-                out["candidates"].append({
-                    "instance": d["instance"],
-                    "queue_length": d["queue_length"],
-                    "heartbeat_age_s": d["heartbeat_age_s"],
-                    "success_rate": d["success_rate"],
-                    "score": d["score"],
-                    "excluded": False,
-                })
+                out["candidates"].append(
+                    {
+                        "instance": d["instance"],
+                        "queue_length": d["queue_length"],
+                        "heartbeat_age_s": d["heartbeat_age_s"],
+                        "success_rate": d["success_rate"],
+                        "score": d["score"],
+                        "excluded": False,
+                    }
+                )
             out["summary"]["healthy_candidates"] = len(scored_sorted)
         else:
             # Only healthy candidates
@@ -258,4 +307,3 @@ class AgentRouter:
         else:
             out["reason"] = "fallback to first candidate"
         return out
-

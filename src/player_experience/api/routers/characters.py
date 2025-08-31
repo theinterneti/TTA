@@ -6,29 +6,28 @@ authentication, authorization (owner-only), and API documentation.
 """
 
 from datetime import datetime
-from typing import List, Optional
 
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
-from ..auth import TokenData, get_current_active_player
+from ...database.character_repository import CharacterRepository
 from ...managers.character_avatar_manager import (
     CharacterAvatarManager,
     CharacterLimitExceededError,
     CharacterNotFoundError,
 )
-from ...database.character_repository import CharacterRepository
 from ...models.character import (
     Character,
     CharacterAppearance,
     CharacterBackground,
-    TherapeuticProfile,
-    TherapeuticGoal,
-    CharacterUpdates,
     CharacterCreationData,
+    CharacterUpdates,
+    TherapeuticGoal,
+    TherapeuticProfile,
 )
 from ...models.enums import IntensityLevel, TherapeuticApproach
+from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
 
@@ -38,15 +37,24 @@ router = APIRouter()
 # Use a single in-memory repository instance only in testing environment for persistence
 _repository_singleton: CharacterRepository | None = None
 
+
 def _is_test_env() -> bool:
     try:
-        from ..config import settings
         # ENVIRONMENT env var is used in settings selection
         import os
-        return os.getenv("ENVIRONMENT", "development").lower() == "test" or settings.debug and settings.app_name.endswith("(test)")
+
+        from ..config import settings
+
+        return (
+            os.getenv("ENVIRONMENT", "development").lower() == "test"
+            or settings.debug
+            and settings.app_name.endswith("(test)")
+        )
     except Exception:
         import os
+
         return os.getenv("ENVIRONMENT", "development").lower() == "test"
+
 
 def get_character_manager() -> CharacterAvatarManager:
     # Always use a module-level singleton repository instance to persist across requests in tests and dev
@@ -58,19 +66,21 @@ def get_character_manager() -> CharacterAvatarManager:
 
 # Wrapper dependency to allow runtime patching in tests
 
+
 def get_character_manager_dep() -> CharacterAvatarManager:
     return get_character_manager()
 
 
 # Request/Response Schemas
 
+
 class CharacterAppearanceRequest(BaseModel):
     age_range: str = Field("adult")
     gender_identity: str = Field("non-binary")
     physical_description: str = Field("")
     clothing_style: str = Field("casual")
-    distinctive_features: List[str] = Field(default_factory=list)
-    avatar_image_url: Optional[str] = None
+    distinctive_features: list[str] = Field(default_factory=list)
+    avatar_image_url: str | None = None
 
 
 class CharacterBackgroundRequest(BaseModel):
@@ -78,47 +88,50 @@ class CharacterBackgroundRequest(BaseModel):
     model_config = ConfigDict(extra="allow")
     name: str
     backstory: str = Field("")
-    personality_traits: List[str] = Field(default_factory=list)
-    core_values: List[str] = Field(default_factory=list)
-    fears_and_anxieties: List[str] = Field(default_factory=list)
-    strengths_and_skills: List[str] = Field(default_factory=list)
-    life_goals: List[str] = Field(default_factory=list)
+    personality_traits: list[str] = Field(default_factory=list)
+    core_values: list[str] = Field(default_factory=list)
+    fears_and_anxieties: list[str] = Field(default_factory=list)
+    strengths_and_skills: list[str] = Field(default_factory=list)
+    life_goals: list[str] = Field(default_factory=list)
     relationships: dict[str, str] = Field(default_factory=dict)
 
 
 class TherapeuticGoalSchema(BaseModel):
     goal_id: str
     description: str
-    target_date: Optional[str] = None
+    target_date: str | None = None
     progress_percentage: float = 0.0
     is_active: bool = True
-    therapeutic_approaches: List[TherapeuticApproach] = Field(default_factory=list)
+    therapeutic_approaches: list[TherapeuticApproach] = Field(default_factory=list)
 
     @field_validator("therapeutic_approaches", mode="before")
     @classmethod
     def _normalize_goal_approaches(cls, v):
         from ...utils.normalization import normalize_approaches
+
         return normalize_approaches(v)
 
 
 class TherapeuticProfileSchema(BaseModel):
-    primary_concerns: List[str] = Field(default_factory=list)
-    therapeutic_goals: List[TherapeuticGoalSchema] = Field(default_factory=list)
+    primary_concerns: list[str] = Field(default_factory=list)
+    therapeutic_goals: list[TherapeuticGoalSchema] = Field(default_factory=list)
     preferred_intensity: IntensityLevel = IntensityLevel.MEDIUM
-    comfort_zones: List[str] = Field(default_factory=list)
+    comfort_zones: list[str] = Field(default_factory=list)
     readiness_level: float = 0.5
-    therapeutic_approaches: List[TherapeuticApproach] = Field(default_factory=list)
+    therapeutic_approaches: list[TherapeuticApproach] = Field(default_factory=list)
 
     @field_validator("preferred_intensity", mode="before")
     @classmethod
     def _normalize_intensity(cls, v):
         from ...utils.normalization import normalize_intensity
+
         return normalize_intensity(v)
 
     @field_validator("therapeutic_approaches", mode="before")
     @classmethod
     def _normalize_profile_approaches(cls, v):
         from ...utils.normalization import normalize_approaches
+
         return normalize_approaches(v)
 
 
@@ -130,9 +143,9 @@ class CreateCharacterRequest(BaseModel):
 
 
 class UpdateCharacterRequest(BaseModel):
-    appearance: Optional[CharacterAppearanceRequest] = None
-    background: Optional[CharacterBackgroundRequest] = None
-    therapeutic_profile: Optional[TherapeuticProfileSchema] = None
+    appearance: CharacterAppearanceRequest | None = None
+    background: CharacterBackgroundRequest | None = None
+    therapeutic_profile: TherapeuticProfileSchema | None = None
 
 
 class CharacterResponse(BaseModel):
@@ -148,6 +161,7 @@ class CharacterResponse(BaseModel):
 
 
 # Converters between dataclasses and API schemas
+
 
 def _goal_to_schema(goal: TherapeuticGoal) -> TherapeuticGoalSchema:
     return TherapeuticGoalSchema(
@@ -223,6 +237,7 @@ def _schema_to_appearance(s: CharacterAppearanceRequest) -> CharacterAppearance:
 def _schema_to_background(s: CharacterBackgroundRequest) -> CharacterBackground:
     # Sanitize background name: only letters, spaces, hyphens, apostrophes per model validation
     import re
+
     clean_name = re.sub(r"[^a-zA-Z\s\-']+", "", (s.name or "")).strip()
     return CharacterBackground(
         name=clean_name,
@@ -238,6 +253,7 @@ def _schema_to_background(s: CharacterBackgroundRequest) -> CharacterBackground:
 
 def _schema_to_goal(s: TherapeuticGoalSchema) -> TherapeuticGoal:
     from datetime import datetime
+
     return TherapeuticGoal(
         goal_id=s.goal_id,
         description=s.description,
@@ -264,25 +280,32 @@ def _schema_to_profile(s: TherapeuticProfileSchema) -> TherapeuticProfile:
     summary="Characters root",
     description="Protected listing endpoint (see list endpoint).",
 )
-async def characters_root(current_player: TokenData = Depends(get_current_active_player)) -> dict[str, str]:
+async def characters_root(
+    current_player: TokenData = Depends(get_current_active_player),
+) -> dict[str, str]:
     return {"message": "Characters root"}
 
 
 @router.get(
     "/",
-    response_model=List[CharacterResponse],
+    response_model=list[CharacterResponse],
     summary="List Player Characters",
     description="List all characters owned by the current player.",
 )
 async def list_characters(
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> List[CharacterResponse]:
+) -> list[CharacterResponse]:
     try:
         chars = manager.get_player_characters(current_player.player_id)
         return [_character_to_response(c) for c in chars]
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while listing characters"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while listing characters"
+            },
+        )
 
 
 @router.get(
@@ -299,12 +322,25 @@ async def get_character(
     try:
         character = manager.get_character(character_id)
         if not character:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if character.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only access your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only access your own characters"
+                },
+            )
         return _character_to_response(character)
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while retrieving character"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while retrieving character"
+            },
+        )
 
 
 @router.post(
@@ -322,6 +358,7 @@ async def create_character(
     try:
         # Convert request to domain models. Sanitize both display and background names to match model constraints.
         import re
+
         sanitize = lambda s: re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip()
         sanitized_name = sanitize(request.name)
         character = manager.create_character(
@@ -335,12 +372,19 @@ async def create_character(
         )
         return _character_to_response(character)
     except CharacterLimitExceededError as e:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)})
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
+        )
     except ValueError as e:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)})
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
+        )
     except Exception as e:
         # Provide error detail to aid debugging in tests
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": f"Internal error: {e.__class__.__name__}: {str(e)}"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": f"Internal error: {e.__class__.__name__}: {str(e)}"},
+        )
 
 
 @router.put(
@@ -358,23 +402,53 @@ async def update_character(
     try:
         existing = manager.get_character(character_id)
         if not existing:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if existing.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only modify your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only modify your own characters"
+                },
+            )
 
         updates = CharacterUpdates(
-            appearance=_schema_to_appearance(request.appearance) if request.appearance else None,
-            background=_schema_to_background(request.background) if request.background else None,
-            therapeutic_profile=_schema_to_profile(request.therapeutic_profile) if request.therapeutic_profile else None,
+            appearance=(
+                _schema_to_appearance(request.appearance)
+                if request.appearance
+                else None
+            ),
+            background=(
+                _schema_to_background(request.background)
+                if request.background
+                else None
+            ),
+            therapeutic_profile=(
+                _schema_to_profile(request.therapeutic_profile)
+                if request.therapeutic_profile
+                else None
+            ),
         )
         updated = manager.update_character(character_id, updates)
         return _character_to_response(updated)
     except CharacterNotFoundError:
-        return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"detail": "Character not found"},
+        )
     except ValueError as e:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)})
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
+        )
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while updating character"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while updating character"
+            },
+        )
 
 
 @router.delete(
@@ -391,16 +465,32 @@ async def delete_character(
     try:
         existing = manager.get_character(character_id)
         if not existing:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if existing.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only delete your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only delete your own characters"
+                },
+            )
 
         success = manager.delete_character(character_id)
         if not success:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         return None
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while deleting character"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while deleting character"
+            },
+        )
 
 
 @router.get(
@@ -417,16 +507,32 @@ async def get_character_therapeutic_profile(
     try:
         character = manager.get_character(character_id)
         if not character:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if character.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only access your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only access your own characters"
+                },
+            )
 
         profile = manager.get_character_therapeutic_profile(character_id)
         if profile is None:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         return _profile_to_schema(profile)
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while retrieving therapeutic profile"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while retrieving therapeutic profile"
+            },
+        )
 
 
 @router.patch(
@@ -444,21 +550,41 @@ async def update_character_therapeutic_profile(
     try:
         character = manager.get_character(character_id)
         if not character:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if character.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only modify your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only modify your own characters"
+                },
+            )
 
-        updated = manager.update_character_therapeutic_profile(character_id, _schema_to_profile(request))
+        updated = manager.update_character_therapeutic_profile(
+            character_id, _schema_to_profile(request)
+        )
         if not updated:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
 
         # Return updated profile
         profile = manager.get_character_therapeutic_profile(character_id)
         return _profile_to_schema(profile)
     except ValueError as e:
-        return JSONResponse(status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)})
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
+        )
     except Exception:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": "Internal server error occurred while updating therapeutic profile"})
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "detail": "Internal server error occurred while updating therapeutic profile"
+            },
+        )
 
 
 @router.get(
@@ -475,9 +601,17 @@ async def export_character_data(
     try:
         character = manager.get_character(character_id)
         if not character:
-            return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": "Character not found"})
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Character not found"},
+            )
         if character.player_id != current_player.player_id:
-            return JSONResponse(status_code=status.HTTP_403_FORBIDDEN, content={"detail": "Access denied: You can only export your own characters"})
+            return JSONResponse(
+                status_code=status.HTTP_403_FORBIDDEN,
+                content={
+                    "detail": "Access denied: You can only export your own characters"
+                },
+            )
 
         # Build comprehensive export data
         export_data = {
@@ -485,52 +619,83 @@ async def export_character_data(
                 "character_id": character.character_id,
                 "name": character.name,
                 "player_id": character.player_id,
-                "created_at": character.created_at.isoformat() if hasattr(character, 'created_at') and character.created_at else None,
-                "appearance": {
-                    "age_range": character.appearance.age_range,
-                    "gender_identity": character.appearance.gender_identity,
-                    "physical_description": character.appearance.physical_description,
-                    "clothing_style": character.appearance.clothing_style,
-                    "distinctive_features": character.appearance.distinctive_features,
-                } if character.appearance else {},
-                "background": {
-                    "name": character.background.name,
-                    "backstory": character.background.backstory,
-                    "personality_traits": character.background.personality_traits,
-                    "core_values": character.background.core_values,
-                    "fears_and_anxieties": character.background.fears_and_anxieties,
-                    "strengths_and_skills": character.background.strengths_and_skills,
-                    "life_goals": character.background.life_goals,
-                } if character.background else {},
-                "therapeutic_profile": {
-                    "primary_concerns": character.therapeutic_profile.primary_concerns,
-                    "therapeutic_goals": [{"goal_id": g.goal_id, "description": g.description} for g in character.therapeutic_profile.therapeutic_goals],
-                    "preferred_intensity": character.therapeutic_profile.preferred_intensity.value if hasattr(character.therapeutic_profile.preferred_intensity, 'value') else str(character.therapeutic_profile.preferred_intensity),
-                    "comfort_zones": character.therapeutic_profile.comfort_zones,
-                    "challenge_areas": character.therapeutic_profile.challenge_areas,
-                    "coping_strategies": character.therapeutic_profile.coping_strategies,
-                    "trigger_topics": character.therapeutic_profile.trigger_topics,
-                    "readiness_level": character.therapeutic_profile.readiness_level,
-                    "therapeutic_approaches": [str(a) for a in character.therapeutic_profile.therapeutic_approaches],
-                } if character.therapeutic_profile else {}
+                "created_at": (
+                    character.created_at.isoformat()
+                    if hasattr(character, "created_at") and character.created_at
+                    else None
+                ),
+                "appearance": (
+                    {
+                        "age_range": character.appearance.age_range,
+                        "gender_identity": character.appearance.gender_identity,
+                        "physical_description": character.appearance.physical_description,
+                        "clothing_style": character.appearance.clothing_style,
+                        "distinctive_features": character.appearance.distinctive_features,
+                    }
+                    if character.appearance
+                    else {}
+                ),
+                "background": (
+                    {
+                        "name": character.background.name,
+                        "backstory": character.background.backstory,
+                        "personality_traits": character.background.personality_traits,
+                        "core_values": character.background.core_values,
+                        "fears_and_anxieties": character.background.fears_and_anxieties,
+                        "strengths_and_skills": character.background.strengths_and_skills,
+                        "life_goals": character.background.life_goals,
+                    }
+                    if character.background
+                    else {}
+                ),
+                "therapeutic_profile": (
+                    {
+                        "primary_concerns": character.therapeutic_profile.primary_concerns,
+                        "therapeutic_goals": [
+                            {"goal_id": g.goal_id, "description": g.description}
+                            for g in character.therapeutic_profile.therapeutic_goals
+                        ],
+                        "preferred_intensity": (
+                            character.therapeutic_profile.preferred_intensity.value
+                            if hasattr(
+                                character.therapeutic_profile.preferred_intensity,
+                                "value",
+                            )
+                            else str(character.therapeutic_profile.preferred_intensity)
+                        ),
+                        "comfort_zones": character.therapeutic_profile.comfort_zones,
+                        "challenge_areas": character.therapeutic_profile.challenge_areas,
+                        "coping_strategies": character.therapeutic_profile.coping_strategies,
+                        "trigger_topics": character.therapeutic_profile.trigger_topics,
+                        "readiness_level": character.therapeutic_profile.readiness_level,
+                        "therapeutic_approaches": [
+                            str(a)
+                            for a in character.therapeutic_profile.therapeutic_approaches
+                        ],
+                    }
+                    if character.therapeutic_profile
+                    else {}
+                ),
             },
             "therapeutic_progress": {
                 "sessions_completed": 0,  # Placeholder - would be populated from session data
                 "milestones_achieved": [],
                 "skills_developed": [],
-                "progress_metrics": {}
+                "progress_metrics": {},
             },
             "sessions": [],  # Placeholder - would be populated from session history
             "export_metadata": {
                 "exported_at": datetime.now().isoformat(),
                 "exported_by": current_player.player_id,
                 "export_version": "1.0",
-                "complete_journey": True
-            }
+                "complete_journey": True,
+            },
         }
 
         return export_data
 
     except Exception as e:
-        return JSONResponse(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, content={"detail": f"Export failed: {str(e)}"})
-
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"detail": f"Export failed: {str(e)}"},
+        )

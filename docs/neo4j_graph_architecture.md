@@ -232,7 +232,7 @@ ORDER BY sd.proficiency_score DESC
 MATCH (u:User {user_id: $user_id})-[:HAS_SESSION]->(s:Session)-[:HAS_SCENE]->(sc:Scene)
 WHERE any(focus IN sc.therapeutic_focus WHERE focus = $therapeutic_focus)
 MATCH (u)-[:TRACKS_PROGRESS]->(pm:ProgressMetric)
-RETURN 
+RETURN
   avg(pm.current_value - pm.baseline_value) as avg_improvement,
   count(DISTINCT s) as sessions_with_focus,
   count(DISTINCT sc) as scenes_with_focus
@@ -242,7 +242,7 @@ RETURN
 ```cypher
 MATCH (s:Session {session_id: $session_id})-[:HAS_SCENE]->(sc:Scene)
 OPTIONAL MATCH (sc)-[r:LEADS_TO]->(next:Scene)
-RETURN 
+RETURN
   sc.scene_type,
   count(r) as outgoing_paths,
   collect(next.scene_type) as next_scene_types

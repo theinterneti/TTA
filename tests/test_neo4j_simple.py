@@ -5,9 +5,12 @@ Basic tests to verify Neo4j integration is working correctly.
 """
 
 import pytest
-from datetime import datetime
 
-from src.components.gameplay_loop.database.schema import GraphSchema, NodeType, RelationshipType
+from src.components.gameplay_loop.database.schema import (
+    GraphSchema,
+    NodeType,
+    RelationshipType,
+)
 from src.components.gameplay_loop.models.core import GameplaySession, GameplayState
 
 
@@ -16,10 +19,10 @@ def test_graph_schema_creation():
     """Test that graph schema can be created."""
     constraints = GraphSchema.get_node_constraints()
     indexes = GraphSchema.get_node_indexes()
-    
+
     assert len(constraints) > 0
     assert len(indexes) > 0
-    
+
     # Check that we have constraints for key node types
     constraint_text = " ".join(constraints)
     assert "Session" in constraint_text
@@ -50,9 +53,9 @@ def test_gameplay_session_model():
     session = GameplaySession(
         user_id="test_user",
         therapeutic_goals=["anxiety_management"],
-        safety_level="standard"
+        safety_level="standard",
     )
-    
+
     assert session.user_id == "test_user"
     assert session.session_state == GameplayState.INITIALIZING
     assert len(session.therapeutic_goals) == 1
@@ -65,19 +68,23 @@ def test_gameplay_session_model():
 def test_schema_statements_format():
     """Test that schema statements are properly formatted."""
     statements = GraphSchema.get_all_schema_statements()
-    
+
     for statement in statements:
         if statement.strip() and not statement.startswith("//"):
             # Should be valid Cypher syntax
             assert "CREATE" in statement.upper() or "DROP" in statement.upper()
-            assert statement.strip().endswith(")") or "IF NOT EXISTS" in statement or "IF EXISTS" in statement
+            assert (
+                statement.strip().endswith(")")
+                or "IF NOT EXISTS" in statement
+                or "IF EXISTS" in statement
+            )
 
 
 @pytest.mark.neo4j
 def test_node_properties_definition():
     """Test node properties are properly defined."""
     session_props = GraphSchema.NODE_PROPERTIES.get(NodeType.SESSION)
-    
+
     assert session_props is not None
     assert "session_id" in session_props.required
     assert "user_id" in session_props.required
@@ -89,7 +96,7 @@ def test_node_properties_definition():
 def test_relationship_properties_definition():
     """Test relationship properties are properly defined."""
     leads_to_props = GraphSchema.RELATIONSHIP_PROPERTIES.get(RelationshipType.LEADS_TO)
-    
+
     assert leads_to_props is not None
     assert "created_at" in leads_to_props.required
     assert "created_at" in leads_to_props.indexed

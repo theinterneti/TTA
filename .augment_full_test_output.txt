@@ -27,7 +27,7 @@ tests/test_narrative_coherence_engine.py ....✓ Conflict resolution mechanisms 
 .
 tests/test_orchestrator.py ....
 tests/test_personalization_service_manager.py ..............................
-tests/test_player_experience_component_integration.py ...FF.....F...                         TTA Component Status                          
+tests/test_player_experience_component_integration.py ...FF.....F...                         TTA Component Status
 ┏━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Component           ┃ Status  ┃ Repository    ┃ Dependencies        ┃
 ┡━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━╇━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━┩
@@ -81,23 +81,23 @@ mock_subprocess = <MagicMock name='run' id='140587678886224'>
         """Test that the component starts correctly through orchestration."""
         # Mock successful Docker Compose execution
         mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
-    
+
         # Mock successful health check
         mock_health_response = Mock()
         mock_health_response.status_code = 200
         mock_health_response.json.return_value = {"status": "healthy"}
         mock_requests.return_value = mock_health_response
-    
+
         # Test starting the component
         result = self.player_experience.start()
         self.assertTrue(result)
         self.assertEqual(self.player_experience.status, ComponentStatus.RUNNING)
-    
+
         # Verify Docker Compose was called
 >       mock_subprocess.assert_called()
 
-tests/test_player_experience_component_integration.py:98: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_experience_component_integration.py:98:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <MagicMock name='run' id='140587678886224'>
 
@@ -129,15 +129,15 @@ mock_subprocess = <MagicMock name='run' id='140587677872592'>
         mock_health_response = Mock()
         mock_health_response.status_code = 200
         mock_requests.return_value = mock_health_response
-    
+
         self.player_experience.start()
-    
+
         # Mock stopping
         mock_requests.side_effect = [
             mock_health_response,  # Initial health check (running)
             Exception("Connection refused")  # After stop (not running)
         ]
-    
+
         # Test stopping the component
         result = self.player_experience.stop()
 >       self.assertTrue(result)
@@ -158,7 +158,7 @@ self = <tests.test_player_experience_component_integration.TestPlayerExperienceC
         # Test with invalid Docker Compose path
         invalid_component = PlayerExperienceComponent(self.config)
         invalid_component.player_experience_dir = Path("/nonexistent/path")
-    
+
         # Starting should fail gracefully
         result = invalid_component.start()
         self.assertFalse(result)
@@ -187,26 +187,26 @@ mock_config = <MagicMock name='TTAConfig()' spec='function' id='140587677147216'
         # Mock the import methods to avoid actual file system operations
         mock_validate.return_value = None
         mock_import_repo.return_value = None
-    
+
         # Create a mock component for the orchestrator to find
         mock_component = Mock(spec=PlayerExperienceComponent)
         mock_component.name = "player_experience"
         mock_component.dependencies = ["redis", "neo4j"]
         mock_component.status = ComponentStatus.STOPPED
-    
+
         def mock_import_core_side_effect(orchestrator_self):
             orchestrator_self.components["player_experience"] = mock_component
-    
+
         mock_import_core.side_effect = mock_import_core_side_effect
-    
+
         # Create orchestrator with mock config
         with patch('src.orchestration.orchestrator.TTAConfig') as mock_config_class:
             mock_config_class.return_value = mock_config
 >           orchestrator = TTAOrchestrator()
                            ^^^^^^^^^^^^^^^^^
 
-tests/test_player_experience_orchestration_integration.py:201: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_experience_orchestration_integration.py:201:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 src/orchestration/orchestrator.py:89: in __init__
     self._import_components()
 src/orchestration/decorators.py:36: in wrapper
@@ -223,7 +223,7 @@ src/orchestration/orchestrator.py:126: in _import_components
 ../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/unittest/mock.py:1128: in _mock_call
     return self._execute_mock_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <MagicMock name='_import_core_components' id='140587704372304'>
 args = (), kwargs = {}
@@ -232,7 +232,7 @@ effect = <function TestPlayerExperienceOrchestrationIntegration.test_orchestrato
     def _execute_mock_call(self, /, *args, **kwargs):
         # separate from _increment_mock_call so that awaited functions are
         # executed separately from their call, also AsyncMock overrides this method
-    
+
         effect = self.side_effect
         if effect is not None:
             if _is_exception(effect):
@@ -274,25 +274,25 @@ self = <tests.test_progress_tracking_service.TestProgressTrackingService testMet
                         therapeutic_interventions_count=2,
                     )
                 )
-    
+
             # Update mock repository with streak data
             self.repo._summaries = streak_summaries
-    
+
             milestones, highlights = await self.service.detect_and_update_milestones(self.player_id)
-    
+
             # Should detect multiple milestones for 7+ day streak
             milestone_titles = [m.title for m in milestones]
             self.assertTrue(any("7" in title for title in milestone_titles))
-    
+
             # Should have celebration highlights
             self.assertGreater(len(highlights), 0)
             highlight_types = [h.highlight_type for h in highlights]
             self.assertIn("milestone", highlight_types)
-    
+
 >       asyncio.run(run())
 
-tests/test_progress_tracking_service.py:217: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_progress_tracking_service.py:217:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
@@ -318,8 +318,8 @@ self = <tests.test_progress_tracking_service.TestProgressTrackingService testMet
             self.assertGreater(len(highlights), 0)
 >       asyncio.run(run())
 
-tests/test_progress_tracking_service.py:86: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_progress_tracking_service.py:86:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
@@ -357,27 +357,27 @@ self = <tests.test_progress_tracking_service.TestProgressTrackingService testMet
                         therapeutic_interventions_count=3,
                     )
                 )
-    
+
             self.repo._summaries = high_momentum_summaries
-    
+
             insights = await self.service.generate_progress_insights(self.player_id)
-    
+
             # Should generate multiple relevant recommendations
             self.assertGreater(len(insights), 0)
             self.assertLessEqual(len(insights), 6)  # Should limit to top 6
-    
+
             # Recommendations should be sorted by priority
             priorities = [rec.priority for rec in insights]
             self.assertEqual(priorities, sorted(priorities))
-    
+
             # Should include diverse recommendation types
             rec_types = [rec.recommendation_type for rec in insights]
             self.assertGreater(len(set(rec_types)), 1)  # Multiple types
-    
+
 >       asyncio.run(run())
 
-tests/test_progress_tracking_service.py:257: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_progress_tracking_service.py:257:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 ../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/asyncio/runners.py:190: in run
     return runner.run(main)
            ^^^^^^^^^^^^^^^^
@@ -398,36 +398,36 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fdd1e800090>
     def test_scale_manager_creates_event_when_magnitude_threshold(monkeypatch):
         sm = ScaleManager(config={})
         choice = PlayerChoice(choice_id="c2", session_id="s1", choice_text="Test", metadata={})
-    
+
         async def fake_assess(choice, scale):
             from src.components.narrative_arc_orchestrator.models import ImpactAssessment
             return ImpactAssessment(scale=scale, magnitude=0.9)
-    
+
         monkeypatch.setattr(sm, "_assess_scale_impact", fake_assess)
-    
+
         import asyncio
-    
+
         events_before = len(sm.get_active_events())
 >       asyncio.get_event_loop().run_until_complete(
         ^^^^^^^^^^^^^^^^^^^^^^^^
             sm.evaluate_choice_impact(choice, [NarrativeScale.SHORT_TERM])
         )
 
-tests/test_scale_manager_extraction.py:30: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_scale_manager_extraction.py:30:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <asyncio.unix_events._UnixDefaultEventLoopPolicy object at 0x7fdd21169850>
 
     def get_event_loop(self):
         """Get the event loop for the current context.
-    
+
         Returns an instance of EventLoop or raises an exception.
         """
         if (self._local._loop is None and
                 not self._local._set_called and
                 threading.current_thread() is threading.main_thread()):
             self.set_event_loop(self.new_event_loop())
-    
+
         if self._local._loop is None:
 >           raise RuntimeError('There is no current event loop in thread %r.'
                                % threading.current_thread().name)

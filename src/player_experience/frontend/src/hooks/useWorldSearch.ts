@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { nexusAPI } from '../services/api';
-import { useDebounce } from './useDebounce';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { nexusAPI } from "../services/api";
+import { useDebounce } from "./useDebounce";
 
 export interface WorldSearchFilters {
   genre?: string;
@@ -55,21 +55,21 @@ export interface UseWorldSearchResult {
   setFilters: (filters: WorldSearchFilters) => void;
   updateFilter: (key: keyof WorldSearchFilters, value: any) => void;
   clearFilters: () => void;
-  
+
   // Results state
   results: WorldSearchResult[];
   searchResponse: WorldSearchResponse | null;
   loading: boolean;
   error: string | null;
-  
+
   // Pagination
   currentPage: number;
   setCurrentPage: (page: number) => void;
-  
+
   // Actions
   search: () => Promise<void>;
   clearError: () => void;
-  
+
   // Computed values
   hasResults: boolean;
   totalResults: number;
@@ -78,7 +78,7 @@ export interface UseWorldSearchResult {
 
 /**
  * Custom hook for managing world search functionality
- * 
+ *
  * Features:
  * - Debounced search queries
  * - Advanced filtering
@@ -86,7 +86,9 @@ export interface UseWorldSearchResult {
  * - Error handling
  * - Loading states
  */
-export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSearchResult => {
+export const useWorldSearch = (
+  options: UseWorldSearchOptions = {}
+): UseWorldSearchResult => {
   const {
     debounceDelay = 300,
     defaultPerPage = 12,
@@ -96,39 +98,43 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
   } = options;
 
   // Search state
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [filters, setFilters] = useState<WorldSearchFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
-  
+
   // Results state
   const [results, setResults] = useState<WorldSearchResult[]>([]);
-  const [searchResponse, setSearchResponse] = useState<WorldSearchResponse | null>(null);
+  const [searchResponse, setSearchResponse] =
+    useState<WorldSearchResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Debounced query
   const debouncedQuery = useDebounce(query, debounceDelay);
-  
+
   // Abort controller for cancelling requests
   const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
    * Update a specific filter
    */
-  const updateFilter = useCallback((key: keyof WorldSearchFilters, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-    }));
-    setCurrentPage(1); // Reset to first page when filters change
-  }, []);
+  const updateFilter = useCallback(
+    (key: keyof WorldSearchFilters, value: any) => {
+      setFilters((prev) => ({
+        ...prev,
+        [key]: value,
+      }));
+      setCurrentPage(1); // Reset to first page when filters change
+    },
+    []
+  );
 
   /**
    * Clear all filters and query
    */
   const clearFilters = useCallback(() => {
     setFilters({});
-    setQuery('');
+    setQuery("");
     setCurrentPage(1);
   }, []);
 
@@ -164,42 +170,52 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
       };
 
       // Remove empty/undefined values
-      const cleanParams = Object.entries(searchParams).reduce((acc, [key, value]) => {
-        if (value !== undefined && value !== null && value !== '') {
-          if (Array.isArray(value) && value.length === 0) {
-            return acc;
+      const cleanParams = Object.entries(searchParams).reduce(
+        (acc, [key, value]) => {
+          if (value !== undefined && value !== null && value !== "") {
+            if (Array.isArray(value) && value.length === 0) {
+              return acc;
+            }
+            acc[key] = value;
           }
-          acc[key] = value;
-        }
-        return acc;
-      }, {} as any);
+          return acc;
+        },
+        {} as any
+      );
 
       const response = await nexusAPI.searchWorlds(cleanParams);
-      
+
       if (abortControllerRef.current?.signal.aborted) {
         return;
       }
 
-      setSearchResponse(response);
-      setResults(response.results || []);
-      onSuccess?.(response);
+      setSearchResponse(response as any);
+      setResults((response as any).results || []);
+      onSuccess?.(response as any);
     } catch (err: any) {
       if (abortControllerRef.current?.signal.aborted) {
         return;
       }
-      
-      const errorMessage = err.message || 'Search failed. Please try again.';
+
+      const errorMessage = err.message || "Search failed. Please try again.";
       setError(errorMessage);
       setResults([]);
       setSearchResponse(null);
       onError?.(err);
-      console.error('World search failed:', err);
+      console.error("World search failed:", err);
     } finally {
       if (!abortControllerRef.current?.signal.aborted) {
         setLoading(false);
       }
     }
-  }, [debouncedQuery, currentPage, defaultPerPage, filters, onSuccess, onError]);
+  }, [
+    debouncedQuery,
+    currentPage,
+    defaultPerPage,
+    filters,
+    onSuccess,
+    onError,
+  ]);
 
   /**
    * Auto-search when parameters change
@@ -207,7 +223,11 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
   useEffect(() => {
     if (autoSearch && (debouncedQuery || Object.keys(filters).length > 0)) {
       search();
-    } else if (autoSearch && !debouncedQuery && Object.keys(filters).length === 0) {
+    } else if (
+      autoSearch &&
+      !debouncedQuery &&
+      Object.keys(filters).length === 0
+    ) {
       // Clear results when no query or filters
       setResults([]);
       setSearchResponse(null);
@@ -233,7 +253,9 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
     if (Array.isArray(value)) {
       return count + (value.length > 0 ? 1 : 0);
     }
-    return count + (value !== undefined && value !== null && value !== '' ? 1 : 0);
+    return (
+      count + (value !== undefined && value !== null && value !== "" ? 1 : 0)
+    );
   }, 0);
 
   return {
@@ -244,21 +266,21 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
     setFilters,
     updateFilter,
     clearFilters,
-    
+
     // Results state
     results,
     searchResponse,
     loading,
     error,
-    
+
     // Pagination
     currentPage,
     setCurrentPage,
-    
+
     // Actions
     search,
     clearError,
-    
+
     // Computed values
     hasResults,
     totalResults,
@@ -270,49 +292,60 @@ export const useWorldSearch = (options: UseWorldSearchOptions = {}): UseWorldSea
  * Hook for saved searches functionality
  */
 export const useSavedSearches = () => {
-  const [savedSearches, setSavedSearches] = useState<Array<{
-    id: string;
-    name: string;
-    query: string;
-    filters: WorldSearchFilters;
-    created_at: string;
-  }>>([]);
+  const [savedSearches, setSavedSearches] = useState<
+    Array<{
+      id: string;
+      name: string;
+      query: string;
+      filters: WorldSearchFilters;
+      created_at: string;
+    }>
+  >([]);
 
-  const saveSearch = useCallback((name: string, query: string, filters: WorldSearchFilters) => {
-    const newSearch = {
-      id: Date.now().toString(),
-      name,
-      query,
-      filters,
-      created_at: new Date().toISOString(),
-    };
-    
-    setSavedSearches(prev => [newSearch, ...prev]);
-    
-    // Save to localStorage
-    try {
-      const updated = [newSearch, ...savedSearches];
-      localStorage.setItem('tta_saved_searches', JSON.stringify(updated));
-    } catch (error) {
-      console.error('Failed to save search to localStorage:', error);
-    }
-  }, [savedSearches]);
+  const saveSearch = useCallback(
+    (name: string, query: string, filters: WorldSearchFilters) => {
+      const newSearch = {
+        id: Date.now().toString(),
+        name,
+        query,
+        filters,
+        created_at: new Date().toISOString(),
+      };
 
-  const loadSearch = useCallback((searchId: string) => {
-    return savedSearches.find(search => search.id === searchId);
-  }, [savedSearches]);
+      setSavedSearches((prev) => [newSearch, ...prev]);
+
+      // Save to localStorage
+      try {
+        const updated = [newSearch, ...savedSearches];
+        localStorage.setItem("tta_saved_searches", JSON.stringify(updated));
+      } catch (error) {
+        console.error("Failed to save search to localStorage:", error);
+      }
+    },
+    [savedSearches]
+  );
+
+  const loadSearch = useCallback(
+    (searchId: string) => {
+      return savedSearches.find((search) => search.id === searchId);
+    },
+    [savedSearches]
+  );
 
   const deleteSearch = useCallback((searchId: string) => {
-    setSavedSearches(prev => {
-      const updated = prev.filter(search => search.id !== searchId);
-      
+    setSavedSearches((prev) => {
+      const updated = prev.filter((search) => search.id !== searchId);
+
       // Update localStorage
       try {
-        localStorage.setItem('tta_saved_searches', JSON.stringify(updated));
+        localStorage.setItem("tta_saved_searches", JSON.stringify(updated));
       } catch (error) {
-        console.error('Failed to update saved searches in localStorage:', error);
+        console.error(
+          "Failed to update saved searches in localStorage:",
+          error
+        );
       }
-      
+
       return updated;
     });
   }, []);
@@ -320,12 +353,12 @@ export const useSavedSearches = () => {
   // Load saved searches from localStorage on mount
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('tta_saved_searches');
+      const saved = localStorage.getItem("tta_saved_searches");
       if (saved) {
         setSavedSearches(JSON.parse(saved));
       }
     } catch (error) {
-      console.error('Failed to load saved searches from localStorage:', error);
+      console.error("Failed to load saved searches from localStorage:", error);
     }
   }, []);
 

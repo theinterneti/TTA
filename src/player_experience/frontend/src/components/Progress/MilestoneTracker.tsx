@@ -100,7 +100,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({
                   <p className="text-sm text-gray-600 mt-1">
                     {milestone.description}
                   </p>
-                  
+
                   {milestone.reward_description && (
                     <div className="mt-2 text-xs text-purple-600 bg-purple-100 rounded px-2 py-1 inline-block">
                       🎁 {milestone.reward_description}
@@ -108,7 +108,7 @@ const MilestoneTracker: React.FC<MilestoneTrackerProps> = ({
                   )}
                 </div>
               </div>
-              
+
               <div className="text-right ml-4">
                 <div className="text-sm font-medium text-gray-900">
                   {milestone.progress_percentage.toFixed(0)}%

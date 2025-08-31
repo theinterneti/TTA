@@ -1,0 +1,634 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.realtime.error_reporting &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.realtime.error_reporting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.realtime.error_reporting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Real-time error reporting and recovery notifications.</span>
+
+<span class="sd">This module provides comprehensive error reporting and recovery notification</span>
+<span class="sd">systems for agent operations and workflows.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.event_publisher</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventPublisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AgentStatus</span><span class="p">,</span>
+    <span class="n">WorkflowStatus</span><span class="p">,</span>
+    <span class="n">create_agent_status_event</span><span class="p">,</span>
+    <span class="n">create_error_event</span><span class="p">,</span>
+    <span class="n">create_workflow_progress_event</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ErrorSeverity">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorSeverity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorSeverity</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Error severity levels.&quot;&quot;&quot;</span>
+
+    <span class="n">LOW</span> <span class="o">=</span> <span class="s2">&quot;low&quot;</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="s2">&quot;medium&quot;</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RecoveryStatus">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.RecoveryStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecoveryStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recovery attempt status.&quot;&quot;&quot;</span>
+
+    <span class="n">NOT_ATTEMPTED</span> <span class="o">=</span> <span class="s2">&quot;not_attempted&quot;</span>
+    <span class="n">IN_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;in_progress&quot;</span>
+    <span class="n">SUCCEEDED</span> <span class="o">=</span> <span class="s2">&quot;succeeded&quot;</span>
+    <span class="n">FAILED</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
+    <span class="n">ABANDONED</span> <span class="o">=</span> <span class="s2">&quot;abandoned&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorReport">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReport">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive error report.&quot;&quot;&quot;</span>
+
+    <span class="n">error_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">error_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">ErrorSeverity</span>
+    <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Error details</span>
+    <span class="n">exception_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">stack_trace</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Recovery information</span>
+    <span class="n">recovery_status</span><span class="p">:</span> <span class="n">RecoveryStatus</span> <span class="o">=</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">NOT_ATTEMPTED</span>
+    <span class="n">recovery_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">recovery_messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recovery_success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Notification tracking</span>
+    <span class="n">notifications_sent</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">)</span>
+    <span class="n">escalation_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorReportingManager">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorReportingManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages real-time error reporting and recovery notifications.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">EventPublisher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_recovery_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">escalation_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>  <span class="c1"># 5 minutes</span>
+        <span class="n">cleanup_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3600.0</span><span class="p">,</span>  <span class="c1"># 1 hour</span>
+        <span class="n">error_retention_hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span> <span class="o">=</span> <span class="n">event_publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_recovery_attempts</span> <span class="o">=</span> <span class="n">max_recovery_attempts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_timeout</span> <span class="o">=</span> <span class="n">escalation_timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span> <span class="o">=</span> <span class="n">cleanup_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_retention_hours</span> <span class="o">=</span> <span class="n">error_retention_hours</span>
+
+        <span class="c1"># Error tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ErrorReport</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ErrorReport</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Recovery handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recovery_handlers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># error_type -&gt; handler</span>
+
+        <span class="c1"># Notification handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ErrorReportingManager initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ErrorReportingManager.start">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.start">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the error reporting manager.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Start background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_loop</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_escalation_loop</span><span class="p">())</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ErrorReportingManager started&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorReportingManager.stop">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.stop">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the error reporting manager.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Cancel background tasks</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">task</span><span class="p">:</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">task</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ErrorReportingManager stopped&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorReportingManager.report_error">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.report_error">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">report_error</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">error_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">severity</span><span class="p">:</span> <span class="n">ErrorSeverity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exception</span><span class="p">:</span> <span class="ne">Exception</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report an error with comprehensive details.&quot;&quot;&quot;</span>
+        <span class="n">error_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;error_</span><span class="si">{</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Create error report</span>
+        <span class="n">error_report</span> <span class="o">=</span> <span class="n">ErrorReport</span><span class="p">(</span>
+            <span class="n">error_id</span><span class="o">=</span><span class="n">error_id</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">error_type</span><span class="o">=</span><span class="n">error_type</span><span class="p">,</span>
+            <span class="n">error_message</span><span class="o">=</span><span class="n">error_message</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+            <span class="n">workflow_id</span><span class="o">=</span><span class="n">workflow_id</span><span class="p">,</span>
+            <span class="n">operation_id</span><span class="o">=</span><span class="n">operation_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">context</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add exception details if provided</span>
+        <span class="k">if</span> <span class="n">exception</span><span class="p">:</span>
+            <span class="n">error_report</span><span class="o">.</span><span class="n">exception_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+            <span class="n">error_report</span><span class="o">.</span><span class="n">stack_trace</span> <span class="o">=</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()</span>
+
+        <span class="c1"># Store error report</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">[</span><span class="n">error_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_report</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+        <span class="c1"># Broadcast error event</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_error_event</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+        <span class="c1"># Attempt automatic recovery</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attempt_recovery</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+        <span class="c1"># Send notifications</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_notifications</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error reported: </span><span class="si">{</span><span class="n">error_id</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">error_id</span></div>
+
+
+<div class="viewcode-block" id="ErrorReportingManager.report_recovery_attempt">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.report_recovery_attempt">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">report_recovery_attempt</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">recovery_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Report a recovery attempt for an error.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">error_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">error_report</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">[</span><span class="n">error_id</span><span class="p">]</span>
+        <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">recovery_message</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_status</span> <span class="o">=</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">SUCCEEDED</span>
+            <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_success</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Broadcast recovery success event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_recovery_event</span><span class="p">(</span><span class="n">error_report</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Move to history and remove from active</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">error_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_status</span> <span class="o">=</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">FAILED</span>
+
+            <span class="c1"># Check if we should abandon recovery</span>
+            <span class="k">if</span> <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_recovery_attempts</span><span class="p">:</span>
+                <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_status</span> <span class="o">=</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">ABANDONED</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_recovery_event</span><span class="p">(</span>
+                    <span class="n">error_report</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">abandoned</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_broadcast_recovery_event</span><span class="p">(</span><span class="n">error_report</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Recovery attempt for </span><span class="si">{</span><span class="n">error_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">recovery_message</span><span class="si">}</span><span class="s2">, success: </span><span class="si">{</span><span class="n">success</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_broadcast_error_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_report</span><span class="p">:</span> <span class="n">ErrorReport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Broadcast error event to WebSocket clients.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">error_report</span><span class="o">.</span><span class="n">agent_id</span><span class="p">:</span>
+                <span class="c1"># Agent-specific error</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">create_agent_status_event</span><span class="p">(</span>
+                    <span class="n">agent_id</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="n">AgentStatus</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_message</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;error_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                        <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="p">,</span>
+                        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;workflow_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">workflow_id</span><span class="p">,</span>
+                        <span class="s2">&quot;operation_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">operation_id</span><span class="p">,</span>
+                        <span class="s2">&quot;exception_type&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">exception_type</span><span class="p">,</span>
+                        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">error_report</span><span class="o">.</span><span class="n">workflow_id</span><span class="p">:</span>
+                <span class="c1"># Workflow-specific error</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">create_workflow_progress_event</span><span class="p">(</span>
+                    <span class="n">workflow_id</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">workflow_id</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="n">WorkflowStatus</span><span class="o">.</span><span class="n">FAILED</span><span class="p">,</span>
+                    <span class="n">progress</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_message</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;error_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                        <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="p">,</span>
+                        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;exception_type&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">exception_type</span><span class="p">,</span>
+                        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># System-wide error</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">create_error_event</span><span class="p">(</span>
+                    <span class="n">error_type</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="p">,</span>
+                    <span class="n">error_message</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_message</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;error_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;exception_type&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">exception_type</span><span class="p">,</span>
+                        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">context</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to broadcast error event: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_broadcast_recovery_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_report</span><span class="p">:</span> <span class="n">ErrorReport</span><span class="p">,</span> <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">abandoned</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Broadcast recovery event to WebSocket clients.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">AgentStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Recovery successful for </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">elif</span> <span class="n">abandoned</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">AgentStatus</span><span class="o">.</span><span class="n">ERROR</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Recovery abandoned for </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">AgentStatus</span><span class="o">.</span><span class="n">PROCESSING</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Recovery attempt </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">recovery_attempts</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">if</span> <span class="n">error_report</span><span class="o">.</span><span class="n">agent_id</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">create_agent_status_event</span><span class="p">(</span>
+                    <span class="n">agent_id</span><span class="o">=</span><span class="n">error_report</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                    <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+                    <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;error_id&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                        <span class="s2">&quot;recovery_attempts&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_attempts</span><span class="p">,</span>
+                        <span class="s2">&quot;recovery_success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">,</span>
+                        <span class="s2">&quot;recovery_abandoned&quot;</span><span class="p">:</span> <span class="n">abandoned</span><span class="p">,</span>
+                        <span class="s2">&quot;recovery_messages&quot;</span><span class="p">:</span> <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_messages</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to broadcast recovery event: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_attempt_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_report</span><span class="p">:</span> <span class="n">ErrorReport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt automatic recovery for an error.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_handlers</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">error_report</span><span class="o">.</span><span class="n">recovery_status</span> <span class="o">=</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">IN_PROGRESS</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_handlers</span><span class="p">[</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_type</span><span class="p">]</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_recovery_attempt</span><span class="p">(</span>
+                <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span> <span class="s2">&quot;Automatic recovery attempt&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="n">success</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recovery handler failed for </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">report_recovery_attempt</span><span class="p">(</span>
+                <span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Recovery handler failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_send_notifications</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_report</span><span class="p">:</span> <span class="n">ErrorReport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send notifications for an error.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Notification handler failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task to clean up old errors.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">retention_cutoff</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_retention_hours</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span>
+
+                <span class="c1"># Clean up old errors from history</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">error</span>
+                    <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span>
+                    <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;</span> <span class="n">retention_cutoff</span>
+                <span class="p">]</span>
+
+                <span class="c1"># Clean up resolved errors from active list</span>
+                <span class="n">resolved_errors</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">error_id</span>
+                    <span class="k">for</span> <span class="n">error_id</span><span class="p">,</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">recovery_success</span>
+                    <span class="ow">or</span> <span class="n">error</span><span class="o">.</span><span class="n">recovery_status</span> <span class="o">==</span> <span class="n">RecoveryStatus</span><span class="o">.</span><span class="n">ABANDONED</span>
+                <span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">error_id</span> <span class="ow">in</span> <span class="n">resolved_errors</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">error_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_escalation_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task to handle error escalation.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="k">for</span> <span class="n">error_report</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                    <span class="c1"># Check if error needs escalation</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">current_time</span> <span class="o">-</span> <span class="n">error_report</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalation_timeout</span>
+                        <span class="ow">and</span> <span class="n">error_report</span><span class="o">.</span><span class="n">escalation_level</span> <span class="o">==</span> <span class="mi">0</span>
+                        <span class="ow">and</span> <span class="n">error_report</span><span class="o">.</span><span class="n">severity</span>
+                        <span class="ow">in</span> <span class="p">[</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span><span class="p">,</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">]</span>
+                    <span class="p">):</span>
+                        <span class="n">error_report</span><span class="o">.</span><span class="n">escalation_level</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escalate_error</span><span class="p">(</span><span class="n">error_report</span><span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">60.0</span><span class="p">)</span>  <span class="c1"># Check every minute</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in escalation loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_escalate_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_report</span><span class="p">:</span> <span class="n">ErrorReport</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Escalate an unresolved error.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Escalating error </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">error_report</span><span class="o">.</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Send escalation notifications</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">error_report</span><span class="p">,</span> <span class="n">escalated</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Escalation notification failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ErrorReportingManager.add_recovery_handler">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.add_recovery_handler">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_recovery_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a recovery handler for a specific error type.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recovery_handlers</span><span class="p">[</span><span class="n">error_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added recovery handler for </span><span class="si">{</span><span class="n">error_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorReportingManager.add_notification_handler">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.add_notification_handler">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_notification_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a notification handler.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Added notification handler&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorReportingManager.get_error_statistics">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.error_reporting.html#src.agent_orchestration.realtime.error_reporting.ErrorReportingManager.get_error_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_error_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get error reporting statistics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;active_errors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">),</span>
+            <span class="s2">&quot;total_errors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">),</span>
+            <span class="s2">&quot;errors_by_severity&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_errors_by_severity</span><span class="p">(),</span>
+            <span class="s2">&quot;errors_by_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_errors_by_type</span><span class="p">(),</span>
+            <span class="s2">&quot;recovery_success_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recovery_success_rate</span><span class="p">(),</span>
+            <span class="s2">&quot;average_recovery_attempts&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_average_recovery_attempts</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_errors_by_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get error count by severity.&quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">severity</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">counts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_errors_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get error count by type.&quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">:</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">error</span><span class="o">.</span><span class="n">error_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">error_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">counts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recovery_success_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get recovery success rate.&quot;&quot;&quot;</span>
+        <span class="n">attempted_recoveries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attempted_recoveries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">successful_recoveries</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">attempted_recoveries</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">recovery_success</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">successful_recoveries</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">attempted_recoveries</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_average_recovery_attempts</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get average number of recovery attempts.&quot;&quot;&quot;</span>
+        <span class="n">attempted_recoveries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">attempted_recoveries</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">total_attempts</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">attempted_recoveries</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total_attempts</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">attempted_recoveries</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@
 Rules and constraint constants used by narrative coherence validators.
 Lifted from narrative_coherence_engine; currently placeholders synced with existing logic.
 """
+
 from __future__ import annotations
 
 # Severity weights used across scoring helpers
@@ -28,4 +29,3 @@ OVERALL_WEIGHTS = {
     "causal": 0.25,
     "therapeutic": 0.2,
 }
-

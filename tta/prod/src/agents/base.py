@@ -5,12 +5,12 @@ This module provides the base agent class for all agents in the TTA project.
 Updated to use the modernized model provider system.
 """
 
-import logging
 import json
-import asyncio
-from typing import Dict, List, Any, Optional, Callable, Tuple, Union
+import logging
+from collections.abc import Callable
+from typing import Any
 
-from ..models import UnifiedModelClient, TaskType
+from ..models import TaskType, UnifiedModelClient
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,9 +26,9 @@ class BaseAgent:
         description: str,
         task_type: TaskType = TaskType.NARRATIVE,
         neo4j_manager=None,
-        tools: Dict[str, Callable] = None,
+        tools: dict[str, Callable] = None,
         system_prompt: str = None,
-        model_client: Optional[UnifiedModelClient] = None
+        model_client: UnifiedModelClient | None = None,
     ):
         """
         Initialize the base agent.
@@ -52,7 +52,9 @@ class BaseAgent:
 
         logger.info(f"Initialized {name} agent with task type {task_type}")
 
-    def process(self, input_data: Any, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    def process(
+        self, input_data: Any, context: dict[str, Any] = None
+    ) -> dict[str, Any]:
         """
         Process input data and return a response.
 
@@ -93,7 +95,7 @@ class BaseAgent:
             return True
         return False
 
-    def get_available_tools(self) -> List[Dict[str, str]]:
+    def get_available_tools(self) -> list[dict[str, str]]:
         """
         Get a list of available tools.
 
@@ -101,10 +103,7 @@ class BaseAgent:
             List of available tools with name and description
         """
         return [
-            {
-                "name": name,
-                "description": getattr(tool, "__doc__", "No description")
-            }
+            {"name": name, "description": getattr(tool, "__doc__", "No description")}
             for name, tool in self.tools.items()
         ]
 
@@ -126,7 +125,11 @@ class BaseAgent:
         """Return a string representation of the agent."""
         return f"Agent(name='{self.name}', description='{self.description}', tools={list(self.tools.keys())})"
 
-    def to_mcp_server(self, server_name: Optional[str] = None, server_description: Optional[str] = None):
+    def to_mcp_server(
+        self,
+        server_name: str | None = None,
+        server_description: str | None = None,
+    ):
         """
         Convert this agent to an MCP server.
 
@@ -141,12 +144,10 @@ class BaseAgent:
         from ..mcp import create_agent_mcp_server
 
         return create_agent_mcp_server(
-            agent=self,
-            server_name=server_name,
-            server_description=server_description
+            agent=self, server_name=server_name, server_description=server_description
         )
 
-    def get_mcp_info(self) -> Dict[str, Any]:
+    def get_mcp_info(self) -> dict[str, Any]:
         """
         Get information about this agent for MCP.
 
@@ -157,16 +158,16 @@ class BaseAgent:
             "name": self.name,
             "description": self.description,
             "tools": self.get_available_tools(),
-            "system_prompt": self.system_prompt
+            "system_prompt": self.system_prompt,
         }
 
     async def generate_response(
         self,
         prompt: str,
-        context: Dict[str, Any] = None,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        **kwargs
+        context: dict[str, Any] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        **kwargs,
     ) -> str:
         """
         Generate a response using the modernized model client.
@@ -193,16 +194,16 @@ class BaseAgent:
             task_type=self.task_type,
             temperature=temperature,
             max_tokens=max_tokens,
-            **kwargs
+            **kwargs,
         )
 
     async def stream_response(
         self,
         prompt: str,
-        context: Dict[str, Any] = None,
-        temperature: Optional[float] = None,
-        max_tokens: Optional[int] = None,
-        **kwargs
+        context: dict[str, Any] = None,
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+        **kwargs,
     ):
         """
         Stream a response using the modernized model client.
@@ -229,7 +230,7 @@ class BaseAgent:
             task_type=self.task_type,
             temperature=temperature,
             max_tokens=max_tokens,
-            **kwargs
+            **kwargs,
         ):
             yield chunk
 

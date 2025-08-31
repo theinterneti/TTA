@@ -8,7 +8,10 @@ message routing, and therapeutic safety features.
 
 # WebSocket components
 from .connection_manager import (
-    WebSocketConnectionManager, WebSocketConnection, ConnectionType, ConnectionStatus
+    ConnectionStatus,
+    ConnectionType,
+    WebSocketConnection,
+    WebSocketConnectionManager,
 )
 from .proxy import WebSocketProxy
 from .router import WebSocketRouter, create_websocket_router

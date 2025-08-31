@@ -15,10 +15,12 @@ For more information on Neo4jGraph in Langchain, see:
 https://python.langchain.com/docs/integrations/graphs/neo4j_cypher
 """
 
-from langchain_community.graphs import Neo4jGraph
+from typing import Any, Dict, List
+
 from langchain import Tool
-from src.utils.neo4j_utils import NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD
-from typing import List, Dict, Any
+from langchain_community.graphs import Neo4jGraph
+
+from src.utils.neo4j_utils import NEO4J_PASSWORD, NEO4J_URI, NEO4J_USER
 
 graph = Neo4jGraph(
     url=NEO4J_URI, username=NEO4J_USER, password=NEO4J_PASSWORD

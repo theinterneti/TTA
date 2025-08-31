@@ -51,7 +51,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
         setError(null);
 
         const response = await nexusAPI.getWorld(worldId);
-        setWorldData(response.world || response);
+        setWorldData((response as any).world || response);
       } catch (err: any) {
         console.error("Failed to fetch world data:", err);
         setError(err.message || "Failed to load world information");

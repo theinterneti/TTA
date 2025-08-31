@@ -6,6 +6,7 @@ with appropriate configuration.
 """
 
 import uvicorn
+
 from src.player_experience.api.app import create_app
 from src.player_experience.api.config import settings
 

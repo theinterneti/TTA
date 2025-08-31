@@ -10,7 +10,7 @@ client = <starlette.testclient.TestClient object at 0x7f1b9a8ba7d0>
         player_id = "new-user-123"
         token = create_auth_token(player_id, "newuser", "newuser@example.com")
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Step 1: Create player profile
         profile_data = {
             "username": "newuser",
@@ -28,7 +28,7 @@ client = <starlette.testclient.TestClient object at 0x7f1b9a8ba7d0>
                 "contact_preferences": ["email"]
             }
         }
-    
+
         response = client.post("/api/v1/players/", json=profile_data, headers=headers)
 >       assert response.status_code == 201
 E       assert 422 == 201

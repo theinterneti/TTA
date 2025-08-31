@@ -4,9 +4,7 @@ Input Processor Agent (IPA) for the Therapeutic Text Adventure (TTA).
 [ ... Docstring from original code ... ]
 """
 
-import json
 import logging
-from typing import Any, Dict, List, Optional
 
 from langchain.prompts import PromptTemplate
 from langchain.schema.output_parser import PydanticOutputParser

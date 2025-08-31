@@ -1,25 +1,25 @@
 /**
  * WorldCard Component
- * 
+ *
  * Displays detailed information about a therapeutic world with options
  * to enter, favorite, or get more information.
  */
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  StarIcon, 
-  HeartIcon, 
-  ClockIcon, 
+import {
+  StarIcon,
+  HeartIcon,
+  ClockIcon,
   UserGroupIcon,
   SparklesIcon,
   XMarkIcon,
   PlayIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import { 
-  StarIcon as StarIconSolid, 
-  HeartIcon as HeartIconSolid 
+import {
+  StarIcon as StarIconSolid,
+  HeartIcon as HeartIconSolid
 } from '@heroicons/react/24/solid';
 
 interface WorldCardProps {
@@ -44,11 +44,11 @@ interface WorldCardProps {
   compact?: boolean;
 }
 
-export const WorldCard: React.FC<WorldCardProps> = ({ 
-  world, 
-  onEnter, 
-  onClose, 
-  compact = false 
+export const WorldCard: React.FC<WorldCardProps> = ({
+  world,
+  onEnter,
+  onClose,
+  compact = false
 }) => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showFullDescription, setShowFullDescription] = useState(false);
@@ -150,7 +150,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
             <XMarkIcon className="w-5 h-5 text-white" />
           </button>
         )}
-        
+
         <div className="absolute bottom-4 left-4 right-4">
           <h2 className="text-xl font-bold text-white mb-1">{world.title}</h2>
           <div className="flex items-center space-x-2">
@@ -173,7 +173,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
             {renderStars(world.rating)}
             <span className="text-sm text-gray-600 ml-2">{world.rating.toFixed(1)}</span>
           </div>
-          
+
           <button
             onClick={() => setIsFavorited(!isFavorited)}
             className="p-1 rounded-full hover:bg-gray-100 transition-colors"
@@ -190,8 +190,8 @@ export const WorldCard: React.FC<WorldCardProps> = ({
         {world.description && (
           <div className="mb-4">
             <p className="text-gray-700 text-sm leading-relaxed">
-              {showFullDescription 
-                ? world.description 
+              {showFullDescription
+                ? world.description
                 : truncateDescription(world.description)
               }
               {world.description.length > 120 && (
@@ -233,7 +233,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
               <p className="text-xs text-gray-500 mt-1">Difficulty</p>
             </div>
           )}
-          
+
           {world.estimated_duration && (
             <div className="text-center">
               <div className="flex items-center justify-center text-gray-700">
@@ -243,7 +243,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
               <p className="text-xs text-gray-500 mt-1">Duration</p>
             </div>
           )}
-          
+
           {world.player_count !== undefined && (
             <div className="text-center">
               <div className="flex items-center justify-center text-gray-700">
@@ -253,7 +253,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
               <p className="text-xs text-gray-500 mt-1">Players</p>
             </div>
           )}
-          
+
           {world.therapeutic_efficacy !== undefined && (
             <div className="text-center">
               <div className="flex items-center justify-center text-gray-700">
@@ -304,7 +304,7 @@ export const WorldCard: React.FC<WorldCardProps> = ({
             <PlayIcon className="w-4 h-4 mr-2" />
             Enter World
           </motion.button>
-          
+
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}

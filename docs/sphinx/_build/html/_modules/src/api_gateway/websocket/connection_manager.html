@@ -1,0 +1,669 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.websocket.connection_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.websocket.connection_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.websocket.connection_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">WebSocket connection manager for the API Gateway.</span>
+
+<span class="sd">This module provides comprehensive WebSocket connection management including</span>
+<span class="sd">authentication, session tracking, therapeutic prioritization, and connection lifecycle.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocket</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.websockets</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketState</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthContext</span><span class="p">,</span> <span class="n">ServiceInfo</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConnectionType">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.ConnectionType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConnectionType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;WebSocket connection types.&quot;&quot;&quot;</span>
+
+    <span class="n">CHAT</span> <span class="o">=</span> <span class="s2">&quot;chat&quot;</span>
+    <span class="n">NARRATIVE</span> <span class="o">=</span> <span class="s2">&quot;narrative&quot;</span>
+    <span class="n">THERAPEUTIC_SESSION</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_session&quot;</span>
+    <span class="n">CRISIS_SUPPORT</span> <span class="o">=</span> <span class="s2">&quot;crisis_support&quot;</span>
+    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
+    <span class="n">MONITORING</span> <span class="o">=</span> <span class="s2">&quot;monitoring&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConnectionStatus">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.ConnectionStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConnectionStatus</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;WebSocket connection status.&quot;&quot;&quot;</span>
+
+    <span class="n">CONNECTING</span> <span class="o">=</span> <span class="s2">&quot;connecting&quot;</span>
+    <span class="n">CONNECTED</span> <span class="o">=</span> <span class="s2">&quot;connected&quot;</span>
+    <span class="n">AUTHENTICATED</span> <span class="o">=</span> <span class="s2">&quot;authenticated&quot;</span>
+    <span class="n">ACTIVE</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
+    <span class="n">IDLE</span> <span class="o">=</span> <span class="s2">&quot;idle&quot;</span>
+    <span class="n">DISCONNECTING</span> <span class="o">=</span> <span class="s2">&quot;disconnecting&quot;</span>
+    <span class="n">DISCONNECTED</span> <span class="o">=</span> <span class="s2">&quot;disconnected&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="WebSocketConnection">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">WebSocketConnection</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;WebSocket connection information.&quot;&quot;&quot;</span>
+
+    <span class="n">connection_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span>
+    <span class="n">connection_type</span><span class="p">:</span> <span class="n">ConnectionType</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">crisis_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">ConnectionStatus</span> <span class="o">=</span> <span class="n">ConnectionStatus</span><span class="o">.</span><span class="n">CONNECTING</span>
+    <span class="n">connected_at</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">last_activity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">client_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebSocketConnection.is_therapeutic">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection.is_therapeutic">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_therapeutic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this is a therapeutic connection.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span>
+            <span class="ow">in</span> <span class="p">[</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">THERAPEUTIC_SESSION</span><span class="p">,</span> <span class="n">ConnectionType</span><span class="o">.</span><span class="n">CRISIS_SUPPORT</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_session_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnection.is_crisis">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection.is_crisis">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_crisis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if this is a crisis connection.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_type</span> <span class="o">==</span> <span class="n">ConnectionType</span><span class="o">.</span><span class="n">CRISIS_SUPPORT</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_mode</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnection.update_activity">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection.update_activity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update last activity timestamp.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnection.get_connection_duration">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection.get_connection_duration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get connection duration in seconds.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">connected_at</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnection.get_idle_time">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnection.get_idle_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_idle_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get idle time in seconds.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WebSocketConnectionManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    WebSocket connection manager for the API Gateway.</span>
+
+<span class="sd">    Manages WebSocket connections with authentication, session tracking,</span>
+<span class="sd">    therapeutic prioritization, and comprehensive connection lifecycle management.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the WebSocket connection manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+        <span class="c1"># Connection storage</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">WebSocketConnection</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># user_id -&gt; connection_ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># session_id -&gt; connection_ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># service_name -&gt; connection_ids</span>
+
+        <span class="c1"># Connection limits and timeouts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_connections_per_user</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_total_connections</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">idle_timeout</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_idle_timeout</span> <span class="o">=</span> <span class="mi">1800</span>  <span class="c1"># 30 minutes for therapeutic sessions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_idle_timeout</span> <span class="o">=</span> <span class="mi">3600</span>  <span class="c1"># 1 hour for crisis sessions</span>
+
+        <span class="c1"># Message handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_handlers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_start_cleanup_task</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_cleanup_task</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start background cleanup task.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_idle_connections</span><span class="p">())</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_idle_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task to cleanup idle connections.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># Check every minute</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_idle_connections</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup task: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_remove_idle_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove idle connections based on timeout settings.&quot;&quot;&quot;</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">connections_to_remove</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">connection_id</span><span class="p">,</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Determine timeout based on connection type</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">idle_timeout</span>
+            <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_crisis</span><span class="p">():</span>
+                <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_idle_timeout</span>
+            <span class="k">elif</span> <span class="n">connection</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">():</span>
+                <span class="n">timeout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_idle_timeout</span>
+
+            <span class="c1"># Check if connection is idle</span>
+            <span class="k">if</span> <span class="n">current_time</span> <span class="o">-</span> <span class="n">connection</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">&gt;</span> <span class="n">timeout</span><span class="p">:</span>
+                <span class="n">connections_to_remove</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Removing idle connection </span><span class="si">{</span><span class="n">connection_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;(idle for </span><span class="si">{</span><span class="n">connection</span><span class="o">.</span><span class="n">get_idle_time</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s)&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Remove idle connections</span>
+        <span class="k">for</span> <span class="n">connection_id</span> <span class="ow">in</span> <span class="n">connections_to_remove</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;idle_timeout&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebSocketConnectionManager.connect">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.connect">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span>
+        <span class="n">connection_type</span><span class="p">:</span> <span class="n">ConnectionType</span><span class="p">,</span>
+        <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">therapeutic_session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Accept and register a new WebSocket connection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            websocket: WebSocket instance</span>
+<span class="sd">            connection_type: Type of connection</span>
+<span class="sd">            auth_context: Authentication context if available</span>
+<span class="sd">            therapeutic_session_id: Therapeutic session ID if applicable</span>
+<span class="sd">            target_service: Target service for proxying</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Connection ID</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If connection cannot be established</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check connection limits</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_total_connections</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1013</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Server overloaded&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Maximum connections exceeded&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check per-user limits</span>
+        <span class="k">if</span> <span class="n">auth_context</span> <span class="ow">and</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">:</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+            <span class="n">user_connection_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">()))</span>
+            <span class="k">if</span> <span class="n">user_connection_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_connections_per_user</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1013</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Too many connections&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Maximum connections per user exceeded: </span><span class="si">{</span><span class="n">user_connection_count</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Accept WebSocket connection</span>
+        <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">accept</span><span class="p">()</span>
+
+        <span class="c1"># Create connection record</span>
+        <span class="n">connection_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">WebSocketConnection</span><span class="p">(</span>
+            <span class="n">connection_id</span><span class="o">=</span><span class="n">connection_id</span><span class="p">,</span>
+            <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+            <span class="n">connection_type</span><span class="o">=</span><span class="n">connection_type</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">auth_context</span> <span class="ow">and</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">auth_context</span><span class="o">.</span><span class="n">username</span> <span class="k">if</span> <span class="n">auth_context</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="n">therapeutic_session_id</span><span class="o">=</span><span class="n">therapeutic_session_id</span><span class="p">,</span>
+            <span class="n">crisis_mode</span><span class="o">=</span><span class="n">auth_context</span><span class="o">.</span><span class="n">crisis_mode</span> <span class="k">if</span> <span class="n">auth_context</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="n">ConnectionStatus</span><span class="o">.</span><span class="n">CONNECTED</span><span class="p">,</span>
+            <span class="n">client_ip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_client_ip</span><span class="p">(</span><span class="n">websocket</span><span class="p">),</span>
+            <span class="n">user_agent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_user_agent</span><span class="p">(</span><span class="n">websocket</span><span class="p">),</span>
+            <span class="n">target_service</span><span class="o">=</span><span class="n">target_service</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Store connection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">connection_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection</span>
+
+        <span class="c1"># Index by user</span>
+        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+
+        <span class="c1"># Index by therapeutic session</span>
+        <span class="k">if</span> <span class="n">therapeutic_session_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">therapeutic_session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">[</span><span class="n">therapeutic_session_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">[</span><span class="n">therapeutic_session_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+
+        <span class="c1"># Index by service</span>
+        <span class="k">if</span> <span class="n">target_service</span><span class="p">:</span>
+            <span class="n">service_name</span> <span class="o">=</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">service_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;WebSocket connection established: </span><span class="si">{</span><span class="n">connection_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(type: </span><span class="si">{</span><span class="n">connection_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, user: </span><span class="si">{</span><span class="n">connection</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;therapeutic: </span><span class="si">{</span><span class="n">connection</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">()</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">connection_id</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.disconnect">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.disconnect">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">connection_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;normal_closure&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Disconnect and cleanup a WebSocket connection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection_id: Connection ID to disconnect</span>
+<span class="sd">            reason: Reason for disconnection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">connection_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">connection_id</span><span class="p">]</span>
+
+        <span class="c1"># Update status</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">ConnectionStatus</span><span class="o">.</span><span class="n">DISCONNECTING</span>
+
+        <span class="c1"># Close WebSocket if still open</span>
+        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">websocket</span><span class="o">.</span><span class="n">client_state</span> <span class="o">==</span> <span class="n">WebSocketState</span><span class="o">.</span><span class="n">CONNECTED</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">connection</span><span class="o">.</span><span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="n">reason</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error closing WebSocket </span><span class="si">{</span><span class="n">connection_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Remove from indexes</span>
+        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">and</span> <span class="n">connection</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">therapeutic_session_id</span>
+            <span class="ow">and</span> <span class="n">connection</span><span class="o">.</span><span class="n">therapeutic_session_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">therapeutic_session_id</span><span class="p">]</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span>
+                <span class="n">connection_id</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">therapeutic_session_id</span><span class="p">]:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">[</span><span class="n">connection</span><span class="o">.</span><span class="n">therapeutic_session_id</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">connection</span><span class="o">.</span><span class="n">target_service</span><span class="p">:</span>
+            <span class="n">service_name</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">target_service</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">if</span> <span class="n">service_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">[</span><span class="n">service_name</span><span class="p">]:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span>
+
+        <span class="c1"># Remove connection</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">ConnectionStatus</span><span class="o">.</span><span class="n">DISCONNECTED</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">connection_id</span><span class="p">]</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;WebSocket connection closed: </span><span class="si">{</span><span class="n">connection_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(reason: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">, duration: </span><span class="si">{</span><span class="n">connection</span><span class="o">.</span><span class="n">get_connection_duration</span><span class="p">()</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">s)&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_connection">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_connection">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WebSocketConnection</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get connection by ID.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_user_connections">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_user_connections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WebSocketConnection</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all connections for a user.&quot;&quot;&quot;</span>
+        <span class="n">connection_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">connection_ids</span> <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_session_connections">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_session_connections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_session_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WebSocketConnection</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all connections for a therapeutic session.&quot;&quot;&quot;</span>
+        <span class="n">connection_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">connection_ids</span> <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_service_connections">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_service_connections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_service_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WebSocketConnection</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all connections for a service.&quot;&quot;&quot;</span>
+        <span class="n">connection_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="k">for</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">connection_ids</span> <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_therapeutic_connections">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_therapeutic_connections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_therapeutic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WebSocketConnection</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all therapeutic connections.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_crisis_connections">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_crisis_connections">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_crisis_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">WebSocketConnection</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all crisis connections.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="n">conn</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">conn</span><span class="o">.</span><span class="n">is_crisis</span><span class="p">()]</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.send_message">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.send_message">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connection_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send message to a specific connection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection_id: Target connection ID</span>
+<span class="sd">            message: Message to send</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if message was sent successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">connection_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">connection</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Update activity</span>
+            <span class="n">connection</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+
+            <span class="c1"># Send message</span>
+            <span class="k">await</span> <span class="n">connection</span><span class="o">.</span><span class="n">websocket</span><span class="o">.</span><span class="n">send_text</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">message</span><span class="p">))</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error sending message to </span><span class="si">{</span><span class="n">connection_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Connection might be broken, schedule for cleanup</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;send_error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.broadcast_to_user">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.broadcast_to_user">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_to_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Broadcast message to all connections of a user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_id: Target user ID</span>
+<span class="sd">            message: Message to broadcast</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Number of connections that received the message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_user_connections</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="n">sent_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">connections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+                <span class="n">sent_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">sent_count</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.broadcast_to_session">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.broadcast_to_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_to_session</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Broadcast message to all connections in a therapeutic session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_id: Target session ID</span>
+<span class="sd">            message: Message to broadcast</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Number of connections that received the message</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connections</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_session_connections</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+        <span class="n">sent_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="n">connections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
+                <span class="n">sent_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">sent_count</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_client_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract client IP from WebSocket.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">websocket</span><span class="o">.</span><span class="n">client</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">websocket</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_user_agent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract user agent from WebSocket headers.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">websocket</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="WebSocketConnectionManager.get_connection_stats">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.get_connection_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_connection_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get connection statistics.&quot;&quot;&quot;</span>
+        <span class="n">total_connections</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="p">)</span>
+        <span class="n">therapeutic_connections</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_therapeutic_connections</span><span class="p">())</span>
+        <span class="n">crisis_connections</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_crisis_connections</span><span class="p">())</span>
+
+        <span class="c1"># Connection types breakdown</span>
+        <span class="n">type_counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">conn_type</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">connection_type</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">type_counts</span><span class="p">[</span><span class="n">conn_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">type_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">conn_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Status breakdown</span>
+        <span class="n">status_counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">connection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">status</span><span class="o">.</span><span class="n">value</span>
+            <span class="n">status_counts</span><span class="p">[</span><span class="n">status</span><span class="p">]</span> <span class="o">=</span> <span class="n">status_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">status</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_connections&quot;</span><span class="p">:</span> <span class="n">total_connections</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_connections&quot;</span><span class="p">:</span> <span class="n">therapeutic_connections</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_connections&quot;</span><span class="p">:</span> <span class="n">crisis_connections</span><span class="p">,</span>
+            <span class="s2">&quot;unique_users&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_connections</span><span class="p">),</span>
+            <span class="s2">&quot;active_sessions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_connections</span><span class="p">),</span>
+            <span class="s2">&quot;connected_services&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service_connections</span><span class="p">),</span>
+            <span class="s2">&quot;connection_types&quot;</span><span class="p">:</span> <span class="n">type_counts</span><span class="p">,</span>
+            <span class="s2">&quot;connection_status&quot;</span><span class="p">:</span> <span class="n">status_counts</span><span class="p">,</span>
+            <span class="s2">&quot;max_connections&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_total_connections</span><span class="p">,</span>
+            <span class="s2">&quot;max_per_user&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_connections_per_user</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnectionManager.shutdown">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.connection_manager.html#src.api_gateway.websocket.WebSocketConnectionManager.shutdown">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shutdown connection manager and cleanup resources.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Shutting down WebSocket connection manager&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Cancel cleanup task</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Close all connections</span>
+        <span class="n">connection_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connections</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">connection_id</span> <span class="ow">in</span> <span class="n">connection_ids</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">connection_id</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;server_shutdown&quot;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;WebSocket connection manager shutdown complete&quot;</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

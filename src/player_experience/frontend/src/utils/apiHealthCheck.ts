@@ -1,6 +1,6 @@
 /**
  * API Health Check Utility
- * 
+ *
  * Provides functions to verify backend connectivity and API health
  * for the TTA Player Experience Interface.
  */
@@ -25,7 +25,7 @@ interface ConnectivityTestResult {
  */
 export async function checkApiHealth(): Promise<HealthCheckResult> {
   const startTime = Date.now();
-  
+
   try {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/health`, {
       method: 'GET',
@@ -77,7 +77,7 @@ export async function testCorsConfiguration(): Promise<boolean> {
     // Check if CORS headers are present
     const corsOrigin = response.headers.get('access-control-allow-origin');
     const corsCredentials = response.headers.get('access-control-allow-credentials');
-    
+
     return corsOrigin !== null && corsCredentials === 'true';
   } catch (error) {
     console.error('CORS test failed:', error);
@@ -166,20 +166,20 @@ export async function runConnectivityTests(): Promise<ConnectivityTestResult> {
  */
 export function displayConnectivityResults(results: ConnectivityTestResult): void {
   console.group('🌐 API Connectivity Test Results');
-  
+
   console.log(`Overall Status: ${results.overallStatus.toUpperCase()}`);
   console.log(`API Health: ${results.apiHealth.healthy ? '✅' : '❌'} ${results.apiHealth.service || ''}`);
   console.log(`CORS Enabled: ${results.corsEnabled ? '✅' : '❌'}`);
   console.log(`Auth Endpoint: ${results.authEndpointAccessible ? '✅' : '❌'}`);
   console.log(`Nexus Endpoint: ${results.nexusEndpointAccessible ? '✅' : '❌'}`);
-  
+
   if (results.apiHealth.responseTime) {
     console.log(`Response Time: ${results.apiHealth.responseTime}ms`);
   }
-  
+
   if (results.apiHealth.error) {
     console.error(`API Error: ${results.apiHealth.error}`);
   }
-  
+
   console.groupEnd();
 }

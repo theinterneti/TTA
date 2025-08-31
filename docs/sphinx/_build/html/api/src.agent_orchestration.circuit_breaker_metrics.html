@@ -1,0 +1,504 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.circuit_breaker_metrics module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.agent_orchestration.circuit_breaker_registry module" href="src.agent_orchestration.circuit_breaker_registry.html" />
+    <link rel="prev" title="src.agent_orchestration.circuit_breaker_config module" href="src.agent_orchestration.circuit_breaker_config.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.circuit_breaker_metrics module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.agent_orchestration.circuit_breaker_metrics.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.agent_orchestration.circuit_breaker_metrics">
+<span id="src-agent-orchestration-circuit-breaker-metrics-module"></span><h1>src.agent_orchestration.circuit_breaker_metrics module<a class="headerlink" href="#module-src.agent_orchestration.circuit_breaker_metrics" title="Link to this heading"></a></h1>
+<p>Circuit breaker metrics integration with existing metrics system.</p>
+<p>Provides structured logging with correlation IDs and metrics collection
+for circuit breaker state changes and operations.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">CircuitBreakerLogger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">logger_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'src.agent_orchestration.circuit_breaker_metrics'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Enhanced logging for circuit breaker operations with correlation IDs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>logger_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.get_metrics_snapshot">
+<span class="sig-name descname"><span class="pre">get_metrics_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.get_metrics_snapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.get_metrics_snapshot" title="Link to this definition"></a></dt>
+<dd><p>Get current metrics snapshot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_circuit_breaker_created">
+<span class="sig-name descname"><span class="pre">log_circuit_breaker_created</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.log_circuit_breaker_created"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_circuit_breaker_created" title="Link to this definition"></a></dt>
+<dd><p>Log circuit breaker creation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_circuit_breaker_reset">
+<span class="sig-name descname"><span class="pre">log_circuit_breaker_reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.log_circuit_breaker_reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_circuit_breaker_reset" title="Link to this definition"></a></dt>
+<dd><p>Log circuit breaker manual reset.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_degraded_mode_activation">
+<span class="sig-name descname"><span class="pre">log_degraded_mode_activation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.log_degraded_mode_activation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_degraded_mode_activation" title="Link to this definition"></a></dt>
+<dd><p>Log activation of degraded mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_degraded_mode_deactivation">
+<span class="sig-name descname"><span class="pre">log_degraded_mode_deactivation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.log_degraded_mode_deactivation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.log_degraded_mode_deactivation" title="Link to this definition"></a></dt>
+<dd><p>Log deactivation of degraded mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.operation_context">
+<span class="sig-name descname"><span class="pre">operation_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operation</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.operation_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.operation_context" title="Link to this definition"></a></dt>
+<dd><p>Context manager for circuit breaker operations with timing and correlation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>operation</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.reset_metrics">
+<span class="sig-name descname"><span class="pre">reset_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerLogger.reset_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger.reset_metrics" title="Link to this definition"></a></dt>
+<dd><p>Reset metrics collector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">CircuitBreakerMetricsCollector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state_transitions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calls_permitted=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">calls_rejected=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful_calls=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_calls=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state_durations=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_update=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Collects and aggregates circuit breaker metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>state_transitions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</span>)</p></li>
+<li><p><strong>calls_permitted</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>calls_rejected</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>successful_calls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>failed_calls</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>state_durations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>last_update</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.calls_permitted">
+<span class="sig-name descname"><span class="pre">calls_permitted</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.calls_permitted" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.calls_rejected">
+<span class="sig-name descname"><span class="pre">calls_rejected</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.calls_rejected" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.failed_calls">
+<span class="sig-name descname"><span class="pre">failed_calls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.failed_calls" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.get_snapshot">
+<span class="sig-name descname"><span class="pre">get_snapshot</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.get_snapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.get_snapshot" title="Link to this definition"></a></dt>
+<dd><p>Get a snapshot of current metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.last_update">
+<span class="sig-name descname"><span class="pre">last_update</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.last_update" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_call_permitted">
+<span class="sig-name descname"><span class="pre">record_call_permitted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_call_permitted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_call_permitted" title="Link to this definition"></a></dt>
+<dd><p>Record a permitted call through circuit breaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_call_rejected">
+<span class="sig-name descname"><span class="pre">record_call_rejected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_call_rejected"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_call_rejected" title="Link to this definition"></a></dt>
+<dd><p>Record a rejected call by circuit breaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_failed_call">
+<span class="sig-name descname"><span class="pre">record_failed_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_ms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_failed_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_failed_call" title="Link to this definition"></a></dt>
+<dd><p>Record a failed call through circuit breaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>duration_ms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_state_duration">
+<span class="sig-name descname"><span class="pre">record_state_duration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_seconds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_state_duration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_state_duration" title="Link to this definition"></a></dt>
+<dd><p>Record how long a circuit breaker spent in a particular state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.circuit_breaker.html#src.agent_orchestration.circuit_breaker.CircuitBreakerState" title="src.agent_orchestration.circuit_breaker.CircuitBreakerState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerState</span></code></a></span>)</p></li>
+<li><p><strong>duration_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_state_transition">
+<span class="sig-name descname"><span class="pre">record_state_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_state_transition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_state_transition" title="Link to this definition"></a></dt>
+<dd><p>Record a circuit breaker state transition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>from_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.circuit_breaker.html#src.agent_orchestration.circuit_breaker.CircuitBreakerState" title="src.agent_orchestration.circuit_breaker.CircuitBreakerState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerState</span></code></a></span>)</p></li>
+<li><p><strong>to_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.circuit_breaker.html#src.agent_orchestration.circuit_breaker.CircuitBreakerState" title="src.agent_orchestration.circuit_breaker.CircuitBreakerState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerState</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_successful_call">
+<span class="sig-name descname"><span class="pre">record_successful_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_ms</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.record_successful_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.record_successful_call" title="Link to this definition"></a></dt>
+<dd><p>Record a successful call through circuit breaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>duration_ms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#CircuitBreakerMetricsCollector.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.reset" title="Link to this definition"></a></dt>
+<dd><p>Reset all metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.state_durations">
+<span class="sig-name descname"><span class="pre">state_durations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.state_durations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.state_transitions">
+<span class="sig-name descname"><span class="pre">state_transitions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.state_transitions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.successful_calls">
+<span class="sig-name descname"><span class="pre">successful_calls</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector.successful_calls" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.get_circuit_breaker_logger">
+<span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">get_circuit_breaker_logger</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#get_circuit_breaker_logger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.get_circuit_breaker_logger" title="Link to this definition"></a></dt>
+<dd><p>Get global circuit breaker logger.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger" title="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerLogger"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerLogger</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.get_circuit_breaker_metrics">
+<span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">get_circuit_breaker_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#get_circuit_breaker_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.get_circuit_breaker_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get global circuit breaker metrics collector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector" title="src.agent_orchestration.circuit_breaker_metrics.CircuitBreakerMetricsCollector"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerMetricsCollector</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.record_degraded_mode_activation">
+<span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">record_degraded_mode_activation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reason</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#record_degraded_mode_activation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.record_degraded_mode_activation" title="Link to this definition"></a></dt>
+<dd><p>Convenience function to record degraded mode activation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>reason</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.agent_orchestration.circuit_breaker_metrics.record_state_transition">
+<span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.circuit_breaker_metrics.</span></span><span class="sig-name descname"><span class="pre">record_state_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">circuit_breaker_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/circuit_breaker_metrics.html#record_state_transition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.circuit_breaker_metrics.record_state_transition" title="Link to this definition"></a></dt>
+<dd><p>Convenience function to record state transition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>circuit_breaker_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>from_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.circuit_breaker.html#src.agent_orchestration.circuit_breaker.CircuitBreakerState" title="src.agent_orchestration.circuit_breaker.CircuitBreakerState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerState</span></code></a></span>)</p></li>
+<li><p><strong>to_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.circuit_breaker.html#src.agent_orchestration.circuit_breaker.CircuitBreakerState" title="src.agent_orchestration.circuit_breaker.CircuitBreakerState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CircuitBreakerState</span></code></a></span>)</p></li>
+<li><p><strong>correlation_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.agent_orchestration.circuit_breaker_config.html" class="btn btn-neutral float-left" title="src.agent_orchestration.circuit_breaker_config module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.agent_orchestration.circuit_breaker_registry.html" class="btn btn-neutral float-right" title="src.agent_orchestration.circuit_breaker_registry module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

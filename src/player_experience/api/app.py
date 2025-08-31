@@ -5,8 +5,8 @@ This module sets up the FastAPI application with middleware, error handling,
 authentication, and CORS configuration.
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -15,6 +15,7 @@ from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from ..database.nexus_schema import NexusSchemaManager
 from ..utils.validation import ValidationError
 from .auth import AuthenticationError, AuthorizationError
 from .middleware import (
@@ -24,11 +25,22 @@ from .middleware import (
     SecurityHeadersMiddleware,
     TherapeuticSafetyMiddleware,
 )
-from .routers import auth, characters, players, worlds, chat, sessions, progress, health, services, nexus
+from .routers import (
+    auth,
+    characters,
+    chat,
+    health,
+)
 from .routers import metrics as metrics_router
-from .services.connection_manager import initialize_services, close_services
-from ..database.nexus_schema import NexusSchemaManager, validate_nexus_schema
-
+from .routers import (
+    nexus,
+    players,
+    progress,
+    services,
+    sessions,
+    worlds,
+)
+from .services.connection_manager import close_services, initialize_services
 
 
 @asynccontextmanager
@@ -49,6 +61,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
             # Initialize Nexus Codex schema
             from .services.connection_manager import get_service_manager
+
             service_manager = get_service_manager()
 
             if service_manager and service_manager.neo4j:
@@ -133,8 +146,8 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title="Player Experience Interface API",
         description="API for the TTA (Therapeutic Technology Applications) Player Experience Interface - "
-                   "A comprehensive system for AI-driven therapeutic gaming experiences with real-time "
-                   "monitoring, personalized content delivery, and integrated health tracking.",
+        "A comprehensive system for AI-driven therapeutic gaming experiences with real-time "
+        "monitoring, personalized content delivery, and integrated health tracking.",
         version="1.0.0",
         docs_url="/docs",
         redoc_url="/redoc",
@@ -175,7 +188,9 @@ def create_app() -> FastAPI:
     app.include_router(services.router, prefix="/api/v1/services", tags=["services"])
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
     app.include_router(players.router, prefix="/api/v1/players", tags=["players"])
-    app.include_router(characters.router, prefix="/api/v1/characters", tags=["characters"])
+    app.include_router(
+        characters.router, prefix="/api/v1/characters", tags=["characters"]
+    )
     app.include_router(worlds.router, prefix="/api/v1/worlds", tags=["worlds"])
     app.include_router(sessions.router, prefix="/api/v1/sessions", tags=["sessions"])
     # Metrics (gated by settings.debug)
@@ -218,7 +233,9 @@ def register_exception_handlers(app: FastAPI) -> None:
     """
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    async def http_exception_handler(
+        request: Request, exc: StarletteHTTPException
+    ) -> JSONResponse:
         """Handle HTTP exceptions."""
         return JSONResponse(
             status_code=exc.status_code,
@@ -230,9 +247,12 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         """Handle request validation errors."""
         from fastapi.encoders import jsonable_encoder
+
         errs = jsonable_encoder(exc.errors())
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -245,7 +265,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(ValidationError)
-    async def custom_validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
+    async def custom_validation_exception_handler(
+        request: Request, exc: ValidationError
+    ) -> JSONResponse:
         """Handle custom validation errors."""
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -256,7 +278,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(AuthenticationError)
-    async def authentication_exception_handler(request: Request, exc: AuthenticationError) -> JSONResponse:
+    async def authentication_exception_handler(
+        request: Request, exc: AuthenticationError
+    ) -> JSONResponse:
         """Handle authentication errors."""
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -268,7 +292,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(AuthorizationError)
-    async def authorization_exception_handler(request: Request, exc: AuthorizationError) -> JSONResponse:
+    async def authorization_exception_handler(
+        request: Request, exc: AuthorizationError
+    ) -> JSONResponse:
         """Handle authorization errors."""
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -279,11 +305,14 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    async def general_exception_handler(
+        request: Request, exc: Exception
+    ) -> JSONResponse:
         """Handle unexpected exceptions."""
         # Log and include a minimal detail for easier test debugging
         try:
             import logging
+
             logging.getLogger(__name__).error("Unhandled exception", exc_info=exc)
         except Exception:
             pass

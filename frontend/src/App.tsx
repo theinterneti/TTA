@@ -1,6 +1,6 @@
 /**
  * TTA Therapeutic Gaming Experience - Main Application Component
- * 
+ *
  * Provides the main application structure with routing, authentication,
  * and therapeutic gaming interface.
  */
@@ -145,11 +145,11 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const isAuthenticated = ttaApi.isAuthenticated();
-  
+
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 };
 
@@ -169,30 +169,30 @@ const App: React.FC = () => {
   const initializeApp = async () => {
     try {
       setIsLoading(true);
-      
+
       // Check service health
       const health = await ttaApi.getServiceHealth();
       setServiceHealth(health);
-      
+
       // If user is authenticated, load user data
       if (ttaApi.isAuthenticated()) {
         try {
           // In a real app, we'd have a "get current user" endpoint
           // For now, we'll just verify the token is valid
           await ttaApi.getServiceHealth(); // This will fail if token is invalid
-          
+
           // Initialize WebSocket connection
           await ttaWebSocket.connect();
-          
+
           // Set up WebSocket event listeners
           setupWebSocketListeners();
-          
+
         } catch (error) {
           console.error('Failed to load user data:', error);
           ttaApi.clearAuthToken();
         }
       }
-      
+
     } catch (error) {
       console.error('Failed to initialize app:', error);
       setError('Failed to connect to TTA services. Please check your connection.');
@@ -264,8 +264,8 @@ const App: React.FC = () => {
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             {/* Navigation Bar (only show when authenticated) */}
             {ttaApi.isAuthenticated() && (
-              <NavigationBar 
-                user={user} 
+              <NavigationBar
+                user={user}
                 onLogout={handleLogout}
                 serviceHealth={serviceHealth}
               />
@@ -275,61 +275,61 @@ const App: React.FC = () => {
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               <Routes>
                 {/* Public Routes */}
-                <Route 
-                  path="/login" 
-                  element={<LoginPage onLogin={handleLogin} />} 
+                <Route
+                  path="/login"
+                  element={<LoginPage onLogin={handleLogin} />}
                 />
-                <Route 
-                  path="/register" 
-                  element={<RegisterPage onRegister={handleLogin} />} 
+                <Route
+                  path="/register"
+                  element={<RegisterPage onRegister={handleLogin} />}
                 />
 
                 {/* Protected Routes */}
-                <Route 
-                  path="/" 
+                <Route
+                  path="/"
                   element={
                     <ProtectedRoute>
                       <Dashboard user={user} />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/characters" 
+                <Route
+                  path="/characters"
                   element={
                     <ProtectedRoute>
                       <CharacterStudio />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/worlds" 
+                <Route
+                  path="/worlds"
                   element={
                     <ProtectedRoute>
                       <WorldExplorer />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/session/:sessionId" 
+                <Route
+                  path="/session/:sessionId"
                   element={
                     <ProtectedRoute>
                       <TherapeuticSession />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
-                <Route 
-                  path="/profile" 
+                <Route
+                  path="/profile"
                   element={
                     <ProtectedRoute>
                       <ProfilePage user={user} />
                     </ProtectedRoute>
-                  } 
+                  }
                 />
 
                 {/* Default redirect */}
-                <Route 
-                  path="*" 
-                  element={<Navigate to="/" replace />} 
+                <Route
+                  path="*"
+                  element={<Navigate to="/" replace />}
                 />
               </Routes>
             </Box>
@@ -344,9 +344,9 @@ const App: React.FC = () => {
               onClose={handleCloseError}
               anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
             >
-              <Alert 
-                onClose={handleCloseError} 
-                severity="error" 
+              <Alert
+                onClose={handleCloseError}
+                severity="error"
                 sx={{ width: '100%' }}
               >
                 {error}
@@ -360,9 +360,9 @@ const App: React.FC = () => {
               onClose={handleCloseNotification}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
             >
-              <Alert 
-                onClose={handleCloseNotification} 
-                severity="success" 
+              <Alert
+                onClose={handleCloseNotification}
+                severity="success"
                 sx={{ width: '100%' }}
               >
                 {notification}

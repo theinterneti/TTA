@@ -208,7 +208,7 @@ success = await session_manager.delete_session(session_id)
 **Usage:**
 ```python
 await narrative_cache.set_context(
-    session_id, "character_relationships", 
+    session_id, "character_relationships",
     {"alice": 0.8, "bob": 0.3}
 )
 

@@ -1,14 +1,13 @@
 import asyncio
-import os
+
 import pytest
 
 from src.agent_orchestration import (
-    AgentId, AgentType, MessagePriority, MessageType,
-    Agent,
     AgentRegistry,
+    AgentType,
     InputProcessorAgentProxy,
-    WorldBuilderAgentProxy,
     NarrativeGeneratorAgentProxy,
+    WorldBuilderAgentProxy,
 )
 
 
@@ -76,7 +75,6 @@ async def test_narrative_generator_filtering():
     assert "[redacted]" in res["story"].lower()
 
 
-
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_proxies_therapeutic_safety_behavior(redis_client, monkeypatch):
@@ -84,10 +82,27 @@ async def test_proxies_therapeutic_safety_behavior(redis_client, monkeypatch):
     monkeypatch.setenv("AGENT_ORCHESTRATION_SAFETY_ENABLED", "true")
     # Seed Redis with rules: block self-harm, warn diagnose
     import json as _json
-    cfg = {"rules": [
-        {"id": "c1", "category": "crisis_detection", "priority": 100, "level": "blocked", "pattern": "kill myself|suicide", "flags": "i"},
-        {"id": "e1", "category": "professional_ethics", "priority": 50, "level": "warning", "pattern": "diagnose|prescribe", "flags": "i"},
-    ]}
+
+    cfg = {
+        "rules": [
+            {
+                "id": "c1",
+                "category": "crisis_detection",
+                "priority": 100,
+                "level": "blocked",
+                "pattern": "kill myself|suicide",
+                "flags": "i",
+            },
+            {
+                "id": "e1",
+                "category": "professional_ethics",
+                "priority": 50,
+                "level": "warning",
+                "pattern": "diagnose|prescribe",
+                "flags": "i",
+            },
+        ]
+    }
     await redis_client.set("ao:safety:rules", _json.dumps(cfg))
 
     # IPA: annotate-only
@@ -106,7 +121,10 @@ async def test_proxies_therapeutic_safety_behavior(redis_client, monkeypatch):
 
     # NGA: WARNING -> annotate only and keep content
     r_nga_warn = await nga.process({"prompt": "Please diagnose me in a story"})
-    assert r_nga_warn.get("therapeutic_validation", {}).get("level") in ("warning", "safe")
+    assert r_nga_warn.get("therapeutic_validation", {}).get("level") in (
+        "warning",
+        "safe",
+    )
     assert "story:" in r_nga_warn["raw"].lower()
 
 
@@ -115,8 +133,10 @@ async def test_agent_registry_discovery_and_healthloop():
     reg = AgentRegistry()
     a1 = InputProcessorAgentProxy(instance="a")
     a2 = WorldBuilderAgentProxy(instance="b")
-    await a1.start(); await a2.start()
-    reg.register(a1); reg.register(a2)
+    await a1.start()
+    await a2.start()
+    reg.register(a1)
+    reg.register(a2)
     # Discover
     ds = reg.discover(AgentType.IPA)
     assert len(ds) == 1 and ds[0].name.startswith("ipa:")
@@ -127,4 +147,3 @@ async def test_agent_registry_discovery_and_healthloop():
     reg.start_periodic_health_checks(interval_s=0.05)
     await asyncio.sleep(0.12)
     reg.stop_periodic_health_checks()
-

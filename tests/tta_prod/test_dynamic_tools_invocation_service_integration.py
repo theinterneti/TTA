@@ -1,9 +1,7 @@
-import os
-import asyncio
 import pytest
 
-from tta.prod.src.tools.dynamic_tools import DynamicTool
 from src.agent_orchestration.tools.metrics import get_tool_metrics
+from tta.prod.src.tools.dynamic_tools import DynamicTool
 
 
 @pytest.mark.redis
@@ -32,7 +30,9 @@ async def mytool_action(x: int, y: int):
 
 
 @pytest.mark.redis
-def test_dynamic_tool_policy_enforcement_blocks_unallowed_callable(redis_client, monkeypatch):
+def test_dynamic_tool_policy_enforcement_blocks_unallowed_callable(
+    redis_client, monkeypatch
+):
     code = """
 async def blocked_action():
     return 1
@@ -71,4 +71,3 @@ async def fc_action():
 
     res = tool.execute()
     assert res == 42
-

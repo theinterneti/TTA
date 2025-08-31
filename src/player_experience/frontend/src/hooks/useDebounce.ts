@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 /**
  * Custom hook for debouncing values
- * 
+ *
  * @param value - The value to debounce
  * @param delay - The delay in milliseconds
  * @returns The debounced value
@@ -25,7 +25,7 @@ export function useDebounce<T>(value: T, delay: number): T {
 
 /**
  * Custom hook for debouncing callback functions
- * 
+ *
  * @param callback - The callback function to debounce
  * @param delay - The delay in milliseconds
  * @param deps - Dependencies array for the callback

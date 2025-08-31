@@ -1,0 +1,414 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.carbon_component &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.carbon_component</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.carbon_component</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Carbon Tracking Component</span>
+
+<span class="sd">This module provides a component for tracking carbon emissions across the TTA project.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    CarbonComponent: Component for tracking carbon emissions</span>
+
+<span class="sd">Example:</span>
+<span class="sd">    ```python</span>
+<span class="sd">    from src.orchestration import TTAConfig</span>
+<span class="sd">    from src.components.carbon_component import CarbonComponent</span>
+
+<span class="sd">    # Create a configuration object</span>
+<span class="sd">    config = TTAConfig()</span>
+
+<span class="sd">    # Create a Carbon component</span>
+<span class="sd">    carbon = CarbonComponent(config)</span>
+
+<span class="sd">    # Start the Carbon component</span>
+<span class="sd">    carbon.start()</span>
+
+<span class="sd">    # Track emissions for a specific function</span>
+<span class="sd">    emissions = carbon.track_function(my_function, *args, **kwargs)</span>
+
+<span class="sd">    # Get emissions report</span>
+<span class="sd">    report = carbon.get_emissions_report()</span>
+<span class="sd">    ```</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="c1"># Try to import codecarbon for carbon tracking</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">codecarbon</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmissionsTracker</span><span class="p">,</span> <span class="n">track_emissions</span>
+
+    <span class="n">CODECARBON_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">CODECARBON_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.orchestration.component</span><span class="w"> </span><span class="kn">import</span> <span class="n">Component</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.orchestration.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_entry_exit</span><span class="p">,</span> <span class="n">timing_decorator</span>
+
+<span class="c1"># Configure logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Type variables for better type hinting</span>
+<span class="n">F</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="n">Callable</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CarbonComponent">
+<a class="viewcode-back" href="../../../api/src.components.carbon_component.html#src.components.CarbonComponent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CarbonComponent</span><span class="p">(</span><span class="n">Component</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Component for tracking carbon emissions across the TTA project.</span>
+
+<span class="sd">    This component provides methods for tracking carbon emissions of</span>
+<span class="sd">    functions and components using the codecarbon library.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        root_dir: Root directory of the project</span>
+<span class="sd">        output_dir: Directory to save emissions data</span>
+<span class="sd">        project_name: Name of the project for emissions tracking</span>
+<span class="sd">        log_level: Log level for codecarbon</span>
+<span class="sd">        measurement_interval: Measurement interval in seconds</span>
+<span class="sd">        emissions_data: Dictionary of emissions data</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">Any</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Carbon component.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: Configuration object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;carbon&quot;</span><span class="p">,</span> <span class="n">dependencies</span><span class="o">=</span><span class="p">[])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;carbon.output_dir&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span> <span class="o">/</span> <span class="s2">&quot;codecarbon&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;carbon.project_name&quot;</span><span class="p">,</span> <span class="s2">&quot;TTA&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;carbon.log_level&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">measurement_interval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;carbon.measurement_interval&quot;</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Initialized Carbon component with output directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@log_entry_exit</span>
+    <span class="nd">@timing_decorator</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_start_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Start the Carbon component.</span>
+
+<span class="sd">        This method initializes the codecarbon library and creates the output directory.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the component was started successfully, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CODECARBON_AVAILABLE</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;codecarbon not available, carbon tracking will be disabled&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Create the output directory if it doesn&#39;t exist</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Initialize emissions data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Carbon component started with output directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error starting Carbon component: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="nd">@log_entry_exit</span>
+    <span class="nd">@timing_decorator</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_stop_impl</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stop the Carbon component.</span>
+
+<span class="sd">        This method saves the emissions data to a file.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if the component was stopped successfully, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">CODECARBON_AVAILABLE</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;codecarbon not available, carbon tracking was disabled&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="c1"># Save emissions data to a file</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_emissions_data</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Carbon component stopped&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error stopping Carbon component: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="CarbonComponent.track_function">
+<a class="viewcode-back" href="../../../api/src.components.carbon_component.html#src.components.CarbonComponent.track_function">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">track_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">:</span> <span class="n">F</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Track carbon emissions of a function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            func: Function to track</span>
+<span class="sd">            *args: Arguments to pass to the function</span>
+<span class="sd">            **kwargs: Keyword arguments to pass to the function</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Any: Result of the function</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If an error occurs during function execution</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">CODECARBON_AVAILABLE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;codecarbon not available, skipping emissions tracking for </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Create the output directory if it doesn&#39;t exist</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Track emissions</span>
+        <span class="n">tracker</span> <span class="o">=</span> <span class="n">EmissionsTracker</span><span class="p">(</span>
+            <span class="n">project_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span>
+            <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span>
+            <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span><span class="p">,</span>
+            <span class="n">measure_power_secs</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">measurement_interval</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">tracker</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">emissions</span> <span class="o">=</span> <span class="n">tracker</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+
+            <span class="c1"># Store emissions data</span>
+            <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">timestamp</span><span class="p">,</span>
+                <span class="s2">&quot;emissions&quot;</span><span class="p">:</span> <span class="n">emissions</span><span class="p">,</span>
+                <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;kg CO2eq&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> emitted </span><span class="si">{</span><span class="n">emissions</span><span class="si">:</span><span class="s2">.6f</span><span class="si">}</span><span class="s2"> kg CO2eq&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">tracker</span><span class="o">.</span><span class="n">stop</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception in </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="CarbonComponent.get_emissions_report">
+<a class="viewcode-back" href="../../../api/src.components.carbon_component.html#src.components.CarbonComponent.get_emissions_report">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_emissions_report</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a report of carbon emissions.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: Dictionary containing emissions data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">CODECARBON_AVAILABLE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;codecarbon not available, emissions report is empty&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;codecarbon not available&quot;</span><span class="p">}</span>
+
+        <span class="c1"># Calculate total emissions</span>
+        <span class="n">total_emissions</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;emissions&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create the report</span>
+        <span class="n">report</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;project_name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;total_emissions&quot;</span><span class="p">:</span> <span class="n">total_emissions</span><span class="p">,</span>
+            <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="s2">&quot;kg CO2eq&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;functions&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">report</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_save_emissions_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Save emissions data to a file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">emissions_data</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No emissions data to save&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Create the output directory if it doesn&#39;t exist</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Save the data to a JSON file</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">_%H%M%S&quot;</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/emissions_</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">.json&quot;</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_emissions_report</span><span class="p">(),</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Emissions data saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CarbonComponent.get_carbon_decorator">
+<a class="viewcode-back" href="../../../api/src.components.carbon_component.html#src.components.CarbonComponent.get_carbon_decorator">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_carbon_decorator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">F</span><span class="p">],</span> <span class="n">F</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a decorator for tracking carbon emissions of a function.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            project_name: Name of the project for emissions tracking</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Callable[[F], F]: Decorator function</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">CODECARBON_AVAILABLE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;codecarbon not available, carbon decorator will be a no-op&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Return a no-op decorator</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">no_op_decorator</span><span class="p">(</span><span class="n">func</span><span class="p">:</span> <span class="n">F</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">F</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">func</span>
+
+            <span class="k">return</span> <span class="n">no_op_decorator</span>
+
+        <span class="n">project</span> <span class="o">=</span> <span class="n">project_name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span>
+
+        <span class="c1"># Create the output directory if it doesn&#39;t exist</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Return the track_emissions decorator</span>
+        <span class="k">return</span> <span class="n">track_emissions</span><span class="p">(</span>
+            <span class="n">project_name</span><span class="o">=</span><span class="n">project</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">log_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">log_level</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

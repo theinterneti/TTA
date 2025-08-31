@@ -1,6 +1,6 @@
 /**
  * TTA WebSocket Client Service
- * 
+ *
  * Provides real-time communication for therapeutic gaming sessions
  * including chat, crisis detection, and session updates.
  */
@@ -54,7 +54,7 @@ class TTAWebSocketClient {
     return new Promise((resolve, reject) => {
       try {
         const token = localStorage.getItem('tta_access_token');
-        
+
         this.socket = io(`${this.baseURL}/ws/chat`, {
           auth: {
             token: token
@@ -88,7 +88,7 @@ class TTAWebSocketClient {
         this.socket.on('connect_error', (error) => {
           console.error('🔌 WebSocket connection error:', error);
           this.reconnectAttempts++;
-          
+
           if (this.reconnectAttempts >= this.maxReconnectAttempts) {
             reject(new Error(`Failed to connect after ${this.maxReconnectAttempts} attempts`));
           }

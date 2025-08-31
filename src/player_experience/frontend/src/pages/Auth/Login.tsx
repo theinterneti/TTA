@@ -39,7 +39,7 @@ const Login: React.FC = () => {
             Therapeutic Text Adventure Platform
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm -space-y-px">
             <div>

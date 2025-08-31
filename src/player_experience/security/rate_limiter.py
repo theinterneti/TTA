@@ -5,28 +5,26 @@ This module provides multiple rate limiting algorithms and DDoS protection
 mechanisms to secure the Player Experience Interface from abuse.
 """
 
-import time
 import threading
-import asyncio
+import time
 from abc import ABC, abstractmethod
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Any, Union
-import hashlib
-import ipaddress
+from typing import Any
+
 import redis
 from redis import Redis
 
-from ..monitoring.logging_config import get_logger, LogCategory, LogContext
-
+from ..monitoring.logging_config import LogCategory, LogContext, get_logger
 
 logger = get_logger(__name__)
 
 
 class RateLimitStrategy(str, Enum):
     """Rate limiting strategies."""
+
     TOKEN_BUCKET = "token_bucket"
     SLIDING_WINDOW = "sliding_window"
     FIXED_WINDOW = "fixed_window"
@@ -35,6 +33,7 @@ class RateLimitStrategy(str, Enum):
 
 class RateLimitScope(str, Enum):
     """Scope for rate limiting."""
+
     GLOBAL = "global"
     IP_ADDRESS = "ip_address"
     USER = "user"
@@ -45,14 +44,15 @@ class RateLimitScope(str, Enum):
 @dataclass
 class RateLimitConfig:
     """Configuration for rate limiting."""
+
     requests_per_minute: int = 60
     requests_per_hour: int = 1000
     requests_per_day: int = 10000
     burst_capacity: int = 10
     strategy: RateLimitStrategy = RateLimitStrategy.TOKEN_BUCKET
     scope: RateLimitScope = RateLimitScope.IP_ADDRESS
-    whitelist: List[str] = field(default_factory=list)
-    blacklist: List[str] = field(default_factory=list)
+    whitelist: list[str] = field(default_factory=list)
+    blacklist: list[str] = field(default_factory=list)
     enable_adaptive: bool = True
     adaptive_threshold: float = 0.8  # Trigger adaptive limiting at 80% capacity
 
@@ -69,11 +69,12 @@ class RateLimitExceeded(Exception):
 @dataclass
 class RateLimitResult:
     """Result of rate limit check."""
+
     allowed: bool
     remaining: int
     reset_time: datetime
-    retry_after: Optional[int] = None
-    limit_type: Optional[str] = None
+    retry_after: int | None = None
+    limit_type: str | None = None
 
 
 class RateLimiter(ABC):
@@ -101,8 +102,13 @@ class RateLimiter(ABC):
         """Check if identifier is blacklisted."""
         return identifier in self.config.blacklist
 
-    def get_identifier(self, ip_address: str, user_id: str = None,
-                      api_key: str = None, endpoint: str = None) -> str:
+    def get_identifier(
+        self,
+        ip_address: str,
+        user_id: str = None,
+        api_key: str = None,
+        endpoint: str = None,
+    ) -> str:
         """Get rate limit identifier based on scope."""
         if self.config.scope == RateLimitScope.GLOBAL:
             return "global"
@@ -123,11 +129,13 @@ class TokenBucketRateLimiter(RateLimiter):
 
     def __init__(self, config: RateLimitConfig):
         super().__init__(config)
-        self.buckets: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
-            "tokens": config.burst_capacity,
-            "last_refill": time.time(),
-            "requests": deque()
-        })
+        self.buckets: dict[str, dict[str, Any]] = defaultdict(
+            lambda: {
+                "tokens": config.burst_capacity,
+                "last_refill": time.time(),
+                "requests": deque(),
+            }
+        )
 
     def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
         """Check token bucket rate limit."""
@@ -135,7 +143,7 @@ class TokenBucketRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.burst_capacity,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
@@ -144,7 +152,7 @@ class TokenBucketRateLimiter(RateLimiter):
                 remaining=0,
                 reset_time=datetime.utcnow() + timedelta(hours=1),
                 retry_after=3600,
-                limit_type="blacklisted"
+                limit_type="blacklisted",
             )
 
         with self.lock:
@@ -155,8 +163,7 @@ class TokenBucketRateLimiter(RateLimiter):
             time_elapsed = current_time - bucket["last_refill"]
             tokens_to_add = time_elapsed * (self.config.requests_per_minute / 60.0)
             bucket["tokens"] = min(
-                self.config.burst_capacity,
-                bucket["tokens"] + tokens_to_add
+                self.config.burst_capacity, bucket["tokens"] + tokens_to_add
             )
             bucket["last_refill"] = current_time
 
@@ -173,18 +180,21 @@ class TokenBucketRateLimiter(RateLimiter):
                 return RateLimitResult(
                     allowed=True,
                     remaining=int(bucket["tokens"]),
-                    reset_time=datetime.utcnow() + timedelta(seconds=60/self.config.requests_per_minute)
+                    reset_time=datetime.utcnow()
+                    + timedelta(seconds=60 / self.config.requests_per_minute),
                 )
             else:
                 # Calculate retry after
-                retry_after = int((1 - bucket["tokens"]) * (60.0 / self.config.requests_per_minute))
+                retry_after = int(
+                    (1 - bucket["tokens"]) * (60.0 / self.config.requests_per_minute)
+                )
 
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
                     reset_time=datetime.utcnow() + timedelta(seconds=retry_after),
                     retry_after=retry_after,
-                    limit_type="rate_limit"
+                    limit_type="rate_limit",
                 )
 
     def reset_limit(self, identifier: str):
@@ -200,7 +210,7 @@ class SlidingWindowRateLimiter(RateLimiter):
 
     def __init__(self, config: RateLimitConfig):
         super().__init__(config)
-        self.windows: Dict[str, deque] = defaultdict(lambda: deque())
+        self.windows: dict[str, deque] = defaultdict(lambda: deque())
 
     def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
         """Check sliding window rate limit."""
@@ -208,7 +218,7 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
@@ -217,7 +227,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                 remaining=0,
                 reset_time=datetime.utcnow() + timedelta(hours=1),
                 retry_after=3600,
-                limit_type="blacklisted"
+                limit_type="blacklisted",
             )
 
         current_time = time.time()
@@ -242,7 +252,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                     remaining=0,
                     reset_time=datetime.utcnow() + timedelta(seconds=60),
                     retry_after=60,
-                    limit_type="per_minute"
+                    limit_type="per_minute",
                 )
 
             if hour_requests >= self.config.requests_per_hour:
@@ -251,7 +261,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                     remaining=0,
                     reset_time=datetime.utcnow() + timedelta(hours=1),
                     retry_after=3600,
-                    limit_type="per_hour"
+                    limit_type="per_hour",
                 )
 
             if day_requests >= self.config.requests_per_day:
@@ -260,7 +270,7 @@ class SlidingWindowRateLimiter(RateLimiter):
                     remaining=0,
                     reset_time=datetime.utcnow() + timedelta(days=1),
                     retry_after=86400,
-                    limit_type="per_day"
+                    limit_type="per_day",
                 )
 
             # Allow request
@@ -269,7 +279,7 @@ class SlidingWindowRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - minute_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):
@@ -292,7 +302,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
         if self.is_blacklisted(identifier):
@@ -301,7 +311,7 @@ class RedisRateLimiter(RateLimiter):
                 remaining=0,
                 reset_time=datetime.utcnow() + timedelta(hours=1),
                 retry_after=3600,
-                limit_type="blacklisted"
+                limit_type="blacklisted",
             )
 
         current_time = int(time.time())
@@ -333,13 +343,13 @@ class RedisRateLimiter(RateLimiter):
                     remaining=0,
                     reset_time=datetime.utcnow() + timedelta(minutes=1),
                     retry_after=60,
-                    limit_type="per_minute"
+                    limit_type="per_minute",
                 )
 
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute - current_requests - 1,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
         except redis.RedisError as e:
@@ -348,7 +358,7 @@ class RedisRateLimiter(RateLimiter):
             return RateLimitResult(
                 allowed=True,
                 remaining=self.config.requests_per_minute,
-                reset_time=datetime.utcnow() + timedelta(minutes=1)
+                reset_time=datetime.utcnow() + timedelta(minutes=1),
             )
 
     def reset_limit(self, identifier: str):
@@ -357,7 +367,9 @@ class RedisRateLimiter(RateLimiter):
         try:
             self.redis.delete(key)
         except redis.RedisError as e:
-            logger.error(f"Redis rate limiter reset error: {e}", category=LogCategory.ERROR)
+            logger.error(
+                f"Redis rate limiter reset error: {e}", category=LogCategory.ERROR
+            )
 
 
 class AdaptiveRateLimiter(RateLimiter):
@@ -371,8 +383,13 @@ class AdaptiveRateLimiter(RateLimiter):
         self.adaptive_factor = 1.0
         self.last_adjustment = time.time()
 
-    def update_system_metrics(self, cpu_usage: float, memory_usage: float,
-                            error_rate: float, response_time: float):
+    def update_system_metrics(
+        self,
+        cpu_usage: float,
+        memory_usage: float,
+        error_rate: float,
+        response_time: float,
+    ):
         """Update system metrics for adaptive limiting."""
         # Calculate system load score (0.0 to 1.0)
         self.system_load = max(cpu_usage / 100.0, memory_usage / 100.0)
@@ -384,7 +401,11 @@ class AdaptiveRateLimiter(RateLimiter):
             if self.system_load > 0.8 or self.error_rate > 0.1 or response_time > 2.0:
                 # System under stress - reduce limits
                 self.adaptive_factor = max(0.1, self.adaptive_factor * 0.8)
-            elif self.system_load < 0.5 and self.error_rate < 0.01 and response_time < 0.5:
+            elif (
+                self.system_load < 0.5
+                and self.error_rate < 0.01
+                and response_time < 0.5
+            ):
                 # System healthy - increase limits
                 self.adaptive_factor = min(2.0, self.adaptive_factor * 1.1)
 
@@ -393,7 +414,7 @@ class AdaptiveRateLimiter(RateLimiter):
             logger.info(
                 f"Adaptive rate limiter adjusted: factor={self.adaptive_factor:.2f}, "
                 f"load={self.system_load:.2f}, error_rate={self.error_rate:.2f}",
-                category=LogCategory.PERFORMANCE
+                category=LogCategory.PERFORMANCE,
             )
 
     def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
@@ -408,13 +429,14 @@ class AdaptiveRateLimiter(RateLimiter):
         if self.adaptive_factor < 1.0:
             # Reduce effective limit
             import random
+
             if random.random() > self.adaptive_factor:
                 return RateLimitResult(
                     allowed=False,
                     remaining=0,
                     reset_time=result.reset_time,
                     retry_after=60,
-                    limit_type="adaptive_limit"
+                    limit_type="adaptive_limit",
                 )
 
         return result
@@ -427,8 +449,7 @@ class AdaptiveRateLimiter(RateLimiter):
 class RateLimitMiddleware:
     """Middleware for applying rate limiting to requests."""
 
-    def __init__(self, rate_limiter: RateLimiter,
-                 get_identifier_func: callable = None):
+    def __init__(self, rate_limiter: RateLimiter, get_identifier_func: callable = None):
         self.rate_limiter = rate_limiter
         self.get_identifier = get_identifier_func or self._default_get_identifier
 
@@ -436,12 +457,12 @@ class RateLimitMiddleware:
         """Default identifier extraction from request."""
         # This would be implemented based on your web framework
         # For FastAPI, you might extract from request.client.host
-        return getattr(request.client, 'host', 'unknown')
+        return getattr(request.client, "host", "unknown")
 
     async def __call__(self, request, call_next):
         """Apply rate limiting to request."""
         identifier = self.get_identifier(request)
-        endpoint = getattr(request.url, 'path', None)
+        endpoint = getattr(request.url, "path", None)
 
         try:
             result = self.rate_limiter.check_limit(identifier, endpoint)
@@ -451,45 +472,46 @@ class RateLimitMiddleware:
                 logger.warning(
                     f"Rate limit exceeded for {identifier}",
                     category=LogCategory.SECURITY,
-                    context=LogContext(
-                        ip_address=identifier,
-                        endpoint=endpoint
-                    ),
+                    context=LogContext(ip_address=identifier, endpoint=endpoint),
                     metadata={
                         "limit_type": result.limit_type,
-                        "retry_after": result.retry_after
-                    }
+                        "retry_after": result.retry_after,
+                    },
                 )
 
                 raise RateLimitExceeded(
                     f"Rate limit exceeded. Try again in {result.retry_after} seconds.",
                     result.retry_after,
-                    result.limit_type
+                    result.limit_type,
                 )
 
             # Add rate limit headers to response
             response = await call_next(request)
             response.headers["X-RateLimit-Remaining"] = str(result.remaining)
-            response.headers["X-RateLimit-Reset"] = str(int(result.reset_time.timestamp()))
+            response.headers["X-RateLimit-Reset"] = str(
+                int(result.reset_time.timestamp())
+            )
 
             return response
 
         except RateLimitExceeded:
             # Return rate limit error response
             from fastapi import HTTPException, status
+
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
                 detail="Rate limit exceeded",
                 headers={
                     "Retry-After": str(result.retry_after),
                     "X-RateLimit-Remaining": "0",
-                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp()))
-                }
+                    "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),
+                },
             )
 
 
-def create_rate_limiter(config: RateLimitConfig,
-                       redis_client: Optional[Redis] = None) -> RateLimiter:
+def create_rate_limiter(
+    config: RateLimitConfig, redis_client: Redis | None = None
+) -> RateLimiter:
     """Factory function to create appropriate rate limiter."""
     if redis_client:
         base_limiter = RedisRateLimiter(config, redis_client)
@@ -505,9 +527,11 @@ def create_rate_limiter(config: RateLimitConfig,
     else:
         return base_limiter
 
+
 # Backward-compat shim expected by middleware imports
 # Provides a simple getter that returns a default validator callable; adjust as needed.
 def get_security_validator():
     def _validator(_: Any) -> bool:
         return True
+
     return _validator

@@ -1,13 +1,17 @@
 import asyncio
+
 import pytest
-from src.agent_orchestration.tools.models import ToolSpec, ToolParameter
+
+from src.agent_orchestration.tools.models import ToolParameter, ToolSpec
 from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_register_get_list_and_cleanup(redis_client):
-    reg = RedisToolRegistry(redis_client, key_prefix="testao_tools", cache_ttl_s=0.2, cache_max_items=16)
+    reg = RedisToolRegistry(
+        redis_client, key_prefix="testao_tools", cache_ttl_s=0.2, cache_max_items=16
+    )
     spec = ToolSpec(
         name="kg.query",
         version="1.0.0",
@@ -39,4 +43,3 @@ async def test_register_get_list_and_cleanup(redis_client):
     await asyncio.sleep(0.25)
     removed2 = await reg.cleanup_expired(max_idle_seconds=0.1)
     assert removed2 >= 0
-

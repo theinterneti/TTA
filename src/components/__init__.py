@@ -37,30 +37,31 @@ Example:
     ```
 """
 
-from .neo4j_component import Neo4jComponent
-from .llm_component import LLMComponent
-from .app_component import AppComponent
-from .docker_component import DockerComponent
-from .carbon_component import CarbonComponent
-from .player_experience_component import PlayerExperienceComponent
-from .narrative_arc_orchestrator_component import NarrativeArcOrchestratorComponent
 from .agent_orchestration_component import AgentOrchestrationComponent
+from .app_component import AppComponent
+from .carbon_component import CarbonComponent
+from .docker_component import DockerComponent
+from .llm_component import LLMComponent
+from .narrative_arc_orchestrator_component import NarrativeArcOrchestratorComponent
+from .neo4j_component import Neo4jComponent
+from .player_experience_component import PlayerExperienceComponent
 
 __all__ = [
-    'Neo4jComponent',
-    'LLMComponent',
-    'AppComponent',
-    'DockerComponent',
-    'CarbonComponent',
-    'PlayerExperienceComponent',
-    'NarrativeArcOrchestratorComponent',
-    'AgentOrchestrationComponent',
+    "Neo4jComponent",
+    "LLMComponent",
+    "AppComponent",
+    "DockerComponent",
+    "CarbonComponent",
+    "PlayerExperienceComponent",
+    "NarrativeArcOrchestratorComponent",
+    "AgentOrchestrationComponent",
 ]
 
 
 # Ensure a default asyncio event loop exists for tests that call get_event_loop directly
 try:
     import asyncio
+
     try:
         asyncio.get_event_loop()
     except RuntimeError:

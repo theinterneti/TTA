@@ -1,0 +1,624 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.optimization.workflow_resource_manager module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.agent_orchestration.performance package" href="src.agent_orchestration.performance.html" />
+    <link rel="prev" title="src.agent_orchestration.optimization.response_time_monitor module" href="src.agent_orchestration.optimization.response_time_monitor.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+          <li class="breadcrumb-item"><a href="src.agent_orchestration.optimization.html">src.agent_orchestration.optimization package</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.optimization.workflow_resource_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.agent_orchestration.optimization.workflow_resource_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.agent_orchestration.optimization.workflow_resource_manager">
+<span id="src-agent-orchestration-optimization-workflow-resource-manager-module"></span><h1>src.agent_orchestration.optimization.workflow_resource_manager module<a class="headerlink" href="#module-src.agent_orchestration.optimization.workflow_resource_manager" title="Link to this heading"></a></h1>
+<p>Workflow resource manager for concurrent workflow optimization.</p>
+<p>This module provides efficient resource allocation and scheduling for
+multiple simultaneous workflows with load balancing and prioritization.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">ResourceAllocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allocated_amount</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_amount</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allocated_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_used=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourceAllocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Resource allocation for a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>resource_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a></span>)</p></li>
+<li><p><strong>allocated_amount</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>max_amount</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>allocated_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>last_used</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.allocated_amount">
+<span class="sig-name descname"><span class="pre">allocated_amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.allocated_amount" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.allocated_at">
+<span class="sig-name descname"><span class="pre">allocated_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.allocated_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.last_used">
+<span class="sig-name descname"><span class="pre">last_used</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.last_used" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.max_amount">
+<span class="sig-name descname"><span class="pre">max_amount</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.max_amount" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.resource_type">
+<span class="sig-name descname"><span class="pre">resource_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.resource_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.utilization_percentage">
+<span class="sig-name descname"><span class="pre">utilization_percentage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourceAllocation.utilization_percentage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.utilization_percentage" title="Link to this definition"></a></dt>
+<dd><p>Calculate resource utilization percentage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.workflow_id">
+<span class="sig-name descname"><span class="pre">workflow_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceAllocation.workflow_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">ResourcePool</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resource_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_capacity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allocated_capacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reserved_capacity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourcePool"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Resource pool for managing available resources.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resource_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a></span>)</p></li>
+<li><p><strong>total_capacity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>allocated_capacity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>reserved_capacity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.allocated_capacity">
+<span class="sig-name descname"><span class="pre">allocated_capacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.allocated_capacity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.available_capacity">
+<span class="sig-name descname"><span class="pre">available_capacity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourcePool.available_capacity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.available_capacity" title="Link to this definition"></a></dt>
+<dd><p>Get available capacity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.can_allocate">
+<span class="sig-name descname"><span class="pre">can_allocate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">amount</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourcePool.can_allocate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.can_allocate" title="Link to this definition"></a></dt>
+<dd><p>Check if amount can be allocated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>amount</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.reserved_capacity">
+<span class="sig-name descname"><span class="pre">reserved_capacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.reserved_capacity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.resource_type">
+<span class="sig-name descname"><span class="pre">resource_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.resource_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.total_capacity">
+<span class="sig-name descname"><span class="pre">total_capacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.total_capacity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.utilization_percentage">
+<span class="sig-name descname"><span class="pre">utilization_percentage</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourcePool.utilization_percentage"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourcePool.utilization_percentage" title="Link to this definition"></a></dt>
+<dd><p>Get utilization percentage.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">ResourceType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#ResourceType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of resources that can be allocated.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.AGENT_SLOTS">
+<span class="sig-name descname"><span class="pre">AGENT_SLOTS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'agent_slots'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.AGENT_SLOTS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.CONCURRENT_WORKFLOWS">
+<span class="sig-name descname"><span class="pre">CONCURRENT_WORKFLOWS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'concurrent_workflows'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.CONCURRENT_WORKFLOWS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.CPU">
+<span class="sig-name descname"><span class="pre">CPU</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cpu'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.CPU" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.MEMORY">
+<span class="sig-name descname"><span class="pre">MEMORY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'memory'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.MEMORY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.MESSAGE_QUEUE_CAPACITY">
+<span class="sig-name descname"><span class="pre">MESSAGE_QUEUE_CAPACITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'message_queue_capacity'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.MESSAGE_QUEUE_CAPACITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.NETWORK">
+<span class="sig-name descname"><span class="pre">NETWORK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'network'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType.NETWORK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">WorkflowLoadBalancer</span></span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Load balancer for distributing workflows across resources.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.assign_agents_to_workflow">
+<span class="sig-name descname"><span class="pre">assign_agents_to_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">available_agents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_agents</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowLoadBalancer.assign_agents_to_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.assign_agents_to_workflow" title="Link to this definition"></a></dt>
+<dd><p>Assign agents to a workflow using load balancing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>available_agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>required_agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.get_load_stats">
+<span class="sig-name descname"><span class="pre">get_load_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowLoadBalancer.get_load_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.get_load_stats" title="Link to this definition"></a></dt>
+<dd><p>Get load balancing statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.release_agents_from_workflow">
+<span class="sig-name descname"><span class="pre">release_agents_from_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowLoadBalancer.release_agents_from_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowLoadBalancer.release_agents_from_workflow" title="Link to this definition"></a></dt>
+<dd><p>Release agents assigned to a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">WorkflowPriority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowPriority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Workflow priority levels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'critical'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'high'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.HIGH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.LOW">
+<span class="sig-name descname"><span class="pre">LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'low'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.LOW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.NORMAL">
+<span class="sig-name descname"><span class="pre">NORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'normal'</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority.NORMAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">WorkflowResourceManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_tracker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_time_collector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_publisher</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent_workflows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_monitoring_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Manages resources for concurrent workflow execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_tracker</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.realtime.workflow_progress.html#src.agent_orchestration.realtime.workflow_progress.WorkflowProgressTracker" title="src.agent_orchestration.realtime.workflow_progress.WorkflowProgressTracker"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowProgressTracker</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>response_time_collector</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.optimization.response_time_monitor.html#src.agent_orchestration.optimization.response_time_monitor.ResponseTimeCollector" title="src.agent_orchestration.optimization.response_time_monitor.ResponseTimeCollector"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResponseTimeCollector</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>event_publisher</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>max_concurrent_workflows</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>resource_monitoring_interval</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.get_statistics">
+<span class="sig-name descname"><span class="pre">get_statistics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager.get_statistics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.get_statistics" title="Link to this definition"></a></dt>
+<dd><p>Get resource manager statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.release_workflow_resources">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">release_workflow_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager.release_workflow_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.release_workflow_resources" title="Link to this definition"></a></dt>
+<dd><p>Release resources allocated to a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.request_workflow_resources">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">request_workflow_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">WorkflowPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_requirements</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent_agents</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager.request_workflow_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.request_workflow_resources" title="Link to this definition"></a></dt>
+<dd><p>Request resources for a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>workflow_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowPriority</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>estimated_duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>resource_requirements</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>max_concurrent_agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.start">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager.start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.start" title="Link to this definition"></a></dt>
+<dd><p>Start the resource manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.stop">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stop</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceManager.stop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceManager.stop" title="Link to this definition"></a></dt>
+<dd><p>Stop the resource manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">WorkflowResourceRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_duration</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resource_requirements</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_concurrent_agents=5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowResourceRequest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Resource request for a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>workflow_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowPriority</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>estimated_duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>resource_requirements</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>max_concurrent_agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>requested_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.estimated_duration">
+<span class="sig-name descname"><span class="pre">estimated_duration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.estimated_duration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.max_concurrent_agents">
+<span class="sig-name descname"><span class="pre">max_concurrent_agents</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.max_concurrent_agents" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowPriority</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.priority" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.requested_at">
+<span class="sig-name descname"><span class="pre">requested_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.requested_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.resource_requirements">
+<span class="sig-name descname"><span class="pre">resource_requirements</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.ResourceType" title="src.agent_orchestration.optimization.workflow_resource_manager.ResourceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResourceType</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.resource_requirements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.workflow_id">
+<span class="sig-name descname"><span class="pre">workflow_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.workflow_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.workflow_type">
+<span class="sig-name descname"><span class="pre">workflow_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest.workflow_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.optimization.workflow_resource_manager.</span></span><span class="sig-name descname"><span class="pre">WorkflowScheduler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_concurrent_workflows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority_weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Schedules workflows based on priority and resource availability.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_concurrent_workflows</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>priority_weights</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowPriority</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.complete_workflow">
+<span class="sig-name descname"><span class="pre">complete_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler.complete_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.complete_workflow" title="Link to this definition"></a></dt>
+<dd><p>Mark a workflow as completed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>success</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.enqueue_workflow">
+<span class="sig-name descname"><span class="pre">enqueue_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler.enqueue_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.enqueue_workflow" title="Link to this definition"></a></dt>
+<dd><p>Enqueue a workflow for scheduling.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResourceRequest</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.get_next_workflow">
+<span class="sig-name descname"><span class="pre">get_next_workflow</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler.get_next_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.get_next_workflow" title="Link to this definition"></a></dt>
+<dd><p>Get the next workflow to schedule based on priority.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResourceRequest</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.get_queue_stats">
+<span class="sig-name descname"><span class="pre">get_queue_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler.get_queue_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.get_queue_stats" title="Link to this definition"></a></dt>
+<dd><p>Get scheduling statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.start_workflow">
+<span class="sig-name descname"><span class="pre">start_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/optimization/workflow_resource_manager.html#WorkflowScheduler.start_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowScheduler.start_workflow" title="Link to this definition"></a></dt>
+<dd><p>Mark a workflow as started.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>request</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest" title="src.agent_orchestration.optimization.workflow_resource_manager.WorkflowResourceRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowResourceRequest</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.agent_orchestration.optimization.response_time_monitor.html" class="btn btn-neutral float-left" title="src.agent_orchestration.optimization.response_time_monitor module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.agent_orchestration.performance.html" class="btn btn-neutral float-right" title="src.agent_orchestration.performance package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

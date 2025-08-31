@@ -1,0 +1,655 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.middleware.auth &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.middleware.auth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.middleware.auth</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Authentication middleware for the API Gateway.</span>
+
+<span class="sd">This middleware integrates with the TTA authentication system to provide</span>
+<span class="sd">JWT token validation, user context extraction, and role-based access control.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">starlette.middleware.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseHTTPMiddleware</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthContext</span><span class="p">,</span>
+    <span class="n">AuthenticationMethod</span><span class="p">,</span>
+    <span class="n">PermissionLevel</span><span class="p">,</span>
+    <span class="n">TherapeuticPermission</span><span class="p">,</span>
+    <span class="n">UserPermissions</span><span class="p">,</span>
+    <span class="n">UserRole</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AuthenticationMiddleware">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.auth.html#src.api_gateway.middleware.auth.AuthenticationMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationMiddleware</span><span class="p">(</span><span class="n">BaseHTTPMiddleware</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Middleware for JWT authentication and user context management.</span>
+
+<span class="sd">    Integrates with the completed TTA authentication system to:</span>
+<span class="sd">    - Validate JWT tokens</span>
+<span class="sd">    - Extract user context and roles</span>
+<span class="sd">    - Handle token refresh</span>
+<span class="sd">    - Manage therapeutic permissions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">app</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_service</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_public_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/health&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/health/live&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/health/ready&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/metrics&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/docs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/redoc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/openapi.json&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_optional_paths</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;/api/v1/auth/login&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/api/v1/auth/register&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/api/v1/auth/refresh&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/api/v1/auth/reset-password&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="AuthenticationMiddleware.dispatch">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.auth.html#src.api_gateway.middleware.auth.AuthenticationMiddleware.dispatch">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">dispatch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process request with authentication validation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming request</span>
+<span class="sd">            call_next: The next middleware or route handler</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: The response from the next handler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Skip authentication for public paths</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_public_path</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Extract and validate authentication</span>
+        <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_authenticate_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Handle authentication failure</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_auth_optional_path</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_auth_error_response</span><span class="p">(</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set authentication context in request state</span>
+        <span class="k">if</span> <span class="n">auth_context</span><span class="p">:</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">auth_context</span> <span class="o">=</span> <span class="n">auth_context</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">user_id</span> <span class="o">=</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">username</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">user_role</span> <span class="o">=</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">role</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">is_therapeutic_context</span> <span class="o">=</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">is_therapeutic_context</span><span class="p">()</span>
+
+            <span class="c1"># Log authentication success</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Authenticated user </span><span class="si">{</span><span class="n">auth_context</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">) &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+                        <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;correlation_id&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">),</span>
+                    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;therapeutic_context&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">is_therapeutic_context</span><span class="p">(),</span>
+                    <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication_success&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Process request</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="c1"># Update authentication context activity if present</span>
+        <span class="k">if</span> <span class="n">auth_context</span><span class="p">:</span>
+            <span class="n">auth_context</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">response</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_authenticate_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticate the request and return authentication context.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[AuthContext]: Authentication context if successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Extract token from Authorization header</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_token</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Validate token using TTA authentication system</span>
+            <span class="n">user_data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user_data</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Create authentication context</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_auth_context</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">user_data</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">auth_context</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Authentication failed for </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+                        <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;correlation_id&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;client_ip&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_client_ip</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+                    <span class="s2">&quot;user_agent&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                    <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication_failure&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract JWT token from request headers.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[str]: JWT token if found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check Authorization header</span>
+        <span class="n">auth_header</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authorization&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">auth_header</span> <span class="ow">and</span> <span class="n">auth_header</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;bearer &quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">auth_header</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># Check query parameter (for WebSocket connections)</span>
+        <span class="n">token</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">token</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">token</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_validate_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate JWT token using TTA authentication system.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            token: JWT token to validate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[dict]: User data if token is valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Import TTA authentication components</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">src.player_experience.services.auth_service</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthService</span>
+
+            <span class="c1"># Initialize auth service if not already done</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_auth_service</span> <span class="o">=</span> <span class="n">AuthService</span><span class="p">()</span>
+
+            <span class="c1"># Verify token</span>
+            <span class="n">authenticated_user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_service</span><span class="o">.</span><span class="n">verify_access_token</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+            <span class="c1"># Convert to dictionary format</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">role</span><span class="p">,</span>
+                <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">permissions</span><span class="p">,</span>
+                <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="s2">&quot;mfa_verified&quot;</span><span class="p">:</span> <span class="n">authenticated_user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Token validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_auth_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">user_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthContext</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create authentication context from validated user data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming request</span>
+<span class="sd">            user_data: Validated user data from token</span>
+<span class="sd">            token: Original JWT token</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AuthContext: Authentication context</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span>
+
+        <span class="c1"># Convert TTA user role to gateway user role</span>
+        <span class="n">tta_role</span> <span class="o">=</span> <span class="n">user_data</span><span class="p">[</span><span class="s2">&quot;role&quot;</span><span class="p">]</span>
+        <span class="n">gateway_role</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_tta_role_to_gateway_role</span><span class="p">(</span><span class="n">tta_role</span><span class="p">)</span>
+
+        <span class="c1"># Convert TTA permissions to gateway permissions</span>
+        <span class="n">tta_permissions</span> <span class="o">=</span> <span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;permissions&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">gateway_permissions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_tta_permissions_to_gateway_permissions</span><span class="p">(</span>
+            <span class="n">tta_permissions</span><span class="p">,</span> <span class="n">tta_role</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create user permissions</span>
+        <span class="n">user_permissions</span> <span class="o">=</span> <span class="n">UserPermissions</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="n">gateway_role</span><span class="p">,</span>
+            <span class="n">permissions</span><span class="o">=</span><span class="n">gateway_permissions</span><span class="o">.</span><span class="n">permissions</span><span class="p">,</span>
+            <span class="n">therapeutic</span><span class="o">=</span><span class="n">gateway_permissions</span><span class="o">.</span><span class="n">therapeutic</span><span class="p">,</span>
+            <span class="n">service_access</span><span class="o">=</span><span class="n">gateway_permissions</span><span class="o">.</span><span class="n">service_access</span><span class="p">,</span>
+            <span class="n">rate_limit_multiplier</span><span class="o">=</span><span class="n">gateway_permissions</span><span class="o">.</span><span class="n">rate_limit_multiplier</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Determine if this is a therapeutic context</span>
+        <span class="n">is_therapeutic</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">gateway_role</span> <span class="ow">in</span> <span class="p">[</span><span class="n">UserRole</span><span class="o">.</span><span class="n">PATIENT</span><span class="p">,</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">]</span>
+            <span class="ow">or</span> <span class="n">user_permissions</span><span class="o">.</span><span class="n">therapeutic</span><span class="o">.</span><span class="n">can_access_sessions</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create authentication context</span>
+        <span class="n">auth_context</span> <span class="o">=</span> <span class="n">AuthContext</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">UUID</span><span class="p">(</span><span class="n">user_data</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">]),</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">user_data</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">],</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">),</span>
+            <span class="n">authenticated</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">auth_method</span><span class="o">=</span><span class="n">AuthenticationMethod</span><span class="o">.</span><span class="n">JWT</span><span class="p">,</span>
+            <span class="n">token_type</span><span class="o">=</span><span class="s2">&quot;Bearer&quot;</span><span class="p">,</span>
+            <span class="n">permissions</span><span class="o">=</span><span class="n">user_permissions</span><span class="p">,</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">),</span>
+            <span class="n">client_ip</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_client_ip</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
+            <span class="n">user_agent</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+            <span class="n">mfa_verified</span><span class="o">=</span><span class="n">user_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mfa_verified&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">authenticated_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">),</span>
+            <span class="n">in_therapeutic_session</span><span class="o">=</span><span class="n">is_therapeutic</span><span class="p">,</span>
+            <span class="n">safety_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_determine_safety_level</span><span class="p">(</span><span class="n">gateway_role</span><span class="p">,</span> <span class="n">is_therapeutic</span><span class="p">),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;original_token&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">,</span>
+                <span class="s2">&quot;gateway_version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;auth_source&quot;</span><span class="p">:</span> <span class="s2">&quot;tta_player_experience&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">auth_context</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_tta_role_to_gateway_role</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tta_role</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserRole</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert TTA user role to gateway user role.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tta_role: TTA UserRole enum value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            UserRole: Gateway user role</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Import TTA UserRole for comparison</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">src.player_experience.models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserRole</span> <span class="k">as</span> <span class="n">TTAUserRole</span>
+
+        <span class="n">role_mapping</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">:</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">PATIENT</span><span class="p">,</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">,</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">RESEARCHER</span><span class="p">:</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>  <span class="c1"># Map to admin for now</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">MODERATOR</span><span class="p">:</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>  <span class="c1"># Map to admin for now</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">role_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">tta_role</span><span class="p">,</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">GUEST</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_tta_permissions_to_gateway_permissions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">tta_permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">tta_role</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserPermissions</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert TTA permissions to gateway permissions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            tta_permissions: List of TTA Permission enum values</span>
+<span class="sd">            tta_role: TTA UserRole enum value</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            UserPermissions: Gateway user permissions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">src.player_experience.models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">Permission</span> <span class="k">as</span> <span class="n">TTAPermission</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">src.player_experience.models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserRole</span> <span class="k">as</span> <span class="n">TTAUserRole</span>
+
+        <span class="c1"># Convert to gateway permission levels</span>
+        <span class="n">gateway_permissions</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Basic permissions mapping</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">perm</span> <span class="ow">in</span> <span class="n">tta_permissions</span>
+            <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">CREATE_CHARACTER</span><span class="p">,</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">MANAGE_OWN_CHARACTERS</span><span class="p">,</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">MANAGE_OWN_PROFILE</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">gateway_permissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PermissionLevel</span><span class="o">.</span><span class="n">WRITE</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gateway_permissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PermissionLevel</span><span class="o">.</span><span class="n">READ</span><span class="p">)</span>
+
+        <span class="c1"># Therapeutic permissions</span>
+        <span class="n">therapeutic_permissions</span> <span class="o">=</span> <span class="n">TherapeuticPermission</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">TTAPermission</span><span class="o">.</span><span class="n">ACCESS_THERAPEUTIC_CONTENT</span> <span class="ow">in</span> <span class="n">tta_permissions</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_access_sessions</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">TTAPermission</span><span class="o">.</span><span class="n">VIEW_PATIENT_PROGRESS</span> <span class="ow">in</span> <span class="n">tta_permissions</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_view_progress</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_access_sensitive_data</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">TTAPermission</span><span class="o">.</span><span class="n">MANAGE_THERAPEUTIC_CONTENT</span> <span class="ow">in</span> <span class="n">tta_permissions</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_modify_treatment</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="n">TTAPermission</span><span class="o">.</span><span class="n">ACCESS_CRISIS_PROTOCOLS</span> <span class="ow">in</span> <span class="n">tta_permissions</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_handle_crisis</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">gateway_permissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PermissionLevel</span><span class="o">.</span><span class="n">CRISIS</span><span class="p">)</span>
+
+        <span class="c1"># Admin permissions</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">perm</span> <span class="ow">in</span> <span class="n">tta_permissions</span>
+            <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">MANAGE_USERS</span><span class="p">,</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">MANAGE_SYSTEM_SETTINGS</span><span class="p">,</span>
+                <span class="n">TTAPermission</span><span class="o">.</span><span class="n">VIEW_SYSTEM_LOGS</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">gateway_permissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PermissionLevel</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">)</span>
+
+        <span class="c1"># Therapeutic permission level</span>
+        <span class="k">if</span> <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">can_access_sessions</span><span class="p">:</span>
+            <span class="n">gateway_permissions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">PermissionLevel</span><span class="o">.</span><span class="n">THERAPEUTIC</span><span class="p">)</span>
+
+        <span class="c1"># Service access mapping</span>
+        <span class="n">service_access</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">tta_role</span> <span class="o">==</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">:</span>
+            <span class="n">service_access</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;authentication-service&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">tta_role</span> <span class="o">==</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span>
+            <span class="n">service_access</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;authentication-service&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;agent-orchestration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">tta_role</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">RESEARCHER</span><span class="p">,</span>
+            <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">MODERATOR</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="n">service_access</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;authentication-service&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;agent-orchestration&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;read&quot;</span><span class="p">,</span> <span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+            <span class="p">}</span>
+
+        <span class="c1"># Rate limit multiplier based on role</span>
+        <span class="n">rate_limit_multiplier</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">if</span> <span class="n">tta_role</span> <span class="o">==</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span>
+            <span class="n">rate_limit_multiplier</span> <span class="o">=</span> <span class="mf">2.0</span>  <span class="c1"># Higher limits for therapists</span>
+        <span class="k">elif</span> <span class="n">tta_role</span> <span class="ow">in</span> <span class="p">[</span><span class="n">TTAUserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">RESEARCHER</span><span class="p">]:</span>
+            <span class="n">rate_limit_multiplier</span> <span class="o">=</span> <span class="mf">3.0</span>  <span class="c1"># Highest limits for admins</span>
+
+        <span class="c1"># Supervision requirements</span>
+        <span class="k">if</span> <span class="n">tta_role</span> <span class="o">==</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">supervision_required</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="n">tta_role</span> <span class="o">==</span> <span class="n">TTAUserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span>
+            <span class="n">therapeutic_permissions</span><span class="o">.</span><span class="n">supervision_required</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">UserPermissions</span><span class="p">(</span>
+            <span class="n">role</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_convert_tta_role_to_gateway_role</span><span class="p">(</span><span class="n">tta_role</span><span class="p">),</span>
+            <span class="n">permissions</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">gateway_permissions</span><span class="p">)),</span>  <span class="c1"># Remove duplicates</span>
+            <span class="n">therapeutic</span><span class="o">=</span><span class="n">therapeutic_permissions</span><span class="p">,</span>
+            <span class="n">service_access</span><span class="o">=</span><span class="n">service_access</span><span class="p">,</span>
+            <span class="n">rate_limit_multiplier</span><span class="o">=</span><span class="n">rate_limit_multiplier</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_safety_level</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">role</span><span class="p">:</span> <span class="n">UserRole</span><span class="p">,</span> <span class="n">is_therapeutic</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine safety monitoring level based on role and context.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            role: User role</span>
+<span class="sd">            is_therapeutic: Whether in therapeutic context</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: Safety level (1-5)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">PATIENT</span> <span class="ow">and</span> <span class="n">is_therapeutic</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">4</span>  <span class="c1"># High monitoring for patients in therapeutic sessions</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">PATIENT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span>  <span class="c1"># Medium-high monitoring for patients</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">2</span>  <span class="c1"># Medium monitoring for therapists</span>
+        <span class="k">elif</span> <span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>  <span class="c1"># Low monitoring for admins</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">3</span>  <span class="c1"># Default medium-high for unknown roles</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_public_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if path is public and doesn&#39;t require authentication.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: Request path</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if path is public</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Exact matches</span>
+        <span class="k">if</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_public_paths</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Pattern matches</span>
+        <span class="n">public_patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;/health/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/metrics/&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/docs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/redoc&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;/openapi.json&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">public_patterns</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_auth_optional_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if path has optional authentication (auth endpoints).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            path: Request path</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if authentication is optional</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_optional_paths</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">pattern</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;/api/v1/auth/&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;/auth/&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_client_ip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract client IP address from request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Client IP address</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for forwarded headers (common in load balancer setups)</span>
+        <span class="n">forwarded_for</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x-forwarded-for&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">forwarded_for</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">forwarded_for</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Check for real IP header</span>
+        <span class="n">real_ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x-real-ip&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">real_ip</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">real_ip</span>
+
+        <span class="c1"># Fallback to direct client IP</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span>
+
+        <span class="k">return</span> <span class="s2">&quot;unknown&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_auth_error_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create authentication error response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            message: Error message</span>
+<span class="sd">            status_code: HTTP status code</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            JSONResponse: Error response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication Error&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;AUTH_REQUIRED&quot;</span> <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span> <span class="k">else</span> <span class="s2">&quot;AUTH_FORBIDDEN&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

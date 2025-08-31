@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { nexusAPI } from '../services/api';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { nexusAPI } from "../services/api";
 
 export interface StorySphereData {
   sphere_id: string;
@@ -45,7 +45,7 @@ export interface UseStorySphereResult {
 
 /**
  * Custom hook for managing story spheres data from the Nexus Codex API
- * 
+ *
  * Features:
  * - Automatic data fetching with filters
  * - Real-time updates with configurable refresh interval
@@ -53,7 +53,9 @@ export interface UseStorySphereResult {
  * - Loading states
  * - Filter management
  */
-export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySphereResult => {
+export const useStorySpheres = (
+  options: UseStorySphereOptions = {}
+): UseStorySphereResult => {
   const {
     filters = {},
     autoRefresh = true,
@@ -65,7 +67,8 @@ export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySp
   const [spheres, setSpheres] = useState<StorySphereData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentFilters, setCurrentFilters] = useState<StorySphereFilters>(filters);
+  const [currentFilters, setCurrentFilters] =
+    useState<StorySphereFilters>(filters);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -74,36 +77,40 @@ export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySp
   /**
    * Fetch spheres from the API
    */
-  const fetchSpheres = useCallback(async (signal?: AbortSignal) => {
-    try {
-      setError(null);
-      
-      const response = await nexusAPI.getSpheres(currentFilters);
-      
-      if (signal?.aborted) return;
+  const fetchSpheres = useCallback(
+    async (signal?: AbortSignal) => {
+      try {
+        setError(null);
 
-      const spheresData = response.spheres || response.data || response;
-      
-      if (Array.isArray(spheresData)) {
-        setSpheres(spheresData);
-        setLastUpdated(new Date());
-        onSuccess?.(spheresData);
-      } else {
-        throw new Error('Invalid response format: expected array of spheres');
+        const response = await nexusAPI.getSpheres(currentFilters);
+
+        if (signal?.aborted) return;
+
+        const spheresData =
+          (response as any).spheres || (response as any).data || response;
+
+        if (Array.isArray(spheresData)) {
+          setSpheres(spheresData);
+          setLastUpdated(new Date());
+          onSuccess?.(spheresData);
+        } else {
+          throw new Error("Invalid response format: expected array of spheres");
+        }
+      } catch (err: any) {
+        if (signal?.aborted) return;
+
+        const errorMessage = err.message || "Failed to fetch story spheres";
+        setError(errorMessage);
+        onError?.(err);
+        console.error("useStorySpheres: Failed to fetch spheres:", err);
+      } finally {
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
       }
-    } catch (err: any) {
-      if (signal?.aborted) return;
-      
-      const errorMessage = err.message || 'Failed to fetch story spheres';
-      setError(errorMessage);
-      onError?.(err);
-      console.error('useStorySpheres: Failed to fetch spheres:', err);
-    } finally {
-      if (!signal?.aborted) {
-        setLoading(false);
-      }
-    }
-  }, [currentFilters, onError, onSuccess]);
+    },
+    [currentFilters, onError, onSuccess]
+  );
 
   /**
    * Refetch spheres manually
@@ -116,7 +123,7 @@ export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySp
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     await fetchSpheres(abortControllerRef.current.signal);
   }, [fetchSpheres]);
@@ -125,7 +132,7 @@ export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySp
    * Update filters and refetch data
    */
   const updateFilters = useCallback((newFilters: StorySphereFilters) => {
-    setCurrentFilters(prev => ({ ...prev, ...newFilters }));
+    setCurrentFilters((prev) => ({ ...prev, ...newFilters }));
   }, []);
 
   /**
@@ -163,7 +170,7 @@ export const useStorySpheres = (options: UseStorySphereOptions = {}): UseStorySp
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     fetchSpheres(abortControllerRef.current.signal);
 

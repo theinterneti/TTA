@@ -55,7 +55,7 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -82,7 +82,7 @@ const Register: React.FC = () => {
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
       setValidationErrors(prev => ({
@@ -136,7 +136,7 @@ const Register: React.FC = () => {
             Create your Therapeutic Text Adventure account
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>

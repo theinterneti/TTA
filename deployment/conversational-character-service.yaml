@@ -1,0 +1,341 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: conversational-character-service
+  namespace: tta-player-experience
+  labels:
+    app: conversational-character-service
+    component: player-experience
+    version: v1.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: conversational-character-service
+  template:
+    metadata:
+      labels:
+        app: conversational-character-service
+        component: player-experience
+        version: v1.0.0
+    spec:
+      containers:
+        - name: conversational-character-service
+          image: tta/conversational-character-service:latest
+          ports:
+            - containerPort: 8000
+              name: http
+            - containerPort: 8001
+              name: websocket
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials
+                  key: url
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-credentials
+                  key: url
+            - name: NEO4J_URI
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-credentials
+                  key: uri
+            - name: NEO4J_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-credentials
+                  key: username
+            - name: NEO4J_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: neo4j-credentials
+                  key: password
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-credentials
+                  key: secret-key
+            - name: THERAPEUTIC_SAFETY_API_URL
+              value: "http://therapeutic-safety-service:8000"
+            - name: CHARACTER_MANAGER_API_URL
+              value: "http://character-manager-service:8000"
+            - name: CONVERSATION_TIMEOUT_MINUTES
+              value: "60"
+            - name: MAX_CONVERSATION_DURATION_HOURS
+              value: "4"
+            - name: CRISIS_DETECTION_ENABLED
+              value: "true"
+            - name: SAFETY_VALIDATION_ENABLED
+              value: "true"
+            - name: CONVERSATION_PERSISTENCE_TTL_HOURS
+              value: "24"
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          volumeMounts:
+            - name: config-volume
+              mountPath: /app/config
+              readOnly: true
+            - name: logs-volume
+              mountPath: /app/logs
+      volumes:
+        - name: config-volume
+          configMap:
+            name: conversational-character-config
+        - name: logs-volume
+          emptyDir: {}
+      imagePullSecrets:
+        - name: tta-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: conversational-character-service
+  namespace: tta-player-experience
+  labels:
+    app: conversational-character-service
+    component: player-experience
+spec:
+  selector:
+    app: conversational-character-service
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+      protocol: TCP
+    - name: websocket
+      port: 8001
+      targetPort: 8001
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conversational-character-config
+  namespace: tta-player-experience
+data:
+  app_config.yaml: |
+    server:
+      host: "0.0.0.0"
+      port: 8000
+      websocket_port: 8001
+      cors_origins:
+        - "https://tta-frontend.example.com"
+        - "https://tta-admin.example.com"
+
+    conversation:
+      max_concurrent_per_user: 3
+      timeout_minutes: 60
+      max_duration_hours: 4
+      persistence_ttl_hours: 24
+      auto_save_interval_seconds: 30
+
+    therapeutic_safety:
+      crisis_detection_enabled: true
+      content_validation_enabled: true
+      safety_threshold: 0.8
+      crisis_threshold: 0.9
+
+    redis:
+      connection_pool_size: 10
+      connection_timeout_seconds: 5
+      retry_attempts: 3
+
+    database:
+      connection_pool_size: 20
+      connection_timeout_seconds: 30
+      query_timeout_seconds: 60
+
+    logging:
+      level: "INFO"
+      format: "json"
+      file_rotation: true
+      max_file_size_mb: 100
+      backup_count: 5
+
+    monitoring:
+      metrics_enabled: true
+      health_check_interval_seconds: 30
+      performance_tracking: true
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: conversational-character-ingress
+  namespace: tta-player-experience
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/websocket-services: "conversational-character-service"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+    - hosts:
+        - api.tta.example.com
+      secretName: tta-api-tls
+  rules:
+    - host: api.tta.example.com
+      http:
+        paths:
+          - path: /ws/conversational-character-creation
+            pathType: Prefix
+            backend:
+              service:
+                name: conversational-character-service
+                port:
+                  number: 8001
+          - path: /api/conversations
+            pathType: Prefix
+            backend:
+              service:
+                name: conversational-character-service
+                port:
+                  number: 8000
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: conversational-character-hpa
+  namespace: tta-player-experience
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: conversational-character-service
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 60
+      policies:
+        - type: Percent
+          value: 50
+          periodSeconds: 60
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: conversational-character-pdb
+  namespace: tta-player-experience
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: conversational-character-service
+---
+apiVersion: v1
+kind: ServiceMonitor
+metadata:
+  name: conversational-character-metrics
+  namespace: tta-player-experience
+  labels:
+    app: conversational-character-service
+spec:
+  selector:
+    matchLabels:
+      app: conversational-character-service
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 30s
+      scrapeTimeout: 10s
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: conversational-character-network-policy
+  namespace: tta-player-experience
+spec:
+  podSelector:
+    matchLabels:
+      app: conversational-character-service
+  policyTypes:
+    - Ingress
+    - Egress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              name: tta-frontend
+        - namespaceSelector:
+            matchLabels:
+              name: tta-gateway
+      ports:
+        - protocol: TCP
+          port: 8000
+        - protocol: TCP
+          port: 8001
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: tta-database
+      ports:
+        - protocol: TCP
+          port: 5432
+        - protocol: TCP
+          port: 6379
+        - protocol: TCP
+          port: 7687
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              name: tta-services
+      ports:
+        - protocol: TCP
+          port: 8000
+    - to: []
+      ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53

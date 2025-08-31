@@ -1,0 +1,328 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.realtime.message_workflow_integration module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.agent_orchestration.realtime.models module" href="src.agent_orchestration.realtime.models.html" />
+    <link rel="prev" title="src.agent_orchestration.realtime.event_subscriber module" href="src.agent_orchestration.realtime.event_subscriber.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4 current"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+          <li class="breadcrumb-item"><a href="src.agent_orchestration.realtime.html">src.agent_orchestration.realtime package</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.realtime.message_workflow_integration module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.agent_orchestration.realtime.message_workflow_integration.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.agent_orchestration.realtime.message_workflow_integration">
+<span id="src-agent-orchestration-realtime-message-workflow-integration-module"></span><h1>src.agent_orchestration.realtime.message_workflow_integration module<a class="headerlink" href="#module-src.agent_orchestration.realtime.message_workflow_integration" title="Link to this heading"></a></h1>
+<p>Integration layer between RedisMessageCoordinator and workflow progress tracking.</p>
+<p>This module provides integration between the existing message coordination system
+and the new real-time workflow progress tracking capabilities.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.agent_orchestration.realtime.message_workflow_integration.</span></span><span class="sig-name descname"><span class="pre">WorkflowAwareMessageCoordinator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis_coordinator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_tracker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedback_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">track_message_workflows</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Enhanced message coordinator with workflow progress tracking integration.</p>
+<p>This class wraps the existing RedisMessageCoordinator and adds workflow
+progress tracking capabilities for messages that are part of workflows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>redis_coordinator</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.redis_message_coordinator.RedisMessageCoordinator" title="src.agent_orchestration.coordinators.redis_message_coordinator.RedisMessageCoordinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">RedisMessageCoordinator</span></code></a></span>)</p></li>
+<li><p><strong>workflow_tracker</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.realtime.workflow_progress.html#src.agent_orchestration.realtime.workflow_progress.WorkflowProgressTracker" title="src.agent_orchestration.realtime.workflow_progress.WorkflowProgressTracker"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkflowProgressTracker</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>feedback_manager</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager" title="src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressiveFeedbackManager</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>track_message_workflows</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.__getattr__">
+<span class="sig-name descname"><span class="pre">__getattr__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.__getattr__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.__getattr__" title="Link to this definition"></a></dt>
+<dd><p>Delegate unknown methods to the underlying Redis coordinator.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.ack_workflow_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ack_workflow_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.ack_workflow_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.ack_workflow_message" title="Link to this definition"></a></dt>
+<dd><p>Acknowledge a message with workflow progress update.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>token</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>workflow_result</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.add_workflow_callback">
+<span class="sig-name descname"><span class="pre">add_workflow_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.add_workflow_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.add_workflow_callback" title="Link to this definition"></a></dt>
+<dd><p>Add a callback for workflow message events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>callback</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]], <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.broadcast_workflow_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">broadcast_workflow_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recipients</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.broadcast_workflow_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.broadcast_workflow_message" title="Link to this definition"></a></dt>
+<dd><p>Broadcast a message with workflow tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentMessage" title="src.agent_orchestration.models.AgentMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentMessage</span></code></a></span>)</p></li>
+<li><p><strong>recipients</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a>]</span>)</p></li>
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.agent_orchestration.messaging.html#src.agent_orchestration.messaging.MessageResult" title="src.agent_orchestration.messaging.MessageResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageResult</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.complete_workflow">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">complete_workflow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">final_result</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.complete_workflow"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.complete_workflow" title="Link to this definition"></a></dt>
+<dd><p>Complete workflow tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>success</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>final_result</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>error_message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.get_workflow_message_stats">
+<span class="sig-name descname"><span class="pre">get_workflow_message_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.get_workflow_message_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.get_workflow_message_stats" title="Link to this definition"></a></dt>
+<dd><p>Get message statistics for a workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.nack_workflow_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nack_workflow_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">FailureType.TRANSIENT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.nack_workflow_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.nack_workflow_message" title="Link to this definition"></a></dt>
+<dd><p>Negative acknowledge a message with workflow error tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>token</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>failure</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.messaging.html#src.agent_orchestration.messaging.FailureType" title="src.agent_orchestration.messaging.FailureType"><code class="xref py py-class docutils literal notranslate"><span class="pre">FailureType</span></code></a></span>)</p></li>
+<li><p><strong>error</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.receive_workflow_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">receive_workflow_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">agent_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visibility_timeout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.receive_workflow_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.receive_workflow_message" title="Link to this definition"></a></dt>
+<dd><p>Receive a message with workflow progress tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>agent_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>visibility_timeout</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.messaging.html#src.agent_orchestration.messaging.ReceivedMessage" title="src.agent_orchestration.messaging.ReceivedMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReceivedMessage</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.send_workflow_message">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">send_workflow_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sender</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recipient</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.send_workflow_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.send_workflow_message" title="Link to this definition"></a></dt>
+<dd><p>Send a message with workflow tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sender</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>recipient</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a></span>)</p></li>
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentMessage" title="src.agent_orchestration.models.AgentMessage"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentMessage</span></code></a></span>)</p></li>
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.agent_orchestration.messaging.html#src.agent_orchestration.messaging.MessageResult" title="src.agent_orchestration.messaging.MessageResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">MessageResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.start_workflow_tracking">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">start_workflow_tracking</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workflow_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workflow_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">participating_agents</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_messages</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/agent_orchestration/realtime/message_workflow_integration.html#WorkflowAwareMessageCoordinator.start_workflow_tracking"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.agent_orchestration.realtime.message_workflow_integration.WorkflowAwareMessageCoordinator.start_workflow_tracking" title="Link to this definition"></a></dt>
+<dd><p>Start tracking a workflow with message coordination.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>workflow_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>workflow_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>participating_agents</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.agent_orchestration.models.html#src.agent_orchestration.models.AgentId" title="src.agent_orchestration.models.AgentId"><code class="xref py py-class docutils literal notranslate"><span class="pre">AgentId</span></code></a>]</span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>estimated_messages</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.agent_orchestration.realtime.event_subscriber.html" class="btn btn-neutral float-left" title="src.agent_orchestration.realtime.event_subscriber module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.agent_orchestration.realtime.models.html" class="btn btn-neutral float-right" title="src.agent_orchestration.realtime.models module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

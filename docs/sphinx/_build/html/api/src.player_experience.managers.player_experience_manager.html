@@ -1,0 +1,249 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.player_experience_manager module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.player_experience.managers.player_profile_manager module" href="src.player_experience.managers.player_profile_manager.html" />
+    <link rel="prev" title="src.player_experience.managers.personalization_service_manager module" href="src.player_experience.managers.personalization_service_manager.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.player_experience.html">src.player_experience package</a></li>
+          <li class="breadcrumb-item"><a href="src.player_experience.managers.html">src.player_experience.managers package</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.player_experience_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.player_experience.managers.player_experience_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.player_experience.managers.player_experience_manager">
+<span id="src-player-experience-managers-player-experience-manager-module"></span><h1>src.player_experience.managers.player_experience_manager module<a class="headerlink" href="#module-src.player_experience.managers.player_experience_manager" title="Link to this heading"></a></h1>
+<p>Central orchestrator for all player experience functionality (Task 10).</p>
+<p>Responsibilities:
+- Player dashboard aggregation (characters, sessions, progress, recommendations)
+- Recommendation system integration (via PersonalizationServiceManager and ProgressTrackingService)
+- Adaptive experience management with feedback processing and crisis integration</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.managers.player_experience_manager.</span></span><span class="sig-name descname"><span class="pre">PlayerExperienceManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_repository</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_repository</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">personalization_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_service</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interactive_narrative_engine</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Central orchestrator for all player experience functionality.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_repository</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.database.session_repository.html#src.player_experience.database.session_repository.SessionRepository" title="src.player_experience.database.session_repository.SessionRepository"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionRepository</span></code></a></span>)</p></li>
+<li><p><strong>character_repository</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.database.character_repository.html#src.player_experience.database.character_repository.CharacterRepository" title="src.player_experience.database.character_repository.CharacterRepository"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharacterRepository</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>personalization_manager</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.personalization_service_manager.PersonalizationServiceManager" title="src.player_experience.managers.personalization_service_manager.PersonalizationServiceManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">PersonalizationServiceManager</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>progress_service</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.progress_tracking_service.ProgressTrackingService" title="src.player_experience.managers.progress_tracking_service.ProgressTrackingService"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressTrackingService</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>interactive_narrative_engine</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.add_progress_marker">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_progress_marker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.add_progress_marker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.add_progress_marker" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.create_session">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.create_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.create_session" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.detect_crisis_and_get_resources">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detect_crisis_and_get_resources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.detect_crisis_and_get_resources"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.detect_crisis_and_get_resources" title="Link to this definition"></a></dt>
+<dd><p>Proxy to personalization crisis detection and resources retrieval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>text</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.get_player_dashboard">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_player_dashboard</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">recent_limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.get_player_dashboard"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.get_player_dashboard" title="Link to this definition"></a></dt>
+<dd><p>Aggregate data to build the player dashboard.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>recent_limit</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.models.session.html#src.player_experience.models.session.PlayerDashboard" title="src.player_experience.models.session.PlayerDashboard"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayerDashboard</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.get_recommendations">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_recommendations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.get_recommendations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.get_recommendations" title="Link to this definition"></a></dt>
+<dd><p>Combine progress-driven and personalization-driven recommendations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.player_experience.models.session.html#src.player_experience.models.session.Recommendation" title="src.player_experience.models.session.Recommendation"><code class="xref py py-class docutils literal notranslate"><span class="pre">Recommendation</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.process_player_feedback">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">process_player_feedback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">player_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feedback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.process_player_feedback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.process_player_feedback" title="Link to this definition"></a></dt>
+<dd><p>Process feedback and adapt experience using personalization manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>player_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>feedback</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.personalization_service_manager.PlayerFeedback" title="src.player_experience.managers.personalization_service_manager.PlayerFeedback"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlayerFeedback</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.PlayerExperienceManager.update_therapeutic_settings">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_therapeutic_settings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/managers/player_experience_manager.html#PlayerExperienceManager.update_therapeutic_settings"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.PlayerExperienceManager.update_therapeutic_settings" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="src.player_experience.managers.player_experience_manager.logger">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.managers.player_experience_manager.</span></span><span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;Logger</span> <span class="pre">src.player_experience.managers.player_experience_manager</span> <span class="pre">(INFO)&gt;</span></em><a class="headerlink" href="#src.player_experience.managers.player_experience_manager.logger" title="Link to this definition"></a></dt>
+<dd><p>Central orchestrator for all player experience functionality.</p>
+<p>This module will be implemented in Task 10.</p>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.player_experience.managers.personalization_service_manager.html" class="btn btn-neutral float-left" title="src.player_experience.managers.personalization_service_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.player_experience.managers.player_profile_manager.html" class="btn btn-neutral float-right" title="src.player_experience.managers.player_profile_manager module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -28,4 +28,3 @@ Call `coord.metrics.snapshot()` to retrieve a dict snapshot of current values.
 - Export metrics via Prometheus/OpenTelemetry exporters
 - Emit events on threshold breaches (e.g., DLQ growth)
 - Persist rolling aggregates to Redis for multi-process visibility
-

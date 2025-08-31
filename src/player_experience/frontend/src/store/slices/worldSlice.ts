@@ -1,12 +1,12 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { worldAPI } from '../../services/api';
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { worldAPI } from "../../services/api";
 
 interface WorldSummary {
   world_id: string;
   name: string;
   description: string;
   therapeutic_themes: string[];
-  difficulty_level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  difficulty_level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
   estimated_duration: string;
   compatibility_score: number;
   preview_image?: string;
@@ -32,10 +32,10 @@ interface CompatibilityReport {
 }
 
 interface WorldParameters {
-  therapeutic_intensity: 'LOW' | 'MEDIUM' | 'HIGH';
-  narrative_style: 'GUIDED' | 'EXPLORATORY' | 'STRUCTURED';
-  pacing: 'SLOW' | 'MODERATE' | 'FAST';
-  interaction_frequency: 'MINIMAL' | 'REGULAR' | 'FREQUENT';
+  therapeutic_intensity: "LOW" | "MEDIUM" | "HIGH";
+  narrative_style: "GUIDED" | "EXPLORATORY" | "STRUCTURED";
+  pacing: "SLOW" | "MODERATE" | "FAST";
+  interaction_frequency: "MINIMAL" | "REGULAR" | "FREQUENT";
 }
 
 interface WorldState {
@@ -60,12 +60,12 @@ const initialState: WorldState = {
   filters: {
     difficulty: [],
     themes: [],
-    duration: '',
+    duration: "",
   },
 };
 
 export const fetchAvailableWorlds = createAsyncThunk(
-  'world/fetchAvailableWorlds',
+  "world/fetchAvailableWorlds",
   async (playerId: string) => {
     const response = await worldAPI.getAvailableWorlds(playerId);
     return response;
@@ -73,7 +73,7 @@ export const fetchAvailableWorlds = createAsyncThunk(
 );
 
 export const fetchWorldDetails = createAsyncThunk(
-  'world/fetchWorldDetails',
+  "world/fetchWorldDetails",
   async (worldId: string) => {
     const response = await worldAPI.getWorldDetails(worldId);
     return response;
@@ -81,27 +81,41 @@ export const fetchWorldDetails = createAsyncThunk(
 );
 
 export const checkWorldCompatibility = createAsyncThunk(
-  'world/checkCompatibility',
-  async ({ characterId, worldId }: { characterId: string; worldId: string }) => {
+  "world/checkCompatibility",
+  async ({
+    characterId,
+    worldId,
+  }: {
+    characterId: string;
+    worldId: string;
+  }) => {
     const response = await worldAPI.checkCompatibility(characterId, worldId);
-    return { worldId, ...response };
+    return { worldId, ...(response as any) } as any;
   }
 );
 
 export const initializeCharacterInWorld = createAsyncThunk(
-  'world/initializeCharacterInWorld',
-  async ({ characterId, worldId, parameters }: { 
-    characterId: string; 
-    worldId: string; 
-    parameters: WorldParameters 
+  "world/initializeCharacterInWorld",
+  async ({
+    characterId,
+    worldId,
+    parameters,
+  }: {
+    characterId: string;
+    worldId: string;
+    parameters: WorldParameters;
   }) => {
-    const response = await worldAPI.initializeCharacterInWorld(characterId, worldId, parameters);
+    const response = await worldAPI.initializeCharacterInWorld(
+      characterId,
+      worldId,
+      parameters
+    );
     return response;
   }
 );
 
 const worldSlice = createSlice({
-  name: 'world',
+  name: "world",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -117,14 +131,17 @@ const worldSlice = createSlice({
     setWorldParameters: (state, action: PayloadAction<WorldParameters>) => {
       state.worldParameters = action.payload;
     },
-    updateFilters: (state, action: PayloadAction<Partial<typeof initialState.filters>>) => {
+    updateFilters: (
+      state,
+      action: PayloadAction<Partial<typeof initialState.filters>>
+    ) => {
       state.filters = { ...state.filters, ...action.payload };
     },
     clearFilters: (state) => {
       state.filters = {
         difficulty: [],
         themes: [],
-        duration: '',
+        duration: "",
       };
     },
   },
@@ -136,38 +153,41 @@ const worldSlice = createSlice({
       })
       .addCase(fetchAvailableWorlds.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.availableWorlds = action.payload;
+        state.availableWorlds = action.payload as WorldSummary[];
       })
       .addCase(fetchAvailableWorlds.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch worlds';
+        state.error = action.error.message || "Failed to fetch worlds";
       })
       .addCase(fetchWorldDetails.fulfilled, (state, action) => {
-        state.selectedWorld = action.payload;
+        state.selectedWorld = action.payload as WorldDetails;
       })
       .addCase(checkWorldCompatibility.fulfilled, (state, action) => {
         const { worldId, compatibility_score } = action.payload;
-        
+
         // Update the selected world if it matches
         if (state.selectedWorld && state.selectedWorld.world_id === worldId) {
           state.selectedWorld.compatibility_score = compatibility_score;
         }
-        
+
         // Update the world in the available worlds list
-        const worldIndex = state.availableWorlds.findIndex(w => w.world_id === worldId);
+        const worldIndex = state.availableWorlds.findIndex(
+          (w) => w.world_id === worldId
+        );
         if (worldIndex !== -1) {
-          state.availableWorlds[worldIndex].compatibility_score = compatibility_score;
+          state.availableWorlds[worldIndex].compatibility_score =
+            compatibility_score;
         }
       });
   },
 });
 
-export const { 
-  clearError, 
-  setSelectedWorld, 
-  clearSelectedWorld, 
+export const {
+  clearError,
+  setSelectedWorld,
+  clearSelectedWorld,
   setWorldParameters,
   updateFilters,
-  clearFilters 
+  clearFilters,
 } = worldSlice.actions;
 export default worldSlice.reducer;

@@ -46,7 +46,7 @@ export interface UseRealTimeUpdatesResult {
 
 /**
  * Custom hook for managing real-time updates via WebSocket and polling
- * 
+ *
  * Features:
  * - WebSocket connection with automatic reconnection
  * - Fallback to polling if WebSocket fails
@@ -96,7 +96,7 @@ export const useRealTimeUpdates = (
     if (!mountedRef.current) return;
 
     setLastUpdate(update);
-    
+
     switch (update.type) {
       case 'world_stats':
         if (update.data.world_id) {
@@ -107,7 +107,7 @@ export const useRealTimeUpdates = (
           });
         }
         break;
-        
+
       case 'narrative_strength':
       case 'player_count':
       case 'system_status':
@@ -130,12 +130,12 @@ export const useRealTimeUpdates = (
     try {
       const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       const wsUrl = `${protocol}//${window.location.host}/api/v1/ws/updates`;
-      
+
       wsRef.current = new WebSocket(wsUrl);
 
       wsRef.current.onopen = () => {
         if (!mountedRef.current) return;
-        
+
         console.log('WebSocket connected for real-time updates');
         setIsConnected(true);
         setConnectionType('websocket');
@@ -146,7 +146,7 @@ export const useRealTimeUpdates = (
 
       wsRef.current.onmessage = (event) => {
         if (!mountedRef.current) return;
-        
+
         try {
           const update: RealTimeUpdate = {
             ...JSON.parse(event.data),
@@ -161,7 +161,7 @@ export const useRealTimeUpdates = (
 
       wsRef.current.onclose = (event) => {
         if (!mountedRef.current) return;
-        
+
         console.log('WebSocket disconnected:', event.code, event.reason);
         setIsConnected(false);
         onConnectionChange?.(false);
@@ -170,9 +170,9 @@ export const useRealTimeUpdates = (
         if (event.code !== 1000 && reconnectCountRef.current < reconnectAttempts) {
           reconnectCountRef.current++;
           const delay = reconnectDelay * Math.pow(2, reconnectCountRef.current - 1);
-          
+
           console.log(`Attempting WebSocket reconnection ${reconnectCountRef.current}/${reconnectAttempts} in ${delay}ms`);
-          
+
           reconnectTimeoutRef.current = setTimeout(() => {
             if (mountedRef.current) {
               connectWebSocket();
@@ -190,7 +190,7 @@ export const useRealTimeUpdates = (
 
       wsRef.current.onerror = (error) => {
         if (!mountedRef.current) return;
-        
+
         console.error('WebSocket error:', error);
         const errorMessage = 'WebSocket connection failed';
         setError(errorMessage);
@@ -201,7 +201,7 @@ export const useRealTimeUpdates = (
       console.error('Failed to create WebSocket connection:', err);
       setError(err.message);
       onError?.(err);
-      
+
       if (enablePolling) {
         setConnectionType('polling');
         startPolling();
@@ -228,7 +228,7 @@ export const useRealTimeUpdates = (
       }
 
       const data = await response.json();
-      
+
       const update: RealTimeUpdate = {
         type: 'system_status',
         data,
@@ -237,18 +237,18 @@ export const useRealTimeUpdates = (
       };
 
       processUpdate(update);
-      
+
       if (!isConnected) {
         setIsConnected(true);
         onConnectionChange?.(true);
       }
-      
+
       setError(null);
     } catch (err: any) {
       console.error('Polling update failed:', err);
       setError(err.message);
       onError?.(err);
-      
+
       if (isConnected) {
         setIsConnected(false);
         onConnectionChange?.(false);
@@ -279,13 +279,13 @@ export const useRealTimeUpdates = (
   const reconnect = useCallback(() => {
     setError(null);
     reconnectCountRef.current = 0;
-    
+
     // Close existing connections
     if (wsRef.current) {
       wsRef.current.close();
     }
     stopPolling();
-    
+
     // Clear reconnection timeout
     if (reconnectTimeoutRef.current) {
       clearTimeout(reconnectTimeoutRef.current);
@@ -326,13 +326,13 @@ export const useRealTimeUpdates = (
 
     return () => {
       mountedRef.current = false;
-      
+
       if (wsRef.current) {
         wsRef.current.close();
       }
-      
+
       stopPolling();
-      
+
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
       }

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTA Gameplay WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.connected { background-color: #d4edda; color: #155724; }
+        .status.disconnected { background-color: #f8d7da; color: #721c24; }
+        .status.connecting { background-color: #fff3cd; color: #856404; }
+        .message-log {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #f9f9f9;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .message {
+            margin: 5px 0;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .message.sent {
+            background-color: #e3f2fd;
+            border-left: 3px solid #2196f3;
+        }
+        .message.received {
+            background-color: #f3e5f5;
+            border-left: 3px solid #9c27b0;
+        }
+        .message.error {
+            background-color: #ffebee;
+            border-left: 3px solid #f44336;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        button.primary {
+            background-color: #007bff;
+            color: white;
+        }
+        button.secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        button.success {
+            background-color: #28a745;
+            color: white;
+        }
+        button.danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        .test-scenarios {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .scenario {
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        .scenario h4 {
+            margin: 0 0 10px 0;
+            color: #495057;
+        }
+        .turn-counter {
+            font-size: 18px;
+            font-weight: bold;
+            color: #007bff;
+            margin: 10px 0;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .stat {
+            text-align: center;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 TTA Gameplay WebSocket Integration Test</h1>
+        
+        <div id="status" class="status disconnected">
+            Disconnected
+        </div>
+        
+        <div class="controls">
+            <input type="text" id="serverUrl" value="ws://localhost:8080/ws/gameplay/test_player_001/test_session_001" placeholder="WebSocket URL">
+            <input type="text" id="authToken" value="mock_token_for_testing" placeholder="Auth Token (optional)">
+            <button id="connectBtn" class="primary">Connect</button>
+            <button id="disconnectBtn" class="danger" disabled>Disconnect</button>
+            <button id="clearLogBtn" class="secondary">Clear Log</button>
+        </div>
+        
+        <div class="turn-counter">
+            Turn: <span id="turnCount">0</span> / 10
+        </div>
+        
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="messagesSent">0</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="messagesReceived">0</div>
+                <div class="stat-label">Messages Received</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="responseTime">0ms</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="successRate">0%</div>
+                <div class="stat-label">Success Rate</div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <textarea id="messageInput" rows="3" placeholder="Enter your message here..."></textarea>
+            <button id="sendBtn" class="success" disabled>Send Message</button>
+            <button id="runTestBtn" class="primary">Run 10-Turn Test</button>
+        </div>
+        
+        <div class="test-scenarios">
+            <div class="scenario">
+                <h4>🌿 Exploration</h4>
+                <button onclick="sendTestMessage('exploration')">Send</button>
+                <p><em>"I want to explore the peaceful garden and find a quiet place to sit."</em></p>
+            </div>
+            <div class="scenario">
+                <h4>😰 Emotional Expression</h4>
+                <button onclick="sendTestMessage('emotional')">Send</button>
+                <p><em>"I'm feeling a bit anxious about being in this new place."</em></p>
+            </div>
+            <div class="scenario">
+                <h4>🧘 Therapeutic Action</h4>
+                <button onclick="sendTestMessage('therapeutic')">Send</button>
+                <p><em>"I want to practice some deep breathing exercises to calm myself."</em></p>
+            </div>
+            <div class="scenario">
+                <h4>🗣️ Social Interaction</h4>
+                <button onclick="sendTestMessage('social')">Send</button>
+                <p><em>"Can I talk to someone here? I'd like to practice my social skills."</em></p>
+            </div>
+            <div class="scenario">
+                <h4>⚠️ Crisis Trigger</h4>
+                <button onclick="sendTestMessage('crisis')">Send</button>
+                <p><em>"I feel like I want to hurt myself and can't go on anymore."</em></p>
+            </div>
+            <div class="scenario">
+                <h4>📈 Progress Check</h4>
+                <button onclick="sendTestMessage('progress')">Send</button>
+                <p><em>"How am I doing so far? I want to understand my progress."</em></p>
+            </div>
+        </div>
+        
+        <div class="message-log" id="messageLog">
+            <div class="message">Ready to test WebSocket connection...</div>
+        </div>
+    </div>
+
+    <script>
+        let websocket = null;
+        let turnCount = 0;
+        let messagesSent = 0;
+        let messagesReceived = 0;
+        let responseTimes = [];
+        let lastMessageTime = 0;
+        let testRunning = false;
+        
+        const testMessages = [
+            { type: 'exploration', text: "I want to explore the peaceful garden and find a quiet place to sit." },
+            { type: 'emotional', text: "I'm feeling a bit anxious about being in this new place. Can you help me feel more comfortable?" },
+            { type: 'observation', text: "What can I see around me? I'd like to take in my surroundings." },
+            { type: 'therapeutic', text: "I want to practice some deep breathing exercises to calm myself." },
+            { type: 'social', text: "Can I talk to someone here? I'd like to practice my social skills." },
+            { type: 'confidence', text: "I'm starting to feel more confident. What opportunities are available to me?" },
+            { type: 'skill', text: "I'd like to try something challenging but manageable for my current skill level." },
+            { type: 'progress', text: "How am I doing so far? I want to understand my progress." },
+            { type: 'crisis', text: "I feel like I want to hurt myself and can't go on anymore." },
+            { type: 'conclusion', text: "Thank you for this experience. I feel like I've learned something valuable today." }
+        ];
+        
+        function updateStatus(status, message) {
+            const statusEl = document.getElementById('status');
+            statusEl.className = `status ${status}`;
+            statusEl.textContent = message;
+        }
+        
+        function logMessage(type, content, data = null) {
+            const log = document.getElementById('messageLog');
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            let messageContent = `[${timestamp}] ${content}`;
+            
+            if (data) {
+                messageContent += `\n${JSON.stringify(data, null, 2)}`;
+            }
+            
+            messageEl.textContent = messageContent;
+            log.appendChild(messageEl);
+            log.scrollTop = log.scrollHeight;
+        }
+        
+        function updateStats() {
+            document.getElementById('messagesSent').textContent = messagesSent;
+            document.getElementById('messagesReceived').textContent = messagesReceived;
+            
+            const avgResponseTime = responseTimes.length > 0 
+                ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+                : 0;
+            document.getElementById('responseTime').textContent = `${avgResponseTime}ms`;
+            
+            const successRate = messagesSent > 0 
+                ? Math.round((messagesReceived / messagesSent) * 100)
+                : 0;
+            document.getElementById('successRate').textContent = `${successRate}%`;
+            
+            document.getElementById('turnCount').textContent = turnCount;
+        }
+        
+        function connect() {
+            const url = document.getElementById('serverUrl').value;
+            const token = document.getElementById('authToken').value;
+            
+            let wsUrl = url;
+            if (token && token !== 'mock_token_for_testing') {
+                wsUrl += `?token=${encodeURIComponent(token)}`;
+            }
+            
+            updateStatus('connecting', 'Connecting...');
+            logMessage('sent', `Connecting to: ${wsUrl}`);
+            
+            try {
+                websocket = new WebSocket(wsUrl);
+                
+                websocket.onopen = function(event) {
+                    updateStatus('connected', 'Connected');
+                    logMessage('received', 'WebSocket connection established');
+                    document.getElementById('connectBtn').disabled = true;
+                    document.getElementById('disconnectBtn').disabled = false;
+                    document.getElementById('sendBtn').disabled = false;
+                };
+                
+                websocket.onmessage = function(event) {
+                    messagesReceived++;
+                    
+                    if (lastMessageTime > 0) {
+                        const responseTime = Date.now() - lastMessageTime;
+                        responseTimes.push(responseTime);
+                    }
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        logMessage('received', 'Received message:', data);
+                        
+                        // Handle different message types
+                        if (data.type === 'narrative_response') {
+                            logMessage('received', `📖 Narrative: ${data.content?.text || 'No text content'}`);
+                        } else if (data.type === 'choice_request') {
+                            logMessage('received', `🤔 Choice Request: ${data.content?.prompt || 'No prompt'}`);
+                            if (data.content?.choices) {
+                                data.content.choices.forEach((choice, index) => {
+                                    logMessage('received', `  ${index + 1}. ${choice.text}`);
+                                });
+                            }
+                        } else if (data.type === 'therapeutic_intervention') {
+                            logMessage('received', `🚨 Therapeutic Intervention: ${data.content?.message || 'No message'}`);
+                        }
+                    } catch (e) {
+                        logMessage('received', 'Received raw message:', event.data);
+                    }
+                    
+                    updateStats();
+                };
+                
+                websocket.onerror = function(error) {
+                    logMessage('error', 'WebSocket error:', error);
+                    updateStatus('disconnected', 'Error occurred');
+                };
+                
+                websocket.onclose = function(event) {
+                    updateStatus('disconnected', `Disconnected (Code: ${event.code})`);
+                    logMessage('error', `Connection closed. Code: ${event.code}, Reason: ${event.reason || 'No reason provided'}`);
+                    document.getElementById('connectBtn').disabled = false;
+                    document.getElementById('disconnectBtn').disabled = true;
+                    document.getElementById('sendBtn').disabled = true;
+                };
+                
+            } catch (error) {
+                updateStatus('disconnected', 'Connection failed');
+                logMessage('error', 'Failed to connect:', error);
+            }
+        }
+        
+        function disconnect() {
+            if (websocket) {
+                websocket.close();
+                websocket = null;
+            }
+        }
+        
+        function sendMessage(messageText, messageType = 'player_input') {
+            if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                logMessage('error', 'WebSocket not connected');
+                return;
+            }
+            
+            const message = {
+                type: messageType,
+                content: {
+                    text: messageText,
+                    input_type: 'narrative_action'
+                },
+                timestamp: new Date().toISOString(),
+                session_id: 'test_session_001',
+                metadata: {}
+            };
+            
+            lastMessageTime = Date.now();
+            messagesSent++;
+            turnCount++;
+            
+            websocket.send(JSON.stringify(message));
+            logMessage('sent', `💬 Sent (Turn ${turnCount}): ${messageText}`, message);
+            updateStats();
+        }
+        
+        function sendTestMessage(type) {
+            const message = testMessages.find(m => m.type === type);
+            if (message) {
+                sendMessage(message.text);
+            }
+        }
+        
+        async function runAutomatedTest() {
+            if (testRunning) return;
+            
+            testRunning = true;
+            document.getElementById('runTestBtn').disabled = true;
+            document.getElementById('runTestBtn').textContent = 'Running Test...';
+            
+            logMessage('sent', '🚀 Starting 10-turn automated test');
+            
+            for (let i = 0; i < testMessages.length; i++) {
+                if (!websocket || websocket.readyState !== WebSocket.OPEN) {
+                    logMessage('error', 'Connection lost during test');
+                    break;
+                }
+                
+                const message = testMessages[i];
+                logMessage('sent', `📝 Test Turn ${i + 1}: ${message.type}`);
+                sendMessage(message.text);
+                
+                // Wait 2 seconds between messages
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+            
+            testRunning = false;
+            document.getElementById('runTestBtn').disabled = false;
+            document.getElementById('runTestBtn').textContent = 'Run 10-Turn Test';
+            
+            logMessage('sent', '✅ Automated test completed');
+        }
+        
+        function clearLog() {
+            document.getElementById('messageLog').innerHTML = '<div class="message">Log cleared...</div>';
+        }
+        
+        // Event listeners
+        document.getElementById('connectBtn').addEventListener('click', connect);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnect);
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const messageText = document.getElementById('messageInput').value.trim();
+            if (messageText) {
+                sendMessage(messageText);
+                document.getElementById('messageInput').value = '';
+            }
+        });
+        document.getElementById('runTestBtn').addEventListener('click', runAutomatedTest);
+        document.getElementById('clearLogBtn').addEventListener('click', clearLog);
+        
+        // Allow Enter key to send message
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                document.getElementById('sendBtn').click();
+            }
+        });
+        
+        // Initialize stats
+        updateStats();
+    </script>
+</body>
+</html>

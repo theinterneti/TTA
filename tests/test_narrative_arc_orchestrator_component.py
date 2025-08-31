@@ -6,19 +6,17 @@ to verify its functionality and integration with the TTA component system.
 """
 
 import unittest
-import asyncio
-from unittest.mock import Mock, patch
 from datetime import datetime
 
-from src.orchestration import TTAConfig
 from src.components.narrative_arc_orchestrator_component import (
+    EmergentEvent,
     NarrativeArcOrchestratorComponent,
-    PlayerChoice,
     NarrativeResponse,
-    NarrativeStatus,
     NarrativeScale,
-    EmergentEvent
+    NarrativeStatus,
+    PlayerChoice,
 )
+from src.orchestration import TTAConfig
 
 
 class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
@@ -32,7 +30,10 @@ class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
     def test_component_initialization(self):
         """Test component initialization."""
         self.assertEqual(self.component.name, "narrative_arc_orchestrator")
-        self.assertEqual(self.component.dependencies, ["neo4j", "redis", "interactive_narrative_engine"])
+        self.assertEqual(
+            self.component.dependencies,
+            ["neo4j", "redis", "interactive_narrative_engine"],
+        )
         self.assertEqual(self.component.port, 8502)
         self.assertEqual(self.component.max_concurrent_sessions, 100)
 
@@ -65,9 +66,9 @@ class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
             choice_id="test_choice_1",
             session_id="test_session",
             choice_text="I want to explore the forest",
-            choice_type="action"
+            choice_type="action",
         )
-        
+
         self.assertEqual(choice.choice_id, "test_choice_1")
         self.assertEqual(choice.session_id, "test_session")
         self.assertEqual(choice.choice_text, "I want to explore the forest")
@@ -80,9 +81,9 @@ class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
         response = NarrativeResponse(
             content="You venture into the mysterious forest...",
             response_type="narrative",
-            session_id="test_session"
+            session_id="test_session",
         )
-        
+
         self.assertEqual(response.content, "You venture into the mysterious forest...")
         self.assertEqual(response.response_type, "narrative")
         self.assertEqual(response.session_id, "test_session")
@@ -98,9 +99,9 @@ class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
             active_threads=["thread_1", "thread_2"],
             character_arcs={"char_1": "development", "char_2": "conflict"},
             coherence_score=0.85,
-            therapeutic_alignment=0.75
+            therapeutic_alignment=0.75,
         )
-        
+
         self.assertEqual(status.session_id, "test_session")
         self.assertEqual(status.current_scale, NarrativeScale.SHORT_TERM)
         self.assertEqual(len(status.active_threads), 2)
@@ -115,9 +116,9 @@ class TestNarrativeArcOrchestratorComponent(unittest.TestCase):
             event_type="character_revelation",
             description="A character reveals a secret",
             scale=NarrativeScale.MEDIUM_TERM,
-            participants=["player", "npc_1"]
+            participants=["player", "npc_1"],
         )
-        
+
         self.assertEqual(event.event_id, "event_1")
         self.assertEqual(event.event_type, "character_revelation")
         self.assertEqual(event.scale, NarrativeScale.MEDIUM_TERM)
@@ -144,11 +145,11 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
         choice = PlayerChoice(
             choice_id="test_choice",
             session_id="test_session",
-            choice_text="I want to help the villagers"
+            choice_text="I want to help the villagers",
         )
-        
+
         response = await self.component.process_player_choice("test_session", choice)
-        
+
         self.assertIsInstance(response, NarrativeResponse)
         self.assertEqual(response.session_id, "test_session")
         self.assertIn("You chose:", response.content)
@@ -160,11 +161,11 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
         choice = PlayerChoice(
             choice_id="invalid_choice",
             session_id="test_session",
-            choice_text=""  # Empty choice text
+            choice_text="",  # Empty choice text
         )
-        
+
         response = await self.component.process_player_choice("test_session", choice)
-        
+
         self.assertEqual(response.response_type, "error")
         self.assertIn("didn't understand", response.content)
 
@@ -174,10 +175,10 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
         choice = PlayerChoice(
             choice_id="setup_choice",
             session_id="test_session",
-            choice_text="Begin the adventure"
+            choice_text="Begin the adventure",
         )
         await self.component.process_player_choice("test_session", choice)
-        
+
         # Now test scale advancement
         result = await self.component.advance_narrative_scales("test_session")
         self.assertTrue(result)
@@ -188,13 +189,13 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
         choice = PlayerChoice(
             choice_id="setup_choice",
             session_id="test_session",
-            choice_text="Begin the adventure"
+            choice_text="Begin the adventure",
         )
         await self.component.process_player_choice("test_session", choice)
-        
+
         # Now test getting status
         status = await self.component.get_narrative_status("test_session")
-        
+
         self.assertIsInstance(status, NarrativeStatus)
         self.assertEqual(status.session_id, "test_session")
         self.assertIsInstance(status.current_scale, NarrativeScale)
@@ -212,19 +213,19 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
         choice = PlayerChoice(
             choice_id="setup_choice",
             session_id="test_session",
-            choice_text="Begin the adventure"
+            choice_text="Begin the adventure",
         )
         await self.component.process_player_choice("test_session", choice)
-        
+
         # Test emergent event triggering with high probability context
         context = {
             "recent_events": ["event1", "event2", "event3"],
             "character_interactions": 5,
-            "emotional_intensity": 0.8
+            "emotional_intensity": 0.8,
         }
-        
+
         event = await self.component.trigger_emergent_event("test_session", context)
-        
+
         # Event may or may not be generated based on probability
         if event:
             self.assertIsInstance(event, EmergentEvent)
@@ -234,9 +235,11 @@ class TestNarrativeArcOrchestratorAsyncMethods(unittest.IsolatedAsyncioTestCase)
     async def test_emergent_event_nonexistent_session(self):
         """Test emergent event for nonexistent session."""
         context = {"test": "context"}
-        event = await self.component.trigger_emergent_event("nonexistent_session", context)
+        event = await self.component.trigger_emergent_event(
+            "nonexistent_session", context
+        )
         self.assertIsNone(event)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

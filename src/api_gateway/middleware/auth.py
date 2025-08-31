@@ -6,15 +6,21 @@ JWT token validation, user context extraction, and role-based access control.
 """
 
 import logging
-from typing import Callable, Optional, Set
+from collections.abc import Callable
 
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from ..config import get_gateway_settings
-from ..models import AuthContext, UserRole, AuthenticationMethod, UserPermissions, PermissionLevel, TherapeuticPermission
-
+from ..models import (
+    AuthContext,
+    AuthenticationMethod,
+    PermissionLevel,
+    TherapeuticPermission,
+    UserPermissions,
+    UserRole,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -86,13 +92,15 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
                 f"Authenticated user {auth_context.username} ({auth_context.user_id}) "
                 f"for {request.method} {request.url.path}",
                 extra={
-                    "correlation_id": getattr(request.state, "correlation_id", "unknown"),
+                    "correlation_id": getattr(
+                        request.state, "correlation_id", "unknown"
+                    ),
                     "user_id": str(auth_context.user_id),
                     "username": auth_context.username,
                     "role": auth_context.permissions.role.value,
                     "therapeutic_context": auth_context.is_therapeutic_context(),
-                    "event_type": "authentication_success"
-                }
+                    "event_type": "authentication_success",
+                },
             )
 
         # Process request
@@ -104,7 +112,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
         return response
 
-    async def _authenticate_request(self, request: Request) -> Optional[AuthContext]:
+    async def _authenticate_request(self, request: Request) -> AuthContext | None:
         """
         Authenticate the request and return authentication context.
 
@@ -134,16 +142,18 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             logger.warning(
                 f"Authentication failed for {request.method} {request.url.path}: {e}",
                 extra={
-                    "correlation_id": getattr(request.state, "correlation_id", "unknown"),
+                    "correlation_id": getattr(
+                        request.state, "correlation_id", "unknown"
+                    ),
                     "client_ip": self._get_client_ip(request),
                     "user_agent": request.headers.get("user-agent", "unknown"),
                     "error": str(e),
-                    "event_type": "authentication_failure"
-                }
+                    "event_type": "authentication_failure",
+                },
             )
             return None
 
-    def _extract_token(self, request: Request) -> Optional[str]:
+    def _extract_token(self, request: Request) -> str | None:
         """
         Extract JWT token from request headers.
 
@@ -165,7 +175,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
         return None
 
-    async def _validate_token(self, token: str) -> Optional[dict]:
+    async def _validate_token(self, token: str) -> dict | None:
         """
         Validate JWT token using TTA authentication system.
 
@@ -201,7 +211,9 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             logger.debug(f"Token validation failed: {e}")
             return None
 
-    def _create_auth_context(self, request: Request, user_data: dict, token: str) -> AuthContext:
+    def _create_auth_context(
+        self, request: Request, user_data: dict, token: str
+    ) -> AuthContext:
         """
         Create authentication context from validated user data.
 
@@ -213,8 +225,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         Returns:
             AuthContext: Authentication context
         """
-        from uuid import UUID
         from datetime import datetime, timezone
+        from uuid import UUID
 
         # Convert TTA user role to gateway user role
         tta_role = user_data["role"]
@@ -222,7 +234,9 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
         # Convert TTA permissions to gateway permissions
         tta_permissions = user_data.get("permissions", [])
-        gateway_permissions = self._convert_tta_permissions_to_gateway_permissions(tta_permissions, tta_role)
+        gateway_permissions = self._convert_tta_permissions_to_gateway_permissions(
+            tta_permissions, tta_role
+        )
 
         # Create user permissions
         user_permissions = UserPermissions(
@@ -230,13 +244,13 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             permissions=gateway_permissions.permissions,
             therapeutic=gateway_permissions.therapeutic,
             service_access=gateway_permissions.service_access,
-            rate_limit_multiplier=gateway_permissions.rate_limit_multiplier
+            rate_limit_multiplier=gateway_permissions.rate_limit_multiplier,
         )
 
         # Determine if this is a therapeutic context
         is_therapeutic = (
-            gateway_role in [UserRole.PATIENT, UserRole.THERAPIST] or
-            user_permissions.therapeutic.can_access_sessions
+            gateway_role in [UserRole.PATIENT, UserRole.THERAPIST]
+            or user_permissions.therapeutic.can_access_sessions
         )
 
         # Create authentication context
@@ -258,8 +272,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             metadata={
                 "original_token": token,
                 "gateway_version": "1.0.0",
-                "auth_source": "tta_player_experience"
-            }
+                "auth_source": "tta_player_experience",
+            },
         )
 
         return auth_context
@@ -282,12 +296,14 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             TTAUserRole.THERAPIST: UserRole.THERAPIST,
             TTAUserRole.ADMIN: UserRole.ADMIN,
             TTAUserRole.RESEARCHER: UserRole.ADMIN,  # Map to admin for now
-            TTAUserRole.MODERATOR: UserRole.ADMIN,   # Map to admin for now
+            TTAUserRole.MODERATOR: UserRole.ADMIN,  # Map to admin for now
         }
 
         return role_mapping.get(tta_role, UserRole.GUEST)
 
-    def _convert_tta_permissions_to_gateway_permissions(self, tta_permissions: list, tta_role) -> UserPermissions:
+    def _convert_tta_permissions_to_gateway_permissions(
+        self, tta_permissions: list, tta_role
+    ) -> UserPermissions:
         """
         Convert TTA permissions to gateway permissions.
 
@@ -298,17 +314,21 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
         Returns:
             UserPermissions: Gateway user permissions
         """
-        from src.player_experience.models.auth import Permission as TTAPermission, UserRole as TTAUserRole
+        from src.player_experience.models.auth import Permission as TTAPermission
+        from src.player_experience.models.auth import UserRole as TTAUserRole
 
         # Convert to gateway permission levels
         gateway_permissions = []
 
         # Basic permissions mapping
-        if any(perm in tta_permissions for perm in [
-            TTAPermission.CREATE_CHARACTER,
-            TTAPermission.MANAGE_OWN_CHARACTERS,
-            TTAPermission.MANAGE_OWN_PROFILE
-        ]):
+        if any(
+            perm in tta_permissions
+            for perm in [
+                TTAPermission.CREATE_CHARACTER,
+                TTAPermission.MANAGE_OWN_CHARACTERS,
+                TTAPermission.MANAGE_OWN_PROFILE,
+            ]
+        ):
             gateway_permissions.append(PermissionLevel.WRITE)
         else:
             gateway_permissions.append(PermissionLevel.READ)
@@ -331,11 +351,14 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             gateway_permissions.append(PermissionLevel.CRISIS)
 
         # Admin permissions
-        if any(perm in tta_permissions for perm in [
-            TTAPermission.MANAGE_USERS,
-            TTAPermission.MANAGE_SYSTEM_SETTINGS,
-            TTAPermission.VIEW_SYSTEM_LOGS
-        ]):
+        if any(
+            perm in tta_permissions
+            for perm in [
+                TTAPermission.MANAGE_USERS,
+                TTAPermission.MANAGE_SYSTEM_SETTINGS,
+                TTAPermission.VIEW_SYSTEM_LOGS,
+            ]
+        ):
             gateway_permissions.append(PermissionLevel.ADMIN)
 
         # Therapeutic permission level
@@ -358,7 +381,11 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
                 "authentication-service": ["read"],
                 "agent-orchestration": ["read", "write"],
             }
-        elif tta_role in [TTAUserRole.ADMIN, TTAUserRole.RESEARCHER, TTAUserRole.MODERATOR]:
+        elif tta_role in [
+            TTAUserRole.ADMIN,
+            TTAUserRole.RESEARCHER,
+            TTAUserRole.MODERATOR,
+        ]:
             service_access = {
                 "player-experience-interface": ["read", "write", "admin"],
                 "core-gameplay-loop": ["read", "write", "admin"],
@@ -384,7 +411,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             permissions=list(set(gateway_permissions)),  # Remove duplicates
             therapeutic=therapeutic_permissions,
             service_access=service_access,
-            rate_limit_multiplier=rate_limit_multiplier
+            rate_limit_multiplier=rate_limit_multiplier,
         )
 
     def _determine_safety_level(self, role: UserRole, is_therapeutic: bool) -> int:
@@ -445,7 +472,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             bool: True if authentication is optional
         """
         return path in self._auth_optional_paths or any(
-            path.startswith(pattern) for pattern in [
+            path.startswith(pattern)
+            for pattern in [
                 "/api/v1/auth/",
                 "/auth/",
             ]
@@ -477,7 +505,9 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
 
         return "unknown"
 
-    def _create_auth_error_response(self, message: str, status_code: int = status.HTTP_401_UNAUTHORIZED) -> JSONResponse:
+    def _create_auth_error_response(
+        self, message: str, status_code: int = status.HTTP_401_UNAUTHORIZED
+    ) -> JSONResponse:
         """
         Create authentication error response.
 
@@ -493,7 +523,7 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
             content={
                 "error": "Authentication Error",
                 "message": message,
-                "code": "AUTH_REQUIRED" if status_code == 401 else "AUTH_FORBIDDEN"
+                "code": "AUTH_REQUIRED" if status_code == 401 else "AUTH_FORBIDDEN",
             },
-            headers={"WWW-Authenticate": "Bearer"}
+            headers={"WWW-Authenticate": "Bearer"},
         )

@@ -1,8 +1,8 @@
 import pytest
 
-from src.agent_orchestration.workflow import WorkflowDefinition, AgentStep, WorkflowType
+from src.agent_orchestration.models import AgentType, OrchestrationRequest
+from src.agent_orchestration.workflow import AgentStep, WorkflowDefinition, WorkflowType
 from src.agent_orchestration.workflow_manager import WorkflowManager
-from src.agent_orchestration.models import OrchestrationRequest, AgentType
 
 
 @pytest.mark.asyncio
@@ -20,11 +20,22 @@ async def test_workflow_manager_aggregates_safety_findings(monkeypatch):
     # Monkeypatch internal _execute_step to attach therapeutic_validation
     def fake_exec(step, run_state):
         from src.agent_orchestration.workflow_manager import StepResult
+
         res = StepResult(step=step)
         if step.agent == AgentType.IPA:
-            res.result = {"therapeutic_validation": {"level": "warning", "findings": [{"rule_id": "e1"}]}}
+            res.result = {
+                "therapeutic_validation": {
+                    "level": "warning",
+                    "findings": [{"rule_id": "e1"}],
+                }
+            }
         else:
-            res.result = {"therapeutic_validation": {"level": "blocked", "findings": [{"rule_id": "c1"}]}}
+            res.result = {
+                "therapeutic_validation": {
+                    "level": "blocked",
+                    "findings": [{"rule_id": "c1"}],
+                }
+            }
         return res
 
     monkeypatch.setattr(wm, "_execute_step", fake_exec)
@@ -36,4 +47,3 @@ async def test_workflow_manager_aggregates_safety_findings(monkeypatch):
     assert agg is not None
     assert agg.get("level") == "blocked"
     assert any(f.get("rule_id") == "c1" for f in agg.get("findings", []))
-

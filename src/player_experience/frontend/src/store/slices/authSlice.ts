@@ -46,10 +46,10 @@ export const login = createAsyncThunk(
 
       // Store tokens using the authAPI utility functions
       authAPI.storeTokens({
-        access_token: response.access_token,
-        refresh_token: response.refresh_token,
-        expires_in: response.expires_in,
-        token_type: response.token_type,
+        access_token: (response as any).access_token,
+        refresh_token: (response as any).refresh_token,
+        expires_in: (response as any).expires_in,
+        token_type: (response as any).token_type,
       });
 
       return response;
@@ -120,10 +120,10 @@ export const refreshToken = createAsyncThunk(
       const response = await authAPI.refreshToken(refreshToken);
 
       authAPI.storeTokens({
-        access_token: response.access_token,
-        refresh_token: response.refresh_token || refreshToken,
-        expires_in: response.expires_in,
-        token_type: response.token_type,
+        access_token: (response as any).access_token,
+        refresh_token: (response as any).refresh_token || refreshToken,
+        expires_in: (response as any).expires_in,
+        token_type: (response as any).token_type,
       });
 
       return response;
@@ -162,11 +162,12 @@ const authSlice = createSlice({
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
         state.isAuthenticated = true;
-        state.user = action.payload.user_info;
-        state.accessToken = action.payload.access_token;
-        state.refreshToken = action.payload.refresh_token;
-        if (action.payload.expires_in) {
-          state.tokenExpiresAt = Date.now() + action.payload.expires_in * 1000;
+        const payload = action.payload as any;
+        state.user = payload.user_info;
+        state.accessToken = payload.access_token;
+        state.refreshToken = payload.refresh_token;
+        if (payload.expires_in) {
+          state.tokenExpiresAt = Date.now() + payload.expires_in * 1000;
         }
       })
       .addCase(login.rejected, (state, action) => {
@@ -197,7 +198,8 @@ const authSlice = createSlice({
       })
       // Token verification cases
       .addCase(verifyToken.fulfilled, (state, action) => {
-        state.user = action.payload.user_info || action.payload;
+        const payload = action.payload as any;
+        state.user = payload.user_info || payload;
         state.isAuthenticated = true;
       })
       .addCase(verifyToken.rejected, (state) => {
@@ -209,12 +211,13 @@ const authSlice = createSlice({
       })
       // Token refresh cases
       .addCase(refreshToken.fulfilled, (state, action) => {
-        state.accessToken = action.payload.access_token;
-        if (action.payload.refresh_token) {
-          state.refreshToken = action.payload.refresh_token;
+        const payload = action.payload as any;
+        state.accessToken = payload.access_token;
+        if (payload.refresh_token) {
+          state.refreshToken = payload.refresh_token;
         }
-        if (action.payload.expires_in) {
-          state.tokenExpiresAt = Date.now() + action.payload.expires_in * 1000;
+        if (payload.expires_in) {
+          state.tokenExpiresAt = Date.now() + payload.expires_in * 1000;
         }
       })
       .addCase(refreshToken.rejected, (state) => {

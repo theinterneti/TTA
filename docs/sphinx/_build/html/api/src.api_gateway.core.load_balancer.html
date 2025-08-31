@@ -1,0 +1,534 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.core.load_balancer module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.api_gateway.core.request_router module" href="src.api_gateway.core.request_router.html" />
+    <link rel="prev" title="src.api_gateway.core.gateway_core module" href="src.api_gateway.core.gateway_core.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.api_gateway.html">src.api_gateway package</a></li>
+          <li class="breadcrumb-item"><a href="src.api_gateway.core.html">src.api_gateway.core package</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.core.load_balancer module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.api_gateway.core.load_balancer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.api_gateway.core.load_balancer">
+<span id="src-api-gateway-core-load-balancer-module"></span><h1>src.api_gateway.core.load_balancer module<a class="headerlink" href="#module-src.api_gateway.core.load_balancer" title="Link to this heading"></a></h1>
+<p>Load balancing algorithms for the API Gateway.</p>
+<p>This module provides various load balancing strategies including round-robin,
+weighted, health-based, and therapeutic priority-based load balancing.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.HealthBasedLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">HealthBasedLoadBalancer</span></span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#HealthBasedLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.HealthBasedLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></p>
+<p>Health-based load balancing algorithm.</p>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.HealthBasedLoadBalancer.select_service">
+<span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#HealthBasedLoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.HealthBasedLoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select service based on health score and performance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LeastConnectionsLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">LeastConnectionsLoadBalancer</span></span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LeastConnectionsLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LeastConnectionsLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></p>
+<p>Least connections load balancing algorithm.</p>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LeastConnectionsLoadBalancer.select_service">
+<span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LeastConnectionsLoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LeastConnectionsLoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select service with least active connections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">LoadBalancer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base class for load balancing algorithms.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy" title="src.api_gateway.core.load_balancer.LoadBalancingStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancingStrategy</span></code></a></span>)</p>
+</dd>
+</dl>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy" title="src.api_gateway.core.load_balancer.LoadBalancingStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancingStrategy</span></code></a></span>) – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer.decrement_connections">
+<span class="sig-name descname"><span class="pre">decrement_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer.decrement_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer.decrement_connections" title="Link to this definition"></a></dt>
+<dd><p>Decrement active connections for a service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer.get_service_metrics">
+<span class="sig-name descname"><span class="pre">get_service_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer.get_service_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer.get_service_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get metrics for a service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.core.load_balancer.ServiceMetrics" title="src.api_gateway.core.load_balancer.ServiceMetrics"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceMetrics</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer.increment_connections">
+<span class="sig-name descname"><span class="pre">increment_connections</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer.increment_connections"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer.increment_connections" title="Link to this definition"></a></dt>
+<dd><p>Increment active connections for a service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer.select_service">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select a service from the available services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>) – List of available services</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether this is a therapeutic request</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether this is a crisis situation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Selected service or None if no service available</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancer.update_metrics">
+<span class="sig-name descname"><span class="pre">update_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancer.update_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancer.update_metrics" title="Link to this definition"></a></dt>
+<dd><p>Update metrics for a service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Service ID</p></li>
+<li><p><strong>response_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Response time in seconds</p></li>
+<li><p><strong>success</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether the request was successful</p></li>
+<li><p><strong>therapeutic</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether this was a therapeutic request</p></li>
+<li><p><strong>crisis</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether this was a crisis request</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">LoadBalancingStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#LoadBalancingStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Load balancing strategy types.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.HEALTH_BASED">
+<span class="sig-name descname"><span class="pre">HEALTH_BASED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'health_based'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.HEALTH_BASED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.LEAST_CONNECTIONS">
+<span class="sig-name descname"><span class="pre">LEAST_CONNECTIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'least_connections'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.LEAST_CONNECTIONS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.RANDOM">
+<span class="sig-name descname"><span class="pre">RANDOM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'random'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.RANDOM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.ROUND_ROBIN">
+<span class="sig-name descname"><span class="pre">ROUND_ROBIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'round_robin'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.ROUND_ROBIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.THERAPEUTIC_PRIORITY">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_PRIORITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_priority'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.THERAPEUTIC_PRIORITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_LEAST_CONNECTIONS">
+<span class="sig-name descname"><span class="pre">WEIGHTED_LEAST_CONNECTIONS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'weighted_least_connections'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_LEAST_CONNECTIONS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_RANDOM">
+<span class="sig-name descname"><span class="pre">WEIGHTED_RANDOM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'weighted_random'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_RANDOM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_ROUND_ROBIN">
+<span class="sig-name descname"><span class="pre">WEIGHTED_ROUND_ROBIN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'weighted_round_robin'</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy.WEIGHTED_ROUND_ROBIN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.RoundRobinLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">RoundRobinLoadBalancer</span></span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#RoundRobinLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.RoundRobinLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></p>
+<p>Round-robin load balancing algorithm.</p>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.RoundRobinLoadBalancer.select_service">
+<span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#RoundRobinLoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.RoundRobinLoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select service using round-robin algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">ServiceMetrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">active_connections=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_response_time=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_health_check=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">health_score=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_load=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_load=0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#ServiceMetrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Metrics for a service instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>active_connections</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>total_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>successful_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>failed_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>average_response_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>last_health_check</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>health_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_load</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>crisis_load</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.active_connections">
+<span class="sig-name descname"><span class="pre">active_connections</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.active_connections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.average_response_time">
+<span class="sig-name descname"><span class="pre">average_response_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.average_response_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.crisis_load">
+<span class="sig-name descname"><span class="pre">crisis_load</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.crisis_load" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.failed_requests">
+<span class="sig-name descname"><span class="pre">failed_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.failed_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.health_score">
+<span class="sig-name descname"><span class="pre">health_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.health_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.last_health_check">
+<span class="sig-name descname"><span class="pre">last_health_check</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.last_health_check" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.service_id">
+<span class="sig-name descname"><span class="pre">service_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.service_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.successful_requests">
+<span class="sig-name descname"><span class="pre">successful_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.successful_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.therapeutic_load">
+<span class="sig-name descname"><span class="pre">therapeutic_load</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.therapeutic_load" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.ServiceMetrics.total_requests">
+<span class="sig-name descname"><span class="pre">total_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.api_gateway.core.load_balancer.ServiceMetrics.total_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.TherapeuticPriorityLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">TherapeuticPriorityLoadBalancer</span></span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#TherapeuticPriorityLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.TherapeuticPriorityLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></p>
+<p>Therapeutic priority-based load balancing algorithm.</p>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.TherapeuticPriorityLoadBalancer.select_service">
+<span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#TherapeuticPriorityLoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.TherapeuticPriorityLoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select service with therapeutic priority considerations.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.WeightedRoundRobinLoadBalancer">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">WeightedRoundRobinLoadBalancer</span></span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#WeightedRoundRobinLoadBalancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.WeightedRoundRobinLoadBalancer" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></p>
+<p>Weighted round-robin load balancing algorithm.</p>
+<p>Initialize the load balancer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> – Load balancing strategy</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.WeightedRoundRobinLoadBalancer.select_service">
+<span class="sig-name descname"><span class="pre">select_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">services</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">crisis_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#WeightedRoundRobinLoadBalancer.select_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.WeightedRoundRobinLoadBalancer.select_service" title="Link to this definition"></a></dt>
+<dd><p>Select service using weighted round-robin algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>services</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>crisis_mode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.api_gateway.core.load_balancer.create_load_balancer">
+<span class="sig-prename descclassname"><span class="pre">src.api_gateway.core.load_balancer.</span></span><span class="sig-name descname"><span class="pre">create_load_balancer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strategy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/core/load_balancer.html#create_load_balancer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.core.load_balancer.create_load_balancer" title="Link to this definition"></a></dt>
+<dd><p>Create a load balancer instance based on strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancingStrategy" title="src.api_gateway.core.load_balancer.LoadBalancingStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancingStrategy</span></code></a></span>) – Load balancing strategy</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.core.load_balancer.LoadBalancer" title="src.api_gateway.core.load_balancer.LoadBalancer"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadBalancer</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>LoadBalancer instance</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.api_gateway.core.gateway_core.html" class="btn btn-neutral float-left" title="src.api_gateway.core.gateway_core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.api_gateway.core.request_router.html" class="btn btn-neutral float-right" title="src.api_gateway.core.request_router module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

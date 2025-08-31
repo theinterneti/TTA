@@ -44,14 +44,14 @@ const TherapeuticSettingsSection: React.FC<TherapeuticSettingsSectionProps> = ({
     const updatedApproaches = settings.preferred_approaches.includes(approach)
       ? settings.preferred_approaches.filter(a => a !== approach)
       : [...settings.preferred_approaches, approach];
-    
+
     onUpdate({ preferred_approaches: updatedApproaches });
   };
 
   const handleAddCustomApproach = () => {
     if (customApproach.trim() && !settings.preferred_approaches.includes(customApproach.trim())) {
-      onUpdate({ 
-        preferred_approaches: [...settings.preferred_approaches, customApproach.trim()] 
+      onUpdate({
+        preferred_approaches: [...settings.preferred_approaches, customApproach.trim()]
       });
       setCustomApproach('');
       setShowCustomApproachInput(false);
@@ -247,7 +247,7 @@ const TherapeuticSettingsSection: React.FC<TherapeuticSettingsSectionProps> = ({
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <h4 className="font-medium text-blue-900 mb-2">💡 Therapeutic Goals Tip</h4>
         <p className="text-blue-800 text-sm">
-          Your therapeutic preferences will be used to personalize your experience and match you with appropriate worlds and interventions. 
+          Your therapeutic preferences will be used to personalize your experience and match you with appropriate worlds and interventions.
           You can update these settings at any time as your needs and comfort level change.
         </p>
       </div>

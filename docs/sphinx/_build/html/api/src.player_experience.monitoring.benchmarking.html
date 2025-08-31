@@ -1,0 +1,614 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.monitoring.benchmarking module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.player_experience.monitoring.logging_config module" href="src.player_experience.monitoring.logging_config.html" />
+    <link rel="prev" title="src.player_experience.monitoring.alerting module" href="src.player_experience.monitoring.alerting.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.player_experience.html">src.player_experience package</a></li>
+          <li class="breadcrumb-item"><a href="src.player_experience.monitoring.html">src.player_experience.monitoring package</a></li>
+      <li class="breadcrumb-item active">src.player_experience.monitoring.benchmarking module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.player_experience.monitoring.benchmarking.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.player_experience.monitoring.benchmarking">
+<span id="src-player-experience-monitoring-benchmarking-module"></span><h1>src.player_experience.monitoring.benchmarking module<a class="headerlink" href="#module-src.player_experience.monitoring.benchmarking" title="Link to this heading"></a></h1>
+<p>Performance benchmarking and load testing utilities.</p>
+<p>This module provides comprehensive benchmarking tools for performance
+testing, load testing, and system capacity planning.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">BenchmarkConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_seconds=60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concurrent_users=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requests_per_second=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_pattern=LoadPattern.CONSTANT</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ramp_up_time=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ramp_down_time=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_endpoints=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">test_data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success_criteria=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Configuration for benchmark tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>benchmark_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkType" title="src.player_experience.monitoring.benchmarking.BenchmarkType"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkType</span></code></a></span>)</p></li>
+<li><p><strong>duration_seconds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>concurrent_users</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>requests_per_second</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>load_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.LoadPattern" title="src.player_experience.monitoring.benchmarking.LoadPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadPattern</span></code></a></span>)</p></li>
+<li><p><strong>ramp_up_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>ramp_down_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>target_endpoints</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>test_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>success_criteria</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.__post_init__">
+<span class="sig-name descname"><span class="pre">__post_init__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkConfig.__post_init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.__post_init__" title="Link to this definition"></a></dt>
+<dd><p>Set default success criteria if not provided.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.benchmark_type">
+<span class="sig-name descname"><span class="pre">benchmark_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkType" title="src.player_experience.monitoring.benchmarking.BenchmarkType"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkType</span></code></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.benchmark_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.concurrent_users">
+<span class="sig-name descname"><span class="pre">concurrent_users</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.concurrent_users" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.duration_seconds">
+<span class="sig-name descname"><span class="pre">duration_seconds</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.duration_seconds" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.load_pattern">
+<span class="sig-name descname"><span class="pre">load_pattern</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.LoadPattern" title="src.player_experience.monitoring.benchmarking.LoadPattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadPattern</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'constant'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.load_pattern" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.ramp_down_time">
+<span class="sig-name descname"><span class="pre">ramp_down_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.ramp_down_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.ramp_up_time">
+<span class="sig-name descname"><span class="pre">ramp_up_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.ramp_up_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.requests_per_second">
+<span class="sig-name descname"><span class="pre">requests_per_second</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.requests_per_second" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.success_criteria">
+<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.success_criteria" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkConfig.target_endpoints">
+<span class="sig-name descname"><span class="pre">target_endpoints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig.target_endpoints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">BenchmarkResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">failed_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_times=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_details=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">system_metrics=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">throughput=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success_rate=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Results from a benchmark test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span>)</p></li>
+<li><p><strong>start_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>end_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>total_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>successful_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>failed_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>response_times</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>error_details</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span>)</p></li>
+<li><p><strong>system_metrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span>)</p></li>
+<li><p><strong>throughput</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>success_rate</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.average_response_time">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">average_response_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.average_response_time" title="Link to this definition"></a></dt>
+<dd><p>Calculate average response time.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.config">
+<span class="sig-name descname"><span class="pre">config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.config" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.end_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.error_details">
+<span class="sig-name descname"><span class="pre">error_details</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.error_details" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.error_rate">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">error_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.error_rate" title="Link to this definition"></a></dt>
+<dd><p>Calculate error rate percentage.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.failed_requests">
+<span class="sig-name descname"><span class="pre">failed_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.failed_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.meets_success_criteria">
+<span class="sig-name descname"><span class="pre">meets_success_criteria</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkResult.meets_success_criteria"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.meets_success_criteria" title="Link to this definition"></a></dt>
+<dd><p>Check if results meet success criteria.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.p95_response_time">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p95_response_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.p95_response_time" title="Link to this definition"></a></dt>
+<dd><p>Calculate 95th percentile response time.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.p99_response_time">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">p99_response_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><span class="pre">float</span></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.p99_response_time" title="Link to this definition"></a></dt>
+<dd><p>Calculate 99th percentile response time.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.response_times">
+<span class="sig-name descname"><span class="pre">response_times</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.response_times" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.start_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.success_rate">
+<span class="sig-name descname"><span class="pre">success_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.success_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.successful_requests">
+<span class="sig-name descname"><span class="pre">successful_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.successful_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.system_metrics">
+<span class="sig-name descname"><span class="pre">system_metrics</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.system_metrics" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.throughput">
+<span class="sig-name descname"><span class="pre">throughput</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.throughput" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkResult.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Convert result to dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkResult.total_requests">
+<span class="sig-name descname"><span class="pre">total_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult.total_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkSuite">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">BenchmarkSuite</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./benchmark_results'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkSuite"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkSuite" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Suite of benchmark tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>output_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkSuite.add_benchmark">
+<span class="sig-name descname"><span class="pre">add_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkSuite.add_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkSuite.add_benchmark" title="Link to this definition"></a></dt>
+<dd><p>Add a benchmark configuration to the suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkSuite" title="src.player_experience.monitoring.benchmarking.BenchmarkSuite"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkSuite</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkSuite.run_all">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_all</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkSuite.run_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkSuite.run_all" title="Link to this definition"></a></dt>
+<dd><p>Run all benchmark tests.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult" title="src.player_experience.monitoring.benchmarking.BenchmarkResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkResult</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">BenchmarkType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#BenchmarkType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of benchmarks.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.BASELINE_TEST">
+<span class="sig-name descname"><span class="pre">BASELINE_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'baseline_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.BASELINE_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.ENDURANCE_TEST">
+<span class="sig-name descname"><span class="pre">ENDURANCE_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'endurance_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.ENDURANCE_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.LOAD_TEST">
+<span class="sig-name descname"><span class="pre">LOAD_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'load_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.LOAD_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.SPIKE_TEST">
+<span class="sig-name descname"><span class="pre">SPIKE_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spike_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.SPIKE_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.STRESS_TEST">
+<span class="sig-name descname"><span class="pre">STRESS_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stress_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.STRESS_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.BenchmarkType.VOLUME_TEST">
+<span class="sig-name descname"><span class="pre">VOLUME_TEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'volume_test'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.BenchmarkType.VOLUME_TEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.HTTPLoadGenerator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">HTTPLoadGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#HTTPLoadGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.HTTPLoadGenerator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.player_experience.monitoring.benchmarking.LoadGenerator" title="src.player_experience.monitoring.benchmarking.LoadGenerator"><code class="xref py py-class docutils literal notranslate"><span class="pre">LoadGenerator</span></code></a></p>
+<p>HTTP load generator for API testing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>headers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.HTTPLoadGenerator.generate_load">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#HTTPLoadGenerator.generate_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.HTTPLoadGenerator.generate_load" title="Link to this definition"></a></dt>
+<dd><p>Generate HTTP load.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult" title="src.player_experience.monitoring.benchmarking.BenchmarkResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadGenerator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">LoadGenerator</span></span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadGenerator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base class for load generators.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadGenerator.generate_load">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">generate_load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadGenerator.generate_load"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadGenerator.generate_load" title="Link to this definition"></a></dt>
+<dd><p>Generate load according to configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkResult" title="src.player_experience.monitoring.benchmarking.BenchmarkResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">LoadPattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadPattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Load patterns for testing.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.CONSTANT">
+<span class="sig-name descname"><span class="pre">CONSTANT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'constant'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.CONSTANT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.RAMP_DOWN">
+<span class="sig-name descname"><span class="pre">RAMP_DOWN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ramp_down'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.RAMP_DOWN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.RAMP_UP">
+<span class="sig-name descname"><span class="pre">RAMP_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ramp_up'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.RAMP_UP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.SPIKE">
+<span class="sig-name descname"><span class="pre">SPIKE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'spike'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.SPIKE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.STEP">
+<span class="sig-name descname"><span class="pre">STEP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'step'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.STEP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadPattern.WAVE">
+<span class="sig-name descname"><span class="pre">WAVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'wave'</span></em><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadPattern.WAVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadTester">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">LoadTester</span></span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadTester"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadTester" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>High-level load testing interface.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadTester.create_baseline_test">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_baseline_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadTester.create_baseline_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadTester.create_baseline_test" title="Link to this definition"></a></dt>
+<dd><p>Create a baseline performance test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadTester.create_load_test">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_load_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concurrent_users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">300</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadTester.create_load_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadTester.create_load_test" title="Link to this definition"></a></dt>
+<dd><p>Create a standard load test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>concurrent_users</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadTester.create_spike_test">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_spike_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spike_users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">180</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadTester.create_spike_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadTester.create_spike_test" title="Link to this definition"></a></dt>
+<dd><p>Create a spike test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>spike_users</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.LoadTester.create_stress_test">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">create_stress_test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_users</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">600</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#LoadTester.create_stress_test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.LoadTester.create_stress_test" title="Link to this definition"></a></dt>
+<dd><p>Create a stress test.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>max_users</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>duration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.player_experience.monitoring.benchmarking.BenchmarkConfig" title="src.player_experience.monitoring.benchmarking.BenchmarkConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkConfig</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.PerformanceBenchmark">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.monitoring.benchmarking.</span></span><span class="sig-name descname"><span class="pre">PerformanceBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./benchmark_results'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#PerformanceBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.PerformanceBenchmark" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Comprehensive performance benchmarking system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>output_dir</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.monitoring.benchmarking.PerformanceBenchmark.run_comprehensive_benchmark">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_comprehensive_benchmark</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/monitoring/benchmarking.html#PerformanceBenchmark.run_comprehensive_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.monitoring.benchmarking.PerformanceBenchmark.run_comprehensive_benchmark" title="Link to this definition"></a></dt>
+<dd><p>Run a comprehensive benchmark suite.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.player_experience.monitoring.alerting.html" class="btn btn-neutral float-left" title="src.player_experience.monitoring.alerting module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.player_experience.monitoring.logging_config.html" class="btn btn-neutral float-right" title="src.player_experience.monitoring.logging_config module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

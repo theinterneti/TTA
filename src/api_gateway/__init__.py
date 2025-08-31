@@ -7,7 +7,7 @@ service discovery, and therapeutic safety monitoring.
 
 Key Components:
 - Gateway Core: Main request processing engine
-- Service Discovery: Dynamic service registration and health monitoring  
+- Service Discovery: Dynamic service registration and health monitoring
 - Authentication: JWT-based authentication with therapeutic role management
 - Rate Limiting: Intelligent traffic management with therapeutic prioritization
 - WebSocket Manager: Real-time communication handler for therapeutic sessions

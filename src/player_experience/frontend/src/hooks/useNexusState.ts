@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { nexusAPI } from '../services/api';
-import { useAuthGuard } from './useAuthGuard';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { nexusAPI } from "../services/api";
+import { useAuthGuard } from "./useAuthGuard";
 
 export interface NexusState {
   status: string;
@@ -9,7 +9,7 @@ export interface NexusState {
   narrative_strength: number;
   hub_energy: number;
   last_updated: string;
-  system_health: 'healthy' | 'degraded' | 'critical';
+  system_health: "healthy" | "degraded" | "critical";
   active_sessions: number;
   pending_worlds: number;
   maintenance_mode: boolean;
@@ -35,7 +35,7 @@ export interface UseNexusStateResult {
 
 /**
  * Custom hook for managing Nexus Codex central hub state
- * 
+ *
  * Features:
  * - Real-time hub status monitoring
  * - Automatic refresh with configurable intervals
@@ -43,7 +43,9 @@ export interface UseNexusStateResult {
  * - Error handling and retry logic
  * - Connection status tracking
  */
-export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusStateResult => {
+export const useNexusState = (
+  options: UseNexusStateOptions = {}
+): UseNexusStateResult => {
   const {
     autoRefresh = true,
     refreshInterval = 30000, // 30 seconds
@@ -53,7 +55,7 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
   } = options;
 
   const { isAuthenticated } = useAuthGuard({ autoRedirect: false });
-  
+
   const [state, setState] = useState<NexusState | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,60 +70,68 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
   /**
    * Fetch nexus state from the API
    */
-  const fetchNexusState = useCallback(async (signal?: AbortSignal) => {
-    // Skip if authentication is required but user is not authenticated
-    if (requireAuth && !isAuthenticated) {
-      setLoading(false);
-      setIsConnected(false);
-      return;
-    }
-
-    try {
-      setError(null);
-      
-      const response = await nexusAPI.getState();
-      
-      if (signal?.aborted) return;
-
-      const nexusState = response.state || response.data || response;
-      
-      setState(nexusState);
-      setLastUpdated(new Date());
-      setIsConnected(true);
-      retryCountRef.current = 0; // Reset retry count on success
-      
-      onStateChange?.(nexusState);
-    } catch (err: any) {
-      if (signal?.aborted) return;
-      
-      const errorMessage = err.message || 'Failed to fetch nexus state';
-      setError(errorMessage);
-      setIsConnected(false);
-      
-      // Retry logic for network errors
-      if (retryCountRef.current < maxRetries && 
-          (err.message?.includes('network') || err.message?.includes('fetch'))) {
-        retryCountRef.current++;
-        console.warn(`useNexusState: Retrying (${retryCountRef.current}/${maxRetries})...`);
-        
-        // Exponential backoff: 1s, 2s, 4s
-        const retryDelay = Math.pow(2, retryCountRef.current - 1) * 1000;
-        setTimeout(() => {
-          if (!signal?.aborted) {
-            fetchNexusState(signal);
-          }
-        }, retryDelay);
+  const fetchNexusState = useCallback(
+    async (signal?: AbortSignal) => {
+      // Skip if authentication is required but user is not authenticated
+      if (requireAuth && !isAuthenticated) {
+        setLoading(false);
+        setIsConnected(false);
         return;
       }
-      
-      onError?.(err);
-      console.error('useNexusState: Failed to fetch nexus state:', err);
-    } finally {
-      if (!signal?.aborted) {
-        setLoading(false);
+
+      try {
+        setError(null);
+
+        const response = await nexusAPI.getState();
+
+        if (signal?.aborted) return;
+
+        const nexusState =
+          (response as any).state || (response as any).data || response;
+
+        setState(nexusState);
+        setLastUpdated(new Date());
+        setIsConnected(true);
+        retryCountRef.current = 0; // Reset retry count on success
+
+        onStateChange?.(nexusState);
+      } catch (err: any) {
+        if (signal?.aborted) return;
+
+        const errorMessage = err.message || "Failed to fetch nexus state";
+        setError(errorMessage);
+        setIsConnected(false);
+
+        // Retry logic for network errors
+        if (
+          retryCountRef.current < maxRetries &&
+          (err.message?.includes("network") || err.message?.includes("fetch"))
+        ) {
+          retryCountRef.current++;
+          console.warn(
+            `useNexusState: Retrying (${retryCountRef.current}/${maxRetries})...`
+          );
+
+          // Exponential backoff: 1s, 2s, 4s
+          const retryDelay = Math.pow(2, retryCountRef.current - 1) * 1000;
+          setTimeout(() => {
+            if (!signal?.aborted) {
+              fetchNexusState(signal);
+            }
+          }, retryDelay);
+          return;
+        }
+
+        onError?.(err);
+        console.error("useNexusState: Failed to fetch nexus state:", err);
+      } finally {
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
       }
-    }
-  }, [isAuthenticated, requireAuth, onError, onStateChange]);
+    },
+    [isAuthenticated, requireAuth, onError, onStateChange]
+  );
 
   /**
    * Refetch nexus state manually
@@ -134,7 +144,7 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     retryCountRef.current = 0; // Reset retry count for manual refetch
     await fetchNexusState(abortControllerRef.current.signal);
@@ -151,7 +161,11 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
    * Set up automatic refresh
    */
   useEffect(() => {
-    if (autoRefresh && refreshInterval > 0 && (requireAuth ? isAuthenticated : true)) {
+    if (
+      autoRefresh &&
+      refreshInterval > 0 &&
+      (requireAuth ? isAuthenticated : true)
+    ) {
       refreshIntervalRef.current = setInterval(() => {
         fetchNexusState();
       }, refreshInterval);
@@ -162,7 +176,13 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
         }
       };
     }
-  }, [autoRefresh, refreshInterval, fetchNexusState, requireAuth, isAuthenticated]);
+  }, [
+    autoRefresh,
+    refreshInterval,
+    fetchNexusState,
+    requireAuth,
+    isAuthenticated,
+  ]);
 
   /**
    * Initial fetch when component mounts or auth state changes
@@ -175,7 +195,7 @@ export const useNexusState = (options: UseNexusStateOptions = {}): UseNexusState
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     retryCountRef.current = 0;
     fetchNexusState(abortControllerRef.current.signal);

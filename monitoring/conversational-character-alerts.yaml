@@ -1,0 +1,382 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: conversational-character-alerts
+  namespace: tta-player-experience
+  labels:
+    app: conversational-character-service
+    prometheus: kube-prometheus
+    role: alert-rules
+spec:
+  groups:
+    - name: conversational-character-service.rules
+      rules:
+        # Service Health Alerts
+        - alert: ConversationalServiceDown
+          expr: up{job="conversational-character-service"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            service: conversational-character
+            component: player-experience
+          annotations:
+            summary: "Conversational Character Service is down"
+            description: "Conversational Character Service has been down for more than 1 minute"
+            runbook_url: "https://docs.tta.example.com/runbooks/conversational-service-down"
+
+        - alert: ConversationalServiceHighErrorRate
+          expr: rate(http_requests_total{job="conversational-character-service",status=~"5.."}[5m]) > 0.1
+          for: 2m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: player-experience
+          annotations:
+            summary: "High error rate in Conversational Character Service"
+            description: "Error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-error-rate"
+
+        - alert: ConversationalServiceHighLatency
+          expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job="conversational-character-service"}[5m])) > 2
+          for: 3m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: player-experience
+          annotations:
+            summary: "High latency in Conversational Character Service"
+            description: "95th percentile latency is {{ $value }}s for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-latency"
+
+        # WebSocket Connection Alerts
+        - alert: WebSocketConnectionFailures
+          expr: rate(websocket_connection_failures_total{job="conversational-character-service"}[5m]) > 0.05
+          for: 2m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: websocket
+          annotations:
+            summary: "High WebSocket connection failure rate"
+            description: "WebSocket connection failure rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/websocket-failures"
+
+        - alert: ActiveWebSocketConnectionsHigh
+          expr: websocket_active_connections{job="conversational-character-service"} > 1000
+          for: 5m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: websocket
+          annotations:
+            summary: "High number of active WebSocket connections"
+            description: "Active WebSocket connections: {{ $value }}"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-websocket-connections"
+
+        # Conversation Flow Alerts
+        - alert: ConversationCompletionRateLow
+          expr: rate(conversations_completed_total{job="conversational-character-service"}[1h]) / rate(conversations_started_total{job="conversational-character-service"}[1h]) < 0.3
+          for: 10m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: conversation-flow
+          annotations:
+            summary: "Low conversation completion rate"
+            description: "Conversation completion rate is {{ $value | humanizePercentage }} for the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/low-completion-rate"
+
+        - alert: ConversationAbandonmentRateHigh
+          expr: rate(conversations_abandoned_total{job="conversational-character-service"}[1h]) / rate(conversations_started_total{job="conversational-character-service"}[1h]) > 0.4
+          for: 10m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: conversation-flow
+          annotations:
+            summary: "High conversation abandonment rate"
+            description: "Conversation abandonment rate is {{ $value | humanizePercentage }} for the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-abandonment-rate"
+
+        - alert: ConversationDurationTooLong
+          expr: histogram_quantile(0.95, rate(conversation_duration_seconds_bucket{job="conversational-character-service"}[1h])) > 7200
+          for: 15m
+          labels:
+            severity: info
+            service: conversational-character
+            component: conversation-flow
+          annotations:
+            summary: "Conversations taking longer than expected"
+            description: "95th percentile conversation duration is {{ $value | humanizeDuration }} for the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/long-conversations"
+
+        # Crisis Detection Alerts
+        - alert: CrisisDetectionRateHigh
+          expr: rate(crisis_detected_total{job="conversational-character-service"}[1h]) > 0.02
+          for: 5m
+          labels:
+            severity: critical
+            service: conversational-character
+            component: crisis-detection
+          annotations:
+            summary: "High crisis detection rate"
+            description: "Crisis detection rate is {{ $value | humanizePercentage }} for the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-crisis-rate"
+
+        - alert: CrisisDetectionSystemDown
+          expr: up{job="therapeutic-safety-service"} == 0
+          for: 1m
+          labels:
+            severity: critical
+            service: conversational-character
+            component: crisis-detection
+          annotations:
+            summary: "Crisis detection system is down"
+            description: "Therapeutic safety service is unavailable"
+            runbook_url: "https://docs.tta.example.com/runbooks/crisis-system-down"
+
+        # Data Persistence Alerts
+        - alert: RedisConnectionFailures
+          expr: rate(redis_connection_failures_total{job="conversational-character-service"}[5m]) > 0.01
+          for: 2m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: data-persistence
+          annotations:
+            summary: "Redis connection failures detected"
+            description: "Redis connection failure rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/redis-failures"
+
+        - alert: ConversationDataLoss
+          expr: rate(conversation_data_loss_total{job="conversational-character-service"}[1h]) > 0
+          for: 1m
+          labels:
+            severity: critical
+            service: conversational-character
+            component: data-persistence
+          annotations:
+            summary: "Conversation data loss detected"
+            description: "{{ $value }} conversations lost data in the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/data-loss"
+
+        # Resource Usage Alerts
+        - alert: ConversationalServiceHighMemoryUsage
+          expr: container_memory_usage_bytes{pod=~"conversational-character-service-.*"} / container_spec_memory_limit_bytes > 0.9
+          for: 5m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: resources
+          annotations:
+            summary: "High memory usage in Conversational Character Service"
+            description: "Memory usage is {{ $value | humanizePercentage }} of limit"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-memory-usage"
+
+        - alert: ConversationalServiceHighCPUUsage
+          expr: rate(container_cpu_usage_seconds_total{pod=~"conversational-character-service-.*"}[5m]) > 0.8
+          for: 5m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: resources
+          annotations:
+            summary: "High CPU usage in Conversational Character Service"
+            description: "CPU usage is {{ $value | humanizePercentage }}"
+            runbook_url: "https://docs.tta.example.com/runbooks/high-cpu-usage"
+
+        # Business Logic Alerts
+        - alert: CharacterCreationFailureRateHigh
+          expr: rate(character_creation_failures_total{job="conversational-character-service"}[1h]) / rate(character_creation_attempts_total{job="conversational-character-service"}[1h]) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: character-creation
+          annotations:
+            summary: "High character creation failure rate"
+            description: "Character creation failure rate is {{ $value | humanizePercentage }} for the last hour"
+            runbook_url: "https://docs.tta.example.com/runbooks/character-creation-failures"
+
+        - alert: DataExtractionAccuracyLow
+          expr: data_extraction_accuracy_score{job="conversational-character-service"} < 0.8
+          for: 15m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: data-extraction
+          annotations:
+            summary: "Low data extraction accuracy"
+            description: "Data extraction accuracy score is {{ $value }}"
+            runbook_url: "https://docs.tta.example.com/runbooks/low-extraction-accuracy"
+
+        # Security Alerts
+        - alert: UnauthorizedAccessAttempts
+          expr: rate(http_requests_total{job="conversational-character-service",status="401"}[5m]) > 0.1
+          for: 2m
+          labels:
+            severity: warning
+            service: conversational-character
+            component: security
+          annotations:
+            summary: "High rate of unauthorized access attempts"
+            description: "Unauthorized access attempt rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/unauthorized-access"
+
+        - alert: RateLimitExceeded
+          expr: rate(http_requests_total{job="conversational-character-service",status="429"}[5m]) > 0.05
+          for: 3m
+          labels:
+            severity: info
+            service: conversational-character
+            component: security
+          annotations:
+            summary: "Rate limit frequently exceeded"
+            description: "Rate limit exceeded rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+            runbook_url: "https://docs.tta.example.com/runbooks/rate-limit-exceeded"
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: conversational-character-dashboards
+  namespace: tta-player-experience
+data:
+  conversational-character-overview.json: |
+    {
+      "dashboard": {
+        "id": null,
+        "title": "Conversational Character Creation - Overview",
+        "tags": ["tta", "conversational", "character-creation"],
+        "timezone": "browser",
+        "panels": [
+          {
+            "id": 1,
+            "title": "Service Health",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "up{job=\"conversational-character-service\"}",
+                "legendFormat": "Service Status"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "green", "value": 1}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": 2,
+            "title": "Active Conversations",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "active_conversations_total{job=\"conversational-character-service\"}",
+                "legendFormat": "Active Conversations"
+              }
+            ]
+          },
+          {
+            "id": 3,
+            "title": "Conversation Completion Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "rate(conversations_completed_total{job=\"conversational-character-service\"}[1h]) / rate(conversations_started_total{job=\"conversational-character-service\"}[1h])",
+                "legendFormat": "Completion Rate"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "percentunit",
+                "thresholds": {
+                  "steps": [
+                    {"color": "red", "value": 0},
+                    {"color": "yellow", "value": 0.3},
+                    {"color": "green", "value": 0.6}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": 4,
+            "title": "Crisis Detection Rate",
+            "type": "stat",
+            "targets": [
+              {
+                "expr": "rate(crisis_detected_total{job=\"conversational-character-service\"}[1h])",
+                "legendFormat": "Crisis Detection Rate"
+              }
+            ],
+            "fieldConfig": {
+              "defaults": {
+                "unit": "reqps",
+                "color": {
+                  "mode": "thresholds"
+                },
+                "thresholds": {
+                  "steps": [
+                    {"color": "green", "value": 0},
+                    {"color": "yellow", "value": 0.01},
+                    {"color": "red", "value": 0.02}
+                  ]
+                }
+              }
+            }
+          },
+          {
+            "id": 5,
+            "title": "Request Rate",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "rate(http_requests_total{job=\"conversational-character-service\"}[5m])",
+                "legendFormat": "{{method}} {{status}}"
+              }
+            ],
+            "yAxes": [
+              {
+                "label": "Requests/sec",
+                "min": 0
+              }
+            ]
+          },
+          {
+            "id": 6,
+            "title": "Response Time",
+            "type": "graph",
+            "targets": [
+              {
+                "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"conversational-character-service\"}[5m]))",
+                "legendFormat": "50th percentile"
+              },
+              {
+                "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"conversational-character-service\"}[5m]))",
+                "legendFormat": "95th percentile"
+              }
+            ],
+            "yAxes": [
+              {
+                "label": "Seconds",
+                "min": 0
+              }
+            ]
+          }
+        ],
+        "time": {
+          "from": "now-1h",
+          "to": "now"
+        },
+        "refresh": "30s"
+      }
+    }

@@ -1,0 +1,34 @@
+# Global code owners
+* @theinterneti
+
+# Core architecture and orchestration
+/src/orchestration/ @theinterneti
+/src/components/ @theinterneti
+/src/agent_orchestration/ @theinterneti
+
+# API and gateway components
+/src/api_gateway/ @theinterneti
+/src/player_experience/api/ @theinterneti
+
+# Database and data management
+/src/*/database/ @theinterneti
+/src/*/models/ @theinterneti
+
+# Security and therapeutic safety
+/src/components/therapeutic_safety/ @theinterneti
+/src/*/security/ @theinterneti
+
+# CI/CD and development tooling
+/.github/ @theinterneti
+/scripts/ @theinterneti
+/.pre-commit-config.yaml @theinterneti
+/pyproject.toml @theinterneti
+
+# Documentation
+/docs/ @theinterneti
+/README.md @theinterneti
+
+# Configuration files
+/.vscode/ @theinterneti
+/.editorconfig @theinterneti
+/docker-compose*.yml @theinterneti

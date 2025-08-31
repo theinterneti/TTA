@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 
 /**
  * ProtectedRoute Component
- * 
+ *
  * Wraps components that require authentication and/or specific permissions.
  * Automatically verifies tokens and redirects unauthorized users.
  */

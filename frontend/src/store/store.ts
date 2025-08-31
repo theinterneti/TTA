@@ -1,6 +1,6 @@
 /**
  * Redux Store Configuration for TTA Therapeutic Gaming Experience
- * 
+ *
  * Manages application state including user authentication, characters,
  * sessions, and therapeutic progress.
  */

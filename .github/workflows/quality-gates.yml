@@ -1,0 +1,161 @@
+name: Quality Gates
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+    inputs:
+      coverage-threshold:
+        description: 'Minimum coverage percentage required'
+        required: false
+        default: '70'
+        type: string
+
+jobs:
+  enforce-quality-standards:
+    name: Enforce Quality Standards
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for better analysis
+
+      - uses: astral-sh/setup-uv@v1
+
+      - name: Sync dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Check for breaking changes
+        run: |
+          echo "## Breaking Changes Analysis" >> $GITHUB_STEP_SUMMARY
+
+          # Check for removed public APIs
+          git diff origin/main...HEAD --name-only | grep -E "\.py$" | while read file; do
+            if [ -f "$file" ]; then
+              # Simple check for removed public functions/classes
+              REMOVED_APIS=$(git diff origin/main...HEAD "$file" | grep -E "^-\s*(def|class)\s+[^_]" | wc -l)
+              if [ "$REMOVED_APIS" -gt 0 ]; then
+                echo "⚠️ Potential breaking changes in $file" >> $GITHUB_STEP_SUMMARY
+              fi
+            fi
+          done
+
+      - name: Check code complexity
+        run: |
+          echo "## Code Complexity Check" >> $GITHUB_STEP_SUMMARY
+
+          # Use radon for complexity analysis (if available)
+          if uv run python -c "import radon" 2>/dev/null; then
+            COMPLEX_FILES=$(uv run radon cc src/ -s -n B | wc -l)
+            if [ "$COMPLEX_FILES" -gt 0 ]; then
+              echo "⚠️ $COMPLEX_FILES files have high complexity" >> $GITHUB_STEP_SUMMARY
+              uv run radon cc src/ -s -n B >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ All files have acceptable complexity" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Check test coverage requirements
+        run: |
+          # Run tests with coverage
+          uv run pytest tests/ --cov=src --cov-report=term-missing --cov-report=json
+
+          # Extract coverage percentage
+          COVERAGE=$(python -c "import json; data=json.load(open('coverage.json')); print(f'{data[\"totals\"][\"percent_covered\"]:.1f}')")
+          THRESHOLD=${{ inputs.coverage-threshold }}
+
+          echo "## Coverage Analysis" >> $GITHUB_STEP_SUMMARY
+          echo "Current coverage: ${COVERAGE}%" >> $GITHUB_STEP_SUMMARY
+          echo "Required threshold: ${THRESHOLD}%" >> $GITHUB_STEP_SUMMARY
+
+          if (( $(echo "$COVERAGE < $THRESHOLD" | bc -l) )); then
+            echo "❌ Coverage ${COVERAGE}% is below required threshold ${THRESHOLD}%" >> $GITHUB_STEP_SUMMARY
+            echo "::error::Coverage ${COVERAGE}% is below required threshold ${THRESHOLD}%"
+            exit 1
+          else
+            echo "✅ Coverage ${COVERAGE}% meets required threshold ${THRESHOLD}%" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Security vulnerability check
+        run: |
+          echo "## Security Analysis" >> $GITHUB_STEP_SUMMARY
+
+          # Run bandit security scan
+          uv run bandit -r src/ -f json -o bandit-report.json || true
+
+          # Check for high severity issues
+          HIGH_ISSUES=$(python -c "
+          import json
+          try:
+              with open('bandit-report.json') as f:
+                  data = json.load(f)
+              high_issues = [r for r in data.get('results', []) if r.get('issue_severity') == 'HIGH']
+              print(len(high_issues))
+          except:
+              print(0)
+          ")
+
+          if [ "$HIGH_ISSUES" -gt 0 ]; then
+            echo "❌ Found $HIGH_ISSUES high-severity security issues" >> $GITHUB_STEP_SUMMARY
+            echo "::warning::Found $HIGH_ISSUES high-severity security issues"
+          else
+            echo "✅ No high-severity security issues found" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Documentation coverage check
+        run: |
+          echo "## Documentation Coverage" >> $GITHUB_STEP_SUMMARY
+
+          # Check for missing docstrings in public APIs
+          MISSING_DOCS=$(uv run python -c "
+          import ast
+          import os
+
+          missing = 0
+          for root, dirs, files in os.walk('src'):
+              for file in files:
+                  if file.endswith('.py'):
+                      filepath = os.path.join(root, file)
+                      try:
+                          with open(filepath) as f:
+                              tree = ast.parse(f.read())
+                          for node in ast.walk(tree):
+                              if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                                  if not node.name.startswith('_'):  # Public API
+                                      if not ast.get_docstring(node):
+                                          missing += 1
+                      except:
+                          pass
+          print(missing)
+          ")
+
+          if [ "$MISSING_DOCS" -gt 0 ]; then
+            echo "⚠️ $MISSING_DOCS public APIs missing documentation" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ All public APIs have documentation" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Performance regression check
+        run: |
+          echo "## Performance Check" >> $GITHUB_STEP_SUMMARY
+
+          # Simple performance test - run a subset of tests with timing
+          START_TIME=$(date +%s)
+          uv run pytest tests/ -k "not integration" --maxfail=1 -q
+          END_TIME=$(date +%s)
+          DURATION=$((END_TIME - START_TIME))
+
+          echo "Test suite execution time: ${DURATION}s" >> $GITHUB_STEP_SUMMARY
+
+          # Warn if tests take too long (adjust threshold as needed)
+          if [ "$DURATION" -gt 300 ]; then
+            echo "⚠️ Test suite is taking longer than expected (${DURATION}s > 300s)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ Test suite performance is acceptable" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Final quality gate decision
+        run: |
+          echo "## Quality Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "All quality checks completed. Review the results above." >> $GITHUB_STEP_SUMMARY
+          echo "If any critical issues are found, the PR should not be merged until resolved." >> $GITHUB_STEP_SUMMARY

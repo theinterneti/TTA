@@ -4,13 +4,14 @@ Dynamic Tools for the TTA Project.
 This module provides functionality for creating and managing dynamic tools.
 """
 
-import logging
-import json
 import datetime
-from typing import Dict, List, Any, Optional, Callable, Tuple
+import json
+import logging
+from collections.abc import Callable
+from typing import Any
 
+from ..knowledge.neo4j_manager import Neo4jManager, get_neo4j_manager
 from .base import BaseTool, ToolParameter
-from ..knowledge.neo4j_manager import get_neo4j_manager, Neo4jManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,17 +31,17 @@ class DynamicTool(BaseTool):
         name: str,
         description: str,
         function_code: str,
-        parameters: List[ToolParameter] = None,
+        parameters: list[ToolParameter] = None,
         therapeutic_value: str = "",
         created_by: str = "system",
-        tags: List[str] = None,
+        tags: list[str] = None,
         kg_read: bool = False,
         kg_write: bool = False,
         usage_count: int = 0,
         average_rating: float = 0.0,
         created_at: str = None,
-        action_fn: Optional[Callable] = None,
-        tool_type: str = "dynamic"
+        action_fn: Callable | None = None,
+        tool_type: str = "dynamic",
     ):
         """
         Initialize the DynamicTool.
@@ -68,7 +69,7 @@ class DynamicTool(BaseTool):
             action_fn=action_fn,
             kg_read=kg_read,
             kg_write=kg_write,
-            tool_type=tool_type
+            tool_type=tool_type,
         )
 
         self.function_code = function_code
@@ -100,9 +101,14 @@ class DynamicTool(BaseTool):
                 self.action_fn = env[function_name]
                 # Register the callable in CallableRegistry: dyn.{tool_name}:{version}
                 try:
-                    from src.agent_orchestration.tools.callable_registry import CallableRegistry
+                    from src.agent_orchestration.tools.callable_registry import (
+                        CallableRegistry,
+                    )
+
                     # Resolve or create a singleton-ish registry instance via component wiring if available
-                    _creg = getattr(self, "_callable_registry", None) or CallableRegistry()
+                    _creg = (
+                        getattr(self, "_callable_registry", None) or CallableRegistry()
+                    )
                     # Dynamic tools may not declare version; use 1.0.0 as default
                     version = getattr(self, "version", None) or "1.0.0"
                     reg_name = f"dyn.{self.name}"
@@ -110,7 +116,9 @@ class DynamicTool(BaseTool):
                     # Save reference for later executions
                     self._callable_registry = _creg
                 except Exception as _e:
-                    logger.warning(f"CallableRegistry registration failed for dynamic tool {self.name}: {_e}")
+                    logger.warning(
+                        f"CallableRegistry registration failed for dynamic tool {self.name}: {_e}"
+                    )
             else:
                 raise ValueError(
                     f"Function '{function_name}' not found in the function code"
@@ -159,7 +167,7 @@ class DynamicTool(BaseTool):
         else:
             self.average_rating = rating
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """
         Convert the tool to a dictionary representation.
 
@@ -170,15 +178,17 @@ class DynamicTool(BaseTool):
         tool_dict = super().to_dict()
 
         # Add dynamic tool specific fields
-        tool_dict.update({
-            "function_code": self.function_code,
-            "therapeutic_value": self.therapeutic_value,
-            "created_by": self.created_by,
-            "tags": self.tags,
-            "usage_count": self.usage_count,
-            "average_rating": self.average_rating,
-            "created_at": self.created_at
-        })
+        tool_dict.update(
+            {
+                "function_code": self.function_code,
+                "therapeutic_value": self.therapeutic_value,
+                "created_by": self.created_by,
+                "tags": self.tags,
+                "usage_count": self.usage_count,
+                "average_rating": self.average_rating,
+                "created_at": self.created_at,
+            }
+        )
 
         return tool_dict
 
@@ -194,7 +204,7 @@ class ToolRegistry:
     4. Managing tool configurations
     """
 
-    def __init__(self, neo4j_manager: Optional[Neo4jManager] = None):
+    def __init__(self, neo4j_manager: Neo4jManager | None = None):
         """
         Initialize the ToolRegistry.
 
@@ -216,7 +226,7 @@ class ToolRegistry:
         self.tools[tool.name] = tool
         logger.info(f"Registered tool: {tool.name}")
 
-    def get_tool(self, name: str) -> Optional[BaseTool]:
+    def get_tool(self, name: str) -> BaseTool | None:
         """
         Get a tool by name.
 
@@ -232,7 +242,7 @@ class ToolRegistry:
         logger.warning(f"Tool not found: {name}")
         return None
 
-    def list_tools(self) -> List[Dict[str, Any]]:
+    def list_tools(self) -> list[dict[str, Any]]:
         """
         List all registered tools.
 
@@ -241,7 +251,7 @@ class ToolRegistry:
         """
         return [tool.to_dict() for tool in self.tools.values()]
 
-    def get_all_tools(self) -> Dict[str, BaseTool]:
+    def get_all_tools(self) -> dict[str, BaseTool]:
         """
         Get all registered tools.
 
@@ -275,7 +285,9 @@ class ToolRegistry:
                     tool_data = dict(record["t"])
 
                     # Convert parameters from JSON string to list of dicts
-                    if "parameters" in tool_data and isinstance(tool_data["parameters"], str):
+                    if "parameters" in tool_data and isinstance(
+                        tool_data["parameters"], str
+                    ):
                         tool_data["parameters"] = json.loads(tool_data["parameters"])
 
                     # Create the tool
@@ -292,7 +304,7 @@ class ToolRegistry:
         except Exception as e:
             logger.error(f"Error loading tools from Neo4j: {e}")
 
-    def save_tool_to_neo4j(self, tool: BaseTool) -> Tuple[bool, str]:
+    def save_tool_to_neo4j(self, tool: BaseTool) -> tuple[bool, str]:
         """
         Save a tool to Neo4j.
 
@@ -352,7 +364,7 @@ class ToolRegistry:
             logger.error(f"Error saving tool to Neo4j: {e}")
             return False, f"Error saving tool to Neo4j: {str(e)}"
 
-    def delete_tool(self, name: str) -> Tuple[bool, str]:
+    def delete_tool(self, name: str) -> tuple[bool, str]:
         """
         Delete a tool from the registry and Neo4j.
 
@@ -388,7 +400,9 @@ class ToolRegistry:
 
     def __str__(self) -> str:
         """Return a string representation of the registry."""
-        return f"ToolRegistry with {len(self.tools)} tools: {', '.join(self.tools.keys())}"
+        return (
+            f"ToolRegistry with {len(self.tools)} tools: {', '.join(self.tools.keys())}"
+        )
 
     def __repr__(self) -> str:
         """Return a string representation of the registry."""
@@ -397,6 +411,7 @@ class ToolRegistry:
 
 # Singleton instance
 _TOOL_REGISTRY = None
+
 
 def get_tool_registry() -> ToolRegistry:
     """

@@ -6,22 +6,21 @@ running the FastAPI application without external dependencies like Neo4j and Red
 """
 
 import asyncio
-import json
 import logging
 import random
 import time
 import uuid
-from typing import Dict, List, Optional, Any, Union, Set
-from datetime import datetime, timedelta
-from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class MockServiceState(Enum):
     """Mock service operational states."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     FAILING = "failing"
@@ -31,6 +30,7 @@ class MockServiceState(Enum):
 @dataclass
 class MockServiceConfig:
     """Configuration for mock service behavior."""
+
     # Performance characteristics
     base_latency_ms: float = 10.0
     latency_variance_ms: float = 5.0
@@ -38,7 +38,9 @@ class MockServiceConfig:
 
     # State management
     state: MockServiceState = MockServiceState.HEALTHY
-    state_transition_probability: float = 0.01  # Probability of state change per operation
+    state_transition_probability: float = (
+        0.01  # Probability of state change per operation
+    )
 
     # Data persistence
     enable_persistence: bool = True
@@ -53,6 +55,7 @@ class MockServiceConfig:
 @dataclass
 class MockServiceMetrics:
     """Metrics tracking for mock services."""
+
     total_operations: int = 0
     successful_operations: int = 0
     failed_operations: int = 0
@@ -76,7 +79,7 @@ class MockServiceMetrics:
             return 0.0
         return self.total_latency_ms / self.successful_operations
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metrics to dictionary."""
         return {
             "total_operations": self.total_operations,
@@ -87,14 +90,14 @@ class MockServiceMetrics:
             "state_changes": self.state_changes,
             "cache_hits": self.cache_hits,
             "cache_misses": self.cache_misses,
-            "uptime_seconds": (datetime.now() - self.created_at).total_seconds()
+            "uptime_seconds": (datetime.now() - self.created_at).total_seconds(),
         }
 
 
 class MockNeo4jDriver:
     """Enhanced Mock Neo4j driver for development and testing."""
 
-    def __init__(self, uri: str, auth: tuple, config: Optional[MockServiceConfig] = None):
+    def __init__(self, uri: str, auth: tuple, config: MockServiceConfig | None = None):
         self.uri = uri
         self.auth = auth
         self.connected = False
@@ -102,9 +105,9 @@ class MockNeo4jDriver:
         self.metrics = MockServiceMetrics()
 
         # Enhanced data storage with relationships and indexing
-        self._nodes: Dict[str, Dict[str, Any]] = {}  # node_id -> node_data
-        self._relationships: Dict[str, Dict[str, Any]] = {}  # rel_id -> rel_data
-        self._indexes: Dict[str, Set[str]] = {}  # label -> set of node_ids
+        self._nodes: dict[str, dict[str, Any]] = {}  # node_id -> node_data
+        self._relationships: dict[str, dict[str, Any]] = {}  # rel_id -> rel_data
+        self._indexes: dict[str, set[str]] = {}  # label -> set of node_ids
         self._node_counter = 0
         self._rel_counter = 0
 
@@ -122,10 +125,12 @@ class MockNeo4jDriver:
     async def _simulate_latency(self):
         """Simulate realistic database latency."""
         if self.config.base_latency_ms > 0:
-            latency = max(0, random.gauss(
-                self.config.base_latency_ms,
-                self.config.latency_variance_ms
-            ))
+            latency = max(
+                0,
+                random.gauss(
+                    self.config.base_latency_ms, self.config.latency_variance_ms
+                ),
+            )
             await asyncio.sleep(latency / 1000.0)
             return latency
         return 0.0
@@ -142,7 +147,7 @@ class MockNeo4jDriver:
             self.metrics.state_changes += 1
             logger.debug(f"MockNeo4jDriver state changed to {self.config.state}")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         return {
             "service": "neo4j",
@@ -151,8 +156,8 @@ class MockNeo4jDriver:
             "data_stats": {
                 "nodes": len(self._nodes),
                 "relationships": len(self._relationships),
-                "indexes": len(self._indexes)
-            }
+                "indexes": len(self._indexes),
+            },
         }
 
 
@@ -189,7 +194,9 @@ class MockNeo4jSession:
 
             # Log operation if enabled
             if self.driver.config.log_operations:
-                logger.debug(f"Mock Neo4j query: {query[:100]}... with params: {parameters}")
+                logger.debug(
+                    f"Mock Neo4j query: {query[:100]}... with params: {parameters}"
+                )
 
             # Process query based on type
             result = await self._process_query(query, parameters)
@@ -229,7 +236,9 @@ class MockNeo4jSession:
         self.driver._update_state()
 
         if self.driver.config.log_operations:
-            logger.debug(f"Mock Neo4j query (sync): {query[:100]}... with params: {parameters}")
+            logger.debug(
+                f"Mock Neo4j query (sync): {query[:100]}... with params: {parameters}"
+            )
 
         try:
             result = self._process_query_sync(query, parameters)
@@ -256,7 +265,9 @@ class MockNeo4jSession:
             raise Exception("Simulated Neo4j failure")
 
         if self.driver.config.log_operations:
-            logger.debug(f"Mock Neo4j query (async): {query[:100]}... with params: {parameters}")
+            logger.debug(
+                f"Mock Neo4j query (async): {query[:100]}... with params: {parameters}"
+            )
 
         try:
             result = await self._process_query(query, parameters)
@@ -268,52 +279,58 @@ class MockNeo4jSession:
             logger.error(f"Mock Neo4j query failed: {e}")
             raise
 
-    async def _process_query(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _process_query(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Process query with realistic Neo4j-like behavior."""
         query_upper = query.upper().strip()
 
         # CREATE operations
-        if query_upper.startswith('CREATE'):
+        if query_upper.startswith("CREATE"):
             return await self._handle_create(query, parameters)
 
         # MATCH operations
-        elif query_upper.startswith('MATCH'):
+        elif query_upper.startswith("MATCH"):
             return await self._handle_match(query, parameters)
 
         # MERGE operations
-        elif query_upper.startswith('MERGE'):
+        elif query_upper.startswith("MERGE"):
             return await self._handle_merge(query, parameters)
 
         # DELETE operations
-        elif query_upper.startswith('DELETE'):
+        elif query_upper.startswith("DELETE"):
             return await self._handle_delete(query, parameters)
 
         # RETURN operations (standalone)
-        elif query_upper.startswith('RETURN'):
+        elif query_upper.startswith("RETURN"):
             return await self._handle_return(query, parameters)
 
         # Default fallback
         else:
             return MockNeo4jResult([{"result": "mock", "query_type": "unknown"}])
 
-    def _process_query_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _process_query_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous version of query processing."""
         query_upper = query.upper().strip()
 
-        if query_upper.startswith('CREATE'):
+        if query_upper.startswith("CREATE"):
             return self._handle_create_sync(query, parameters)
-        elif query_upper.startswith('MATCH'):
+        elif query_upper.startswith("MATCH"):
             return self._handle_match_sync(query, parameters)
-        elif query_upper.startswith('MERGE'):
+        elif query_upper.startswith("MERGE"):
             return self._handle_merge_sync(query, parameters)
-        elif query_upper.startswith('DELETE'):
+        elif query_upper.startswith("DELETE"):
             return self._handle_delete_sync(query, parameters)
-        elif query_upper.startswith('RETURN'):
+        elif query_upper.startswith("RETURN"):
             return self._handle_return_sync(query, parameters)
         else:
             return MockNeo4jResult([{"result": "mock", "query_type": "unknown"}])
 
-    async def _handle_create(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _handle_create(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Handle CREATE operations."""
         # Simple node creation simulation
         node_id = str(uuid.uuid4())
@@ -323,7 +340,7 @@ class MockNeo4jSession:
         node_data = {
             "id": node_id,
             "created_at": datetime.now().isoformat(),
-            **parameters
+            **parameters,
         }
 
         self.driver._nodes[node_id] = node_data
@@ -335,9 +352,13 @@ class MockNeo4jSession:
                 self.driver._indexes[label] = set()
             self.driver._indexes[label].add(node_id)
 
-        return MockNeo4jResult([{"created": True, "node_id": node_id, "properties": node_data}])
+        return MockNeo4jResult(
+            [{"created": True, "node_id": node_id, "properties": node_data}]
+        )
 
-    def _handle_create_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _handle_create_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous CREATE handler."""
         node_id = str(uuid.uuid4())
         self.driver._node_counter += 1
@@ -345,7 +366,7 @@ class MockNeo4jSession:
         node_data = {
             "id": node_id,
             "created_at": datetime.now().isoformat(),
-            **parameters
+            **parameters,
         }
 
         self.driver._nodes[node_id] = node_data
@@ -356,9 +377,13 @@ class MockNeo4jSession:
                 self.driver._indexes[label] = set()
             self.driver._indexes[label].add(node_id)
 
-        return MockNeo4jResult([{"created": True, "node_id": node_id, "properties": node_data}])
+        return MockNeo4jResult(
+            [{"created": True, "node_id": node_id, "properties": node_data}]
+        )
 
-    async def _handle_match(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _handle_match(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Handle MATCH operations."""
         # Simple matching simulation
         results = []
@@ -383,7 +408,9 @@ class MockNeo4jSession:
 
         return MockNeo4jResult(results)
 
-    def _handle_match_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _handle_match_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous MATCH handler."""
         results = []
 
@@ -405,7 +432,9 @@ class MockNeo4jSession:
 
         return MockNeo4jResult(results)
 
-    async def _handle_merge(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _handle_merge(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Handle MERGE operations (CREATE if not exists)."""
         # Check if node exists
         existing = await self._handle_match(query, parameters)
@@ -414,7 +443,9 @@ class MockNeo4jSession:
         else:
             return await self._handle_create(query, parameters)
 
-    def _handle_merge_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _handle_merge_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous MERGE handler."""
         existing = self._handle_match_sync(query, parameters)
         if existing.records:
@@ -422,7 +453,9 @@ class MockNeo4jSession:
         else:
             return self._handle_create_sync(query, parameters)
 
-    async def _handle_delete(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _handle_delete(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Handle DELETE operations."""
         deleted_count = 0
         nodes_to_delete = []
@@ -450,7 +483,9 @@ class MockNeo4jSession:
 
         return MockNeo4jResult([{"deleted": deleted_count}])
 
-    def _handle_delete_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _handle_delete_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous DELETE handler."""
         deleted_count = 0
         nodes_to_delete = []
@@ -475,7 +510,9 @@ class MockNeo4jSession:
 
         return MockNeo4jResult([{"deleted": deleted_count}])
 
-    async def _handle_return(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    async def _handle_return(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Handle standalone RETURN operations."""
         # Simple return value simulation
         if parameters:
@@ -483,7 +520,9 @@ class MockNeo4jSession:
         else:
             return MockNeo4jResult([{"returned": 1}])
 
-    def _handle_return_sync(self, query: str, parameters: Dict[str, Any]) -> 'MockNeo4jResult':
+    def _handle_return_sync(
+        self, query: str, parameters: dict[str, Any]
+    ) -> "MockNeo4jResult":
         """Synchronous RETURN handler."""
         if parameters:
             return MockNeo4jResult([parameters])
@@ -494,12 +533,12 @@ class MockNeo4jSession:
 class MockNeo4jResult:
     """Enhanced Mock Neo4j query result with realistic behavior."""
 
-    def __init__(self, records: List[Dict[str, Any]]):
+    def __init__(self, records: list[dict[str, Any]]):
         self.records = records
         self._consumed = False
         self._current_index = 0
 
-    def single(self) -> Optional[Dict[str, Any]]:
+    def single(self) -> dict[str, Any] | None:
         """Return single record or None."""
         if not self.records:
             return None
@@ -507,26 +546,26 @@ class MockNeo4jResult:
             logger.warning("Multiple records found, returning first one")
         return self.records[0]
 
-    def data(self) -> List[Dict[str, Any]]:
+    def data(self) -> list[dict[str, Any]]:
         """Return all records as list of dictionaries."""
         return [record for record in self.records]
 
-    def values(self) -> List[List[Any]]:
+    def values(self) -> list[list[Any]]:
         """Return all records as list of value lists."""
         return [list(record.values()) for record in self.records]
 
-    def keys(self) -> List[str]:
+    def keys(self) -> list[str]:
         """Return keys from first record."""
         if not self.records:
             return []
         return list(self.records[0].keys())
 
-    def consume(self) -> List[Dict[str, Any]]:
+    def consume(self) -> list[dict[str, Any]]:
         """Consume and return all records."""
         self._consumed = True
         return self.records
 
-    def peek(self) -> Optional[Dict[str, Any]]:
+    def peek(self) -> dict[str, Any] | None:
         """Peek at next record without consuming."""
         if self._current_index < len(self.records):
             return self.records[self._current_index]
@@ -544,22 +583,23 @@ class MockNeo4jResult:
         """Return True if has records."""
         return bool(self.records)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary format."""
         return {
             "records": self.records,
             "record_count": len(self.records),
             "consumed": self._consumed,
-            "keys": self.keys()
+            "keys": self.keys(),
         }
 
 
 @dataclass
 class MockRedisValue:
     """Enhanced Redis value with expiration and metadata."""
+
     value: Any
     created_at: datetime = field(default_factory=datetime.now)
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
     access_count: int = 0
     last_accessed: datetime = field(default_factory=datetime.now)
 
@@ -581,28 +621,30 @@ class MockRedisValue:
 class MockRedisClient:
     """Enhanced Mock Redis client for development and testing."""
 
-    def __init__(self, config: Optional[MockServiceConfig] = None, **kwargs):
-        self.host = kwargs.get('host', 'localhost')
-        self.port = kwargs.get('port', 6379)
-        self.db = kwargs.get('db', 0)
+    def __init__(self, config: MockServiceConfig | None = None, **kwargs):
+        self.host = kwargs.get("host", "localhost")
+        self.port = kwargs.get("port", 6379)
+        self.db = kwargs.get("db", 0)
         self.config = config or MockServiceConfig()
         self.metrics = MockServiceMetrics()
 
         # Enhanced data storage with expiration and metadata
-        self._data: Dict[str, MockRedisValue] = {}
-        self._pubsub_channels: Dict[str, List[Any]] = {}
+        self._data: dict[str, MockRedisValue] = {}
+        self._pubsub_channels: dict[str, list[Any]] = {}
         self.connected = False
 
         # Background cleanup task
         self._cleanup_task = None
 
-        logger.info(f"Enhanced MockRedisClient initialized for {self.host}:{self.port}/{self.db}")
+        logger.info(
+            f"Enhanced MockRedisClient initialized for {self.host}:{self.port}/{self.db}"
+        )
 
     async def ping(self):
         """Mock ping operation with latency simulation."""
         await self._simulate_operation("ping")
         self.connected = True
-        return b'PONG'
+        return b"PONG"
 
     async def get(self, key: str):
         """Enhanced mock get operation with expiration handling."""
@@ -623,7 +665,15 @@ class MockRedisClient:
             self.metrics.cache_misses += 1
             return None
 
-    async def set(self, key: str, value: Any, ex: Optional[int] = None, px: Optional[int] = None, nx: bool = False, xx: bool = False):
+    async def set(
+        self,
+        key: str,
+        value: Any,
+        ex: int | None = None,
+        px: int | None = None,
+        nx: bool = False,
+        xx: bool = False,
+    ):
         """Enhanced mock set operation with expiration and conditions."""
         result = await self._simulate_operation("set")
         if result is False:  # Simulated failure
@@ -721,14 +771,16 @@ class MockRedisClient:
     async def _simulate_operation(self, operation: str) -> bool:
         """Simulate operation with latency and failure handling."""
         self.metrics.total_operations += 1
-        self.config._update_state() if hasattr(self.config, '_update_state') else None
+        self.config._update_state() if hasattr(self.config, "_update_state") else None
 
         # Simulate latency
         if self.config.base_latency_ms > 0:
-            latency = max(0, random.gauss(
-                self.config.base_latency_ms,
-                self.config.latency_variance_ms
-            ))
+            latency = max(
+                0,
+                random.gauss(
+                    self.config.base_latency_ms, self.config.latency_variance_ms
+                ),
+            )
             await asyncio.sleep(latency / 1000.0)
             self.metrics.total_latency_ms += latency
 
@@ -758,7 +810,7 @@ class MockRedisClient:
         if expired_keys:
             logger.debug(f"Cleaned up {len(expired_keys)} expired Redis keys")
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get service metrics."""
         return {
             "service": "redis",
@@ -767,49 +819,49 @@ class MockRedisClient:
             "data_stats": {
                 "keys": len(self._data),
                 "expired_keys": sum(1 for v in self._data.values() if v.is_expired()),
-                "channels": len(self._pubsub_channels)
-            }
+                "channels": len(self._pubsub_channels),
+            },
         }
 
 
 class MockUserRepository:
     """Mock user repository for development and testing."""
-    
+
     def __init__(self):
         self.users = {}
         self.connected = False
         logger.info("MockUserRepository initialized")
-    
+
     def connect(self):
         """Mock connect operation."""
         self.connected = True
         logger.debug("MockUserRepository connected")
-    
+
     def disconnect(self):
         """Mock disconnect operation."""
         self.connected = False
         logger.debug("MockUserRepository disconnected")
-    
+
     def create_user(self, user) -> bool:
         """Mock user creation."""
         self.users[user.user_id] = user
         logger.debug(f"Mock user created: {user.username}")
         return True
-    
+
     def get_user_by_username(self, username: str):
         """Mock user retrieval by username."""
         for user in self.users.values():
             if user.username == username:
                 return user
         return None
-    
+
     def get_user_by_email(self, email: str):
         """Mock user retrieval by email."""
         for user in self.users.values():
             if user.email == email:
                 return user
         return None
-    
+
     def update_user(self, user) -> bool:
         """Mock user update."""
         if user.user_id in self.users:
@@ -817,7 +869,7 @@ class MockUserRepository:
             logger.debug(f"Mock user updated: {user.username}")
             return True
         return False
-    
+
     def delete_user(self, user_id: str) -> bool:
         """Mock user deletion."""
         if user_id in self.users:
@@ -844,9 +896,9 @@ def create_mock_user_repository():
 
 # Mock service registry for easy access
 MOCK_SERVICES = {
-    'neo4j_driver': create_mock_neo4j_driver,
-    'redis_client': create_mock_redis_client,
-    'user_repository': create_mock_user_repository,
+    "neo4j_driver": create_mock_neo4j_driver,
+    "redis_client": create_mock_redis_client,
+    "user_repository": create_mock_user_repository,
 }
 
 
@@ -861,14 +913,16 @@ def get_mock_service(service_name: str, *args, **kwargs):
 def is_development_mode() -> bool:
     """Check if we're running in development mode."""
     import os
+
     return os.getenv("TTA_DEVELOPMENT_MODE", "false").lower() in ("true", "1", "yes")
 
 
 def should_use_mocks() -> bool:
     """Check if we should use mock services."""
     import os
+
     return (
-        is_development_mode() or 
-        os.getenv("TTA_USE_MOCKS", "false").lower() in ("true", "1", "yes") or
-        os.getenv("TTA_USE_NEO4J", "0") != "1"
+        is_development_mode()
+        or os.getenv("TTA_USE_MOCKS", "false").lower() in ("true", "1", "yes")
+        or os.getenv("TTA_USE_NEO4J", "0") != "1"
     )

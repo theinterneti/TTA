@@ -1,0 +1,938 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.player_profile_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.player_profile_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.player_profile_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Player Profile Manager service.</span>
+
+<span class="sd">This module provides business logic for player profile management,</span>
+<span class="sd">including CRUD operations, privacy controls, and data access restrictions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.player_profile_repository</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PlayerProfileRepository</span><span class="p">,</span>
+    <span class="n">PlayerProfileRepositoryError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.player</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PlayerProfile</span><span class="p">,</span>
+    <span class="n">PrivacySettings</span><span class="p">,</span>
+    <span class="n">ProgressSummary</span><span class="p">,</span>
+    <span class="n">TherapeuticPreferences</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PlayerProfileManagerError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManagerError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerProfileManagerError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when player profile manager operations fail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="PrivacyViolationError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PrivacyViolationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrivacyViolationError</span><span class="p">(</span><span class="n">PlayerProfileManagerError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an operation violates privacy settings.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="DataAccessRestrictedError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.DataAccessRestrictedError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataAccessRestrictedError</span><span class="p">(</span><span class="n">PlayerProfileManagerError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when data access is restricted by privacy settings.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="PlayerProfileManager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerProfileManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Service for managing player profiles with privacy controls and data access restrictions.</span>
+
+<span class="sd">    This class provides high-level business logic for player profile operations,</span>
+<span class="sd">    enforcing privacy settings and data access controls according to requirements 7.1, 7.2, 7.3.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">repository</span><span class="p">:</span> <span class="n">PlayerProfileRepository</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize Player Profile Manager.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            repository: PlayerProfileRepository instance for data access</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">repository</span> <span class="o">=</span> <span class="n">repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="PlayerProfileManager.create_player_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.create_player_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_player_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="n">TherapeuticPreferences</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">privacy_settings</span><span class="p">:</span> <span class="n">PrivacySettings</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new player profile with validation and privacy controls.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: Unique username for the player</span>
+<span class="sd">            email: Player&#39;s email address</span>
+<span class="sd">            therapeutic_preferences: Optional therapeutic preferences</span>
+<span class="sd">            privacy_settings: Optional privacy settings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            PlayerProfile: Created player profile</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            PlayerProfileManagerError: If profile creation fails</span>
+<span class="sd">            PrivacyViolationError: If privacy requirements are not met</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Validate input data</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_username</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+
+            <span class="c1"># Check for existing username/email</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">username_exists</span><span class="p">(</span><span class="n">username</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Username &#39;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&#39; already exists&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">email_exists</span><span class="p">(</span><span class="n">email</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Email &#39;</span><span class="si">{</span><span class="n">email</span><span class="si">}</span><span class="s2">&#39; already exists&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Generate unique player ID (allow external override for E2E determinism)</span>
+            <span class="n">player_id</span> <span class="o">=</span> <span class="n">player_id</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_player_id</span><span class="p">()</span>
+
+            <span class="c1"># Use defaults if not provided</span>
+            <span class="k">if</span> <span class="n">therapeutic_preferences</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">therapeutic_preferences</span> <span class="o">=</span> <span class="n">TherapeuticPreferences</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">privacy_settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">privacy_settings</span> <span class="o">=</span> <span class="n">PrivacySettings</span><span class="p">()</span>
+
+            <span class="c1"># Validate privacy settings compliance</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_privacy_compliance</span><span class="p">(</span><span class="n">privacy_settings</span><span class="p">)</span>
+
+            <span class="c1"># Create player profile</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="n">PlayerProfile</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+                <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+                <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">therapeutic_preferences</span><span class="p">,</span>
+                <span class="n">privacy_settings</span><span class="o">=</span><span class="n">privacy_settings</span><span class="p">,</span>
+                <span class="n">progress_summary</span><span class="o">=</span><span class="n">ProgressSummary</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store in repository</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">create_player_profile</span><span class="p">(</span><span class="n">profile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to create player profile in database&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Log access for audit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_access</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="s2">&quot;CREATE&quot;</span><span class="p">,</span> <span class="s2">&quot;Player profile created&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created player profile: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2"> (username: </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">profile</span>
+
+        <span class="k">except</span> <span class="n">PlayerProfileRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repository error creating player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error creating player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error creating player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.get_player_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.get_player_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_player_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a player profile with privacy controls.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            accessor_id: ID of the entity requesting access (for audit)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[PlayerProfile]: Player profile if found and accessible</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            DataAccessRestrictedError: If access is restricted by privacy settings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve profile from repository</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Check data access restrictions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_access_permissions</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+            <span class="c1"># Apply privacy filtering</span>
+            <span class="n">filtered_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_privacy_filtering</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+            <span class="c1"># Log access for audit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_access</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="s2">&quot;READ&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Profile accessed by </span><span class="si">{</span><span class="n">accessor_id</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;system&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">filtered_profile</span>
+
+        <span class="k">except</span> <span class="n">PlayerProfileRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repository error retrieving player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to retrieve player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DataAccessRestrictedError</span><span class="p">:</span>
+            <span class="c1"># Re-raise privacy violations</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error retrieving player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error retrieving player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.update_player_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.update_player_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_player_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update a player profile with privacy controls and validation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            updates: Dictionary of fields to update</span>
+<span class="sd">            accessor_id: ID of the entity making the update</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if update was successful</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            PlayerProfileManagerError: If update fails</span>
+<span class="sd">            DataAccessRestrictedError: If update is restricted by privacy settings</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve existing profile</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Player profile not found: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check update permissions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_update_permissions</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">updates</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+            <span class="c1"># Validate updates</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_profile_updates</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span>
+
+            <span class="c1"># Apply updates to profile</span>
+            <span class="n">updated_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_profile_updates</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">updates</span><span class="p">)</span>
+
+            <span class="c1"># Store updated profile</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">update_player_profile</span><span class="p">(</span><span class="n">updated_profile</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to update player profile in database&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Log access for audit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_access</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span>
+                <span class="s2">&quot;UPDATE&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Profile updated by </span><span class="si">{</span><span class="n">accessor_id</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;system&#39;</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">updates</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated player profile: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="n">PlayerProfileRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repository error updating player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DataAccessRestrictedError</span><span class="p">:</span>
+            <span class="c1"># Re-raise privacy violations</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error updating player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error updating player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.delete_player_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.delete_player_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_player_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete a player profile with privacy compliance (GDPR right to erasure).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            accessor_id: ID of the entity requesting deletion</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if deletion was successful</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            PlayerProfileManagerError: If deletion fails</span>
+<span class="sd">            DataAccessRestrictedError: If deletion is restricted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Retrieve profile to check permissions</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Player profile not found for deletion: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Check deletion permissions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_check_deletion_permissions</span><span class="p">(</span><span class="n">profile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+            <span class="c1"># Perform secure deletion</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">delete_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to delete player profile from database&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Log deletion for audit (before profile is gone)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_access</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Profile deleted by </span><span class="si">{</span><span class="n">accessor_id</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;system&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleted player profile: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="n">PlayerProfileRepositoryError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Repository error deleting player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to delete player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">DataAccessRestrictedError</span><span class="p">:</span>
+            <span class="c1"># Re-raise privacy violations</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error deleting player profile </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected error deleting player profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.get_player_by_username">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.get_player_by_username">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_player_by_username</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a player profile by username with privacy controls.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            username: Player username</span>
+<span class="sd">            accessor_id: ID of the entity requesting access</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[PlayerProfile]: Player profile if found and accessible</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving player by username </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving player by username: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.get_player_by_email">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.get_player_by_email">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_player_by_email</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a player profile by email with privacy controls.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            email: Player email</span>
+<span class="sd">            accessor_id: ID of the entity requesting access</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[PlayerProfile]: Player profile if found and accessible</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_by_email</span><span class="p">(</span><span class="n">email</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving player by email: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving player by email: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.update_therapeutic_preferences">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.update_therapeutic_preferences">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_therapeutic_preferences</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">preferences</span><span class="p">:</span> <span class="n">TherapeuticPreferences</span><span class="p">,</span>
+        <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update therapeutic preferences for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            preferences: New therapeutic preferences</span>
+<span class="sd">            accessor_id: ID of the entity making the update</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if update was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_player_profile</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">:</span> <span class="n">preferences</span><span class="p">},</span> <span class="n">accessor_id</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.update_privacy_settings">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.update_privacy_settings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_privacy_settings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">privacy_settings</span><span class="p">:</span> <span class="n">PrivacySettings</span><span class="p">,</span>
+        <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update privacy settings for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            privacy_settings: New privacy settings</span>
+<span class="sd">            accessor_id: ID of the entity making the update</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if update was successful</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Validate privacy settings compliance</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_privacy_compliance</span><span class="p">(</span><span class="n">privacy_settings</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_player_profile</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;privacy_settings&quot;</span><span class="p">:</span> <span class="n">privacy_settings</span><span class="p">},</span> <span class="n">accessor_id</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.export_player_data">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.export_player_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_player_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export all player data for GDPR compliance.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            accessor_id: ID of the entity requesting export</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: Complete player data in readable format</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            DataAccessRestrictedError: If export is not allowed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Player profile not found: </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Check export permissions (player must consent or be the accessor)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">accessor_id</span> <span class="o">!=</span> <span class="n">player_id</span>
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_collection_consent</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span>
+                    <span class="s2">&quot;Data export not permitted without consent&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Create comprehensive data export</span>
+            <span class="n">export_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;player_profile&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;player_id&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+                    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                    <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="s2">&quot;last_login&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">profile</span><span class="o">.</span><span class="n">last_login</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">last_login</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;is_active&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span>
+                    <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">characters</span><span class="p">,</span>
+                    <span class="s2">&quot;active_sessions&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;intensity_level&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">intensity_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;preferred_approaches&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="n">approach</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">for</span> <span class="n">approach</span> <span class="ow">in</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">preferred_approaches</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;trigger_warnings&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">trigger_warnings</span><span class="p">,</span>
+                    <span class="s2">&quot;comfort_topics&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">comfort_topics</span><span class="p">,</span>
+                    <span class="s2">&quot;avoid_topics&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+                    <span class="s2">&quot;session_duration_preference&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">session_duration_preference</span><span class="p">,</span>
+                    <span class="s2">&quot;reminder_frequency&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="p">,</span>
+                    <span class="s2">&quot;crisis_contact_info&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;primary_contact_name&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_name</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;primary_contact_phone&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_phone</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;therapist_name&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_name</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;therapist_phone&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_phone</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;crisis_hotline_preference&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">crisis_hotline_preference</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;emergency_instructions&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">emergency_instructions</span>
+                                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                        <span class="p">}</span>
+                        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;privacy_settings&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;data_collection_consent&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_collection_consent</span><span class="p">,</span>
+                    <span class="s2">&quot;research_participation_consent&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">research_participation_consent</span><span class="p">,</span>
+                    <span class="s2">&quot;progress_sharing_enabled&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">progress_sharing_enabled</span><span class="p">,</span>
+                    <span class="s2">&quot;anonymous_analytics_enabled&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">anonymous_analytics_enabled</span><span class="p">,</span>
+                    <span class="s2">&quot;session_recording_enabled&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">session_recording_enabled</span><span class="p">,</span>
+                    <span class="s2">&quot;data_retention_period_days&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_retention_period_days</span><span class="p">,</span>
+                    <span class="s2">&quot;third_party_sharing_consent&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">third_party_sharing_consent</span><span class="p">,</span>
+                    <span class="s2">&quot;collect_interaction_patterns&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_interaction_patterns</span><span class="p">,</span>
+                    <span class="s2">&quot;collect_emotional_responses&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_emotional_responses</span><span class="p">,</span>
+                    <span class="s2">&quot;collect_therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_therapeutic_outcomes</span><span class="p">,</span>
+                    <span class="s2">&quot;collect_usage_statistics&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_usage_statistics</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;progress_summary&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;total_sessions&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">total_sessions</span><span class="p">,</span>
+                    <span class="s2">&quot;total_time_minutes&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">total_time_minutes</span><span class="p">,</span>
+                    <span class="s2">&quot;milestones_achieved&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">,</span>
+                    <span class="s2">&quot;current_streak_days&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">current_streak_days</span><span class="p">,</span>
+                    <span class="s2">&quot;longest_streak_days&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">longest_streak_days</span><span class="p">,</span>
+                    <span class="s2">&quot;favorite_therapeutic_approach&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">favorite_therapeutic_approach</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">favorite_therapeutic_approach</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;most_effective_world_type&quot;</span><span class="p">:</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">most_effective_world_type</span><span class="p">,</span>
+                    <span class="s2">&quot;last_session_date&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">last_session_date</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">last_session_date</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;next_recommended_session&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">next_recommended_session</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">next_recommended_session</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;export_metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;export_date&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="s2">&quot;export_requested_by&quot;</span><span class="p">:</span> <span class="n">accessor_id</span><span class="p">,</span>
+                    <span class="s2">&quot;data_format_version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Log data export for audit</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_access</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="s2">&quot;EXPORT&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Data exported by </span><span class="si">{</span><span class="n">accessor_id</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;system&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">export_data</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error exporting player data </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error exporting player data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerProfileManager.get_access_log">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.PlayerProfileManager.get_access_log">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_access_log</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get access log for a player profile (for transparency).</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: Player identifier</span>
+<span class="sd">            accessor_id: ID of the entity requesting access log</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[Dict[str, Any]]: Access log entries</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            DataAccessRestrictedError: If access log viewing is restricted</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Only allow player themselves or authorized entities to view access log</span>
+        <span class="k">if</span> <span class="n">accessor_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span>
+                <span class="s2">&quot;Access log viewing restricted to profile owner&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Filter access log for this player</span>
+        <span class="n">player_log</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">entry</span> <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">player_id</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">player_log</span></div>
+
+
+    <span class="c1"># Private helper methods</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_player_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a unique player ID.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate username format and constraints.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">username</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">username</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="s2">&quot;Username must be at least 3 characters long&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">username</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="s2">&quot;Username cannot exceed 50 characters&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_-]+$&quot;</span><span class="p">,</span> <span class="n">username</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span>
+                <span class="s2">&quot;Username can only contain letters, numbers, underscores, and hyphens&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate email format.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">email</span> <span class="ow">or</span> <span class="s2">&quot;@&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">email</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="s2">&quot;Valid email address is required&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Basic email validation</span>
+        <span class="n">email_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">email_pattern</span><span class="p">,</span> <span class="n">email</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PlayerProfileManagerError</span><span class="p">(</span><span class="s2">&quot;Invalid email format&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_privacy_compliance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">privacy_settings</span><span class="p">:</span> <span class="n">PrivacySettings</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate privacy settings for compliance requirements.&quot;&quot;&quot;</span>
+        <span class="c1"># Ensure minimum data retention period</span>
+        <span class="k">if</span> <span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_retention_period_days</span> <span class="o">&lt;</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PrivacyViolationError</span><span class="p">(</span>
+                <span class="s2">&quot;Data retention period must be at least 30 days&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Ensure maximum data retention period</span>
+        <span class="k">if</span> <span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_retention_period_days</span> <span class="o">&gt;</span> <span class="mi">2555</span><span class="p">:</span>  <span class="c1"># ~7 years</span>
+            <span class="k">raise</span> <span class="n">PrivacyViolationError</span><span class="p">(</span><span class="s2">&quot;Data retention period cannot exceed 7 years&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_data_access_permissions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if data access is permitted based on privacy settings.&quot;&quot;&quot;</span>
+        <span class="c1"># If accessor is the profile owner, always allow</span>
+        <span class="k">if</span> <span class="n">accessor_id</span> <span class="o">==</span> <span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check if data collection consent is given</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_collection_consent</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span>
+                <span class="s2">&quot;Data access restricted: no data collection consent&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Additional checks can be added here based on specific access patterns</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_update_permissions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">profile</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">,</span>
+        <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if profile updates are permitted.&quot;&quot;&quot;</span>
+        <span class="c1"># Only profile owner can update their profile</span>
+        <span class="k">if</span> <span class="n">accessor_id</span> <span class="o">!=</span> <span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span>
+                <span class="s2">&quot;Profile updates restricted to profile owner&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check for restricted fields</span>
+        <span class="n">restricted_fields</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;player_id&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">restricted_fields</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; cannot be updated&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_deletion_permissions</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if profile deletion is permitted.&quot;&quot;&quot;</span>
+        <span class="c1"># Only profile owner can delete their profile</span>
+        <span class="k">if</span> <span class="n">accessor_id</span> <span class="o">!=</span> <span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DataAccessRestrictedError</span><span class="p">(</span>
+                <span class="s2">&quot;Profile deletion restricted to profile owner&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_privacy_filtering</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">,</span> <span class="n">accessor_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply privacy filtering to profile data based on settings and accessor.&quot;&quot;&quot;</span>
+        <span class="c1"># If accessor is the profile owner, return full profile</span>
+        <span class="k">if</span> <span class="n">accessor_id</span> <span class="o">==</span> <span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">profile</span>
+
+        <span class="c1"># Create filtered copy of profile</span>
+        <span class="n">filtered_profile</span> <span class="o">=</span> <span class="n">PlayerProfile</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">email</span>
+                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">progress_sharing_enabled</span>
+                <span class="k">else</span> <span class="s2">&quot;***@***.***&quot;</span>
+            <span class="p">),</span>
+            <span class="n">created_at</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+            <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="p">,</span>
+            <span class="n">privacy_settings</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="p">,</span>
+            <span class="n">characters</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">characters</span><span class="p">,</span>
+            <span class="n">active_sessions</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">active_sessions</span>
+                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">progress_sharing_enabled</span>
+                <span class="k">else</span> <span class="p">{}</span>
+            <span class="p">),</span>
+            <span class="n">progress_summary</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span>
+                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">progress_sharing_enabled</span>
+                <span class="k">else</span> <span class="n">ProgressSummary</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="n">last_login</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">profile</span><span class="o">.</span><span class="n">last_login</span>
+                <span class="k">if</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_usage_statistics</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="n">is_active</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">filtered_profile</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_profile_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate profile update data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;username&quot;</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_username</span><span class="p">(</span><span class="n">updates</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s2">&quot;email&quot;</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_email</span><span class="p">(</span><span class="n">updates</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s2">&quot;privacy_settings&quot;</span> <span class="ow">in</span> <span class="n">updates</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_validate_privacy_compliance</span><span class="p">(</span><span class="n">updates</span><span class="p">[</span><span class="s2">&quot;privacy_settings&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_apply_profile_updates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">,</span> <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfile</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply updates to a player profile.&quot;&quot;&quot;</span>
+        <span class="c1"># Create a copy of the profile</span>
+        <span class="n">updated_profile</span> <span class="o">=</span> <span class="n">PlayerProfile</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">username</span><span class="p">),</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">email</span><span class="p">),</span>
+            <span class="n">created_at</span><span class="o">=</span><span class="n">profile</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+            <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">therapeutic_preferences</span>
+            <span class="p">),</span>
+            <span class="n">privacy_settings</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;privacy_settings&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">privacy_settings</span><span class="p">),</span>
+            <span class="n">characters</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;characters&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">characters</span><span class="p">),</span>
+            <span class="n">active_sessions</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;active_sessions&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">),</span>
+            <span class="n">progress_summary</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;progress_summary&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">progress_summary</span><span class="p">),</span>
+            <span class="n">last_login</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;last_login&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">last_login</span><span class="p">),</span>
+            <span class="n">is_active</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;is_active&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">.</span><span class="n">is_active</span><span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">updated_profile</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">details</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log access for audit purposes.&quot;&quot;&quot;</span>
+        <span class="n">log_entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;player_id&quot;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+            <span class="s2">&quot;operation&quot;</span><span class="p">:</span> <span class="n">operation</span><span class="p">,</span>
+            <span class="s2">&quot;details&quot;</span><span class="p">:</span> <span class="n">details</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">log_entry</span><span class="p">)</span>
+
+        <span class="c1"># Keep only recent entries (last 1000)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_access_log</span><span class="p">[</span><span class="o">-</span><span class="mi">1000</span><span class="p">:]</span></div>
+
+
+
+<span class="c1"># Utility functions for player profile manager operations</span>
+<div class="viewcode-block" id="create_player_profile_manager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_profile_manager.html#src.player_experience.managers.create_player_profile_manager">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_player_profile_manager</span><span class="p">(</span>
+    <span class="n">repository</span><span class="p">:</span> <span class="n">PlayerProfileRepository</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerProfileManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a player profile manager with the given repository.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        repository: PlayerProfileRepository instance</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerProfileManager: Manager instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PlayerProfileManager</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

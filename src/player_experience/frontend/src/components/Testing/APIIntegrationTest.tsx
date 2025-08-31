@@ -48,13 +48,13 @@ const APIIntegrationTest: React.FC = () => {
     testIndex: number
   ): Promise<void> => {
     const startTime = Date.now();
-    
+
     try {
       updateTestResult(suiteIndex, testIndex, { status: 'pending' });
-      
+
       const result = await testFn();
       const duration = Date.now() - startTime;
-      
+
       updateTestResult(suiteIndex, testIndex, {
         status: 'success',
         message: 'Test passed',
@@ -63,7 +63,7 @@ const APIIntegrationTest: React.FC = () => {
       });
     } catch (error: any) {
       const duration = Date.now() - startTime;
-      
+
       updateTestResult(suiteIndex, testIndex, {
         status: 'error',
         message: error.message || 'Test failed',
@@ -296,7 +296,7 @@ const APIIntegrationTest: React.FC = () => {
           max_players: 1,
           is_public: false,
         };
-        
+
         await nexusAPI.createWorld(testWorld);
         return { message: 'World creation endpoint accessible' };
       } catch (error: any) {
@@ -352,7 +352,7 @@ const APIIntegrationTest: React.FC = () => {
   const runAllTests = async () => {
     setIsRunning(true);
     setOverallStatus('running');
-    
+
     const suites = initializeTestSuites();
     setTestSuites(suites);
 
@@ -361,7 +361,7 @@ const APIIntegrationTest: React.FC = () => {
       await runAuthTestSuite(1);
       await runNexusTestSuite(2);
       await runWorldManagementTestSuite(3);
-      
+
       setOverallStatus('complete');
     } catch (error) {
       console.error('Test suite failed:', error);
@@ -415,7 +415,7 @@ const APIIntegrationTest: React.FC = () => {
                  overallStatus === 'complete' ? 'Complete' :
                  'Error'}
               </div>
-              
+
               {connectivityResults && (
                 <div className={`px-3 py-1 rounded-full text-sm font-medium ${
                   connectivityResults.overallStatus === 'healthy' ? 'bg-green-100 text-green-800' :
@@ -458,7 +458,7 @@ const APIIntegrationTest: React.FC = () => {
                     </span>
                   </h3>
                 </div>
-                
+
                 <div className="p-4">
                   <div className="space-y-3">
                     {suite.tests.map((test, testIndex) => (
@@ -472,7 +472,7 @@ const APIIntegrationTest: React.FC = () => {
                             </div>
                           </div>
                         </div>
-                        
+
                         {test.duration && (
                           <div className="text-sm text-gray-500">
                             {test.duration}ms

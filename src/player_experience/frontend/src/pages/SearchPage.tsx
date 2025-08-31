@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { WorldSearch } from '../components/Search';
-import { WorldDetailsModal } from '../components/World';
-import { useAuthGuard } from '../hooks/useAuthGuard';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { WorldSearch } from "../components/Search";
+import { WorldDetailsModal } from "../components/World";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 const SearchPage: React.FC = () => {
   const { isAuthenticated, user } = useAuthGuard({ autoRedirect: true });
@@ -38,9 +38,12 @@ const SearchPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <h1 className="text-3xl font-bold text-gray-900">Discover Worlds</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Discover Worlds
+              </h1>
               <p className="mt-2 text-gray-600">
-                Search and explore therapeutic text adventure worlds tailored to your needs
+                Search and explore therapeutic text adventure worlds tailored to
+                your needs
               </p>
             </motion.div>
           </div>
@@ -54,10 +57,7 @@ const SearchPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <WorldSearch
-            onWorldSelect={handleWorldSelect}
-            className="w-full"
-          />
+          <WorldSearch onWorldSelect={handleWorldSelect} className="w-full" />
         </motion.div>
 
         {/* Quick Search Suggestions */}
@@ -68,24 +68,26 @@ const SearchPage: React.FC = () => {
           className="mt-8"
         >
           <div className="bg-white rounded-lg shadow-sm p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Popular Searches</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Popular Searches
+            </h2>
             <div className="flex flex-wrap gap-2">
               {[
-                'Anxiety Management',
-                'Fantasy Adventure',
-                'Beginner Friendly',
-                'Social Skills',
-                'Mystery Solving',
-                'Emotional Regulation',
-                'Short Sessions',
-                'Group Therapy'
+                "Anxiety Management",
+                "Fantasy Adventure",
+                "Beginner Friendly",
+                "Social Skills",
+                "Mystery Solving",
+                "Emotional Regulation",
+                "Short Sessions",
+                "Group Therapy",
               ].map((tag) => (
                 <button
                   key={tag}
                   className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm hover:bg-blue-200 transition-colors"
                   onClick={() => {
                     // This would trigger a search with the tag
-                    console.log('Search for:', tag);
+                    console.log("Search for:", tag);
                   }}
                 >
                   {tag}
@@ -103,30 +105,37 @@ const SearchPage: React.FC = () => {
           className="mt-8"
         >
           <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Search Tips</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              Search Tips
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
               <div className="flex items-start space-x-2">
                 <div className="text-blue-600 mt-0.5">💡</div>
                 <div>
-                  <strong>Use specific keywords:</strong> Try searching for therapeutic goals like "anxiety", "depression", or "social skills"
+                  <strong>Use specific keywords:</strong> Try searching for
+                  therapeutic goals like "anxiety", "depression", or "social
+                  skills"
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="text-blue-600 mt-0.5">🎯</div>
                 <div>
-                  <strong>Filter by difficulty:</strong> Choose beginner, intermediate, or advanced based on your comfort level
+                  <strong>Filter by difficulty:</strong> Choose beginner,
+                  intermediate, or advanced based on your comfort level
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="text-blue-600 mt-0.5">⏱️</div>
                 <div>
-                  <strong>Set time limits:</strong> Use the duration filter to find worlds that fit your available time
+                  <strong>Set time limits:</strong> Use the duration filter to
+                  find worlds that fit your available time
                 </div>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="text-blue-600 mt-0.5">🌟</div>
                 <div>
-                  <strong>Check ratings:</strong> Higher-rated worlds often provide better therapeutic experiences
+                  <strong>Check ratings:</strong> Higher-rated worlds often
+                  provide better therapeutic experiences
                 </div>
               </div>
             </div>
@@ -140,9 +149,9 @@ const SearchPage: React.FC = () => {
           worldId={selectedWorldId}
           isOpen={showWorldDetails}
           onClose={handleCloseWorldDetails}
-          onEnterWorld={(worldId) => {
-            console.log('Entering world:', worldId);
-            // Handle world entry logic here
+          onCustomize={() => {
+            console.log("Customizing world:", selectedWorldId);
+            // Handle world customization logic here
           }}
         />
       )}

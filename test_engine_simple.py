@@ -13,23 +13,25 @@ sys.path.insert(0, str(project_root))
 try:
     from tta.prototype.core.interactive_narrative_engine import (
         InteractiveNarrativeEngine,
-        UserChoice,
         NarrativeEvent,
-        NarrativeResponse
+        NarrativeResponse,
+        UserChoice,
     )
+
     print("✓ Successfully imported InteractiveNarrativeEngine classes")
 except ImportError as e:
     print(f"✗ Failed to import InteractiveNarrativeEngine: {e}")
     sys.exit(1)
 
+
 def test_basic_functionality():
     """Test basic engine functionality."""
     print("\n=== Testing Basic Functionality ===")
-    
+
     # Create engine instance
     engine = InteractiveNarrativeEngine()
     print("✓ Created InteractiveNarrativeEngine instance")
-    
+
     # Test session creation
     try:
         session = engine.start_session("test_user", "test_scenario")
@@ -40,7 +42,7 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Failed to create session: {e}")
         return False
-    
+
     # Test session retrieval
     try:
         retrieved_session = engine.get_session(session.session_id)
@@ -52,13 +54,11 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Error retrieving session: {e}")
         return False
-    
+
     # Test user choice processing
     try:
         choice = UserChoice(
-            choice_id="test_choice",
-            choice_text="look around",
-            choice_type="action"
+            choice_id="test_choice", choice_text="look around", choice_type="action"
         )
         response = engine.process_user_choice(session.session_id, choice)
         print(f"✓ Processed user choice: {choice.choice_text}")
@@ -68,7 +68,7 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Failed to process user choice: {e}")
         return False
-    
+
     # Test scenario retrieval
     try:
         scenario = engine.get_current_scenario(session.session_id)
@@ -81,14 +81,14 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Error retrieving scenario: {e}")
         return False
-    
+
     # Test narrative advancement
     try:
         event = NarrativeEvent(
             event_id="test_event",
             event_type="location_change",
             description="Player moved to garden",
-            location_id="garden"
+            location_id="garden",
         )
         success = engine.advance_narrative(session.session_id, event)
         if success:
@@ -102,7 +102,7 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Error advancing narrative: {e}")
         return False
-    
+
     # Test session cleanup
     try:
         success = engine.end_session(session.session_id)
@@ -114,15 +114,16 @@ def test_basic_functionality():
     except Exception as e:
         print(f"✗ Error ending session: {e}")
         return False
-    
+
     return True
+
 
 def test_error_handling():
     """Test error handling scenarios."""
     print("\n=== Testing Error Handling ===")
-    
+
     engine = InteractiveNarrativeEngine()
-    
+
     # Test invalid user ID
     try:
         engine.start_session("")
@@ -133,10 +134,12 @@ def test_error_handling():
     except Exception as e:
         print(f"✗ Unexpected error with empty user ID: {e}")
         return False
-    
+
     # Test invalid session ID
     try:
-        response = engine.process_user_choice("invalid_session", UserChoice("test", "test"))
+        response = engine.process_user_choice(
+            "invalid_session", UserChoice("test", "test")
+        )
         print("✗ Should have failed with invalid session ID")
         return False
     except ValueError:
@@ -144,7 +147,7 @@ def test_error_handling():
     except Exception as e:
         print(f"✗ Unexpected error with invalid session ID: {e}")
         return False
-    
+
     # Test empty choice text
     try:
         session = engine.start_session("test_user")
@@ -158,24 +161,25 @@ def test_error_handling():
     except Exception as e:
         print(f"✗ Unexpected error with empty choice: {e}")
         return False
-    
+
     return True
+
 
 def main():
     """Run all tests."""
     print("Interactive Narrative Engine Test Suite")
     print("=" * 50)
-    
+
     success = True
-    
+
     # Run basic functionality tests
     if not test_basic_functionality():
         success = False
-    
+
     # Run error handling tests
     if not test_error_handling():
         success = False
-    
+
     print("\n" + "=" * 50)
     if success:
         print("✓ All tests passed!")
@@ -183,6 +187,7 @@ def main():
     else:
         print("✗ Some tests failed!")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

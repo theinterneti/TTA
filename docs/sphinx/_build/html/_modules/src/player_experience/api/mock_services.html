@@ -1,0 +1,1195 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.api.mock_services &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.api.mock_services</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.api.mock_services</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Mock Services for Development and Testing</span>
+
+<span class="sd">This module provides mock implementations of external services to enable</span>
+<span class="sd">running the FastAPI application without external dependencies like Neo4j and Redis.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MockServiceState">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockServiceState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockServiceState</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock service operational states.&quot;&quot;&quot;</span>
+
+    <span class="n">HEALTHY</span> <span class="o">=</span> <span class="s2">&quot;healthy&quot;</span>
+    <span class="n">DEGRADED</span> <span class="o">=</span> <span class="s2">&quot;degraded&quot;</span>
+    <span class="n">FAILING</span> <span class="o">=</span> <span class="s2">&quot;failing&quot;</span>
+    <span class="n">OFFLINE</span> <span class="o">=</span> <span class="s2">&quot;offline&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MockServiceConfig">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockServiceConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockServiceConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for mock service behavior.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Performance characteristics</span>
+    <span class="n">base_latency_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">10.0</span>
+    <span class="n">latency_variance_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">failure_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0 = no failures, 1.0 = always fail</span>
+
+    <span class="c1"># State management</span>
+    <span class="n">state</span><span class="p">:</span> <span class="n">MockServiceState</span> <span class="o">=</span> <span class="n">MockServiceState</span><span class="o">.</span><span class="n">HEALTHY</span>
+    <span class="n">state_transition_probability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">0.01</span>  <span class="c1"># Probability of state change per operation</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Data persistence</span>
+    <span class="n">enable_persistence</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">max_memory_items</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="n">ttl_seconds</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3600</span>  <span class="c1"># Default TTL for cached items</span>
+
+    <span class="c1"># Monitoring</span>
+    <span class="n">enable_metrics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log_operations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="MockServiceMetrics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockServiceMetrics">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockServiceMetrics</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Metrics tracking for mock services.&quot;&quot;&quot;</span>
+
+    <span class="n">total_operations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">successful_operations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">failed_operations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_latency_ms</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">state_changes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cache_hits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">cache_misses</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">success_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate success rate.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_operations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_operations</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">average_latency_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate average latency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_latency_ms</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">successful_operations</span>
+
+<div class="viewcode-block" id="MockServiceMetrics.to_dict">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockServiceMetrics.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert metrics to dictionary.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_operations&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_operations</span><span class="p">,</span>
+            <span class="s2">&quot;successful_operations&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">successful_operations</span><span class="p">,</span>
+            <span class="s2">&quot;failed_operations&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_operations</span><span class="p">,</span>
+            <span class="s2">&quot;success_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">success_rate</span><span class="p">,</span>
+            <span class="s2">&quot;average_latency_ms&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">average_latency_ms</span><span class="p">,</span>
+            <span class="s2">&quot;state_changes&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_changes</span><span class="p">,</span>
+            <span class="s2">&quot;cache_hits&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_hits</span><span class="p">,</span>
+            <span class="s2">&quot;cache_misses&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_misses</span><span class="p">,</span>
+            <span class="s2">&quot;uptime_seconds&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MockNeo4jDriver">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jDriver">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockNeo4jDriver</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced Mock Neo4j driver for development and testing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MockServiceConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="n">uri</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth</span> <span class="o">=</span> <span class="n">auth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">MockServiceConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MockServiceMetrics</span><span class="p">()</span>
+
+        <span class="c1"># Enhanced data storage with relationships and indexing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># node_id -&gt; node_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_relationships</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># rel_id -&gt; rel_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># label -&gt; set of node_ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_node_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rel_counter</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Enhanced MockNeo4jDriver initialized for </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockNeo4jDriver.session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jDriver.session">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a mock session context manager.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">MockNeo4jSession</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jDriver.close">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jDriver.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the mock driver.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MockNeo4jDriver closed&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_latency</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate realistic database latency.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">base_latency_ms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">latency</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">base_latency_ms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">latency_variance_ms</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">latency</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">latency</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_should_fail</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if operation should fail based on configuration.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">failure_rate</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Randomly update service state based on configuration.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">state_transition_probability</span><span class="p">:</span>
+            <span class="n">states</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">MockServiceState</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">states</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">state_changes</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;MockNeo4jDriver state changed to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">state</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockNeo4jDriver.get_metrics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jDriver.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get service metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="s2">&quot;neo4j&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;data_stats&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;nodes&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">),</span>
+                <span class="s2">&quot;relationships&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_relationships</span><span class="p">),</span>
+                <span class="s2">&quot;indexes&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_indexes</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MockNeo4jSession">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jSession">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockNeo4jSession</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced Mock Neo4j session with realistic query processing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">driver</span><span class="p">:</span> <span class="n">MockNeo4jDriver</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transaction_active</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">transaction_active</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transaction_active</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock query execution with realistic processing.&quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Update metrics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_update_state</span><span class="p">()</span>
+
+            <span class="c1"># Simulate latency</span>
+            <span class="n">latency</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_simulate_latency</span><span class="p">()</span>
+
+            <span class="c1"># Check for failure simulation</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_should_fail</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Simulated Neo4j failure&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Log operation if enabled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_operations</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Mock Neo4j query: </span><span class="si">{</span><span class="n">query</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">... with params: </span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Process query based on type</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+            <span class="c1"># Update success metrics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_latency_ms</span> <span class="o">+=</span> <span class="n">latency</span>
+
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock Neo4j query failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+<div class="viewcode-block" id="MockNeo4jSession.run_sync">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jSession.run_sync">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous version for compatibility.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">))</span></div>
+
+
+    <span class="c1"># Alias for backward compatibility</span>
+<div class="viewcode-block" id="MockNeo4jSession.run">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jSession.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock query execution (sync version for compatibility).&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">loop</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">get_event_loop</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">loop</span><span class="o">.</span><span class="n">is_running</span><span class="p">():</span>
+                <span class="c1"># If we&#39;re already in an async context, create a task</span>
+                <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_async_run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_async_run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+            <span class="c1"># Fallback to sync processing</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sync_run</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sync_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous query processing fallback.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_update_state</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_operations</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Mock Neo4j query (sync): </span><span class="si">{</span><span class="n">query</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">... with params: </span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_query_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock Neo4j query failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_async_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">parameters</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Async query processing.&quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_update_state</span><span class="p">()</span>
+
+        <span class="c1"># Simulate latency</span>
+        <span class="n">latency</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_simulate_latency</span><span class="p">()</span>
+
+        <span class="c1"># Check for failure simulation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_should_fail</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Simulated Neo4j failure&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_operations</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Mock Neo4j query (async): </span><span class="si">{</span><span class="n">query</span><span class="p">[:</span><span class="mi">100</span><span class="p">]</span><span class="si">}</span><span class="s2">... with params: </span><span class="si">{</span><span class="n">parameters</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_latency_ms</span> <span class="o">+=</span> <span class="n">latency</span>
+            <span class="k">return</span> <span class="n">result</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock Neo4j query failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_query</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process query with realistic Neo4j-like behavior.&quot;&quot;&quot;</span>
+        <span class="n">query_upper</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># CREATE operations</span>
+        <span class="k">if</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CREATE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_create</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># MATCH operations</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;MATCH&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_match</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># MERGE operations</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;MERGE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_merge</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># DELETE operations</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_delete</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># RETURN operations (standalone)</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;RETURN&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_return</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+        <span class="c1"># Default fallback</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;mock&quot;</span><span class="p">,</span> <span class="s2">&quot;query_type&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">}])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_query_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous version of query processing.&quot;&quot;&quot;</span>
+        <span class="n">query_upper</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CREATE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_create_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;MATCH&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_match_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;MERGE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_merge_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;DELETE&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_delete_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">query_upper</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;RETURN&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_return_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;result&quot;</span><span class="p">:</span> <span class="s2">&quot;mock&quot;</span><span class="p">,</span> <span class="s2">&quot;query_type&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">}])</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_create</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle CREATE operations.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple node creation simulation</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_node_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Extract basic node properties from parameters</span>
+        <span class="n">node_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">node_id</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_data</span>
+
+        <span class="c1"># Add to indexes (simulate labels)</span>
+        <span class="k">if</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">(</span>
+            <span class="p">[{</span><span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="n">node_id</span><span class="p">,</span> <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">node_data</span><span class="p">}]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_create_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous CREATE handler.&quot;&quot;&quot;</span>
+        <span class="n">node_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_node_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">node_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">node_id</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="o">**</span><span class="n">parameters</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">node_data</span>
+
+        <span class="k">if</span> <span class="s2">&quot;label&quot;</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="n">label</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">(</span>
+            <span class="p">[{</span><span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="n">node_id</span><span class="p">,</span> <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">node_data</span><span class="p">}]</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle MATCH operations.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple matching simulation</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># If specific parameters provided, try to find matching nodes</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">node_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_data</span> <span class="ow">or</span> <span class="n">node_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_data</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_hits</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># If no specific matches, return sample data for testing</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;match&quot;</span><span class="p">}]</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_match_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous MATCH handler.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">node_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_data</span> <span class="ow">or</span> <span class="n">node_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_data</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_hits</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;sample&quot;</span><span class="p">:</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="s2">&quot;match&quot;</span><span class="p">}]</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_merge</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle MERGE operations (CREATE if not exists).&quot;&quot;&quot;</span>
+        <span class="c1"># Check if node exists</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_match</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">existing</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">existing</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_create</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_merge_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous MERGE handler.&quot;&quot;&quot;</span>
+        <span class="n">existing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_match_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">existing</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">existing</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_create_sync</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">parameters</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_delete</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle DELETE operations.&quot;&quot;&quot;</span>
+        <span class="n">deleted_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nodes_to_delete</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Find nodes to delete based on parameters</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">node_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_data</span> <span class="ow">or</span> <span class="n">node_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">nodes_to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="c1"># Delete the nodes</span>
+        <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">nodes_to_delete</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
+                <span class="n">deleted_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="c1"># Remove from indexes</span>
+                <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">node_set</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">node_set</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;deleted&quot;</span><span class="p">:</span> <span class="n">deleted_count</span><span class="p">}])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_delete_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous DELETE handler.&quot;&quot;&quot;</span>
+        <span class="n">deleted_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">nodes_to_delete</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">node_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">node_data</span> <span class="ow">or</span> <span class="n">node_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">!=</span> <span class="n">value</span><span class="p">:</span>
+                        <span class="n">match</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                    <span class="n">nodes_to_delete</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="n">nodes_to_delete</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">node_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_nodes</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span>
+                <span class="n">deleted_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">node_set</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver</span><span class="o">.</span><span class="n">_indexes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">node_set</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">node_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;deleted&quot;</span><span class="p">:</span> <span class="n">deleted_count</span><span class="p">}])</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_return</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle standalone RETURN operations.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple return value simulation</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([</span><span class="n">parameters</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;returned&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}])</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_handle_return_sync</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;MockNeo4jResult&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronous RETURN handler.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([</span><span class="n">parameters</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MockNeo4jResult</span><span class="p">([{</span><span class="s2">&quot;returned&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}])</span></div>
+
+
+
+<div class="viewcode-block" id="MockNeo4jResult">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockNeo4jResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced Mock Neo4j query result with realistic behavior.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">records</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">records</span> <span class="o">=</span> <span class="n">records</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consumed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="MockNeo4jResult.single">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.single">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">single</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return single record or None.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Multiple records found, returning first one&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.data">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all records as list of dictionaries.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">record</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.values">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.values">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">values</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return all records as list of value lists.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.keys">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return keys from first record.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.consume">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.consume">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">consume</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Consume and return all records.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_consumed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.peek">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.peek">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">peek</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Peek at next record without consuming.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_index</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.__iter__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.__iter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Make result iterable.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.__len__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.__len__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return number of records.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.__bool__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.__bool__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__bool__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return True if has records.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockNeo4jResult.to_dict">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockNeo4jResult.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert result to dictionary format.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;records&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">,</span>
+            <span class="s2">&quot;record_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">records</span><span class="p">),</span>
+            <span class="s2">&quot;consumed&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_consumed</span><span class="p">,</span>
+            <span class="s2">&quot;keys&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MockRedisValue">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisValue">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockRedisValue</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced Redis value with expiration and metadata.&quot;&quot;&quot;</span>
+
+    <span class="n">value</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">access_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_accessed</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockRedisValue.is_expired">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisValue.is_expired">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if value has expired.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span></div>
+
+
+<div class="viewcode-block" id="MockRedisValue.access">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisValue.access">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">access</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Access the value and update metadata.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_accessed</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MockRedisClient">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockRedisClient</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced Mock Redis client for development and testing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MockServiceConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">host</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;port&quot;</span><span class="p">,</span> <span class="mi">6379</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;db&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">MockServiceConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MockServiceMetrics</span><span class="p">()</span>
+
+        <span class="c1"># Enhanced data storage with expiration and metadata</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MockRedisValue</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pubsub_channels</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Background cleanup task</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Enhanced MockRedisClient initialized for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">host</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="MockRedisClient.ping">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.ping">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock ping operation with latency simulation.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;ping&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="sa">b</span><span class="s2">&quot;PONG&quot;</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.get">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.get">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock get operation with expiration handling.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;get&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="n">redis_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_hits</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">return</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">access</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">cache_misses</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.set">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.set">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">set</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">ex</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">px</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">nx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">xx</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock set operation with expiration and conditions.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;set&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Handle conditional sets</span>
+        <span class="k">if</span> <span class="n">nx</span> <span class="ow">and</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Key exists, nx (not exists) condition failed</span>
+        <span class="k">if</span> <span class="n">xx</span> <span class="ow">and</span> <span class="p">(</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">is_expired</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="kc">False</span>  <span class="c1"># Key doesn&#39;t exist, xx (exists) condition failed</span>
+
+        <span class="c1"># Calculate expiration</span>
+        <span class="n">expires_at</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">ex</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Seconds</span>
+            <span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">ex</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">px</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Milliseconds</span>
+            <span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">milliseconds</span><span class="o">=</span><span class="n">px</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ttl_seconds</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Default TTL</span>
+            <span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">ttl_seconds</span><span class="p">)</span>
+
+        <span class="c1"># Store value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">MockRedisValue</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">expires_at</span><span class="o">=</span><span class="n">expires_at</span><span class="p">)</span>
+
+        <span class="c1"># Cleanup expired keys if storage is getting full</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_memory_items</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_expired</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.delete">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.delete">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">keys</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock delete operation supporting multiple keys.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;delete&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">deleted_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="n">deleted_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">deleted_count</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.exists">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.exists">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">keys</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock exists operation supporting multiple keys.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;exists&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+                <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">count</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.expire">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.expire">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">expire</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">seconds</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock expire operation.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;expire&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">seconds</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.ttl">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.ttl">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ttl</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get time to live for a key.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_simulate_operation</span><span class="p">(</span><span class="s2">&quot;ttl&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>  <span class="c1"># Simulated failure</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">2</span>  <span class="c1"># Key doesn&#39;t exist</span>
+
+        <span class="n">redis_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">expires_at</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>  <span class="c1"># No expiration set</span>
+
+        <span class="k">if</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">2</span>  <span class="c1"># Key expired</span>
+
+        <span class="n">remaining</span> <span class="o">=</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">-</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">remaining</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()))</span></div>
+
+
+<div class="viewcode-block" id="MockRedisClient.close">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.close">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhanced mock close operation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MockRedisClient closed&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_simulate_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Simulate operation with latency and failure handling.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">_update_state</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;_update_state&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Simulate latency</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">base_latency_ms</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">latency</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="n">random</span><span class="o">.</span><span class="n">gauss</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">base_latency_ms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">latency_variance_ms</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">latency</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">total_latency_ms</span> <span class="o">+=</span> <span class="n">latency</span>
+
+        <span class="c1"># Check for failure simulation</span>
+        <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">failure_rate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">failed_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_operations</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulated Redis </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> failure&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">successful_operations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_operations</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock Redis </span><span class="si">{</span><span class="n">operation</span><span class="si">}</span><span class="s2"> operation&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean up expired keys.&quot;&quot;&quot;</span>
+        <span class="n">expired_keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">redis_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">redis_value</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+                <span class="n">expired_keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">expired_keys</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">expired_keys</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaned up </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">expired_keys</span><span class="p">)</span><span class="si">}</span><span class="s2"> expired Redis keys&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockRedisClient.get_metrics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockRedisClient.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get service metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="s2">&quot;redis&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="s2">&quot;data_stats&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;keys&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="p">),</span>
+                <span class="s2">&quot;expired_keys&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">is_expired</span><span class="p">()),</span>
+                <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pubsub_channels</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MockUserRepository">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MockUserRepository</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock user repository for development and testing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;MockUserRepository initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MockUserRepository.connect">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.connect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock connect operation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MockUserRepository connected&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.disconnect">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.disconnect">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock disconnect operation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connected</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;MockUserRepository disconnected&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.create_user">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.create_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock user creation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock user created: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.get_user_by_username">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.get_user_by_username">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user_by_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock user retrieval by username.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="n">username</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">user</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.get_user_by_email">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.get_user_by_email">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_user_by_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock user retrieval by email.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">user</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.update_user">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.update_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock user update.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">user</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock user updated: </span><span class="si">{</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MockUserRepository.delete_user">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.MockUserRepository.delete_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mock user deletion.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock user deleted: </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="create_mock_neo4j_driver">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.create_mock_neo4j_driver">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_mock_neo4j_driver</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">auth</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a mock Neo4j driver.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MockNeo4jDriver</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">auth</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_mock_redis_client">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.create_mock_redis_client">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_mock_redis_client</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a mock Redis client.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MockRedisClient</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_mock_user_repository">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.create_mock_user_repository">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_mock_user_repository</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a mock user repository.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">MockUserRepository</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># Mock service registry for easy access</span>
+<span class="n">MOCK_SERVICES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;neo4j_driver&quot;</span><span class="p">:</span> <span class="n">create_mock_neo4j_driver</span><span class="p">,</span>
+    <span class="s2">&quot;redis_client&quot;</span><span class="p">:</span> <span class="n">create_mock_redis_client</span><span class="p">,</span>
+    <span class="s2">&quot;user_repository&quot;</span><span class="p">:</span> <span class="n">create_mock_user_repository</span><span class="p">,</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_mock_service">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.get_mock_service">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_mock_service</span><span class="p">(</span><span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a mock service by name.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">service_name</span> <span class="ow">in</span> <span class="n">MOCK_SERVICES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">MOCK_SERVICES</span><span class="p">[</span><span class="n">service_name</span><span class="p">](</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown mock service: </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="is_development_mode">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.is_development_mode">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_development_mode</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if we&#39;re running in development mode.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TTA_DEVELOPMENT_MODE&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="should_use_mocks">
+<a class="viewcode-back" href="../../../../api/src.player_experience.api.mock_services.html#src.player_experience.api.mock_services.should_use_mocks">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">should_use_mocks</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if we should use mock services.&quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">is_development_mode</span><span class="p">()</span>
+        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TTA_USE_MOCKS&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">)</span>
+        <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TTA_USE_NEO4J&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;1&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

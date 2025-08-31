@@ -1,31 +1,35 @@
-import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import { RootState } from '../../store/store';
-import { logout } from '../../store/slices/authSlice';
+import React from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { RootState, AppDispatch } from "../../store/store";
+import { logout } from "../../store/slices/authSlice";
 
 const Header: React.FC = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { profile } = useSelector((state: RootState) => state.player);
-  const { selectedCharacter } = useSelector((state: RootState) => state.character);
+  const { selectedCharacter } = useSelector(
+    (state: RootState) => state.character
+  );
   const { isConnected } = useSelector((state: RootState) => state.chat);
 
   const getPageTitle = () => {
     switch (location.pathname) {
-      case '/dashboard':
-        return 'Dashboard';
-      case '/characters':
-        return 'Character Management';
-      case '/worlds':
-        return 'World Selection';
-      case '/settings':
-        return 'Settings';
+      case "/dashboard":
+        return "Dashboard";
+      case "/characters":
+        return "Character Management";
+      case "/worlds":
+        return "World Selection";
+      case "/settings":
+        return "Settings";
       default:
-        if (location.pathname.startsWith('/chat')) {
-          return selectedCharacter ? `Chat - ${selectedCharacter.name}` : 'Chat';
+        if (location.pathname.startsWith("/chat")) {
+          return selectedCharacter
+            ? `Chat - ${selectedCharacter.name}`
+            : "Chat";
         }
-        return 'TTA Platform';
+        return "TTA Platform";
     }
   };
 
@@ -37,18 +41,20 @@ const Header: React.FC = () => {
     <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <h2 className="text-lg font-semibold text-gray-900">{getPageTitle()}</h2>
-          
+          <h2 className="text-lg font-semibold text-gray-900">
+            {getPageTitle()}
+          </h2>
+
           {/* Connection Status */}
-          {location.pathname.startsWith('/chat') && (
+          {location.pathname.startsWith("/chat") && (
             <div className="flex items-center space-x-2">
               <div
                 className={`w-2 h-2 rounded-full ${
-                  isConnected ? 'bg-green-500' : 'bg-red-500'
+                  isConnected ? "bg-green-500" : "bg-red-500"
                 }`}
               />
               <span className="text-xs text-gray-500">
-                {isConnected ? 'Connected' : 'Disconnected'}
+                {isConnected ? "Connected" : "Disconnected"}
               </span>
             </div>
           )}
@@ -63,13 +69,20 @@ const Header: React.FC = () => {
                   {selectedCharacter.name.charAt(0).toUpperCase()}
                 </span>
               </div>
-              <span className="text-sm text-primary-700">{selectedCharacter.name}</span>
+              <span className="text-sm text-primary-700">
+                {selectedCharacter.name}
+              </span>
             </div>
           )}
 
           {/* Notifications */}
           <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors duration-200">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -86,7 +99,12 @@ const Header: React.FC = () => {
               className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors duration-200"
             >
               <span>Logout</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

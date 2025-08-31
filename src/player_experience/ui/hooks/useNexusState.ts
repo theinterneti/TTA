@@ -1,6 +1,6 @@
 /**
  * useNexusState Hook
- * 
+ *
  * Custom hook for managing Nexus Codex state, including real-time updates
  * and connection to the Nexus API endpoints.
  */
@@ -50,7 +50,7 @@ export const useNexusState = (): UseNexusStateReturn => {
   const fetchNexusState = useCallback(async () => {
     try {
       setError(null);
-      
+
       const response = await fetch('/api/v1/nexus/state', {
         headers: {
           'Authorization': token ? `Bearer ${token}` : '',
@@ -65,7 +65,7 @@ export const useNexusState = (): UseNexusStateReturn => {
       const data = await response.json();
       setNexusState(data);
       setIsConnected(true);
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
@@ -105,19 +105,19 @@ export const useNexusState = (): UseNexusStateReturn => {
 
     // TODO: Implement WebSocket connection for real-time updates
     // const ws = new WebSocket(`ws://localhost:8080/ws/nexus?token=${token}`);
-    // 
+    //
     // ws.onmessage = (event) => {
     //   const data = JSON.parse(event.data);
     //   if (data.type === 'nexus_update') {
     //     setNexusState(prev => prev ? { ...prev, ...data.payload } : null);
     //   }
     // };
-    // 
+    //
     // ws.onerror = (error) => {
     //   console.error('WebSocket error:', error);
     //   setIsConnected(false);
     // };
-    // 
+    //
     // return () => {
     //   ws.close();
     // };
@@ -134,7 +134,7 @@ export const useNexusState = (): UseNexusStateReturn => {
 
 /**
  * useStorySpheres Hook
- * 
+ *
  * Custom hook for managing story sphere data and visualization state.
  */
 
@@ -174,13 +174,13 @@ export const useStorySpheres = (): UseStorySpheresReturn => {
   const fetchSpheres = useCallback(async (filters?: { genre?: string; threat_level?: string }) => {
     try {
       setError(null);
-      
+
       const params = new URLSearchParams();
       if (filters?.genre) params.append('genre', filters.genre);
       if (filters?.threat_level) params.append('threat_level', filters.threat_level);
-      
+
       const url = `/api/v1/nexus/spheres${params.toString() ? `?${params.toString()}` : ''}`;
-      
+
       const response = await fetch(url, {
         headers: {
           'Authorization': token ? `Bearer ${token}` : '',
@@ -194,7 +194,7 @@ export const useStorySpheres = (): UseStorySpheresReturn => {
 
       const data = await response.json();
       setSpheres(data.spheres || []);
-      
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
       setError(errorMessage);
@@ -230,7 +230,7 @@ export const useStorySpheres = (): UseStorySpheresReturn => {
 
 /**
  * useWorldCreation Hook
- * 
+ *
  * Custom hook for managing world creation workflow and state.
  */
 
@@ -298,7 +298,7 @@ export const useWorldCreation = (): UseWorldCreationReturn => {
 
 /**
  * useWorldSearch Hook
- * 
+ *
  * Custom hook for searching and filtering worlds.
  */
 
@@ -353,7 +353,7 @@ export const useWorldSearch = (): UseWorldSearchReturn => {
 
     try {
       const params = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           if (Array.isArray(value)) {

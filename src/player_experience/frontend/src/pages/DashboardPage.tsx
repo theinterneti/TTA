@@ -1,12 +1,12 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import PlayerDashboard from '../components/Progress/PlayerDashboard';
-import { useDashboardData } from '../hooks/useDashboardData';
-import { useAuth } from '../hooks/useAuth';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import PlayerDashboard from "../components/Progress/PlayerDashboard";
+import { useDashboardData } from "../hooks/useDashboardData";
+import { useAuthGuard } from "../hooks/useAuthGuard";
 
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user } = useAuthGuard();
   const {
     data: dashboardData,
     loading,
@@ -15,7 +15,7 @@ const DashboardPage: React.FC = () => {
     dismissHighlight,
     updateCharacterActivity,
   } = useDashboardData({
-    playerId: user?.id || '',
+    playerId: user?.id || "",
     refreshInterval: 30000,
     autoRefresh: true,
   });

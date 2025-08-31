@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useRealTimeUpdates, WorldStatistics } from '../../hooks/useRealTimeUpdates';
+import React, { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  useRealTimeUpdates,
+  WorldStatistics,
+} from "../../hooks/useRealTimeUpdates";
 
 interface RealTimeStatsDisplayProps {
   worldId?: string;
-  variant?: 'compact' | 'detailed' | 'widget';
+  variant?: "compact" | "detailed" | "widget";
   className?: string;
   showConnectionStatus?: boolean;
   animateChanges?: boolean;
@@ -12,8 +15,8 @@ interface RealTimeStatsDisplayProps {
 
 const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
   worldId,
-  variant = 'detailed',
-  className = '',
+  variant = "detailed",
+  className = "",
   showConnectionStatus = true,
   animateChanges = true,
 }) => {
@@ -31,10 +34,10 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
     enablePolling: true,
     pollingInterval: 20000,
     onUpdate: (update) => {
-      console.log('Real-time update received:', update);
+      console.log("Real-time update received:", update);
     },
     onError: (error) => {
-      console.error('Real-time update error:', error);
+      console.error("Real-time update error:", error);
     },
   });
 
@@ -46,26 +49,26 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
     if (!animateChanges) return;
 
     const currentStats = worldId ? worldStats.get(worldId) : globalStats;
-    
+
     if (previousStats && currentStats) {
       const changes = new Set<string>();
-      
-      Object.keys(currentStats).forEach(key => {
-        if (previousStats[key] !== currentStats[key]) {
+
+      Object.keys(currentStats).forEach((key) => {
+        if ((previousStats as any)[key] !== (currentStats as any)[key]) {
           changes.add(key);
         }
       });
-      
+
       setChangedFields(changes);
-      
+
       // Clear change indicators after animation
       const timer = setTimeout(() => {
         setChangedFields(new Set());
       }, 2000);
-      
+
       return () => clearTimeout(timer);
     }
-    
+
     setPreviousStats(currentStats);
   }, [worldStats, globalStats, worldId, previousStats, animateChanges]);
 
@@ -89,17 +92,17 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
   };
 
   const getConnectionStatusColor = () => {
-    if (!isConnected) return 'text-red-500';
-    if (connectionType === 'websocket') return 'text-green-500';
-    if (connectionType === 'polling') return 'text-yellow-500';
-    return 'text-gray-500';
+    if (!isConnected) return "text-red-500";
+    if (connectionType === "websocket") return "text-green-500";
+    if (connectionType === "polling") return "text-yellow-500";
+    return "text-gray-500";
   };
 
   const getConnectionStatusIcon = () => {
-    if (!isConnected) return '🔴';
-    if (connectionType === 'websocket') return '🟢';
-    if (connectionType === 'polling') return '🟡';
-    return '⚪';
+    if (!isConnected) return "🔴";
+    if (connectionType === "websocket") return "🟢";
+    if (connectionType === "polling") return "🟡";
+    return "⚪";
   };
 
   const StatItem: React.FC<{
@@ -108,12 +111,14 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
     fieldKey: string;
     icon?: string;
     color?: string;
-  }> = ({ label, value, fieldKey, icon, color = 'text-gray-900' }) => {
+  }> = ({ label, value, fieldKey, icon, color = "text-gray-900" }) => {
     const isChanged = changedFields.has(fieldKey);
-    
+
     return (
       <motion.div
-        className={`${isChanged ? 'bg-blue-50 border-blue-200' : 'bg-gray-50'} rounded-lg p-3 transition-colors duration-500`}
+        className={`${
+          isChanged ? "bg-blue-50 border-blue-200" : "bg-gray-50"
+        } rounded-lg p-3 transition-colors duration-500`}
         animate={isChanged ? { scale: [1, 1.05, 1] } : {}}
         transition={{ duration: 0.5 }}
       >
@@ -123,7 +128,9 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
             <span className="text-sm text-gray-600">{label}</span>
           </div>
           <motion.span
-            className={`text-lg font-semibold ${color} ${isChanged ? 'text-blue-600' : ''}`}
+            className={`text-lg font-semibold ${color} ${
+              isChanged ? "text-blue-600" : ""
+            }`}
             animate={isChanged ? { scale: [1, 1.2, 1] } : {}}
             transition={{ duration: 0.3 }}
           >
@@ -137,7 +144,9 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
   const renderWorldStats = (stats: WorldStatistics) => (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-900">World Statistics</h3>
+        <h3 className="text-lg font-semibold text-gray-900">
+          World Statistics
+        </h3>
         {showConnectionStatus && (
           <div className="flex items-center space-x-2 text-sm">
             <span className={getConnectionStatusColor()}>
@@ -155,7 +164,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
           icon="👥"
           color="text-blue-600"
         />
-        
+
         <StatItem
           label="Completion Rate"
           value={formatPercentage(stats.completion_rate)}
@@ -163,7 +172,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
           icon="✅"
           color="text-green-600"
         />
-        
+
         <StatItem
           label="Avg Session"
           value={formatDuration(stats.average_session_duration)}
@@ -171,7 +180,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
           icon="⏱️"
           color="text-purple-600"
         />
-        
+
         <StatItem
           label="Narrative Strength"
           value={formatPercentage(stats.narrative_strength)}
@@ -195,7 +204,9 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">Global Statistics</h3>
+          <h3 className="text-lg font-semibold text-gray-900">
+            Global Statistics
+          </h3>
           {showConnectionStatus && (
             <div className="flex items-center space-x-2 text-sm">
               <span className={getConnectionStatusColor()}>
@@ -213,7 +224,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
             icon="👥"
             color="text-blue-600"
           />
-          
+
           <StatItem
             label="Active Worlds"
             value={formatNumber(globalStats.activeWorlds)}
@@ -221,7 +232,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
             icon="🌍"
             color="text-green-600"
           />
-          
+
           <StatItem
             label="Narrative Strength"
             value={formatPercentage(globalStats.narrativeStrength)}
@@ -229,7 +240,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
             icon="⚡"
             color="text-purple-600"
           />
-          
+
           <StatItem
             label="System Health"
             value={globalStats.systemHealth}
@@ -245,7 +256,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
   const renderCompactView = () => {
     const stats = worldId ? worldStats.get(worldId) : null;
     const displayStats = stats || globalStats;
-    
+
     if (!displayStats) return null;
 
     return (
@@ -258,7 +269,7 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
             <span className="text-gray-600">{connectionType}</span>
           </div>
         )}
-        
+
         <div className="flex items-center space-x-4 text-sm">
           {stats ? (
             <>
@@ -298,32 +309,44 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
         <h4 className="text-sm font-medium text-gray-900">Live Stats</h4>
         {showConnectionStatus && (
           <div className="flex items-center space-x-1">
-            <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+            <div
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? "bg-green-500" : "bg-red-500"
+              }`}
+            ></div>
             <span className="text-xs text-gray-600">{connectionType}</span>
           </div>
         )}
       </div>
-      
+
       {worldId && worldStats.has(worldId) ? (
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Players:</span>
-            <span className="font-medium">{formatNumber(worldStats.get(worldId)!.active_players)}</span>
+            <span className="font-medium">
+              {formatNumber(worldStats.get(worldId)!.active_players)}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Strength:</span>
-            <span className="font-medium">{formatPercentage(worldStats.get(worldId)!.narrative_strength)}</span>
+            <span className="font-medium">
+              {formatPercentage(worldStats.get(worldId)!.narrative_strength)}
+            </span>
           </div>
         </div>
       ) : globalStats ? (
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Total Players:</span>
-            <span className="font-medium">{formatNumber(globalStats.totalPlayers)}</span>
+            <span className="font-medium">
+              {formatNumber(globalStats.totalPlayers)}
+            </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray-600">Active Worlds:</span>
-            <span className="font-medium">{formatNumber(globalStats.activeWorlds)}</span>
+            <span className="font-medium">
+              {formatNumber(globalStats.activeWorlds)}
+            </span>
           </div>
         </div>
       ) : (
@@ -334,12 +357,16 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
 
   if (error && !isConnected) {
     return (
-      <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
+      <div
+        className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <span className="text-red-500">⚠️</span>
             <div>
-              <h4 className="text-sm font-medium text-red-800">Connection Error</h4>
+              <h4 className="text-sm font-medium text-red-800">
+                Connection Error
+              </h4>
               <p className="text-xs text-red-600">{error}</p>
             </div>
           </div>
@@ -359,21 +386,21 @@ const RealTimeStatsDisplay: React.FC<RealTimeStatsDisplayProps> = ({
 
   return (
     <div className={`bg-white rounded-lg shadow-sm ${className}`}>
-      {variant === 'compact' && renderCompactView()}
-      {variant === 'detailed' && (
+      {variant === "compact" && renderCompactView()}
+      {variant === "detailed" && (
         <div className="p-6">
-          {worldId && worldStats.has(worldId) 
+          {worldId && worldStats.has(worldId)
             ? renderWorldStats(worldStats.get(worldId)!)
-            : renderGlobalStats()
-          }
+            : renderGlobalStats()}
         </div>
       )}
-      {variant === 'widget' && renderWidgetView()}
-      
-      {lastUpdate && variant === 'detailed' && (
+      {variant === "widget" && renderWidgetView()}
+
+      {lastUpdate && variant === "detailed" && (
         <div className="px-6 pb-4">
           <div className="text-xs text-gray-400 text-center">
-            Last update: {new Date(lastUpdate.timestamp).toLocaleTimeString()} via {lastUpdate.source}
+            Last update: {new Date(lastUpdate.timestamp).toLocaleTimeString()}{" "}
+            via {lastUpdate.source}
           </div>
         </div>
       )}

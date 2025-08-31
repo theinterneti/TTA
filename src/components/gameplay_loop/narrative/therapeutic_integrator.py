@@ -6,17 +6,27 @@ for therapeutic text adventures. Integrates with the therapeutic safety validati
 """
 
 import logging
-from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field
+from typing import Any
 
 from src.components.gameplay_loop.models.core import NarrativeScene
 from src.components.gameplay_loop.services.session_state import SessionState
 from src.components.therapeutic_safety import (
-    ContentPayload, ValidationContext, ValidationResult,
-    ContentType, ValidationScope, SafetyLevel, CrisisLevel, ValidationAction
+    ContentPayload,
+    ContentType,
+    CrisisLevel,
+    SafetyLevel,
+    ValidationAction,
+    ValidationContext,
+    ValidationResult,
+    ValidationScope,
 )
-from .emotional_safety_system import EmotionalSafetySystem, EmotionalState, DistressLevel
 
+from .emotional_safety_system import (
+    DistressLevel,
+    EmotionalSafetySystem,
+    EmotionalState,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,27 +34,30 @@ logger = logging.getLogger(__name__)
 @dataclass
 class TherapeuticContext:
     """Context for therapeutic integration."""
+
     session_id: str
-    therapeutic_goals: List[str] = field(default_factory=list)
-    current_focus: Optional[str] = None
-    progress_metrics: Dict[str, float] = field(default_factory=dict)
+    therapeutic_goals: list[str] = field(default_factory=list)
+    current_focus: str | None = None
+    progress_metrics: dict[str, float] = field(default_factory=dict)
 
 
 @dataclass
 class SafetyMonitor:
     """Safety monitoring configuration."""
+
     monitor_id: str
     safety_level: str = "standard"
-    risk_factors: List[str] = field(default_factory=list)
-    protective_factors: List[str] = field(default_factory=list)
+    risk_factors: list[str] = field(default_factory=list)
+    protective_factors: list[str] = field(default_factory=list)
 
 
 @dataclass
 class ProgressTracker:
     """Progress tracking configuration."""
+
     tracker_id: str
-    metrics: Dict[str, float] = field(default_factory=dict)
-    milestones: List[str] = field(default_factory=list)
+    metrics: dict[str, float] = field(default_factory=dict)
+    milestones: list[str] = field(default_factory=list)
 
 
 class TherapeuticIntegrator:
@@ -58,9 +71,9 @@ class TherapeuticIntegrator:
         self.emotional_safety_system = EmotionalSafetySystem(narrative_engine.event_bus)
 
         # Therapeutic context tracking
-        self.session_contexts: Dict[str, TherapeuticContext] = {}
-        self.safety_monitors: Dict[str, SafetyMonitor] = {}
-        self.progress_trackers: Dict[str, ProgressTracker] = {}
+        self.session_contexts: dict[str, TherapeuticContext] = {}
+        self.safety_monitors: dict[str, SafetyMonitor] = {}
+        self.progress_trackers: dict[str, ProgressTracker] = {}
 
         # Safety validation metrics
         self.validation_count = 0
@@ -75,11 +88,13 @@ class TherapeuticIntegrator:
         # Try to get safety service from component system
         try:
             # This will be injected by the narrative engine during initialization
-            if hasattr(self.narrative_engine, 'safety_service'):
+            if hasattr(self.narrative_engine, "safety_service"):
                 self.safety_service = self.narrative_engine.safety_service
                 logger.info("Safety validation service connected")
             else:
-                logger.warning("Safety validation service not available - using fallback validation")
+                logger.warning(
+                    "Safety validation service not available - using fallback validation"
+                )
         except Exception as e:
             logger.error(f"Failed to connect to safety service: {e}")
 
@@ -99,7 +114,7 @@ class TherapeuticIntegrator:
             session_id=session_id,
             therapeutic_goals=session_state.context.get("therapeutic_goals", []),
             current_focus=session_state.context.get("current_therapeutic_focus"),
-            progress_metrics=session_state.context.get("progress_metrics", {})
+            progress_metrics=session_state.context.get("progress_metrics", {}),
         )
         self.session_contexts[session_id] = therapeutic_context
 
@@ -108,7 +123,7 @@ class TherapeuticIntegrator:
             monitor_id=f"safety_{session_id}",
             safety_level=session_state.context.get("safety_level", "standard"),
             risk_factors=session_state.context.get("risk_factors", []),
-            protective_factors=session_state.context.get("protective_factors", [])
+            protective_factors=session_state.context.get("protective_factors", []),
         )
         self.safety_monitors[session_id] = safety_monitor
 
@@ -116,7 +131,7 @@ class TherapeuticIntegrator:
         progress_tracker = ProgressTracker(
             tracker_id=f"progress_{session_id}",
             metrics=session_state.context.get("progress_metrics", {}),
-            milestones=session_state.context.get("milestones", [])
+            milestones=session_state.context.get("milestones", []),
         )
         self.progress_trackers[session_id] = progress_tracker
 
@@ -139,7 +154,9 @@ class TherapeuticIntegrator:
 
         logger.debug(f"Therapeutic context finalized for session: {session_id}")
 
-    async def validate_scene_safety(self, session_state: SessionState, scene: NarrativeScene) -> bool:
+    async def validate_scene_safety(
+        self, session_state: SessionState, scene: NarrativeScene
+    ) -> bool:
         """Validate scene safety using the safety validation system."""
         if not self.safety_service:
             logger.warning("Safety service not available - using fallback validation")
@@ -153,8 +170,8 @@ class TherapeuticIntegrator:
                 metadata={
                     "scene_id": scene.scene_id,
                     "scene_type": scene.scene_type,
-                    "choices_count": len(scene.choices) if scene.choices else 0
-                }
+                    "choices_count": len(scene.choices) if scene.choices else 0,
+                },
             )
 
             # Create validation context
@@ -171,7 +188,9 @@ class TherapeuticIntegrator:
 
             if not is_safe:
                 self.safety_violations += 1
-                logger.warning(f"Scene safety validation failed for session {session_state.session_id}")
+                logger.warning(
+                    f"Scene safety validation failed for session {session_state.session_id}"
+                )
 
             return is_safe
 
@@ -180,7 +199,9 @@ class TherapeuticIntegrator:
             # Fall back to basic validation
             return await self._fallback_safety_validation(scene)
 
-    async def validate_user_input_safety(self, session_state: SessionState, user_input: str) -> ValidationResult:
+    async def validate_user_input_safety(
+        self, session_state: SessionState, user_input: str
+    ) -> ValidationResult:
         """Validate user input for safety concerns."""
         if not self.safety_service:
             logger.warning("Safety service not available for user input validation")
@@ -193,11 +214,14 @@ class TherapeuticIntegrator:
                 user_id=session_state.user_id,
                 session_id=session_state.session_id,
                 validation_scope=ValidationScope.COMPREHENSIVE,
-                timeout_ms=200
+                timeout_ms=200,
             )
 
             # Process crisis detection
-            if result.crisis_level >= CrisisLevel.HIGH or result.immediate_intervention_needed:
+            if (
+                result.crisis_level >= CrisisLevel.HIGH
+                or result.immediate_intervention_needed
+            ):
                 await self._handle_crisis_intervention(session_state, result)
 
             return result
@@ -225,7 +249,9 @@ class TherapeuticIntegrator:
         # Update safety level based on session progress
         await self._update_safety_level(session_state, safety_monitor)
 
-    def _create_validation_context(self, session_state: SessionState) -> ValidationContext:
+    def _create_validation_context(
+        self, session_state: SessionState
+    ) -> ValidationContext:
         """Create validation context from session state."""
         therapeutic_context = self.session_contexts.get(session_state.session_id)
         safety_monitor = self.safety_monitors.get(session_state.session_id)
@@ -235,46 +261,67 @@ class TherapeuticIntegrator:
             session_id=session_state.session_id,
             validation_scope=ValidationScope.STANDARD,
             timeout_ms=200,
-            user_therapeutic_goals=therapeutic_context.therapeutic_goals if therapeutic_context else [],
+            user_therapeutic_goals=(
+                therapeutic_context.therapeutic_goals if therapeutic_context else []
+            ),
             user_risk_factors=safety_monitor.risk_factors if safety_monitor else [],
             current_safety_level=SafetyLevel.SAFE,  # Default, could be dynamic
-            strict_mode=session_state.context.get("strict_safety_mode", False)
+            strict_mode=session_state.context.get("strict_safety_mode", False),
         )
 
-    async def _process_validation_result(self, session_state: SessionState, result: ValidationResult) -> bool:
+    async def _process_validation_result(
+        self, session_state: SessionState, result: ValidationResult
+    ) -> bool:
         """Process validation result and determine if content is safe."""
         # Check overall safety
         if result.action in [ValidationAction.REJECT, ValidationAction.BLOCK]:
             return False
 
         # Handle crisis detection
-        if result.crisis_level >= CrisisLevel.HIGH or result.immediate_intervention_needed:
+        if (
+            result.crisis_level >= CrisisLevel.HIGH
+            or result.immediate_intervention_needed
+        ):
             await self._handle_crisis_intervention(session_state, result)
             return False  # Block content that triggers crisis intervention
 
         # Handle warnings and modifications
         if result.action == ValidationAction.FLAG_FOR_REVIEW:
-            logger.warning(f"Content flagged for review in session {session_state.session_id}")
+            logger.warning(
+                f"Content flagged for review in session {session_state.session_id}"
+            )
             # Could implement review queue here
 
         if result.action == ValidationAction.MODIFY:
-            logger.info(f"Content modification suggested for session {session_state.session_id}")
+            logger.info(
+                f"Content modification suggested for session {session_state.session_id}"
+            )
             # Could implement content modification here
 
-        return result.action in [ValidationAction.APPROVE, ValidationAction.WARN, ValidationAction.MODIFY]
+        return result.action in [
+            ValidationAction.APPROVE,
+            ValidationAction.WARN,
+            ValidationAction.MODIFY,
+        ]
 
-    async def _handle_crisis_intervention(self, session_state: SessionState, result: ValidationResult) -> None:
+    async def _handle_crisis_intervention(
+        self, session_state: SessionState, result: ValidationResult
+    ) -> None:
         """Handle crisis intervention protocols."""
         self.crisis_interventions += 1
 
-        logger.critical(f"Crisis intervention triggered for session {session_state.session_id}: "
-                       f"Level {result.crisis_level}, Indicators: {result.crisis_indicators}")
+        logger.critical(
+            f"Crisis intervention triggered for session {session_state.session_id}: "
+            f"Level {result.crisis_level}, Indicators: {result.crisis_indicators}"
+        )
 
         # Update session context with crisis information
         session_state.context["crisis_detected"] = True
         session_state.context["crisis_level"] = result.crisis_level.value
         session_state.context["crisis_indicators"] = result.crisis_indicators
-        session_state.context["intervention_needed"] = result.immediate_intervention_needed
+        session_state.context["intervention_needed"] = (
+            result.immediate_intervention_needed
+        )
 
         # Could trigger additional crisis protocols here
         # - Notify human oversight
@@ -285,19 +332,28 @@ class TherapeuticIntegrator:
         """Fallback safety validation when safety service is unavailable."""
         # Basic keyword-based safety check
         unsafe_keywords = [
-            "suicide", "kill myself", "self-harm", "hurt myself",
-            "violence", "attack", "harm others"
+            "suicide",
+            "kill myself",
+            "self-harm",
+            "hurt myself",
+            "violence",
+            "attack",
+            "harm others",
         ]
 
         text = scene.description.lower()
         for keyword in unsafe_keywords:
             if keyword in text:
-                logger.warning(f"Fallback safety check detected unsafe keyword: {keyword}")
+                logger.warning(
+                    f"Fallback safety check detected unsafe keyword: {keyword}"
+                )
                 return False
 
         return True
 
-    async def _analyze_interaction_patterns(self, session_state: SessionState, interactions: List[Dict]) -> None:
+    async def _analyze_interaction_patterns(
+        self, session_state: SessionState, interactions: list[dict]
+    ) -> None:
         """Analyze interaction patterns for safety concerns."""
         # Simple pattern analysis - could be enhanced
         concerning_patterns = 0
@@ -307,10 +363,14 @@ class TherapeuticIntegrator:
                 concerning_patterns += 1
 
         if concerning_patterns >= 3:
-            logger.warning(f"Concerning interaction pattern detected in session {session_state.session_id}")
+            logger.warning(
+                f"Concerning interaction pattern detected in session {session_state.session_id}"
+            )
             session_state.context["safety_alert"] = True
 
-    async def _update_safety_level(self, session_state: SessionState, safety_monitor: SafetyMonitor) -> None:
+    async def _update_safety_level(
+        self, session_state: SessionState, safety_monitor: SafetyMonitor
+    ) -> None:
         """Update safety level based on session progress."""
         # Simple safety level adjustment - could be enhanced
         if session_state.context.get("crisis_detected", False):
@@ -320,8 +380,9 @@ class TherapeuticIntegrator:
         else:
             safety_monitor.safety_level = "standard"
 
-    async def monitor_emotional_safety(self, session_state: SessionState,
-                                     interaction_data: Dict[str, Any]) -> None:
+    async def monitor_emotional_safety(
+        self, session_state: SessionState, interaction_data: dict[str, Any]
+    ) -> None:
         """Monitor emotional safety during narrative interactions."""
         try:
             # Monitor emotional state
@@ -336,9 +397,13 @@ class TherapeuticIntegrator:
                 # Update safety monitor if exists
                 if session_state.session_id in self.safety_monitors:
                     safety_monitor = self.safety_monitors[session_state.session_id]
-                    safety_monitor.safety_level = f"emotional_distress_{snapshot.distress_level.name.lower()}"
+                    safety_monitor.safety_level = (
+                        f"emotional_distress_{snapshot.distress_level.name.lower()}"
+                    )
                     safety_monitor.risk_factors.extend(snapshot.trigger_indicators)
-                    safety_monitor.protective_factors.extend(snapshot.protective_factors)
+                    safety_monitor.protective_factors.extend(
+                        snapshot.protective_factors
+                    )
 
             # Detect triggers in content
             if "content" in interaction_data:
@@ -352,20 +417,27 @@ class TherapeuticIntegrator:
                         {
                             "category": trigger.category.value,
                             "intensity": trigger.intensity,
-                            "suggested_interventions": [i.value for i in trigger.suggested_interventions]
+                            "suggested_interventions": [
+                                i.value for i in trigger.suggested_interventions
+                            ],
                         }
                         for trigger in triggers
                     ]
 
         except Exception as e:
-            logger.error(f"Failed to monitor emotional safety for session {session_state.session_id}: {e}")
+            logger.error(
+                f"Failed to monitor emotional safety for session {session_state.session_id}: {e}"
+            )
 
-    async def provide_emotional_support(self, session_state: SessionState,
-                                      emotion: EmotionalState, intensity: float) -> Dict[str, Any]:
+    async def provide_emotional_support(
+        self, session_state: SessionState, emotion: EmotionalState, intensity: float
+    ) -> dict[str, Any]:
         """Provide targeted emotional support."""
         try:
-            support_response = await self.emotional_safety_system.provide_emotional_regulation_support(
-                session_state, emotion, intensity
+            support_response = (
+                await self.emotional_safety_system.provide_emotional_regulation_support(
+                    session_state, emotion, intensity
+                )
             )
 
             # Update therapeutic context
@@ -376,10 +448,14 @@ class TherapeuticIntegrator:
             return support_response
 
         except Exception as e:
-            logger.error(f"Failed to provide emotional support for session {session_state.session_id}: {e}")
+            logger.error(
+                f"Failed to provide emotional support for session {session_state.session_id}: {e}"
+            )
             return {"error": "Unable to provide emotional support"}
 
-    def get_emotional_safety_status(self, session_state: SessionState) -> Dict[str, Any]:
+    def get_emotional_safety_status(
+        self, session_state: SessionState
+    ) -> dict[str, Any]:
         """Get current emotional safety status for a session."""
         try:
             # Get recent emotional history
@@ -404,15 +480,21 @@ class TherapeuticIntegrator:
                 "recent_triggers_count": len(trigger_history),
                 "monitoring_active": self.emotional_safety_system.monitoring_enabled,
                 "intervention_threshold": self.emotional_safety_system.intervention_threshold.name,
-                "support_available": session_state.context.get("coping_support_offered", False),
-                "crisis_protocol_active": session_state.context.get("crisis_intervention_active", False)
+                "support_available": session_state.context.get(
+                    "coping_support_offered", False
+                ),
+                "crisis_protocol_active": session_state.context.get(
+                    "crisis_intervention_active", False
+                ),
             }
 
         except Exception as e:
-            logger.error(f"Failed to get emotional safety status for session {session_state.session_id}: {e}")
+            logger.error(
+                f"Failed to get emotional safety status for session {session_state.session_id}: {e}"
+            )
             return {"error": "Unable to get safety status"}
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get therapeutic integrator metrics."""
         emotional_metrics = self.emotional_safety_system.get_metrics()
 
@@ -424,5 +506,5 @@ class TherapeuticIntegrator:
             "active_sessions": len(self.session_contexts),
             "safety_monitors": len(self.safety_monitors),
             "progress_trackers": len(self.progress_trackers),
-            "emotional_safety_metrics": emotional_metrics
+            "emotional_safety_metrics": emotional_metrics,
         }

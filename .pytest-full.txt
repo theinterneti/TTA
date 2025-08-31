@@ -563,7 +563,7 @@ client = <starlette.testclient.TestClient object at 0x7ff156d45d90>
         player_id = "new-user-123"
         token = create_auth_token(player_id, "newuser", "newuser@example.com")
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Step 1: Create player profile
         profile_data = {
             "username": "newuser",
@@ -581,7 +581,7 @@ client = <starlette.testclient.TestClient object at 0x7ff156d45d90>
                 "contact_preferences": ["email"]
             }
         }
-    
+
         response = client.post("/api/v1/players/", json=profile_data, headers=headers)
 >       assert response.status_code == 201
 E       assert 422 == 201
@@ -850,7 +850,7 @@ client = <starlette.testclient.TestClient object at 0x7ff157fad710>
         player_id = "multi-char-user"
         token = create_auth_token(player_id)
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Create player profile
         profile_data = {
             "username": "multiuser",
@@ -864,7 +864,7 @@ client = <starlette.testclient.TestClient object at 0x7ff157fad710>
             }
         }
         client.post("/api/v1/players/", json=profile_data, headers=headers)
-    
+
         # Create multiple characters
         characters = []
         for i, name in enumerate(["Character1", "Character2", "Character3"]):
@@ -873,12 +873,12 @@ client = <starlette.testclient.TestClient object at 0x7ff157fad710>
             char_data["therapeutic_profile"]["therapeutic_approaches"] = [
                 ["cbt"], ["narrative_therapy"], ["mindfulness"]
             ][i]
-    
+
 >           response = client.post("/api/v1/characters/", json=char_data, headers=headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_end_to_end_workflows.py:251: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_end_to_end_workflows.py:251:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -949,7 +949,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='multi-char-user', username='testuser', email='test@example.com', exp=datetime.datetime(2025, 8, 17, 19, 25, 46, tzinfo=datetime.timezone.utc))
 item = 'get'
@@ -960,7 +960,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -973,7 +973,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -1251,7 +1251,7 @@ client = <starlette.testclient.TestClient object at 0x7ff156b54a10>
         player_id = "adaptive-user"
         token = create_auth_token(player_id)
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Create player and character
         profile_data = {
             "username": "adaptiveuser",
@@ -1265,14 +1265,14 @@ client = <starlette.testclient.TestClient object at 0x7ff156b54a10>
             }
         }
         client.post("/api/v1/players/", json=profile_data, headers=headers)
-    
+
         char_data = create_test_character_data("Adaptive Character")
         char_data["therapeutic_profile"]["preferred_intensity"] = "low"
 >       response = client.post("/api/v1/characters/", json=char_data, headers=headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_end_to_end_workflows.py:346: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_end_to_end_workflows.py:346:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -1343,7 +1343,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='adaptive-user', username='testuser', email='test@example.com', exp=datetime.datetime(2025, 8, 17, 19, 25, 46, tzinfo=datetime.timezone.utc))
 item = 'get'
@@ -1354,7 +1354,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -1367,7 +1367,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -1396,30 +1396,30 @@ client = <starlette.testclient.TestClient object at 0x7ff156d72310>
         """Test concurrent API requests performance."""
         num_requests = 20
         request_results = []
-    
+
         def make_api_request(request_id: int):
             """Make a concurrent API request."""
             try:
                 player_id = f"api-user-{request_id}"
                 token = create_auth_token(player_id)
                 headers = {"Authorization": f"Bearer {token}"}
-    
+
                 start_time = time.time()
-    
+
                 # Test different endpoints
                 endpoints = [
                     ("/api/v1/worlds/", "GET"),
                     ("/health", "GET"),
                     ("/", "GET")
                 ]
-    
+
                 endpoint, method = endpoints[request_id % len(endpoints)]
-    
+
                 if method == "GET":
                     response = client.get(endpoint, headers=headers if endpoint.startswith("/api/") else None)
-    
+
                 request_time = time.time() - start_time
-    
+
                 return {
                     "request_id": request_id,
                     "endpoint": endpoint,
@@ -1427,7 +1427,7 @@ client = <starlette.testclient.TestClient object at 0x7ff156d72310>
                     "status_code": response.status_code,
                     "request_time": request_time
                 }
-    
+
             except Exception as e:
                 return {
                     "request_id": request_id,
@@ -1435,19 +1435,19 @@ client = <starlette.testclient.TestClient object at 0x7ff156d72310>
                     "error": str(e),
                     "request_time": None
                 }
-    
+
         # Execute concurrent requests
         with ThreadPoolExecutor(max_workers=num_requests) as executor:
             futures = [executor.submit(make_api_request, i) for i in range(num_requests)]
-    
+
             for future in as_completed(futures):
                 result = future.result()
                 request_results.append(result)
-    
+
         # Analyze results
         successful_requests = [r for r in request_results if r["success"]]
         failed_requests = [r for r in request_results if not r["success"]]
-    
+
         # Performance assertions
 >       assert len(successful_requests) >= num_requests * 0.95  # 95% success rate
         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1760,7 +1760,7 @@ client = <starlette.testclient.TestClient object at 0x7ff15c99bb50>
         player_id = "consistency-test-user"
         token = create_auth_token(player_id)
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Create player and character
         profile_data = {
             "username": "consistencyuser",
@@ -1774,13 +1774,13 @@ client = <starlette.testclient.TestClient object at 0x7ff15c99bb50>
             }
         }
         client.post("/api/v1/players/", json=profile_data, headers=headers)
-    
+
         char_data = create_test_character_data("Consistency Character")
 >       response = client.post("/api/v1/characters/", json=char_data, headers=headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_end_to_end_workflows.py:607: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_end_to_end_workflows.py:607:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -1851,7 +1851,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='consistency-test-user', username='testuser', email='test@example.com', exp=datetime.datetime(2025, 8, 17, 19, 25, 47, tzinfo=datetime.timezone.utc))
 item = 'get'
@@ -1862,7 +1862,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -1875,7 +1875,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -2153,7 +2153,7 @@ client = <starlette.testclient.TestClient object at 0x7ff156ef3a10>
         player_id = "invalid-data-user"
         token = create_auth_token(player_id)
         headers = {"Authorization": f"Bearer {token}"}
-    
+
         # Test invalid character creation data
         invalid_char_data = {
             "name": "",  # Invalid: empty name
@@ -2169,12 +2169,12 @@ client = <starlette.testclient.TestClient object at 0x7ff156ef3a10>
                 "therapeutic_approaches": ["invalid_approach"]
             }
         }
-    
+
 >       response = client.post("/api/v1/characters/", json=invalid_char_data, headers=headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_end_to_end_workflows.py:739: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_end_to_end_workflows.py:739:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -2245,7 +2245,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='invalid-data-user', username='testuser', email='test@example.com', exp=datetime.datetime(2025, 8, 17, 19, 25, 47, tzinfo=datetime.timezone.utc))
 item = 'get'
@@ -2256,7 +2256,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -2269,7 +2269,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -2549,20 +2549,20 @@ client = <starlette.testclient.TestClient object at 0x7ff156d0d150>
             "exp": datetime.utcnow() - timedelta(hours=1)  # Expired
         }
         expired_token = jwt.encode(expired_payload, SECRET_KEY, algorithm=ALGORITHM)
-    
+
         # Should fail with expired token
         headers = {"Authorization": f"Bearer {expired_token}"}
         response = client.get("/api/v1/worlds/", headers=headers)
         assert response.status_code == 401
-    
+
         # Should succeed with valid token
         valid_token = create_auth_token("valid-user")
         headers = {"Authorization": f"Bearer {valid_token}"}
 >       response = client.get("/api/v1/worlds/", headers=headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_end_to_end_workflows.py:763: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_end_to_end_workflows.py:763:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -2633,7 +2633,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='valid-user', username='testuser', email='test@example.com', exp=datetime.datetime(2025, 8, 17, 19, 25, 47, tzinfo=datetime.timezone.utc))
 item = 'get'
@@ -2644,7 +2644,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -2657,7 +2657,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -2686,23 +2686,23 @@ mock_subprocess = <MagicMock name='run' id='140674520829840'>
         """Test that the component starts correctly through orchestration."""
         # Mock successful Docker Compose execution
         mock_subprocess.return_value = Mock(returncode=0, stdout="", stderr="")
-    
+
         # Mock successful health check
         mock_health_response = Mock()
         mock_health_response.status_code = 200
         mock_health_response.json.return_value = {"status": "healthy"}
         mock_requests.return_value = mock_health_response
-    
+
         # Test starting the component
         result = self.player_experience.start()
         self.assertTrue(result)
         self.assertEqual(self.player_experience.status, ComponentStatus.RUNNING)
-    
+
         # Verify Docker Compose was called
 >       mock_subprocess.assert_called()
 
-tests/test_player_experience_component_integration.py:98: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_experience_component_integration.py:98:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <MagicMock name='run' id='140674520829840'>
 
@@ -2734,15 +2734,15 @@ mock_subprocess = <MagicMock name='run' id='140674540175312'>
         mock_health_response = Mock()
         mock_health_response.status_code = 200
         mock_requests.return_value = mock_health_response
-    
+
         self.player_experience.start()
-    
+
         # Mock stopping
         mock_requests.side_effect = [
             mock_health_response,  # Initial health check (running)
             Exception("Connection refused")  # After stop (not running)
         ]
-    
+
         # Test stopping the component
         result = self.player_experience.stop()
 >       self.assertTrue(result)
@@ -2763,7 +2763,7 @@ self = <tests.test_player_experience_component_integration.TestPlayerExperienceC
         # Test with invalid Docker Compose path
         invalid_component = PlayerExperienceComponent(self.config)
         invalid_component.player_experience_dir = Path("/nonexistent/path")
-    
+
         # Starting should fail gracefully
         result = invalid_component.start()
         self.assertFalse(result)
@@ -2801,7 +2801,7 @@ mock_start = <MagicMock name='start' id='140674540159568'>
     def test_orchestrator_start_component_integration(self, mock_start):
         """Test starting player experience through orchestrator."""
         mock_start.return_value = True
-    
+
         # Test starting through orchestrator
         result = self.orchestrator.start_component("player_experience")
 >       self.assertTrue(result)
@@ -2828,26 +2828,26 @@ mock_config = <MagicMock name='TTAConfig()' spec='function' id='140674618764304'
         # Mock the import methods to avoid actual file system operations
         mock_validate.return_value = None
         mock_import_repo.return_value = None
-    
+
         # Create a mock component for the orchestrator to find
         mock_component = Mock(spec=PlayerExperienceComponent)
         mock_component.name = "player_experience"
         mock_component.dependencies = ["redis", "neo4j"]
         mock_component.status = ComponentStatus.STOPPED
-    
+
         def mock_import_core_side_effect(orchestrator_self):
             orchestrator_self.components["player_experience"] = mock_component
-    
+
         mock_import_core.side_effect = mock_import_core_side_effect
-    
+
         # Create orchestrator with mock config
         with patch('src.orchestration.orchestrator.TTAConfig') as mock_config_class:
             mock_config_class.return_value = mock_config
 >           orchestrator = TTAOrchestrator()
                            ^^^^^^^^^^^^^^^^^
 
-tests/test_player_experience_orchestration_integration.py:201: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_experience_orchestration_integration.py:201:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 src/orchestration/orchestrator.py:89: in __init__
     self._import_components()
 src/orchestration/decorators.py:36: in wrapper
@@ -2864,7 +2864,7 @@ src/orchestration/orchestrator.py:126: in _import_components
 ../../../.local/share/uv/python/cpython-3.11.12-linux-x86_64-gnu/lib/python3.11/unittest/mock.py:1128: in _mock_call
     return self._execute_mock_call(*args, **kwargs)
            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <MagicMock name='_import_core_components' id='140674518080144'>
 args = (), kwargs = {}
@@ -2873,7 +2873,7 @@ effect = <function TestPlayerExperienceOrchestrationIntegration.test_orchestrato
     def _execute_mock_call(self, /, *args, **kwargs):
         # separate from _increment_mock_call so that awaited functions are
         # executed separately from their call, also AsyncMock overrides this method
-    
+
         effect = self.side_effect
         if effect is not None:
             if _is_exception(effect):
@@ -3149,13 +3149,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_get_player_success(self, client, mock_player_manager, sample_player_profile, auth_headers):
         """Test successful player profile retrieval."""
         mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.get(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:168: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:168:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -3226,7 +3226,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -3237,7 +3237,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -3250,7 +3250,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -3525,13 +3525,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_get_player_not_found(self, client, mock_player_manager, auth_headers):
         """Test player retrieval when player doesn't exist."""
         mock_player_manager.get_player_profile.return_value = None
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.get("/api/v1/players/nonexistent-player", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:187: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:187:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -3602,7 +3602,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -3613,7 +3613,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -3626,7 +3626,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -3901,13 +3901,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_get_player_access_denied(self, client, mock_player_manager, auth_headers):
         """Test player retrieval with access denied."""
         mock_player_manager.get_player_profile.side_effect = DataAccessRestrictedError("Access denied")
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.get("/api/v1/players/other-player-id", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:206: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:206:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -3978,7 +3978,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -3989,7 +3989,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -4002,7 +4002,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -4279,7 +4279,7 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test successful player profile update."""
         mock_player_manager.update_player_profile.return_value = True
         mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
         request_data = {
             "username": "updateduser",
             "therapeutic_preferences": {
@@ -4288,13 +4288,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
                 "session_duration_preference": 60
             }
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.put(f"/api/v1/players/{sample_player_profile.player_id}", json=request_data, headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:227: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:227:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:583: in put
     return super().put(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1194: in put
@@ -4365,7 +4365,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -4376,7 +4376,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -4389,7 +4389,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -4668,13 +4668,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             "username": "ab",  # Too short
             "email": "invalid-email"  # Invalid format
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.put(f"/api/v1/players/{sample_player_profile.player_id}", json=request_data, headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:249: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:249:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:583: in put
     return super().put(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1194: in put
@@ -4745,7 +4745,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -4756,7 +4756,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -4769,7 +4769,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -5045,17 +5045,17 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_update_player_username_conflict(self, client, mock_player_manager, sample_player_profile, auth_headers):
         """Test player update with username conflict."""
         mock_player_manager.update_player_profile.side_effect = PlayerProfileManagerError("Username 'existinguser' already exists")
-    
+
         request_data = {
             "username": "existinguser"
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.put(f"/api/v1/players/{sample_player_profile.player_id}", json=request_data, headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:265: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:265:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:583: in put
     return super().put(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1194: in put
@@ -5126,7 +5126,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -5137,7 +5137,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -5150,7 +5150,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -5426,13 +5426,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_delete_player_success(self, client, mock_player_manager, sample_player_profile, auth_headers):
         """Test successful player profile deletion."""
         mock_player_manager.delete_player_profile.return_value = True
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.delete(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:276: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:276:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:641: in delete
     return super().delete(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1264: in delete
@@ -5503,7 +5503,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -5514,7 +5514,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -5527,7 +5527,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -5803,13 +5803,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
     def test_delete_player_not_found(self, client, mock_player_manager, sample_player_profile, auth_headers):
         """Test player deletion when player doesn't exist."""
         mock_player_manager.delete_player_profile.return_value = False
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.delete(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:291: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:291:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:641: in delete
     return super().delete(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1264: in delete
@@ -5880,7 +5880,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -5891,7 +5891,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -5904,7 +5904,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -6192,13 +6192,13 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             }
         }
         mock_player_manager.export_player_data.return_value = export_data
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.get(f"/api/v1/players/{sample_player_profile.player_id}/export", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:314: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:314:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -6269,7 +6269,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -6280,7 +6280,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -6293,7 +6293,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -6570,7 +6570,7 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test successful therapeutic preferences update."""
         mock_player_manager.update_therapeutic_preferences.return_value = True
         mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
         request_data = {
             "intensity_level": "high",
             "preferred_approaches": ["mindfulness", "acceptance_commitment_therapy"],
@@ -6578,7 +6578,7 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             "session_duration_preference": 60,
             "reminder_frequency": "daily"
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.patch(
                 f"/api/v1/players/{sample_player_profile.player_id}/therapeutic-preferences",
@@ -6586,8 +6586,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
                 headers=auth_headers
             )
 
-tests/test_player_management_api.py:342: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:342:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:614: in patch
     return super().patch(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1231: in patch
@@ -6658,7 +6658,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -6669,7 +6669,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -6682,7 +6682,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -6959,14 +6959,14 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test successful privacy settings update."""
         mock_player_manager.update_privacy_settings.return_value = True
         mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
         request_data = {
             "data_collection_consent": False,
             "research_participation_consent": True,
             "progress_sharing_enabled": False,
             "data_retention_period_days": 180
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.patch(
                 f"/api/v1/players/{sample_player_profile.player_id}/privacy-settings",
@@ -6974,8 +6974,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
                 headers=auth_headers
             )
 
-tests/test_player_management_api.py:368: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:368:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:614: in patch
     return super().patch(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1231: in patch
@@ -7046,7 +7046,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -7057,7 +7057,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -7070,7 +7070,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -7348,7 +7348,7 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         request_data = {
             "data_retention_period_days": 10  # Too short, minimum is 30
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.patch(
                 f"/api/v1/players/{sample_player_profile.player_id}/privacy-settings",
@@ -7356,8 +7356,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
                 headers=auth_headers
             )
 
-tests/test_player_management_api.py:388: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:388:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:614: in patch
     return super().patch(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1231: in patch
@@ -7428,7 +7428,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -7439,7 +7439,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -7452,7 +7452,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -7731,7 +7731,7 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             "session_duration_preference": 200,  # Too long, maximum is 120
             "preferred_approaches": ["invalid_approach"]  # Invalid approach
         }
-    
+
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
 >           response = client.patch(
                 f"/api/v1/players/{sample_player_profile.player_id}/therapeutic-preferences",
@@ -7739,8 +7739,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
                 headers=auth_headers
             )
 
-tests/test_player_management_api.py:407: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:407:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:614: in patch
     return super().patch(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1231: in patch
@@ -7811,7 +7811,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -7822,7 +7822,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -7835,7 +7835,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -8111,12 +8111,12 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test that players cannot access other players' profiles."""
         # Try to access a different player's profile
         other_player_id = "other-player-456"
-    
+
 >       response = client.get(f"/api/v1/players/{other_player_id}", headers=auth_headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:423: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:423:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -8187,7 +8187,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -8198,7 +8198,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -8211,7 +8211,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -8488,12 +8488,12 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test that CORS headers are properly set."""
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
             mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
 >           response = client.get(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:483: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:483:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -8564,7 +8564,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -8575,7 +8575,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -8588,7 +8588,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -8865,12 +8865,12 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test that security headers are properly set."""
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
             mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
 >           response = client.get(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:494: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:494:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -8941,7 +8941,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -8952,7 +8952,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -8965,7 +8965,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -9242,12 +9242,12 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
         """Test that rate limiting headers are properly set."""
         with patch('src.player_experience.api.routers.players.get_player_manager', return_value=mock_player_manager):
             mock_player_manager.get_player_profile.return_value = sample_player_profile
-    
+
 >           response = client.get(f"/api/v1/players/{sample_player_profile.player_id}", headers=auth_headers)
                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_player_management_api.py:508: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_player_management_api.py:508:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -9318,7 +9318,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='test-player-123', username='testuser', email='test@example.com', exp=None)
 item = 'get'
@@ -9329,7 +9329,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -9342,7 +9342,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -9366,36 +9366,36 @@ monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7ff1569a6010>
     def test_scale_manager_creates_event_when_magnitude_threshold(monkeypatch):
         sm = ScaleManager(config={})
         choice = PlayerChoice(choice_id="c2", session_id="s1", choice_text="Test", metadata={})
-    
+
         async def fake_assess(choice, scale):
             from src.components.narrative_arc_orchestrator.models import ImpactAssessment
             return ImpactAssessment(scale=scale, magnitude=0.9)
-    
+
         monkeypatch.setattr(sm, "_assess_scale_impact", fake_assess)
-    
+
         import asyncio
-    
+
         events_before = len(sm.get_active_events())
 >       asyncio.get_event_loop().run_until_complete(
         ^^^^^^^^^^^^^^^^^^^^^^^^
             sm.evaluate_choice_impact(choice, [NarrativeScale.SHORT_TERM])
         )
 
-tests/test_scale_manager_extraction.py:30: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_scale_manager_extraction.py:30:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = <asyncio.unix_events._UnixDefaultEventLoopPolicy object at 0x7ff15cc55550>
 
     def get_event_loop(self):
         """Get the event loop for the current context.
-    
+
         Returns an instance of EventLoop or raises an exception.
         """
         if (self._local._loop is None and
                 not self._local._set_called and
                 threading.current_thread() is threading.main_thread()):
             self.set_event_loop(self.new_event_loop())
-    
+
         if self._local._loop is None:
 >           raise RuntimeError('There is no current event loop in thread %r.'
                                % threading.current_thread().name)
@@ -9659,8 +9659,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
 >       resp = client.get("/api/v1/worlds/?limit=1&offset=0", headers=auth_headers)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_world_management_api.py:52: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:52:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -9731,7 +9731,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -9742,7 +9742,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -9755,7 +9755,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -10029,8 +10029,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
 >       resp = client.get("/api/v1/worlds/world_mindfulness_garden", headers=auth_headers)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_world_management_api.py:61: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:61:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -10101,7 +10101,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -10112,7 +10112,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -10125,7 +10125,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -10401,8 +10401,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             headers=auth_headers,
         )
 
-tests/test_world_management_api.py:69: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:69:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -10473,7 +10473,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -10484,7 +10484,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -10497,7 +10497,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -10775,8 +10775,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             json=payload,
         )
 
-tests/test_world_management_api.py:81: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:81:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -10847,7 +10847,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -10858,7 +10858,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -10871,7 +10871,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -11145,8 +11145,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
 >       resp = client.get("/api/v1/worlds/does-not-exist", headers=auth_headers)
                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_world_management_api.py:95: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:95:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -11217,7 +11217,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -11228,7 +11228,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -11241,7 +11241,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -11518,8 +11518,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             json={},
         )
 
-tests/test_world_management_api.py:100: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:100:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -11590,7 +11590,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -11601,7 +11601,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -11614,7 +11614,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -11893,8 +11893,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
             json=payload,
         )
 
-tests/test_world_management_api.py:111: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:111:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:552: in post
     return super().post(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1157: in post
@@ -11965,7 +11965,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -11976,7 +11976,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -11989,7 +11989,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]
@@ -12263,8 +12263,8 @@ auth_headers = {'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.ey
 >       resp_all = client.get("/api/v1/worlds/", headers=auth_headers)
                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-tests/test_world_management_api.py:120: 
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_world_management_api.py:120:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 .venv/lib/python3.11/site-packages/starlette/testclient.py:479: in get
     return super().get(
 .venv/lib/python3.11/site-packages/httpx/_client.py:1066: in get
@@ -12335,7 +12335,7 @@ src/player_experience/api/middleware.py:326: in dispatch
 src/player_experience/api/middleware.py:125: in dispatch
     request_id, endpoint, method, user_id=getattr(request.state, 'current_player', {}).get('player_id')
                                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
 
 self = TokenData(player_id='player-1', username='test', email='t@example.com', exp=None)
 item = 'get'
@@ -12346,7 +12346,7 @@ item = 'get'
             attribute = private_attributes[item]
             if hasattr(attribute, '__get__'):
                 return attribute.__get__(self, type(self))  # type: ignore
-    
+
             try:
                 # Note: self.__pydantic_private__ cannot be None if self.__private_attributes__ has items
                 return self.__pydantic_private__[item]  # type: ignore
@@ -12359,7 +12359,7 @@ item = 'get'
                 pydantic_extra = object.__getattribute__(self, '__pydantic_extra__')
             except AttributeError:
                 pydantic_extra = None
-    
+
             if pydantic_extra:
                 try:
                     return pydantic_extra[item]

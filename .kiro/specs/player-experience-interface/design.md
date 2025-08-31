@@ -19,7 +19,7 @@ graph TB
         SPM[Settings & Preferences Module]
         PTM[Progress Tracking Module]
     end
-    
+
     subgraph "Player Experience API Layer"
         PEM[Player Experience Manager]
         CAM[Character & Avatar Manager]
@@ -27,7 +27,7 @@ graph TB
         PSM[Personalization Service Manager]
         SIM[Session Integration Manager]
     end
-    
+
     subgraph "Existing TTA Core"
         PE[Personalization Engine]
         CDS[Character Development System]
@@ -35,25 +35,25 @@ graph TB
         INE[Interactive Narrative Engine]
         WSManager[World State Manager]
     end
-    
+
     subgraph "Data Layer"
         Neo4j[(Neo4j Graph DB)]
         Redis[(Redis Cache)]
         PlayerDB[(Player Profiles DB)]
     end
-    
+
     WUI --> PEM
     CCM --> CAM
     WSM --> WMM
     SPM --> PSM
     PTM --> PEM
-    
+
     PEM --> PE
     CAM --> CDS
     WMM --> WSManager
     PSM --> PE
     SIM --> INE
-    
+
     PEM --> PlayerDB
     CAM --> Neo4j
     WMM --> Neo4j
@@ -86,7 +86,7 @@ class PlayerExperienceManager:
     def get_progress_summary(self, player_id: str) -> ProgressSummary
 ```
 
-**Dependencies**: 
+**Dependencies**:
 - Character & Avatar Manager
 - World Management Module
 - Personalization Service Manager
@@ -305,13 +305,13 @@ class CrisisDetectionSystem:
 class TestDataFactory:
     @staticmethod
     def create_test_player() -> PlayerProfile
-    
+
     @staticmethod
     def create_test_character(player_id: str) -> Character
-    
+
     @staticmethod
     def create_test_world() -> WorldSummary
-    
+
     @staticmethod
     def create_therapeutic_session(character_id: str, world_id: str) -> SessionContext
 ```
@@ -397,14 +397,14 @@ sequenceDiagram
     participant PEI as Player Experience Interface
     participant TTA as TTA Core Components
     participant DB as Data Layer
-    
+
     Player->>PEI: Create Character
     PEI->>TTA: Initialize Character (CharacterDevelopmentSystem)
     TTA->>DB: Store Character Data
     DB-->>TTA: Confirm Storage
     TTA-->>PEI: Character Created
     PEI-->>Player: Character Ready
-    
+
     Player->>PEI: Select World
     PEI->>TTA: Check Compatibility (WorldStateManager)
     TTA-->>PEI: Compatibility Report

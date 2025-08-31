@@ -17,29 +17,29 @@ graph TB
         KM --> GS[Graph Service]
         KM --> VS[Vector Service]
         KM --> CS[Cache Service]
-        
+
         GS --> N4J[(Neo4j Graph DB)]
         VS --> VDB[(Vector Database)]
         CS --> REDIS[(Redis Cache)]
     end
-    
+
     subgraph "TTA Components"
         NAO[Narrative Arc Orchestrator]
         CVS[Coherence Validation System]
         AOS[AI Agent Orchestration]
         PES[Player Experience Service]
     end
-    
+
     subgraph "External Services"
         EMB[Embedding Service]
         LLM[Language Models]
     end
-    
+
     NAO --> KM
     CVS --> KM
     AOS --> KM
     PES --> KM
-    
+
     VS --> EMB
     KM --> LLM
 ```
@@ -69,16 +69,16 @@ class KnowledgeManager(Component):
         self.graph_service = GraphService(config)
         self.vector_service = VectorService(config)
         self.cache_service = CacheService(config)
-    
+
     async def store_knowledge(self, knowledge: KnowledgeItem) -> str:
         """Store knowledge in both graph and vector stores"""
-        
+
     async def retrieve_knowledge(self, query: KnowledgeQuery) -> List[KnowledgeResult]:
         """Unified knowledge retrieval with hybrid search"""
-        
+
     async def update_knowledge(self, knowledge_id: str, updates: Dict) -> bool:
         """Update knowledge maintaining consistency across stores"""
-        
+
     async def delete_knowledge(self, knowledge_id: str) -> bool:
         """Delete knowledge from all stores with cascade handling"""
 ```
@@ -94,16 +94,16 @@ class GraphService(Component):
             dependencies=["neo4j"]
         )
         self.neo4j_client = Neo4jClient(config)
-    
+
     async def create_node(self, node: GraphNode) -> str:
         """Create node with therapeutic safety validation"""
-        
+
     async def create_relationship(self, rel: GraphRelationship) -> str:
         """Create relationship with consistency checks"""
-        
+
     async def query_graph(self, cypher: str, params: Dict) -> List[Dict]:
         """Execute Cypher queries with performance monitoring"""
-        
+
     async def get_subgraph(self, center_node: str, depth: int) -> SubGraph:
         """Retrieve subgraph for context building"""
 ```
@@ -120,16 +120,16 @@ class VectorService(Component):
         )
         self.embedding_client = EmbeddingClient(config)
         self.vector_store = VectorStore(config)
-    
+
     async def embed_content(self, content: str) -> List[float]:
         """Generate embeddings using configured models"""
-        
+
     async def store_embedding(self, content_id: str, embedding: List[float], metadata: Dict) -> str:
         """Store embedding with therapeutic metadata"""
-        
+
     async def semantic_search(self, query: str, filters: Dict, limit: int) -> List[VectorResult]:
         """Perform semantic search with therapeutic filtering"""
-        
+
     async def similarity_search(self, embedding: List[float], threshold: float) -> List[VectorResult]:
         """Find similar content by embedding similarity"""
 ```
@@ -145,16 +145,16 @@ class CacheService(Component):
             dependencies=["redis"]
         )
         self.redis_client = RedisClient(config)
-    
+
     async def cache_result(self, key: str, result: Any, ttl: int) -> bool:
         """Cache knowledge query results"""
-        
+
     async def get_cached(self, key: str) -> Optional[Any]:
         """Retrieve cached results with validation"""
-        
+
     async def invalidate_cache(self, pattern: str) -> int:
         """Invalidate cache entries by pattern"""
-        
+
     async def cache_session_context(self, session_id: str, context: Dict) -> bool:
         """Cache user session knowledge context"""
 ```
@@ -305,16 +305,16 @@ class TestKnowledgeManager(unittest.TestCase):
     def setUp(self):
         self.config = create_test_config()
         self.knowledge_manager = KnowledgeManager(self.config)
-    
+
     async def test_store_knowledge_success(self):
         """Test successful knowledge storage"""
-        
+
     async def test_retrieve_knowledge_hybrid_search(self):
         """Test hybrid graph + vector search"""
-        
+
     async def test_consistency_maintenance(self):
         """Test consistency between graph and vector stores"""
-        
+
     async def test_therapeutic_safety_validation(self):
         """Test therapeutic content safety checks"""
 ```
@@ -325,13 +325,13 @@ class TestKnowledgeManager(unittest.TestCase):
 class TestKnowledgeSystemIntegration(unittest.TestCase):
     async def test_neo4j_vector_consistency(self):
         """Test consistency between Neo4j and vector database"""
-        
+
     async def test_cross_session_persistence(self):
         """Test knowledge persistence across user sessions"""
-        
+
     async def test_performance_under_load(self):
         """Test system performance with concurrent operations"""
-        
+
     async def test_therapeutic_workflow_integration(self):
         """Test integration with therapeutic content workflows"""
 ```

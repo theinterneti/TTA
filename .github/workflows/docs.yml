@@ -1,0 +1,268 @@
+name: Documentation Build and Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - '.github/workflows/docs.yml'
+      - 'requirements*.txt'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'docs/**'
+      - 'src/**'
+      - '.github/workflows/docs.yml'
+      - 'requirements*.txt'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Fetch full history for proper versioning
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -r requirements.txt
+        uv pip install -r requirements-dev.txt
+
+    - name: Install additional documentation dependencies
+      run: |
+        uv pip install sphinx-rtd-theme sphinx-copybutton sphinx-tabs myst-parser
+
+    - name: Build documentation
+      run: |
+        cd docs/sphinx
+        uv run sphinx-build -b html . _build/html -W --keep-going
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+
+    - name: Upload documentation artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation
+        path: docs/sphinx/_build/html/
+        retention-days: 30
+
+    - name: Setup Pages (if main branch)
+      if: github.ref == 'refs/heads/main'
+      uses: actions/configure-pages@v3
+
+    - name: Upload to GitHub Pages (if main branch)
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-pages-artifact@v2
+      with:
+        path: docs/sphinx/_build/html/
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v2
+
+  # Additional job for documentation quality checks
+  quality-check:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -r requirements.txt
+        uv pip install -r requirements-dev.txt
+
+    - name: Check documentation links
+      run: |
+        cd docs/sphinx
+        uv run sphinx-build -b linkcheck . _build/linkcheck
+      continue-on-error: true
+
+    - name: Generate documentation coverage report
+      run: |
+        cd docs/sphinx
+        uv run sphinx-build -b coverage . _build/coverage
+        cat _build/coverage/python.txt
+      continue-on-error: true
+
+    - name: Check for documentation warnings
+      run: |
+        cd docs/sphinx
+        uv run sphinx-build -b html . _build/html -W -q
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+
+  # Job for building and testing documentation in PR context
+  pr-preview:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -r requirements.txt
+        uv pip install -r requirements-dev.txt
+
+    - name: Build documentation for PR
+      run: |
+        cd docs/sphinx
+        uv run sphinx-build -b html . _build/html
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+
+    - name: Upload PR documentation preview
+      uses: actions/upload-artifact@v3
+      with:
+        name: pr-documentation-preview
+        path: docs/sphinx/_build/html/
+        retention-days: 7
+
+    - name: Comment PR with preview link
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { owner, repo, number } = context.issue;
+          const run_id = context.runId;
+
+          const comment = `## 📚 Documentation Preview
+
+          The documentation for this PR has been built and is available as an artifact.
+
+          **Download Link**: [Documentation Preview](https://github.com/${owner}/${repo}/actions/runs/${run_id})
+
+          To view the documentation:
+          1. Download the \`pr-documentation-preview\` artifact
+          2. Extract the ZIP file
+          3. Open \`index.html\` in your browser
+
+          The documentation will be automatically deployed to GitHub Pages when this PR is merged to main.`;
+
+          github.rest.issues.createComment({
+            owner,
+            repo,
+            issue_number: number,
+            body: comment
+          });
+
+  # Job for generating documentation metrics
+  metrics:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+
+    - name: Create virtual environment
+      run: uv venv
+
+    - name: Install dependencies
+      run: |
+        uv pip install -r requirements.txt
+        uv pip install -r requirements-dev.txt
+
+    - name: Generate documentation metrics
+      run: |
+        cd docs/sphinx
+
+        # Count documentation files
+        echo "## Documentation Metrics" > metrics.md
+        echo "" >> metrics.md
+        echo "- **RST Files**: $(find . -name '*.rst' | wc -l)" >> metrics.md
+        echo "- **Markdown Files**: $(find . -name '*.md' | wc -l)" >> metrics.md
+        echo "- **Python Modules Documented**: $(find ../../src -name '*.py' | wc -l)" >> metrics.md
+
+        # Build and count generated pages
+        uv run sphinx-build -b html . _build/html -q
+        echo "- **Generated HTML Pages**: $(find _build/html -name '*.html' | wc -l)" >> metrics.md
+
+        # Check for undocumented modules
+        uv run sphinx-build -b coverage . _build/coverage -q
+        if [ -f "_build/coverage/python.txt" ]; then
+          undoc_count=$(grep -c "UNDOCUMENTED" _build/coverage/python.txt || echo "0")
+          echo "- **Undocumented Modules**: $undoc_count" >> metrics.md
+        fi
+
+        echo "" >> metrics.md
+        echo "Generated on: $(date)" >> metrics.md
+
+        cat metrics.md
+      env:
+        PYTHONPATH: ${{ github.workspace }}/src
+
+    - name: Upload metrics
+      uses: actions/upload-artifact@v3
+      with:
+        name: documentation-metrics
+        path: docs/sphinx/metrics.md
+        retention-days: 30

@@ -282,11 +282,10 @@ export const playerAPI = {
 
 // Character API
 export const characterAPI = {
-  getCharacters: (playerId: string) =>
-    apiClient.get(`/players/${playerId}/characters`),
+  getCharacters: (playerId: string) => apiClient.get(`/characters/`),
 
   createCharacter: (playerId: string, characterData: any) =>
-    apiClient.post(`/players/${playerId}/characters`, characterData),
+    apiClient.post(`/characters/`, characterData),
 
   updateCharacter: (characterId: string, updates: any) =>
     apiClient.put(`/characters/${characterId}`, updates),

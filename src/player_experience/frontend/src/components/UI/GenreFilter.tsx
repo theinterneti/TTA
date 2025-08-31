@@ -43,7 +43,7 @@ const GenreFilter: React.FC<GenreFilterProps> = ({
   onToggle,
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
-  
+
   const isFilterOpen = onToggle ? isOpen : internalOpen;
   const toggleFilter = onToggle || (() => setInternalOpen(!internalOpen));
 
@@ -77,8 +77,8 @@ const GenreFilter: React.FC<GenreFilterProps> = ({
         onClick={toggleFilter}
         className={`
           flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200
-          ${isFilterOpen 
-            ? 'bg-blue-600 text-white' 
+          ${isFilterOpen
+            ? 'bg-blue-600 text-white'
             : 'bg-black bg-opacity-50 text-white hover:bg-opacity-70'
           }
         `}

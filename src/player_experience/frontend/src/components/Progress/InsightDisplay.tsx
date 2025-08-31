@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
-import { 
-  LightBulbIcon, 
-  TrendingUpIcon, 
-  TrendingDownIcon, 
+import React, { useState } from "react";
+import {
+  LightBulbIcon,
+  ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   ArrowRightIcon,
   ChevronDownIcon,
-  ChevronUpIcon
-} from '@heroicons/react/24/outline';
+  ChevronUpIcon,
+} from "@heroicons/react/24/outline";
 
 interface Recommendation {
   recommendation_id: string;
@@ -40,14 +40,16 @@ interface InsightDisplayProps {
 const InsightDisplay: React.FC<InsightDisplayProps> = ({
   progressSummary,
   recommendations,
-  className = '',
+  className = "",
   expandable = true,
 }) => {
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['insights']));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["insights"])
+  );
 
   const toggleSection = (section: string) => {
     if (!expandable) return;
-    
+
     const newExpanded = new Set(expandedSections);
     if (newExpanded.has(section)) {
       newExpanded.delete(section);
@@ -59,12 +61,12 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'improving':
-      case 'increasing':
-        return <TrendingUpIcon className="h-5 w-5 text-green-500" />;
-      case 'declining':
-      case 'decreasing':
-        return <TrendingDownIcon className="h-5 w-5 text-red-500" />;
+      case "improving":
+      case "increasing":
+        return <ArrowTrendingUpIcon className="h-5 w-5 text-green-500" />;
+      case "declining":
+      case "decreasing":
+        return <ArrowTrendingDownIcon className="h-5 w-5 text-red-500" />;
       default:
         return <ArrowRightIcon className="h-5 w-5 text-gray-500" />;
     }
@@ -72,59 +74,59 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
-      case 'improving':
-      case 'increasing':
-        return 'text-green-700 bg-green-100';
-      case 'declining':
-      case 'decreasing':
-        return 'text-red-700 bg-red-100';
+      case "improving":
+      case "increasing":
+        return "text-green-700 bg-green-100";
+      case "declining":
+      case "decreasing":
+        return "text-red-700 bg-red-100";
       default:
-        return 'text-gray-700 bg-gray-100';
+        return "text-gray-700 bg-gray-100";
     }
   };
 
   const getMomentumColor = (momentum: number) => {
-    if (momentum >= 0.8) return 'text-green-700 bg-green-100';
-    if (momentum >= 0.6) return 'text-blue-700 bg-blue-100';
-    if (momentum >= 0.4) return 'text-yellow-700 bg-yellow-100';
-    return 'text-red-700 bg-red-100';
+    if (momentum >= 0.8) return "text-green-700 bg-green-100";
+    if (momentum >= 0.6) return "text-blue-700 bg-blue-100";
+    if (momentum >= 0.4) return "text-yellow-700 bg-yellow-100";
+    return "text-red-700 bg-red-100";
   };
 
   const getPriorityColor = (priority: number) => {
     switch (priority) {
       case 1:
-        return 'bg-red-100 text-red-800 border-red-200';
+        return "bg-red-100 text-red-800 border-red-200";
       case 2:
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       case 3:
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+        return "bg-blue-100 text-blue-800 border-blue-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getPriorityLabel = (priority: number) => {
     switch (priority) {
       case 1:
-        return 'High Priority';
+        return "High Priority";
       case 2:
-        return 'Medium Priority';
+        return "Medium Priority";
       case 3:
-        return 'Low Priority';
+        return "Low Priority";
       default:
-        return 'Normal';
+        return "Normal";
     }
   };
 
-  const SectionHeader: React.FC<{ title: string; sectionKey: string; icon: React.ReactNode }> = ({
-    title,
-    sectionKey,
-    icon,
-  }) => (
+  const SectionHeader: React.FC<{
+    title: string;
+    sectionKey: string;
+    icon: React.ReactNode;
+  }> = ({ title, sectionKey, icon }) => (
     <button
       onClick={() => toggleSection(sectionKey)}
       className={`w-full flex items-center justify-between p-3 text-left hover:bg-gray-50 transition-colors ${
-        expandable ? 'cursor-pointer' : 'cursor-default'
+        expandable ? "cursor-pointer" : "cursor-default"
       }`}
       disabled={!expandable}
     >
@@ -132,13 +134,12 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
         {icon}
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
       </div>
-      {expandable && (
-        expandedSections.has(sectionKey) ? (
+      {expandable &&
+        (expandedSections.has(sectionKey) ? (
           <ChevronUpIcon className="h-5 w-5 text-gray-500" />
         ) : (
           <ChevronDownIcon className="h-5 w-5 text-gray-500" />
-        )
-      )}
+        ))}
     </button>
   );
 
@@ -151,30 +152,49 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
           sectionKey="insights"
           icon={<LightBulbIcon className="h-6 w-6 text-yellow-500" />}
         />
-        
-        {expandedSections.has('insights') && (
+
+        {expandedSections.has("insights") && (
           <div className="p-4 space-y-4">
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-sm text-gray-600 mb-1">Therapeutic Momentum</div>
-                <div className={`text-lg font-semibold px-2 py-1 rounded ${getMomentumColor(progressSummary.therapeutic_momentum)}`}>
+                <div className="text-sm text-gray-600 mb-1">
+                  Therapeutic Momentum
+                </div>
+                <div
+                  className={`text-lg font-semibold px-2 py-1 rounded ${getMomentumColor(
+                    progressSummary.therapeutic_momentum
+                  )}`}
+                >
                   {(progressSummary.therapeutic_momentum * 100).toFixed(0)}%
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 rounded-lg p-3">
                 <div className="text-sm text-gray-600 mb-1">Progress Trend</div>
-                <div className={`flex items-center px-2 py-1 rounded ${getTrendColor(progressSummary.progress_trend)}`}>
+                <div
+                  className={`flex items-center px-2 py-1 rounded ${getTrendColor(
+                    progressSummary.progress_trend
+                  )}`}
+                >
                   {getTrendIcon(progressSummary.progress_trend)}
-                  <span className="ml-2 font-medium capitalize">{progressSummary.progress_trend}</span>
+                  <span className="ml-2 font-medium capitalize">
+                    {progressSummary.progress_trend}
+                  </span>
                 </div>
               </div>
-              
+
               <div className="bg-gray-50 rounded-lg p-3">
-                <div className="text-sm text-gray-600 mb-1">Readiness for Advancement</div>
-                <div className={`text-lg font-semibold px-2 py-1 rounded ${getMomentumColor(progressSummary.readiness_for_advancement)}`}>
-                  {(progressSummary.readiness_for_advancement * 100).toFixed(0)}%
+                <div className="text-sm text-gray-600 mb-1">
+                  Readiness for Advancement
+                </div>
+                <div
+                  className={`text-lg font-semibold px-2 py-1 rounded ${getMomentumColor(
+                    progressSummary.readiness_for_advancement
+                  )}`}
+                >
+                  {(progressSummary.readiness_for_advancement * 100).toFixed(0)}
+                  %
                 </div>
               </div>
             </div>
@@ -183,23 +203,33 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {progressSummary.strength_areas.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-green-800 mb-2">💪 Strength Areas</h4>
+                  <h4 className="font-medium text-green-800 mb-2">
+                    💪 Strength Areas
+                  </h4>
                   <div className="space-y-1">
                     {progressSummary.strength_areas.map((area, index) => (
-                      <div key={index} className="text-sm bg-green-50 text-green-700 px-2 py-1 rounded">
+                      <div
+                        key={index}
+                        className="text-sm bg-green-50 text-green-700 px-2 py-1 rounded"
+                      >
                         {area}
                       </div>
                     ))}
                   </div>
                 </div>
               )}
-              
+
               {progressSummary.challenge_areas.length > 0 && (
                 <div>
-                  <h4 className="font-medium text-orange-800 mb-2">🎯 Growth Areas</h4>
+                  <h4 className="font-medium text-orange-800 mb-2">
+                    🎯 Growth Areas
+                  </h4>
                   <div className="space-y-1">
                     {progressSummary.challenge_areas.map((area, index) => (
-                      <div key={index} className="text-sm bg-orange-50 text-orange-700 px-2 py-1 rounded">
+                      <div
+                        key={index}
+                        className="text-sm bg-orange-50 text-orange-700 px-2 py-1 rounded"
+                      >
                         {area}
                       </div>
                     ))}
@@ -211,9 +241,14 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
             {/* Favorite Therapeutic Approach */}
             {progressSummary.favorite_therapeutic_approach && (
               <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-                <h4 className="font-medium text-purple-800 mb-1">🌟 Your Preferred Approach</h4>
+                <h4 className="font-medium text-purple-800 mb-1">
+                  🌟 Your Preferred Approach
+                </h4>
                 <p className="text-purple-700 text-sm">
-                  {progressSummary.favorite_therapeutic_approach.replace('_', ' ')}
+                  {progressSummary.favorite_therapeutic_approach.replace(
+                    "_",
+                    " "
+                  )}
                 </p>
               </div>
             )}
@@ -228,15 +263,17 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
           sectionKey="recommendations"
           icon={<ArrowRightIcon className="h-6 w-6 text-blue-500" />}
         />
-        
-        {expandedSections.has('recommendations') && (
+
+        {expandedSections.has("recommendations") && (
           <div className="p-4">
             {recommendations.length > 0 ? (
               <div className="space-y-3">
                 {recommendations.map((rec) => (
                   <div
                     key={rec.recommendation_id}
-                    className={`border rounded-lg p-3 ${getPriorityColor(rec.priority)}`}
+                    className={`border rounded-lg p-3 ${getPriorityColor(
+                      rec.priority
+                    )}`}
                   >
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium">{rec.title}</h4>
@@ -246,7 +283,7 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
                     </div>
                     <p className="text-sm mb-2">{rec.description}</p>
                     <div className="text-xs opacity-75 capitalize">
-                      {rec.recommendation_type.replace('_', ' ')}
+                      {rec.recommendation_type.replace("_", " ")}
                     </div>
                   </div>
                 ))}
@@ -254,7 +291,10 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
             ) : (
               <div className="text-center text-gray-500 py-4">
                 <LightBulbIcon className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>No specific recommendations at this time. Keep up the great work!</p>
+                <p>
+                  No specific recommendations at this time. Keep up the great
+                  work!
+                </p>
               </div>
             )}
           </div>
@@ -269,12 +309,15 @@ const InsightDisplay: React.FC<InsightDisplayProps> = ({
             sectionKey="goals"
             icon={<ArrowRightIcon className="h-6 w-6 text-green-500" />}
           />
-          
-          {expandedSections.has('goals') && (
+
+          {expandedSections.has("goals") && (
             <div className="p-4">
               <div className="space-y-2">
                 {progressSummary.next_recommended_goals.map((goal, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-2 bg-green-50 rounded">
+                  <div
+                    key={index}
+                    className="flex items-center space-x-3 p-2 bg-green-50 rounded"
+                  >
                     <div className="w-6 h-6 bg-green-200 text-green-800 rounded-full flex items-center justify-center text-sm font-medium">
                       {index + 1}
                     </div>

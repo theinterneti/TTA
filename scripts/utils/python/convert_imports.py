@@ -6,7 +6,7 @@ Script to convert absolute imports from src to relative imports in the TTA.proto
 import os
 import re
 import sys
-from pathlib import Path
+
 
 def get_relative_import(file_path, import_path):
     """
@@ -20,16 +20,16 @@ def get_relative_import(file_path, import_path):
         The relative import path
     """
     # Remove 'src.' from the import path
-    import_path = import_path.replace('src.', '')
+    import_path = import_path.replace("src.", "")
 
     # Get the directory of the file relative to src
-    file_dir = os.path.dirname(os.path.relpath(file_path, 'TTA.prototype/src'))
+    file_dir = os.path.dirname(os.path.relpath(file_path, "TTA.prototype/src"))
 
     # Split the import path into components
-    import_components = import_path.split('.')
+    import_components = import_path.split(".")
 
     # Calculate the number of parent directories to go up
-    file_dirs = file_dir.split(os.sep) if file_dir != '.' else []
+    file_dirs = file_dir.split(os.sep) if file_dir != "." else []
     import_dirs = import_components[:-1]
 
     # Find common prefix
@@ -47,21 +47,22 @@ def get_relative_import(file_path, import_path):
     # Construct the relative import
     if up_levels == 0 and not down_path:
         # Same directory
-        return f'.{import_components[-1]}'
+        return f".{import_components[-1]}"
     elif up_levels > 0:
         # Need to go up
-        rel_import = '.' * (up_levels + 1)
+        rel_import = "." * (up_levels + 1)
         if down_path:
-            rel_import += '.'.join(down_path) + '.'
+            rel_import += ".".join(down_path) + "."
         rel_import += import_components[-1]
         return rel_import
     else:
         # Need to go down
-        rel_import = '.'
+        rel_import = "."
         if down_path:
-            rel_import += '.'.join(down_path) + '.'
+            rel_import += ".".join(down_path) + "."
         rel_import += import_components[-1]
         return rel_import
+
 
 def convert_imports(file_path, dry_run=False):
     """
@@ -74,11 +75,11 @@ def convert_imports(file_path, dry_run=False):
     Returns:
         True if the file was modified, False otherwise
     """
-    with open(file_path, 'r') as f:
+    with open(file_path) as f:
         content = f.read()
 
     # Find all imports from src
-    matches = re.findall(r'^from src\.([^\s]+) import ([^\n]+)', content, re.MULTILINE)
+    matches = re.findall(r"^from src\.([^\s]+) import ([^\n]+)", content, re.MULTILINE)
 
     if not matches:
         return False
@@ -100,13 +101,14 @@ def convert_imports(file_path, dry_run=False):
         modified_content = modified_content.replace(abs_import, rel_import)
 
     if modified_content != content and not dry_run:
-        with open(file_path, 'w') as f:
+        with open(file_path, "w") as f:
             f.write(modified_content)
         return True
     elif modified_content != content:
         return True
 
     return False
+
 
 def main():
     """Main function."""
@@ -125,7 +127,7 @@ def main():
 
     for root, _, files in os.walk(directory):
         for file in files:
-            if file.endswith('.py'):
+            if file.endswith(".py"):
                 file_path = os.path.join(root, file)
                 try:
                     if convert_imports(file_path, dry_run):
@@ -140,6 +142,7 @@ def main():
     print(f"Modified {len(modified_files)} files:")
     for file_path in modified_files:
         print(f"  {file_path}")
+
 
 if __name__ == "__main__":
     main()

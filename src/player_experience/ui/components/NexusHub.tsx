@@ -1,6 +1,6 @@
 /**
  * Nexus Hub Component
- * 
+ *
  * The central hub interface for The Nexus Codex, displaying story spheres
  * and providing navigation to different therapeutic worlds.
  */
@@ -37,16 +37,16 @@ interface StorySphereProps {
 const StorySphere: React.FC<StorySphereProps> = ({ sphere, onSphereClick, onSphereHover }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
-  
+
   useFrame((state) => {
     if (meshRef.current) {
       // Pulsing animation based on sphere's pulse frequency
       const pulse = Math.sin(state.clock.elapsedTime * sphere.pulse_frequency * 2) * 0.1 + 1;
       meshRef.current.scale.setScalar(sphere.size_scale * pulse);
-      
+
       // Gentle rotation
       meshRef.current.rotation.y += 0.005;
-      
+
       // Visual state effects
       if (sphere.visual_state === 'bright_glow') {
         meshRef.current.rotation.y += 0.01;
@@ -108,7 +108,7 @@ const StorySphere: React.FC<StorySphereProps> = ({ sphere, onSphereClick, onSphe
           opacity={sphere.visual_state === 'dark_void' ? 0.3 : 0.8}
         />
       </Sphere>
-      
+
       {hovered && (
         <Html distanceFactor={10}>
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-3 shadow-lg max-w-xs">
@@ -133,7 +133,7 @@ const StorySphere: React.FC<StorySphereProps> = ({ sphere, onSphereClick, onSphe
 
 const NexusTree: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null);
-  
+
   useFrame((state) => {
     if (meshRef.current) {
       meshRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.1) * 0.1;
@@ -153,7 +153,7 @@ const NexusTree: React.FC = () => {
           opacity={0.7}
         />
       </mesh>
-      
+
       {/* Tree branches */}
       {[...Array(6)].map((_, i) => (
         <mesh key={i} position={[Math.cos(i) * 1.5, 1 + i * 0.3, Math.sin(i) * 1.5]}>
@@ -167,7 +167,7 @@ const NexusTree: React.FC = () => {
           />
         </mesh>
       ))}
-      
+
       <Text
         position={[0, -3, 0]}
         fontSize={0.5}
@@ -243,9 +243,9 @@ export const NexusHub: React.FC = () => {
           <ambientLight intensity={0.4} />
           <pointLight position={[10, 10, 10]} intensity={1} />
           <pointLight position={[-10, -10, -10]} intensity={0.5} color="#F18F01" />
-          
+
           <NexusTree />
-          
+
           {spheres.map((sphere) => (
             <StorySphere
               key={sphere.sphere_id}
@@ -254,7 +254,7 @@ export const NexusHub: React.FC = () => {
               onSphereHover={handleSphereHover}
             />
           ))}
-          
+
           <OrbitControls
             enablePan={true}
             enableZoom={true}
@@ -277,7 +277,7 @@ export const NexusHub: React.FC = () => {
                   {nexusState?.total_worlds} worlds • {nexusState?.active_story_weavers} active weavers
                 </p>
               </div>
-              
+
               <div className="flex space-x-4">
                 <button className="px-4 py-2 bg-white/20 backdrop-blur-sm rounded-lg text-white hover:bg-white/30 transition-colors">
                   Create World

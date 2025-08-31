@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { playerAPI } from '../../services/api';
+import { createSlice, createAsyncThunk, PayloadAction } from "@reduxjs/toolkit";
+import { playerAPI } from "../../services/api";
 
 interface PlayerProfile {
   player_id: string;
@@ -7,7 +7,7 @@ interface PlayerProfile {
   email: string;
   created_at: string;
   therapeutic_preferences: {
-    intensity_level: 'LOW' | 'MEDIUM' | 'HIGH';
+    intensity_level: "LOW" | "MEDIUM" | "HIGH";
     preferred_approaches: string[];
     trigger_warnings: string[];
     comfort_topics: string[];
@@ -46,7 +46,7 @@ const initialState: PlayerState = {
 };
 
 export const fetchPlayerProfile = createAsyncThunk(
-  'player/fetchProfile',
+  "player/fetchProfile",
   async (playerId: string) => {
     const response = await playerAPI.getProfile(playerId);
     return response;
@@ -54,7 +54,7 @@ export const fetchPlayerProfile = createAsyncThunk(
 );
 
 export const fetchPlayerDashboard = createAsyncThunk(
-  'player/fetchDashboard',
+  "player/fetchDashboard",
   async (playerId: string) => {
     const response = await playerAPI.getDashboard(playerId);
     return response;
@@ -62,15 +62,21 @@ export const fetchPlayerDashboard = createAsyncThunk(
 );
 
 export const updatePlayerProfile = createAsyncThunk(
-  'player/updateProfile',
-  async ({ playerId, updates }: { playerId: string; updates: Partial<PlayerProfile> }) => {
+  "player/updateProfile",
+  async ({
+    playerId,
+    updates,
+  }: {
+    playerId: string;
+    updates: Partial<PlayerProfile>;
+  }) => {
     const response = await playerAPI.updateProfile(playerId, updates);
     return response;
   }
 );
 
 const playerSlice = createSlice({
-  name: 'player',
+  name: "player",
   initialState,
   reducers: {
     clearError: (state) => {
@@ -93,17 +99,17 @@ const playerSlice = createSlice({
       })
       .addCase(fetchPlayerProfile.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.profile = action.payload;
+        state.profile = action.payload as any;
       })
       .addCase(fetchPlayerProfile.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.error.message || 'Failed to fetch profile';
+        state.error = action.error.message || "Failed to fetch profile";
       })
       .addCase(fetchPlayerDashboard.fulfilled, (state, action) => {
-        state.dashboard = action.payload;
+        state.dashboard = action.payload as any;
       })
       .addCase(updatePlayerProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        state.profile = action.payload as any;
       });
   },
 });

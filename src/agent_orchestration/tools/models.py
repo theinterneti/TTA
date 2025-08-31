@@ -1,13 +1,15 @@
 """
 Tool models and validation for dynamic tool system (Task 7.1/7.2).
 """
+
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Literal
-from pydantic import BaseModel, Field, field_validator
-from enum import Enum
 import hashlib
 import json
+from enum import Enum
+from typing import Any
+
+from pydantic import BaseModel, Field, field_validator
 
 from ..models import AgentId
 
@@ -19,20 +21,27 @@ class ToolStatus(str, Enum):
 
 class ToolParameter(BaseModel):
     name: str = Field(..., min_length=1, max_length=64)
-    description: Optional[str] = Field(default=None, max_length=512)
+    description: str | None = Field(default=None, max_length=512)
     required: bool = True
-    schema: Dict[str, Any] = Field(default_factory=dict, description="JSON schema for the parameter")
+    schema: dict[str, Any] = Field(
+        default_factory=dict, description="JSON schema for the parameter"
+    )
 
 
 class ToolSpec(BaseModel):
     name: str = Field(..., min_length=3, max_length=128)
     version: str = Field("1.0.0", description="Semver string")
     description: str = Field(..., min_length=1, max_length=1024)
-    parameters: List[ToolParameter] = Field(default_factory=list)
-    returns_schema: Dict[str, Any] = Field(default_factory=dict)
-    capabilities: List[str] = Field(default_factory=list, description="Tags/capabilities e.g. ['kg_read']")
-    safety_flags: List[str] = Field(default_factory=list, description="Flags like 'network', 'filesystem', 'process'")
-    owner: Optional[AgentId] = None
+    parameters: list[ToolParameter] = Field(default_factory=list)
+    returns_schema: dict[str, Any] = Field(default_factory=dict)
+    capabilities: list[str] = Field(
+        default_factory=list, description="Tags/capabilities e.g. ['kg_read']"
+    )
+    safety_flags: list[str] = Field(
+        default_factory=list,
+        description="Flags like 'network', 'filesystem', 'process'",
+    )
+    owner: AgentId | None = None
     created_at: float = Field(default=0.0)
     last_used_at: float = Field(default=0.0)
     status: ToolStatus = ToolStatus.ACTIVE
@@ -63,7 +72,7 @@ class ToolSpec(BaseModel):
 
     @field_validator("parameters")
     @classmethod
-    def _limit_params(cls, params: List[ToolParameter]) -> List[ToolParameter]:
+    def _limit_params(cls, params: list[ToolParameter]) -> list[ToolParameter]:
         if len(params) > 16:
             raise ValueError("too many parameters (max 16)")
         return params
@@ -76,8 +85,8 @@ class ToolRegistration(BaseModel):
 
 class ToolInvocation(BaseModel):
     tool_name: str
-    version: Optional[str] = None
-    arguments: Dict[str, Any] = Field(default_factory=dict)
+    version: str | None = None
+    arguments: dict[str, Any] = Field(default_factory=dict)
 
 
 from .policy_config import ToolPolicyConfig
@@ -90,11 +99,13 @@ class ToolPolicy(BaseModel):
     allow_process_tools: bool = False
     allow_subprocess_tools: bool = False
     allow_shell_exec: bool = False
-    allowed_callables: List[str] = Field(default_factory=list, description="Dot-path allowlist for wrapped callables")
+    allowed_callables: list[str] = Field(
+        default_factory=list, description="Dot-path allowlist for wrapped callables"
+    )
     max_schema_depth: int = 5
 
     # New configuration container
-    config: Optional[ToolPolicyConfig] = None
+    config: ToolPolicyConfig | None = None
 
     def _effective(self) -> ToolPolicyConfig:
         # Merge legacy flags into a ToolPolicyConfig if provided
@@ -119,11 +130,11 @@ class ToolPolicy(BaseModel):
         # default allow unknown capabilities
         return True
 
-    def get_timeout_ms(self) -> Optional[int]:
+    def get_timeout_ms(self) -> int | None:
         cfg = self._effective()
         return cfg.default_timeout_ms
 
-    def validate_safety_flags(self, safety_flags: List[str]) -> None:
+    def validate_safety_flags(self, safety_flags: list[str]) -> None:
         # Use capability gating
         for flag in safety_flags:
             if not self.is_capability_allowed(flag):
@@ -132,6 +143,7 @@ class ToolPolicy(BaseModel):
     def check_safety(self, spec: ToolSpec) -> None:
         # Backward-compat: honor legacy flags and schema depth checks
         self.validate_safety_flags(spec.safety_flags)
+
         # basic schema depth check
         def depth(obj: Any, d: int = 0) -> int:
             if isinstance(obj, dict):
@@ -139,6 +151,7 @@ class ToolPolicy(BaseModel):
             if isinstance(obj, list):
                 return max([d] + [depth(v, d + 1) for v in obj])
             return d
+
         for p in spec.parameters:
             if depth(p.schema) > self.max_schema_depth:
                 raise ValueError("parameter schema too deep")
@@ -149,4 +162,3 @@ class ToolPolicy(BaseModel):
         cfg = self._effective()
         if cfg.callable_allowlist and dotted_path not in set(cfg.callable_allowlist):
             raise ValueError(f"callable {dotted_path} not in allowed_callables")
-

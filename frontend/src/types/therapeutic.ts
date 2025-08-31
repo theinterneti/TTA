@@ -1,6 +1,6 @@
 /**
  * TypeScript definitions for TTA Therapeutic Gaming System
- * 
+ *
  * These types correspond to the API models from our backend system
  * and provide type safety for the frontend application.
  */

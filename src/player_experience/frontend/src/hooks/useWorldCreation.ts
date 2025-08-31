@@ -1,13 +1,13 @@
-import { useState, useCallback } from 'react';
-import { nexusAPI } from '../services/api';
-import { useAuthGuard } from './useAuthGuard';
+import { useCallback, useState } from "react";
+import { nexusAPI } from "../services/api";
+import { useAuthGuard } from "./useAuthGuard";
 
 export interface WorldCreationData {
   world_title: string;
   world_genre: string;
   description: string;
-  difficulty_level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  threat_level: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+  difficulty_level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
+  threat_level: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   therapeutic_focus: string[];
   tags: string[];
   estimated_duration: number;
@@ -18,7 +18,7 @@ export interface WorldCreationData {
 export interface WorldCreationResult {
   world_id: string;
   world_title: string;
-  status: 'created' | 'pending' | 'failed';
+  status: "created" | "pending" | "failed";
   message?: string;
 }
 
@@ -34,12 +34,14 @@ export interface UseWorldCreationResult {
   error: string | null;
   lastCreatedWorld: WorldCreationResult | null;
   clearError: () => void;
-  validateWorldData: (data: Partial<WorldCreationData>) => Record<string, string>;
+  validateWorldData: (
+    data: Partial<WorldCreationData>
+  ) => Record<string, string>;
 }
 
 /**
  * Custom hook for managing world creation workflow
- * 
+ *
  * Features:
  * - World creation with API integration
  * - Form validation
@@ -47,135 +49,148 @@ export interface UseWorldCreationResult {
  * - Success callbacks
  * - Authentication checks
  */
-export const useWorldCreation = (options: UseWorldCreationOptions = {}): UseWorldCreationResult => {
-  const {
-    onSuccess,
-    onError,
-    validateBeforeSubmit = true,
-  } = options;
+export const useWorldCreation = (
+  options: UseWorldCreationOptions = {}
+): UseWorldCreationResult => {
+  const { onSuccess, onError, validateBeforeSubmit = true } = options;
 
   const { isAuthenticated } = useAuthGuard({ autoRedirect: false });
-  
+
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [lastCreatedWorld, setLastCreatedWorld] = useState<WorldCreationResult | null>(null);
+  const [lastCreatedWorld, setLastCreatedWorld] =
+    useState<WorldCreationResult | null>(null);
 
   /**
    * Validate world creation data
    */
-  const validateWorldData = useCallback((data: Partial<WorldCreationData>): Record<string, string> => {
-    const errors: Record<string, string> = {};
+  const validateWorldData = useCallback(
+    (data: Partial<WorldCreationData>): Record<string, string> => {
+      const errors: Record<string, string> = {};
 
-    // Title validation
-    if (!data.world_title?.trim()) {
-      errors.world_title = 'World title is required';
-    } else if (data.world_title.length < 3) {
-      errors.world_title = 'World title must be at least 3 characters';
-    } else if (data.world_title.length > 100) {
-      errors.world_title = 'World title must be less than 100 characters';
-    }
-
-    // Genre validation
-    if (!data.world_genre) {
-      errors.world_genre = 'Genre is required';
-    }
-
-    // Description validation
-    if (!data.description?.trim()) {
-      errors.description = 'Description is required';
-    } else if (data.description.length < 20) {
-      errors.description = 'Description must be at least 20 characters';
-    } else if (data.description.length > 1000) {
-      errors.description = 'Description must be less than 1000 characters';
-    }
-
-    // Therapeutic focus validation
-    if (!data.therapeutic_focus || data.therapeutic_focus.length === 0) {
-      errors.therapeutic_focus = 'At least one therapeutic focus is required';
-    }
-
-    // Duration validation
-    if (data.estimated_duration !== undefined) {
-      if (data.estimated_duration < 5) {
-        errors.estimated_duration = 'Duration must be at least 5 minutes';
-      } else if (data.estimated_duration > 300) {
-        errors.estimated_duration = 'Duration must be less than 300 minutes';
+      // Title validation
+      if (!data.world_title?.trim()) {
+        errors.world_title = "World title is required";
+      } else if (data.world_title.length < 3) {
+        errors.world_title = "World title must be at least 3 characters";
+      } else if (data.world_title.length > 100) {
+        errors.world_title = "World title must be less than 100 characters";
       }
-    }
 
-    // Max players validation
-    if (data.max_players !== undefined) {
-      if (data.max_players < 1) {
-        errors.max_players = 'Must allow at least 1 player';
-      } else if (data.max_players > 10) {
-        errors.max_players = 'Maximum 10 players allowed';
+      // Genre validation
+      if (!data.world_genre) {
+        errors.world_genre = "Genre is required";
       }
-    }
 
-    return errors;
-  }, []);
+      // Description validation
+      if (!data.description?.trim()) {
+        errors.description = "Description is required";
+      } else if (data.description.length < 20) {
+        errors.description = "Description must be at least 20 characters";
+      } else if (data.description.length > 1000) {
+        errors.description = "Description must be less than 1000 characters";
+      }
+
+      // Therapeutic focus validation
+      if (!data.therapeutic_focus || data.therapeutic_focus.length === 0) {
+        errors.therapeutic_focus = "At least one therapeutic focus is required";
+      }
+
+      // Duration validation
+      if (data.estimated_duration !== undefined) {
+        if (data.estimated_duration < 5) {
+          errors.estimated_duration = "Duration must be at least 5 minutes";
+        } else if (data.estimated_duration > 300) {
+          errors.estimated_duration = "Duration must be less than 300 minutes";
+        }
+      }
+
+      // Max players validation
+      if (data.max_players !== undefined) {
+        if (data.max_players < 1) {
+          errors.max_players = "Must allow at least 1 player";
+        } else if (data.max_players > 10) {
+          errors.max_players = "Maximum 10 players allowed";
+        }
+      }
+
+      return errors;
+    },
+    []
+  );
 
   /**
    * Create a new world
    */
-  const createWorld = useCallback(async (data: WorldCreationData): Promise<WorldCreationResult> => {
-    try {
-      setIsCreating(true);
-      setError(null);
+  const createWorld = useCallback(
+    async (data: WorldCreationData): Promise<WorldCreationResult> => {
+      try {
+        setIsCreating(true);
+        setError(null);
 
-      // Check authentication
-      if (!isAuthenticated) {
-        throw new Error('You must be logged in to create a world');
-      }
-
-      // Validate data if required
-      if (validateBeforeSubmit) {
-        const validationErrors = validateWorldData(data);
-        if (Object.keys(validationErrors).length > 0) {
-          const errorMessage = Object.values(validationErrors)[0];
-          throw new Error(`Validation failed: ${errorMessage}`);
+        // Check authentication
+        if (!isAuthenticated) {
+          throw new Error("You must be logged in to create a world");
         }
+
+        // Validate data if required
+        if (validateBeforeSubmit) {
+          const validationErrors = validateWorldData(data);
+          if (Object.keys(validationErrors).length > 0) {
+            const errorMessage = Object.values(validationErrors)[0];
+            throw new Error(`Validation failed: ${errorMessage}`);
+          }
+        }
+
+        // Prepare data for API
+        const worldData = {
+          ...data,
+          // Ensure arrays are properly formatted
+          therapeutic_focus: Array.isArray(data.therapeutic_focus)
+            ? data.therapeutic_focus
+            : [],
+          tags: Array.isArray(data.tags) ? data.tags : [],
+        };
+
+        // Call API
+        const response = await nexusAPI.createWorld(worldData);
+
+        const result: WorldCreationResult = {
+          world_id: (response as any).world_id || (response as any).id,
+          world_title: data.world_title,
+          status: "created",
+          message: (response as any).message || "World created successfully",
+        };
+
+        setLastCreatedWorld(result);
+        onSuccess?.(result);
+
+        return result;
+      } catch (err: any) {
+        const errorMessage = err.message || "Failed to create world";
+        setError(errorMessage);
+
+        const result: WorldCreationResult = {
+          world_id: "",
+          world_title: data.world_title,
+          status: "failed",
+          message: errorMessage,
+        };
+
+        onError?.(err);
+        throw err;
+      } finally {
+        setIsCreating(false);
       }
-
-      // Prepare data for API
-      const worldData = {
-        ...data,
-        // Ensure arrays are properly formatted
-        therapeutic_focus: Array.isArray(data.therapeutic_focus) ? data.therapeutic_focus : [],
-        tags: Array.isArray(data.tags) ? data.tags : [],
-      };
-
-      // Call API
-      const response = await nexusAPI.createWorld(worldData);
-      
-      const result: WorldCreationResult = {
-        world_id: response.world_id || response.id,
-        world_title: data.world_title,
-        status: 'created',
-        message: response.message || 'World created successfully',
-      };
-
-      setLastCreatedWorld(result);
-      onSuccess?.(result);
-      
-      return result;
-    } catch (err: any) {
-      const errorMessage = err.message || 'Failed to create world';
-      setError(errorMessage);
-      
-      const result: WorldCreationResult = {
-        world_id: '',
-        world_title: data.world_title,
-        status: 'failed',
-        message: errorMessage,
-      };
-
-      onError?.(err);
-      throw err;
-    } finally {
-      setIsCreating(false);
-    }
-  }, [isAuthenticated, validateBeforeSubmit, validateWorldData, onSuccess, onError]);
+    },
+    [
+      isAuthenticated,
+      validateBeforeSubmit,
+      validateWorldData,
+      onSuccess,
+      onError,
+    ]
+  );
 
   /**
    * Clear error state
@@ -202,7 +217,7 @@ export const useWorldCreationWithNavigation = (
 ) => {
   const worldCreation = useWorldCreation({
     onSuccess: (result) => {
-      if (result.status === 'created' && onNavigateToWorld) {
+      if (result.status === "created" && onNavigateToWorld) {
         onNavigateToWorld(result.world_id);
       }
     },
@@ -219,44 +234,47 @@ export const useBatchWorldCreation = () => {
   const [batchProgress, setBatchProgress] = useState({ current: 0, total: 0 });
   const [isBatchCreating, setIsBatchCreating] = useState(false);
 
-  const createWorldsBatch = useCallback(async (worldsData: WorldCreationData[]) => {
-    setIsBatchCreating(true);
-    setBatchResults([]);
-    setBatchProgress({ current: 0, total: worldsData.length });
+  const createWorldsBatch = useCallback(
+    async (worldsData: WorldCreationData[]) => {
+      setIsBatchCreating(true);
+      setBatchResults([]);
+      setBatchProgress({ current: 0, total: worldsData.length });
 
-    const results: WorldCreationResult[] = [];
+      const results: WorldCreationResult[] = [];
 
-    for (let i = 0; i < worldsData.length; i++) {
-      try {
-        setBatchProgress({ current: i + 1, total: worldsData.length });
-        
-        const response = await nexusAPI.createWorld(worldsData[i]);
-        
-        const result: WorldCreationResult = {
-          world_id: response.world_id || response.id,
-          world_title: worldsData[i].world_title,
-          status: 'created',
-          message: 'World created successfully',
-        };
-        
-        results.push(result);
-      } catch (err: any) {
-        const result: WorldCreationResult = {
-          world_id: '',
-          world_title: worldsData[i].world_title,
-          status: 'failed',
-          message: err.message || 'Failed to create world',
-        };
-        
-        results.push(result);
+      for (let i = 0; i < worldsData.length; i++) {
+        try {
+          setBatchProgress({ current: i + 1, total: worldsData.length });
+
+          const response = await nexusAPI.createWorld(worldsData[i]);
+
+          const result: WorldCreationResult = {
+            world_id: (response as any).world_id || (response as any).id,
+            world_title: worldsData[i].world_title,
+            status: "created",
+            message: "World created successfully",
+          };
+
+          results.push(result);
+        } catch (err: any) {
+          const result: WorldCreationResult = {
+            world_id: "",
+            world_title: worldsData[i].world_title,
+            status: "failed",
+            message: err.message || "Failed to create world",
+          };
+
+          results.push(result);
+        }
       }
-    }
 
-    setBatchResults(results);
-    setIsBatchCreating(false);
-    
-    return results;
-  }, []);
+      setBatchResults(results);
+      setIsBatchCreating(false);
+
+      return results;
+    },
+    []
+  );
 
   return {
     createWorldsBatch,

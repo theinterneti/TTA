@@ -1,10 +1,7 @@
-import asyncio
 import pytest
 
-from types import SimpleNamespace
-
+from src.agent_orchestration.models import AgentId, AgentType
 from src.agent_orchestration.router import AgentRouter
-from src.agent_orchestration.models import AgentType, AgentId
 
 
 class DummyMetrics:
@@ -12,32 +9,48 @@ class DummyMetrics:
         self.requests = requests
         self.errors = errors
 
+
 class DummyAgent:
-    def __init__(self, atype: AgentType, instance: str, running=True, degraded=False, requests=0, errors=0):
+    def __init__(
+        self,
+        atype: AgentType,
+        instance: str,
+        running=True,
+        degraded=False,
+        requests=0,
+        errors=0,
+    ):
         self.agent_id = AgentId(type=atype, instance=instance)
         self._running = running
         self._degraded = degraded
         self._metrics = DummyMetrics(requests=requests, errors=errors)
         self.name = f"{atype.value}:{instance}"
 
+
 class DummyRegistry:
     def __init__(self, agents):
         self._agents = agents
+
     def all(self):
         return list(self._agents)
+
 
 class DummyRedis:
     def __init__(self, llen_map=None, heartbeat_map=None):
         self.llen_map = llen_map or {}
         self.heartbeat_map = heartbeat_map or {}
+
     async def llen(self, key: str):
         return int(self.llen_map.get(key, 0))
+
     async def get(self, key: str):
         v = self.heartbeat_map.get(key)
         if v is None:
             return None
         import json
+
         return (json.dumps(v)).encode()
+
 
 @pytest.mark.asyncio
 async def test_shortest_queue_wins():
@@ -53,12 +66,16 @@ async def test_shortest_queue_wins():
     }
     # Heartbeats all fresh and identical
     import time
+
     now = time.time()
-    hb = {f"ao:agents:{at.value}:{i}": {"last_heartbeat": now} for i in ("a1","a2","a3")}
+    hb = {
+        f"ao:agents:{at.value}:{i}": {"last_heartbeat": now} for i in ("a1", "a2", "a3")
+    }
     r = DummyRedis(llen_map=llen_map, heartbeat_map=hb)
     router = AgentRouter(reg, r, heartbeat_fresh_s=30.0)
     res = await router.resolve_healthy_instance(at)
     assert res.instance == "a2"
+
 
 @pytest.mark.asyncio
 async def test_degraded_agents_excluded():
@@ -71,6 +88,7 @@ async def test_degraded_agents_excluded():
     res = await router.resolve_healthy_instance(at)
     assert res.instance == "a2"
 
+
 @pytest.mark.asyncio
 async def test_heartbeat_freshness_preference():
     at = AgentType.IPA
@@ -78,6 +96,7 @@ async def test_heartbeat_freshness_preference():
     a2 = DummyAgent(at, "a2")
     reg = DummyRegistry([a1, a2])
     import time
+
     now = time.time()
     # same queue, but a1 is stale heartbeat (older)
     llen_map = {f"ao:queue:{at.value}:a1": 3, f"ao:queue:{at.value}:a2": 3}
@@ -91,7 +110,6 @@ async def test_heartbeat_freshness_preference():
     assert res.instance == "a2"
 
 
-
 @pytest.mark.asyncio
 async def test_configured_weights_flow_into_preview():
     # Two agents to allow preview; configure via ctor args explicitly
@@ -100,13 +118,20 @@ async def test_configured_weights_flow_into_preview():
     a2 = DummyAgent(at, "a2")
     reg = DummyRegistry([a1, a2])
     import time
+
     now = time.time()
-    hb = {f"ao:agents:{at.value}:{i}": {"last_heartbeat": now} for i in ("a1","a2")}
-    llen_map = {f"ao:queue:{at.value}:{i}": 1 for i in ("a1","a2")}
+    hb = {f"ao:agents:{at.value}:{i}": {"last_heartbeat": now} for i in ("a1", "a2")}
+    llen_map = {f"ao:queue:{at.value}:{i}": 1 for i in ("a1", "a2")}
     r = DummyRedis(llen_map=llen_map, heartbeat_map=hb)
-    router = AgentRouter(reg, r, heartbeat_fresh_s=45.0, w_queue=0.5, w_heartbeat=0.3, w_success=0.2)
+    router = AgentRouter(
+        reg, r, heartbeat_fresh_s=45.0, w_queue=0.5, w_heartbeat=0.3, w_success=0.2
+    )
     preview = await router.preview(at)
-    assert preview["configured_weights"] == {"queue": 0.5, "heartbeat": 0.3, "success": 0.2}
+    assert preview["configured_weights"] == {
+        "queue": 0.5,
+        "heartbeat": 0.3,
+        "success": 0.2,
+    }
     assert preview["configured_heartbeat_fresh_seconds"] == 45.0
 
 
@@ -152,6 +177,7 @@ async def test_show_all_candidates_includes_excluded_agents():
     reg = DummyRegistry([a_ok1, a_ok2, a_deg, a_wrong, a_down])
     # Provide equal queues and fresh heartbeats so scoring differences do not affect presence checks
     import time
+
     now = time.time()
     llen_map = {
         f"ao:queue:{at.value}:ok1": 1,

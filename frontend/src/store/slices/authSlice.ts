@@ -1,6 +1,6 @@
 /**
  * Authentication Redux Slice
- * 
+ *
  * Manages user authentication state and therapeutic preferences.
  */
 

@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 from unittest.mock import Mock
 
 
@@ -11,4 +10,3 @@ def build_mock_driver():
     mock_driver.session.return_value = mock_session_ctx
     mock_session.run.return_value = Mock(single=Mock(return_value=None))
     return mock_driver
-

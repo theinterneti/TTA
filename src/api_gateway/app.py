@@ -5,8 +5,8 @@ This module contains the FastAPI application instance and configuration
 for the TTA API Gateway & Service Integration system.
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,8 +14,8 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 
-from .config import GatewaySettings, get_gateway_settings
-from .core import GatewayCore, create_gateway_router
+from .config import get_gateway_settings
+from .core import GatewayCore
 from .middleware.auth import AuthenticationMiddleware
 from .middleware.logging import LoggingMiddleware
 from .middleware.rate_limiting import RateLimitingMiddleware
@@ -23,7 +23,7 @@ from .middleware.security import SecurityHeadersMiddleware
 from .middleware.therapeutic_safety import TherapeuticSafetyMiddleware
 from .monitoring.health import health_router
 from .monitoring.metrics import metrics_router
-from .services import ServiceDiscoveryManager, AutoRegistrationService
+from .services import AutoRegistrationService, ServiceDiscoveryManager
 from .websocket import WebSocketConnectionManager, create_websocket_router
 
 
@@ -54,9 +54,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
     # Create and include WebSocket router
     websocket_router = create_websocket_router(
-        websocket_manager,
-        gateway_core.service_router,
-        discovery_manager
+        websocket_manager, gateway_core.service_router, discovery_manager
     )
     app.include_router(websocket_router, tags=["websocket"])
 
@@ -83,30 +81,27 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 def create_gateway_app() -> FastAPI:
     """
     Create and configure the API Gateway FastAPI application.
-    
+
     Returns:
         FastAPI: Configured API Gateway application
     """
     settings = get_gateway_settings()
-    
+
     app = FastAPI(
         title="TTA API Gateway",
         description="Unified entry point for all TTA services with centralized routing, "
-                   "authentication, rate limiting, and therapeutic safety monitoring.",
+        "authentication, rate limiting, and therapeutic safety monitoring.",
         version="1.0.0",
         docs_url="/docs" if settings.debug else None,
         redoc_url="/redoc" if settings.debug else None,
         openapi_url="/openapi.json" if settings.debug else None,
         lifespan=lifespan,
     )
-    
+
     # Add security middleware
     if settings.trusted_hosts:
-        app.add_middleware(
-            TrustedHostMiddleware,
-            allowed_hosts=settings.trusted_hosts
-        )
-    
+        app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.trusted_hosts)
+
     # Add CORS middleware
     if settings.cors_origins:
         app.add_middleware(
@@ -116,21 +111,21 @@ def create_gateway_app() -> FastAPI:
             allow_methods=["*"],
             allow_headers=["*"],
         )
-    
+
     # Add compression middleware
     app.add_middleware(GZipMiddleware, minimum_size=1000)
-    
+
     # Add custom middleware (order matters - last added runs first)
     app.add_middleware(TherapeuticSafetyMiddleware)
     app.add_middleware(SecurityHeadersMiddleware)
     app.add_middleware(RateLimitingMiddleware)
     app.add_middleware(AuthenticationMiddleware)
     app.add_middleware(LoggingMiddleware)
-    
+
     # Include routers
     app.include_router(health_router, prefix="/health", tags=["health"])
     app.include_router(metrics_router, prefix="/metrics", tags=["metrics"])
-    
+
     return app
 
 
@@ -145,11 +140,14 @@ async def root():
         "service": "TTA API Gateway",
         "version": "1.0.0",
         "status": "operational",
-        "description": "Unified entry point for all TTA services"
+        "description": "Unified entry point for all TTA services",
     }
 
 
-@app.api_route("/api/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"])
+@app.api_route(
+    "/api/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH", "HEAD", "OPTIONS"],
+)
 async def gateway_route(request: Request, path: str) -> Response:
     """
     Main gateway route handler for all API requests.
@@ -161,7 +159,7 @@ async def gateway_route(request: Request, path: str) -> Response:
     Returns:
         Response: Processed response from target service
     """
-    if hasattr(request.app.state, 'gateway_core'):
+    if hasattr(request.app.state, "gateway_core"):
         return await request.app.state.gateway_core.process_request(request)
     else:
         # Fallback if gateway core is not initialized
@@ -170,14 +168,14 @@ async def gateway_route(request: Request, path: str) -> Response:
             content={
                 "error": "Gateway not ready",
                 "message": "Gateway core is not initialized",
-                "code": "GATEWAY_NOT_READY"
-            }
+                "code": "GATEWAY_NOT_READY",
+            },
         )
 
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     settings = get_gateway_settings()
     uvicorn.run(
         "src.api_gateway.app:app",

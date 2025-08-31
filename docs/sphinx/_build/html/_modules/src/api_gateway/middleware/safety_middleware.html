@@ -1,0 +1,894 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.middleware.safety_middleware &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.middleware.safety_middleware</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.middleware.safety_middleware</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Therapeutic safety middleware for the API Gateway.</span>
+
+<span class="sd">This module provides comprehensive therapeutic content safety scanning,</span>
+<span class="sd">crisis detection, intervention mechanisms, and compliance monitoring.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayRequest</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SafetyLevel">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.SafetyLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SafetyLevel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Safety assessment levels.&quot;&quot;&quot;</span>
+
+    <span class="n">SAFE</span> <span class="o">=</span> <span class="s2">&quot;safe&quot;</span>
+    <span class="n">CAUTION</span> <span class="o">=</span> <span class="s2">&quot;caution&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;warning&quot;</span>
+    <span class="n">DANGER</span> <span class="o">=</span> <span class="s2">&quot;danger&quot;</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="InterventionType">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.InterventionType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InterventionType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of safety interventions.&quot;&quot;&quot;</span>
+
+    <span class="n">LOG_ONLY</span> <span class="o">=</span> <span class="s2">&quot;log_only&quot;</span>
+    <span class="n">FLAG_CONTENT</span> <span class="o">=</span> <span class="s2">&quot;flag_content&quot;</span>
+    <span class="n">NOTIFY_STAFF</span> <span class="o">=</span> <span class="s2">&quot;notify_staff&quot;</span>
+    <span class="n">BLOCK_REQUEST</span> <span class="o">=</span> <span class="s2">&quot;block_request&quot;</span>
+    <span class="n">EMERGENCY_RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;emergency_response&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="CrisisIndicator">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.CrisisIndicator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrisisIndicator</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of crisis indicators.&quot;&quot;&quot;</span>
+
+    <span class="n">SELF_HARM</span> <span class="o">=</span> <span class="s2">&quot;self_harm&quot;</span>
+    <span class="n">SUICIDE_IDEATION</span> <span class="o">=</span> <span class="s2">&quot;suicide_ideation&quot;</span>
+    <span class="n">SUBSTANCE_ABUSE</span> <span class="o">=</span> <span class="s2">&quot;substance_abuse&quot;</span>
+    <span class="n">VIOLENCE</span> <span class="o">=</span> <span class="s2">&quot;violence&quot;</span>
+    <span class="n">PSYCHOSIS</span> <span class="o">=</span> <span class="s2">&quot;psychosis&quot;</span>
+    <span class="n">SEVERE_DEPRESSION</span> <span class="o">=</span> <span class="s2">&quot;severe_depression&quot;</span>
+    <span class="n">PANIC_DISORDER</span> <span class="o">=</span> <span class="s2">&quot;panic_disorder&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SafetyRule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.SafetyRule">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SafetyRule</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Individual safety rule configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Lower numbers execute first</span>
+    <span class="n">path_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">])</span>
+
+    <span class="c1"># Content scanning</span>
+    <span class="n">scan_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">,</span> <span class="s2">&quot;content&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">crisis_keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">warning_keywords</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Crisis detection patterns</span>
+    <span class="n">crisis_patterns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">CrisisIndicator</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Safety thresholds</span>
+    <span class="n">crisis_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># 0.0 to 1.0</span>
+    <span class="n">warning_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+
+    <span class="c1"># Intervention configuration</span>
+    <span class="n">intervention_type</span><span class="p">:</span> <span class="n">InterventionType</span> <span class="o">=</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">LOG_ONLY</span>
+    <span class="n">notify_roles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Therapeutic context requirements</span>
+    <span class="n">require_therapeutic_context</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">therapeutic_session_monitoring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="SafetyConfig">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.SafetyConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SafetyConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for therapeutic safety middleware.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">real_time_monitoring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">crisis_intervention</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">compliance_logging</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Crisis response settings</span>
+    <span class="n">emergency_contact_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">emergency_contact_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.9</span>
+    <span class="n">auto_escalation</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Content monitoring</span>
+    <span class="n">content_retention_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">audit_trail_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">sensitive_content_masking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Notification settings</span>
+    <span class="n">staff_notification_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">email_notifications</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sms_notifications</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Compliance settings</span>
+    <span class="n">hipaa_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">gdpr_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">therapeutic_standards_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticSafetyMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Therapeutic safety middleware for comprehensive content safety scanning.</span>
+
+<span class="sd">    Provides crisis detection, intervention mechanisms, compliance monitoring,</span>
+<span class="sd">    and therapeutic content safety validation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SafetyConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize therapeutic safety middleware.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: Safety configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">SafetyConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+        <span class="c1"># Safety rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SafetyRule</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_default_rules</span><span class="p">()</span>
+
+        <span class="c1"># Crisis detection patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_crisis_patterns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">warning_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_warning_patterns</span><span class="p">()</span>
+
+        <span class="c1"># Safety assessment cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">assessment_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">SafetyLevel</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache_ttl</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+        <span class="c1"># Intervention tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Compliance tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_default_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load default safety rules.&quot;&quot;&quot;</span>
+        <span class="c1"># Crisis detection rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SafetyRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;crisis_detection&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Detect crisis content and self-harm indicators&quot;</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/api/therapeutic/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/sessions/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/chat/*&quot;</span><span class="p">],</span>
+                <span class="n">crisis_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                <span class="n">warning_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+                <span class="n">intervention_type</span><span class="o">=</span><span class="n">InterventionType</span><span class="o">.</span><span class="n">NOTIFY_STAFF</span><span class="p">,</span>
+                <span class="n">notify_roles</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;therapist&quot;</span><span class="p">,</span> <span class="s2">&quot;crisis_counselor&quot;</span><span class="p">,</span> <span class="s2">&quot;admin&quot;</span><span class="p">],</span>
+                <span class="n">require_therapeutic_context</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">therapeutic_session_monitoring</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Content safety rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SafetyRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;content_safety&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;General content safety scanning&quot;</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+                <span class="n">warning_threshold</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                <span class="n">intervention_type</span><span class="o">=</span><span class="n">InterventionType</span><span class="o">.</span><span class="n">FLAG_CONTENT</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Therapeutic compliance rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SafetyRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;therapeutic_compliance&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic standards compliance monitoring&quot;</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/api/therapeutic/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/sessions/*&quot;</span><span class="p">],</span>
+                <span class="n">intervention_type</span><span class="o">=</span><span class="n">InterventionType</span><span class="o">.</span><span class="n">LOG_ONLY</span><span class="p">,</span>
+                <span class="n">require_therapeutic_context</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_crisis_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">CrisisIndicator</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load crisis detection patterns.&quot;&quot;&quot;</span>
+        <span class="n">patterns</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">SELF_HARM</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(cut|cutting|hurt myself|self.?harm|mutilate)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(razor|blade|knife|burn|burning)\b.*\b(myself|skin)\b&quot;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(want to hurt|need to hurt|going to hurt)\b.*\bmyself\b&quot;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">SUICIDE_IDEATION</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(suicide|kill myself|end it all|take my life)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(want to die|wish I was dead|better off dead)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(jump off|hang myself|overdose|pills)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(planning to|going to|about to)\b.*\b(kill|die|end)\b&quot;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">SUBSTANCE_ABUSE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(overdosed|too many pills|drinking too much)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(can\&#39;t stop using|relapsed|using again)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(high right now|drunk|wasted|stoned)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">VIOLENCE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(want to hurt|going to hurt|kill)\b.*\b(someone|others|them)\b&quot;</span><span class="p">,</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(violent thoughts|rage|anger|furious)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(weapon|gun|knife|violence)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">SEVERE_DEPRESSION</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(hopeless|worthless|useless|failure)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(can\&#39;t go on|no point|give up|trapped)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(unbearable pain|can\&#39;t take it|desperate)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+            <span class="p">],</span>
+            <span class="n">CrisisIndicator</span><span class="o">.</span><span class="n">PANIC_DISORDER</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                    <span class="sa">r</span><span class="s2">&quot;\b(panic attack|can\&#39;t breathe|heart racing)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+                <span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(chest pain|dizzy|fainting|dying)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(losing control|going crazy|unreal)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">patterns</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_warning_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load warning-level patterns.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(sad|depressed|down|low|blue)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(anxious|worried|stressed|overwhelmed)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(tired|exhausted|drained|empty)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(lonely|isolated|alone|abandoned)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(angry|frustrated|irritated|mad)\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.assess_safety">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.assess_safety">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">assess_safety</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assess therapeutic safety of the request content.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Request to assess</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GatewayRequest: Request with safety assessment</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find applicable safety rules</span>
+            <span class="n">applicable_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_applicable_rules</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sort rules by priority</span>
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+            <span class="c1"># Perform safety assessment</span>
+            <span class="n">overall_safety_level</span> <span class="o">=</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">SAFE</span>
+            <span class="n">detected_indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisIndicator</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">safety_score</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">applicable_rules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">rule_assessment</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assess_rule</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+                    <span class="c1"># Update overall assessment</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">rule_assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span>
+                        <span class="o">&gt;</span> <span class="n">overall_safety_level</span><span class="o">.</span><span class="n">value</span>
+                    <span class="p">):</span>
+                        <span class="n">overall_safety_level</span> <span class="o">=</span> <span class="n">rule_assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span>
+
+                    <span class="n">safety_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">safety_score</span><span class="p">,</span> <span class="n">rule_assessment</span><span class="p">[</span><span class="s2">&quot;safety_score&quot;</span><span class="p">])</span>
+                    <span class="n">detected_indicators</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">rule_assessment</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">])</span>
+
+                    <span class="c1"># Handle interventions</span>
+                    <span class="k">if</span> <span class="n">rule_assessment</span><span class="p">[</span><span class="s2">&quot;intervention_required&quot;</span><span class="p">]:</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_intervention</span><span class="p">(</span>
+                            <span class="n">gateway_request</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="n">rule_assessment</span>
+                        <span class="p">)</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error assessing safety rule &#39;</span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Add safety metadata to request</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">):</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="n">gateway_request</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;safety_assessment&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">overall_safety_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;safety_score&quot;</span><span class="p">:</span> <span class="n">safety_score</span><span class="p">,</span>
+                        <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="p">[</span>
+                            <span class="n">indicator</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">detected_indicators</span>
+                        <span class="p">],</span>
+                        <span class="s2">&quot;assessment_timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                        <span class="s2">&quot;requires_intervention&quot;</span><span class="p">:</span> <span class="n">overall_safety_level</span>
+                        <span class="ow">in</span> <span class="p">[</span><span class="n">SafetyLevel</span><span class="o">.</span><span class="n">DANGER</span><span class="p">,</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Log safety event for compliance</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">compliance_logging</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log_safety_event</span><span class="p">(</span>
+                    <span class="n">gateway_request</span><span class="p">,</span> <span class="n">overall_safety_level</span><span class="p">,</span> <span class="n">detected_indicators</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">gateway_request</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during safety assessment: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_request</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_applicable_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SafetyRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find safety rules applicable to the request.&quot;&quot;&quot;</span>
+        <span class="n">applicable_rules</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="p">:</span>
+            <span class="c1"># Check method match</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Check path pattern match</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">path_patterns</span><span class="p">:</span>
+                <span class="n">path_match</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">path_patterns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pattern</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;.*&quot;</span><span class="p">),</span> <span class="n">path</span><span class="p">):</span>
+                        <span class="n">path_match</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">path_match</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">applicable_rules</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_assess_rule</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SafetyRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assess a single safety rule against the request.&quot;&quot;&quot;</span>
+        <span class="n">assessment</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">SAFE</span><span class="p">,</span>
+            <span class="s2">&quot;safety_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;intervention_required&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;details&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Check therapeutic context requirement</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">require_therapeutic_context</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;therapeutic_context&quot;</span>
+            <span class="p">):</span>
+                <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">][</span><span class="s2">&quot;therapeutic_context_missing&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">return</span> <span class="n">assessment</span>
+
+        <span class="c1"># Extract content to analyze</span>
+        <span class="n">content_to_analyze</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">body_data</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span>
+
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">scan_fields</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">body_data</span><span class="p">:</span>
+                            <span class="n">content_to_analyze</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">body_data</span><span class="p">[</span><span class="n">field</span><span class="p">]))</span>
+
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="c1"># Treat entire body as text content</span>
+                <span class="n">content_to_analyze</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">))</span>
+
+        <span class="c1"># Analyze content for crisis indicators</span>
+        <span class="k">if</span> <span class="n">content_to_analyze</span><span class="p">:</span>
+            <span class="n">crisis_score</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">detected_indicators</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">for</span> <span class="n">content</span> <span class="ow">in</span> <span class="n">content_to_analyze</span><span class="p">:</span>
+                <span class="n">content_assessment</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_content</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">crisis_score</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">crisis_score</span><span class="p">,</span> <span class="n">content_assessment</span><span class="p">[</span><span class="s2">&quot;crisis_score&quot;</span><span class="p">])</span>
+                <span class="n">detected_indicators</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">content_assessment</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">])</span>
+
+            <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">crisis_score</span>
+            <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">detected_indicators</span><span class="p">))</span>
+
+            <span class="c1"># Determine safety level</span>
+            <span class="k">if</span> <span class="n">crisis_score</span> <span class="o">&gt;=</span> <span class="n">rule</span><span class="o">.</span><span class="n">crisis_threshold</span><span class="p">:</span>
+                <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">CRITICAL</span>
+                <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;intervention_required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">crisis_score</span> <span class="o">&gt;=</span> <span class="n">rule</span><span class="o">.</span><span class="n">warning_threshold</span><span class="p">:</span>
+                <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">WARNING</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">!=</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">LOG_ONLY</span><span class="p">:</span>
+                    <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;intervention_required&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">crisis_score</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">CAUTION</span>
+
+        <span class="k">return</span> <span class="n">assessment</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze content for crisis indicators and safety concerns.&quot;&quot;&quot;</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;crisis_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;warning_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;details&quot;</span><span class="p">:</span> <span class="p">{},</span>
+        <span class="p">}</span>
+
+        <span class="n">content_lower</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># Check crisis patterns</span>
+        <span class="n">crisis_matches</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_crisis_patterns</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">indicator</span><span class="p">,</span> <span class="n">patterns</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_patterns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">total_crisis_patterns</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">patterns</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+                    <span class="n">crisis_matches</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">indicator</span><span class="p">)</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;details&quot;</span><span class="p">][</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indicator</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_detected&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Calculate crisis score</span>
+        <span class="k">if</span> <span class="n">total_crisis_patterns</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;crisis_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="mf">1.0</span><span class="p">,</span> <span class="n">crisis_matches</span> <span class="o">/</span> <span class="n">total_crisis_patterns</span> <span class="o">*</span> <span class="mf">2.0</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check warning patterns</span>
+        <span class="n">warning_matches</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_patterns</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">content</span><span class="p">):</span>
+                <span class="n">warning_matches</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Calculate warning score</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">warning_patterns</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;warning_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="mf">1.0</span><span class="p">,</span> <span class="n">warning_matches</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">warning_patterns</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Combine scores (crisis score takes precedence)</span>
+        <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;crisis_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;crisis_score&quot;</span><span class="p">],</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;warning_score&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.5</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">analysis</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_intervention</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SafetyRule</span><span class="p">,</span> <span class="n">assessment</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle safety intervention based on rule configuration.&quot;&quot;&quot;</span>
+        <span class="n">intervention_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">correlation_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">intervention_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;intervention_id&quot;</span><span class="p">:</span> <span class="n">intervention_id</span><span class="p">,</span>
+            <span class="s2">&quot;rule_name&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;intervention_type&quot;</span><span class="p">:</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;safety_score&quot;</span><span class="p">:</span> <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;safety_score&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">indicator</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">assessment</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">]</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_session_id&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Store intervention</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="p">[</span><span class="n">intervention_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">intervention_data</span>
+
+        <span class="c1"># Execute intervention based on type</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">==</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">LOG_ONLY</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Safety intervention logged: </span><span class="si">{</span><span class="n">intervention_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">==</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">FLAG_CONTENT</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Content flagged for review: </span><span class="si">{</span><span class="n">intervention_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Add flag to request metadata</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">):</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;content_flagged&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;flag_reason&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;safety_concern&quot;</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">==</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">NOTIFY_STAFF</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Staff notification triggered: </span><span class="si">{</span><span class="n">intervention_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_notify_staff</span><span class="p">(</span><span class="n">intervention_data</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">notify_roles</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">==</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">BLOCK_REQUEST</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Request blocked due to safety concerns: </span><span class="si">{</span><span class="n">intervention_data</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># This would typically raise an exception to block the request</span>
+            <span class="c1"># For now, we&#39;ll just log and flag</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">):</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;request_blocked&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;block_reason&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;safety_violation&quot;</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">==</span> <span class="n">InterventionType</span><span class="o">.</span><span class="n">EMERGENCY_RESPONSE</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Emergency response triggered: </span><span class="si">{</span><span class="n">intervention_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_emergency_response</span><span class="p">(</span><span class="n">intervention_data</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_notify_staff</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">intervention_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">notify_roles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Notify staff members about safety concerns.&quot;&quot;&quot;</span>
+        <span class="n">notification</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;safety_alert&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;high&quot;</span>
+                <span class="k">if</span> <span class="n">intervention_data</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;danger&quot;</span><span class="p">,</span> <span class="s2">&quot;critical&quot;</span><span class="p">]</span>
+                <span class="k">else</span> <span class="s2">&quot;medium&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;intervention_data&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="p">,</span>
+            <span class="s2">&quot;notify_roles&quot;</span><span class="p">:</span> <span class="n">notify_roles</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Log notification (in a real implementation, this would send actual notifications)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+            <span class="s2">&quot;Staff notification sent&quot;</span><span class="p">,</span>
+            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;notification&quot;</span><span class="p">:</span> <span class="n">notification</span><span class="p">,</span>
+                <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># TODO: Implement actual notification mechanisms</span>
+        <span class="c1"># - Email notifications</span>
+        <span class="c1"># - SMS notifications</span>
+        <span class="c1"># - In-app notifications</span>
+        <span class="c1"># - Integration with crisis response systems</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_trigger_emergency_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">intervention_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger emergency response procedures.&quot;&quot;&quot;</span>
+        <span class="n">emergency_response</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;emergency_response&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;intervention_data&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="p">,</span>
+            <span class="s2">&quot;response_level&quot;</span><span class="p">:</span> <span class="s2">&quot;immediate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;escalation_required&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Log emergency response</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+            <span class="s2">&quot;Emergency response triggered&quot;</span><span class="p">,</span>
+            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;emergency_response&quot;</span><span class="p">:</span> <span class="n">emergency_response</span><span class="p">,</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="n">intervention_data</span><span class="p">[</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># TODO: Implement emergency response procedures</span>
+        <span class="c1"># - Contact emergency services if configured</span>
+        <span class="c1"># - Notify crisis counselors immediately</span>
+        <span class="c1"># - Escalate to supervisors</span>
+        <span class="c1"># - Document for legal/compliance requirements</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_log_safety_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span>
+        <span class="n">safety_level</span><span class="p">:</span> <span class="n">SafetyLevel</span><span class="p">,</span>
+        <span class="n">crisis_indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisIndicator</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log safety event for compliance and monitoring.&quot;&quot;&quot;</span>
+        <span class="n">safety_event</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;event_id&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;safety_</span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">correlation_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">safety_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">indicator</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">crisis_indicators</span><span class="p">],</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_session_id&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;client_ip&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">client_ip</span><span class="p">,</span>
+            <span class="s2">&quot;user_agent&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;therapeutic_context&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_context&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span>
+                <span class="k">else</span> <span class="kc">False</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Store safety event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">safety_event</span><span class="p">)</span>
+
+        <span class="c1"># Clean up old events (keep only recent events in memory)</span>
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span>
+            <span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">content_retention_days</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">event</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">cutoff_time</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Log for external systems</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="s2">&quot;Safety event logged&quot;</span><span class="p">,</span>
+            <span class="n">extra</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;safety_event&quot;</span><span class="p">:</span> <span class="n">safety_event</span><span class="p">,</span> <span class="s2">&quot;compliance_logging&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.add_safety_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.add_safety_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_safety_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SafetyRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a custom safety rule.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.remove_safety_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.remove_safety_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_safety_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a safety rule by name.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">rule_name</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.get_safety_stats">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.get_safety_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_safety_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get safety statistics and monitoring data.&quot;&quot;&quot;</span>
+        <span class="n">recent_events</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">event</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span>
+            <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span><span class="p">),</span>
+            <span class="s2">&quot;enabled_rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">([</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_rules</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">enabled</span><span class="p">]),</span>
+            <span class="s2">&quot;active_interventions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="p">),</span>
+            <span class="s2">&quot;recent_events_24h&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_events</span><span class="p">),</span>
+            <span class="s2">&quot;total_events&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">safety_events</span><span class="p">),</span>
+            <span class="s2">&quot;events_by_level&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">recent_events</span> <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">SafetyLevel</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;crisis_indicators_detected&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">indicator</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">e</span>
+                        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">recent_events</span>
+                        <span class="k">if</span> <span class="n">indicator</span><span class="o">.</span><span class="n">value</span> <span class="ow">in</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;crisis_indicators&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">CrisisIndicator</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;real_time_monitoring&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">real_time_monitoring</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_intervention&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">crisis_intervention</span><span class="p">,</span>
+                <span class="s2">&quot;emergency_contact_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">emergency_contact_enabled</span><span class="p">,</span>
+                <span class="s2">&quot;compliance_logging&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">compliance_logging</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.get_recent_interventions">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.get_recent_interventions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_recent_interventions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get recent safety interventions.&quot;&quot;&quot;</span>
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">intervention</span>
+            <span class="k">for</span> <span class="n">intervention</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">intervention</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="n">cutoff_time</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticSafetyMiddleware.clear_old_interventions">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.safety_middleware.html#src.api_gateway.middleware.TherapeuticSafetyMiddleware.clear_old_interventions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_old_interventions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">168</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>  <span class="c1"># Default 1 week</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear old interventions from memory.&quot;&quot;&quot;</span>
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">)</span>
+
+        <span class="n">old_interventions</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">intervention_id</span>
+            <span class="k">for</span> <span class="n">intervention_id</span><span class="p">,</span> <span class="n">intervention</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">intervention</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">cutoff_time</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">intervention_id</span> <span class="ow">in</span> <span class="n">old_interventions</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_interventions</span><span class="p">[</span><span class="n">intervention_id</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">old_interventions</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

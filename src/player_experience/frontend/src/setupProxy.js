@@ -1,6 +1,6 @@
 /**
  * Create React App Proxy Configuration
- * 
+ *
  * This file configures the development server proxy to route API calls
  * to the TTA Player Experience API backend running on port 8080.
  */

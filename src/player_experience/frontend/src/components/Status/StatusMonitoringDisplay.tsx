@@ -144,14 +144,14 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
           {getStatusIcon(systemStatus.api_status)} System {systemStatus.api_status}
         </div>
       )}
-      
+
       {isMonitoring && (
         <div className="flex items-center space-x-1 text-xs text-gray-600">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
           <span>Monitoring</span>
         </div>
       )}
-      
+
       {error && (
         <div className="text-xs text-red-600 flex items-center space-x-1">
           <span>🚨</span>
@@ -182,7 +182,7 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
               Start Monitoring
             </button>
           )}
-          
+
           {showHealthCheck && (
             <button
               onClick={performHealthCheck}
@@ -206,14 +206,14 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
                 System {isHealthy ? 'Healthy' : 'Issues Detected'}
               </h4>
               <p className={`text-sm ${isHealthy ? 'text-green-600' : 'text-red-600'}`}>
-                {isHealthy 
-                  ? 'All systems operational' 
+                {isHealthy
+                  ? 'All systems operational'
                   : 'Some services may be experiencing issues'
                 }
               </p>
             </div>
           </div>
-          
+
           {lastHealthCheck && (
             <div className="text-right">
               <p className="text-xs text-gray-600">Last checked</p>
@@ -230,7 +230,7 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
             <h4 className="font-medium text-gray-900">Service Status</h4>
-            
+
             <div className="space-y-2">
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">API Server</span>
@@ -238,14 +238,14 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
                   {getStatusIcon(systemStatus.api_status)} {systemStatus.api_status}
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Database</span>
                 <div className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(systemStatus.database_status)}`}>
                   {getStatusIcon(systemStatus.database_status)} {systemStatus.database_status}
                 </div>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Nexus Hub</span>
                 <div className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(systemStatus.nexus_hub_status)}`}>
@@ -257,7 +257,7 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
 
           <div className="space-y-3">
             <h4 className="font-medium text-gray-900">Performance</h4>
-            
+
             <div className="space-y-2">
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Response Time</span>
@@ -265,14 +265,14 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
                   {formatResponseTime(systemStatus.response_time)}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Error Count</span>
                 <span className="text-sm font-medium">
                   {systemStatus.error_count}
                 </span>
               </div>
-              
+
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Monitoring</span>
                 <span className={`text-sm font-medium ${isMonitoring ? 'text-green-600' : 'text-gray-600'}`}>
@@ -320,13 +320,13 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
           </button>
         </div>
       )}
-      
+
       <AnimatePresence>
         {alerts.map((alert) => (
           <AlertItem key={alert.id} alert={alert} />
         ))}
       </AnimatePresence>
-      
+
       {alerts.length === 0 && (
         <div className="text-center py-4 text-gray-500 text-sm">
           No system alerts
@@ -341,7 +341,7 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
       {variant === 'full' && (
         <div className="p-6">
           {renderFullView()}
-          
+
           {/* Alerts Section */}
           {showAlerts && alerts.length > 0 && (
             <div className="mt-6 pt-6 border-t border-gray-200">
@@ -354,7 +354,7 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
                   Clear All
                 </button>
               </div>
-              
+
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 <AnimatePresence>
                   {alerts.slice(0, 5).map((alert) => (

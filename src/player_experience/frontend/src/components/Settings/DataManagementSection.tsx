@@ -72,7 +72,7 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
         <p className="text-sm text-gray-600 mb-4">
           Here's what data we store about your therapeutic journey:
         </p>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {dataTypes.map((item, index) => (
             <div key={index} className="bg-white border border-gray-200 rounded-lg p-4">
@@ -96,10 +96,10 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
             <div className="flex-1">
               <h5 className="font-medium text-gray-900 mb-2">Complete Data Export</h5>
               <p className="text-sm text-gray-600 mb-4">
-                Download a comprehensive archive of all your therapeutic data in a human-readable format. 
+                Download a comprehensive archive of all your therapeutic data in a human-readable format.
                 This includes your progress, characters, session history, and all personal information.
               </p>
-              
+
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
                 <h6 className="font-medium text-blue-900 mb-2">Export includes:</h6>
                 <ul className="text-sm text-blue-800 space-y-1">
@@ -157,7 +157,7 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
             <div>
               <h5 className="font-medium text-green-900">Your Right to Data Portability</h5>
               <p className="text-sm text-green-800 mt-1">
-                You have the right to receive your personal data in a structured, commonly used, and machine-readable format. 
+                You have the right to receive your personal data in a structured, commonly used, and machine-readable format.
                 You can also request to have this data transmitted directly to another service provider where technically feasible.
               </p>
             </div>
@@ -257,12 +257,12 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
                 </svg>
                 <h3 className="text-lg font-semibold text-gray-900">Confirm Account Deletion</h3>
               </div>
-              
+
               <div className="mb-6">
                 <p className="text-gray-600 mb-4">
                   This action will permanently delete your account and all associated data. This cannot be undone.
                 </p>
-                
+
                 <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
                   <p className="text-red-800 text-sm font-medium mb-2">Before you proceed:</p>
                   <ul className="text-red-700 text-sm space-y-1">
@@ -276,7 +276,7 @@ const DataManagementSection: React.FC<DataManagementSectionProps> = ({
                 <p className="text-sm text-gray-600 mb-3">
                   To confirm deletion, please type <strong>"DELETE MY ACCOUNT"</strong> in the box below:
                 </p>
-                
+
                 <input
                   type="text"
                   value={deleteConfirmationText}

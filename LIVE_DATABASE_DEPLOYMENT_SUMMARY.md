@@ -13,7 +13,7 @@ Successfully deployed live Redis and Neo4j database services using Docker contai
 - **✅ Persistent Storage**: Data volumes configured to prevent data loss across container restarts
 
 ### **2. Database Configuration**
-- **✅ Redis Configuration**: 
+- **✅ Redis Configuration**:
   - Password authentication: `TTA_Redis_2024!`
   - Memory management: 1GB with LRU eviction
   - Persistence: RDB snapshots + AOF logging

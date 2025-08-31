@@ -7,19 +7,21 @@ including world management, story weaver profiles, and community features.
 
 import logging
 from datetime import datetime
-from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Query, Path, Body
-from fastapi.responses import JSONResponse
 
+from fastapi import APIRouter, Body, Depends, HTTPException, Path, Query, status
+
+from ...database.nexus_schema import NexusSchemaManager
+from ...models.nexus import (
+    ActivityEvent,
+    DifficultyLevel,
+    GenreType,
+    NarrativeState,
+    NexusStateResponse,
+    WorldCreationRequest,
+)
+from ...services.nexus_cache import NexusCacheService
 from ..auth import TokenData, get_current_active_player
 from ..services.connection_manager import get_service_manager
-from ...models.nexus import (
-    NexusStateResponse, StoryWorld, StoryWeaver, WorldTemplate,
-    WorldCreationRequest, WorldSearchRequest, ActivityEvent,
-    GenreType, DifficultyLevel, NarrativeState
-)
-from ...database.nexus_schema import NexusSchemaManager
-from ...services.nexus_cache import NexusCacheService
 
 logger = logging.getLogger(__name__)
 
@@ -28,11 +30,11 @@ router = APIRouter(prefix="/nexus", tags=["nexus"])
 
 @router.get("/state", response_model=NexusStateResponse)
 async def get_nexus_state(
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ) -> NexusStateResponse:
     """
     Get current state of the Nexus Codex.
-    
+
     Returns comprehensive information about the central hub including
     world count, active users, threat levels, and recent activity.
     """
@@ -40,17 +42,17 @@ async def get_nexus_state(
         # Get Neo4j connection
         neo4j_manager = NexusSchemaManager(service_manager.neo4j.driver)
         nexus_state = await neo4j_manager.get_nexus_state()
-        
+
         if not nexus_state:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to retrieve Nexus state"
+                detail="Failed to retrieve Nexus state",
             )
-        
+
         # Get real-time data from cache
         cache_service = NexusCacheService(service_manager.redis)
         realtime_state = await cache_service.get_nexus_realtime_state()
-        
+
         # Get recent activity
         recent_events = await cache_service.get_recent_events("world_activity", count=5)
         activity_events = [
@@ -62,60 +64,66 @@ async def get_nexus_state(
                 world_id=event.get("world_id"),
                 world_title=event.get("world_title"),
                 description=event.get("description", ""),
-                timestamp=datetime.fromisoformat(event.get("timestamp", datetime.now().isoformat()))
+                timestamp=datetime.fromisoformat(
+                    event.get("timestamp", datetime.now().isoformat())
+                ),
             )
             for event in recent_events
         ]
-        
+
         # Get featured worlds
         featured_worlds = await cache_service.get_top_worlds("featured", limit=3)
-        
+
         return NexusStateResponse(
             codex_id=nexus_state["codex_id"],
             total_worlds=nexus_state["total_worlds"],
-            active_story_weavers=int(realtime_state.get("active_players", 0)) if realtime_state else 0,
+            active_story_weavers=(
+                int(realtime_state.get("active_players", 0)) if realtime_state else 0
+            ),
             silence_threat_level=nexus_state["silence_threat_level"],
             narrative_strength=nexus_state["narrative_strength"],
             featured_worlds=featured_worlds,
             recent_activity=activity_events,
-            timestamp=datetime.now()
+            timestamp=datetime.now(),
         )
-        
+
     except Exception as e:
         logger.error(f"Failed to get Nexus state: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve Nexus state: {str(e)}"
+            detail=f"Failed to retrieve Nexus state: {str(e)}",
         )
 
 
 @router.get("/spheres")
 async def get_story_spheres(
-    genre: Optional[GenreType] = Query(None, description="Filter spheres by genre"),
-    threat_level: Optional[str] = Query(None, description="Filter by threat level"),
+    genre: GenreType | None = Query(None, description="Filter spheres by genre"),
+    threat_level: str | None = Query(None, description="Filter by threat level"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ):
     """
     Get visual data for story spheres in the Nexus.
-    
+
     Returns positioning, visual state, and metadata for all story spheres
     that the user can see, with optional filtering by genre or threat level.
     """
     try:
         # Build Neo4j query with filters
-        query_parts = ["MATCH (world:StoryWorld)-[:VISUALIZED_BY]->(sphere:StorySphere)"]
+        query_parts = [
+            "MATCH (world:StoryWorld)-[:VISUALIZED_BY]->(sphere:StorySphere)"
+        ]
         params = {}
-        
+
         if genre:
             query_parts.append("WHERE world.genre = $genre")
             params["genre"] = genre.value
-        
+
         if threat_level:
             threat_filter = {
                 "low": "world.silence_threat < 0.3",
                 "medium": "world.silence_threat >= 0.3 AND world.silence_threat < 0.7",
-                "high": "world.silence_threat >= 0.7"
+                "high": "world.silence_threat >= 0.7",
             }
             if threat_level in threat_filter:
                 filter_clause = threat_filter[threat_level]
@@ -123,8 +131,9 @@ async def get_story_spheres(
                     query_parts.append(f"AND {filter_clause}")
                 else:
                     query_parts.append(f"WHERE {filter_clause}")
-        
-        query_parts.append("""
+
+        query_parts.append(
+            """
         RETURN {
             sphere_id: sphere.sphere_id,
             world_id: sphere.world_id,
@@ -144,21 +153,22 @@ async def get_story_spheres(
             world_rating: world.rating,
             world_player_count: world.player_count
         } as sphere_data
-        """)
-        
+        """
+        )
+
         query = " ".join(query_parts)
-        
+
         async with service_manager.neo4j.driver.session() as session:
             result = await session.run(query, params)
             spheres = [record["sphere_data"] async for record in result]
-        
+
         return {"spheres": spheres, "total_count": len(spheres)}
-        
+
     except Exception as e:
         logger.error(f"Failed to get story spheres: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve story spheres: {str(e)}"
+            detail=f"Failed to retrieve story spheres: {str(e)}",
         )
 
 
@@ -166,11 +176,11 @@ async def get_story_spheres(
 async def create_world(
     world_request: WorldCreationRequest = Body(...),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ):
     """
     Create a new therapeutic world.
-    
+
     Creates a new StoryWorld with the specified parameters, connects it to
     the Nexus Codex, and creates a corresponding StorySphere for visualization.
     """
@@ -179,9 +189,9 @@ async def create_world(
         if not current_player.player_id:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="User authentication required"
+                detail="User authentication required",
             )
-        
+
         # Prepare world data
         world_data = {
             "world_id": f"world_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{current_player.player_id[:8]}",
@@ -201,70 +211,86 @@ async def create_world(
             "rating": 0.0,
             "tags": [],
             "is_public": world_request.is_public,
-            "is_featured": False
+            "is_featured": False,
         }
-        
+
         # Create world in Neo4j
         neo4j_manager = NexusSchemaManager(service_manager.neo4j.driver)
         world_id = await neo4j_manager.create_story_world(world_data)
-        
+
         if not world_id:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Failed to create world in database"
+                detail="Failed to create world in database",
             )
-        
+
         # Cache initial world state
         cache_service = NexusCacheService(service_manager.redis)
-        await cache_service.set_world_state(world_id, {
-            "narrative_strength": str(world_data["strength_level"]),
-            "player_count": "0",
-            "current_events": "[]",
-            "creation_status": "ready"
-        })
-        
+        await cache_service.set_world_state(
+            world_id,
+            {
+                "narrative_strength": str(world_data["strength_level"]),
+                "player_count": "0",
+                "current_events": "[]",
+                "creation_status": "ready",
+            },
+        )
+
         # Update world rankings
-        await cache_service.update_world_ranking(world_id, "recent", datetime.now().timestamp())
-        
+        await cache_service.update_world_ranking(
+            world_id, "recent", datetime.now().timestamp()
+        )
+
         # Publish creation event
-        await cache_service.publish_event("world_created", {
-            "world_id": world_id,
-            "world_title": world_request.title,
-            "creator_id": current_player.player_id,
-            "creator_name": current_player.username or "Unknown",
-            "genre": world_request.genre.value
-        })
-        
+        await cache_service.publish_event(
+            "world_created",
+            {
+                "world_id": world_id,
+                "world_title": world_request.title,
+                "creator_id": current_player.player_id,
+                "creator_name": current_player.username or "Unknown",
+                "genre": world_request.genre.value,
+            },
+        )
+
         return {
             "world_id": world_id,
             "title": world_request.title,
             "creator_id": current_player.player_id,
             "creation_status": "ready",
-            "message": "World created successfully"
+            "message": "World created successfully",
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to create world: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create world: {str(e)}"
+            detail=f"Failed to create world: {str(e)}",
         )
 
 
 @router.get("/worlds/search")
 async def search_worlds(
-    query: Optional[str] = Query(None, description="Text search in title, description, tags"),
-    genre: Optional[GenreType] = Query(None, description="Filter by genre"),
-    therapeutic_focus: Optional[List[str]] = Query(None, description="Filter by therapeutic goals"),
-    difficulty: Optional[DifficultyLevel] = Query(None, description="Filter by difficulty level"),
-    rating_min: Optional[float] = Query(None, ge=0.0, le=5.0, description="Minimum rating"),
+    query: str | None = Query(
+        None, description="Text search in title, description, tags"
+    ),
+    genre: GenreType | None = Query(None, description="Filter by genre"),
+    therapeutic_focus: list[str] | None = Query(
+        None, description="Filter by therapeutic goals"
+    ),
+    difficulty: DifficultyLevel | None = Query(
+        None, description="Filter by difficulty level"
+    ),
+    rating_min: float | None = Query(
+        None, ge=0.0, le=5.0, description="Minimum rating"
+    ),
     sort_by: str = Query("rating", description="Sort criteria"),
     limit: int = Query(20, ge=1, le=100, description="Maximum results"),
     offset: int = Query(0, ge=0, description="Pagination offset"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ):
     """
     Search for worlds based on criteria.
@@ -291,15 +317,19 @@ async def search_worlds(
             params["rating_min"] = rating_min
 
         if therapeutic_focus:
-            where_conditions.append("ANY(focus IN $therapeutic_focus WHERE focus IN world.therapeutic_focus)")
+            where_conditions.append(
+                "ANY(focus IN $therapeutic_focus WHERE focus IN world.therapeutic_focus)"
+            )
             params["therapeutic_focus"] = therapeutic_focus
 
         if query:
-            where_conditions.append("""
+            where_conditions.append(
+                """
                 (toLower(world.title) CONTAINS toLower($search_query) OR
                  toLower(world.description) CONTAINS toLower($search_query) OR
                  ANY(tag IN world.tags WHERE toLower(tag) CONTAINS toLower($search_query)))
-            """)
+            """
+            )
             params["search_query"] = query
 
         # Always add WHERE clause, even if it's just the default condition
@@ -310,7 +340,8 @@ async def search_worlds(
             query_parts.append("WHERE world.is_public = true")
 
         # Add RETURN clause (must come before ORDER BY)
-        query_parts.append("""
+        query_parts.append(
+            """
         RETURN {
             world_id: world.world_id,
             title: world.title,
@@ -327,7 +358,8 @@ async def search_worlds(
             is_featured: world.is_featured,
             created_at: world.created_at
         } as world_summary
-        """)
+        """
+        )
 
         # Add sorting
         sort_mapping = {
@@ -335,7 +367,7 @@ async def search_worlds(
             "popularity": "world_summary.player_count DESC",
             "recent": "world_summary.created_at DESC",
             "therapeutic_efficacy": "world_summary.therapeutic_efficacy DESC",
-            "title": "world_summary.title ASC"
+            "title": "world_summary.title ASC",
         }
 
         order_by = sort_mapping.get(sort_by, "world_summary.rating DESC")
@@ -367,7 +399,10 @@ async def search_worlds(
         count_query = " ".join(count_parts)
 
         async with service_manager.neo4j.driver.session() as session:
-            result = await session.run(count_query, {k: v for k, v in params.items() if k not in ["offset", "limit"]})
+            result = await session.run(
+                count_query,
+                {k: v for k, v in params.items() if k not in ["offset", "limit"]},
+            )
             record = await result.single()
             total_count = record["total"] if record else 0
 
@@ -376,14 +411,14 @@ async def search_worlds(
             "total_count": total_count,
             "limit": limit,
             "offset": offset,
-            "has_more": offset + len(worlds) < total_count
+            "has_more": offset + len(worlds) < total_count,
         }
 
     except Exception as e:
         logger.error(f"Failed to search worlds: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to search worlds: {str(e)}"
+            detail=f"Failed to search worlds: {str(e)}",
         )
 
 
@@ -391,11 +426,11 @@ async def search_worlds(
 async def get_world(
     world_id: str = Path(..., description="World ID"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ):
     """
     Get detailed information about a specific world.
-    
+
     Returns comprehensive world data including narrative structure,
     therapeutic elements, statistics, and user-specific compatibility.
     """
@@ -404,7 +439,7 @@ async def get_world(
         MATCH (world:StoryWorld {world_id: $world_id})
         OPTIONAL MATCH (world)<-[:CREATED_BY]-(creator:StoryWeaver)
         OPTIONAL MATCH (creator)<-[:STORY_WEAVER]-(creator_player:Player)
-        
+
         RETURN {
             world_id: world.world_id,
             title: world.title,
@@ -429,36 +464,36 @@ async def get_world(
             last_updated: world.last_updated
         } as world_data
         """
-        
+
         async with service_manager.neo4j.driver.session() as session:
             result = await session.run(query, {"world_id": world_id})
             record = await result.single()
-            
+
             if not record:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=f"World {world_id} not found"
+                    detail=f"World {world_id} not found",
                 )
-            
+
             world_data = record["world_data"]
-        
+
         # Get real-time state from cache
         cache_service = NexusCacheService(service_manager.redis)
         cached_state = await cache_service.get_world_state(world_id)
-        
+
         if cached_state:
             world_data["current_players"] = int(cached_state.get("player_count", 0))
             world_data["last_activity"] = cached_state.get("last_interaction")
-        
+
         return world_data
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to get world {world_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to retrieve world: {str(e)}"
+            detail=f"Failed to retrieve world: {str(e)}",
         )
 
 
@@ -466,11 +501,11 @@ async def get_world(
 async def enter_world(
     world_id: str = Path(..., description="World ID"),
     current_player: TokenData = Depends(get_current_active_player),
-    service_manager: object = Depends(get_service_manager)
+    service_manager: object = Depends(get_service_manager),
 ):
     """
     Enter a world and start therapeutic journey.
-    
+
     Initializes a new session in the specified world, sets up player state,
     and returns initial world context and available actions.
     """
@@ -481,24 +516,23 @@ async def enter_world(
         WHERE world.is_public = true OR world.creator_id = $user_id
         RETURN world.title as title, world.narrative_state as state
         """
-        
+
         async with service_manager.neo4j.driver.session() as session:
-            result = await session.run(query, {
-                "world_id": world_id,
-                "user_id": current_player.player_id
-            })
+            result = await session.run(
+                query, {"world_id": world_id, "user_id": current_player.player_id}
+            )
             record = await result.single()
-            
+
             if not record:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail="World not found or not accessible"
+                    detail="World not found or not accessible",
                 )
-        
+
         # Create or get StoryWeaver profile
         neo4j_manager = NexusSchemaManager(service_manager.neo4j.driver)
         weaver_id = await neo4j_manager.create_story_weaver(current_player.player_id)
-        
+
         # Set up player session
         cache_service = NexusCacheService(service_manager.redis)
         session_data = {
@@ -507,22 +541,25 @@ async def enter_world(
             "session_start": datetime.now().isoformat(),
             "world_progress": "{}",
             "therapeutic_state": "{}",
-            "achievements_pending": "[]"
+            "achievements_pending": "[]",
         }
-        
+
         await cache_service.set_player_session(current_player.player_id, session_data)
-        
+
         # Update world active player count
         await cache_service.increment_active_players(world_id)
-        
+
         # Publish enter event
-        await cache_service.publish_event("player_entered", {
-            "world_id": world_id,
-            "world_title": record["title"],
-            "player_id": current_player.player_id,
-            "player_name": current_player.username or "Unknown"
-        })
-        
+        await cache_service.publish_event(
+            "player_entered",
+            {
+                "world_id": world_id,
+                "world_title": record["title"],
+                "player_id": current_player.player_id,
+                "player_name": current_player.username or "Unknown",
+            },
+        )
+
         return {
             "session_id": f"{current_player.player_id}_{world_id}_{int(datetime.now().timestamp())}",
             "world_id": world_id,
@@ -531,22 +568,19 @@ async def enter_world(
             "available_actions": [
                 {"action": "explore", "description": "Begin exploring the world"},
                 {"action": "reflect", "description": "Set therapeutic intentions"},
-                {"action": "customize", "description": "Adjust world parameters"}
+                {"action": "customize", "description": "Adjust world parameters"},
             ],
             "therapeutic_guidance": {
                 "welcome_message": f"Welcome to {record['title']}! Take a moment to set your therapeutic intentions for this journey.",
-                "suggested_focus": "Consider what you hope to learn or practice in this world."
-            }
+                "suggested_focus": "Consider what you hope to learn or practice in this world.",
+            },
         }
-        
+
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to enter world {world_id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to enter world: {str(e)}"
+            detail=f"Failed to enter world: {str(e)}",
         )
-
-
-

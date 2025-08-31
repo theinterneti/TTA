@@ -1,7 +1,8 @@
 import pytest
-from src.agent_orchestration.tools.models import ToolSpec, ToolParameter, ToolPolicy
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
+
 from src.agent_orchestration.tools.coordinator import ToolCoordinator
+from src.agent_orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
+from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 @pytest.mark.redis
@@ -26,4 +27,3 @@ async def test_tool_coordinator_create_or_get(redis_client):
     # second call should not create duplicate
     spec2 = await coord.create_or_get("sig-kg-query-v101", factory)
     assert spec2.version == spec.version
-

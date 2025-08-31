@@ -24,10 +24,10 @@ fi
 create_repo_if_needed() {
     local repo_name=$1
     local repo_url="https://github.com/theinterneti/$repo_name"
-    
+
     # Check if the repository exists
     status_code=$(curl -s -o /dev/null -w "%{http_code}" $repo_url)
-    
+
     if [ "$status_code" == "404" ]; then
         echo -e "${YELLOW}Repository $repo_name doesn't exist on GitHub.${NC}"
         echo "Would you like to create it? (y/n)"
@@ -48,7 +48,7 @@ create_repo_if_needed() {
     else
         echo -e "${GREEN}Repository $repo_name exists on GitHub.${NC}"
     fi
-    
+
     return 0
 }
 
@@ -56,19 +56,19 @@ create_repo_if_needed() {
 setup_submodule() {
     local repo_name=$1
     local local_path=$2
-    
+
     echo -e "${GREEN}Setting up $repo_name submodule...${NC}"
-    
+
     # Check if the repository exists on GitHub
     if create_repo_if_needed "$repo_name"; then
         # Check if the directory exists
         if [ -d "$local_path" ]; then
             echo "$local_path directory exists."
-            
+
             # Check if it's already a git repository
             if [ -d "$local_path/.git" ]; then
                 echo "$local_path is already a git repository."
-                
+
                 # Check if it has a remote
                 if git -C "$local_path" remote -v | grep -q origin; then
                     echo "$local_path already has a remote."
@@ -76,7 +76,7 @@ setup_submodule() {
                     echo "Adding remote to $local_path..."
                     git -C "$local_path" remote add origin "https://github.com/theinterneti/$repo_name.git"
                 fi
-                
+
                 # Push to GitHub if needed
                 echo "Would you like to push $local_path to GitHub? (y/n)"
                 read -r response
@@ -95,11 +95,11 @@ setup_submodule() {
         else
             echo "$local_path directory doesn't exist. Creating it..."
             mkdir -p "$local_path"
-            
+
             # Copy template files
             echo "Copying template files to $local_path..."
             cp -r "templates/$repo_name/." "$local_path/"
-            
+
             # Initialize git repository
             git -C "$local_path" init
             git -C "$local_path" add .
@@ -107,7 +107,7 @@ setup_submodule() {
             git -C "$local_path" remote add origin "https://github.com/theinterneti/$repo_name.git"
             git -C "$local_path" push -u origin main
         fi
-        
+
         # Add as submodule
         echo "Adding $repo_name as submodule..."
         git submodule add "https://github.com/theinterneti/$repo_name.git" "$local_path"

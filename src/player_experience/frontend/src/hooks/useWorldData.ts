@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { nexusAPI } from '../services/api';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { nexusAPI } from "../services/api";
 
 export interface WorldData {
   world_id: string;
@@ -39,7 +39,7 @@ export interface UseWorldDataResult {
 
 /**
  * Custom hook for fetching and managing individual world data
- * 
+ *
  * Features:
  * - Automatic data fetching with optional refresh
  * - Error handling and retry logic
@@ -68,38 +68,42 @@ export const useWorldData = (
   /**
    * Fetch world data from the API
    */
-  const fetchWorld = useCallback(async (signal?: AbortSignal) => {
-    if (!worldId) {
-      setWorld(null);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setError(null);
-      
-      const response = await nexusAPI.getWorld(worldId);
-      
-      if (signal?.aborted) return;
-
-      const worldData = response.world || response.data || response;
-      
-      setWorld(worldData);
-      setLastUpdated(new Date());
-      onSuccess?.(worldData);
-    } catch (err: any) {
-      if (signal?.aborted) return;
-      
-      const errorMessage = err.message || 'Failed to fetch world data';
-      setError(errorMessage);
-      onError?.(err);
-      console.error('useWorldData: Failed to fetch world:', err);
-    } finally {
-      if (!signal?.aborted) {
+  const fetchWorld = useCallback(
+    async (signal?: AbortSignal) => {
+      if (!worldId) {
+        setWorld(null);
         setLoading(false);
+        return;
       }
-    }
-  }, [worldId, onError, onSuccess]);
+
+      try {
+        setError(null);
+
+        const response = await nexusAPI.getWorld(worldId);
+
+        if (signal?.aborted) return;
+
+        const worldData =
+          (response as any).world || (response as any).data || response;
+
+        setWorld(worldData);
+        setLastUpdated(new Date());
+        onSuccess?.(worldData);
+      } catch (err: any) {
+        if (signal?.aborted) return;
+
+        const errorMessage = err.message || "Failed to fetch world data";
+        setError(errorMessage);
+        onError?.(err);
+        console.error("useWorldData: Failed to fetch world:", err);
+      } finally {
+        if (!signal?.aborted) {
+          setLoading(false);
+        }
+      }
+    },
+    [worldId, onError, onSuccess]
+  );
 
   /**
    * Refetch world data manually
@@ -112,7 +116,7 @@ export const useWorldData = (
 
     // Create new abort controller
     abortControllerRef.current = new AbortController();
-    
+
     setLoading(true);
     await fetchWorld(abortControllerRef.current.signal);
   }, [fetchWorld]);
@@ -153,7 +157,7 @@ export const useWorldData = (
     if (worldId) {
       // Create new abort controller
       abortControllerRef.current = new AbortController();
-      
+
       setLoading(true);
       fetchWorld(abortControllerRef.current.signal);
     } else {
@@ -218,9 +222,10 @@ export const useMultipleWorlds = (worldIds: string[]) => {
         worldIds.map(async (worldId) => {
           try {
             const response = await nexusAPI.getWorld(worldId);
-            newWorlds[worldId] = response.world || response.data || response;
+            newWorlds[worldId] =
+              (response as any).world || (response as any).data || response;
           } catch (err: any) {
-            newErrors[worldId] = err.message || 'Failed to fetch world';
+            newErrors[worldId] = err.message || "Failed to fetch world";
           }
         })
       );
@@ -255,11 +260,11 @@ export const useWorldEntry = () => {
     try {
       setEntering(true);
       setError(null);
-      
+
       const response = await nexusAPI.enterWorld(worldId, entryData);
       return response;
     } catch (err: any) {
-      const errorMessage = err.message || 'Failed to enter world';
+      const errorMessage = err.message || "Failed to enter world";
       setError(errorMessage);
       throw err;
     } finally {

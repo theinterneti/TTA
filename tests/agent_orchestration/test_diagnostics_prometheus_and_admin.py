@@ -17,21 +17,25 @@ class DummyConfig(dict):
 async def test_diagnostics_gated_and_prometheus(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
     # Gate diagnostics off
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8601,
-        "agent_orchestration.diagnostics.enabled": False,
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8601,
+            "agent_orchestration.diagnostics.enabled": False,
+        }
+    )
     assert comp._start_impl() is True
     # No server start expected; stop immediately
     assert comp._stop_impl() is True
 
     # Gate diagnostics on and build app directly to test endpoints
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8602,
-        "agent_orchestration.diagnostics.enabled": True,
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8602,
+            "agent_orchestration.diagnostics.enabled": True,
+        }
+    )
     assert comp._start_impl() is True
 
     # Use internal app creation to avoid running server in test
@@ -40,13 +44,20 @@ async def test_diagnostics_gated_and_prometheus(redis_client):
 
     # Acquire coord and generate some metrics
     coord = comp._message_coordinator
-    from src.agent_orchestration import AgentId, AgentType, AgentMessage, MessageType
+    from src.agent_orchestration import AgentId, AgentMessage, AgentType, MessageType
+
     aid = AgentId(type=AgentType.IPA, instance="promtest")
-    m = AgentMessage(message_id=uuid.uuid4().hex, sender=aid, recipient=aid, message_type=MessageType.EVENT)
+    m = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=aid,
+        recipient=aid,
+        message_type=MessageType.EVENT,
+    )
     assert (await coord.send_message(aid, aid, m)).delivered
 
     # Build ASGI app client
     from starlette.testclient import TestClient
+
     client = TestClient(app)
     # /health
     res = client.get("/health")
@@ -71,15 +82,24 @@ async def test_admin_recover_script(redis_client):
     # Simulate admin recover via function
     # Build URL based on the redis_client fixture to ensure we hit the same instance
     kwargs = redis_client.connection_pool.connection_kwargs
-    host = kwargs.get("host", "localhost"); port = kwargs.get("port", 6379); db = kwargs.get("db", 0)
+    host = kwargs.get("host", "localhost")
+    port = kwargs.get("port", 6379)
+    db = kwargs.get("db", 0)
     url = f"redis://{host}:{port}/{db}"
+    from src.agent_orchestration import AgentId, AgentMessage, AgentType, MessageType
     from src.agent_orchestration.admin.recover import run_recovery
+
     # Create a reservation to be recovered
     from src.agent_orchestration.coordinators import RedisMessageCoordinator
-    from src.agent_orchestration import AgentId, AgentType, AgentMessage, MessageType
+
     coord = RedisMessageCoordinator(redis_client, key_prefix="ao")
     aid = AgentId(type=AgentType.IPA, instance="adminrecov")
-    m = AgentMessage(message_id=uuid.uuid4().hex, sender=aid, recipient=aid, message_type=MessageType.EVENT)
+    m = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=aid,
+        recipient=aid,
+        message_type=MessageType.EVENT,
+    )
     assert (await coord.send_message(aid, aid, m)).delivered
     rm = await coord.receive(aid, visibility_timeout=0.05)
     assert rm is not None
@@ -88,4 +108,3 @@ async def test_admin_recover_script(redis_client):
     per_agent = await run_recovery(url, key_prefix="ao")
     # Should have recovered at least for our agent
     assert any(k.startswith("ipa:adminrecov") for k in per_agent.keys())
-

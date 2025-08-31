@@ -5,26 +5,32 @@ This module tests the service integration with actual WorkflowManager, MessageCo
 and other orchestration components to validate end-to-end functionality.
 """
 
-import asyncio
+from unittest.mock import Mock, patch
+
 import pytest
 import redis.asyncio as aioredis
-from unittest.mock import Mock, AsyncMock, patch
 
+from src.agent_orchestration import (
+    AgentContext,
+    AgentId,
+    AgentStep,
+    AgentType,
+    ErrorHandlingStrategy,
+    OrchestrationResponse,
+    SessionContext,
+    WorkflowDefinition,
+    WorkflowType,
+)
+from src.agent_orchestration.agents import AgentRegistry
+from src.agent_orchestration.coordinators import RedisMessageCoordinator
+from src.agent_orchestration.resources import ResourceManager
 from src.agent_orchestration.service import AgentOrchestrationService
 from src.agent_orchestration.workflow_manager import WorkflowManager
-from src.agent_orchestration.coordinators import RedisMessageCoordinator
-from src.agent_orchestration.agents import AgentRegistry
-from src.agent_orchestration.resources import ResourceManager
-from src.agent_orchestration import (
-    WorkflowType, WorkflowDefinition, AgentStep, ErrorHandlingStrategy,
-    AgentType, OrchestrationRequest, OrchestrationResponse,
-    AgentContext, SessionContext, AgentId
-)
-
 
 # ============================================================================
 # Integration Test Fixtures
 # ============================================================================
+
 
 @pytest.fixture
 async def redis_client():
@@ -69,7 +75,7 @@ def real_resource_manager(redis_client):
         crit_cpu_percent=95.0,
         crit_mem_percent=95.0,
         redis_client=redis_client,
-        redis_prefix="test_ao"
+        redis_prefix="test_ao",
     )
 
 
@@ -85,8 +91,8 @@ def sample_session_context():
             session_id="integration-test-session",
             memory={"test_memory": "integration_test"},
             world_state={"location": "test_forest"},
-            metadata={"integration_test": True}
-        )
+            metadata={"integration_test": True},
+        ),
     )
 
 
@@ -95,7 +101,7 @@ async def integration_service(
     real_workflow_manager,
     real_message_coordinator,
     real_agent_registry,
-    real_resource_manager
+    real_resource_manager,
 ):
     """AgentOrchestrationService with real components for integration testing."""
     service = AgentOrchestrationService(
@@ -105,14 +111,14 @@ async def integration_service(
         therapeutic_validator=None,  # Use basic safety checks
         resource_manager=real_resource_manager,
         optimization_engine=None,
-        neo4j_manager=None
+        neo4j_manager=None,
     )
-    
+
     # Initialize the service
     await service.initialize()
-    
+
     yield service
-    
+
     # Cleanup
     await service.shutdown()
 
@@ -121,19 +127,20 @@ async def integration_service(
 # Component Integration Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.redis
 async def test_service_initialization_with_real_components(integration_service):
     """Test service initialization with real components."""
     assert integration_service._initialized is True
-    
+
     # Verify workflows were registered
     workflows = integration_service.workflow_manager._workflows
     assert "collaborative" in workflows
     assert "input_processing" in workflows
     assert "world_building" in workflows
     assert "narrative_generation" in workflows
-    
+
     # Verify component integration
     status = integration_service.get_service_status()
     assert status["components"]["workflow_manager"] is True
@@ -144,25 +151,26 @@ async def test_service_initialization_with_real_components(integration_service):
 
 @pytest.mark.asyncio
 @pytest.mark.redis
-async def test_workflow_manager_integration(integration_service, sample_session_context):
+async def test_workflow_manager_integration(
+    integration_service, sample_session_context
+):
     """Test integration with real WorkflowManager."""
     # Create a simple agent context
     agent_context = AgentContext(
         user_id=sample_session_context.user_id,
         session_id=sample_session_context.session_id,
-        memory={"test": "data"}
+        memory={"test": "data"},
     )
-    
+
     # Test workflow execution through the service
     response, run_id, error = await integration_service.coordinate_agents(
-        workflow_type=WorkflowType.INPUT_PROCESSING,
-        context=agent_context
+        workflow_type=WorkflowType.INPUT_PROCESSING, context=agent_context
     )
-    
+
     # The workflow should execute but may not have real agents
     # So we expect either success or a specific error about missing agents
     assert run_id is not None
-    
+
     # Check that the workflow was tracked
     run_state = integration_service.workflow_manager.get_run_state(run_id)
     assert run_state is not None
@@ -176,10 +184,10 @@ async def test_message_coordinator_integration(integration_service):
     # Test that message coordinator is properly integrated
     coordinator = integration_service.message_coordinator
     assert coordinator is not None
-    
+
     # Test basic coordinator functionality
     agent_id = AgentId(type=AgentType.IPA, instance="test")
-    
+
     # This should not raise an exception
     try:
         await coordinator.configure(queue_size=100, retry_attempts=3)
@@ -193,11 +201,11 @@ async def test_agent_registry_integration(integration_service):
     """Test integration with real AgentRegistry."""
     registry = integration_service.agent_registry
     assert registry is not None
-    
+
     # Test registry functionality
     snapshot = registry.snapshot()
     assert isinstance(snapshot, dict)
-    
+
     # Test agent lookup (should handle missing agents gracefully)
     agent_id = AgentId(type=AgentType.IPA, instance="test")
     agent = registry.get_agent(agent_id)
@@ -210,14 +218,13 @@ async def test_resource_manager_integration(integration_service):
     """Test integration with real ResourceManager."""
     resource_manager = integration_service.resource_manager
     assert resource_manager is not None
-    
+
     # Test resource allocation
     context = AgentContext(session_id="test")
-    
+
     # This should not raise an exception
     await integration_service._allocate_workflow_resources(
-        WorkflowType.COLLABORATIVE,
-        context
+        WorkflowType.COLLABORATIVE, context
     )
 
 
@@ -225,36 +232,41 @@ async def test_resource_manager_integration(integration_service):
 # End-to-End Integration Tests
 # ============================================================================
 
+
 @pytest.mark.asyncio
 @pytest.mark.redis
-async def test_end_to_end_user_input_processing(integration_service, sample_session_context):
+async def test_end_to_end_user_input_processing(
+    integration_service, sample_session_context
+):
     """Test end-to-end user input processing with real components."""
     # Mock the workflow execution to avoid needing real agents
-    with patch.object(integration_service.workflow_manager, 'execute_workflow') as mock_execute:
+    with patch.object(
+        integration_service.workflow_manager, "execute_workflow"
+    ) as mock_execute:
         mock_execute.return_value = (
             OrchestrationResponse(
                 response_text="Integration test response",
                 updated_context={"memory": {"integration": "success"}},
-                workflow_metadata={"test": "integration"}
+                workflow_metadata={"test": "integration"},
             ),
             "integration-run-123",
-            None
+            None,
         )
-        
+
         # Process user input
         response = await integration_service.process_user_input(
             user_input="Hello, this is an integration test",
-            session_context=sample_session_context
+            session_context=sample_session_context,
         )
-        
+
         # Verify response
         assert isinstance(response, OrchestrationResponse)
         assert response.response_text == "Integration test response"
         assert "integration" in response.updated_context["memory"]
-        
+
         # Verify session context was updated
         assert sample_session_context.context.memory["integration"] == "success"
-        
+
         # Verify metrics were updated
         assert integration_service._request_count >= 1
         assert integration_service._error_count == 0
@@ -262,30 +274,32 @@ async def test_end_to_end_user_input_processing(integration_service, sample_sess
 
 @pytest.mark.asyncio
 @pytest.mark.redis
-async def test_therapeutic_safety_integration(integration_service, sample_session_context):
+async def test_therapeutic_safety_integration(
+    integration_service, sample_session_context
+):
     """Test therapeutic safety integration with basic safety checks."""
     # Test safe content
     try:
         await integration_service._validate_therapeutic_safety(
-            "I'm feeling a bit sad today",
-            sample_session_context
+            "I'm feeling a bit sad today", sample_session_context
         )
     except Exception as e:
         pytest.fail(f"Safe content should not raise exception: {e}")
-    
+
     # Test unsafe content (should raise TherapeuticSafetyError)
     from src.agent_orchestration.service import TherapeuticSafetyError
-    
+
     with pytest.raises(TherapeuticSafetyError):
         await integration_service._validate_therapeutic_safety(
-            "I want to hurt myself",
-            sample_session_context
+            "I want to hurt myself", sample_session_context
         )
 
 
 @pytest.mark.asyncio
 @pytest.mark.redis
-async def test_session_context_persistence_integration(integration_service, sample_session_context):
+async def test_session_context_persistence_integration(
+    integration_service, sample_session_context
+):
     """Test session context persistence integration."""
     # Create a response with context updates
     response = OrchestrationResponse(
@@ -293,16 +307,18 @@ async def test_session_context_persistence_integration(integration_service, samp
         updated_context={
             "memory": {"new_memory": "integration_test"},
             "world_state": {"new_location": "integration_cave"},
-            "metadata": {"integration_updated": True}
-        }
+            "metadata": {"integration_updated": True},
+        },
     )
-    
+
     # Update session context
     await integration_service._update_session_context(sample_session_context, response)
-    
+
     # Verify context was updated
     assert sample_session_context.context.memory["new_memory"] == "integration_test"
-    assert sample_session_context.context.world_state["new_location"] == "integration_cave"
+    assert (
+        sample_session_context.context.world_state["new_location"] == "integration_cave"
+    )
     assert sample_session_context.context.metadata["integration_updated"] is True
 
 
@@ -314,20 +330,20 @@ async def test_service_status_with_real_components(integration_service):
     integration_service._request_count = 5
     integration_service._error_count = 1
     integration_service._total_processing_time = 2.5
-    
+
     status = integration_service.get_service_status()
-    
+
     # Verify status structure
     assert status["initialized"] is True
     assert status["active_sessions"] >= 0
     assert status["active_workflows"] >= 0
-    
+
     # Verify metrics
     assert status["metrics"]["request_count"] == 5
     assert status["metrics"]["error_count"] == 1
     assert status["metrics"]["error_rate"] == 0.2
     assert status["metrics"]["avg_processing_time"] == 0.5
-    
+
     # Verify component status
     assert status["components"]["workflow_manager"] is True
     assert status["components"]["message_coordinator"] is True
@@ -344,12 +360,12 @@ async def test_service_shutdown_integration(integration_service):
     integration_service._session_contexts["session1"] = SessionContext(
         session_id="session1",
         user_id="user1",
-        context=AgentContext(session_id="session1")
+        context=AgentContext(session_id="session1"),
     )
-    
+
     # Shutdown should succeed
     result = await integration_service.shutdown()
-    
+
     assert result is True
     assert integration_service._initialized is False
     assert len(integration_service._session_contexts) == 0
@@ -359,6 +375,7 @@ async def test_service_shutdown_integration(integration_service):
 # ============================================================================
 # Component Structure Validation Tests (No Redis Required)
 # ============================================================================
+
 
 def test_service_component_structure():
     """Test that service can be instantiated with real component types."""
@@ -374,7 +391,7 @@ def test_service_component_structure():
         therapeutic_validator=None,
         resource_manager=None,
         optimization_engine=None,
-        neo4j_manager=None
+        neo4j_manager=None,
     )
 
     assert service.workflow_manager is workflow_manager
@@ -387,14 +404,16 @@ def test_workflow_manager_integration_structure():
     workflow_manager = WorkflowManager()
 
     # Test workflow registration
-    from src.agent_orchestration import WorkflowDefinition, AgentStep, AgentType, ErrorHandlingStrategy
+    from src.agent_orchestration import (
+        AgentType,
+    )
 
     test_workflow = WorkflowDefinition(
         workflow_type=WorkflowType.INPUT_PROCESSING,
         agent_sequence=[
             AgentStep(agent=AgentType.IPA, name="test_step", timeout_seconds=10)
         ],
-        error_handling=ErrorHandlingStrategy.FAIL_FAST
+        error_handling=ErrorHandlingStrategy.FAIL_FAST,
     )
 
     success, error = workflow_manager.register_workflow("test_workflow", test_workflow)

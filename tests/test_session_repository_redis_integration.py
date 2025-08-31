@@ -1,10 +1,10 @@
-import pytest
-import asyncio
 from datetime import datetime
 
+import pytest
+
 from src.player_experience.database.session_repository import SessionRepository
-from src.player_experience.models.session import SessionContext, TherapeuticSettings
 from src.player_experience.models.enums import SessionStatus, TherapeuticApproach
+from src.player_experience.models.session import SessionContext, TherapeuticSettings
 
 
 @pytest.mark.redis
@@ -43,4 +43,3 @@ async def test_session_repository_redis_cache_roundtrip(redis_client):
     assert await repo.update_session(ctx) is True
     got2 = await repo.get_session("redis_it_session")
     assert got2.session_variables["mood"] == "energized"
-

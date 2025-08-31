@@ -6,13 +6,8 @@ from initial registration through first therapeutic session creation.
 """
 
 import json
-import re
-import time
-from typing import Dict, Any
 
-import pytest
 from playwright.sync_api import Page, expect
-
 
 # Test data for realistic onboarding scenario
 TEST_USER_DATA = {
@@ -22,12 +17,9 @@ TEST_USER_DATA = {
     "therapeutic_preferences": {
         "focus_areas": ["anxiety", "social_skills"],
         "intensity_preference": "moderate",
-        "session_length_preference": "30-45 minutes"
+        "session_length_preference": "30-45 minutes",
     },
-    "privacy_settings": {
-        "data_sharing": "minimal",
-        "progress_visibility": "private"
-    }
+    "privacy_settings": {"data_sharing": "minimal", "progress_visibility": "private"},
 }
 
 PLAYER_PROFILE_DATA = {
@@ -37,13 +29,13 @@ PLAYER_PROFILE_DATA = {
         "primary_goals": ["stress_management", "confidence_building"],
         "preferred_interaction_style": "supportive",
         "comfort_with_challenge": "moderate",
-        "session_frequency": "3-4 times per week"
+        "session_frequency": "3-4 times per week",
     },
     "privacy_settings": {
         "share_progress_with_therapist": True,
         "anonymous_data_contribution": False,
-        "marketing_communications": False
-    }
+        "marketing_communications": False,
+    },
 }
 
 CHARACTER_DATA = {
@@ -53,16 +45,29 @@ CHARACTER_DATA = {
         "gender_identity": "non-binary",
         "physical_description": "Medium height, friendly demeanor, casual style",
         "clothing_style": "comfortable_casual",
-        "distinctive_features": ["warm_smile", "expressive_eyes"]
+        "distinctive_features": ["warm_smile", "expressive_eyes"],
     },
     "background": {
         "name": "Alex Journey",
         "backstory": "A college student exploring personal growth and building confidence in social situations",
-        "personality_traits": ["curious", "empathetic", "sometimes_anxious", "determined"],
+        "personality_traits": [
+            "curious",
+            "empathetic",
+            "sometimes_anxious",
+            "determined",
+        ],
         "core_values": ["authenticity", "kindness", "personal_growth"],
         "fears_and_anxieties": ["public_speaking", "social_judgment"],
-        "strengths_and_skills": ["good_listener", "creative_problem_solving", "artistic"],
-        "life_goals": ["build_confidence", "develop_social_skills", "pursue_creative_career"]
+        "strengths_and_skills": [
+            "good_listener",
+            "creative_problem_solving",
+            "artistic",
+        ],
+        "life_goals": [
+            "build_confidence",
+            "develop_social_skills",
+            "pursue_creative_career",
+        ],
     },
     "therapeutic_profile": {
         "primary_therapeutic_goals": ["anxiety_management", "social_confidence"],
@@ -70,8 +75,8 @@ CHARACTER_DATA = {
         "preferred_coping_strategies": ["mindfulness", "gradual_exposure"],
         "trigger_topics": ["harsh_criticism", "public_failure"],
         "comfort_zones": ["creative_expression", "one_on_one_conversations"],
-        "growth_areas": ["group_interactions", "assertiveness"]
-    }
+        "growth_areas": ["group_interactions", "assertiveness"],
+    },
 }
 
 WORLD_CUSTOMIZATION = {
@@ -84,7 +89,7 @@ WORLD_CUSTOMIZATION = {
     "challenge_level": "gradual",
     "focus_areas": ["social_confidence", "anxiety_management"],
     "avoid_topics": ["public_speaking_initially"],
-    "session_length_preference": "30_minutes"
+    "session_length_preference": "30_minutes",
 }
 
 
@@ -98,61 +103,63 @@ class TestPlayerOnboardingFlow:
         self.character_id = None
         self.world_id = None
         self.session_id = None
-        
+
     def test_complete_player_onboarding_flow(self, page: Page):
         """Test the complete player onboarding flow through Swagger UI."""
-        
+
         # Step 1: Navigate to Swagger UI and verify it loads
         self._navigate_to_swagger_ui(page)
-        
+
         # Step 2: Complete user registration
         self._register_new_user(page)
-        
+
         # Step 3: Login and get access token
         self._login_user(page)
-        
+
         # Step 4: Authorize in Swagger UI
         self._authorize_swagger_ui(page)
-        
+
         # Step 5: Create player profile
         self._create_player_profile(page)
-        
+
         # Step 6: Create character
         self._create_character(page)
-        
+
         # Step 7: Browse and select world
         self._browse_and_select_world(page)
-        
+
         # Step 8: Check world-character compatibility
         self._check_world_compatibility(page)
-        
+
         # Step 9: Customize world (optional)
         self._customize_world(page)
-        
+
         # Step 10: Create first therapeutic session
         self._create_first_session(page)
-        
+
         # Step 11: Final validation
         self._validate_complete_onboarding(page)
-        
+
         print("🎉 Complete player onboarding flow test PASSED!")
 
     def _navigate_to_swagger_ui(self, page: Page):
         """Navigate to Swagger UI and verify it loads correctly."""
         print("📍 Step 1: Navigating to Swagger UI...")
-        
+
         page.goto("http://localhost:8080/docs")
-        
+
         # Wait for Swagger UI to load completely
         page.wait_for_selector(".swagger-ui", timeout=10000)
-        
+
         # Verify all main sections are visible (using exact match for section headers)
-        expect(page.get_by_role("link", name="authentication", exact=True)).to_be_visible()
+        expect(
+            page.get_by_role("link", name="authentication", exact=True)
+        ).to_be_visible()
         expect(page.get_by_role("link", name="players", exact=True)).to_be_visible()
         expect(page.get_by_role("link", name="characters", exact=True)).to_be_visible()
         expect(page.get_by_role("link", name="worlds", exact=True)).to_be_visible()
         expect(page.get_by_role("link", name="sessions", exact=True)).to_be_visible()
-        
+
         # Take screenshot for documentation
         page.screenshot(path="tests/screenshots/01_swagger_ui_loaded.png")
         print("✅ Swagger UI loaded successfully with all sections visible")
@@ -160,32 +167,36 @@ class TestPlayerOnboardingFlow:
     def _register_new_user(self, page: Page):
         """Register a new user through the authentication section."""
         print("📍 Step 2: Registering new user...")
-        
+
         # Navigate to authentication section
         auth_section = page.get_by_role("link", name="authentication", exact=True)
         auth_section.click()
-        
+
         # Find and click the register endpoint
-        register_endpoint = page.get_by_role("button", name="POST /api/v1/auth/register Register")
+        register_endpoint = page.get_by_role(
+            "button", name="POST /api/v1/auth/register Register"
+        )
         register_endpoint.click()
-        
+
         # Click "Try it out" button
         page.locator("button:has-text('Try it out')").first.click()
-        
+
         # Fill in the request body
         request_body_textarea = page.locator("textarea").first
         request_body_textarea.fill(json.dumps(TEST_USER_DATA, indent=2))
-        
+
         # Execute the request
         page.locator("button:has-text('Execute')").first.click()
-        
+
         # Wait for response and verify success
         page.wait_for_selector(".response-col_status", timeout=10000)
-        
+
         # Check for successful response (201 or 200)
         response_status = page.locator(".response-col_status").first.inner_text()
-        assert "20" in response_status, f"Registration failed with status: {response_status}"
-        
+        assert (
+            "20" in response_status
+        ), f"Registration failed with status: {response_status}"
+
         page.screenshot(path="tests/screenshots/02_user_registered.png")
         print("✅ User registration completed successfully")
 
@@ -194,7 +205,9 @@ class TestPlayerOnboardingFlow:
         print("📍 Step 3: Logging in user...")
 
         # Find and click the login endpoint
-        login_endpoint = page.get_by_role("button", name="POST /api/v1/auth/login Login")
+        login_endpoint = page.get_by_role(
+            "button", name="POST /api/v1/auth/login Login"
+        )
         login_endpoint.click()
 
         # Click "Try it out" button
@@ -203,7 +216,7 @@ class TestPlayerOnboardingFlow:
         # Fill in login credentials
         login_data = {
             "username": TEST_USER_DATA["username"],
-            "password": TEST_USER_DATA["password"]
+            "password": TEST_USER_DATA["password"],
         }
 
         request_body_textarea = page.locator("textarea").nth(1)
@@ -223,7 +236,9 @@ class TestPlayerOnboardingFlow:
         self.access_token = response_data["access_token"]
 
         page.screenshot(path="tests/screenshots/03_user_logged_in.png")
-        print(f"✅ User logged in successfully, token obtained: {self.access_token[:20]}...")
+        print(
+            f"✅ User logged in successfully, token obtained: {self.access_token[:20]}..."
+        )
 
     def _authorize_swagger_ui(self, page: Page):
         """Authorize Swagger UI with the Bearer token."""
@@ -257,7 +272,9 @@ class TestPlayerOnboardingFlow:
         players_section.click()
 
         # Find and click the create player endpoint
-        create_player_endpoint = page.get_by_role("button", name="POST /api/v1/players/ Create Player Profile")
+        create_player_endpoint = page.get_by_role(
+            "button", name="POST /api/v1/players/ Create Player Profile"
+        )
         create_player_endpoint.click()
 
         # Click "Try it out" button
@@ -276,7 +293,9 @@ class TestPlayerOnboardingFlow:
         response_body = page.locator(".response-col_description pre").first.inner_text()
         response_data = json.loads(response_body)
 
-        assert "player_id" in response_data, "Player creation response missing player_id"
+        assert (
+            "player_id" in response_data
+        ), "Player creation response missing player_id"
         self.player_id = response_data["player_id"]
 
         page.screenshot(path="tests/screenshots/05_player_profile_created.png")
@@ -291,7 +310,9 @@ class TestPlayerOnboardingFlow:
         characters_section.click()
 
         # Find and click the create character endpoint
-        create_character_endpoint = page.get_by_role("button", name="POST /api/v1/characters/ Create Character")
+        create_character_endpoint = page.get_by_role(
+            "button", name="POST /api/v1/characters/ Create Character"
+        )
         create_character_endpoint.click()
 
         # Click "Try it out" button
@@ -310,7 +331,9 @@ class TestPlayerOnboardingFlow:
         response_body = page.locator(".response-col_description pre").first.inner_text()
         response_data = json.loads(response_body)
 
-        assert "character_id" in response_data, "Character creation response missing character_id"
+        assert (
+            "character_id" in response_data
+        ), "Character creation response missing character_id"
         self.character_id = response_data["character_id"]
 
         page.screenshot(path="tests/screenshots/06_character_created.png")
@@ -325,7 +348,9 @@ class TestPlayerOnboardingFlow:
         worlds_section.click()
 
         # Find and click the list worlds endpoint
-        list_worlds_endpoint = page.get_by_role("button", name="GET /api/v1/worlds/ List available worlds")
+        list_worlds_endpoint = page.get_by_role(
+            "button", name="GET /api/v1/worlds/ List available worlds"
+        )
         list_worlds_endpoint.click()
 
         # Click "Try it out" button
@@ -352,7 +377,10 @@ class TestPlayerOnboardingFlow:
         print("📍 Step 8: Checking world-character compatibility...")
 
         # Find and click the compatibility endpoint
-        compatibility_endpoint = page.get_by_role("button", name="GET /api/v1/worlds/{world_id}/compatibility/{character_id} Check world-character compatibility")
+        compatibility_endpoint = page.get_by_role(
+            "button",
+            name="GET /api/v1/worlds/{world_id}/compatibility/{character_id} Check world-character compatibility",
+        )
         compatibility_endpoint.click()
 
         # Click "Try it out" button
@@ -379,7 +407,10 @@ class TestPlayerOnboardingFlow:
         print("📍 Step 9: Customizing world parameters...")
 
         # Find and click the customize world endpoint
-        customize_endpoint = page.get_by_role("button", name="POST /api/v1/worlds/{world_id}/customize Customize world parameters")
+        customize_endpoint = page.get_by_role(
+            "button",
+            name="POST /api/v1/worlds/{world_id}/customize Customize world parameters",
+        )
         customize_endpoint.click()
 
         # Click "Try it out" button
@@ -411,7 +442,9 @@ class TestPlayerOnboardingFlow:
         sessions_section.click()
 
         # Find and click the create session endpoint
-        create_session_endpoint = page.get_by_role("button", name="POST /api/v1/sessions/ Create Session")
+        create_session_endpoint = page.get_by_role(
+            "button", name="POST /api/v1/sessions/ Create Session"
+        )
         create_session_endpoint.click()
 
         # Click "Try it out" button
@@ -428,8 +461,8 @@ class TestPlayerOnboardingFlow:
                 "duration_minutes": 30,
                 "ai_guidance_level": "supportive",
                 "real_time_feedback": True,
-                "progress_tracking": True
-            }
+                "progress_tracking": True,
+            },
         }
 
         # Fill in session data
@@ -445,11 +478,15 @@ class TestPlayerOnboardingFlow:
         response_body = page.locator(".response-col_description pre").first.inner_text()
         response_data = json.loads(response_body)
 
-        assert "session_id" in response_data, "Session creation response missing session_id"
+        assert (
+            "session_id" in response_data
+        ), "Session creation response missing session_id"
         self.session_id = response_data["session_id"]
 
         page.screenshot(path="tests/screenshots/10_session_created.png")
-        print(f"✅ First therapeutic session created successfully, ID: {self.session_id}")
+        print(
+            f"✅ First therapeutic session created successfully, ID: {self.session_id}"
+        )
 
     def _validate_complete_onboarding(self, page: Page):
         """Final validation of the complete onboarding flow."""
@@ -473,4 +510,6 @@ class TestPlayerOnboardingFlow:
         print(f"✅ World ID: {self.world_id}")
         print(f"✅ Session ID: {self.session_id}")
         print("\n🎮 Player onboarding flow completed successfully!")
-        print("   New player 'Alex Journey' is ready for therapeutic gaming experience!")
+        print(
+            "   New player 'Alex Journey' is ready for therapeutic gaming experience!"
+        )

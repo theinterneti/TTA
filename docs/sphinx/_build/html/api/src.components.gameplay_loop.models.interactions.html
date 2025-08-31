@@ -1,0 +1,880 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.models.interactions module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.models.progress module" href="src.components.gameplay_loop.models.progress.html" />
+    <link rel="prev" title="src.components.gameplay_loop.models.core module" href="src.components.gameplay_loop.models.core.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.models.html">src.components.gameplay_loop.models package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.models.interactions module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.models.interactions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.models.interactions">
+<span id="src-components-gameplay-loop-models-interactions-module"></span><h1>src.components.gameplay_loop.models.interactions module<a class="headerlink" href="#module-src.components.gameplay_loop.models.interactions" title="Link to this heading"></a></h1>
+<p>User Interaction Models</p>
+<p>This module defines data structures for user interactions, validation,
+and response handling in the therapeutic gameplay loop.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">InteractionBatch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionBatch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Batch of interactions for processing efficiency.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>batch_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interactions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="src.components.gameplay_loop.models.interactions.UserInteraction"><em>UserInteraction</em></a><em>]</em>)</p></li>
+<li><p><strong>batch_context</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>created_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+<li><p><strong>processed_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>processing_time_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>batch_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interactions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference internal" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="src.components.gameplay_loop.models.interactions.UserInteraction"><em>UserInteraction</em></a><em>]</em>)</p></li>
+<li><p><strong>batch_context</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>created_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+<li><p><strong>processed_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>processing_time_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.add_interaction">
+<span class="sig-name descname"><span class="pre">add_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interaction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionBatch.add_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.add_interaction" title="Link to this definition"></a></dt>
+<dd><p>Add an interaction to the batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>interaction</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="src.components.gameplay_loop.models.interactions.UserInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserInteraction</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.batch_context">
+<span class="sig-name descname"><span class="pre">batch_context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.batch_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.batch_id">
+<span class="sig-name descname"><span class="pre">batch_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.batch_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.get_safety_concerns">
+<span class="sig-name descname"><span class="pre">get_safety_concerns</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionBatch.get_safety_concerns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.get_safety_concerns" title="Link to this definition"></a></dt>
+<dd><p>Get interactions with safety concerns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="src.components.gameplay_loop.models.interactions.UserInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserInteraction</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.get_therapeutic_opportunities">
+<span class="sig-name descname"><span class="pre">get_therapeutic_opportunities</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionBatch.get_therapeutic_opportunities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.get_therapeutic_opportunities" title="Link to this definition"></a></dt>
+<dd><p>Get interactions with therapeutic opportunities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="src.components.gameplay_loop.models.interactions.UserInteraction"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserInteraction</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.interactions">
+<span class="sig-name descname"><span class="pre">interactions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[UserInteraction]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.interactions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.mark_processed">
+<span class="sig-name descname"><span class="pre">mark_processed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_time_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionBatch.mark_processed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.mark_processed" title="Link to this definition"></a></dt>
+<dd><p>Mark the batch as processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processing_time_ms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.processed_at">
+<span class="sig-name descname"><span class="pre">processed_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.processed_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.processing_time_ms">
+<span class="sig-name descname"><span class="pre">processing_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.processing_time_ms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionBatch.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionBatch.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">InteractionContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Context information for user interactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>scene_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_emotional_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em>)</p></li>
+<li><p><strong>therapeutic_goals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>recent_interactions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>narrative_context</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>user_preferences</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>scene_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>user_emotional_state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em>)</p></li>
+<li><p><strong>therapeutic_goals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>recent_interactions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>narrative_context</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>user_preferences</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.narrative_context">
+<span class="sig-name descname"><span class="pre">narrative_context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.narrative_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.recent_interactions">
+<span class="sig-name descname"><span class="pre">recent_interactions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.recent_interactions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.safety_level">
+<span class="sig-name descname"><span class="pre">safety_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.safety_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.scene_id">
+<span class="sig-name descname"><span class="pre">scene_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.scene_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.therapeutic_goals">
+<span class="sig-name descname"><span class="pre">therapeutic_goals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.therapeutic_goals" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.user_emotional_state">
+<span class="sig-name descname"><span class="pre">user_emotional_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">float]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.user_emotional_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.user_preferences">
+<span class="sig-name descname"><span class="pre">user_preferences</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.user_preferences" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionContext.validate_emotional_state">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_emotional_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionContext.validate_emotional_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionContext.validate_emotional_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">InteractionResponse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionResponse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Response to a user interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>response_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>response_type</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.ResponseType" title="src.components.gameplay_loop.models.interactions.ResponseType"><em>ResponseType</em></a>)</p></li>
+<li><p><strong>response_content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>therapeutic_intent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>emotional_tone</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em>)</p></li>
+<li><p><strong>follow_up_actions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>narrative_impact</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_considerations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>response_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>response_type</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.ResponseType" title="src.components.gameplay_loop.models.interactions.ResponseType"><em>ResponseType</em></a>)</p></li>
+<li><p><strong>response_content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>therapeutic_intent</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>emotional_tone</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em>)</p></li>
+<li><p><strong>follow_up_actions</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>narrative_impact</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_considerations</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.emotional_tone">
+<span class="sig-name descname"><span class="pre">emotional_tone</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">float]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.emotional_tone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.follow_up_actions">
+<span class="sig-name descname"><span class="pre">follow_up_actions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.follow_up_actions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.interaction_id">
+<span class="sig-name descname"><span class="pre">interaction_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.interaction_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.narrative_impact">
+<span class="sig-name descname"><span class="pre">narrative_impact</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.narrative_impact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.response_content">
+<span class="sig-name descname"><span class="pre">response_content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.response_content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.response_id">
+<span class="sig-name descname"><span class="pre">response_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.response_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.response_type">
+<span class="sig-name descname"><span class="pre">response_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ResponseType</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.response_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.safety_considerations">
+<span class="sig-name descname"><span class="pre">safety_considerations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.safety_considerations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.therapeutic_intent">
+<span class="sig-name descname"><span class="pre">therapeutic_intent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.therapeutic_intent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionResponse.validate_emotional_tone">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_emotional_tone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionResponse.validate_emotional_tone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionResponse.validate_emotional_tone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">InteractionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of user interactions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.CHOICE_SELECTION">
+<span class="sig-name descname"><span class="pre">CHOICE_SELECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_selection'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.CHOICE_SELECTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.EMOTIONAL_RESPONSE">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_RESPONSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_response'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.EMOTIONAL_RESPONSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.HELP_REQUEST">
+<span class="sig-name descname"><span class="pre">HELP_REQUEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'help_request'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.HELP_REQUEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.PAUSE_REQUEST">
+<span class="sig-name descname"><span class="pre">PAUSE_REQUEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pause_request'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.PAUSE_REQUEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.REFLECTION_INPUT">
+<span class="sig-name descname"><span class="pre">REFLECTION_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reflection_input'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.REFLECTION_INPUT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.SAFETY_REQUEST">
+<span class="sig-name descname"><span class="pre">SAFETY_REQUEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_request'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.SAFETY_REQUEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.SKILL_PRACTICE">
+<span class="sig-name descname"><span class="pre">SKILL_PRACTICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_practice'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.SKILL_PRACTICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionType.TEXT_INPUT">
+<span class="sig-name descname"><span class="pre">TEXT_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'text_input'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionType.TEXT_INPUT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">InteractionValidation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionValidation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Validation result for user interactions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>validation_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>status</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.ValidationStatus" title="src.components.gameplay_loop.models.interactions.ValidationStatus"><em>ValidationStatus</em></a>)</p></li>
+<li><p><strong>safety_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>therapeutic_relevance</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>emotional_appropriateness</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>validation_notes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_concerns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>therapeutic_opportunities</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>recommended_responses</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>requires_human_review</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>validation_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>status</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.ValidationStatus" title="src.components.gameplay_loop.models.interactions.ValidationStatus"><em>ValidationStatus</em></a>)</p></li>
+<li><p><strong>safety_score</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>therapeutic_relevance</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>emotional_appropriateness</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Annotated" title="(in Python v3.13)"><em>Annotated</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>Ge</em><em>(</em><em>ge=0.0</em><em>)</em><em>, </em><em>Le</em><em>(</em><em>le=1.0</em><em>)</em><em>]</em>)</p></li>
+<li><p><strong>validation_notes</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>safety_concerns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>therapeutic_opportunities</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>recommended_responses</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>)</p></li>
+<li><p><strong>requires_human_review</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.emotional_appropriateness">
+<span class="sig-name descname"><span class="pre">emotional_appropriateness</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.emotional_appropriateness" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.interaction_id">
+<span class="sig-name descname"><span class="pre">interaction_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.interaction_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.recommended_responses">
+<span class="sig-name descname"><span class="pre">recommended_responses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.recommended_responses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.requires_human_review">
+<span class="sig-name descname"><span class="pre">requires_human_review</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">bool</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.requires_human_review" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.safety_concerns">
+<span class="sig-name descname"><span class="pre">safety_concerns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.safety_concerns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.safety_score">
+<span class="sig-name descname"><span class="pre">safety_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.safety_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ValidationStatus</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.therapeutic_opportunities">
+<span class="sig-name descname"><span class="pre">therapeutic_opportunities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.therapeutic_opportunities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.therapeutic_relevance">
+<span class="sig-name descname"><span class="pre">therapeutic_relevance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.therapeutic_relevance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.validate_scores">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_scores</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#InteractionValidation.validate_scores"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.validate_scores" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.validation_id">
+<span class="sig-name descname"><span class="pre">validation_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.validation_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.InteractionValidation.validation_notes">
+<span class="sig-name descname"><span class="pre">validation_notes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list[str]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.InteractionValidation.validation_notes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">ResponseType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#ResponseType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of responses to user interactions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.ACKNOWLEDGMENT">
+<span class="sig-name descname"><span class="pre">ACKNOWLEDGMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'acknowledgment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.ACKNOWLEDGMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.CLARIFICATION">
+<span class="sig-name descname"><span class="pre">CLARIFICATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'clarification'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.CLARIFICATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.NARRATIVE_CONTINUATION">
+<span class="sig-name descname"><span class="pre">NARRATIVE_CONTINUATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_continuation'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.NARRATIVE_CONTINUATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.SAFETY_INTERVENTION">
+<span class="sig-name descname"><span class="pre">SAFETY_INTERVENTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_intervention'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.SAFETY_INTERVENTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.SKILL_REINFORCEMENT">
+<span class="sig-name descname"><span class="pre">SKILL_REINFORCEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_reinforcement'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.SKILL_REINFORCEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ResponseType.THERAPEUTIC_GUIDANCE">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_GUIDANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_guidance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ResponseType.THERAPEUTIC_GUIDANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">UserInteraction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.pydantic.dev/latest/api/base_model/#pydantic.BaseModel" title="(in Pydantic v0.0.0)"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></a></p>
+<p>Represents a user interaction during gameplay.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>user_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_type</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionType" title="src.components.gameplay_loop.models.interactions.InteractionType"><em>InteractionType</em></a>)</p></li>
+<li><p><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionContext" title="src.components.gameplay_loop.models.interactions.InteractionContext"><em>InteractionContext</em></a>)</p></li>
+<li><p><strong>validation</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionValidation" title="src.components.gameplay_loop.models.interactions.InteractionValidation"><em>InteractionValidation</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>response</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionResponse" title="src.components.gameplay_loop.models.interactions.InteractionResponse"><em>InteractionResponse</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>processing_time_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+<li><p><strong>processed_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<p>Create a new model by parsing and validating input data from keyword arguments.</p>
+<p>Raises [<cite>ValidationError</cite>][pydantic_core.ValidationError] if the input data cannot be
+validated to form a valid model.</p>
+<p><cite>self</cite> is explicitly positional-only to allow <cite>self</cite> as a field name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+<li><p><strong>interaction_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>session_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>user_id</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>interaction_type</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionType" title="src.components.gameplay_loop.models.interactions.InteractionType"><em>InteractionType</em></a>)</p></li>
+<li><p><strong>content</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>)</p></li>
+<li><p><strong>context</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionContext" title="src.components.gameplay_loop.models.interactions.InteractionContext"><em>InteractionContext</em></a>)</p></li>
+<li><p><strong>validation</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionValidation" title="src.components.gameplay_loop.models.interactions.InteractionValidation"><em>InteractionValidation</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>response</strong> (<a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionResponse" title="src.components.gameplay_loop.models.interactions.InteractionResponse"><em>InteractionResponse</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>processing_time_ms</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>metadata</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><em>Any</em></a><em>]</em>)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a>)</p></li>
+<li><p><strong>processed_at</strong> (<a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><em>datetime</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.add_response">
+<span class="sig-name descname"><span class="pre">add_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">response</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.add_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.add_response" title="Link to this definition"></a></dt>
+<dd><p>Add response to the interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>response</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionResponse" title="src.components.gameplay_loop.models.interactions.InteractionResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">InteractionResponse</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.add_validation">
+<span class="sig-name descname"><span class="pre">add_validation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validation</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.add_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.add_validation" title="Link to this definition"></a></dt>
+<dd><p>Add validation result to the interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>validation</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.models.interactions.InteractionValidation" title="src.components.gameplay_loop.models.interactions.InteractionValidation"><code class="xref py py-class docutils literal notranslate"><span class="pre">InteractionValidation</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.content">
+<span class="sig-name descname"><span class="pre">content</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.content" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.context">
+<span class="sig-name descname"><span class="pre">context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InteractionContext</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.get_emotional_intensity">
+<span class="sig-name descname"><span class="pre">get_emotional_intensity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.get_emotional_intensity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.get_emotional_intensity" title="Link to this definition"></a></dt>
+<dd><p>Get the overall emotional intensity of the interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.interaction_id">
+<span class="sig-name descname"><span class="pre">interaction_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.interaction_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.interaction_type">
+<span class="sig-name descname"><span class="pre">interaction_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InteractionType</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.interaction_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.is_safe">
+<span class="sig-name descname"><span class="pre">is_safe</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.is_safe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.is_safe" title="Link to this definition"></a></dt>
+<dd><p>Check if the interaction is considered safe.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.mark_processed">
+<span class="sig-name descname"><span class="pre">mark_processed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processing_time_ms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.mark_processed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.mark_processed" title="Link to this definition"></a></dt>
+<dd><p>Mark the interaction as processed.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>processing_time_ms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">dict[str,</span> <span class="pre">Any]</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.processed_at">
+<span class="sig-name descname"><span class="pre">processed_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.processed_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.processing_time_ms">
+<span class="sig-name descname"><span class="pre">processing_time_ms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">float</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.processing_time_ms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.requires_therapeutic_attention">
+<span class="sig-name descname"><span class="pre">requires_therapeutic_attention</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#UserInteraction.requires_therapeutic_attention"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.requires_therapeutic_attention" title="Link to this definition"></a></dt>
+<dd><p>Check if the interaction requires therapeutic attention.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.response">
+<span class="sig-name descname"><span class="pre">response</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InteractionResponse</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">datetime</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.UserInteraction.validation">
+<span class="sig-name descname"><span class="pre">validation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">InteractionValidation</span> <span class="pre">|</span> <span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.UserInteraction.validation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.models.interactions.</span></span><span class="sig-name descname"><span class="pre">ValidationStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/models/interactions.html#ValidationStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Status of interaction validation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus.INVALID">
+<span class="sig-name descname"><span class="pre">INVALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'invalid'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus.INVALID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus.REQUIRES_REVIEW">
+<span class="sig-name descname"><span class="pre">REQUIRES_REVIEW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'requires_review'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus.REQUIRES_REVIEW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus.SAFETY_CONCERN">
+<span class="sig-name descname"><span class="pre">SAFETY_CONCERN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_concern'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus.SAFETY_CONCERN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus.THERAPEUTIC_OPPORTUNITY">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_OPPORTUNITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_opportunity'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus.THERAPEUTIC_OPPORTUNITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.models.interactions.ValidationStatus.VALID">
+<span class="sig-name descname"><span class="pre">VALID</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'valid'</span></em><a class="headerlink" href="#src.components.gameplay_loop.models.interactions.ValidationStatus.VALID" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.models.core.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.models.core module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.models.progress.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.models.progress module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

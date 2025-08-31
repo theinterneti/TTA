@@ -1,0 +1,65 @@
+{{ modname | e | heading }}
+
+.. automodule:: {{ modname }}
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+
+{% block modules %}
+{% if modules %}
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+{% for item in modules %}
+   {{ item }}
+{%- endfor %}
+{% endif %}
+{% endblock %}
+
+{% block functions %}
+{% if functions %}
+
+Functions
+---------
+
+{% for item in functions %}
+.. autofunction:: {{ item }}
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block classes %}
+{% if classes %}
+
+Classes
+-------
+
+{% for item in classes %}
+.. autoclass:: {{ item }}
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :special-members: __init__
+{% endfor %}
+{% endif %}
+{% endblock %}
+
+{% block exceptions %}
+{% if exceptions %}
+
+Exceptions
+----------
+
+{% for item in exceptions %}
+.. autoexception:: {{ item }}
+   :members:
+   :undoc-members:
+   :show-inheritance:
+{% endfor %}
+{% endif %}
+{% endblock %}
