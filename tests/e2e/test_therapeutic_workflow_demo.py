@@ -72,6 +72,13 @@ class SimplifiedTherapeuticWorkflowDemo:
         emotional_safety = TherapeuticEmotionalSafetySystem()
         await emotional_safety.initialize()
 
+        # Real adaptive difficulty engine
+        from src.components.therapeutic_systems.adaptive_difficulty_engine import (
+            TherapeuticAdaptiveDifficultyEngine,
+        )
+        adaptive_difficulty = TherapeuticAdaptiveDifficultyEngine()
+        await adaptive_difficulty.initialize()
+
         # Mock character development system
         character_development = AsyncMock()
         mock_character = MagicMock()
@@ -82,6 +89,7 @@ class SimplifiedTherapeuticWorkflowDemo:
         self.mock_services = {
             "consequence_system": consequence_system,
             "emotional_safety": emotional_safety,
+            "adaptive_difficulty": adaptive_difficulty,
             "character_development": character_development,
         }
 
