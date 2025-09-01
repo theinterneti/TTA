@@ -107,6 +107,13 @@ class SimplifiedTherapeuticWorkflowDemo:
         replayability_system = TherapeuticReplayabilitySystem()
         await replayability_system.initialize()
 
+        # Real collaborative system
+        from src.components.therapeutic_systems.collaborative_system import (
+            TherapeuticCollaborativeSystem,
+        )
+        collaborative_system = TherapeuticCollaborativeSystem()
+        await collaborative_system.initialize()
+
         # Inject all therapeutic systems into the controllers
         gameplay_controller.inject_therapeutic_systems(
             consequence_system=consequence_system,
@@ -125,6 +132,16 @@ class SimplifiedTherapeuticWorkflowDemo:
             gameplay_loop_controller=gameplay_controller,
         )
 
+        collaborative_system.inject_therapeutic_systems(
+            consequence_system=consequence_system,
+            emotional_safety_system=emotional_safety,
+            adaptive_difficulty_engine=adaptive_difficulty,
+            character_development_system=character_development,
+            therapeutic_integration_system=therapeutic_integration,
+            gameplay_loop_controller=gameplay_controller,
+            replayability_system=replayability_system,
+        )
+
         self.mock_services = {
             "consequence_system": consequence_system,
             "emotional_safety": emotional_safety,
@@ -133,6 +150,7 @@ class SimplifiedTherapeuticWorkflowDemo:
             "therapeutic_integration": therapeutic_integration,
             "gameplay_controller": gameplay_controller,
             "replayability_system": replayability_system,
+            "collaborative_system": collaborative_system,
         }
 
         print("✅ Mock therapeutic services initialized")
