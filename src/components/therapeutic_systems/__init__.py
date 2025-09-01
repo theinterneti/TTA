@@ -9,10 +9,12 @@ from .adaptive_difficulty_engine import TherapeuticAdaptiveDifficultyEngine
 from .character_development_system import TherapeuticCharacterDevelopmentSystem
 from .consequence_system import TherapeuticConsequenceSystem
 from .emotional_safety_system import TherapeuticEmotionalSafetySystem
+from .therapeutic_integration_system import TherapeuticIntegrationSystem
 
 __all__ = [
     "TherapeuticConsequenceSystem",
     "TherapeuticEmotionalSafetySystem",
     "TherapeuticAdaptiveDifficultyEngine",
     "TherapeuticCharacterDevelopmentSystem",
+    "TherapeuticIntegrationSystem",
 ]

@@ -86,11 +86,19 @@ class SimplifiedTherapeuticWorkflowDemo:
         character_development = TherapeuticCharacterDevelopmentSystem()
         await character_development.initialize()
 
+        # Real therapeutic integration system
+        from src.components.therapeutic_systems.therapeutic_integration_system import (
+            TherapeuticIntegrationSystem,
+        )
+        therapeutic_integration = TherapeuticIntegrationSystem()
+        await therapeutic_integration.initialize()
+
         self.mock_services = {
             "consequence_system": consequence_system,
             "emotional_safety": emotional_safety,
             "adaptive_difficulty": adaptive_difficulty,
             "character_development": character_development,
+            "therapeutic_integration": therapeutic_integration,
         }
 
         print("✅ Mock therapeutic services initialized")
