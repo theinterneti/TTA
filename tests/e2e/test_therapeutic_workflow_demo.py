@@ -79,12 +79,12 @@ class SimplifiedTherapeuticWorkflowDemo:
         adaptive_difficulty = TherapeuticAdaptiveDifficultyEngine()
         await adaptive_difficulty.initialize()
 
-        # Mock character development system
-        character_development = AsyncMock()
-        mock_character = MagicMock()
-        mock_character.character_id = "demo_character"
-        mock_character.attributes = {"courage": 6.0, "wisdom": 5.0, "compassion": 7.0}
-        character_development.create_character.return_value = mock_character
+        # Real character development system
+        from src.components.therapeutic_systems.character_development_system import (
+            TherapeuticCharacterDevelopmentSystem,
+        )
+        character_development = TherapeuticCharacterDevelopmentSystem()
+        await character_development.initialize()
 
         self.mock_services = {
             "consequence_system": consequence_system,
