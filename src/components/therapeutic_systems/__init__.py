@@ -13,6 +13,7 @@ from .therapeutic_integration_system import TherapeuticIntegrationSystem
 from .gameplay_loop_controller import TherapeuticGameplayLoopController
 from .replayability_system import TherapeuticReplayabilitySystem
 from .collaborative_system import TherapeuticCollaborativeSystem
+from .error_recovery_manager import TherapeuticErrorRecoveryManager
 
 __all__ = [
     "TherapeuticConsequenceSystem",
@@ -23,4 +24,5 @@ __all__ = [
     "TherapeuticGameplayLoopController",
     "TherapeuticReplayabilitySystem",
     "TherapeuticCollaborativeSystem",
+    "TherapeuticErrorRecoveryManager",
 ]
