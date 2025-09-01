@@ -11,6 +11,7 @@ from .consequence_system import TherapeuticConsequenceSystem
 from .emotional_safety_system import TherapeuticEmotionalSafetySystem
 from .therapeutic_integration_system import TherapeuticIntegrationSystem
 from .gameplay_loop_controller import TherapeuticGameplayLoopController
+from .replayability_system import TherapeuticReplayabilitySystem
 
 __all__ = [
     "TherapeuticConsequenceSystem",
@@ -19,4 +20,5 @@ __all__ = [
     "TherapeuticCharacterDevelopmentSystem",
     "TherapeuticIntegrationSystem",
     "TherapeuticGameplayLoopController",
+    "TherapeuticReplayabilitySystem",
 ]
