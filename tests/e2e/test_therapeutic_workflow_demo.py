@@ -55,25 +55,22 @@ class SimplifiedTherapeuticWorkflowDemo:
         print("✅ Demo environment setup complete")
 
     async def _initialize_mock_services(self):
-        """Initialize mock therapeutic services."""
-        # Mock consequence system
-        consequence_system = AsyncMock()
-        consequence_system.process_choice_consequence.return_value = {
-            "consequence_id": "demo_consequence",
-            "therapeutic_value": 0.85,
-            "learning_opportunity": "Demonstrated courage in difficult situation",
-            "character_impact": {"courage": 0.2, "wisdom": 0.1},
-        }
+        """Initialize therapeutic services with real ConsequenceSystem."""
+        # Real consequence system
+        from src.components.therapeutic_systems.consequence_system import (
+            TherapeuticConsequenceSystem,
+        )
 
-        # Mock emotional safety system
-        emotional_safety = AsyncMock()
-        emotional_safety.assess_crisis_risk.return_value = {
-            "crisis_detected": False,
-            "crisis_level": "NONE",
-            "immediate_intervention": False,
-            "indicators": [],
-            "response_time": 0.05,
-        }
+        consequence_system = TherapeuticConsequenceSystem()
+        await consequence_system.initialize()
+
+        # Real emotional safety system
+        from src.components.therapeutic_systems.emotional_safety_system import (
+            TherapeuticEmotionalSafetySystem,
+        )
+
+        emotional_safety = TherapeuticEmotionalSafetySystem()
+        await emotional_safety.initialize()
 
         # Mock character development system
         character_development = AsyncMock()
@@ -283,17 +280,8 @@ class SimplifiedTherapeuticWorkflowDemo:
 
         start_time = time.time()
 
-        # Mock crisis detection
+        # Real crisis detection
         safety_service = self.mock_services["emotional_safety"]
-
-        # Override mock for crisis scenario
-        safety_service.assess_crisis_risk.return_value = {
-            "crisis_detected": True,
-            "crisis_level": "CRITICAL",
-            "immediate_intervention": True,
-            "indicators": ["suicide_ideation", "hopelessness"],
-            "response_time": 0.02,  # Very fast response
-        }
 
         print("  🔍 Step 1: Crisis Detection")
         crisis_result = await safety_service.assess_crisis_risk(

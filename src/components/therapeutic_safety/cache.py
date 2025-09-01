@@ -282,7 +282,7 @@ class SafetyResultCache:
 
     async def cache_batch_results(
         self,
-        results: list[Tuple[ContentPayload, ValidationContext, ValidationResult]],
+        results: list[tuple[ContentPayload, ValidationContext, ValidationResult]],
         ttl: timedelta | None = None,
     ) -> int:
         """Cache multiple validation results in batch."""
@@ -318,7 +318,9 @@ class SafetyResultCache:
             "cache_effectiveness": (
                 "high"
                 if stats["hit_rate_percent"] > 70
-                else "medium" if stats["hit_rate_percent"] > 40 else "low"
+                else "medium"
+                if stats["hit_rate_percent"] > 40
+                else "low"
             ),
             "total_validations_cached": stats["cache_sets"],
             "cache_errors_rate": (
@@ -356,7 +358,7 @@ class SafetyResultCache:
 
     async def warm_cache(
         self,
-        common_content: list[Tuple[ContentPayload, ValidationContext]],
+        common_content: list[tuple[ContentPayload, ValidationContext]],
         validator_func,
     ) -> int:
         """Warm cache with common content validations."""
