@@ -93,12 +93,29 @@ class SimplifiedTherapeuticWorkflowDemo:
         therapeutic_integration = TherapeuticIntegrationSystem()
         await therapeutic_integration.initialize()
 
+        # Real gameplay loop controller
+        from src.components.therapeutic_systems.gameplay_loop_controller import (
+            TherapeuticGameplayLoopController,
+        )
+        gameplay_controller = TherapeuticGameplayLoopController()
+        await gameplay_controller.initialize()
+
+        # Inject all therapeutic systems into the controller
+        gameplay_controller.inject_therapeutic_systems(
+            consequence_system=consequence_system,
+            emotional_safety_system=emotional_safety,
+            adaptive_difficulty_engine=adaptive_difficulty,
+            character_development_system=character_development,
+            therapeutic_integration_system=therapeutic_integration,
+        )
+
         self.mock_services = {
             "consequence_system": consequence_system,
             "emotional_safety": emotional_safety,
             "adaptive_difficulty": adaptive_difficulty,
             "character_development": character_development,
             "therapeutic_integration": therapeutic_integration,
+            "gameplay_controller": gameplay_controller,
         }
 
         print("✅ Mock therapeutic services initialized")

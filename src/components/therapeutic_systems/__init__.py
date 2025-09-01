@@ -10,6 +10,7 @@ from .character_development_system import TherapeuticCharacterDevelopmentSystem
 from .consequence_system import TherapeuticConsequenceSystem
 from .emotional_safety_system import TherapeuticEmotionalSafetySystem
 from .therapeutic_integration_system import TherapeuticIntegrationSystem
+from .gameplay_loop_controller import TherapeuticGameplayLoopController
 
 __all__ = [
     "TherapeuticConsequenceSystem",
@@ -17,4 +18,5 @@ __all__ = [
     "TherapeuticAdaptiveDifficultyEngine",
     "TherapeuticCharacterDevelopmentSystem",
     "TherapeuticIntegrationSystem",
+    "TherapeuticGameplayLoopController",
 ]
