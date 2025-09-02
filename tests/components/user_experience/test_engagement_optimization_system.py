@@ -40,7 +40,7 @@ class TestEngagementOptimizationSystem:
         system.accessibility_profiles = {
             "test_user_001": Mock(
                 disability_types=["visual"],
-                enabled_features=set(["screen_reader", "high_contrast"]),
+                enabled_features={"screen_reader", "high_contrast"},
                 font_size_multiplier=1.2,
             )
         }
@@ -373,7 +373,7 @@ class TestEngagementOptimizationSystem:
         user_id = "motivation_optimization_user_001"
 
         # Create motivation profile first
-        profile = await engagement_system.create_motivation_profile(
+        await engagement_system.create_motivation_profile(
             user_id=user_id,
             therapeutic_goals=sample_therapeutic_goals,
             preferences={"intrinsic_motivation": True, "achievement_motivation": True},
@@ -424,7 +424,7 @@ class TestEngagementOptimizationSystem:
         user_id = "analytics_user_001"
 
         # Create motivation profile
-        profile = await engagement_system.create_motivation_profile(
+        await engagement_system.create_motivation_profile(
             user_id=user_id, therapeutic_goals=sample_therapeutic_goals, preferences={}
         )
 
@@ -438,7 +438,7 @@ class TestEngagementOptimizationSystem:
 
         therapeutic_context = {"progress": 0.7, "goal_achievement_rate": 0.5}
 
-        metrics = await engagement_system.track_user_engagement(
+        await engagement_system.track_user_engagement(
             user_id=user_id,
             session_data=session_data,
             therapeutic_context=therapeutic_context,
@@ -455,7 +455,7 @@ class TestEngagementOptimizationSystem:
         )
 
         # Generate visualization
-        visualization = await engagement_system.generate_progress_visualization(
+        await engagement_system.generate_progress_visualization(
             user_id=user_id,
             visualization_type=VisualizationType.CIRCULAR_PROGRESS,
             therapeutic_context=therapeutic_context,
@@ -516,7 +516,7 @@ class TestEngagementOptimizationSystem:
         # Test motivation profile creation performance
         start_time = time.perf_counter()
 
-        profile = await engagement_system.create_motivation_profile(
+        await engagement_system.create_motivation_profile(
             user_id=user_id,
             therapeutic_goals=sample_therapeutic_goals,
             preferences=sample_user_preferences,
@@ -531,7 +531,7 @@ class TestEngagementOptimizationSystem:
         session_data = {"duration": 30, "completion_rate": 0.8, "points_earned": 100}
         therapeutic_context = {"progress": 0.6, "goal_achievement_rate": 0.4}
 
-        metrics = await engagement_system.track_user_engagement(
+        await engagement_system.track_user_engagement(
             user_id=user_id,
             session_data=session_data,
             therapeutic_context=therapeutic_context,
@@ -546,7 +546,7 @@ class TestEngagementOptimizationSystem:
         achievement_criteria = {"sessions_completed": 1}
         session_context = {"session_id": "perf_session"}
 
-        achievements = await engagement_system.process_achievement_unlock(
+        await engagement_system.process_achievement_unlock(
             user_id=user_id,
             achievement_criteria=achievement_criteria,
             session_context=session_context,
@@ -558,7 +558,7 @@ class TestEngagementOptimizationSystem:
         # Test visualization generation performance
         start_time = time.perf_counter()
 
-        visualization = await engagement_system.generate_progress_visualization(
+        await engagement_system.generate_progress_visualization(
             user_id=user_id,
             visualization_type=VisualizationType.JOURNEY_MAP,
             therapeutic_context=therapeutic_context,
@@ -570,7 +570,7 @@ class TestEngagementOptimizationSystem:
         # Test motivation optimization performance
         start_time = time.perf_counter()
 
-        intervention_plan = await engagement_system.optimize_user_motivation(
+        await engagement_system.optimize_user_motivation(
             user_id=user_id,
             current_engagement=EngagementLevel.MODERATE,
             therapeutic_context=therapeutic_context,

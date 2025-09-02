@@ -1,5 +1,5 @@
 """
-Engagement Optimization System
+Engagement Optimization System.
 
 Comprehensive engagement system with therapeutic gamification, motivation tracking,
 progress visualization, achievement systems, and user journey optimization to maintain
@@ -234,9 +234,10 @@ class EngagementMetrics:
 
 class EngagementOptimizationSystem:
     """
-    Comprehensive engagement system with therapeutic gamification, motivation tracking,
-    progress visualization, achievement systems, and user journey optimization to maintain
-    long-term therapeutic engagement.
+    Comprehensive engagement system with therapeutic gamification.
+
+    Includes motivation tracking, progress visualization, achievement systems, and user
+    journey optimization to maintain long-term therapeutic engagement.
     """
 
     def __init__(self):
