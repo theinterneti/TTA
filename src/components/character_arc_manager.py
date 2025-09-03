@@ -186,7 +186,7 @@ class CharacterArcManagerComponent(Component):
 
         # Initialize integration with Character Development System
         self.integration = None
-        if INTEGRATION_AVAILABLE:
+        if INTEGRATION_AVAILABLE and CharacterArcIntegration is not None:
             try:
                 self.integration = CharacterArcIntegration(self)
                 logger.info("Character Development System integration enabled")

@@ -16,7 +16,6 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from typing import Any
 
 from ..orchestration.component import Component
@@ -37,14 +36,7 @@ from .narrative_arc_orchestrator.models import (
     ScaleConflict,
 )
 
-
-class NarrativeScale(Enum):
-    """Temporal scales for narrative management."""
-
-    SHORT_TERM = "short_term"  # Immediate scene/interaction
-    MEDIUM_TERM = "medium_term"  # Character arc progression
-    LONG_TERM = "long_term"  # World story development
-    EPIC_TERM = "epic_term"  # Generational saga
+# NarrativeScale is imported from narrative_arc_interfaces
 
 
 @dataclass

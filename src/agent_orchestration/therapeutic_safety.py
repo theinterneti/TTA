@@ -51,14 +51,20 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 try:
     import yaml  # type: ignore
 except Exception:  # pragma: no cover
     yaml = None  # Optional; JSON works without it
+
+try:
+    from redis.asyncio import Redis as _Redis
+except Exception:  # pragma: no cover
+    _Redis = None  # type: ignore
 
 
 class SafetyLevel(str, Enum):
@@ -3356,15 +3362,7 @@ class SafetyMonitoringDashboard:
             raise ValueError(f"Unsupported export format: {format_type}")
 
 
-import time
-
 # ---- Redis-backed rules provider and SafetyService ----
-from typing import cast
-
-try:
-    from redis.asyncio import Redis as _Redis
-except Exception:  # pragma: no cover
-    _Redis = None  # type: ignore
 
 
 class SafetyRulesProvider:
