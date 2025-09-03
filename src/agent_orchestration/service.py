@@ -233,7 +233,7 @@ class AgentOrchestrationService:
             ):
                 raise
             else:
-                raise ServiceError(f"Unexpected error during processing: {e}")
+                raise ServiceError(f"Unexpected error during processing: {e}") from e
 
     async def coordinate_agents(
         self,
@@ -295,7 +295,7 @@ class AgentOrchestrationService:
             if isinstance(e, WorkflowExecutionError):
                 raise
             else:
-                raise WorkflowExecutionError(f"Agent coordination failed: {e}")
+                raise WorkflowExecutionError(f"Agent coordination failed: {e}") from e
 
     def get_therapeutic_safety_metrics(self) -> dict[str, Any]:
         """Get therapeutic safety metrics from the validator."""
@@ -525,7 +525,7 @@ class AgentOrchestrationService:
 
         except Exception as e:
             logger.error(f"Error registering default workflows: {e}")
-            raise ServiceError(f"Failed to register default workflows: {e}")
+            raise ServiceError(f"Failed to register default workflows: {e}") from e
 
     async def _validate_components(self) -> None:
         """Validate that required components are available and functional."""
@@ -554,7 +554,7 @@ class AgentOrchestrationService:
 
         except Exception as e:
             logger.error(f"Component validation failed: {e}")
-            raise ServiceError(f"Component validation failed: {e}")
+            raise ServiceError(f"Component validation failed: {e}") from e
 
     async def _validate_therapeutic_safety(
         self, user_input: str, session_context: SessionContext
@@ -890,7 +890,7 @@ class AgentOrchestrationService:
             if isinstance(e, WorkflowExecutionError):
                 raise
             else:
-                raise WorkflowExecutionError(f"Workflow execution failed: {e}")
+                raise WorkflowExecutionError(f"Workflow execution failed: {e}") from e
 
     async def _update_session_context(
         self, session_context: SessionContext, response: OrchestrationResponse

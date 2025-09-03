@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class DeploymentStatus(Enum):
     """Cloud deployment status."""
+
     INITIALIZING = "initializing"
     DEPLOYING = "deploying"
     ACTIVE = "active"
@@ -31,6 +32,7 @@ class DeploymentStatus(Enum):
 
 class ServiceType(Enum):
     """Types of services in the deployment."""
+
     WEB_API = "web_api"
     THERAPEUTIC_SYSTEMS = "therapeutic_systems"
     CLINICAL_DASHBOARD = "clinical_dashboard"
@@ -44,6 +46,7 @@ class ServiceType(Enum):
 @dataclass
 class ServiceInstance:
     """Cloud service instance configuration."""
+
     instance_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     service_type: ServiceType = ServiceType.WEB_API
     instance_name: str = ""
@@ -65,11 +68,14 @@ class ServiceInstance:
 @dataclass
 class DeploymentConfiguration:
     """Cloud deployment configuration."""
+
     deployment_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     deployment_name: str = "tta-therapeutic-platform"
     environment: str = "production"
     region: str = "us-east-1"
-    availability_zones: list[str] = field(default_factory=lambda: ["us-east-1a", "us-east-1b", "us-east-1c"])
+    availability_zones: list[str] = field(
+        default_factory=lambda: ["us-east-1a", "us-east-1b", "us-east-1c"]
+    )
 
     # Scaling configuration
     min_instances: int = 3
@@ -164,12 +170,8 @@ class CloudDeploymentManager:
             self._deployment_monitoring_task = asyncio.create_task(
                 self._deployment_monitoring_loop()
             )
-            self._health_check_task = asyncio.create_task(
-                self._health_check_loop()
-            )
-            self._scaling_task = asyncio.create_task(
-                self._scaling_loop()
-            )
+            self._health_check_task = asyncio.create_task(self._health_check_loop())
+            self._scaling_task = asyncio.create_task(self._scaling_loop())
 
             self.status = DeploymentStatus.ACTIVE
             logger.info("CloudDeploymentManager initialization complete")
@@ -197,9 +199,7 @@ class CloudDeploymentManager:
         logger.info("Infrastructure components injected into CloudDeploymentManager")
 
     def inject_therapeutic_systems(
-        self,
-        clinical_dashboard_manager=None,
-        **therapeutic_systems
+        self, clinical_dashboard_manager=None, **therapeutic_systems
     ):
         """Inject therapeutic systems for deployment integration."""
         self.clinical_dashboard_manager = clinical_dashboard_manager
@@ -211,7 +211,7 @@ class CloudDeploymentManager:
         self,
         deployment_name: str | None = None,
         environment: str = "production",
-        custom_configuration: dict[str, Any] | None = None
+        custom_configuration: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Deploy the complete TTA therapeutic platform to cloud infrastructure."""
         try:
@@ -226,7 +226,9 @@ class CloudDeploymentManager:
                 await self._apply_custom_configuration(custom_configuration)
 
             # Deploy core infrastructure
-            infrastructure_result = await self._deploy_core_infrastructure(deployment_id)
+            infrastructure_result = await self._deploy_core_infrastructure(
+                deployment_id
+            )
 
             # Deploy therapeutic systems
             therapeutic_result = await self._deploy_therapeutic_systems(deployment_id)
@@ -235,10 +237,14 @@ class CloudDeploymentManager:
             dashboard_result = await self._deploy_clinical_dashboard(deployment_id)
 
             # Configure load balancing and scaling
-            scaling_result = await self._configure_scaling_and_load_balancing(deployment_id)
+            scaling_result = await self._configure_scaling_and_load_balancing(
+                deployment_id
+            )
 
             # Configure monitoring and security
-            monitoring_result = await self._configure_monitoring_and_security(deployment_id)
+            monitoring_result = await self._configure_monitoring_and_security(
+                deployment_id
+            )
 
             # Validate deployment
             validation_result = await self._validate_deployment(deployment_id)
@@ -271,7 +277,9 @@ class CloudDeploymentManager:
                 self.deployment_metrics["failed_deployments"] += 1
                 self.status = DeploymentStatus.DEGRADED
 
-            logger.info(f"Deployment completed: {deployment_name} - Status: {deployment_record['status']}")
+            logger.info(
+                f"Deployment completed: {deployment_name} - Status: {deployment_record['status']}"
+            )
 
             return deployment_record
 
@@ -292,14 +300,18 @@ class CloudDeploymentManager:
                 raise ValueError("Minimum instances must be at least 1")
 
             if self.configuration.max_instances < self.configuration.min_instances:
-                raise ValueError("Maximum instances must be greater than minimum instances")
+                raise ValueError(
+                    "Maximum instances must be greater than minimum instances"
+                )
 
             if self.configuration.max_concurrent_sessions < 1:
                 raise ValueError("Maximum concurrent sessions must be at least 1")
 
             # Validate availability zones
             if len(self.configuration.availability_zones) < 2:
-                logger.warning("Less than 2 availability zones configured - high availability may be compromised")
+                logger.warning(
+                    "Less than 2 availability zones configured - high availability may be compromised"
+                )
 
             logger.info("Deployment configuration validated successfully")
 
@@ -379,7 +391,7 @@ class CloudDeploymentManager:
                     instance = await self._deploy_service_instance(
                         service_type=ServiceType.THERAPEUTIC_SYSTEMS,
                         service_name=system_name,
-                        deployment_id=deployment_id
+                        deployment_id=deployment_id,
                     )
                     deployed_systems[system_name] = instance
 
@@ -407,7 +419,7 @@ class CloudDeploymentManager:
                 dashboard_instance = await self._deploy_service_instance(
                     service_type=ServiceType.CLINICAL_DASHBOARD,
                     service_name="clinical_dashboard",
-                    deployment_id=deployment_id
+                    deployment_id=deployment_id,
                 )
 
                 return {
@@ -435,7 +447,7 @@ class CloudDeploymentManager:
         service_type: ServiceType,
         service_name: str,
         deployment_id: str,
-        instance_size: str = "t3.medium"
+        instance_size: str = "t3.medium",
     ) -> ServiceInstance:
         """Deploy a service instance to cloud infrastructure."""
         try:
@@ -451,7 +463,7 @@ class CloudDeploymentManager:
                     "service_name": service_name,
                     "auto_scaling": True,
                     "health_check_enabled": True,
-                }
+                },
             )
 
             # Simulate deployment process
@@ -465,7 +477,9 @@ class CloudDeploymentManager:
             self.service_instances[instance.instance_id] = instance
             self.deployment_metrics["active_instances"] += 1
 
-            logger.info(f"Service instance deployed: {instance.instance_name} ({instance.instance_id})")
+            logger.info(
+                f"Service instance deployed: {instance.instance_name} ({instance.instance_id})"
+            )
 
             return instance
 
@@ -483,7 +497,11 @@ class CloudDeploymentManager:
                 if instance.health_status == "healthy":
                     healthy_instances += 1
 
-            health_percentage = (healthy_instances / total_instances * 100) if total_instances > 0 else 0
+            health_percentage = (
+                (healthy_instances / total_instances * 100)
+                if total_instances > 0
+                else 0
+            )
 
             return {
                 "success": health_percentage >= 90.0,
@@ -538,7 +556,8 @@ class CloudDeploymentManager:
             benchmarks_met = {
                 "response_time": performance_results["response_time_ms"] < 100,
                 "throughput": performance_results["throughput_rps"] > 500,
-                "concurrent_sessions": performance_results["concurrent_sessions"] >= 1000,
+                "concurrent_sessions": performance_results["concurrent_sessions"]
+                >= 1000,
                 "cpu_utilization": performance_results["cpu_utilization"] < 80,
                 "memory_utilization": performance_results["memory_utilization"] < 85,
             }
@@ -593,10 +612,13 @@ class CloudDeploymentManager:
 
             # Check each therapeutic system
             for system_name, system in self.therapeutic_systems.items():
-                if system and hasattr(system, 'health_check'):
+                if system and hasattr(system, "health_check"):
                     try:
                         health = await system.health_check()
-                        integration_results[system_name] = health.get("status") in ["healthy", "degraded"]
+                        integration_results[system_name] = health.get("status") in [
+                            "healthy",
+                            "degraded",
+                        ]
                     except Exception as e:
                         integration_results[system_name] = False
                         logger.error(f"Error checking {system_name} health: {e}")
@@ -604,10 +626,16 @@ class CloudDeploymentManager:
                     integration_results[system_name] = False
 
             # Check clinical dashboard integration
-            if self.clinical_dashboard_manager and hasattr(self.clinical_dashboard_manager, 'health_check'):
+            if self.clinical_dashboard_manager and hasattr(
+                self.clinical_dashboard_manager, "health_check"
+            ):
                 try:
-                    dashboard_health = await self.clinical_dashboard_manager.health_check()
-                    integration_results["clinical_dashboard"] = dashboard_health.get("status") in ["healthy", "degraded"]
+                    dashboard_health = (
+                        await self.clinical_dashboard_manager.health_check()
+                    )
+                    integration_results["clinical_dashboard"] = dashboard_health.get(
+                        "status"
+                    ) in ["healthy", "degraded"]
                 except Exception as e:
                     integration_results["clinical_dashboard"] = False
                     logger.error(f"Error checking clinical dashboard health: {e}")
@@ -616,7 +644,8 @@ class CloudDeploymentManager:
             total_integrations = len(integration_results)
 
             return {
-                "success": successful_integrations >= total_integrations * 0.8,  # 80% success rate
+                "success": successful_integrations
+                >= total_integrations * 0.8,  # 80% success rate
                 "integration_results": integration_results,
                 "successful_integrations": successful_integrations,
                 "total_integrations": total_integrations,
@@ -718,6 +747,7 @@ class CloudDeploymentManager:
         try:
             # Simulate health check
             import random
+
             health_check_success = random.random() > 0.05  # 95% success rate
 
             if health_check_success:
@@ -745,7 +775,8 @@ class CloudDeploymentManager:
 
             # Update uptime percentage
             healthy_instances = sum(
-                1 for instance in self.service_instances.values()
+                1
+                for instance in self.service_instances.values()
                 if instance.health_status == "healthy"
             )
             total_instances = len(self.service_instances)
@@ -764,27 +795,40 @@ class CloudDeploymentManager:
             if not self.service_instances:
                 return
 
-            total_cpu = sum(instance.cpu_utilization for instance in self.service_instances.values())
-            total_memory = sum(instance.memory_utilization for instance in self.service_instances.values())
+            total_cpu = sum(
+                instance.cpu_utilization for instance in self.service_instances.values()
+            )
+            total_memory = sum(
+                instance.memory_utilization
+                for instance in self.service_instances.values()
+            )
             instance_count = len(self.service_instances)
 
             avg_cpu = total_cpu / instance_count
             avg_memory = total_memory / instance_count
 
             # Check if scaling up is needed
-            if (avg_cpu > self.configuration.scale_up_threshold or
-                avg_memory > self.configuration.scale_up_threshold):
+            if (
+                avg_cpu > self.configuration.scale_up_threshold
+                or avg_memory > self.configuration.scale_up_threshold
+            ):
 
                 if instance_count < self.configuration.max_instances:
-                    logger.info(f"Scaling up triggered: CPU={avg_cpu:.1f}%, Memory={avg_memory:.1f}%")
+                    logger.info(
+                        f"Scaling up triggered: CPU={avg_cpu:.1f}%, Memory={avg_memory:.1f}%"
+                    )
                     self.deployment_metrics["scaling_events"] += 1
 
             # Check if scaling down is needed
-            elif (avg_cpu < self.configuration.scale_down_threshold and
-                  avg_memory < self.configuration.scale_down_threshold):
+            elif (
+                avg_cpu < self.configuration.scale_down_threshold
+                and avg_memory < self.configuration.scale_down_threshold
+            ):
 
                 if instance_count > self.configuration.min_instances:
-                    logger.info(f"Scaling down triggered: CPU={avg_cpu:.1f}%, Memory={avg_memory:.1f}%")
+                    logger.info(
+                        f"Scaling down triggered: CPU={avg_cpu:.1f}%, Memory={avg_memory:.1f}%"
+                    )
                     self.deployment_metrics["scaling_events"] += 1
 
         except Exception as e:
@@ -813,36 +857,44 @@ class CloudDeploymentManager:
                 service_type=ServiceType.DATABASE,
                 service_name="postgresql-primary",
                 deployment_id="db-cluster",
-                instance_size=self.configuration.database_instance_class
+                instance_size=self.configuration.database_instance_class,
             )
-            primary_db.configuration.update({
-                "engine": self.configuration.database_engine,
-                "version": self.configuration.database_version,
-                "multi_az": self.configuration.database_multi_az,
-                "backup_retention": self.configuration.database_backup_retention_days,
-                "role": "primary"
-            })
+            primary_db.configuration.update(
+                {
+                    "engine": self.configuration.database_engine,
+                    "version": self.configuration.database_version,
+                    "multi_az": self.configuration.database_multi_az,
+                    "backup_retention": self.configuration.database_backup_retention_days,
+                    "role": "primary",
+                }
+            )
             database_instances.append(primary_db)
 
             # Deploy read replicas if multi-AZ enabled
             if self.configuration.database_multi_az:
-                for i, az in enumerate(self.configuration.availability_zones[1:3]):  # Up to 2 replicas
+                for i, az in enumerate(
+                    self.configuration.availability_zones[1:3]
+                ):  # Up to 2 replicas
                     replica_db = await self._deploy_service_instance(
                         service_type=ServiceType.DATABASE,
                         service_name=f"postgresql-replica-{i+1}",
                         deployment_id="db-cluster",
-                        instance_size=self.configuration.database_instance_class
+                        instance_size=self.configuration.database_instance_class,
                     )
                     replica_db.availability_zone = az
-                    replica_db.configuration.update({
-                        "engine": self.configuration.database_engine,
-                        "version": self.configuration.database_version,
-                        "role": "replica",
-                        "primary_instance": primary_db.instance_id
-                    })
+                    replica_db.configuration.update(
+                        {
+                            "engine": self.configuration.database_engine,
+                            "version": self.configuration.database_version,
+                            "role": "replica",
+                            "primary_instance": primary_db.instance_id,
+                        }
+                    )
                     database_instances.append(replica_db)
 
-            logger.info(f"Database cluster deployed with {len(database_instances)} instances")
+            logger.info(
+                f"Database cluster deployed with {len(database_instances)} instances"
+            )
             return database_instances
 
         except Exception as e:
@@ -856,20 +908,24 @@ class CloudDeploymentManager:
 
             # Deploy cache nodes
             for i in range(self.configuration.cache_num_cache_nodes):
-                az = self.configuration.availability_zones[i % len(self.configuration.availability_zones)]
+                az = self.configuration.availability_zones[
+                    i % len(self.configuration.availability_zones)
+                ]
                 cache_instance = await self._deploy_service_instance(
                     service_type=ServiceType.CACHE,
                     service_name=f"redis-node-{i+1}",
                     deployment_id="cache-cluster",
-                    instance_size=self.configuration.cache_node_type
+                    instance_size=self.configuration.cache_node_type,
                 )
                 cache_instance.availability_zone = az
-                cache_instance.configuration.update({
-                    "engine": self.configuration.cache_engine,
-                    "version": self.configuration.cache_version,
-                    "node_type": self.configuration.cache_node_type,
-                    "cluster_mode": True
-                })
+                cache_instance.configuration.update(
+                    {
+                        "engine": self.configuration.cache_engine,
+                        "version": self.configuration.cache_version,
+                        "node_type": self.configuration.cache_node_type,
+                        "cluster_mode": True,
+                    }
+                )
                 cache_instances.append(cache_instance)
 
             logger.info(f"Cache cluster deployed with {len(cache_instances)} nodes")
@@ -889,16 +945,18 @@ class CloudDeploymentManager:
                 service_type=ServiceType.LOAD_BALANCER,
                 service_name="application-load-balancer",
                 deployment_id="load-balancing",
-                instance_size="large"
+                instance_size="large",
             )
-            alb.configuration.update({
-                "type": "application",
-                "scheme": "internet-facing",
-                "ssl_certificate": self.configuration.ssl_certificate_arn,
-                "health_check_path": "/health",
-                "health_check_interval": 30,
-                "target_groups": ["therapeutic-systems", "clinical-dashboard"]
-            })
+            alb.configuration.update(
+                {
+                    "type": "application",
+                    "scheme": "internet-facing",
+                    "ssl_certificate": self.configuration.ssl_certificate_arn,
+                    "health_check_path": "/health",
+                    "health_check_interval": 30,
+                    "target_groups": ["therapeutic-systems", "clinical-dashboard"],
+                }
+            )
             load_balancer_instances.append(alb)
 
             # Deploy network load balancer for database connections
@@ -906,16 +964,20 @@ class CloudDeploymentManager:
                 service_type=ServiceType.LOAD_BALANCER,
                 service_name="network-load-balancer",
                 deployment_id="load-balancing",
-                instance_size="medium"
+                instance_size="medium",
             )
-            nlb.configuration.update({
-                "type": "network",
-                "scheme": "internal",
-                "target_groups": ["database-cluster", "cache-cluster"]
-            })
+            nlb.configuration.update(
+                {
+                    "type": "network",
+                    "scheme": "internal",
+                    "target_groups": ["database-cluster", "cache-cluster"],
+                }
+            )
             load_balancer_instances.append(nlb)
 
-            logger.info(f"Load balancers deployed: {len(load_balancer_instances)} instances")
+            logger.info(
+                f"Load balancers deployed: {len(load_balancer_instances)} instances"
+            )
             return load_balancer_instances
 
         except Exception as e:
@@ -928,18 +990,29 @@ class CloudDeploymentManager:
             networking_config = {
                 "vpc_id": self.configuration.vpc_id or "vpc-tta-production",
                 "subnets": {
-                    "public": [f"subnet-public-{az}" for az in self.configuration.availability_zones],
-                    "private": [f"subnet-private-{az}" for az in self.configuration.availability_zones],
-                    "database": [f"subnet-db-{az}" for az in self.configuration.availability_zones]
+                    "public": [
+                        f"subnet-public-{az}"
+                        for az in self.configuration.availability_zones
+                    ],
+                    "private": [
+                        f"subnet-private-{az}"
+                        for az in self.configuration.availability_zones
+                    ],
+                    "database": [
+                        f"subnet-db-{az}"
+                        for az in self.configuration.availability_zones
+                    ],
                 },
                 "security_groups": {
                     "web": "sg-web-tier",
                     "app": "sg-app-tier",
                     "database": "sg-database-tier",
-                    "cache": "sg-cache-tier"
+                    "cache": "sg-cache-tier",
                 },
-                "nat_gateways": [f"nat-{az}" for az in self.configuration.availability_zones],
-                "internet_gateway": "igw-tta-production"
+                "nat_gateways": [
+                    f"nat-{az}" for az in self.configuration.availability_zones
+                ],
+                "internet_gateway": "igw-tta-production",
             }
 
             logger.info("Networking infrastructure configured")
@@ -949,7 +1022,9 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying networking: {e}")
             raise
 
-    async def _configure_scaling_and_load_balancing(self, deployment_id: str) -> dict[str, Any]:
+    async def _configure_scaling_and_load_balancing(
+        self, deployment_id: str
+    ) -> dict[str, Any]:
         """Configure auto-scaling and load balancing."""
         try:
             if self.scalability_manager:
@@ -958,7 +1033,7 @@ class CloudDeploymentManager:
                     min_instances=self.configuration.min_instances,
                     max_instances=self.configuration.max_instances,
                     target_cpu=self.configuration.target_cpu_utilization,
-                    target_memory=self.configuration.target_memory_utilization
+                    target_memory=self.configuration.target_memory_utilization,
                 )
             else:
                 scaling_config = {
@@ -969,14 +1044,14 @@ class CloudDeploymentManager:
                         "scale_up": {
                             "metric": "cpu_utilization",
                             "threshold": self.configuration.scale_up_threshold,
-                            "adjustment": "+2"
+                            "adjustment": "+2",
                         },
                         "scale_down": {
                             "metric": "cpu_utilization",
                             "threshold": self.configuration.scale_down_threshold,
-                            "adjustment": "-1"
-                        }
-                    }
+                            "adjustment": "-1",
+                        },
+                    },
                 }
 
             logger.info("Auto-scaling and load balancing configured")
@@ -994,7 +1069,9 @@ class CloudDeploymentManager:
                 "configured_at": datetime.utcnow().isoformat(),
             }
 
-    async def _configure_monitoring_and_security(self, deployment_id: str) -> dict[str, Any]:
+    async def _configure_monitoring_and_security(
+        self, deployment_id: str
+    ) -> dict[str, Any]:
         """Configure monitoring and security systems."""
         try:
             monitoring_config = {}
@@ -1002,21 +1079,29 @@ class CloudDeploymentManager:
 
             # Configure monitoring
             if self.monitoring_system:
-                monitoring_config = await self.monitoring_system.configure_deployment_monitoring(
-                    deployment_id=deployment_id
+                monitoring_config = (
+                    await self.monitoring_system.configure_deployment_monitoring(
+                        deployment_id=deployment_id
+                    )
                 )
             else:
                 monitoring_config = {
                     "metrics_enabled": True,
                     "logging_enabled": True,
                     "alerting_enabled": True,
-                    "dashboards": ["infrastructure", "therapeutic_systems", "clinical_dashboard"]
+                    "dashboards": [
+                        "infrastructure",
+                        "therapeutic_systems",
+                        "clinical_dashboard",
+                    ],
                 }
 
             # Configure security
             if self.security_framework:
-                security_config = await self.security_framework.configure_deployment_security(
-                    deployment_id=deployment_id
+                security_config = (
+                    await self.security_framework.configure_deployment_security(
+                        deployment_id=deployment_id
+                    )
                 )
             else:
                 security_config = {
@@ -1024,7 +1109,7 @@ class CloudDeploymentManager:
                     "encryption_in_transit": True,
                     "hipaa_compliance": True,
                     "access_controls": True,
-                    "audit_logging": True
+                    "audit_logging": True,
                 }
 
             logger.info("Monitoring and security configured")
@@ -1055,7 +1140,11 @@ class CloudDeploymentManager:
             }
 
             # Calculate overall success
-            success_count = sum(1 for result in validation_results.values() if result.get("success", False))
+            success_count = sum(
+                1
+                for result in validation_results.values()
+                if result.get("success", False)
+            )
             total_validations = len(validation_results)
             success_rate = (success_count / total_validations) * 100
 
@@ -1081,15 +1170,23 @@ class CloudDeploymentManager:
         try:
             # Check infrastructure component availability
             components_available = 0
-            if self.high_availability_controller: components_available += 1
-            if self.security_framework: components_available += 1
-            if self.monitoring_system: components_available += 1
-            if self.performance_optimizer: components_available += 1
-            if self.scalability_manager: components_available += 1
+            if self.high_availability_controller:
+                components_available += 1
+            if self.security_framework:
+                components_available += 1
+            if self.monitoring_system:
+                components_available += 1
+            if self.performance_optimizer:
+                components_available += 1
+            if self.scalability_manager:
+                components_available += 1
 
             # Check therapeutic systems availability
-            systems_available = len([s for s in self.therapeutic_systems.values() if s is not None])
-            if self.clinical_dashboard_manager: systems_available += 1
+            systems_available = len(
+                [s for s in self.therapeutic_systems.values() if s is not None]
+            )
+            if self.clinical_dashboard_manager:
+                systems_available += 1
 
             return {
                 "status": "healthy" if components_available >= 3 else "degraded",
@@ -1099,9 +1196,12 @@ class CloudDeploymentManager:
                 "infrastructure_components_available": f"{components_available}/5",
                 "therapeutic_systems_available": f"{systems_available}/10",
                 "background_tasks_running": (
-                    self._deployment_monitoring_task is not None and not self._deployment_monitoring_task.done() and
-                    self._health_check_task is not None and not self._health_check_task.done() and
-                    self._scaling_task is not None and not self._scaling_task.done()
+                    self._deployment_monitoring_task is not None
+                    and not self._deployment_monitoring_task.done()
+                    and self._health_check_task is not None
+                    and not self._health_check_task.done()
+                    and self._scaling_task is not None
+                    and not self._scaling_task.done()
                 ),
                 "deployment_metrics": self.deployment_metrics,
             }

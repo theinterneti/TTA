@@ -307,9 +307,11 @@ class CoordinationBenchmark:
             scenario_name = scenario["name"]
             logger.info(f"Running benchmark scenario: {scenario_name}")
 
-            async def coordination_func(request_id: int):
+            async def coordination_func(request_id: int, current_scenario=scenario):
                 """Coordination function for this scenario."""
-                return await self._execute_scenario(agent_proxies, scenario, request_id)
+                return await self._execute_scenario(
+                    agent_proxies, current_scenario, request_id
+                )
 
             # Profile coordination at different concurrency levels
             concurrency_results = await self.profiler.profile_concurrent_coordination(

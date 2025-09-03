@@ -997,9 +997,6 @@ class AgentOrchestrationComponent(Component):
                         except Exception:
                             pass
                 except Exception:
-                    pass
-
-                except Exception:
                     self._agent_registry = None
 
             # Auto-register built-in proxies if enabled
@@ -1401,9 +1398,7 @@ class AgentOrchestrationComponent(Component):
                 match=f"ao:sched:{at.value}:*:prio:*"
             ):
                 skey = (
-                    skey_b.decode()
-                    if isinstance(skey_b, bytes | bytearray)
-                    else skey_b
+                    skey_b.decode() if isinstance(skey_b, bytes | bytearray) else skey_b
                 )
                 # skey format: ao:sched:{type}:{inst}:prio:{prio}
                 parts = skey.split(":")

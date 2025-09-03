@@ -36,16 +36,7 @@ class CircuitBreakerConfig:
     success_threshold: int = 2  # Successes needed in half-open to close
 
 
-@dataclass
-class CircuitBreakerMetrics:
-    """Metrics tracking for circuit breaker operations."""
-
-    total_calls: int = 0
-    failed_calls: int = 0
-    successful_calls: int = 0
-    state_changes: int = 0
-    last_failure_time: float | None = None
-    last_success_time: float | None = None
+# CircuitBreakerMetrics is imported from circuit_breaker_types
 
 
 class CircuitBreaker:
@@ -421,9 +412,7 @@ class CircuitBreaker:
             await self._transition_to_closed()
 
     def _record_state_transition(
-        self,
-        old_state: CircuitBreakerState,
-        new_state: CircuitBreakerState
+        self, old_state: CircuitBreakerState, new_state: CircuitBreakerState
     ) -> None:
         """Record state transition for metrics."""
         try:
@@ -434,7 +423,7 @@ class CircuitBreaker:
                 new_state=new_state,
                 correlation_id=self._correlation_id or str(uuid.uuid4()),
                 reason=f"Transition from {old_state.value} to {new_state.value}",
-                metrics_snapshot=self._metrics
+                metrics_snapshot=self._metrics,
             )
 
             # Log the transition

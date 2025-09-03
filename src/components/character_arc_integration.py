@@ -27,9 +27,8 @@ try:
     from core.character_development_system import (
         CharacterDevelopmentSystem,
         Interaction,
-        PersonalityTrait,
     )
-    from models.data_models import CharacterState, DialogueStyle, MemoryFragment
+    from models.data_models import CharacterState
 except ImportError as e:
     logging.warning(f"Could not import tta.prototype modules: {e}")
 

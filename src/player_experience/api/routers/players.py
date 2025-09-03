@@ -29,6 +29,7 @@ from ...models.player import (
     PrivacySettings,
     TherapeuticPreferences,
 )
+from ...utils.normalization import normalize_approaches
 from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
@@ -281,7 +282,6 @@ class PlayerResponse(BaseModel):
 
 
 # Normalization helpers to accept flexible client/test payloads
-from ...utils.normalization import normalize_approaches
 
 
 def _normalize_therapeutic_preferences_dict(data: dict[str, Any]) -> dict[str, Any]:
@@ -319,9 +319,7 @@ def _normalize_privacy_settings_dict(data: dict[str, Any]) -> dict[str, Any]:
     return result
 
     Field(..., description="List of character IDs")
-    Field(
-        ..., description="Therapeutic preferences"
-    )
+    Field(..., description="Therapeutic preferences")
     Field(..., description="Privacy settings")
     Field(..., description="Progress summary")
 

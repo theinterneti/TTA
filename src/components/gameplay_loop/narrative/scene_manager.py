@@ -163,9 +163,9 @@ class SceneValidator:
         issues = []
 
         # Check required fields
-        for field in self.validation_rules["required_fields"]:
-            if not getattr(scene, field, None):
-                issues.append(f"Missing required field: {field}")
+        for field_name in self.validation_rules["required_fields"]:
+            if not getattr(scene, field_name, None):
+                issues.append(f"Missing required field: {field_name}")
 
         # Check content length
         content_length = len(scene.narrative_content or "")

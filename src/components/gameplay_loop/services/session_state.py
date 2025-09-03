@@ -187,9 +187,9 @@ class SessionState(BaseModel):
             self.scene_history.append(scene_id)
         self.current_scene_id = scene_id
         self.update_activity()
-        for field in ["scene_history", "current_scene_id"]:
-            if field not in self.dirty_fields:
-                self.dirty_fields.append(field)
+        for field_name in ["scene_history", "current_scene_id"]:
+            if field_name not in self.dirty_fields:
+                self.dirty_fields.append(field_name)
 
     def add_choice(self, choice_id: str) -> None:
         """Add a choice to the session history."""
