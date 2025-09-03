@@ -900,25 +900,7 @@ class ClinicalDashboardManager:
             logger.error(f"Error getting system health summary: {e}")
             return {"error": str(e)}
 
-    async def acknowledge_alert(self, alert_id: str, clinician_id: str) -> bool:
-        """Acknowledge a clinical alert."""
-        try:
-            if alert_id in self.active_alerts:
-                alert = self.active_alerts[alert_id]
-                alert.acknowledged = True
-                alert.acknowledged_by = clinician_id
-                alert.acknowledged_at = datetime.utcnow()
-
-                logger.info(
-                    f"Alert {alert_id} acknowledged by clinician {clinician_id}"
-                )
-                return True
-
-            return False
-
-        except Exception as e:
-            logger.error(f"Error acknowledging alert: {e}")
-            return False
+    # Duplicate acknowledge_alert method removed - using the comprehensive implementation above
 
     async def resolve_alert(self, alert_id: str, clinician_id: str) -> bool:
         """Resolve a clinical alert."""

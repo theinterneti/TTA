@@ -36,12 +36,11 @@ from components.character_arc_interfaces import (
 # Try to import CharacterArcIntegration if available
 try:
     from components.character_arc_integration import CharacterArcIntegration
+
+    INTEGRATION_AVAILABLE = True
 except ImportError:
     CharacterArcIntegration = None
     INTEGRATION_AVAILABLE = False
-
-# Integration will be injected via dependency injection
-INTEGRATION_AVAILABLE = True
 
 
 @dataclass
@@ -187,7 +186,7 @@ class CharacterArcManagerComponent(Component):
 
         # Initialize integration with Character Development System
         self.integration = None
-        if INTEGRATION_AVAILABLE and CharacterArcIntegration is not None:
+        if INTEGRATION_AVAILABLE:
             try:
                 self.integration = CharacterArcIntegration(self)
                 logger.info("Character Development System integration enabled")
@@ -344,9 +343,7 @@ class CharacterArcManagerComponent(Component):
             await self._update_relationship_dynamics(character_arc, interaction)
 
             # Check for milestone progression
-            await self._check_milestone_progression(
-                character_arc, interaction
-            )
+            await self._check_milestone_progression(character_arc, interaction)
 
             # Update therapeutic modeling
             await self._update_therapeutic_modeling(character_arc, interaction)
@@ -894,7 +891,6 @@ class CharacterArcManagerComponent(Component):
             therapeutic_modeling = []
 
             # Match character traits to therapeutic concepts
-
             for concept_data in self.therapeutic_concepts:
                 concept = TherapeuticConcept(
                     concept_id=concept_data["id"],
@@ -1180,7 +1176,7 @@ class CharacterArcManagerComponent(Component):
 
             stage = character_arc.current_stage
 
-            # Generate response based on stage and personality
+            # Generate response based on stage and personality evolution
             if stage == ArcStage.INTRODUCTION:
                 response = f"Hello there! I'm {character_arc.character_name}. Nice to meet you."
             elif stage == ArcStage.ESTABLISHMENT:

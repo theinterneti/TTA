@@ -354,4 +354,4 @@ class AuthService:
             )
 
         except JWTError as e:
-            raise AuthenticationError(f"Invalid refresh token: {str(e)}")
+            raise AuthenticationError(f"Invalid refresh token: {str(e)}") from e

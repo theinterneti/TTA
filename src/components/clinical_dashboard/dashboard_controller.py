@@ -210,7 +210,7 @@ class ClinicalDashboardController:
         except Exception as e:
             logger.error(f"Error collecting metric: {e}")
             self.controller_metrics["errors"] += 1
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     async def record_outcome_measurement(
         self, request: OutcomeMeasurementRequest
@@ -225,11 +225,11 @@ class ClinicalDashboardController:
             # Parse outcome measure type
             try:
                 measure_type = OutcomeMeasure(request.measure_type.lower())
-            except ValueError:
+            except ValueError as e:
                 raise HTTPException(
                     status_code=400,
                     detail=f"Invalid outcome measure type: {request.measure_type}",
-                )
+                ) from e
 
             # Record outcome measurement
             outcome_id = await self.monitoring_service.record_outcome_measure(

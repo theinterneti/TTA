@@ -228,7 +228,7 @@ class DiagnosticsAPI:
             logger.error(f"Failed to get agents diagnostics: {e}")
             raise HTTPException(
                 status_code=500, detail="Failed to retrieve diagnostics"
-            )
+            ) from e
 
     async def _get_agent_diagnostics(
         self,

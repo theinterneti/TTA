@@ -27,8 +27,6 @@ from datetime import datetime, timezone
 
 from redis.asyncio import Redis
 
-logger = logging.getLogger(__name__)
-
 from ..interfaces import MessageCoordinator
 from ..messaging import (
     FailureType,
@@ -38,6 +36,8 @@ from ..messaging import (
     ReceivedMessage,
 )
 from ..models import AgentId, AgentMessage, AgentType, MessageType
+
+logger = logging.getLogger(__name__)
 
 
 def _now_us() -> int:

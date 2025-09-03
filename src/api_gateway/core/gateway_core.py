@@ -410,7 +410,7 @@ class GatewayCore:
                     "timeout": route_rule.timeout,
                 },
             )
-            raise Exception(f"Service timeout: {target_service.name}")
+            raise Exception(f"Service timeout: {target_service.name}") from None
 
         except aiohttp.ClientError as e:
             logger.error(
