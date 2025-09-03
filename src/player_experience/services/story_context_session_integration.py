@@ -404,7 +404,7 @@ class StoryContextSessionIntegration:
         """
         try:
             cleaned_count = 0
-            expiry_threshold = datetime.utcnow() - timedelta(
+            datetime.utcnow() - timedelta(
                 hours=self.context_expiry_hours
             )
 
@@ -530,7 +530,7 @@ class StoryContextSessionIntegration:
     ) -> None:
         """Update personalization service with therapeutic progress."""
         try:
-            progress_data = {
+            {
                 "player_id": context.player_id,
                 "session_id": context.session_id,
                 "therapeutic_progress": context.therapeutic_progress,

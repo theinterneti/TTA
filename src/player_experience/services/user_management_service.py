@@ -232,7 +232,6 @@ class UserManagementService:
             Tuple of (success, errors)
         """
         errors = []
-        profile_deleted = False
 
         try:
             # Step 1: Delete player profile first (to maintain referential integrity)
@@ -242,12 +241,11 @@ class UserManagementService:
                         user_id
                     )
                     if profile_success:
-                        profile_deleted = True
+                        pass
                     else:
                         logger.warning(
                             f"Player profile not found or already deleted: {user_id}"
                         )
-                        profile_deleted = True  # Consider it successful if not found
                 except Exception as e:
                     logger.error(f"Error deleting player profile: {e}")
                     errors.append(f"Failed to delete player profile: {str(e)}")

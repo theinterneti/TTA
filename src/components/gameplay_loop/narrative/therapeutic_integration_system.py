@@ -485,7 +485,6 @@ class TherapeuticIntegrationSystem:
             return self.therapeutic_concepts[concept_id]
 
         # Try to create from template based on therapeutic goals
-        therapeutic_goals = session_state.therapeutic_goals
         user_approach = session_state.context.get(
             "preferred_therapeutic_approach", TherapeuticApproach.COGNITIVE_BEHAVIORAL
         )
@@ -530,7 +529,7 @@ class TherapeuticIntegrationSystem:
         session_state: SessionState,
     ) -> str:
         """Generate narrative embedding for therapeutic concept."""
-        strategy_config = self.integration_strategies[strategy]
+        self.integration_strategies[strategy]
 
         if strategy == IntegrationStrategy.METAPHORICAL_EMBEDDING:
             # Use story metaphors

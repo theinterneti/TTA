@@ -416,7 +416,7 @@ class ConversationDataExtractor:
             if field_value:
                 # Remove empty strings and duplicates
                 cleaned = list(
-                    set([item.strip() for item in field_value if item.strip()])
+                    {item.strip() for item in field_value if item.strip()}
                 )
                 setattr(collected_data, field_name, cleaned)
 
@@ -471,7 +471,7 @@ class ConversationDataExtractor:
                 errors.append(f"{field_name} must be one of: {', '.join(valid_values)}")
 
             # Check numeric ranges
-            if isinstance(value, (int, float)):
+            if isinstance(value, int | float):
                 min_value = rules.get("min_value")
                 max_value = rules.get("max_value")
 

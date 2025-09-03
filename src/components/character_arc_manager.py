@@ -33,6 +33,13 @@ from components.character_arc_interfaces import (
     RelationshipType,
 )
 
+# Try to import CharacterArcIntegration if available
+try:
+    from components.character_arc_integration import CharacterArcIntegration
+except ImportError:
+    CharacterArcIntegration = None
+    INTEGRATION_AVAILABLE = False
+
 # Integration will be injected via dependency injection
 INTEGRATION_AVAILABLE = True
 
@@ -180,7 +187,7 @@ class CharacterArcManagerComponent(Component):
 
         # Initialize integration with Character Development System
         self.integration = None
-        if INTEGRATION_AVAILABLE:
+        if INTEGRATION_AVAILABLE and CharacterArcIntegration is not None:
             try:
                 self.integration = CharacterArcIntegration(self)
                 logger.info("Character Development System integration enabled")
@@ -337,7 +344,7 @@ class CharacterArcManagerComponent(Component):
             await self._update_relationship_dynamics(character_arc, interaction)
 
             # Check for milestone progression
-            milestone_progress = await self._check_milestone_progression(
+            await self._check_milestone_progression(
                 character_arc, interaction
             )
 
@@ -887,7 +894,6 @@ class CharacterArcManagerComponent(Component):
             therapeutic_modeling = []
 
             # Match character traits to therapeutic concepts
-            personality = character_arc.base_personality
 
             for concept_data in self.therapeutic_concepts:
                 concept = TherapeuticConcept(
@@ -1173,7 +1179,6 @@ class CharacterArcManagerComponent(Component):
             # For now, we'll return a placeholder that reflects the character's current state
 
             stage = character_arc.current_stage
-            personality = character_arc.personality_evolution
 
             # Generate response based on stage and personality
             if stage == ArcStage.INTRODUCTION:

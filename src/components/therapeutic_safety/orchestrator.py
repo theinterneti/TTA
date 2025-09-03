@@ -23,6 +23,7 @@ from .enums import (
 from .event_types import (
     create_safety_event,
     create_validation_failure_event,
+    create_validation_timeout_event,
 )
 from .models import (
     ContentPayload,
@@ -295,7 +296,7 @@ class SafetyValidationOrchestrator:
             await self._calculate_overall_result(result)
 
         except asyncio.TimeoutError:
-            pending_components = [
+            [
                 comp for comp in components if comp not in completed_components
             ]
             raise ValidationTimeout(timeout_ms, completed_components)

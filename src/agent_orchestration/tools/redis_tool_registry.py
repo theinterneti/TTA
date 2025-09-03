@@ -119,7 +119,7 @@ class RedisToolRegistry:
             members = await self._redis.smembers(self._idx)
             candidates: list[tuple[str, str]] = []
             for b in members:
-                s = b.decode() if isinstance(b, (bytes, bytearray)) else b
+                s = b.decode() if isinstance(b, bytes | bytearray) else b
                 if not s.startswith(f"{name}:"):
                     continue
                 _, ver = s.split(":", 1)
@@ -150,7 +150,7 @@ class RedisToolRegistry:
         members = await self._redis.smembers(self._idx)
         out: list[ToolSpec] = []
         for b in members:
-            s = b.decode() if isinstance(b, (bytes, bytearray)) else b
+            s = b.decode() if isinstance(b, bytes | bytearray) else b
             nm, ver = s.split(":", 1)
             if prefix and not nm.startswith(prefix):
                 continue
@@ -163,14 +163,14 @@ class RedisToolRegistry:
         members = await self._redis.smembers(self._idx)
         ids: list[str] = []
         for b in members:
-            s = b.decode() if isinstance(b, (bytes, bytearray)) else b
+            s = b.decode() if isinstance(b, bytes | bytearray) else b
             ids.append(s)
         return ids
 
     async def get_status(self, name: str, version: str) -> str:
         s = await self._redis.get(self._status_key(name, version))
         return (
-            (s.decode() if isinstance(s, (bytes, bytearray)) else s)
+            (s.decode() if isinstance(s, bytes | bytearray) else s)
             if s
             else ToolStatus.ACTIVE.value
         )
@@ -202,7 +202,7 @@ class RedisToolRegistry:
         removed = 0
         now = time.time()
         for b in members:
-            s = b.decode() if isinstance(b, (bytes, bytearray)) else b
+            s = b.decode() if isinstance(b, bytes | bytearray) else b
             nm, ver = s.split(":", 1)
             key = self._key(nm, ver)
             raw = await self._redis.get(key)

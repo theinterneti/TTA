@@ -432,7 +432,7 @@ class TTAConfig:
                     raise ValueError(f"Key '{path}.{key}' must be a string")
                 elif expected_type == "int" and not isinstance(value, int):
                     raise ValueError(f"Key '{path}.{key}' must be an integer")
-                elif expected_type == "float" and not isinstance(value, (int, float)):
+                elif expected_type == "float" and not isinstance(value, int | float):
                     raise ValueError(f"Key '{path}.{key}' must be a number")
                 elif expected_type == "bool" and not isinstance(value, bool):
                     raise ValueError(f"Key '{path}.{key}' must be a boolean")

@@ -302,7 +302,7 @@ class RedisAgentRegistry(AgentRegistry):
             keys = await self._redis.smembers(self._index_key())
             agents: list[dict[str, Any]] = []
             for bkey in keys:
-                k = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                k = bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 val = await self._redis.get(k)
                 if not val:
                     continue
@@ -487,7 +487,7 @@ class RedisAgentRegistry(AgentRegistry):
             capability_sets = []
 
             for bkey in cap_keys:
-                key = bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                key = bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 data = await self._redis.get(key)
 
                 if data:
@@ -662,7 +662,7 @@ class RedisAgentRegistry(AgentRegistry):
             expected_cap_keys = set()
             for bkey in agent_keys:
                 agent_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                    bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 )
                 # Convert from "ao:agents:type:instance" to "ao:capabilities:type:instance"
                 if ":agents:" in agent_key:
@@ -673,7 +673,7 @@ class RedisAgentRegistry(AgentRegistry):
             stale_keys = []
             for bkey in cap_keys:
                 cap_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                    bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 )
                 if cap_key not in expected_cap_keys:
                     stale_keys.append(cap_key)
@@ -711,7 +711,7 @@ class RedisAgentRegistry(AgentRegistry):
         """
         try:
             cap_key = self._capability_key(agent_id)
-            px = max(1, int(self._ttl * 1000))
+            max(1, int(self._ttl * 1000))
 
             # Check if capability data exists
             exists = await self._redis.exists(cap_key)
@@ -743,7 +743,7 @@ class RedisAgentRegistry(AgentRegistry):
             expected_cap_keys = set()
             for bkey in agent_keys:
                 agent_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                    bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 )
                 if ":agents:" in agent_key:
                     cap_key = agent_key.replace(":agents:", ":capabilities:")
@@ -752,7 +752,7 @@ class RedisAgentRegistry(AgentRegistry):
             orphaned_count = 0
             for bkey in cap_keys:
                 cap_key = (
-                    bkey.decode() if isinstance(bkey, (bytes, bytearray)) else bkey
+                    bkey.decode() if isinstance(bkey, bytes | bytearray) else bkey
                 )
                 if cap_key not in expected_cap_keys:
                     orphaned_count += 1

@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class CollaborativeMode(Enum):
     """Modes of collaborative therapeutic experiences."""
+
     PEER_SUPPORT = "peer_support"  # Mutual support and encouragement
     GROUP_THERAPY = "group_therapy"  # Structured group therapy sessions
     MENTORSHIP = "mentorship"  # One-on-one mentoring relationships
@@ -28,6 +29,7 @@ class CollaborativeMode(Enum):
 
 class ParticipantRole(Enum):
     """Roles within collaborative therapeutic sessions."""
+
     HOST = "host"  # Session creator and primary facilitator
     FACILITATOR = "facilitator"  # Professional or trained facilitator
     MENTOR = "mentor"  # Experienced peer providing guidance
@@ -38,6 +40,7 @@ class ParticipantRole(Enum):
 
 class SessionStatus(Enum):
     """Status of collaborative therapeutic sessions."""
+
     INITIALIZING = "initializing"
     WAITING_FOR_PARTICIPANTS = "waiting_for_participants"
     ACTIVE = "active"
@@ -49,6 +52,7 @@ class SessionStatus(Enum):
 
 class SupportType(Enum):
     """Types of peer support interactions."""
+
     ENCOURAGEMENT = "encouragement"
     SHARED_EXPERIENCE = "shared_experience"
     PRACTICAL_ADVICE = "practical_advice"
@@ -62,6 +66,7 @@ class SupportType(Enum):
 @dataclass
 class CollaborativeParticipant:
     """Represents a participant in a collaborative therapeutic session."""
+
     user_id: str
     username: str
     role: ParticipantRole
@@ -92,6 +97,7 @@ class CollaborativeParticipant:
 @dataclass
 class SupportInteraction:
     """Represents a peer support interaction."""
+
     interaction_id: str = field(default_factory=lambda: str(uuid4()))
     session_id: str = ""
 
@@ -118,6 +124,7 @@ class SupportInteraction:
 @dataclass
 class CollaborativeGoal:
     """Represents a shared therapeutic goal."""
+
     goal_id: str = field(default_factory=lambda: str(uuid4()))
     session_id: str = ""
 
@@ -149,6 +156,7 @@ class CollaborativeGoal:
 @dataclass
 class CollaborativeSession:
     """Manages a collaborative therapeutic session."""
+
     session_id: str = field(default_factory=lambda: str(uuid4()))
     host_user_id: str = ""
 
@@ -203,7 +211,9 @@ class TherapeuticCollaborativeSystem:
 
         # Collaborative session storage
         self.collaborative_sessions = {}  # session_id -> CollaborativeSession
-        self.collaborative_participants = {}  # user_id -> List[CollaborativeParticipant]
+        self.collaborative_participants = (
+            {}
+        )  # user_id -> List[CollaborativeParticipant]
         self.support_interactions = {}  # interaction_id -> SupportInteraction
         self.collaborative_goals = {}  # goal_id -> CollaborativeGoal
 
@@ -223,7 +233,9 @@ class TherapeuticCollaborativeSystem:
 
         # Configuration parameters
         self.max_concurrent_sessions = self.config.get("max_concurrent_sessions", 50)
-        self.max_participants_per_session = self.config.get("max_participants_per_session", 8)
+        self.max_participants_per_session = self.config.get(
+            "max_participants_per_session", 8
+        )
         self.session_timeout_minutes = self.config.get("session_timeout_minutes", 180)
         self.crisis_response_enabled = self.config.get("crisis_response_enabled", True)
         self.peer_matching_enabled = self.config.get("peer_matching_enabled", True)
@@ -305,7 +317,9 @@ class TherapeuticCollaborativeSystem:
                 session_name=session_name,
                 session_description=f"Collaborative {collaborative_mode.value.replace('_', ' ').title()} session focusing on {', '.join(therapeutic_focus or ['general wellness'])}",
                 collaborative_mode=collaborative_mode,
-                max_participants=min(max_participants, self.max_participants_per_session),
+                max_participants=min(
+                    max_participants, self.max_participants_per_session
+                ),
                 therapeutic_focus=therapeutic_focus or ["general_wellness"],
                 requires_facilitator=requires_facilitator,
             )
@@ -324,7 +338,10 @@ class TherapeuticCollaborativeSystem:
                 username=f"Host_{host_user_id[:8]}",  # Would be replaced with actual username
                 role=ParticipantRole.HOST,
                 therapeutic_goals=therapeutic_focus or [],
-                support_preferences=[SupportType.ENCOURAGEMENT, SupportType.SHARED_EXPERIENCE],
+                support_preferences=[
+                    SupportType.ENCOURAGEMENT,
+                    SupportType.SHARED_EXPERIENCE,
+                ],
             )
 
             # Add host to session
@@ -357,7 +374,9 @@ class TherapeuticCollaborativeSystem:
             return session
 
         except Exception as e:
-            logger.error(f"Error creating collaborative session for host {host_user_id}: {e}")
+            logger.error(
+                f"Error creating collaborative session for host {host_user_id}: {e}"
+            )
 
             # Return error session
             return CollaborativeSession(
@@ -394,8 +413,13 @@ class TherapeuticCollaborativeSystem:
                 raise ValueError(f"Collaborative session {session_id} not found")
 
             # Check session status
-            if session.status not in [SessionStatus.WAITING_FOR_PARTICIPANTS, SessionStatus.ACTIVE]:
-                raise ValueError(f"Session {session_id} is not accepting participants (status: {session.status.value})")
+            if session.status not in [
+                SessionStatus.WAITING_FOR_PARTICIPANTS,
+                SessionStatus.ACTIVE,
+            ]:
+                raise ValueError(
+                    f"Session {session_id} is not accepting participants (status: {session.status.value})"
+                )
 
             # Check if user is already in session
             if user_id in session.participants:
@@ -420,7 +444,9 @@ class TherapeuticCollaborativeSystem:
                 if session.facilitator_id is None:
                     session.facilitator_id = user_id
                 else:
-                    role = ParticipantRole.PARTICIPANT  # Downgrade if facilitator already exists
+                    role = (
+                        ParticipantRole.PARTICIPANT
+                    )  # Downgrade if facilitator already exists
 
             # Create participant
             participant = CollaborativeParticipant(
@@ -444,7 +470,10 @@ class TherapeuticCollaborativeSystem:
             self.user_sessions[user_id].append(session_id)
 
             # Start session if minimum participants reached
-            if session.status == SessionStatus.WAITING_FOR_PARTICIPANTS and len(session.participants) >= 2:
+            if (
+                session.status == SessionStatus.WAITING_FOR_PARTICIPANTS
+                and len(session.participants) >= 2
+            ):
                 await self._start_collaborative_session(session)
 
             # Update metrics
@@ -459,7 +488,9 @@ class TherapeuticCollaborativeSystem:
             return participant
 
         except Exception as e:
-            logger.error(f"Error joining collaborative session {session_id} for user {user_id}: {e}")
+            logger.error(
+                f"Error joining collaborative session {session_id} for user {user_id}: {e}"
+            )
 
             # Return error participant
             return CollaborativeParticipant(
@@ -500,13 +531,20 @@ class TherapeuticCollaborativeSystem:
             if not session:
                 raise ValueError(f"Collaborative session {session_id} not found")
 
-            if supporter_id not in session.participants or recipient_id not in session.participants:
-                raise ValueError("Both supporter and recipient must be session participants")
+            if (
+                supporter_id not in session.participants
+                or recipient_id not in session.participants
+            ):
+                raise ValueError(
+                    "Both supporter and recipient must be session participants"
+                )
 
             # Check for crisis support
             is_crisis_related = support_type == SupportType.CRISIS_SUPPORT
             if is_crisis_related and self.crisis_response_enabled:
-                await self._handle_crisis_support(session, supporter_id, recipient_id, message)
+                await self._handle_crisis_support(
+                    session, supporter_id, recipient_id, message
+                )
 
             # Create support interaction
             interaction = SupportInteraction(
@@ -522,12 +560,19 @@ class TherapeuticCollaborativeSystem:
             # Calculate therapeutic value using integrated systems
             if self.consequence_system:
                 try:
-                    consequence_result = await self.consequence_system.process_choice_consequence(
-                        user_id=supporter_id,
-                        choice=f"provide_{support_type.value}_support",
-                        scenario_context={"collaborative_session": True, "support_interaction": True},
+                    consequence_result = (
+                        await self.consequence_system.process_choice_consequence(
+                            user_id=supporter_id,
+                            choice=f"provide_{support_type.value}_support",
+                            scenario_context={
+                                "collaborative_session": True,
+                                "support_interaction": True,
+                            },
+                        )
                     )
-                    interaction.therapeutic_value = consequence_result.get("therapeutic_value", 1.0)
+                    interaction.therapeutic_value = consequence_result.get(
+                        "therapeutic_value", 1.0
+                    )
                 except Exception as e:
                     logger.debug(f"Error calculating therapeutic value: {e}")
                     interaction.therapeutic_value = 1.0
@@ -621,7 +666,8 @@ class TherapeuticCollaborativeSystem:
                 therapeutic_framework=therapeutic_framework,
                 primary_participants=primary_participants,
                 supporting_participants=[
-                    p_id for p_id in session.participants.keys()
+                    p_id
+                    for p_id in session.participants.keys()
                     if p_id not in primary_participants
                 ],
                 target_completion=target_completion,
@@ -631,16 +677,20 @@ class TherapeuticCollaborativeSystem:
             if self.therapeutic_integration_system:
                 try:
                     recommendations = await self.therapeutic_integration_system.generate_personalized_recommendations(
-                        user_id=primary_participants[0],  # Use first participant as reference
+                        user_id=primary_participants[
+                            0
+                        ],  # Use first participant as reference
                         therapeutic_goals=[goal_name],
                         character_data={"collaborative_context": True},
                     )
 
                     if recommendations:
+                        # Use the first recommendation for milestone generation
+                        first_rec = recommendations[0]
                         goal.target_milestones = [
-                            f"Complete {rec.framework.value} exercise",
-                            f"Practice {rec.integration_strategy.value}",
-                            "Achieve therapeutic breakthrough"
+                            f"Complete {first_rec.framework.value} exercise",
+                            f"Practice {first_rec.integration_strategy.value}",
+                            "Achieve therapeutic breakthrough",
                         ]
                 except Exception as e:
                     logger.debug(f"Error generating goal milestones: {e}")
@@ -650,7 +700,7 @@ class TherapeuticCollaborativeSystem:
                 goal.target_milestones = [
                     "Initial goal commitment",
                     "Progress checkpoint",
-                    "Goal achievement celebration"
+                    "Goal achievement celebration",
                 ]
 
             # Store goal
@@ -667,7 +717,9 @@ class TherapeuticCollaborativeSystem:
             return goal
 
         except Exception as e:
-            logger.error(f"Error creating collaborative goal for session {session_id}: {e}")
+            logger.error(
+                f"Error creating collaborative goal for session {session_id}: {e}"
+            )
 
             # Return minimal goal
             return CollaborativeGoal(
@@ -679,7 +731,9 @@ class TherapeuticCollaborativeSystem:
 
     # Helper methods for therapeutic system integration
 
-    async def _configure_session_by_mode(self, session: CollaborativeSession, mode: CollaborativeMode):
+    async def _configure_session_by_mode(
+        self, session: CollaborativeSession, mode: CollaborativeMode
+    ):
         """Configure session settings based on collaborative mode."""
         try:
             if mode == CollaborativeMode.GROUP_THERAPY:
@@ -724,7 +778,9 @@ class TherapeuticCollaborativeSystem:
                 )
 
                 if recommendations:
-                    session.therapeutic_frameworks.extend([rec.framework.value for rec in recommendations[:3]])
+                    session.therapeutic_frameworks.extend(
+                        [rec.framework.value for rec in recommendations[:3]]
+                    )
 
             # Initialize safety monitoring
             if self.emotional_safety_system:
@@ -737,7 +793,9 @@ class TherapeuticCollaborativeSystem:
         except Exception as e:
             logger.error(f"Error initializing therapeutic context: {e}")
 
-    async def _initialize_participant_context(self, participant: CollaborativeParticipant, session: CollaborativeSession):
+    async def _initialize_participant_context(
+        self, participant: CollaborativeParticipant, session: CollaborativeSession
+    ):
         """Initialize therapeutic context for a new participant."""
         try:
             # Initialize character development if available
@@ -788,12 +846,16 @@ class TherapeuticCollaborativeSystem:
             # Initialize group therapeutic context
             await self._initialize_group_therapeutic_context(session)
 
-            logger.info(f"Started collaborative session {session.session_id} with {len(session.participants)} participants")
+            logger.info(
+                f"Started collaborative session {session.session_id} with {len(session.participants)} participants"
+            )
 
         except Exception as e:
             logger.error(f"Error starting collaborative session: {e}")
 
-    async def _initialize_group_therapeutic_context(self, session: CollaborativeSession):
+    async def _initialize_group_therapeutic_context(
+        self, session: CollaborativeSession
+    ):
         """Initialize therapeutic context for group dynamics."""
         try:
             # Aggregate therapeutic goals from all participants
@@ -803,20 +865,33 @@ class TherapeuticCollaborativeSystem:
 
             # Update session therapeutic focus with participant goals
             session.therapeutic_focus.extend(list(all_goals))
-            session.therapeutic_focus = list(set(session.therapeutic_focus))  # Remove duplicates
+            session.therapeutic_focus = list(
+                set(session.therapeutic_focus)
+            )  # Remove duplicates
 
         except Exception as e:
             logger.error(f"Error initializing group therapeutic context: {e}")
 
-    async def _handle_crisis_support(self, session: CollaborativeSession, supporter_id: str, recipient_id: str, message: str):
+    async def _handle_crisis_support(
+        self,
+        session: CollaborativeSession,
+        supporter_id: str,
+        recipient_id: str,
+        message: str,
+    ):
         """Handle crisis support situation."""
         try:
             # Escalate to emotional safety system
             if self.emotional_safety_system:
-                crisis_assessment = await self.emotional_safety_system.assess_crisis_risk(
-                    user_id=recipient_id,
-                    user_input=message,
-                    session_context={"collaborative_session": True, "peer_support": True},
+                crisis_assessment = (
+                    await self.emotional_safety_system.assess_crisis_risk(
+                        user_id=recipient_id,
+                        user_input=message,
+                        session_context={
+                            "collaborative_session": True,
+                            "peer_support": True,
+                        },
+                    )
                 )
 
                 if crisis_assessment.get("crisis_detected", False):
@@ -889,9 +964,12 @@ class TherapeuticCollaborativeSystem:
             systems_status = {
                 "consequence_system": self.consequence_system is not None,
                 "emotional_safety_system": self.emotional_safety_system is not None,
-                "adaptive_difficulty_engine": self.adaptive_difficulty_engine is not None,
-                "character_development_system": self.character_development_system is not None,
-                "therapeutic_integration_system": self.therapeutic_integration_system is not None,
+                "adaptive_difficulty_engine": self.adaptive_difficulty_engine
+                is not None,
+                "character_development_system": self.character_development_system
+                is not None,
+                "therapeutic_integration_system": self.therapeutic_integration_system
+                is not None,
                 "gameplay_loop_controller": self.gameplay_loop_controller is not None,
                 "replayability_system": self.replayability_system is not None,
             }
@@ -903,12 +981,23 @@ class TherapeuticCollaborativeSystem:
                 "collaborative_modes": len(CollaborativeMode),
                 "participant_roles": len(ParticipantRole),
                 "support_types": len(SupportType),
-                "active_sessions": len([s for s in self.collaborative_sessions.values() if s.status == SessionStatus.ACTIVE]),
+                "active_sessions": len(
+                    [
+                        s
+                        for s in self.collaborative_sessions.values()
+                        if s.status == SessionStatus.ACTIVE
+                    ]
+                ),
                 "total_sessions": len(self.collaborative_sessions),
-                "total_participants": sum(len(s.participants) for s in self.collaborative_sessions.values()),
+                "total_participants": sum(
+                    len(s.participants) for s in self.collaborative_sessions.values()
+                ),
                 "support_interactions": len(self.support_interactions),
                 "collaborative_goals": len(self.collaborative_goals),
-                "peer_connections": sum(len(connections) for connections in self.peer_connections.values()) // 2,
+                "peer_connections": sum(
+                    len(connections) for connections in self.peer_connections.values()
+                )
+                // 2,
                 "therapeutic_systems": systems_status,
                 "systems_available": f"{systems_available}/7",
                 "metrics": self.get_metrics(),
@@ -924,8 +1013,16 @@ class TherapeuticCollaborativeSystem:
     def get_metrics(self) -> dict[str, Any]:
         """Get collaborative system metrics."""
         # Calculate additional metrics
-        active_sessions = len([s for s in self.collaborative_sessions.values() if s.status == SessionStatus.ACTIVE])
-        total_participants = sum(len(s.participants) for s in self.collaborative_sessions.values())
+        active_sessions = len(
+            [
+                s
+                for s in self.collaborative_sessions.values()
+                if s.status == SessionStatus.ACTIVE
+            ]
+        )
+        total_participants = sum(
+            len(s.participants) for s in self.collaborative_sessions.values()
+        )
 
         average_session_size = 0.0
         if len(self.collaborative_sessions) > 0:
@@ -939,6 +1036,9 @@ class TherapeuticCollaborativeSystem:
             "average_session_size": round(average_session_size, 1),
             "support_interactions_total": len(self.support_interactions),
             "collaborative_goals_total": len(self.collaborative_goals),
-            "peer_connections_total": sum(len(connections) for connections in self.peer_connections.values()) // 2,
+            "peer_connections_total": sum(
+                len(connections) for connections in self.peer_connections.values()
+            )
+            // 2,
             "users_with_connections": len(self.peer_connections),
         }

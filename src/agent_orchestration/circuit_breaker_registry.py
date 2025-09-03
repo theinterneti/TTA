@@ -96,7 +96,7 @@ class CircuitBreakerRegistry:
         try:
             members = await self._redis.smembers(self._registry_key())
             return [
-                m.decode() if isinstance(m, (bytes, bytearray)) else m for m in members
+                m.decode() if isinstance(m, bytes | bytearray) else m for m in members
             ]
         except Exception as e:
             logger.warning(f"Failed to list circuit breaker names: {e}")
@@ -164,7 +164,7 @@ class CircuitBreakerRegistry:
             # Scan for state keys
             state_keys = []
             async for key in self._redis.scan_iter(match=self._state_pattern()):
-                key_str = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                key_str = key.decode() if isinstance(key, bytes | bytearray) else key
                 state_keys.append(key_str)
 
             # Check each state key

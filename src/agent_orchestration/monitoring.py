@@ -283,7 +283,7 @@ class SystemMonitor:
         health_statuses = []
 
         # Check individual agents
-        for monitor_key, monitor in self.agent_monitors.items():
+        for _monitor_key, monitor in self.agent_monitors.items():
             agent_health = await monitor.health_check()
             health_statuses.append(agent_health)
 

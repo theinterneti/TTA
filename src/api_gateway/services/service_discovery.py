@@ -89,7 +89,6 @@ class RedisServiceRegistry:
             bool: True if registration successful
         """
         try:
-            service_key = f"{self._registry_key}:{service.id}"
             health_key = f"{self._health_key_prefix}:{service.id}"
 
             # Serialize service info

@@ -76,7 +76,7 @@ async def check_user_database_health() -> DatabaseHealthCheck:
         user_repo.connect()
 
         # Test basic query
-        exists = user_repo.username_exists("__health_check_user__")
+        user_repo.username_exists("__health_check_user__")
 
         user_repo.disconnect()
 
@@ -113,7 +113,7 @@ async def check_player_database_health() -> DatabaseHealthCheck:
         player_repo.connect()
 
         # Test basic query
-        exists = player_repo.username_exists("__health_check_player__")
+        player_repo.username_exists("__health_check_player__")
 
         player_repo.disconnect()
 

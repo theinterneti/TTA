@@ -54,6 +54,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: "npm"
+          cache-dependency-path: "web-interfaces/developer-interface/package-lock.json"
 
       - name: Install Python dependencies
         run: uv sync --all-extras --dev

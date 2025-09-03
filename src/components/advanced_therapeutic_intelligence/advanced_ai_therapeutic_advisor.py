@@ -363,7 +363,7 @@ class AdvancedAITherapeuticAdvisor:
 
             if self.predictive_analytics:
                 predictions = await self.predictive_analytics.generate_therapeutic_predictions(user_id)
-                optimizations = await self.predictive_analytics.optimize_therapeutic_interventions(user_id)
+                await self.predictive_analytics.optimize_therapeutic_interventions(user_id)
 
             # Determine optimal therapeutic framework
             optimal_framework = await self._determine_optimal_framework(user_id, target_outcomes, user_profile, predictions)
@@ -514,14 +514,13 @@ class AdvancedAITherapeuticAdvisor:
             # Gather comprehensive user data
             user_profile = None
             predictions = []
-            insights = {}
 
             if self.personalization_engine:
                 user_profile = await self.personalization_engine.get_user_profile(user_id)
 
             if self.predictive_analytics:
                 predictions = await self.predictive_analytics.generate_therapeutic_predictions(user_id)
-                insights = await self.predictive_analytics.get_predictive_insights(user_id)
+                await self.predictive_analytics.get_predictive_insights(user_id)
 
             # Analyze each option
             option_analysis = {}
@@ -711,7 +710,7 @@ class AdvancedAITherapeuticAdvisor:
                 "analysis_timestamp": datetime.utcnow().isoformat(),
                 "guidance_summary": {
                     "total_guidance_provided": len(user_guidance),
-                    "guidance_types": list(set(g.guidance_type.value for g in user_guidance)),
+                    "guidance_types": list({g.guidance_type.value for g in user_guidance}),
                     "average_confidence": np.mean([g.confidence_score for g in user_guidance]) if user_guidance else 0.0,
                     "high_priority_guidance": len([g for g in user_guidance if g.priority in [InterventionPriority.CRITICAL, InterventionPriority.HIGH]]),
                     "validated_guidance": len([g for g in user_guidance if g.effectiveness_score is not None]),
@@ -722,14 +721,14 @@ class AdvancedAITherapeuticAdvisor:
                 },
                 "strategy_summary": {
                     "total_strategies_created": len(user_strategies),
-                    "therapeutic_frameworks": list(set(s.therapeutic_framework.value for s in user_strategies)),
+                    "therapeutic_frameworks": list({s.therapeutic_framework.value for s in user_strategies}),
                     "average_expected_effectiveness": np.mean([s.expected_effectiveness for s in user_strategies]) if user_strategies else 0.0,
                     "high_evidence_strategies": len([s for s in user_strategies if s.evidence_strength > 0.7]),
                     "active_strategies": len([s for s in user_strategies if s.status == "recommended"])
                 },
                 "decision_summary": {
                     "total_decisions_made": len(user_decisions),
-                    "decision_contexts": list(set(d.decision_context for d in user_decisions)),
+                    "decision_contexts": list({d.decision_context for d in user_decisions}),
                     "high_confidence_decisions": len([
                         d for d in user_decisions
                         if d.confidence_level in [GuidanceConfidence.HIGH, GuidanceConfidence.VERY_HIGH]
@@ -1779,7 +1778,7 @@ class AdvancedAITherapeuticAdvisor:
             # Get user data
             user_guidance = self.active_guidance.get(user_id, [])
             user_strategies = self.intervention_strategies.get(user_id, [])
-            user_decisions = self.therapeutic_decisions.get(user_id, [])
+            self.therapeutic_decisions.get(user_id, [])
 
             # Generate recommendations based on data
             if not user_guidance:

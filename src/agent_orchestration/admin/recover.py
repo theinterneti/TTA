@@ -20,7 +20,7 @@ async def run_recovery(redis_url: str, key_prefix: str = "ao") -> dict[str, int]
     for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
         pattern = f"{key_prefix}:reserved_deadlines:{at.value}:*"
         async for key in redis.scan_iter(match=pattern):
-            k = key.decode() if isinstance(key, (bytes, bytearray)) else key
+            k = key.decode() if isinstance(key, bytes | bytearray) else key
             inst = k.split(":")[-1]
             # Targeted recovery for this agent
             aid = AgentId(type=at, instance=inst)

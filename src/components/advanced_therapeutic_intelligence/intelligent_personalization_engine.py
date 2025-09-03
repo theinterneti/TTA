@@ -819,7 +819,7 @@ class IntelligentPersonalizationEngine:
         """Update learning models with new interaction data."""
         try:
             # Update model accuracy metrics (placeholder for ML implementation)
-            for model_name, model_data in self.learning_models.items():
+            for _model_name, model_data in self.learning_models.items():
                 # Simulate learning improvement
                 current_accuracy = model_data["accuracy"]
                 improvement = 0.001 * (outcome_data.get("satisfaction_score", 0.5) - 0.5)

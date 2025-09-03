@@ -222,26 +222,23 @@ class ScaleManager:
     async def _calculate_causal_strength(
         self, choice: PlayerChoice, scale: NarrativeScale
     ) -> float:
-        strength = 0.5
         # moved to impact_analysis.calculate_causal_strength
         return await calculate_causal_strength(choice, scale)  # type: ignore[arg-type]
 
     async def _assess_therapeutic_alignment(
         self, choice: PlayerChoice, scale: NarrativeScale
     ) -> float:
-        align = 0.5
         # moved to impact_analysis.assess_therapeutic_alignment
         return assess_therapeutic_alignment(choice, scale)
 
     def _calculate_confidence_score(
         self, choice: PlayerChoice, scale: NarrativeScale
     ) -> float:
-        confidence = 0.5
         # moved to impact_analysis.calculate_confidence_score
         return calculate_confidence_score(choice, scale)
 
     def _calculate_temporal_decay(self, scale: NarrativeScale) -> float:
-        decay = {
+        {
             NarrativeScale.SHORT_TERM: 0.7,
             NarrativeScale.MEDIUM_TERM: 0.85,
             NarrativeScale.LONG_TERM: 0.95,

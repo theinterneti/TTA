@@ -243,7 +243,7 @@ class TTLCacheStrategy(CacheStrategy):
         """Estimate size of value in bytes."""
         if isinstance(value, str):
             return len(value.encode("utf-8"))
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int | float):
             return 8
         elif isinstance(value, dict):
             return len(str(value).encode("utf-8"))
@@ -351,7 +351,7 @@ class LRUCacheStrategy(CacheStrategy):
         """Estimate size of value in bytes."""
         if isinstance(value, str):
             return len(value.encode("utf-8"))
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int | float):
             return 8
         elif isinstance(value, dict):
             return len(str(value).encode("utf-8"))
@@ -495,7 +495,7 @@ class WriteBackCacheStrategy(CacheStrategy):
         """Estimate size of value in bytes."""
         if isinstance(value, str):
             return len(value.encode("utf-8"))
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int | float):
             return 8
         elif isinstance(value, dict):
             return len(str(value).encode("utf-8"))
@@ -617,7 +617,7 @@ class WriteThroughCacheStrategy(CacheStrategy):
         """Estimate size of value in bytes."""
         if isinstance(value, str):
             return len(value.encode("utf-8"))
-        elif isinstance(value, (int, float)):
+        elif isinstance(value, int | float):
             return 8
         elif isinstance(value, dict):
             return len(str(value).encode("utf-8"))

@@ -695,8 +695,8 @@ class IntelligentContentGenerationSystem:
                 "analysis_timestamp": datetime.utcnow().isoformat(),
                 "content_summary": {
                     "total_content_generated": len(user_content),
-                    "content_types": list(set(c.content_type.value for c in user_content)),
-                    "therapeutic_intents": list(set(c.therapeutic_intent.value for c in user_content)),
+                    "content_types": list({c.content_type.value for c in user_content}),
+                    "therapeutic_intents": list({c.therapeutic_intent.value for c in user_content}),
                     "average_quality_score": np.mean([
                         (c.therapeutic_appropriateness + c.narrative_coherence + c.personalization_score + c.engagement_potential) / 4
                         for c in user_content

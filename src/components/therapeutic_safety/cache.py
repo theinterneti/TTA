@@ -155,7 +155,7 @@ class ValidationCache:
                 try:
                     cached_data = await self.redis_client.get(key)
                     if cached_data:
-                        result_data = json.loads(cached_data)
+                        json.loads(cached_data)
                         # Check if this result belongs to the user
                         # This is a simplified check - in production, include user_id in key
                         await self.redis_client.delete(key)

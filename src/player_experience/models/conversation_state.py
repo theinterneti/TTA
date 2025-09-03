@@ -8,7 +8,7 @@ state, including conversation progress, collected data, and WebSocket message sc
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -310,16 +310,16 @@ class ErrorMessage(BaseModel):
 
 
 # Union type for all message types
-WebSocketMessage = Union[
-    StartConversationMessage,
-    UserResponseMessage,
-    AssistantMessage,
-    ProgressUpdateMessage,
-    ConversationCompletedMessage,
-    ValidationErrorMessage,
-    CrisisDetectedMessage,
-    ErrorMessage,
-]
+WebSocketMessage = (
+    StartConversationMessage
+    | UserResponseMessage
+    | AssistantMessage
+    | ProgressUpdateMessage
+    | ConversationCompletedMessage
+    | ValidationErrorMessage
+    | CrisisDetectedMessage
+    | ErrorMessage
+)
 
 
 # API Response Models

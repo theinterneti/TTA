@@ -185,7 +185,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             # Remove it from sched set
             await self._redis.zrem(skey, member)
             payload = (
-                member.decode() if isinstance(member, (bytes, bytearray)) else member
+                member.decode() if isinstance(member, bytes | bytearray) else member
             )
             # Create reservation
             token = f"res_{uuid.uuid4().hex[:16]}"
@@ -311,7 +311,7 @@ class RedisMessageCoordinator(MessageCoordinator):
                 ):
                     async for key in self._redis.scan_iter(match=pattern):
                         parts = (
-                            key.decode() if isinstance(key, (bytes, bytearray)) else key
+                            key.decode() if isinstance(key, bytes | bytearray) else key
                         )
                         inst = parts.split(":")[-1]
                         sig = f"{at.value}:{inst}"
@@ -328,7 +328,7 @@ class RedisMessageCoordinator(MessageCoordinator):
             dkey = self._reserved_deadlines(aid)
             tokens = await self._redis.zrangebyscore(dkey, min=-1, max=now)
             for t in tokens:
-                token = t.decode() if isinstance(t, (bytes, bytearray)) else t
+                token = t.decode() if isinstance(t, bytes | bytearray) else t
                 payload = await self._redis.hget(self._reserved_hash(aid), token)
                 if payload:
                     try:

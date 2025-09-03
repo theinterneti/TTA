@@ -386,9 +386,9 @@ class StoryInitializationService:
 
         # Identify strengths from character attributes
         for attr, value in attributes.items():
-            if isinstance(value, (int, float)) and value > 7:  # High attribute values
+            if isinstance(value, int | float) and value > 7:  # High attribute values
                 analysis["strengths"].append(attr)
-            elif isinstance(value, (int, float)) and value < 4:  # Low attribute values
+            elif isinstance(value, int | float) and value < 4:  # Low attribute values
                 analysis["growth_areas"].append(attr)
 
         # Determine interaction style based on social attributes

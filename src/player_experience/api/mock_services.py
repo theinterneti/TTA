@@ -177,7 +177,7 @@ class MockNeo4jSession:
 
     async def run(self, query: str, **parameters):
         """Enhanced mock query execution with realistic processing."""
-        start_time = time.time()
+        time.time()
 
         try:
             # Update metrics
@@ -251,7 +251,7 @@ class MockNeo4jSession:
 
     async def _async_run(self, query: str, **parameters):
         """Async query processing."""
-        start_time = time.time()
+        time.time()
 
         self.driver.metrics.total_operations += 1
         self.driver._update_state()
@@ -390,7 +390,7 @@ class MockNeo4jSession:
 
         # If specific parameters provided, try to find matching nodes
         if parameters:
-            for node_id, node_data in self.driver._nodes.items():
+            for _node_id, node_data in self.driver._nodes.items():
                 match = True
                 for key, value in parameters.items():
                     if key not in node_data or node_data[key] != value:
@@ -415,7 +415,7 @@ class MockNeo4jSession:
         results = []
 
         if parameters:
-            for node_id, node_data in self.driver._nodes.items():
+            for _node_id, node_data in self.driver._nodes.items():
                 match = True
                 for key, value in parameters.items():
                     if key not in node_data or node_data[key] != value:
@@ -478,7 +478,7 @@ class MockNeo4jSession:
                 deleted_count += 1
 
                 # Remove from indexes
-                for label, node_set in self.driver._indexes.items():
+                for _label, node_set in self.driver._indexes.items():
                     node_set.discard(node_id)
 
         return MockNeo4jResult([{"deleted": deleted_count}])
@@ -505,7 +505,7 @@ class MockNeo4jSession:
                 del self.driver._nodes[node_id]
                 deleted_count += 1
 
-                for label, node_set in self.driver._indexes.items():
+                for _label, node_set in self.driver._indexes.items():
                     node_set.discard(node_id)
 
         return MockNeo4jResult([{"deleted": deleted_count}])
@@ -548,7 +548,7 @@ class MockNeo4jResult:
 
     def data(self) -> list[dict[str, Any]]:
         """Return all records as list of dictionaries."""
-        return [record for record in self.records]
+        return list(self.records)
 
     def values(self) -> list[list[Any]]:
         """Return all records as list of value lists."""

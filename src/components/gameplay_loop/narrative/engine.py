@@ -487,7 +487,7 @@ class NarrativeEngine:
         """Background safety monitoring loop."""
         while self.state not in [EngineState.SHUTDOWN, EngineState.ERROR]:
             try:
-                for session_id, session_state in self.active_sessions.items():
+                for _session_id, session_state in self.active_sessions.items():
                     await self.therapeutic_integrator.monitor_session_safety(
                         session_state
                     )

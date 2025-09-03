@@ -380,7 +380,7 @@ class ContentSafetyValidator:
         total_frameworks = 0
 
         # Check alignment with therapeutic frameworks
-        for framework, keywords in self.therapeutic_keywords.items():
+        for _framework, keywords in self.therapeutic_keywords.items():
             framework_score = 0.0
             for keyword in keywords:
                 if keyword.lower() in text:
@@ -465,7 +465,7 @@ class ContentSafetyValidator:
             return recommendations
 
         # Group violations by risk category
-        risk_categories = set(v["risk_category"] for v in violations)
+        risk_categories = {v["risk_category"] for v in violations}
 
         for risk_category in risk_categories:
             if risk_category == RiskCategory.SELF_HARM.value:

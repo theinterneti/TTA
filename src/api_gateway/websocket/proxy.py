@@ -603,6 +603,6 @@ class WebSocketProxy:
             "backend_connections": len(self.backend_connections),
             "active_proxies": len(self.connection_to_backend),
             "backend_services": len(
-                set(key.split(":")[0] for key in self.backend_connections.keys())
+                {key.split(":")[0] for key in self.backend_connections.keys()}
             ),
         }

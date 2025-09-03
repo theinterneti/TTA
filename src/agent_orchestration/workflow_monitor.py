@@ -160,7 +160,7 @@ class WorkflowMonitor:
         transitioned = 0
         try:
             async for key in self._redis.scan_iter(match=f"{self._pfx}:wf:runs:*"):
-                k = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                k = key.decode() if isinstance(key, bytes | bytearray) else key
                 data = await self._redis.get(k)
                 if not data:
                     continue

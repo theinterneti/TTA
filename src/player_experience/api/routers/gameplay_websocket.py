@@ -19,6 +19,7 @@ from src.components.gameplay_loop.controllers.gameplay_loop_controller import (
 )
 from src.components.therapeutic_safety import SafetyValidationOrchestrator
 
+from ...services.dynamic_story_generation_service import DynamicStoryGenerationService
 from ...services.gameplay_chat_manager import GameplayChatManager
 from ...services.narrative_generation_service import NarrativeGenerationService
 from ...services.story_initialization_service import StoryInitializationService

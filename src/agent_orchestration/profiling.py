@@ -108,7 +108,7 @@ class AgentCoordinationProfiler:
 
         # Extract top functions
         top_functions = []
-        for func_info, (cc, nc, tt, ct, callers) in stats.stats.items():
+        for func_info, (cc, _nc, tt, ct, _callers) in stats.stats.items():
             filename, line_num, func_name = func_info
             top_functions.append(
                 {

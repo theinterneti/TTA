@@ -770,7 +770,6 @@ class CharacterDevelopmentSystem:
         attr_level = self.character_attributes[user_id][attribute]
 
         # Apply change
-        old_level = attr_level.current_level
         attr_level.current_level = max(
             0.0, min(10.0, attr_level.current_level + change)
         )
@@ -961,7 +960,7 @@ class CharacterDevelopmentSystem:
                 return False
 
         # Check milestone-specific conditions
-        thresholds = self.milestone_thresholds.get(milestone, {})
+        self.milestone_thresholds.get(milestone, {})
 
         if milestone == CharacterMilestone.FIRST_BRAVE_ACT:
             # Check if this event involved courage

@@ -542,8 +542,8 @@ class TTASystemIntegration:
 
             # Simulate safety monitoring system integration
             user_id = request.payload["user_id"]
-            content = request.payload["content"]
-            context = request.payload["context"]
+            request.payload["content"]
+            request.payload["context"]
 
             response_data = {
                 "user_id": user_id,
@@ -601,7 +601,7 @@ class TTASystemIntegration:
 
             # Simulate progress tracking system integration
             user_id = request.payload["user_id"]
-            progress_data = request.payload["progress_data"]
+            request.payload["progress_data"]
 
             response_data = {
                 "user_id": user_id,

@@ -762,7 +762,7 @@ class ConcurrentWorldStateManager:
     async def _cleanup_expired_instances(self) -> None:
         """Clean up expired and inactive instances."""
         try:
-            cutoff_date = datetime.utcnow() - timedelta(
+            datetime.utcnow() - timedelta(
                 days=self.auto_archive_inactive_days
             )
 

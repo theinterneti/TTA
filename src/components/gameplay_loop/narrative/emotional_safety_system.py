@@ -656,7 +656,7 @@ class EmotionalSafetySystem:
         dominant_emotion, intensity = snapshot.get_dominant_emotion()
 
         # Select interventions based on emotion and distress level
-        for intervention_type, interventions in self.interventions.items():
+        for _intervention_type, interventions in self.interventions.items():
             for intervention in interventions:
                 # Check if intervention targets the dominant emotion
                 if dominant_emotion in intervention.target_emotions:
@@ -1024,7 +1024,7 @@ class EmotionalSafetySystem:
 
         # Get appropriate interventions
         matching_interventions = []
-        for intervention_type, interventions in self.interventions.items():
+        for _intervention_type, interventions in self.interventions.items():
             for intervention in interventions:
                 if emotion in intervention.target_emotions:
                     matching_interventions.append(intervention)

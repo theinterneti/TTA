@@ -395,7 +395,7 @@ class TherapeuticPriorityLoadBalancer(LoadBalancer):
 
         # Separate therapeutic and non-therapeutic services
         therapeutic_services = [s for s in healthy_services if s.therapeutic_priority]
-        non_therapeutic_services = [
+        [
             s for s in healthy_services if not s.therapeutic_priority
         ]
 

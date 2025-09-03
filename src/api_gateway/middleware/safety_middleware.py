@@ -446,7 +446,7 @@ class TherapeuticSafetyMiddleware:
             "details": {},
         }
 
-        content_lower = content.lower()
+        content.lower()
 
         # Check crisis patterns
         crisis_matches = 0

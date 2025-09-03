@@ -28,7 +28,7 @@ def _parse_bytes(v: Any) -> int | None:
     if v is None:
         return None
     try:
-        if isinstance(v, (int, float)):
+        if isinstance(v, int | float):
             return int(v)
         s = str(v).strip().lower()
         for suf, mul in _DEF_UNITS.items():
@@ -236,7 +236,7 @@ class AgentOrchestrationComponent(Component):
                     self._state_validator = StateValidator(
                         self._redis_client, key_prefix="ao"
                     )
-                    svi = float(
+                    float(
                         self.config.get(
                             "agent_orchestration.workflow.state_validation_interval_s",
                             10.0,
@@ -1370,7 +1370,7 @@ class AgentOrchestrationComponent(Component):
             async for key in self._redis_client.scan_iter(
                 match=f"ao:queue:{at.value}:*"
             ):
-                k = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                k = key.decode() if isinstance(key, bytes | bytearray) else key
                 inst = k.split(":")[-1]
                 agent_key = f"{at.name.lower()}:{inst}"
                 # Audit list overall length (priority 0)
@@ -1402,7 +1402,7 @@ class AgentOrchestrationComponent(Component):
             ):
                 skey = (
                     skey_b.decode()
-                    if isinstance(skey_b, (bytes, bytearray))
+                    if isinstance(skey_b, bytes | bytearray)
                     else skey_b
                 )
                 # skey format: ao:sched:{type}:{inst}:prio:{prio}
@@ -1976,7 +1976,6 @@ class AgentOrchestrationComponent(Component):
 
             # Tool metrics
             tool_exec = {}
-            tool_cache = {"hits": 0, "misses": 0}
             try:
                 from src.agent_orchestration.tools.metrics import get_tool_metrics
 
@@ -1988,7 +1987,7 @@ class AgentOrchestrationComponent(Component):
                     self, "_tool_registry", None
                 )
                 if reg:
-                    tool_cache = await reg.cache_stats()
+                    await reg.cache_stats()
             except Exception:
                 pass
             # Set counters (note: prometheus_client counters can only inc; we inc to target absolute on first pass)
@@ -2480,7 +2479,7 @@ class AgentOrchestrationComponent(Component):
                         if b:
                             raw = (
                                 b.decode()
-                                if isinstance(b, (bytes, bytearray))
+                                if isinstance(b, bytes | bytearray)
                                 else str(b)
                             )
                             cfg = _json.loads(raw)
@@ -2557,7 +2556,7 @@ class AgentOrchestrationComponent(Component):
                             if b:
                                 raw = (
                                     b.decode()
-                                    if isinstance(b, (bytes, bytearray))
+                                    if isinstance(b, bytes | bytearray)
                                     else str(b)
                                 )
                                 _json.loads(raw)
@@ -2591,7 +2590,7 @@ class AgentOrchestrationComponent(Component):
         @app.get("/policy/status")
         async def policy_status() -> dict:
             try:
-                pol_cfg = getattr(self._tool_policy, "config", None)
+                getattr(self._tool_policy, "config", None)
                 src = "env"
                 try:
                     import os

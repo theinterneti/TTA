@@ -716,7 +716,7 @@ class TherapeuticMonitoringService:
                 "metrics": {
                     **self.service_metrics,
                     "active_users": len(
-                        set(key.split(":")[0] for key in self.metrics_data.keys())
+                        {key.split(":")[0] for key in self.metrics_data.keys()}
                     ),
                     "total_metrics_stored": sum(
                         len(data) for data in self.metrics_data.values()
@@ -775,7 +775,7 @@ class TherapeuticMonitoringService:
         return {
             **self.service_metrics,
             "active_users": len(
-                set(key.split(":")[0] for key in self.metrics_data.keys())
+                {key.split(":")[0] for key in self.metrics_data.keys()}
             ),
             "total_metrics_stored": sum(
                 len(data) for data in self.metrics_data.values()

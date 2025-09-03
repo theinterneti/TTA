@@ -151,7 +151,7 @@ class RequestTracker:
         """Update concurrent users metric."""
         with self.lock:
             unique_users = len(
-                set(ctx.user_id for ctx in self.active_requests.values() if ctx.user_id)
+                {ctx.user_id for ctx in self.active_requests.values() if ctx.user_id}
             )
             self.metrics_collector.record_gauge("concurrent_users", unique_users)
 
@@ -533,7 +533,7 @@ class PerformanceMonitor:
         """Set up alerting based on performance thresholds."""
 
         def check_response_time(metric_name: str, value: Any):
-            if metric_name == "response_time_avg" and isinstance(value, (int, float)):
+            if metric_name == "response_time_avg" and isinstance(value, int | float):
                 if value > self.thresholds.response_time_critical:
                     self._trigger_alert(
                         "critical",
@@ -556,7 +556,7 @@ class PerformanceMonitor:
                     )
 
         def check_error_rate(metric_name: str, value: Any):
-            if metric_name == "error_rate" and isinstance(value, (int, float)):
+            if metric_name == "error_rate" and isinstance(value, int | float):
                 if value > self.thresholds.error_rate_critical:
                     self._trigger_alert(
                         "critical",
@@ -580,7 +580,7 @@ class PerformanceMonitor:
 
         def check_memory_usage(metric_name: str, value: Any):
             if metric_name == "memory_usage_percent" and isinstance(
-                value, (int, float)
+                value, int | float
             ):
                 if value > self.thresholds.memory_usage_critical:
                     self._trigger_alert(

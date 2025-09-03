@@ -360,7 +360,7 @@ class TherapeuticConsequenceSystem:
         choice_type: ChoiceType,
     ) -> str:
         """Generate a learning opportunity description directly from choice analysis."""
-        choice_lower = choice.lower()
+        choice.lower()
 
         # Generate based on choice type
         if choice_type == ChoiceType.THERAPEUTIC:

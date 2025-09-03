@@ -152,7 +152,7 @@ def _convert_field_value(value: Any, field_type: type) -> Any:
             return value
 
     # Handle timedelta fields
-    if field_type == timedelta and isinstance(value, (int, float)):
+    if field_type == timedelta and isinstance(value, int | float):
         return timedelta(seconds=value)
 
     # Handle enum fields
@@ -208,7 +208,7 @@ def create_model_schema(model_class: type) -> dict[str, Any]:
         # Check if field has a default value
         if hasattr(model_class, "__dataclass_fields__"):
             field_info = model_class.__dataclass_fields__.get(field_name)
-            if field_info and field_info.default == field_info.default_factory == None:
+            if field_info and field_info.default == field_info.default_factory is None:
                 schema["required"].append(field_name)
 
     return schema
@@ -216,16 +216,16 @@ def create_model_schema(model_class: type) -> dict[str, Any]:
 
 def _get_field_schema(field_type: type) -> dict[str, Any]:
     """Get JSON schema for a field type."""
-    if field_type == str:
+    if field_type is str:
         return {"type": "string"}
 
-    if field_type == int:
+    if field_type is int:
         return {"type": "integer"}
 
-    if field_type == float:
+    if field_type is float:
         return {"type": "number"}
 
-    if field_type == bool:
+    if field_type is bool:
         return {"type": "boolean"}
 
     if field_type == datetime:

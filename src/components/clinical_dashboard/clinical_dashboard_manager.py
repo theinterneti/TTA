@@ -759,7 +759,7 @@ class ClinicalDashboardManager:
 
             # Get recent metrics summary
             recent_metrics = []
-            for session_id, metrics_list in self.metrics_history.items():
+            for _session_id, metrics_list in self.metrics_history.items():
                 if metrics_list:
                     recent_metrics.append(metrics_list[-1])
 
@@ -1120,7 +1120,7 @@ class ClinicalDashboardManager:
                 "error_recovery_manager": self.error_recovery_manager,
             }
 
-            for system_name, system in therapeutic_systems.items():
+            for system_name, _system in therapeutic_systems.items():
                 total_systems += 1
                 health_data = self.system_health_cache.get(system_name, {})
 

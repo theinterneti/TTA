@@ -405,7 +405,7 @@ class CrisisAlertSystem:
             while not self._shutdown_event.is_set():
                 try:
                     # Monitor active crisis alerts for escalation
-                    for alert_id, alert in list(self.active_crisis_alerts.items()):
+                    for _alert_id, alert in list(self.active_crisis_alerts.items()):
                         await self._monitor_crisis_alert(alert)
 
                     # Clean up old resolved alerts

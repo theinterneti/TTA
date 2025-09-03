@@ -656,7 +656,7 @@ class CloudDeploymentManager:
             while not self._shutdown_event.is_set():
                 try:
                     # Perform health checks on all service instances
-                    for instance_id, instance in list(self.service_instances.items()):
+                    for _instance_id, instance in list(self.service_instances.items()):
                         await self._perform_instance_health_check(instance)
 
                     # Wait for next health check cycle

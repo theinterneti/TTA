@@ -338,7 +338,7 @@ def create_gateway_router(
         APIRouter: Configured router
     """
     router = APIRouter()
-    request_router = RequestRouter(gateway_core, discovery_manager)
+    RequestRouter(gateway_core, discovery_manager)
 
     @router.api_route(
         "/{path:path}",

@@ -497,7 +497,7 @@ class CrossStoryCharacterPersistence:
             )
 
             # Create snapshot for the transfer
-            snapshot_id = await self.create_character_snapshot(
+            await self.create_character_snapshot(
                 character_id=character_id,
                 player_id=profile.player_id,
                 instance_id=target_instance_id,
@@ -1029,7 +1029,7 @@ class CrossStoryCharacterPersistence:
         """Clean up expired character snapshots."""
         try:
             cleaned_count = 0
-            cutoff_date = datetime.utcnow() - timedelta(
+            datetime.utcnow() - timedelta(
                 days=self.snapshot_retention_days
             )
 

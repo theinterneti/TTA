@@ -5,6 +5,7 @@ This module handles user choice processing, validation, and consequence
 application for therapeutic narrative experiences.
 """
 
+import asyncio
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -475,7 +476,7 @@ class ChoiceProcessor:
                 if therapeutic_concept:
                     story_context = f"Through your choice of '{choice.text}', you encounter an opportunity to explore {therapeutic_concept}"
 
-                    integration = await self.therapeutic_integration.integrate_therapeutic_concept(
+                    await self.therapeutic_integration.integrate_therapeutic_concept(
                         session_state,
                         therapeutic_concept,
                         story_context,
@@ -532,7 +533,7 @@ class ChoiceProcessor:
                 ),
             }
 
-            character_event = (
+            (
                 await self.character_development.process_character_development(
                     session_state,
                     DevelopmentTrigger.CHOICE_CONSEQUENCE,

@@ -1247,7 +1247,7 @@ class CollaborativeSystem:
         """Execute an approved group choice."""
         try:
             # Create user choice for the group
-            user_choice = UserChoice(
+            UserChoice(
                 choice_id=group_choice.choice_id,
                 text=group_choice.choice_text,
                 choice_type=group_choice.choice_type,
@@ -1282,7 +1282,7 @@ class CollaborativeSystem:
     ) -> None:
         """Notify all participants of a proposed choice."""
         try:
-            notification = {
+            {
                 "type": "group_choice_proposed",
                 "choice_id": group_choice.choice_id,
                 "choice_text": group_choice.choice_text,
@@ -1341,7 +1341,7 @@ class CollaborativeSystem:
     ) -> None:
         """Trigger therapeutic intervention for a participant."""
         try:
-            intervention_data = {
+            {
                 "user_id": user_id,
                 "session_id": session.session_id,
                 "intervention_type": "collaborative_support",
@@ -1367,7 +1367,7 @@ class CollaborativeSystem:
     ) -> None:
         """Escalate issue to human moderator."""
         try:
-            escalation_data = {
+            {
                 "session_id": session.session_id,
                 "user_id": user_id,
                 "reason": reason,
@@ -1434,16 +1434,16 @@ class CollaborativeSystem:
 
             # Get collaborative modes used
             modes_used = list(
-                set(session.collaborative_mode.value for session in sessions)
+                {session.collaborative_mode.value for session in sessions}
             )
 
             # Get roles played
             roles_played = list(
-                set(
+                {
                     session.participants[user_id].role.value
                     for session in sessions
                     if user_id in session.participants
-                )
+                }
             )
 
             return {

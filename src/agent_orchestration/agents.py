@@ -536,8 +536,6 @@ class AgentRegistry:
                 await self._maybe_restart(agent)
         return summary
 
-        return results
-
     def start_periodic_health_checks(self, interval_s: float = 15.0) -> None:
         self._health_interval_s = float(interval_s)
         if self._health_task and not self._health_task.done():

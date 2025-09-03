@@ -725,7 +725,7 @@ class TherapeuticReplayabilitySystem:
                 total_score = 0.0
                 metric_count = 0
 
-                for metric_name, path_scores in metric_scores.items():
+                for _metric_name, path_scores in metric_scores.items():
                     if path.path_id in path_scores:
                         total_score += path_scores[path.path_id]
                         metric_count += 1
@@ -736,7 +736,7 @@ class TherapeuticReplayabilitySystem:
             sorted_paths = sorted(path_totals.items(), key=lambda x: x[1], reverse=True)
             rankings = {}
 
-            for rank, (path_id, score) in enumerate(sorted_paths, 1):
+            for rank, (path_id, _score) in enumerate(sorted_paths, 1):
                 rankings[path_id] = rank
 
             return rankings
@@ -865,7 +865,7 @@ class TherapeuticReplayabilitySystem:
                 total_score = 0.0
                 metric_count = 0
 
-                for metric_name, path_metric_scores in metric_scores.items():
+                for _metric_name, path_metric_scores in metric_scores.items():
                     if path.path_id in path_metric_scores:
                         total_score += path_metric_scores[path.path_id]
                         metric_count += 1

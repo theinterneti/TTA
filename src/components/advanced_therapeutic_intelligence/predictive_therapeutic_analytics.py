@@ -586,7 +586,7 @@ class PredictiveTherapeuticAnalytics:
                 "analysis_timestamp": datetime.utcnow().isoformat(),
                 "pattern_analysis": {
                     "total_patterns_identified": len(user_patterns),
-                    "pattern_types": list(set(p.pattern_type for p in user_patterns)),
+                    "pattern_types": list({p.pattern_type for p in user_patterns}),
                     "strongest_patterns": sorted(
                         user_patterns, key=lambda p: p.strength, reverse=True
                     )[:3],
@@ -596,7 +596,7 @@ class PredictiveTherapeuticAnalytics:
                 },
                 "prediction_summary": {
                     "total_active_predictions": len(user_predictions),
-                    "prediction_types": list(set(p.prediction_type.value for p in user_predictions)),
+                    "prediction_types": list({p.prediction_type.value for p in user_predictions}),
                     "high_confidence_predictions": [
                         p for p in user_predictions
                         if p.confidence in [PredictionConfidence.HIGH, PredictionConfidence.VERY_HIGH]
@@ -609,7 +609,7 @@ class PredictiveTherapeuticAnalytics:
                     "high_impact_optimizations": [
                         opt for opt in user_optimizations if opt.estimated_impact > 0.3
                     ],
-                    "systems_optimized": list(set(opt.target_system for opt in user_optimizations)),
+                    "systems_optimized": list({opt.target_system for opt in user_optimizations}),
                     "average_improvement_potential": np.mean([
                         opt.improvement_potential for opt in user_optimizations
                     ]) if user_optimizations else 0.0
@@ -1280,7 +1280,7 @@ class PredictiveTherapeuticAnalytics:
         """Update models with new interaction data."""
         try:
             # Update model accuracy metrics (placeholder for ML implementation)
-            for model_name, model_data in self.prediction_models.items():
+            for _model_name, model_data in self.prediction_models.items():
                 # Simulate learning improvement
                 current_accuracy = model_data["accuracy"]
                 improvement = 0.001 * (interaction_data.get("satisfaction_score", 0.5) - 0.5)

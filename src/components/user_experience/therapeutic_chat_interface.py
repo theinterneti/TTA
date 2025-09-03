@@ -1523,7 +1523,7 @@ class TherapeuticChatInterface:
         import random
 
         themes = narrative_elements.get("themes", [])
-        emotions = narrative_elements.get("emotions", [])
+        narrative_elements.get("emotions", [])
 
         metaphor_templates = {
             "resilience": [
@@ -1989,7 +1989,7 @@ class TherapeuticChatInterface:
         """Update conversation flow based on interaction."""
         # Simple flow progression
         if flow.current_stage < len(flow.conversation_stages) - 1:
-            current_stage = flow.conversation_stages[flow.current_stage]
+            flow.conversation_stages[flow.current_stage]
             # Check if stage objectives are met (simplified)
             if len(user_message.content) > 50:  # Simple engagement check
                 flow.stage_completion[flow.current_stage] = True

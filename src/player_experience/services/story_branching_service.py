@@ -950,7 +950,7 @@ class StoryBranchingService:
         """Clean up expired branches and branch points."""
         try:
             cleaned_count = 0
-            current_time = datetime.utcnow()
+            datetime.utcnow()
 
             # This would implement actual cleanup logic
             logger.debug("Would perform branch cleanup here")

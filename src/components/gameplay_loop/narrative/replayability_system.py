@@ -794,7 +794,7 @@ class ReplayabilitySystem:
                 paths.append(path)
 
             # Ensure all paths are from same user
-            user_ids = set(path.user_id for path in paths)
+            user_ids = {path.user_id for path in paths}
             if len(user_ids) > 1:
                 raise ValueError("Cannot compare paths from different users")
 
@@ -872,12 +872,12 @@ class ReplayabilitySystem:
         try:
             # Calculate engagement score based on choices and outcomes
             choice_count = len(path.choices_made)
-            outcome_count = len(path.outcomes_achieved)
+            len(path.outcomes_achieved)
 
             if choice_count > 0:
                 # Base engagement on choice frequency and variety
                 choice_variety = len(
-                    set(choice["choice_type"] for choice in path.choices_made)
+                    {choice["choice_type"] for choice in path.choices_made}
                 )
                 path.engagement_score = min(
                     1.0, (choice_count * 0.1) + (choice_variety * 0.2)
@@ -896,10 +896,10 @@ class ReplayabilitySystem:
                 path.therapeutic_effectiveness = min(1.0, avg_therapeutic_value)
 
             # Calculate learning value based on outcome diversity
-            outcome_types = set(
+            outcome_types = {
                 outcome.get("outcome_type", "general")
                 for outcome in path.outcomes_achieved
-            )
+            }
             path.learning_value = min(1.0, len(outcome_types) * 0.2)
 
         except Exception as e:
@@ -937,10 +937,10 @@ class ReplayabilitySystem:
             # Enhance learning value with emotional journey
             if path.emotional_journey:
                 emotional_variety = len(
-                    set(
+                    {
                         event.get("emotion_type", "neutral")
                         for event in path.emotional_journey
-                    )
+                    }
                 )
                 path.learning_value = min(
                     1.0, path.learning_value + (emotional_variety * 0.05)
@@ -1058,7 +1058,7 @@ class ReplayabilitySystem:
             differences = []
 
             # Compare path types
-            path_types = set(path.path_type for path in paths)
+            path_types = {path.path_type for path in paths}
             if len(path_types) > 1:
                 differences.append(
                     f"Different exploration focuses: {', '.join(pt.value for pt in path_types)}"
@@ -1196,7 +1196,7 @@ class ReplayabilitySystem:
                 score = 0.0
                 metric_count = 0
 
-                for metric, path_scores_dict in metric_comparisons.items():
+                for _metric, path_scores_dict in metric_comparisons.items():
                     if path.path_id in path_scores_dict:
                         score += path_scores_dict[path.path_id]
                         metric_count += 1
@@ -1272,13 +1272,12 @@ class ReplayabilitySystem:
                         )
 
             # Identify unexplored choice types
-            all_choice_types = set()
             used_choice_types = set()
 
             for path in paths:
-                path_choice_types = set(
+                path_choice_types = {
                     choice["choice_type"] for choice in path.choices_made
-                )
+                }
                 used_choice_types.update(path_choice_types)
 
             # Common choice types that might not have been explored

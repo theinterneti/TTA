@@ -229,7 +229,7 @@ class AgentOrchestrationService:
             logger.error(f"Error processing user input: {e}")
 
             if isinstance(
-                e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)
+                e, TherapeuticSafetyError | WorkflowExecutionError | SessionContextError
             ):
                 raise
             else:

@@ -48,12 +48,12 @@ class StateValidator:
                 async for key in self._redis.scan_iter(
                     match=f"{self._pfx}:reserved_deadlines:{at.value}:*"
                 ):
-                    k = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                    k = key.decode() if isinstance(key, bytes | bytearray) else key
                     instances.add(k.split(":")[-1])
                 async for key in self._redis.scan_iter(
                     match=f"{self._pfx}:reserved:{at.value}:*"
                 ):
-                    k = key.decode() if isinstance(key, (bytes, bytearray)) else key
+                    k = key.decode() if isinstance(key, bytes | bytearray) else key
                     instances.add(k.split(":")[-1])
                 # Also union with KEYS results (robustness in tests/small envs)
                 try:
@@ -61,13 +61,13 @@ class StateValidator:
                         f"{self._pfx}:reserved_deadlines:{at.value}:*"
                     )
                     for kk in klist or []:
-                        k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
+                        k = kk.decode() if isinstance(kk, bytes | bytearray) else kk
                         instances.add(k.split(":")[-1])
                     klist2 = await self._redis.keys(
                         f"{self._pfx}:reserved:{at.value}:*"
                     )
                     for kk in klist2 or []:
-                        k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
+                        k = kk.decode() if isinstance(kk, bytes | bytearray) else kk
                         instances.add(k.split(":")[-1])
                 except Exception:
                     pass
@@ -88,7 +88,7 @@ class StateValidator:
                     except Exception:
                         pass
                     # Run up to two passes to be robust to immediate writes
-                    for pass_idx, cutoff in enumerate(passes):
+                    for _pass_idx, cutoff in enumerate(passes):
                         cut = (
                             cutoff
                             if cutoff is not None
@@ -104,7 +104,7 @@ class StateValidator:
                             for ht in htokens or []:
                                 htok = (
                                     ht.decode()
-                                    if isinstance(ht, (bytes, bytearray))
+                                    if isinstance(ht, bytes | bytearray)
                                     else ht
                                 )
                                 try:
@@ -120,7 +120,7 @@ class StateValidator:
                         for tb in zr_tokens or []:
                             tokens_set.add(
                                 tb.decode()
-                                if isinstance(tb, (bytes, bytearray))
+                                if isinstance(tb, bytes | bytearray)
                                 else tb
                             )
                         for et in extra_tokens:
@@ -169,13 +169,13 @@ class StateValidator:
                 for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
                     klist = await self._redis.keys(f"{self._pfx}:reserved:{at.value}:*")
                     for kk in klist or []:
-                        k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
+                        k = kk.decode() if isinstance(kk, bytes | bytearray) else kk
                         inst = k.split(":")[-1]
                         hkeys = await self._redis.hkeys(k)
                         for ht in hkeys or []:
                             tok = (
                                 ht.decode()
-                                if isinstance(ht, (bytes, bytearray))
+                                if isinstance(ht, bytes | bytearray)
                                 else ht
                             )
                             try:
@@ -223,7 +223,7 @@ class StateValidator:
                 now3 = int(time.time() * 1_000_000)
                 klist = await self._redis.keys(f"{self._pfx}:reserved_deadlines:*")
                 for kk in klist or []:
-                    dkey = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
+                    dkey = kk.decode() if isinstance(kk, bytes | bytearray) else kk
                     parts = dkey.split(":")
                     if len(parts) < 4:
                         continue

@@ -1151,7 +1151,7 @@ class UniversalAccessibilitySystem:
         """Optimize accessibility adaptations based on usage."""
         try:
             # Analyze adaptation effectiveness and optimize
-            for user_id, profile in self.accessibility_profiles.items():
+            for _user_id, _profile in self.accessibility_profiles.items():
                 # Update adaptation timing metrics
                 self.accessibility_metrics["average_adaptation_time"] = 0.15  # 150ms average
 
@@ -1162,7 +1162,7 @@ class UniversalAccessibilitySystem:
         """Update localization data and translations."""
         try:
             # Update completion percentages and add new translations
-            for lang, data in self.localization_data.items():
+            for _lang, data in self.localization_data.items():
                 if data.completion_percentage < 1.0:
                     data.completion_percentage = min(1.0, data.completion_percentage + 0.05)
                     data.last_updated = datetime.utcnow()

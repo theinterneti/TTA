@@ -286,7 +286,7 @@ class MessageRouter:
                 )
 
             # Process through IPA adapter
-            result = await self.ipa_adapter.process_input(text)
+            await self.ipa_adapter.process_input(text)
 
             return MessageResult(
                 message_id=self._get_message_id(message), delivered=True, error=None
@@ -323,7 +323,7 @@ class MessageRouter:
             updates = translated_msg.get("updates")
 
             # Process through WBA adapter
-            result = await self.wba_adapter.process_world_request(world_id, updates)
+            await self.wba_adapter.process_world_request(world_id, updates)
 
             return MessageResult(
                 message_id=self._get_message_id(message), delivered=True, error=None
@@ -367,7 +367,7 @@ class MessageRouter:
                 )
 
             # Process through NGA adapter
-            result = await self.nga_adapter.generate_narrative(prompt, context)
+            await self.nga_adapter.generate_narrative(prompt, context)
 
             return MessageResult(
                 message_id=self._get_message_id(message), delivered=True, error=None

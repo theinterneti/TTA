@@ -7,7 +7,7 @@ story events, choice presentations, narrative responses, and therapeutic interve
 
 from datetime import datetime
 from enum import Enum
-from typing import Any, Literal, Union
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -367,25 +367,25 @@ class HeartbeatMessage(BaseGameplayMessage):
 
 # Union Types for Message Validation
 
-GameplayWebSocketMessage = Union[
+GameplayWebSocketMessage = (
     # Client to Server
-    StartGameplayMessage,
-    PlayerActionMessage,
-    ChoiceSelectionMessage,
-    BreakResponseMessage,
-    EndSessionMessage,
+    StartGameplayMessage
+    | PlayerActionMessage
+    | ChoiceSelectionMessage
+    | BreakResponseMessage
+    | EndSessionMessage
     # Server to Client
-    SessionStartedMessage,
-    NarrativeResponseMessage,
-    ChoiceRequestMessage,
-    StoryEventMessage,
-    TherapeuticInterventionMessage,
-    BreakPointDetectedMessage,
-    SessionUpdateMessage,
-    SystemMessage,
-    ErrorMessage,
-    HeartbeatMessage,
-]
+    | SessionStartedMessage
+    | NarrativeResponseMessage
+    | ChoiceRequestMessage
+    | StoryEventMessage
+    | TherapeuticInterventionMessage
+    | BreakPointDetectedMessage
+    | SessionUpdateMessage
+    | SystemMessage
+    | ErrorMessage
+    | HeartbeatMessage
+)
 
 
 # Helper Models for Complex Content

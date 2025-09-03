@@ -122,7 +122,7 @@ class GatewayAuthService:
         """
         try:
             # Get TTA auth service
-            tta_auth_service = await self._get_tta_auth_service()
+            await self._get_tta_auth_service()
 
             # Use TTA auth service to refresh token
             # Note: This would need to be implemented in the TTA auth service

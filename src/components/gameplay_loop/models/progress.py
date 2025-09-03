@@ -242,7 +242,7 @@ class BehavioralChange(BaseModel):
         elif self.change_type == "decrease":
             return self.current_frequency < self.baseline_frequency
         else:  # modify
-            target_diff = abs(self.target_frequency - self.baseline_frequency)
+            abs(self.target_frequency - self.baseline_frequency)
             current_diff = abs(self.current_frequency - self.target_frequency)
             baseline_diff = abs(self.baseline_frequency - self.target_frequency)
             return current_diff < baseline_diff

@@ -634,7 +634,7 @@ class ValidationMiddleware:
 
     def _calculate_json_depth(self, obj: Any, current_depth: int = 0) -> int:
         """Calculate the maximum depth of a JSON object."""
-        if not isinstance(obj, (dict, list)):
+        if not isinstance(obj, dict | list):
             return current_depth
 
         if isinstance(obj, dict):

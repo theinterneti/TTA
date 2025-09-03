@@ -531,7 +531,7 @@ async def enter_world(
 
         # Create or get StoryWeaver profile
         neo4j_manager = NexusSchemaManager(service_manager.neo4j.driver)
-        weaver_id = await neo4j_manager.create_story_weaver(current_player.player_id)
+        await neo4j_manager.create_story_weaver(current_player.player_id)
 
         # Set up player session
         cache_service = NexusCacheService(service_manager.redis)

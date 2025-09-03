@@ -819,7 +819,7 @@ class APIDocumentationGenerator:
                         content.append("")
 
                         if "content" in response:
-                            for content_type, content_schema in response[
+                            for _content_type, content_schema in response[
                                 "content"
                             ].items():
                                 if "schema" in content_schema:

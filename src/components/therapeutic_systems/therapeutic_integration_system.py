@@ -741,9 +741,8 @@ class TherapeuticIntegrationSystem:
         personalized = template.copy()
 
         # Personalize title and description
-        character_name = "your character"
         if character_data and "name" in character_data:
-            character_name = character_data["name"]
+            character_data["name"]
 
         personalized["title"] = template.get("title", "Therapeutic Journey")
         personalized["description"] = template.get("base_description", "A therapeutic scenario tailored for growth")

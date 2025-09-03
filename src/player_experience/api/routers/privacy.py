@@ -252,7 +252,7 @@ async def export_user_data(
         export_data = privacy_service.export_user_data(export_request)
 
         # Create streaming response
-        export_stream = io.BytesIO(export_data)
+        io.BytesIO(export_data)
 
         return StreamingResponse(
             io.BytesIO(export_data),
