@@ -7,6 +7,7 @@ message coordination, and agent proxy registration in subsequent tasks.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
 from typing import Any
@@ -23,7 +24,7 @@ _DEF_UNITS = {
 }
 
 
-def _parse_bytes(v: Any) -> Optional[int]:
+def _parse_bytes(v: Any) -> int | None:
     if v is None:
         return None
     try:

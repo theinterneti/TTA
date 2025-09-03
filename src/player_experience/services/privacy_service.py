@@ -237,7 +237,8 @@ class AnonymizationService:
     def pseudonymize_user_id(self, user_id: str) -> str:
         """Create pseudonymous identifier that can be reversed."""
         if user_id not in self.pseudonym_mappings:
-            pseudonym = f"user_{hashlib.md5(user_id.encode()).hexdigest()[:12]}"
+            # Use SHA-256 instead of MD5 for security
+            pseudonym = f"user_{hashlib.sha256(user_id.encode()).hexdigest()[:12]}"
             self.pseudonym_mappings[user_id] = pseudonym
 
         return self.pseudonym_mappings[user_id]

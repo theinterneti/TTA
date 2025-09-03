@@ -5,12 +5,15 @@ This module provides utility functions for authentication, authorization,
 and role-based access control.
 """
 
+import logging
 from collections.abc import Callable
 from functools import wraps
 
 from fastapi import HTTPException, Request, status
 
 from ..models import AuthContext, PermissionLevel, UserRole
+
+logger = logging.getLogger(__name__)
 
 
 def require_auth(request: Request) -> AuthContext:

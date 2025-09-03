@@ -7,6 +7,7 @@ features including multi-factor authentication and role-based access control.
 
 import base64
 import io
+import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any
@@ -34,6 +35,8 @@ from ..models.auth import (
     UserRegistration,
     UserRole,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AuthenticationError(Exception):
@@ -286,6 +289,9 @@ class EnhancedAuthService:
         self.mfa_secrets: dict[str, list[MFASecret]] = {}
         self.security_events: list[SecurityEvent] = []
 
+        # In-memory user store fallback when database is unavailable
+        self.in_memory_users: dict[str, User] = {}
+
     def register_user(self, registration: UserRegistration) -> tuple[bool, list[str]]:
         """
         Register a new user with validation.
@@ -305,12 +311,19 @@ class EnhancedAuthService:
         if not is_valid:
             errors.extend(password_errors)
 
-        # Check if username/email already exists in database
+        # Check if username/email already exists in database or in-memory store
         if self.user_repository:
             if self.user_repository.username_exists(registration.username):
                 errors.append("Username already exists")
             if self.user_repository.email_exists(registration.email):
                 errors.append("Email already exists")
+        else:
+            # Check in-memory store when database is not available
+            for user in self.in_memory_users.values():
+                if user.username == registration.username:
+                    errors.append("Username already exists")
+                if user.email == registration.email:
+                    errors.append("Email already exists")
 
         if errors:
             return False, errors
@@ -318,31 +331,38 @@ class EnhancedAuthService:
         # Hash password
         hashed_password = self.security_service.hash_password(registration.password)
 
-        # Store user in database with hashed password
+        # Create user object
+        from uuid import uuid4
+
+        user = User(
+            user_id=str(uuid4()),
+            username=registration.username,
+            email=registration.email,
+            password_hash=hashed_password,
+            role=registration.role,
+            email_verified=False,
+            created_at=datetime.utcnow(),
+            account_status="active",
+            failed_login_attempts=0,
+        )
+
+        # Store user in database or in-memory store
         if self.user_repository:
-            from uuid import uuid4
-
-            user = User(
-                user_id=str(uuid4()),
-                username=registration.username,
-                email=registration.email,
-                password_hash=hashed_password,
-                role=registration.role,
-                email_verified=False,
-                created_at=datetime.utcnow(),
-                account_status="active",
-                failed_login_attempts=0,
-            )
-
             try:
                 success = self.user_repository.create_user(user)
                 if not success:
                     errors.append("Failed to create user account")
                     return False, errors
             except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
                 logger.error(f"Error creating user in database: {e}")
                 errors.append("Failed to create user account")
                 return False, errors
+        else:
+            # Store in in-memory store when database is not available
+            self.in_memory_users[user.username] = user
 
         # Log security event
         self.log_security_event(
@@ -385,16 +405,22 @@ class EnhancedAuthService:
                 "Account is temporarily locked due to too many failed attempts"
             )
 
-        # Retrieve user from database
+        # Retrieve user from database or in-memory store
         user = None
         if self.user_repository:
             try:
                 user = self.user_repository.get_user_by_username(credentials.username)
             except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
                 logger.error(f"Error retrieving user from database: {e}")
                 raise AuthenticationError(
                     "Authentication service temporarily unavailable"
                 )
+        else:
+            # Check in-memory store when database is not available
+            user = self.in_memory_users.get(credentials.username)
 
         if not user:
             self.record_failed_login(credentials.username)

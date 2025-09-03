@@ -35,8 +35,10 @@ class APISettings(BaseSettings):
     )
     use_neo4j: bool = os.getenv("TTA_USE_NEO4J", "0") == "1"
 
-    # Server settings
-    host: str = "0.0.0.0"
+    # Server settings - secure by default
+    host: str = (
+        "127.0.0.1"  # Use localhost for security, override with PLAYER_EXPERIENCE_HOST env var
+    )
     port: int = 8080
     reload: bool = False
 

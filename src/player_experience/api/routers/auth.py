@@ -5,6 +5,7 @@ This module provides endpoints for user authentication, registration,
 token management, multi-factor authentication, and role-based access control.
 """
 
+import logging
 import os
 from typing import Any
 
@@ -79,8 +80,6 @@ try:
 
 except Exception as e:
     # In development/testing, continue without database
-    import logging
-
     logger = logging.getLogger(__name__)
     logger.warning(f"Failed to initialize user database components: {e}")
 
@@ -225,8 +224,15 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
         client_ip = get_client_ip(request)
         user_agent = request.headers.get("User-Agent")
 
+        # Convert LoginRequest to UserCredentials
+        from ...models.auth import UserCredentials
+
+        user_credentials = UserCredentials(
+            username=credentials.username, password=credentials.password
+        )
+
         # Authenticate user
-        user = auth_service.authenticate_user(credentials, client_ip)
+        user = auth_service.authenticate_user(user_credentials, client_ip)
 
         if not user:
             raise HTTPException(
