@@ -1,4 +1,5 @@
 name: Debug Tools Integration
+# Enhanced CI/CD pipeline for TTA debug tools integration testing
 
 on:
   push:
