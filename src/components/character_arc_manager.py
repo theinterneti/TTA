@@ -17,48 +17,24 @@ import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
 from typing import Any
 
 from ..orchestration.component import Component
 
 logger = logging.getLogger(__name__)
 
-# Import integration module
-try:
-    from .character_arc_integration import CharacterArcIntegration
+# Import interfaces instead of concrete integration
+from components.character_arc_interfaces import (
+    ArcStage,
+    CharacterArc,
+    InteractionContext,
+    PlayerInteraction,
+    RelationshipState,
+    RelationshipType,
+)
 
-    INTEGRATION_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"Character arc integration not available: {e}")
-    INTEGRATION_AVAILABLE = False
-    CharacterArcIntegration = None
-
-
-class ArcStage(Enum):
-    """Character development stages."""
-
-    INTRODUCTION = "introduction"
-    ESTABLISHMENT = "establishment"
-    DEVELOPMENT = "development"
-    CONFLICT = "conflict"
-    GROWTH = "growth"
-    RESOLUTION = "resolution"
-    TRANSFORMATION = "transformation"
-
-
-class RelationshipType(Enum):
-    """Types of relationships between characters and player."""
-
-    STRANGER = "stranger"
-    ACQUAINTANCE = "acquaintance"
-    FRIEND = "friend"
-    CLOSE_FRIEND = "close_friend"
-    ROMANTIC_INTEREST = "romantic_interest"
-    MENTOR = "mentor"
-    RIVAL = "rival"
-    ENEMY = "enemy"
-    FAMILY = "family"
+# Integration will be injected via dependency injection
+INTEGRATION_AVAILABLE = True
 
 
 @dataclass
@@ -78,21 +54,7 @@ class ArcMilestone:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
-class RelationshipState:
-    """Tracks relationship dynamics between characters."""
-
-    character_id: str
-    relationship_type: RelationshipType
-    trust_level: float = 0.5  # 0.0 to 1.0
-    affection_level: float = 0.5  # 0.0 to 1.0
-    respect_level: float = 0.5  # 0.0 to 1.0
-    shared_experiences: list[str] = field(default_factory=list)
-    conflicts: list[str] = field(default_factory=list)
-    last_interaction: datetime | None = None
-    interaction_count: int = 0
-    relationship_history: list[dict[str, Any]] = field(default_factory=list)
-    metadata: dict[str, Any] = field(default_factory=dict)
+# RelationshipState is now imported from character_arc_interfaces
 
 
 @dataclass
@@ -109,16 +71,15 @@ class TherapeuticConcept:
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
+# CharacterArc is now imported from character_arc_interfaces
+# Extended local version with additional fields
 @dataclass
-class CharacterArc:
-    """Data model representing a character's development arc."""
+class ExtendedCharacterArc(CharacterArc):
+    """Extended character arc with additional manager-specific fields."""
 
-    character_id: str
-    character_name: str
-    current_stage: ArcStage
+    character_name: str = ""
     development_trajectory: list[ArcMilestone] = field(default_factory=list)
     personality_evolution: dict[str, float] = field(default_factory=dict)
-    relationship_dynamics: dict[str, RelationshipState] = field(default_factory=dict)
     therapeutic_modeling: list[TherapeuticConcept] = field(default_factory=list)
     growth_potential: dict[str, float] = field(default_factory=dict)
     base_personality: dict[str, Any] = field(default_factory=dict)
@@ -126,18 +87,16 @@ class CharacterArc:
     completed_milestones: list[str] = field(default_factory=list)
     active_conflicts: list[str] = field(default_factory=list)
     character_history: list[dict[str, Any]] = field(default_factory=list)
-    last_updated: datetime = field(default_factory=datetime.now)
-    metadata: dict[str, Any] = field(default_factory=dict)
 
 
+# InteractionContext is now imported from character_arc_interfaces
+# Extended local version with additional fields
 @dataclass
-class InteractionContext:
-    """Context for character interactions."""
+class ExtendedInteractionContext(InteractionContext):
+    """Extended interaction context with additional manager-specific fields."""
 
-    session_id: str
-    scene_id: str
-    location: str
-    participants: list[str] = field(default_factory=list)
+    session_id: str = ""
+    scene_id: str = ""
     mood: str = "neutral"
     tension_level: float = 0.5
     therapeutic_opportunity: bool = False

@@ -20,7 +20,7 @@ from src.components.gameplay_loop.controllers.gameplay_loop_controller import (
 )
 from src.components.gameplay_loop.narrative.choice_processor import ChoiceProcessor
 from src.components.gameplay_loop.narrative.events import EventBus
-from src.components.gameplay_loop.narrative.narrative_engine import NarrativeEngine
+from src.components.gameplay_loop.narrative.engine import NarrativeEngine
 from src.components.gameplay_loop.services.redis_session_manager import (
     RedisSessionManager,
 )

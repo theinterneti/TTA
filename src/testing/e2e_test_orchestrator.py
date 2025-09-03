@@ -8,13 +8,11 @@ clinical workflow testing for the complete TTA therapeutic platform.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
-import time
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -60,24 +58,24 @@ class TestResult:
     success: bool = False
     execution_time_ms: float = 0.0
     start_time: datetime = field(default_factory=datetime.utcnow)
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
 
     # Test metrics
     assertions_passed: int = 0
     assertions_failed: int = 0
-    performance_metrics: Dict[str, float] = field(default_factory=dict)
-    security_findings: List[Dict[str, Any]] = field(default_factory=list)
-    clinical_validations: List[Dict[str, Any]] = field(default_factory=list)
+    performance_metrics: dict[str, float] = field(default_factory=dict)
+    security_findings: list[dict[str, Any]] = field(default_factory=list)
+    clinical_validations: list[dict[str, Any]] = field(default_factory=list)
 
     # Error information
     error_message: str = ""
-    error_details: Dict[str, Any] = field(default_factory=dict)
+    error_details: dict[str, Any] = field(default_factory=dict)
     severity: TestSeverity = TestSeverity.INFO
 
     # Test context
     test_environment: str = "e2e_testing"
-    test_data: Dict[str, Any] = field(default_factory=dict)
-    system_state: Dict[str, Any] = field(default_factory=dict)
+    test_data: dict[str, Any] = field(default_factory=dict)
+    system_state: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -95,19 +93,19 @@ class TestSuiteReport:
     total_execution_time_ms: float = 0.0
     average_test_time_ms: float = 0.0
     start_time: datetime = field(default_factory=datetime.utcnow)
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
 
     # Test results
-    test_results: List[TestResult] = field(default_factory=list)
-    critical_failures: List[TestResult] = field(default_factory=list)
-    performance_summary: Dict[str, float] = field(default_factory=dict)
-    security_summary: Dict[str, Any] = field(default_factory=dict)
-    clinical_summary: Dict[str, Any] = field(default_factory=dict)
+    test_results: list[TestResult] = field(default_factory=list)
+    critical_failures: list[TestResult] = field(default_factory=list)
+    performance_summary: dict[str, float] = field(default_factory=dict)
+    security_summary: dict[str, Any] = field(default_factory=dict)
+    clinical_summary: dict[str, Any] = field(default_factory=dict)
 
     # Overall assessment
     success_rate: float = 0.0
     overall_status: TestStatus = TestStatus.INITIALIZING
-    recommendations: List[str] = field(default_factory=list)
+    recommendations: list[str] = field(default_factory=list)
 
 
 class E2ETestOrchestrator:
@@ -120,9 +118,9 @@ class E2ETestOrchestrator:
     def __init__(self):
         """Initialize the E2E Test Orchestrator."""
         self.status = TestStatus.INITIALIZING
-        self.test_results: Dict[str, TestResult] = {}
-        self.suite_reports: Dict[str, TestSuiteReport] = {}
-        self.active_tests: Dict[str, Dict[str, Any]] = {}
+        self.test_results: dict[str, TestResult] = {}
+        self.suite_reports: dict[str, TestSuiteReport] = {}
+        self.active_tests: dict[str, dict[str, Any]] = {}
 
         # Testing components (injected)
         self.system_integration_tester = None
@@ -213,7 +211,7 @@ class E2ETestOrchestrator:
 
     async def execute_comprehensive_e2e_testing(
         self,
-        test_configuration: Optional[Dict[str, Any]] = None
+        test_configuration: dict[str, Any] | None = None
     ) -> TestSuiteReport:
         """Execute comprehensive end-to-end testing across all systems."""
         try:
@@ -421,7 +419,7 @@ class E2ETestOrchestrator:
     async def _aggregate_test_suite_results(
         self,
         comprehensive_report: TestSuiteReport,
-        suite_reports: List[TestSuiteReport]
+        suite_reports: list[TestSuiteReport]
     ) -> TestSuiteReport:
         """Aggregate results from multiple test suites."""
         try:
@@ -468,7 +466,7 @@ class E2ETestOrchestrator:
             logger.error(f"Error aggregating test suite results: {e}")
             raise
 
-    async def _generate_test_recommendations(self, suite_report: TestSuiteReport) -> List[str]:
+    async def _generate_test_recommendations(self, suite_report: TestSuiteReport) -> list[str]:
         """Generate recommendations based on test results."""
         recommendations = []
 
@@ -597,7 +595,7 @@ class E2ETestOrchestrator:
         # Placeholder for test pattern analysis
         pass
 
-    async def get_comprehensive_test_report(self) -> Dict[str, Any]:
+    async def get_comprehensive_test_report(self) -> dict[str, Any]:
         """Get comprehensive testing report."""
         try:
             return {
@@ -659,7 +657,7 @@ class E2ETestOrchestrator:
             logger.error(f"Error generating comprehensive test report: {e}")
             return {"error": str(e)}
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the E2E Test Orchestrator."""
         try:
             testing_components_available = sum([

@@ -6,30 +6,30 @@ This will be expanded in future development phases.
 """
 
 import logging
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
 
-from .e2e_test_orchestrator import TestSuiteReport, TestSuite, TestStatus, TestResult
+from .e2e_test_orchestrator import TestResult, TestStatus, TestSuite, TestSuiteReport
 
 logger = logging.getLogger(__name__)
 
 
 class ClinicalWorkflowTester:
     """End-to-end therapeutic workflow testing across all systems."""
-    
+
     def __init__(self):
         """Initialize the clinical workflow tester."""
         pass
-    
+
     async def initialize(self):
         """Initialize the clinical workflow tester."""
         logger.info("ClinicalWorkflowTester initialized (placeholder)")
-    
+
     async def execute_clinical_tests(self, **system_components) -> TestSuiteReport:
         """Execute clinical workflow tests."""
         # Create mock clinical workflow test results
         test_results = []
-        
+
         # Complete therapeutic session workflow
         test_results.append(TestResult(
             test_suite=TestSuite.CLINICAL_WORKFLOW,
@@ -47,7 +47,7 @@ class ClinicalWorkflowTester:
                 {"validation": "session_completion", "passed": True}
             ]
         ))
-        
+
         # Crisis intervention workflow
         test_results.append(TestResult(
             test_suite=TestSuite.CLINICAL_WORKFLOW,
@@ -65,7 +65,7 @@ class ClinicalWorkflowTester:
                 {"validation": "intervention_delivery", "passed": True}
             ]
         ))
-        
+
         # Multi-system therapeutic integration
         test_results.append(TestResult(
             test_suite=TestSuite.CLINICAL_WORKFLOW,
@@ -84,7 +84,7 @@ class ClinicalWorkflowTester:
                 {"validation": "therapeutic_integration_system", "passed": True}
             ]
         ))
-        
+
         # Clinical validation workflow
         test_results.append(TestResult(
             test_suite=TestSuite.CLINICAL_WORKFLOW,
@@ -102,7 +102,7 @@ class ClinicalWorkflowTester:
                 {"validation": "compliance_validation", "passed": True}
             ]
         ))
-        
+
         # Clinical dashboard workflow
         test_results.append(TestResult(
             test_suite=TestSuite.CLINICAL_WORKFLOW,
@@ -120,7 +120,7 @@ class ClinicalWorkflowTester:
                 {"validation": "therapeutic_metrics_display", "passed": True}
             ]
         ))
-        
+
         # Create suite report
         suite_report = TestSuiteReport(
             suite_type=TestSuite.CLINICAL_WORKFLOW,
@@ -149,9 +149,9 @@ class ClinicalWorkflowTester:
             },
             end_time=datetime.utcnow()
         )
-        
+
         return suite_report
-    
-    async def health_check(self) -> Dict[str, Any]:
+
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {"status": "healthy", "service": "clinical_workflow_tester"}

@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class ServiceStatus(str, Enum):
@@ -58,7 +58,8 @@ class ServiceEndpoint(BaseModel):
         """Get the full service URL."""
         return f"{self.scheme}://{self.host}:{self.port}{self.path}"
 
-    @validator("scheme")
+    @field_validator("scheme")
+    @classmethod
     def validate_scheme(cls, v):
         """Validate service scheme."""
         allowed_schemes = ["http", "https", "ws", "wss"]
@@ -157,7 +158,8 @@ class ServiceInfo(BaseModel):
         use_enum_values = True
         json_encoders = {datetime: lambda v: v.isoformat(), UUID: lambda v: str(v)}
 
-    @validator("tags")
+    @field_validator("tags")
+    @classmethod
     def validate_tags(cls, v):
         """Validate service tags."""
         if v:

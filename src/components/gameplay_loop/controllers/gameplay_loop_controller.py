@@ -15,13 +15,13 @@ from typing import Any
 from uuid import uuid4
 
 from src.components.gameplay_loop.narrative.choice_processor import ChoiceProcessor
+from src.components.gameplay_loop.narrative.engine import NarrativeEngine
 from src.components.gameplay_loop.narrative.events import (
     EventBus,
     EventType,
     NarrativeEvent,
 )
-from src.components.gameplay_loop.narrative.narrative_engine import NarrativeEngine
-from src.components.gameplay_loop.services.redis_session_manager import (
+from src.components.gameplay_loop.services.redis_manager import (
     RedisSessionManager,
 )
 from src.components.gameplay_loop.services.session_state import (

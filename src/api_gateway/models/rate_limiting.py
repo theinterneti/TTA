@@ -10,7 +10,7 @@ from enum import Enum
 from typing import Any
 from uuid import UUID
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class RateLimitType(str, Enum):
@@ -107,14 +107,16 @@ class RateLimitRule(BaseModel):
         use_enum_values = True
         json_encoders = {datetime: lambda v: v.isoformat()}
 
-    @validator("path_patterns")
+    @field_validator("path_patterns")
+    @classmethod
     def validate_path_patterns(cls, v):
         """Validate path patterns."""
         if not v:
             return ["*"]  # Default to match all paths
         return v
 
-    @validator("methods")
+    @field_validator("methods")
+    @classmethod
     def validate_methods(cls, v):
         """Validate HTTP methods."""
         if not v:

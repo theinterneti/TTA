@@ -6,23 +6,23 @@ This will be expanded in future development phases.
 """
 
 import logging
-from typing import Dict, Any
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
 
 class SecurityFramework:
     """HIPAA-compliant security framework for therapeutic platform deployment."""
-    
+
     def __init__(self):
         """Initialize the security framework."""
         pass
-    
+
     async def initialize(self):
         """Initialize the security framework."""
         logger.info("SecurityFramework initialized (placeholder)")
-    
-    async def configure_deployment_security(self, deployment_id: str) -> Dict[str, Any]:
+
+    async def configure_deployment_security(self, deployment_id: str) -> dict[str, Any]:
         """Configure security for deployment."""
         return {
             "encryption_at_rest": True,
@@ -31,7 +31,7 @@ class SecurityFramework:
             "access_controls": True,
             "audit_logging": True
         }
-    
-    async def health_check(self) -> Dict[str, Any]:
+
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {"status": "healthy", "service": "security_framework"}

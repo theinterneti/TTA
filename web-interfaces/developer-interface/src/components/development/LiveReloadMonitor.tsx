@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BoltIcon, 
-  CheckCircleIcon, 
-  XCircleIcon, 
+import {
+  BoltIcon,
+  CheckCircleIcon,
+  XCircleIcon,
   ClockIcon,
   ArrowPathIcon,
   SignalIcon
@@ -172,8 +172,8 @@ export const LiveReloadMonitor: React.FC = () => {
   };
 
   const forceReload = (interfaceId: string) => {
-    setInterfaces(prev => prev.map(interface_ => 
-      interface_.id === interfaceId 
+    setInterfaces(prev => prev.map(interface_ =>
+      interface_.id === interfaceId
         ? { ...interface_, status: 'reloading', lastReload: new Date() }
         : interface_
     ));
@@ -262,7 +262,7 @@ export const LiveReloadMonitor: React.FC = () => {
 
                   <div className="text-right">
                     <p className="text-sm text-gray-900">
-                      {interface_.lastReload 
+                      {interface_.lastReload
                         ? interface_.lastReload.toLocaleTimeString()
                         : 'Never'
                       }

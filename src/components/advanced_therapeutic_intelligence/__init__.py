@@ -12,10 +12,10 @@ Components:
 - IntelligentContentGenerationSystem: AI-powered personalized content generation
 """
 
-from .intelligent_personalization_engine import IntelligentPersonalizationEngine
-from .predictive_therapeutic_analytics import PredictiveTherapeuticAnalytics
 from .advanced_ai_therapeutic_advisor import AdvancedAITherapeuticAdvisor
 from .intelligent_content_generation_system import IntelligentContentGenerationSystem
+from .intelligent_personalization_engine import IntelligentPersonalizationEngine
+from .predictive_therapeutic_analytics import PredictiveTherapeuticAnalytics
 
 __all__ = [
     "IntelligentPersonalizationEngine",

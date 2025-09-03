@@ -94,7 +94,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
     // Determine initial environment
     const nodeEnv = process.env.NODE_ENV;
     const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    
+
     if (nodeEnv === 'production' && !hostname.includes('localhost')) {
       return 'production';
     } else if (hostname.includes('staging')) {
@@ -109,7 +109,7 @@ export const EnvironmentProvider: React.FC<EnvironmentProviderProps> = ({ childr
   const setEnvironment = (env: Environment) => {
     setEnvironmentState(env);
     setConfig(getEnvironmentConfig(env));
-    
+
     // Store preference in localStorage
     localStorage.setItem('tta-dev-environment', env);
   };

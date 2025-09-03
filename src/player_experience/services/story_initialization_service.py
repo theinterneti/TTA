@@ -20,7 +20,7 @@ from src.components.gameplay_loop.controllers.gameplay_loop_controller import (
 from ..database.character_repository import CharacterRepository
 from ..managers.world_management_module import WorldManagementModule
 from ..models.character import Character
-from ..models.world import World
+from ..models.world import WorldDetails as World
 
 logger = logging.getLogger(__name__)
 

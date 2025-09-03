@@ -30,9 +30,6 @@ from .routers import (
     characters,
     chat,
     health,
-)
-from .routers import metrics as metrics_router
-from .routers import (
     nexus,
     players,
     progress,
@@ -40,6 +37,7 @@ from .routers import (
     sessions,
     worlds,
 )
+from .routers import metrics as metrics_router
 from .services.connection_manager import close_services, initialize_services
 
 

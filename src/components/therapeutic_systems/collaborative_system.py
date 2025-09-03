@@ -7,12 +7,11 @@ therapeutic systems for comprehensive collaborative workflows.
 """
 
 import logging
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional, Set
-from uuid import uuid4
 from dataclasses import dataclass, field
-import asyncio
+from datetime import datetime
+from enum import Enum
+from typing import Any
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
@@ -68,9 +67,9 @@ class CollaborativeParticipant:
     role: ParticipantRole
 
     # Therapeutic context
-    therapeutic_goals: List[str] = field(default_factory=list)
-    character_id: Optional[str] = None
-    current_emotional_state: Dict[str, Any] = field(default_factory=dict)
+    therapeutic_goals: list[str] = field(default_factory=list)
+    character_id: str | None = None
+    current_emotional_state: dict[str, Any] = field(default_factory=dict)
 
     # Participation tracking
     joined_at: datetime = field(default_factory=datetime.utcnow)
@@ -81,13 +80,13 @@ class CollaborativeParticipant:
 
     # Preferences and settings
     privacy_level: str = "standard"  # minimal, standard, open
-    support_preferences: List[SupportType] = field(default_factory=list)
+    support_preferences: list[SupportType] = field(default_factory=list)
     crisis_contact_enabled: bool = True
 
     # Session progress
-    therapeutic_progress: Dict[str, float] = field(default_factory=dict)
-    milestones_achieved: List[str] = field(default_factory=list)
-    session_satisfaction: Optional[float] = None  # 0.0 to 1.0
+    therapeutic_progress: dict[str, float] = field(default_factory=dict)
+    milestones_achieved: list[str] = field(default_factory=list)
+    session_satisfaction: float | None = None  # 0.0 to 1.0
 
 
 @dataclass
@@ -103,13 +102,13 @@ class SupportInteraction:
     # Interaction details
     support_type: SupportType = SupportType.ENCOURAGEMENT
     message: str = ""
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
 
     # Impact tracking
     therapeutic_value: float = 0.0
-    emotional_impact: Dict[str, float] = field(default_factory=dict)
-    recipient_feedback: Optional[str] = None
-    effectiveness_score: Optional[float] = None
+    emotional_impact: dict[str, float] = field(default_factory=dict)
+    recipient_feedback: str | None = None
+    effectiveness_score: float | None = None
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -125,26 +124,26 @@ class CollaborativeGoal:
     # Goal definition
     goal_name: str = ""
     goal_description: str = ""
-    therapeutic_framework: Optional[str] = None
+    therapeutic_framework: str | None = None
 
     # Participants
-    primary_participants: List[str] = field(default_factory=list)  # user_ids
-    supporting_participants: List[str] = field(default_factory=list)  # user_ids
+    primary_participants: list[str] = field(default_factory=list)  # user_ids
+    supporting_participants: list[str] = field(default_factory=list)  # user_ids
 
     # Progress tracking
-    target_milestones: List[str] = field(default_factory=list)
-    achieved_milestones: List[str] = field(default_factory=list)
+    target_milestones: list[str] = field(default_factory=list)
+    achieved_milestones: list[str] = field(default_factory=list)
     progress_percentage: float = 0.0
 
     # Collaborative elements
-    shared_activities: List[str] = field(default_factory=list)
+    shared_activities: list[str] = field(default_factory=list)
     peer_accountability: bool = True
-    celebration_triggers: List[str] = field(default_factory=list)
+    celebration_triggers: list[str] = field(default_factory=list)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
-    target_completion: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    target_completion: datetime | None = None
+    completed_at: datetime | None = None
 
 
 @dataclass
@@ -160,30 +159,30 @@ class CollaborativeSession:
     max_participants: int = 6
 
     # Therapeutic configuration
-    therapeutic_focus: List[str] = field(default_factory=list)
-    therapeutic_frameworks: List[str] = field(default_factory=list)
+    therapeutic_focus: list[str] = field(default_factory=list)
+    therapeutic_frameworks: list[str] = field(default_factory=list)
     requires_facilitator: bool = False
     safety_level: str = "standard"  # standard, high, maximum
 
     # Participants and roles
-    participants: Dict[str, CollaborativeParticipant] = field(default_factory=dict)
-    waiting_list: List[str] = field(default_factory=list)
-    facilitator_id: Optional[str] = None
+    participants: dict[str, CollaborativeParticipant] = field(default_factory=dict)
+    waiting_list: list[str] = field(default_factory=list)
+    facilitator_id: str | None = None
 
     # Session state
     status: SessionStatus = SessionStatus.INITIALIZING
-    started_at: Optional[datetime] = None
-    ended_at: Optional[datetime] = None
-    current_activity: Optional[str] = None
+    started_at: datetime | None = None
+    ended_at: datetime | None = None
+    current_activity: str | None = None
 
     # Collaborative elements
-    shared_goals: List[str] = field(default_factory=list)  # goal_ids
-    support_interactions: List[str] = field(default_factory=list)  # interaction_ids
-    group_achievements: List[str] = field(default_factory=list)
+    shared_goals: list[str] = field(default_factory=list)  # goal_ids
+    support_interactions: list[str] = field(default_factory=list)  # interaction_ids
+    group_achievements: list[str] = field(default_factory=list)
 
     # Session tracking
     total_therapeutic_value: float = 0.0
-    participant_satisfaction: Dict[str, float] = field(default_factory=dict)
+    participant_satisfaction: dict[str, float] = field(default_factory=dict)
     crisis_interventions: int = 0
 
     # Metadata
@@ -198,7 +197,7 @@ class TherapeuticCollaborativeSystem:
     with all therapeutic systems.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic collaborative system."""
         self.config = config or {}
 
@@ -272,7 +271,7 @@ class TherapeuticCollaborativeSystem:
         host_user_id: str,
         session_name: str,
         collaborative_mode: CollaborativeMode = CollaborativeMode.PEER_SUPPORT,
-        therapeutic_focus: Optional[List[str]] = None,
+        therapeutic_focus: list[str] | None = None,
         max_participants: int = 6,
         requires_facilitator: bool = False,
     ) -> CollaborativeSession:
@@ -372,7 +371,7 @@ class TherapeuticCollaborativeSystem:
         session_id: str,
         user_id: str,
         role: ParticipantRole = ParticipantRole.PARTICIPANT,
-        therapeutic_goals: Optional[List[str]] = None,
+        therapeutic_goals: list[str] | None = None,
     ) -> CollaborativeParticipant:
         """
         Join an existing collaborative therapeutic session.
@@ -477,7 +476,7 @@ class TherapeuticCollaborativeSystem:
         recipient_id: str,
         support_type: SupportType,
         message: str,
-        therapeutic_context: Optional[Dict[str, Any]] = None,
+        therapeutic_context: dict[str, Any] | None = None,
     ) -> SupportInteraction:
         """
         Provide peer support within a collaborative session.
@@ -583,9 +582,9 @@ class TherapeuticCollaborativeSystem:
         session_id: str,
         goal_name: str,
         goal_description: str,
-        primary_participants: List[str],
-        therapeutic_framework: Optional[str] = None,
-        target_completion: Optional[datetime] = None,
+        primary_participants: list[str],
+        therapeutic_framework: str | None = None,
+        target_completion: datetime | None = None,
     ) -> CollaborativeGoal:
         """
         Create a shared therapeutic goal for collaborative achievement.
@@ -641,7 +640,7 @@ class TherapeuticCollaborativeSystem:
                         goal.target_milestones = [
                             f"Complete {rec.framework.value} exercise",
                             f"Practice {rec.integration_strategy.value}",
-                            f"Achieve therapeutic breakthrough"
+                            "Achieve therapeutic breakthrough"
                         ]
                 except Exception as e:
                     logger.debug(f"Error generating goal milestones: {e}")
@@ -762,7 +761,7 @@ class TherapeuticCollaborativeSystem:
         except Exception as e:
             logger.error(f"Error initializing participant context: {e}")
 
-    async def _determine_support_preferences(self, user_id: str) -> List[SupportType]:
+    async def _determine_support_preferences(self, user_id: str) -> list[SupportType]:
         """Determine support preferences for a user."""
         try:
             # Default support preferences
@@ -856,7 +855,7 @@ class TherapeuticCollaborativeSystem:
         except Exception as e:
             logger.error(f"Error strengthening peer connection: {e}")
 
-    async def get_session_status(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
         """Get current status of a collaborative session."""
         try:
             session = self.collaborative_sessions.get(session_id)
@@ -883,7 +882,7 @@ class TherapeuticCollaborativeSystem:
             logger.error(f"Error getting session status: {e}")
             return None
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the collaborative system."""
         try:
             # Check therapeutic system availability
@@ -922,7 +921,7 @@ class TherapeuticCollaborativeSystem:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get collaborative system metrics."""
         # Calculate additional metrics
         active_sessions = len([s for s in self.collaborative_sessions.values() if s.status == SessionStatus.ACTIVE])

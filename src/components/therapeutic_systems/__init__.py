@@ -7,13 +7,13 @@ evidence-based therapeutic approaches with the TTA platform.
 
 from .adaptive_difficulty_engine import TherapeuticAdaptiveDifficultyEngine
 from .character_development_system import TherapeuticCharacterDevelopmentSystem
+from .collaborative_system import TherapeuticCollaborativeSystem
 from .consequence_system import TherapeuticConsequenceSystem
 from .emotional_safety_system import TherapeuticEmotionalSafetySystem
-from .therapeutic_integration_system import TherapeuticIntegrationSystem
+from .error_recovery_manager import TherapeuticErrorRecoveryManager
 from .gameplay_loop_controller import TherapeuticGameplayLoopController
 from .replayability_system import TherapeuticReplayabilitySystem
-from .collaborative_system import TherapeuticCollaborativeSystem
-from .error_recovery_manager import TherapeuticErrorRecoveryManager
+from .therapeutic_integration_system import TherapeuticIntegrationSystem
 
 __all__ = [
     "TherapeuticConsequenceSystem",

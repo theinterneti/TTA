@@ -42,7 +42,7 @@ export const DeveloperLayout: React.FC<DeveloperLayoutProps> = ({ children }) =>
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -62,7 +62,7 @@ export const DeveloperLayout: React.FC<DeveloperLayoutProps> = ({ children }) =>
               <p className="text-xs text-gray-600">Developer Interface</p>
             </div>
           </div>
-          
+
           <button
             onClick={() => setSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600"
@@ -76,7 +76,7 @@ export const DeveloperLayout: React.FC<DeveloperLayoutProps> = ({ children }) =>
             {navigation.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.href);
-              
+
               return (
                 <Link
                   key={item.name}

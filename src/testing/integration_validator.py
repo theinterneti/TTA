@@ -6,30 +6,30 @@ This will be expanded in future development phases.
 """
 
 import logging
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
 
-from .e2e_test_orchestrator import TestSuiteReport, TestSuite, TestStatus, TestResult
+from .e2e_test_orchestrator import TestResult, TestStatus, TestSuite, TestSuiteReport
 
 logger = logging.getLogger(__name__)
 
 
 class IntegrationValidator:
     """Integration validation between Phase A and Phase B components."""
-    
+
     def __init__(self):
         """Initialize the integration validator."""
         pass
-    
+
     async def initialize(self):
         """Initialize the integration validator."""
         logger.info("IntegrationValidator initialized (placeholder)")
-    
+
     async def execute_validation_tests(self, **system_components) -> TestSuiteReport:
         """Execute integration validation tests."""
         # Create mock integration validation test results
         test_results = []
-        
+
         # Phase A to Phase B integration validation
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -41,7 +41,7 @@ class IntegrationValidator:
             assertions_passed=35,
             assertions_failed=0
         ))
-        
+
         # Clinical dashboard integration validation
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -53,7 +53,7 @@ class IntegrationValidator:
             assertions_passed=20,
             assertions_failed=0
         ))
-        
+
         # Production infrastructure integration validation
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -65,7 +65,7 @@ class IntegrationValidator:
             assertions_passed=30,
             assertions_failed=0
         ))
-        
+
         # Clinical validation framework integration
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -77,7 +77,7 @@ class IntegrationValidator:
             assertions_passed=25,
             assertions_failed=0
         ))
-        
+
         # Cross-component data flow validation
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -89,7 +89,7 @@ class IntegrationValidator:
             assertions_passed=40,
             assertions_failed=0
         ))
-        
+
         # API compatibility validation
         test_results.append(TestResult(
             test_suite=TestSuite.INTEGRATION_VALIDATION,
@@ -101,7 +101,7 @@ class IntegrationValidator:
             assertions_passed=15,
             assertions_failed=0
         ))
-        
+
         # Create suite report
         suite_report = TestSuiteReport(
             suite_type=TestSuite.INTEGRATION_VALIDATION,
@@ -116,9 +116,9 @@ class IntegrationValidator:
             success_rate=100.0,
             end_time=datetime.utcnow()
         )
-        
+
         return suite_report
-    
-    async def health_check(self) -> Dict[str, Any]:
+
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {"status": "healthy", "service": "integration_validator"}

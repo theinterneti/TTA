@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   ArrowsPointingOutIcon,
   ArrowsPointingInIcon,
   ArrowPathIcon,
@@ -127,7 +127,7 @@ export const InterfacePreview: React.FC<InterfacePreviewProps> = ({
               <span>Loading...</span>
             </div>
           )}
-          
+
           <button
             onClick={refreshPreview}
             className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
@@ -135,7 +135,7 @@ export const InterfacePreview: React.FC<InterfacePreviewProps> = ({
           >
             <ArrowPathIcon className="h-4 w-4" />
           </button>
-          
+
           <button
             onClick={toggleFullscreen}
             className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200 rounded transition-colors"
@@ -161,7 +161,7 @@ export const InterfacePreview: React.FC<InterfacePreviewProps> = ({
           onError={handleIframeError}
           sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox"
         />
-        
+
         {/* Loading Overlay */}
         {isLoading && (
           <div className="absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center">
@@ -187,7 +187,7 @@ export const InterfacePreview: React.FC<InterfacePreviewProps> = ({
                 {interface_.status}
               </span>
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <span className="text-xs text-gray-600">Port:</span>
               <code className="text-xs font-mono bg-gray-200 px-1.5 py-0.5 rounded">
@@ -212,7 +212,7 @@ export const InterfacePreview: React.FC<InterfacePreviewProps> = ({
 
       {/* Fullscreen Backdrop */}
       {isFullscreen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={toggleFullscreen}
         />

@@ -9,7 +9,7 @@ performance, therapeutic goals, and emotional safety considerations.
 import logging
 from datetime import datetime, timedelta
 from enum import Enum, IntEnum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -66,7 +66,7 @@ class TherapeuticAdaptiveDifficultyEngine:
     based on user performance, therapeutic goals, and emotional safety.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic adaptive difficulty engine."""
         self.config = config or {}
 
@@ -134,10 +134,10 @@ class TherapeuticAdaptiveDifficultyEngine:
     async def assess_user_capability(
         self,
         user_id: str,
-        session_id: Optional[str] = None,
-        therapeutic_goals: Optional[List[str]] = None,
-        user_history: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        session_id: str | None = None,
+        therapeutic_goals: list[str] | None = None,
+        user_history: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Assess user capability and determine appropriate difficulty level.
 
@@ -206,10 +206,10 @@ class TherapeuticAdaptiveDifficultyEngine:
     async def adapt_difficulty(
         self,
         user_id: str,
-        performance_data: Dict[str, Any],
-        session_context: Optional[Any] = None,
-        emotional_state: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        performance_data: dict[str, Any],
+        session_context: Any | None = None,
+        emotional_state: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Adapt difficulty based on user performance and emotional state.
 
@@ -309,7 +309,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             }
 
     def _calculate_baseline_capability(
-        self, user_id: str, performance_history: List[Any], user_history: Optional[Dict[str, Any]]
+        self, user_id: str, performance_history: list[Any], user_history: dict[str, Any] | None
     ) -> float:
         """Calculate baseline capability score for the user."""
         if not performance_history and not user_history:
@@ -347,7 +347,7 @@ class TherapeuticAdaptiveDifficultyEngine:
 
     def _generate_assessment_reasoning(
         self, capability_score: float, difficulty_level: DifficultyLevel,
-        therapeutic_goals: Optional[List[str]]
+        therapeutic_goals: list[str] | None
     ) -> str:
         """Generate human-readable reasoning for the assessment."""
         base_reasoning = f"Based on capability score of {capability_score:.2f}, "
@@ -365,7 +365,7 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         return base_reasoning
 
-    def _recommend_strategies(self, capability_score: float) -> List[str]:
+    def _recommend_strategies(self, capability_score: float) -> list[str]:
         """Recommend adaptation strategies based on capability."""
         strategies = []
 
@@ -380,7 +380,7 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         return strategies
 
-    def _create_performance_metrics(self, user_id: str, performance_data: Dict[str, Any]) -> PerformanceMetrics:
+    def _create_performance_metrics(self, user_id: str, performance_data: dict[str, Any]) -> PerformanceMetrics:
         """Create performance metrics object from performance data."""
         metrics = PerformanceMetrics(user_id, performance_data.get("session_id", "unknown"))
 
@@ -415,8 +415,8 @@ class TherapeuticAdaptiveDifficultyEngine:
         return "stable"
 
     def _determine_adjustment_trigger(
-        self, metrics: PerformanceMetrics, trend: str, emotional_state: Optional[Dict[str, Any]]
-    ) -> Optional[AdjustmentTrigger]:
+        self, metrics: PerformanceMetrics, trend: str, emotional_state: dict[str, Any] | None
+    ) -> AdjustmentTrigger | None:
         """Determine if difficulty adjustment is needed and why."""
         # Check emotional distress first (highest priority)
         if emotional_state and emotional_state.get("crisis_detected", False):
@@ -442,7 +442,7 @@ class TherapeuticAdaptiveDifficultyEngine:
 
     def _select_adaptation_strategy(
         self, metrics: PerformanceMetrics, trigger: AdjustmentTrigger,
-        emotional_state: Optional[Dict[str, Any]]
+        emotional_state: dict[str, Any] | None
     ) -> AdaptationStrategy:
         """Select appropriate adaptation strategy based on trigger and context."""
         if trigger == AdjustmentTrigger.EMOTIONAL_DISTRESS:
@@ -553,8 +553,8 @@ class TherapeuticAdaptiveDifficultyEngine:
             return f"Due to {trigger_desc}, difficulty {direction} from {old_difficulty.name} to {new_difficulty.name} using {strategy_desc}."
 
     async def get_difficulty_calibration(
-        self, user_id: str, session_context: Optional[Any] = None
-    ) -> Dict[str, Any]:
+        self, user_id: str, session_context: Any | None = None
+    ) -> dict[str, Any]:
         """
         Get current difficulty calibration for the user.
 
@@ -611,7 +611,7 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         return 0.5
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the adaptive difficulty engine."""
         try:
             return {
@@ -632,7 +632,7 @@ class TherapeuticAdaptiveDifficultyEngine:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get adaptive difficulty engine metrics."""
         # Calculate success rate of adjustments
         total_adjustments = self.metrics["difficulty_adjustments"]

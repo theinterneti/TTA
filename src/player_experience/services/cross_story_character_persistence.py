@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any
 
-from src.components.gameplay_loop.services.session_integration_manager import (
+from src.player_experience.managers.session_integration_manager import (
     SessionIntegrationManager,
 )
 

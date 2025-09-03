@@ -6,13 +6,13 @@ alternative outcome exploration for therapeutic learning, and integration
 with therapeutic goal achievement tracking.
 """
 
+import copy
 import logging
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
-from dataclasses import dataclass, field
-import copy
 
 logger = logging.getLogger(__name__)
 
@@ -57,16 +57,16 @@ class ExplorationSnapshot:
 
     # Session state preservation
     session_phase: str = ""
-    character_state: Dict[str, Any] = field(default_factory=dict)
-    therapeutic_progress: Dict[str, Any] = field(default_factory=dict)
-    choice_history: List[Dict[str, Any]] = field(default_factory=list)
-    scenario_context: Dict[str, Any] = field(default_factory=dict)
+    character_state: dict[str, Any] = field(default_factory=dict)
+    therapeutic_progress: dict[str, Any] = field(default_factory=dict)
+    choice_history: list[dict[str, Any]] = field(default_factory=list)
+    scenario_context: dict[str, Any] = field(default_factory=dict)
 
     # Therapeutic context
-    therapeutic_goals: List[str] = field(default_factory=list)
-    current_framework: Optional[str] = None
+    therapeutic_goals: list[str] = field(default_factory=list)
+    current_framework: str | None = None
     difficulty_level: str = "moderate"
-    safety_status: Dict[str, Any] = field(default_factory=dict)
+    safety_status: dict[str, Any] = field(default_factory=dict)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -86,19 +86,19 @@ class AlternativePath:
     path_description: str = ""
 
     # Alternative choices and outcomes
-    alternative_choices: List[Dict[str, Any]] = field(default_factory=list)
-    predicted_outcomes: Dict[str, Any] = field(default_factory=dict)
-    actual_outcomes: Dict[str, Any] = field(default_factory=dict)
+    alternative_choices: list[dict[str, Any]] = field(default_factory=list)
+    predicted_outcomes: dict[str, Any] = field(default_factory=dict)
+    actual_outcomes: dict[str, Any] = field(default_factory=dict)
 
     # Therapeutic analysis
     therapeutic_value: float = 0.0
-    character_impact: Dict[str, float] = field(default_factory=dict)
-    learning_opportunities: List[str] = field(default_factory=list)
-    safety_considerations: List[str] = field(default_factory=list)
+    character_impact: dict[str, float] = field(default_factory=dict)
+    learning_opportunities: list[str] = field(default_factory=list)
+    safety_considerations: list[str] = field(default_factory=list)
 
     # Execution tracking
     is_executed: bool = False
-    execution_results: Dict[str, Any] = field(default_factory=dict)
+    execution_results: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -109,20 +109,20 @@ class PathComparison:
     exploration_id: str = ""
 
     # Paths being compared
-    path_ids: List[str] = field(default_factory=list)
-    comparison_metrics: List[ComparisonMetric] = field(default_factory=list)
+    path_ids: list[str] = field(default_factory=list)
+    comparison_metrics: list[ComparisonMetric] = field(default_factory=list)
 
     # Comparison results
-    metric_scores: Dict[str, Dict[str, float]] = field(default_factory=dict)  # metric -> path_id -> score
-    overall_rankings: Dict[str, int] = field(default_factory=dict)  # path_id -> rank
+    metric_scores: dict[str, dict[str, float]] = field(default_factory=dict)  # metric -> path_id -> score
+    overall_rankings: dict[str, int] = field(default_factory=dict)  # path_id -> rank
 
     # Insights and recommendations
-    key_differences: List[str] = field(default_factory=list)
-    therapeutic_insights: List[str] = field(default_factory=list)
-    character_development_insights: List[str] = field(default_factory=list)
-    recommended_approach: Optional[str] = None
+    key_differences: list[str] = field(default_factory=list)
+    therapeutic_insights: list[str] = field(default_factory=list)
+    character_development_insights: list[str] = field(default_factory=list)
+    recommended_approach: str | None = None
     recommendation_reasoning: str = ""
-    learning_opportunities: List[str] = field(default_factory=list)
+    learning_opportunities: list[str] = field(default_factory=list)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -139,20 +139,20 @@ class ExplorationSession:
     exploration_name: str = ""
     exploration_mode: ExplorationMode = ExplorationMode.GUIDED
     focus_area: str = ""
-    therapeutic_goals: List[str] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
 
     # Exploration tracking
-    snapshots_created: List[str] = field(default_factory=list)
-    paths_explored: List[str] = field(default_factory=list)
-    comparisons_generated: List[str] = field(default_factory=list)
-    insights_discovered: List[str] = field(default_factory=list)
-    learning_outcomes: Dict[str, Any] = field(default_factory=dict)
+    snapshots_created: list[str] = field(default_factory=list)
+    paths_explored: list[str] = field(default_factory=list)
+    comparisons_generated: list[str] = field(default_factory=list)
+    insights_discovered: list[str] = field(default_factory=list)
+    learning_outcomes: dict[str, Any] = field(default_factory=dict)
 
     # Session management
     is_active: bool = True
     started_at: datetime = field(default_factory=datetime.utcnow)
     last_activity: datetime = field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = None
+    completed_at: datetime | None = None
 
 
 class TherapeuticReplayabilitySystem:
@@ -161,7 +161,7 @@ class TherapeuticReplayabilitySystem:
     with outcome comparison and alternative outcome exploration for therapeutic learning.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic replayability system."""
         self.config = config or {}
 
@@ -229,7 +229,7 @@ class TherapeuticReplayabilitySystem:
         self,
         session_id: str,
         user_id: str,
-        session_state: Dict[str, Any],
+        session_state: dict[str, Any],
         description: str = "",
     ) -> ExplorationSnapshot:
         """
@@ -311,7 +311,7 @@ class TherapeuticReplayabilitySystem:
         base_session_id: str,
         exploration_mode: ExplorationMode = ExplorationMode.GUIDED,
         focus_area: str = "",
-        therapeutic_goals: Optional[List[str]] = None,
+        therapeutic_goals: list[str] | None = None,
     ) -> ExplorationSession:
         """
         Start a new therapeutic exploration session.
@@ -372,7 +372,7 @@ class TherapeuticReplayabilitySystem:
         snapshot_id: str,
         path_type: PathType,
         path_name: str,
-        alternative_choices: Optional[List[Dict[str, Any]]] = None,
+        alternative_choices: list[dict[str, Any]] | None = None,
         path_description: str = "",
     ) -> AlternativePath:
         """
@@ -454,8 +454,8 @@ class TherapeuticReplayabilitySystem:
     async def compare_alternative_paths(
         self,
         exploration_id: str,
-        path_ids: List[str],
-        comparison_metrics: Optional[List[ComparisonMetric]] = None,
+        path_ids: list[str],
+        comparison_metrics: list[ComparisonMetric] | None = None,
     ) -> PathComparison:
         """
         Compare multiple alternative paths and generate insights.
@@ -551,7 +551,7 @@ class TherapeuticReplayabilitySystem:
         self,
         snapshot_id: str,
         target_session_id: str,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Restore session state from an exploration snapshot.
 
@@ -619,7 +619,7 @@ class TherapeuticReplayabilitySystem:
 
     # Helper methods for therapeutic system integration
 
-    async def _predict_path_outcomes(self, path: AlternativePath, snapshot: ExplorationSnapshot) -> Dict[str, Any]:
+    async def _predict_path_outcomes(self, path: AlternativePath, snapshot: ExplorationSnapshot) -> dict[str, Any]:
         """Predict outcomes for an alternative path using therapeutic systems."""
         try:
             predicted_outcomes = {
@@ -684,7 +684,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error predicting path outcomes: {e}")
             return {"therapeutic_value": 0.0, "character_impact": {}, "learning_opportunities": [], "safety_considerations": []}
 
-    async def _calculate_metric_scores(self, paths: List[AlternativePath], metrics: List[ComparisonMetric]) -> Dict[str, Dict[str, float]]:
+    async def _calculate_metric_scores(self, paths: list[AlternativePath], metrics: list[ComparisonMetric]) -> dict[str, dict[str, float]]:
         """Calculate metric scores for path comparison."""
         try:
             scores = {}
@@ -715,7 +715,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error calculating metric scores: {e}")
             return {}
 
-    async def _generate_path_rankings(self, paths: List[AlternativePath], metric_scores: Dict[str, Dict[str, float]]) -> Dict[str, int]:
+    async def _generate_path_rankings(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> dict[str, int]:
         """Generate overall rankings for paths based on metric scores."""
         try:
             # Calculate weighted average scores
@@ -745,7 +745,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating path rankings: {e}")
             return {}
 
-    async def _identify_key_differences(self, paths: List[AlternativePath]) -> List[str]:
+    async def _identify_key_differences(self, paths: list[AlternativePath]) -> list[str]:
         """Identify key differences between alternative paths."""
         try:
             differences = []
@@ -781,7 +781,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error identifying key differences: {e}")
             return ["Error analyzing path differences"]
 
-    async def _generate_therapeutic_insights(self, paths: List[AlternativePath], metric_scores: Dict[str, Dict[str, float]]) -> List[str]:
+    async def _generate_therapeutic_insights(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> list[str]:
         """Generate therapeutic insights from path comparison."""
         try:
             insights = []
@@ -819,7 +819,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating therapeutic insights: {e}")
             return ["Error generating therapeutic insights"]
 
-    async def _generate_character_insights(self, paths: List[AlternativePath]) -> List[str]:
+    async def _generate_character_insights(self, paths: list[AlternativePath]) -> list[str]:
         """Generate character development insights from path comparison."""
         try:
             insights = []
@@ -853,7 +853,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating character insights: {e}")
             return ["Error analyzing character development patterns"]
 
-    async def _recommend_best_approach(self, paths: List[AlternativePath], metric_scores: Dict[str, Dict[str, float]]) -> Optional[str]:
+    async def _recommend_best_approach(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> str | None:
         """Recommend the best therapeutic approach based on analysis."""
         try:
             if not paths or not metric_scores:
@@ -886,7 +886,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error recommending best approach: {e}")
             return None
 
-    async def _generate_recommendation_reasoning(self, paths: List[AlternativePath], comparison: PathComparison) -> str:
+    async def _generate_recommendation_reasoning(self, paths: list[AlternativePath], comparison: PathComparison) -> str:
         """Generate reasoning for the recommended approach."""
         try:
             if not comparison.recommended_approach:
@@ -925,7 +925,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating recommendation reasoning: {e}")
             return "Unable to generate reasoning for recommendation."
 
-    async def _identify_learning_opportunities(self, paths: List[AlternativePath], comparison: PathComparison) -> List[str]:
+    async def _identify_learning_opportunities(self, paths: list[AlternativePath], comparison: PathComparison) -> list[str]:
         """Identify learning opportunities from path comparison."""
         try:
             opportunities = []
@@ -968,7 +968,7 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error identifying learning opportunities: {e}")
             return ["Explore alternative approaches to gain therapeutic insights"]
 
-    async def _restore_through_controller(self, restored_state: Dict[str, Any], target_session_id: str) -> Dict[str, Any]:
+    async def _restore_through_controller(self, restored_state: dict[str, Any], target_session_id: str) -> dict[str, Any]:
         """Restore session state through gameplay loop controller."""
         try:
             # This would integrate with the gameplay loop controller to restore state
@@ -1026,7 +1026,7 @@ class TherapeuticReplayabilitySystem:
         except Exception as e:
             logger.error(f"Error cleaning up old snapshots for user {user_id}: {e}")
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the replayability system."""
         try:
             # Check therapeutic system availability
@@ -1062,7 +1062,7 @@ class TherapeuticReplayabilitySystem:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get replayability system metrics."""
         # Calculate additional metrics
         active_explorations = sum(1 for exp in self.exploration_sessions.values() if exp.is_active)

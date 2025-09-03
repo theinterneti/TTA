@@ -58,9 +58,10 @@ except ImportError as e:
                 setattr(self, k, v)
 
 
-from .character_arc_manager import (
+from components.character_arc_interfaces import (
     CharacterArc,
-    CharacterArcManagerComponent,
+    CharacterArcIntegrationInterface,
+    CharacterArcManagerInterface,
     InteractionContext,
     PlayerInteraction,
     RelationshipState,
@@ -420,10 +421,10 @@ class RelationshipDynamicsManager:
             return 0.5
 
 
-class CharacterArcIntegration:
+class CharacterArcIntegration(CharacterArcIntegrationInterface):
     """Main integration class between CharacterArcManager and Character Development System."""
 
-    def __init__(self, character_arc_manager: CharacterArcManagerComponent):
+    def __init__(self, character_arc_manager: CharacterArcManagerInterface):
         self.character_arc_manager = character_arc_manager
         self.character_development_system = CharacterDevelopmentSystem()
         self.data_synchronizer = CharacterDataSynchronizer(

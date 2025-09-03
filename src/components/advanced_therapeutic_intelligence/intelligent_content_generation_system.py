@@ -9,16 +9,13 @@ natural language generation and therapeutic content optimization.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
+
 import numpy as np
-from collections import defaultdict, deque
-import random
-import re
 
 logger = logging.getLogger(__name__)
 
@@ -83,14 +80,14 @@ class ContentGenerationRequest:
     narrative_style: NarrativeStyle = NarrativeStyle.CONVERSATIONAL
 
     # Context and constraints
-    context: Dict[str, Any] = field(default_factory=dict)
-    constraints: Dict[str, Any] = field(default_factory=dict)
-    personalization_data: Dict[str, Any] = field(default_factory=dict)
+    context: dict[str, Any] = field(default_factory=dict)
+    constraints: dict[str, Any] = field(default_factory=dict)
+    personalization_data: dict[str, Any] = field(default_factory=dict)
 
     # Content requirements
     target_length: int = 200  # words
     therapeutic_framework: str = "cognitive_behavioral"
-    character_context: Dict[str, Any] = field(default_factory=dict)
+    character_context: dict[str, Any] = field(default_factory=dict)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -108,7 +105,7 @@ class GeneratedContent:
     # Generated content
     title: str = ""
     content: str = ""
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     # Content characteristics
     therapeutic_intent: TherapeuticIntent = TherapeuticIntent.SKILL_BUILDING
@@ -123,13 +120,13 @@ class GeneratedContent:
 
     # Validation and feedback
     clinical_validation_status: str = "pending"
-    user_feedback_score: Optional[float] = None
-    effectiveness_score: Optional[float] = None
+    user_feedback_score: float | None = None
+    effectiveness_score: float | None = None
 
     # Content structure
-    sections: List[Dict[str, Any]] = field(default_factory=list)
-    dialogue_elements: List[Dict[str, Any]] = field(default_factory=list)
-    interactive_elements: List[Dict[str, Any]] = field(default_factory=list)
+    sections: list[dict[str, Any]] = field(default_factory=list)
+    dialogue_elements: list[dict[str, Any]] = field(default_factory=list)
+    interactive_elements: list[dict[str, Any]] = field(default_factory=list)
 
     # Metadata
     generated_at: datetime = field(default_factory=datetime.utcnow)
@@ -145,19 +142,19 @@ class NarrativeContext:
     user_id: str = ""
 
     # Narrative elements
-    character_profiles: Dict[str, Any] = field(default_factory=dict)
-    story_timeline: List[Dict[str, Any]] = field(default_factory=list)
-    relationship_dynamics: Dict[str, Any] = field(default_factory=dict)
+    character_profiles: dict[str, Any] = field(default_factory=dict)
+    story_timeline: list[dict[str, Any]] = field(default_factory=list)
+    relationship_dynamics: dict[str, Any] = field(default_factory=dict)
 
     # Therapeutic journey
-    therapeutic_goals: List[str] = field(default_factory=list)
-    progress_milestones: List[Dict[str, Any]] = field(default_factory=list)
-    completed_scenarios: List[str] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
+    progress_milestones: list[dict[str, Any]] = field(default_factory=list)
+    completed_scenarios: list[str] = field(default_factory=list)
 
     # Consistency tracking
-    established_facts: Dict[str, Any] = field(default_factory=dict)
-    character_development: Dict[str, Any] = field(default_factory=dict)
-    narrative_themes: List[str] = field(default_factory=list)
+    established_facts: dict[str, Any] = field(default_factory=dict)
+    character_development: dict[str, Any] = field(default_factory=dict)
+    narrative_themes: list[str] = field(default_factory=list)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -175,21 +172,21 @@ class IntelligentContentGenerationSystem:
     def __init__(self):
         """Initialize the Intelligent Content Generation System."""
         self.status = "initializing"
-        self.generated_content: Dict[str, List[GeneratedContent]] = {}
-        self.narrative_contexts: Dict[str, NarrativeContext] = {}
-        self.content_templates: Dict[str, Dict[str, Any]] = {}
+        self.generated_content: dict[str, list[GeneratedContent]] = {}
+        self.narrative_contexts: dict[str, NarrativeContext] = {}
+        self.content_templates: dict[str, dict[str, Any]] = {}
 
         # Content generation models
-        self.scenario_generation_models: Dict[str, Any] = {}
-        self.dialogue_generation_models: Dict[str, Any] = {}
-        self.exercise_generation_models: Dict[str, Any] = {}
-        self.narrative_coherence_models: Dict[str, Any] = {}
+        self.scenario_generation_models: dict[str, Any] = {}
+        self.dialogue_generation_models: dict[str, Any] = {}
+        self.exercise_generation_models: dict[str, Any] = {}
+        self.narrative_coherence_models: dict[str, Any] = {}
 
         # Content libraries and knowledge bases
-        self.therapeutic_content_library: Dict[str, Any] = {}
-        self.dialogue_patterns: Dict[str, List[str]] = {}
-        self.exercise_templates: Dict[str, Dict[str, Any]] = {}
-        self.narrative_elements: Dict[str, Any] = {}
+        self.therapeutic_content_library: dict[str, Any] = {}
+        self.dialogue_patterns: dict[str, list[str]] = {}
+        self.exercise_templates: dict[str, dict[str, Any]] = {}
+        self.narrative_elements: dict[str, Any] = {}
 
         # System references (injected)
         self.personalization_engine = None
@@ -290,7 +287,7 @@ class IntelligentContentGenerationSystem:
         user_id: str,
         therapeutic_intent: TherapeuticIntent,
         complexity_level: ContentComplexity = ContentComplexity.MODERATE,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> GeneratedContent:
         """Generate personalized therapeutic scenario."""
         try:
@@ -309,7 +306,9 @@ class IntelligentContentGenerationSystem:
             # Get AI advisor guidance
             advisor_guidance = None
             if self.ai_therapeutic_advisor:
-                from src.components.advanced_therapeutic_intelligence.advanced_ai_therapeutic_advisor import TherapeuticGuidanceType
+                from src.components.advanced_therapeutic_intelligence.advanced_ai_therapeutic_advisor import (
+                    TherapeuticGuidanceType,
+                )
                 advisor_guidance = await self.ai_therapeutic_advisor.generate_therapeutic_guidance(
                     user_id=user_id,
                     guidance_type=TherapeuticGuidanceType.SESSION_PLANNING,
@@ -390,7 +389,7 @@ class IntelligentContentGenerationSystem:
     async def generate_adaptive_dialogue(
         self,
         user_id: str,
-        dialogue_context: Dict[str, Any],
+        dialogue_context: dict[str, Any],
         narrative_style: NarrativeStyle = NarrativeStyle.CONVERSATIONAL
     ) -> GeneratedContent:
         """Generate adaptive dialogue response."""
@@ -587,8 +586,8 @@ class IntelligentContentGenerationSystem:
 
     async def generate_content_batch(
         self,
-        requests: List[ContentGenerationRequest]
-    ) -> List[GeneratedContent]:
+        requests: list[ContentGenerationRequest]
+    ) -> list[GeneratedContent]:
         """Generate batch of content efficiently."""
         try:
             generated_contents = []
@@ -643,7 +642,7 @@ class IntelligentContentGenerationSystem:
     async def validate_content_quality(
         self,
         content: GeneratedContent
-    ) -> Dict[str, float]:
+    ) -> dict[str, float]:
         """Validate content quality across multiple dimensions."""
         try:
             quality_scores = {}
@@ -683,7 +682,7 @@ class IntelligentContentGenerationSystem:
             logger.error(f"Error validating content quality: {e}")
             return {"overall_quality": 0.5}
 
-    async def get_content_generation_insights(self, user_id: str) -> Dict[str, Any]:
+    async def get_content_generation_insights(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive content generation insights."""
         try:
             # Get user content history
@@ -903,11 +902,11 @@ class IntelligentContentGenerationSystem:
         user_id: str,
         therapeutic_intent: TherapeuticIntent,
         complexity_level: ContentComplexity,
-        personalization_data: Dict[str, Any],
+        personalization_data: dict[str, Any],
         advisor_guidance: Any,
         narrative_context: NarrativeContext,
-        context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate therapeutic scenario content."""
         try:
             # Select appropriate scenario template
@@ -1058,7 +1057,7 @@ class IntelligentContentGenerationSystem:
     def _generate_scenario_introduction(
         self,
         therapeutic_intent: TherapeuticIntent,
-        personalization_data: Dict[str, Any],
+        personalization_data: dict[str, Any],
         narrative_context: NarrativeContext
     ) -> str:
         """Generate scenario introduction."""
@@ -1081,7 +1080,7 @@ class IntelligentContentGenerationSystem:
         self,
         scenario_type: str,
         complexity_level: ContentComplexity,
-        personalization_data: Dict[str, Any]
+        personalization_data: dict[str, Any]
     ) -> str:
         """Generate scenario context."""
         contexts = {
@@ -1127,7 +1126,7 @@ class IntelligentContentGenerationSystem:
     def _generate_skill_application(
         self,
         therapeutic_intent: TherapeuticIntent,
-        personalization_data: Dict[str, Any]
+        personalization_data: dict[str, Any]
     ) -> str:
         """Generate skill application section."""
         applications = {
@@ -1176,7 +1175,7 @@ class IntelligentContentGenerationSystem:
         self,
         therapeutic_intent: TherapeuticIntent,
         complexity_level: ContentComplexity
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Generate interactive elements."""
         elements = []
 
@@ -1211,8 +1210,8 @@ class IntelligentContentGenerationSystem:
     def _generate_dialogue_elements(
         self,
         narrative_context: NarrativeContext,
-        personalization_data: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        personalization_data: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate dialogue elements."""
         return [
             {
@@ -1268,7 +1267,7 @@ class IntelligentContentGenerationSystem:
 
         return min(1.0, base_coherence)
 
-    def _calculate_personalization_score(self, content: str, personalization_data: Dict[str, Any]) -> float:
+    def _calculate_personalization_score(self, content: str, personalization_data: dict[str, Any]) -> float:
         """Calculate personalization score."""
         # Simplified personalization scoring
         base_score = 0.6
@@ -1284,7 +1283,7 @@ class IntelligentContentGenerationSystem:
     def _calculate_engagement_potential(
         self,
         content: str,
-        interactive_elements: List[Dict[str, Any]],
+        interactive_elements: list[dict[str, Any]],
         complexity_level: ContentComplexity
     ) -> float:
         """Calculate engagement potential score."""
@@ -1304,7 +1303,7 @@ class IntelligentContentGenerationSystem:
 
         return min(1.0, (base_engagement + interaction_bonus) * complexity_multiplier)
 
-    def _estimate_content_duration(self, content: str, interactive_elements: List[Dict[str, Any]]) -> int:
+    def _estimate_content_duration(self, content: str, interactive_elements: list[dict[str, Any]]) -> int:
         """Estimate content duration in minutes."""
         # Base reading time (200 words per minute)
         word_count = len(content.split())
@@ -1520,7 +1519,7 @@ class IntelligentContentGenerationSystem:
             logger.error(f"Error maintaining story timeline: {e}")
 
     # Placeholder methods for missing functionality
-    async def _generate_dialogue_content(self, user_id: str, dialogue_context: Dict[str, Any], narrative_style: NarrativeStyle, personalization_data: Dict[str, Any], narrative_context: NarrativeContext) -> Dict[str, Any]:
+    async def _generate_dialogue_content(self, user_id: str, dialogue_context: dict[str, Any], narrative_style: NarrativeStyle, personalization_data: dict[str, Any], narrative_context: NarrativeContext) -> dict[str, Any]:
         """Generate dialogue content (simplified implementation)."""
         return {
             "content": "I understand. Can you tell me more about how you're feeling?",
@@ -1532,7 +1531,7 @@ class IntelligentContentGenerationSystem:
             "metadata": {"generation_method": "template_based"}
         }
 
-    async def _generate_exercise_content(self, user_id: str, therapeutic_intent: TherapeuticIntent, difficulty_level: ContentComplexity, therapeutic_framework: str, personalization_data: Dict[str, Any], predictive_insights: Dict[str, Any]) -> Dict[str, Any]:
+    async def _generate_exercise_content(self, user_id: str, therapeutic_intent: TherapeuticIntent, difficulty_level: ContentComplexity, therapeutic_framework: str, personalization_data: dict[str, Any], predictive_insights: dict[str, Any]) -> dict[str, Any]:
         """Generate exercise content (simplified implementation)."""
         return {
             "title": f"{therapeutic_intent.value.replace('_', ' ').title()} Exercise",
@@ -1588,7 +1587,7 @@ class IntelligentContentGenerationSystem:
         return 0.9  # High safety score for generated content
 
     # Analysis methods (simplified implementations)
-    async def _analyze_personalization_effectiveness(self, user_id: str) -> Dict[str, Any]:
+    async def _analyze_personalization_effectiveness(self, user_id: str) -> dict[str, Any]:
         """Analyze personalization effectiveness."""
         user_content = self.generated_content.get(user_id, [])
         if not user_content:
@@ -1601,7 +1600,7 @@ class IntelligentContentGenerationSystem:
             "improvement_suggestions": ["Increase personalization factors", "Gather more user data"]
         }
 
-    async def _generate_content_recommendations(self, user_id: str) -> List[str]:
+    async def _generate_content_recommendations(self, user_id: str) -> list[str]:
         """Generate content recommendations."""
         return [
             "Continue with current therapeutic approach",
@@ -1610,7 +1609,7 @@ class IntelligentContentGenerationSystem:
             "Maintain narrative coherence"
         ]
 
-    async def _analyze_quality_trends(self, user_id: str) -> Dict[str, Any]:
+    async def _analyze_quality_trends(self, user_id: str) -> dict[str, Any]:
         """Analyze quality trends."""
         user_content = self.generated_content.get(user_id, [])
         if not user_content:
@@ -1627,7 +1626,7 @@ class IntelligentContentGenerationSystem:
             "areas_for_improvement": ["personalization", "engagement"]
         }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Intelligent Content Generation System."""
         try:
             therapeutic_systems_available = len([

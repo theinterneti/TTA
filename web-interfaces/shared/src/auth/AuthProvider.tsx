@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
         if (storedToken) {
           const decoded = jwtDecode(storedToken);
           const currentTime = Date.now() / 1000;
-          
+
           if (decoded.exp && decoded.exp > currentTime) {
             setToken(storedToken);
             await loadUserProfile(storedToken);
@@ -103,7 +103,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({
       );
 
       const { access_token, user: userData } = response.data;
-      
+
       // Validate user role matches interface type
       if (!isValidRoleForInterface(userData.role, interfaceType)) {
         throw new Error(`Invalid role ${userData.role} for ${interfaceType} interface`);

@@ -8,14 +8,11 @@ based on user preferences and therapeutic needs for the TTA therapeutic platform
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple, Union
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
-import numpy as np
-from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -81,7 +78,7 @@ class InterfaceConfiguration:
 
     # Theme and visual settings
     theme: InterfaceTheme = InterfaceTheme.THERAPEUTIC_CALM
-    custom_colors: Dict[str, str] = field(default_factory=dict)
+    custom_colors: dict[str, str] = field(default_factory=dict)
     font_family: str = "Inter"
     font_size_base: int = 16
     font_size_multiplier: float = 1.0
@@ -94,7 +91,7 @@ class InterfaceConfiguration:
 
     # Device and interaction
     device_type: DeviceType = DeviceType.DESKTOP
-    interaction_modes: List[InteractionMode] = field(default_factory=lambda: [InteractionMode.MOUSE])
+    interaction_modes: list[InteractionMode] = field(default_factory=lambda: [InteractionMode.MOUSE])
 
     # Accessibility integration
     accessibility_enabled: bool = True
@@ -103,7 +100,7 @@ class InterfaceConfiguration:
     focus_indicators_enhanced: bool = False
 
     # Therapeutic customization
-    therapeutic_focus_areas: List[str] = field(default_factory=list)
+    therapeutic_focus_areas: list[str] = field(default_factory=list)
     progress_visualization_style: str = "progress_bars"
     motivation_elements_enabled: bool = True
 
@@ -126,21 +123,21 @@ class InterfaceComponent:
     component_name: str = ""
 
     # Component properties
-    properties: Dict[str, Any] = field(default_factory=dict)
-    styles: Dict[str, Any] = field(default_factory=dict)
-    layout: Dict[str, Any] = field(default_factory=dict)
+    properties: dict[str, Any] = field(default_factory=dict)
+    styles: dict[str, Any] = field(default_factory=dict)
+    layout: dict[str, Any] = field(default_factory=dict)
 
     # Responsive behavior
-    responsive_breakpoints: Dict[str, Dict[str, Any]] = field(default_factory=dict)
-    adaptive_properties: Dict[str, Any] = field(default_factory=dict)
+    responsive_breakpoints: dict[str, dict[str, Any]] = field(default_factory=dict)
+    adaptive_properties: dict[str, Any] = field(default_factory=dict)
 
     # Accessibility features
-    accessibility_attributes: Dict[str, Any] = field(default_factory=dict)
-    keyboard_navigation: Dict[str, Any] = field(default_factory=dict)
+    accessibility_attributes: dict[str, Any] = field(default_factory=dict)
+    keyboard_navigation: dict[str, Any] = field(default_factory=dict)
 
     # Therapeutic integration
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
-    engagement_metrics: Dict[str, float] = field(default_factory=dict)
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
+    engagement_metrics: dict[str, float] = field(default_factory=dict)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -155,21 +152,21 @@ class InterfaceLayout:
     user_id: str = ""
 
     # Layout structure
-    components: List[InterfaceComponent] = field(default_factory=list)
-    layout_grid: Dict[str, Any] = field(default_factory=dict)
-    navigation_structure: Dict[str, Any] = field(default_factory=dict)
+    components: list[InterfaceComponent] = field(default_factory=list)
+    layout_grid: dict[str, Any] = field(default_factory=dict)
+    navigation_structure: dict[str, Any] = field(default_factory=dict)
 
     # Responsive design
-    breakpoints: Dict[str, Dict[str, Any]] = field(default_factory=dict)
+    breakpoints: dict[str, dict[str, Any]] = field(default_factory=dict)
     fluid_layout: bool = True
 
     # Performance optimization
-    critical_components: List[str] = field(default_factory=list)
-    lazy_loaded_components: List[str] = field(default_factory=list)
+    critical_components: list[str] = field(default_factory=list)
+    lazy_loaded_components: list[str] = field(default_factory=list)
 
     # Therapeutic optimization
-    therapeutic_flow: List[str] = field(default_factory=list)
-    progress_indicators: Dict[str, Any] = field(default_factory=dict)
+    therapeutic_flow: list[str] = field(default_factory=list)
+    progress_indicators: dict[str, Any] = field(default_factory=dict)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -185,15 +182,15 @@ class AdaptationRule:
 
     # Trigger conditions
     trigger: AdaptationTrigger = AdaptationTrigger.USER_PREFERENCE
-    conditions: Dict[str, Any] = field(default_factory=dict)
+    conditions: dict[str, Any] = field(default_factory=dict)
 
     # Adaptation actions
-    adaptations: Dict[str, Any] = field(default_factory=dict)
+    adaptations: dict[str, Any] = field(default_factory=dict)
     priority: int = 5  # 1-10 scale
 
     # Validation
-    validation_criteria: Dict[str, Any] = field(default_factory=dict)
-    rollback_conditions: Dict[str, Any] = field(default_factory=dict)
+    validation_criteria: dict[str, Any] = field(default_factory=dict)
+    rollback_conditions: dict[str, Any] = field(default_factory=dict)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -210,19 +207,19 @@ class AdvancedUserInterfaceEngine:
     def __init__(self):
         """Initialize the Advanced User Interface Engine."""
         self.status = "initializing"
-        self.interface_configurations: Dict[str, InterfaceConfiguration] = {}
-        self.interface_layouts: Dict[str, InterfaceLayout] = {}
-        self.adaptation_rules: Dict[str, List[AdaptationRule]] = {}
+        self.interface_configurations: dict[str, InterfaceConfiguration] = {}
+        self.interface_layouts: dict[str, InterfaceLayout] = {}
+        self.adaptation_rules: dict[str, list[AdaptationRule]] = {}
 
         # UI/UX frameworks and templates
-        self.theme_definitions: Dict[InterfaceTheme, Dict[str, Any]] = {}
-        self.layout_templates: Dict[LayoutType, Dict[str, Any]] = {}
-        self.component_library: Dict[str, Dict[str, Any]] = {}
+        self.theme_definitions: dict[InterfaceTheme, dict[str, Any]] = {}
+        self.layout_templates: dict[LayoutType, dict[str, Any]] = {}
+        self.component_library: dict[str, dict[str, Any]] = {}
 
         # Responsive design system
-        self.breakpoint_system: Dict[str, Dict[str, Any]] = {}
-        self.responsive_components: Dict[str, Any] = {}
-        self.adaptive_algorithms: Dict[str, Any] = {}
+        self.breakpoint_system: dict[str, dict[str, Any]] = {}
+        self.responsive_components: dict[str, Any] = {}
+        self.adaptive_algorithms: dict[str, Any] = {}
 
         # System references (injected)
         self.accessibility_system = None
@@ -314,7 +311,7 @@ class AdvancedUserInterfaceEngine:
         self,
         user_id: str,
         device_type: DeviceType,
-        preferences: Dict[str, Any]
+        preferences: dict[str, Any]
     ) -> InterfaceConfiguration:
         """Create personalized interface configuration for user."""
         try:
@@ -377,7 +374,7 @@ class AdvancedUserInterfaceEngine:
     async def adapt_interface_layout(
         self,
         user_id: str,
-        layout_context: Dict[str, Any],
+        layout_context: dict[str, Any],
         adaptation_trigger: AdaptationTrigger
     ) -> InterfaceLayout:
         """Adapt interface layout based on context and triggers."""
@@ -428,7 +425,7 @@ class AdvancedUserInterfaceEngine:
         self,
         component_type: str,
         user_id: str,
-        component_context: Dict[str, Any]
+        component_context: dict[str, Any]
     ) -> InterfaceComponent:
         """Generate responsive component optimized for user needs."""
         try:
@@ -478,8 +475,8 @@ class AdvancedUserInterfaceEngine:
     async def optimize_interface_performance(
         self,
         user_id: str,
-        performance_context: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        performance_context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Optimize interface performance based on user context."""
         try:
             # Get user configuration and layout
@@ -527,8 +524,8 @@ class AdvancedUserInterfaceEngine:
     async def customize_interface_theme(
         self,
         user_id: str,
-        theme_preferences: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        theme_preferences: dict[str, Any]
+    ) -> dict[str, Any]:
         """Customize interface theme based on user preferences."""
         try:
             # Get user configuration
@@ -587,7 +584,7 @@ class AdvancedUserInterfaceEngine:
             logger.error(f"Error customizing interface theme: {e}")
             return {"theme_applied": False, "error": str(e)}
 
-    async def get_interface_analytics(self, user_id: str) -> Dict[str, Any]:
+    async def get_interface_analytics(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive interface analytics for user."""
         try:
             config = self.interface_configurations.get(user_id)
@@ -621,7 +618,7 @@ class AdvancedUserInterfaceEngine:
             logger.error(f"Error getting interface analytics: {e}")
             return {"error": str(e)}
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform comprehensive health check of the interface engine."""
         try:
             health_status = {
@@ -1122,8 +1119,8 @@ class AdvancedUserInterfaceEngine:
     async def _apply_personalization_to_config(
         self,
         config: InterfaceConfiguration,
-        personalization_data: Dict[str, Any],
-        preferences: Dict[str, Any]
+        personalization_data: dict[str, Any],
+        preferences: dict[str, Any]
     ):
         """Apply personalization data to interface configuration."""
         try:
@@ -1163,7 +1160,7 @@ class AdvancedUserInterfaceEngine:
     async def _apply_accessibility_to_config(
         self,
         config: InterfaceConfiguration,
-        accessibility_requirements: Dict[str, Any]
+        accessibility_requirements: dict[str, Any]
     ):
         """Apply accessibility requirements to interface configuration."""
         try:
@@ -1179,7 +1176,9 @@ class AdvancedUserInterfaceEngine:
 
             # Apply high contrast if needed
             if "enabled_features" in accessibility_requirements:
-                from src.components.user_experience.universal_accessibility_system import AccessibilityFeature
+                from src.components.user_experience.universal_accessibility_system import (
+                    AccessibilityFeature,
+                )
                 enabled_features = accessibility_requirements["enabled_features"]
 
                 if AccessibilityFeature.HIGH_CONTRAST in enabled_features:
@@ -1199,7 +1198,7 @@ class AdvancedUserInterfaceEngine:
     async def _apply_therapeutic_optimization_to_config(
         self,
         config: InterfaceConfiguration,
-        personalization_data: Dict[str, Any]
+        personalization_data: dict[str, Any]
     ):
         """Apply therapeutic optimization to interface configuration."""
         try:

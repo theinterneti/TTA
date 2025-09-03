@@ -7,11 +7,12 @@ integrating with the EmotionalSafetySystem for real-time crisis monitoring.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Callable
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -49,20 +50,20 @@ class CrisisAlert:
     crisis_type: CrisisType = CrisisType.SUICIDE_IDEATION
     crisis_level: CrisisLevel = CrisisLevel.NONE
     detected_at: datetime = field(default_factory=datetime.utcnow)
-    
+
     # Crisis detection details
-    trigger_indicators: List[str] = field(default_factory=list)
+    trigger_indicators: list[str] = field(default_factory=list)
     risk_assessment_score: float = 0.0
     user_input_context: str = ""
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
-    
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
+
     # Clinical response tracking
-    response_time_seconds: Optional[float] = None
+    response_time_seconds: float | None = None
     clinician_notified: bool = False
-    clinician_id: Optional[str] = None
+    clinician_id: str | None = None
     intervention_initiated: bool = False
-    intervention_type: Optional[str] = None
-    
+    intervention_type: str | None = None
+
     # Follow-up tracking
     follow_up_required: bool = True
     follow_up_scheduled: bool = False
@@ -76,10 +77,10 @@ class CrisisProtocol:
     crisis_type: CrisisType
     crisis_level: CrisisLevel
     response_time_target_seconds: float
-    notification_channels: List[str]
-    intervention_steps: List[str]
-    escalation_criteria: Dict[str, Any]
-    follow_up_requirements: Dict[str, Any]
+    notification_channels: list[str]
+    intervention_steps: list[str]
+    escalation_criteria: dict[str, Any]
+    follow_up_requirements: dict[str, Any]
 
 
 class CrisisAlertSystem:
@@ -90,23 +91,23 @@ class CrisisAlertSystem:
 
     def __init__(self):
         """Initialize the Crisis Alert System."""
-        self.active_crisis_alerts: Dict[str, CrisisAlert] = {}
-        self.crisis_protocols: Dict[CrisisType, Dict[CrisisLevel, CrisisProtocol]] = {}
-        self.notification_callbacks: List[Callable] = []
-        
+        self.active_crisis_alerts: dict[str, CrisisAlert] = {}
+        self.crisis_protocols: dict[CrisisType, dict[CrisisLevel, CrisisProtocol]] = {}
+        self.notification_callbacks: list[Callable] = []
+
         # System references
         self.emotional_safety_system = None
         self.clinical_dashboard_manager = None
-        
+
         # Configuration
         self.crisis_detection_interval = 1.0  # seconds - real-time monitoring
         self.alert_retention_hours = 72  # Keep crisis alerts for 72 hours
         self.max_response_time_seconds = 30  # Maximum acceptable response time
-        
+
         # Background monitoring
         self._crisis_monitoring_task = None
         self._shutdown_event = asyncio.Event()
-        
+
         # Performance metrics
         self.crisis_metrics = {
             "crises_detected": 0,
@@ -116,7 +117,7 @@ class CrisisAlertSystem:
             "false_positives": 0,
             "successful_interventions": 0,
         }
-        
+
         # Initialize default crisis protocols
         self._initialize_crisis_protocols()
 
@@ -169,7 +170,7 @@ class CrisisAlertSystem:
                 follow_up_requirements={"within_hours": 2, "type": "emergency_assessment"}
             ),
         }
-        
+
         # Self-harm protocols
         self.crisis_protocols[CrisisType.SELF_HARM] = {
             CrisisLevel.MODERATE: CrisisProtocol(
@@ -206,14 +207,14 @@ class CrisisAlertSystem:
         """Initialize the Crisis Alert System."""
         try:
             logger.info("Initializing CrisisAlertSystem")
-            
+
             # Start crisis monitoring task
             self._crisis_monitoring_task = asyncio.create_task(
                 self._crisis_monitoring_loop()
             )
-            
+
             logger.info("CrisisAlertSystem initialization complete")
-            
+
         except Exception as e:
             logger.error(f"Error initializing CrisisAlertSystem: {e}")
             raise
@@ -226,7 +227,7 @@ class CrisisAlertSystem:
         """Inject system dependencies."""
         self.emotional_safety_system = emotional_safety_system
         self.clinical_dashboard_manager = clinical_dashboard_manager
-        
+
         logger.info("Systems injected into CrisisAlertSystem")
 
     def add_notification_callback(self, callback: Callable):
@@ -238,41 +239,41 @@ class CrisisAlertSystem:
         user_id: str,
         session_id: str,
         user_input: str,
-        session_context: Optional[Dict[str, Any]] = None
-    ) -> Optional[CrisisAlert]:
+        session_context: dict[str, Any] | None = None
+    ) -> CrisisAlert | None:
         """Detect potential crisis from user input and context."""
         try:
             # Use EmotionalSafetySystem for crisis detection
             if not self.emotional_safety_system:
                 logger.warning("EmotionalSafetySystem not available for crisis detection")
                 return None
-            
+
             # Get crisis risk assessment
             safety_result = await self.emotional_safety_system.assess_crisis_risk(
                 user_id=user_id,
                 user_input=user_input,
                 session_context=session_context or {}
             )
-            
+
             # Check if crisis detected
             if not safety_result.get("crisis_detected", False):
                 return None
-            
+
             # Extract crisis details
             crisis_level_str = safety_result.get("crisis_level", "none")
             crisis_indicators = safety_result.get("crisis_indicators", [])
             risk_score = safety_result.get("risk_assessment_score", 0.0)
-            
+
             # Map crisis level
             crisis_level = CrisisLevel.NONE
             try:
                 crisis_level = CrisisLevel(crisis_level_str.lower())
             except ValueError:
                 crisis_level = CrisisLevel.MODERATE  # Default to moderate if unknown
-            
+
             # Determine crisis type based on indicators
             crisis_type = self._determine_crisis_type(crisis_indicators)
-            
+
             # Create crisis alert
             crisis_alert = CrisisAlert(
                 user_id=user_id,
@@ -284,23 +285,23 @@ class CrisisAlertSystem:
                 user_input_context=user_input,
                 therapeutic_context=session_context or {}
             )
-            
+
             # Store active crisis alert
             self.active_crisis_alerts[crisis_alert.alert_id] = crisis_alert
             self.crisis_metrics["crises_detected"] += 1
-            
+
             # Trigger immediate response
             await self._trigger_crisis_response(crisis_alert)
-            
+
             logger.critical(f"Crisis detected: {crisis_type.value} - {crisis_level.value} for user {user_id}")
-            
+
             return crisis_alert
-            
+
         except Exception as e:
             logger.error(f"Error detecting crisis: {e}")
             return None
 
-    def _determine_crisis_type(self, indicators: List[str]) -> CrisisType:
+    def _determine_crisis_type(self, indicators: list[str]) -> CrisisType:
         """Determine crisis type based on indicators."""
         # Map indicators to crisis types
         indicator_mapping = {
@@ -315,12 +316,12 @@ class CrisisAlertSystem:
             "eating_disorder": CrisisType.EATING_DISORDER,
             "trauma_response": CrisisType.TRAUMA_RESPONSE,
         }
-        
+
         # Find the most severe crisis type from indicators
         for indicator in indicators:
             if indicator in indicator_mapping:
                 return indicator_mapping[indicator]
-        
+
         # Default to suicide ideation if no specific type found
         return CrisisType.SUICIDE_IDEATION
 
@@ -328,10 +329,10 @@ class CrisisAlertSystem:
         """Trigger immediate crisis response protocol."""
         try:
             start_time = datetime.utcnow()
-            
+
             # Get appropriate protocol
             protocol = self._get_crisis_protocol(crisis_alert.crisis_type, crisis_alert.crisis_level)
-            
+
             if protocol:
                 # Notify clinical dashboard
                 if self.clinical_dashboard_manager:
@@ -343,50 +344,50 @@ class CrisisAlertSystem:
                         message=f"Crisis detected: {crisis_alert.crisis_type.value} - {crisis_alert.crisis_level.value}",
                         therapeutic_context=crisis_alert.therapeutic_context
                     )
-                
+
                 # Execute notification callbacks
                 for callback in self.notification_callbacks:
                     try:
                         await callback(crisis_alert, protocol)
                     except Exception as e:
                         logger.error(f"Error in crisis notification callback: {e}")
-                
+
                 # Mark intervention as initiated
                 crisis_alert.intervention_initiated = True
                 crisis_alert.intervention_type = "crisis_protocol"
-                
+
                 # Calculate response time
                 response_time = (datetime.utcnow() - start_time).total_seconds()
                 crisis_alert.response_time_seconds = response_time
-                
+
                 # Update metrics
                 self.crisis_metrics["alerts_generated"] += 1
                 self.crisis_metrics["interventions_initiated"] += 1
-                
+
                 # Update average response time
                 current_avg = self.crisis_metrics["average_response_time"]
                 total_alerts = self.crisis_metrics["alerts_generated"]
                 self.crisis_metrics["average_response_time"] = (
                     (current_avg * (total_alerts - 1) + response_time) / total_alerts
                 )
-                
+
                 logger.info(f"Crisis response triggered in {response_time:.3f}s for alert {crisis_alert.alert_id}")
-            
+
         except Exception as e:
             logger.error(f"Error triggering crisis response: {e}")
 
-    def _get_crisis_protocol(self, crisis_type: CrisisType, crisis_level: CrisisLevel) -> Optional[CrisisProtocol]:
+    def _get_crisis_protocol(self, crisis_type: CrisisType, crisis_level: CrisisLevel) -> CrisisProtocol | None:
         """Get appropriate crisis protocol for type and level."""
         if crisis_type in self.crisis_protocols:
             if crisis_level in self.crisis_protocols[crisis_type]:
                 return self.crisis_protocols[crisis_type][crisis_level]
-        
+
         return None
 
     def _map_crisis_to_alert_severity(self, crisis_level: CrisisLevel):
         """Map crisis level to clinical alert severity."""
         from .clinical_dashboard_manager import AlertSeverity
-        
+
         mapping = {
             CrisisLevel.NONE: AlertSeverity.LOW,
             CrisisLevel.LOW: AlertSeverity.LOW,
@@ -395,7 +396,7 @@ class CrisisAlertSystem:
             CrisisLevel.CRITICAL: AlertSeverity.CRITICAL,
             CrisisLevel.EMERGENCY: AlertSeverity.EMERGENCY,
         }
-        
+
         return mapping.get(crisis_level, AlertSeverity.MEDIUM)
 
     async def _crisis_monitoring_loop(self):
@@ -406,19 +407,19 @@ class CrisisAlertSystem:
                     # Monitor active crisis alerts for escalation
                     for alert_id, alert in list(self.active_crisis_alerts.items()):
                         await self._monitor_crisis_alert(alert)
-                    
+
                     # Clean up old resolved alerts
                     await self._cleanup_old_alerts()
-                    
+
                     # Wait for next monitoring cycle
                     await asyncio.sleep(self.crisis_detection_interval)
-                    
+
                 except asyncio.CancelledError:
                     break
                 except Exception as e:
                     logger.error(f"Error in crisis monitoring loop: {e}")
                     await asyncio.sleep(self.crisis_detection_interval)
-                    
+
         except asyncio.CancelledError:
             logger.info("Crisis monitoring loop cancelled")
 
@@ -428,13 +429,13 @@ class CrisisAlertSystem:
             # Check if response time exceeded
             if alert.response_time_seconds and alert.response_time_seconds > self.max_response_time_seconds:
                 logger.warning(f"Crisis alert {alert.alert_id} exceeded response time target")
-            
+
             # Check for escalation criteria
             protocol = self._get_crisis_protocol(alert.crisis_type, alert.crisis_level)
             if protocol and protocol.escalation_criteria.get("immediate_escalation", False):
                 # Trigger escalation if needed
                 await self._escalate_crisis_alert(alert)
-            
+
         except Exception as e:
             logger.error(f"Error monitoring crisis alert: {e}")
 
@@ -442,13 +443,13 @@ class CrisisAlertSystem:
         """Escalate crisis alert to higher level of intervention."""
         try:
             logger.critical(f"Escalating crisis alert {alert.alert_id} for user {alert.user_id}")
-            
+
             # In production, this would trigger:
             # - Emergency services contact
             # - Hospital notification
             # - Emergency contact notification
             # - Supervisor escalation
-            
+
         except Exception as e:
             logger.error(f"Error escalating crisis alert: {e}")
 
@@ -456,19 +457,19 @@ class CrisisAlertSystem:
         """Clean up old resolved crisis alerts."""
         try:
             cutoff_time = datetime.utcnow() - timedelta(hours=self.alert_retention_hours)
-            
+
             alerts_to_remove = []
             for alert_id, alert in self.active_crisis_alerts.items():
                 if alert.follow_up_completed and alert.detected_at < cutoff_time:
                     alerts_to_remove.append(alert_id)
-            
+
             for alert_id in alerts_to_remove:
                 self.active_crisis_alerts.pop(alert_id, None)
-                
+
         except Exception as e:
             logger.error(f"Error cleaning up old crisis alerts: {e}")
 
-    async def get_active_crises(self) -> List[Dict[str, Any]]:
+    async def get_active_crises(self) -> list[dict[str, Any]]:
         """Get all active crisis alerts."""
         try:
             return [
@@ -486,12 +487,12 @@ class CrisisAlertSystem:
                 }
                 for alert in self.active_crisis_alerts.values()
             ]
-            
+
         except Exception as e:
             logger.error(f"Error getting active crises: {e}")
             return []
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Crisis Alert System."""
         try:
             return {
@@ -504,7 +505,7 @@ class CrisisAlertSystem:
                 "monitoring_active": self._crisis_monitoring_task is not None and not self._crisis_monitoring_task.done(),
                 "crisis_metrics": self.crisis_metrics,
             }
-            
+
         except Exception as e:
             logger.error(f"Error in crisis alert system health check: {e}")
             return {
@@ -516,10 +517,10 @@ class CrisisAlertSystem:
         """Shutdown the Crisis Alert System."""
         try:
             logger.info("Shutting down CrisisAlertSystem")
-            
+
             # Signal shutdown
             self._shutdown_event.set()
-            
+
             # Cancel monitoring task
             if self._crisis_monitoring_task:
                 self._crisis_monitoring_task.cancel()
@@ -527,9 +528,9 @@ class CrisisAlertSystem:
                     await self._crisis_monitoring_task
                 except asyncio.CancelledError:
                     pass
-            
+
             logger.info("CrisisAlertSystem shutdown complete")
-            
+
         except Exception as e:
             logger.error(f"Error during crisis alert system shutdown: {e}")
             raise

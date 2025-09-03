@@ -14,12 +14,12 @@ Components:
 - IntegrationValidator: Integration validation between Phase A and Phase B components
 """
 
+from .clinical_workflow_tester import ClinicalWorkflowTester
 from .e2e_test_orchestrator import E2ETestOrchestrator
-from .system_integration_tester import SystemIntegrationTester
+from .integration_validator import IntegrationValidator
 from .performance_benchmark_tester import PerformanceBenchmarkTester
 from .security_penetration_tester import SecurityPenetrationTester
-from .clinical_workflow_tester import ClinicalWorkflowTester
-from .integration_validator import IntegrationValidator
+from .system_integration_tester import SystemIntegrationTester
 
 __all__ = [
     "E2ETestOrchestrator",

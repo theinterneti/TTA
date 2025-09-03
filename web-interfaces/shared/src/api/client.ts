@@ -29,7 +29,7 @@ export class ApiClient {
         // Get token from localStorage based on current interface
         const interfaceType = this.getInterfaceType();
         const token = localStorage.getItem(`tta_token_${interfaceType}`);
-        
+
         if (token && config.headers) {
           config.headers.Authorization = `Bearer ${token}`;
         }
@@ -69,7 +69,7 @@ export class ApiClient {
     // Determine interface type from current URL or environment
     const hostname = window.location.hostname;
     const port = window.location.port;
-    
+
     const portMapping: { [key: string]: string } = {
       '3000': 'patient',
       '3001': 'clinical',
@@ -106,7 +106,7 @@ export class ApiClient {
   private handleAuthError(): void {
     const interfaceType = this.getInterfaceType();
     localStorage.removeItem(`tta_token_${interfaceType}`);
-    
+
     // Redirect to login page
     window.location.href = '/login';
   }

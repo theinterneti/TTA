@@ -6,30 +6,30 @@ This will be expanded in future development phases.
 """
 
 import logging
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
 
-from .e2e_test_orchestrator import TestSuiteReport, TestSuite, TestStatus, TestResult
+from .e2e_test_orchestrator import TestResult, TestStatus, TestSuite, TestSuiteReport
 
 logger = logging.getLogger(__name__)
 
 
 class PerformanceBenchmarkTester:
     """Clinical-grade performance validation under load testing."""
-    
+
     def __init__(self):
         """Initialize the performance benchmark tester."""
         pass
-    
+
     async def initialize(self):
         """Initialize the performance benchmark tester."""
         logger.info("PerformanceBenchmarkTester initialized (placeholder)")
-    
+
     async def execute_performance_tests(self, **system_components) -> TestSuiteReport:
         """Execute performance benchmark tests."""
         # Create mock performance test results
         test_results = []
-        
+
         # Response time tests
         test_results.append(TestResult(
             test_suite=TestSuite.PERFORMANCE_BENCHMARK,
@@ -48,7 +48,7 @@ class PerformanceBenchmarkTester:
                 "requests_per_second": 850
             }
         ))
-        
+
         # Throughput tests
         test_results.append(TestResult(
             test_suite=TestSuite.PERFORMANCE_BENCHMARK,
@@ -67,7 +67,7 @@ class PerformanceBenchmarkTester:
                 "memory_utilization": 72.3
             }
         ))
-        
+
         # Scalability tests
         test_results.append(TestResult(
             test_suite=TestSuite.PERFORMANCE_BENCHMARK,
@@ -85,7 +85,7 @@ class PerformanceBenchmarkTester:
                 "resource_utilization": 0.78
             }
         ))
-        
+
         # Create suite report
         suite_report = TestSuiteReport(
             suite_type=TestSuite.PERFORMANCE_BENCHMARK,
@@ -106,9 +106,9 @@ class PerformanceBenchmarkTester:
             },
             end_time=datetime.utcnow()
         )
-        
+
         return suite_report
-    
-    async def health_check(self) -> Dict[str, Any]:
+
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {"status": "healthy", "service": "performance_benchmark_tester"}

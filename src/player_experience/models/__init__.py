@@ -26,11 +26,9 @@ from .player import (
     CrisisContactInfo,
     PlayerProfile,
     PrivacySettings,
-)
-from .player import ProgressSummary as PlayerProgressSummary
-from .player import (
     TherapeuticPreferences,
 )
+from .player import ProgressSummary as PlayerProgressSummary
 from .progress import (
     EngagementMetrics,
     Milestone,

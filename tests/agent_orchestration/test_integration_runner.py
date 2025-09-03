@@ -15,7 +15,7 @@ def test_integration_test_structure():
 
     # Test imports
     try:
-        from . import (
+        from tests.agent_orchestration import (
             test_end_to_end_workflows,
             test_error_handling_recovery,
             test_multi_agent_workflow_integration,
@@ -28,7 +28,7 @@ def test_integration_test_structure():
 
     # Test fixture availability
     try:
-        from .test_multi_agent_workflow_integration import (
+        from tests.agent_orchestration.test_multi_agent_workflow_integration import (
             IntegrationTestHelper,
             PerformanceMetrics,
             WorkflowStateVerifier,
@@ -123,7 +123,7 @@ def test_test_data_fixtures():
 def test_performance_metrics_utility():
     """Test the performance metrics utility class."""
 
-    from .test_multi_agent_workflow_integration import PerformanceMetrics
+    from tests.agent_orchestration.test_multi_agent_workflow_integration import PerformanceMetrics
 
     # Create metrics instance
     metrics = PerformanceMetrics()
@@ -179,7 +179,7 @@ def test_workflow_state_verifier():
         AgentType,
     )
 
-    from .test_multi_agent_workflow_integration import WorkflowStateVerifier
+    from tests.agent_orchestration.test_multi_agent_workflow_integration import WorkflowStateVerifier
 
     verifier = WorkflowStateVerifier()
 

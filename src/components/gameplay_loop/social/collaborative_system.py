@@ -170,7 +170,7 @@ class GroupChoice:
 
     # Choice details
     choice_text: str = ""
-    choice_type: ChoiceType = ChoiceType.GENERAL
+    choice_type: ChoiceType = ChoiceType.NARRATIVE
     proposed_by: str = ""  # user_id
 
     # Group decision process
@@ -557,7 +557,7 @@ class CollaborativeSystem:
         session_id: str,
         proposer_user_id: str,
         choice_text: str,
-        choice_type: ChoiceType = ChoiceType.GENERAL,
+        choice_type: ChoiceType = ChoiceType.NARRATIVE,
     ) -> GroupChoice:
         """Propose a choice for group consideration."""
         try:
@@ -1107,7 +1107,7 @@ class CollaborativeSystem:
                 ChoiceType.PROBLEM_SOLVING: 0.8,
                 ChoiceType.SELF_REFLECTION: 0.9,
                 ChoiceType.SOCIAL_INTERACTION: 0.7,
-                ChoiceType.GENERAL: 0.5,
+                ChoiceType.NARRATIVE: 0.5,
             }
 
             impact_assessment["therapeutic_relevance"] = therapeutic_choice_types.get(

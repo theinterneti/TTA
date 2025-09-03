@@ -5,17 +5,17 @@ This module tests the production gameplay loop controller implementation
 including session lifecycle management, therapeutic system integration, and workflow orchestration.
 """
 
-import pytest
 from unittest.mock import AsyncMock, Mock
-from datetime import datetime, timedelta
+
+import pytest
 
 from src.components.therapeutic_systems.gameplay_loop_controller import (
-    TherapeuticGameplayLoopController,
     SessionConfiguration,
+    SessionOutcome,
+    SessionPhase,
     SessionState,
     SessionStatus,
-    SessionPhase,
-    SessionOutcome,
+    TherapeuticGameplayLoopController,
 )
 
 
@@ -76,17 +76,26 @@ class TestTherapeuticGameplayLoopController:
         controller.inject_therapeutic_systems(**mock_therapeutic_systems)
 
         # Mock system responses
-        mock_therapeutic_systems["emotional_safety_system"].initialize_user_monitoring.return_value = {"status": "initialized"}
-        mock_therapeutic_systems["character_development_system"].create_character.return_value = Mock(
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].initialize_user_monitoring.return_value = {"status": "initialized"}
+        mock_therapeutic_systems[
+            "character_development_system"
+        ].create_character.return_value = Mock(
             character_id="char_001", attributes={"courage": 5.0, "wisdom": 4.0}
         )
-        mock_therapeutic_systems["therapeutic_integration_system"].generate_personalized_recommendations.return_value = [
-            Mock(framework=Mock(value="cbt"), scenario_type=Mock(value="confidence_building"))
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].generate_personalized_recommendations.return_value = [
+            Mock(
+                framework=Mock(value="cbt"),
+                scenario_type=Mock(value="confidence_building"),
+            )
         ]
 
         session_state = await controller.start_session(
             user_id="test_user_001",
-            therapeutic_goals=["confidence_building", "anxiety_management"]
+            therapeutic_goals=["confidence_building", "anxiety_management"],
         )
 
         # Should return valid session state
@@ -104,18 +113,29 @@ class TestTherapeuticGameplayLoopController:
         assert controller.metrics["sessions_started"] == 1
 
     @pytest.mark.asyncio
-    async def test_start_session_with_configuration(self, controller, mock_therapeutic_systems):
+    async def test_start_session_with_configuration(
+        self, controller, mock_therapeutic_systems
+    ):
         """Test session start with custom configuration."""
         await controller.initialize()
         controller.inject_therapeutic_systems(**mock_therapeutic_systems)
 
         # Mock system responses
-        mock_therapeutic_systems["emotional_safety_system"].initialize_user_monitoring.return_value = {"status": "initialized"}
-        mock_therapeutic_systems["character_development_system"].create_character.return_value = Mock(
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].initialize_user_monitoring.return_value = {"status": "initialized"}
+        mock_therapeutic_systems[
+            "character_development_system"
+        ].create_character.return_value = Mock(
             character_id="char_002", attributes={"courage": 6.0, "wisdom": 5.0}
         )
-        mock_therapeutic_systems["therapeutic_integration_system"].generate_personalized_recommendations.return_value = [
-            Mock(framework=Mock(value="dbt"), scenario_type=Mock(value="emotional_regulation"))
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].generate_personalized_recommendations.return_value = [
+            Mock(
+                framework=Mock(value="dbt"),
+                scenario_type=Mock(value="emotional_regulation"),
+            )
         ]
 
         config = SessionConfiguration(
@@ -127,8 +147,7 @@ class TestTherapeuticGameplayLoopController:
         )
 
         session_state = await controller.start_session(
-            user_id="test_user_002",
-            session_config=config
+            user_id="test_user_002", session_config=config
         )
 
         # Should use configuration
@@ -153,30 +172,52 @@ class TestTherapeuticGameplayLoopController:
         controller.active_sessions["session_001"] = session_state
 
         # Mock system responses
-        mock_therapeutic_systems["emotional_safety_system"].assess_crisis_risk.return_value = {
-            "crisis_detected": False, "safety_level": "standard"
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].assess_crisis_risk.return_value = {
+            "crisis_detected": False,
+            "safety_level": "standard",
         }
-        mock_therapeutic_systems["consequence_system"].process_choice_consequence.return_value = {
-            "consequence_text": "You feel more confident.", "therapeutic_value": 2.5, "character_impact": {"courage": 0.5}
+        mock_therapeutic_systems[
+            "consequence_system"
+        ].process_choice_consequence.return_value = {
+            "consequence_text": "You feel more confident.",
+            "therapeutic_value": 2.5,
+            "character_impact": {"courage": 0.5},
         }
-        mock_therapeutic_systems["character_development_system"].apply_consequence_to_character.return_value = {
-            "character_updated": True, "updated_attributes": {"courage": 5.5}
+        mock_therapeutic_systems[
+            "character_development_system"
+        ].apply_consequence_to_character.return_value = {
+            "character_updated": True,
+            "updated_attributes": {"courage": 5.5},
         }
-        mock_therapeutic_systems["adaptive_difficulty_engine"].adjust_difficulty.return_value = {
-            "difficulty_adjusted": False, "current_difficulty": "moderate"
+        mock_therapeutic_systems[
+            "adaptive_difficulty_engine"
+        ].adjust_difficulty.return_value = {
+            "difficulty_adjusted": False,
+            "current_difficulty": "moderate",
         }
-        mock_therapeutic_systems["therapeutic_integration_system"].generate_personalized_recommendations.return_value = [
-            Mock(framework=Mock(value="cbt"), scenario_type=Mock(value="confidence_building"))
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].generate_personalized_recommendations.return_value = [
+            Mock(
+                framework=Mock(value="cbt"),
+                scenario_type=Mock(value="confidence_building"),
+            )
         ]
-        mock_therapeutic_systems["therapeutic_integration_system"].create_therapeutic_scenario.return_value = Mock(
-            scenario_id="scenario_001", title="Building Confidence", description="A confidence-building scenario",
-            therapeutic_goals=["confidence_building"]
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].create_therapeutic_scenario.return_value = Mock(
+            scenario_id="scenario_001",
+            title="Building Confidence",
+            description="A confidence-building scenario",
+            therapeutic_goals=["confidence_building"],
         )
 
         response = await controller.process_user_choice(
             session_id="session_001",
             user_choice="approach_with_confidence",
-            choice_context={"scenario": "social_interaction"}
+            choice_context={"scenario": "social_interaction"},
         )
 
         # Should return comprehensive response
@@ -194,7 +235,9 @@ class TestTherapeuticGameplayLoopController:
         assert session_state.therapeutic_value_accumulated == 2.5
 
     @pytest.mark.asyncio
-    async def test_process_choice_crisis_intervention(self, controller, mock_therapeutic_systems):
+    async def test_process_choice_crisis_intervention(
+        self, controller, mock_therapeutic_systems
+    ):
         """Test crisis intervention during choice processing."""
         await controller.initialize()
         controller.inject_therapeutic_systems(**mock_therapeutic_systems)
@@ -209,14 +252,18 @@ class TestTherapeuticGameplayLoopController:
         controller.active_sessions["session_002"] = session_state
 
         # Mock crisis detection
-        mock_therapeutic_systems["emotional_safety_system"].assess_crisis_risk.return_value = {
-            "crisis_detected": True, "crisis_level": "HIGH", "support_resources": ["crisis_hotline"]
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].assess_crisis_risk.return_value = {
+            "crisis_detected": True,
+            "crisis_level": "HIGH",
+            "support_resources": ["crisis_hotline"],
         }
 
         response = await controller.process_user_choice(
             session_id="session_002",
             user_choice="I don't want to continue",
-            choice_context={}
+            choice_context={},
         )
 
         # Should trigger crisis intervention
@@ -250,10 +297,14 @@ class TestTherapeuticGameplayLoopController:
         controller.active_sessions["session_003"] = session_state
 
         # Mock system responses
-        mock_therapeutic_systems["character_development_system"].get_character_progression_summary.return_value = {
+        mock_therapeutic_systems[
+            "character_development_system"
+        ].get_character_progression_summary.return_value = {
             "attribute_changes": {"courage": 2.0, "wisdom": 1.5}
         }
-        mock_therapeutic_systems["therapeutic_integration_system"].generate_personalized_recommendations.return_value = [
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].generate_personalized_recommendations.return_value = [
             Mock(framework=Mock(value="mindfulness"))
         ]
 
@@ -331,8 +382,7 @@ class TestTherapeuticGameplayLoopController:
 
         # Test processing choice for non-existent session
         response = await controller.process_user_choice(
-            session_id="non_existent",
-            user_choice="test_choice"
+            session_id="non_existent", user_choice="test_choice"
         )
 
         assert response["choice_processed"] is False
@@ -351,7 +401,7 @@ class TestTherapeuticGameplayLoopController:
         assert health["status"] == "healthy"  # All 5 systems available
         assert "active_sessions" in health
         assert "therapeutic_systems" in health
-        assert health["systems_available"] == "5/5"
+        assert health["systems_available"] == "5/6"
         assert "metrics" in health
 
     @pytest.mark.asyncio
@@ -363,7 +413,7 @@ class TestTherapeuticGameplayLoopController:
         health = await controller.health_check()
 
         assert health["status"] == "degraded"  # Less than 3 systems available
-        assert health["systems_available"] == "0/5"
+        assert health["systems_available"] == "0/6"
 
     def test_get_metrics(self, controller):
         """Test metrics collection."""
@@ -384,24 +434,34 @@ class TestTherapeuticGameplayLoopController:
         assert metrics["completion_rate"] == 80.0  # 8/10 * 100
 
     @pytest.mark.asyncio
-    async def test_e2e_interface_compatibility(self, controller, mock_therapeutic_systems):
+    async def test_e2e_interface_compatibility(
+        self, controller, mock_therapeutic_systems
+    ):
         """Test compatibility with E2E test interface expectations."""
         await controller.initialize()
         controller.inject_therapeutic_systems(**mock_therapeutic_systems)
 
         # Mock system responses for E2E compatibility
-        mock_therapeutic_systems["emotional_safety_system"].initialize_user_monitoring.return_value = {"status": "initialized"}
-        mock_therapeutic_systems["character_development_system"].create_character.return_value = Mock(
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].initialize_user_monitoring.return_value = {"status": "initialized"}
+        mock_therapeutic_systems[
+            "character_development_system"
+        ].create_character.return_value = Mock(
             character_id="demo_char", attributes={"courage": 5.0}
         )
-        mock_therapeutic_systems["therapeutic_integration_system"].generate_personalized_recommendations.return_value = [
-            Mock(framework=Mock(value="cbt"), scenario_type=Mock(value="confidence_building"))
+        mock_therapeutic_systems[
+            "therapeutic_integration_system"
+        ].generate_personalized_recommendations.return_value = [
+            Mock(
+                framework=Mock(value="cbt"),
+                scenario_type=Mock(value="confidence_building"),
+            )
         ]
 
         # Test session start (E2E interface)
         session_state = await controller.start_session(
-            user_id="demo_user_001",
-            therapeutic_goals=["confidence_building"]
+            user_id="demo_user_001", therapeutic_goals=["confidence_building"]
         )
 
         # Should match expected structure
@@ -412,16 +472,21 @@ class TestTherapeuticGameplayLoopController:
         assert hasattr(session_state, "character_id")
 
         # Test choice processing (E2E interface)
-        mock_therapeutic_systems["emotional_safety_system"].assess_crisis_risk.return_value = {
-            "crisis_detected": False, "safety_level": "standard"
+        mock_therapeutic_systems[
+            "emotional_safety_system"
+        ].assess_crisis_risk.return_value = {
+            "crisis_detected": False,
+            "safety_level": "standard",
         }
-        mock_therapeutic_systems["consequence_system"].process_choice_consequence.return_value = {
-            "consequence_text": "Test consequence", "therapeutic_value": 1.0
+        mock_therapeutic_systems[
+            "consequence_system"
+        ].process_choice_consequence.return_value = {
+            "consequence_text": "Test consequence",
+            "therapeutic_value": 1.0,
         }
 
         response = await controller.process_user_choice(
-            session_id=session_state.session_id,
-            user_choice="test_choice"
+            session_id=session_state.session_id, user_choice="test_choice"
         )
 
         # Should match expected structure

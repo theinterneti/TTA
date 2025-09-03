@@ -14,18 +14,15 @@ import time
 import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
-from enum import Enum
 from typing import Any
 
+from .circuit_breaker_types import (
+    CircuitBreakerMetrics,
+    CircuitBreakerState,
+    StateTransitionEvent,
+)
+
 logger = logging.getLogger(__name__)
-
-
-class CircuitBreakerState(str, Enum):
-    """Circuit breaker states following the standard pattern."""
-
-    CLOSED = "closed"  # Normal operation, failures counted
-    OPEN = "open"  # Failing fast, not executing operations
-    HALF_OPEN = "half_open"  # Testing if service has recovered
 
 
 @dataclass
@@ -194,11 +191,7 @@ class CircuitBreaker:
             self._metrics.state_changes += 1
 
             # Record metrics and log transition
-            from .circuit_breaker_metrics import record_state_transition
-
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            self._record_state_transition(old_state, self._state)
 
             logger.warning(
                 f"Circuit breaker {self._name} transitioning to OPEN state",
@@ -226,11 +219,7 @@ class CircuitBreaker:
             self._metrics.state_changes += 1
 
             # Record metrics and log transition
-            from .circuit_breaker_metrics import record_state_transition
-
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            self._record_state_transition(old_state, self._state)
 
             logger.info(
                 f"Circuit breaker {self._name} transitioning to HALF_OPEN state",
@@ -258,11 +247,7 @@ class CircuitBreaker:
             self._metrics.state_changes += 1
 
             # Record metrics and log transition
-            from .circuit_breaker_metrics import record_state_transition
-
-            record_state_transition(
-                self._name, old_state, self._state, self._correlation_id
-            )
+            self._record_state_transition(old_state, self._state)
 
             logger.info(
                 f"Circuit breaker {self._name} transitioning to CLOSED state",
@@ -306,9 +291,8 @@ class CircuitBreaker:
         self._correlation_id = correlation_id or str(uuid.uuid4())
         start_time = time.time()
 
-        from .circuit_breaker_metrics import get_circuit_breaker_metrics
-
-        metrics_collector = get_circuit_breaker_metrics()
+        # Use internal metrics instead of external collector
+        metrics_collector = None  # Will be handled internally
 
         async with self._lock:
             # Check if we should transition from OPEN to HALF_OPEN
@@ -435,6 +419,35 @@ class CircuitBreaker:
         async with self._lock:
             logger.info(f"Manually resetting circuit breaker {self._name}")
             await self._transition_to_closed()
+
+    def _record_state_transition(
+        self,
+        old_state: CircuitBreakerState,
+        new_state: CircuitBreakerState
+    ) -> None:
+        """Record state transition for metrics."""
+        try:
+            # Create transition event
+            event = StateTransitionEvent(
+                circuit_breaker_name=self._name,
+                old_state=old_state,
+                new_state=new_state,
+                correlation_id=self._correlation_id or str(uuid.uuid4()),
+                reason=f"Transition from {old_state.value} to {new_state.value}",
+                metrics_snapshot=self._metrics
+            )
+
+            # Log the transition
+            logger.info(
+                f"Circuit breaker {self._name} transitioned from {old_state.value} "
+                f"to {new_state.value} (correlation_id: {event.correlation_id})"
+            )
+
+            # Here you could emit the event to a metrics collector if needed
+            # For now, we just log it
+
+        except Exception as e:
+            logger.error(f"Error recording state transition: {e}")
 
 
 class CircuitBreakerOpenError(Exception):

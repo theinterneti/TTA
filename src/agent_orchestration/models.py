@@ -12,7 +12,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 class AgentType(str, Enum):
@@ -153,7 +153,8 @@ class AgentCapability(BaseModel):
         default_factory=dict, description="Additional metadata"
     )
 
-    @validator("version")
+    @field_validator("version")
+    @classmethod
     def validate_version(cls, v):
         """Validate semantic version format."""
         import re
@@ -164,7 +165,8 @@ class AgentCapability(BaseModel):
             )
         return v
 
-    @validator("name")
+    @field_validator("name")
+    @classmethod
     def validate_name(cls, v):
         """Validate capability name format."""
         import re

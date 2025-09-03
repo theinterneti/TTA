@@ -357,7 +357,7 @@ class TTASystemIntegration:
 
             # Cache successful responses
             if response.success and request.operation == "get":
-                self._cache_response(cache_key, response)
+                await self._cache_response(cache_key, response)
 
             # Update metrics
             self.metrics["requests_sent"] += 1
@@ -862,7 +862,7 @@ class TTASystemIntegration:
             logger.error(f"Failed to get cached response: {e}")
             return None
 
-    def _cache_response(self, cache_key: str, response: IntegrationResponse) -> None:
+    async def _cache_response(self, cache_key: str, response: IntegrationResponse) -> None:
         """Cache response for future use."""
         try:
             self.data_cache[cache_key] = {

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ComputerDesktopIcon, 
-  ChartBarIcon, 
+import {
+  ComputerDesktopIcon,
+  ChartBarIcon,
   ExclamationTriangleIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -115,7 +115,7 @@ const Dashboard: React.FC = () => {
             Unified development environment for TTA web interfaces
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3 bg-white rounded-lg px-4 py-2 shadow-sm">
           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
           <span className="text-sm font-medium text-gray-700">Live</span>
@@ -255,7 +255,7 @@ const Dashboard: React.FC = () => {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-semibold text-gray-900">Performance Overview</h2>
-          <Link 
+          <Link
             to="/performance"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
@@ -264,7 +264,7 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="flex items-center space-x-4">
           <div className="flex-1 bg-gray-200 rounded-full h-3">
-            <div 
+            <div
               className="bg-green-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${systemStats.performanceScore}%` }}
             />

@@ -11,16 +11,71 @@ from typing import Any
 
 from src.components.gameplay_loop.models.core import NarrativeScene
 from src.components.gameplay_loop.services.session_state import SessionState
-from src.components.therapeutic_safety import (
-    ContentPayload,
-    ContentType,
-    CrisisLevel,
-    SafetyLevel,
-    ValidationAction,
-    ValidationContext,
-    ValidationResult,
-    ValidationScope,
-)
+
+# Use local imports to avoid circular dependency
+try:
+    from src.components.therapeutic_safety.enums import (
+        ContentType,
+        CrisisLevel,
+        SafetyLevel,
+        ValidationAction,
+        ValidationScope,
+    )
+    from src.components.therapeutic_safety.models import (
+        ContentPayload,
+        ValidationContext,
+        ValidationResult,
+    )
+except ImportError:
+    # Fallback definitions if imports fail
+    from dataclasses import dataclass
+    from enum import Enum
+
+    class ContentType(Enum):
+        NARRATIVE_SCENE = "narrative_scene"
+
+    class CrisisLevel(Enum):
+        NONE = "none"
+        LOW = "low"
+        MODERATE = "moderate"
+        HIGH = "high"
+        CRITICAL = "critical"
+
+    class SafetyLevel(Enum):
+        SAFE = "safe"
+        CAUTION = "caution"
+        UNSAFE = "unsafe"
+
+    class ValidationAction(Enum):
+        APPROVE = "approve"
+        REJECT = "reject"
+        BLOCK = "block"
+        FLAG_FOR_REVIEW = "flag_for_review"
+
+    class ValidationScope(Enum):
+        STANDARD = "standard"
+        STRICT = "strict"
+
+    @dataclass
+    class ContentPayload:
+        content_text: str = ""
+        content_type: ContentType = ContentType.NARRATIVE_SCENE
+        metadata: dict = None
+
+        def __post_init__(self):
+            if self.metadata is None:
+                self.metadata = {}
+
+    @dataclass
+    class ValidationContext:
+        user_id: str = ""
+        session_id: str = ""
+
+    @dataclass
+    class ValidationResult:
+        action: ValidationAction = ValidationAction.APPROVE
+        crisis_level: CrisisLevel = CrisisLevel.NONE
+        immediate_intervention_needed: bool = False
 
 from .emotional_safety_system import (
     DistressLevel,

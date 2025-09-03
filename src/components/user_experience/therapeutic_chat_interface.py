@@ -8,14 +8,14 @@ clinical-grade performance for the TTA therapeutic platform.
 
 import asyncio
 import logging
-import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple, Union, Callable
-from dataclasses import dataclass, field
-from enum import Enum
-import uuid
 import time
-from collections import defaultdict, deque
+import uuid
+from collections import defaultdict
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -80,15 +80,15 @@ class ChatMessage:
     timestamp: datetime = field(default_factory=datetime.utcnow)
 
     # Therapeutic context
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
-    emotional_indicators: Dict[str, float] = field(default_factory=dict)
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
+    emotional_indicators: dict[str, float] = field(default_factory=dict)
     crisis_risk_level: float = 0.0
-    therapeutic_goals: List[str] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
 
     # Processing metadata
     processing_time_ms: float = 0.0
     confidence_score: float = 0.0
-    therapeutic_frameworks: List[TherapeuticFramework] = field(default_factory=list)
+    therapeutic_frameworks: list[TherapeuticFramework] = field(default_factory=list)
 
     # Response metadata
     response_priority: ResponsePriority = ResponsePriority.NORMAL
@@ -109,21 +109,21 @@ class ChatSession:
 
     # Conversation state
     conversation_state: ConversationState = ConversationState.INITIALIZING
-    current_therapeutic_focus: Optional[str] = None
-    active_therapeutic_frameworks: List[TherapeuticFramework] = field(default_factory=list)
+    current_therapeutic_focus: str | None = None
+    active_therapeutic_frameworks: list[TherapeuticFramework] = field(default_factory=list)
 
     # Therapeutic context
-    session_goals: List[str] = field(default_factory=list)
-    therapeutic_progress: Dict[str, float] = field(default_factory=dict)
-    emotional_journey: List[Dict[str, Any]] = field(default_factory=list)
+    session_goals: list[str] = field(default_factory=list)
+    therapeutic_progress: dict[str, float] = field(default_factory=dict)
+    emotional_journey: list[dict[str, Any]] = field(default_factory=list)
 
     # Message history
-    messages: List[ChatMessage] = field(default_factory=list)
+    messages: list[ChatMessage] = field(default_factory=list)
     message_count: int = 0
 
     # Session analytics
-    engagement_metrics: Dict[str, Any] = field(default_factory=dict)
-    therapeutic_outcomes: Dict[str, Any] = field(default_factory=dict)
+    engagement_metrics: dict[str, Any] = field(default_factory=dict)
+    therapeutic_outcomes: dict[str, Any] = field(default_factory=dict)
 
     # Session configuration
     max_duration_minutes: int = 60
@@ -139,31 +139,31 @@ class TherapeuticContext:
     session_id: str = ""
 
     # User therapeutic profile
-    therapeutic_goals: List[str] = field(default_factory=list)
-    current_challenges: List[str] = field(default_factory=list)
-    therapeutic_preferences: Dict[str, Any] = field(default_factory=dict)
+    therapeutic_goals: list[str] = field(default_factory=list)
+    current_challenges: list[str] = field(default_factory=list)
+    therapeutic_preferences: dict[str, Any] = field(default_factory=dict)
 
     # Current therapeutic state
-    emotional_state: Dict[str, float] = field(default_factory=dict)
+    emotional_state: dict[str, float] = field(default_factory=dict)
     stress_level: float = 0.0
     engagement_level: float = 0.5
-    crisis_risk_assessment: Dict[str, Any] = field(default_factory=dict)
+    crisis_risk_assessment: dict[str, Any] = field(default_factory=dict)
 
     # Therapeutic history
-    previous_sessions: List[str] = field(default_factory=list)
-    therapeutic_progress: Dict[str, float] = field(default_factory=dict)
-    successful_interventions: List[str] = field(default_factory=list)
-    emotional_journey: List[Dict[str, Any]] = field(default_factory=list)
+    previous_sessions: list[str] = field(default_factory=list)
+    therapeutic_progress: dict[str, float] = field(default_factory=dict)
+    successful_interventions: list[str] = field(default_factory=list)
+    emotional_journey: list[dict[str, Any]] = field(default_factory=list)
 
     # Contextual factors
     time_of_day: str = ""
-    session_context: Dict[str, Any] = field(default_factory=dict)
-    environmental_factors: Dict[str, Any] = field(default_factory=dict)
+    session_context: dict[str, Any] = field(default_factory=dict)
+    environmental_factors: dict[str, Any] = field(default_factory=dict)
 
     # Personalization data
     communication_style: str = "supportive"
-    preferred_therapeutic_approaches: List[TherapeuticFramework] = field(default_factory=list)
-    response_preferences: Dict[str, Any] = field(default_factory=dict)
+    preferred_therapeutic_approaches: list[TherapeuticFramework] = field(default_factory=list)
+    response_preferences: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -173,27 +173,27 @@ class ConversationFlow:
     session_id: str = ""
 
     # Flow configuration
-    therapeutic_objectives: List[str] = field(default_factory=list)
-    conversation_stages: List[Dict[str, Any]] = field(default_factory=list)
+    therapeutic_objectives: list[str] = field(default_factory=list)
+    conversation_stages: list[dict[str, Any]] = field(default_factory=list)
     current_stage: int = 0
 
     # Flow control
-    stage_transitions: Dict[str, Any] = field(default_factory=dict)
-    intervention_triggers: Dict[str, Any] = field(default_factory=dict)
-    flow_adaptations: List[Dict[str, Any]] = field(default_factory=list)
+    stage_transitions: dict[str, Any] = field(default_factory=dict)
+    intervention_triggers: dict[str, Any] = field(default_factory=dict)
+    flow_adaptations: list[dict[str, Any]] = field(default_factory=list)
 
     # Progress tracking
-    stage_completion: Dict[int, bool] = field(default_factory=dict)
-    therapeutic_milestones: List[Dict[str, Any]] = field(default_factory=list)
+    stage_completion: dict[int, bool] = field(default_factory=dict)
+    therapeutic_milestones: list[dict[str, Any]] = field(default_factory=list)
 
     # Timing and pacing
-    stage_durations: Dict[int, timedelta] = field(default_factory=dict)
-    optimal_pacing: Dict[str, Any] = field(default_factory=dict)
+    stage_durations: dict[int, timedelta] = field(default_factory=dict)
+    optimal_pacing: dict[str, Any] = field(default_factory=dict)
 
     # Adaptation metadata
     flow_effectiveness: float = 0.0
-    user_engagement_per_stage: Dict[int, float] = field(default_factory=dict)
-    adaptation_history: List[Dict[str, Any]] = field(default_factory=list)
+    user_engagement_per_stage: dict[int, float] = field(default_factory=dict)
+    adaptation_history: list[dict[str, Any]] = field(default_factory=list)
 
 
 class TherapeuticChatInterface:
@@ -209,15 +209,15 @@ class TherapeuticChatInterface:
         self.status = "initializing"
 
         # Core chat components
-        self.active_sessions: Dict[str, ChatSession] = {}
-        self.therapeutic_contexts: Dict[str, TherapeuticContext] = {}
-        self.conversation_flows: Dict[str, ConversationFlow] = {}
-        self.message_history: Dict[str, List[ChatMessage]] = defaultdict(list)
+        self.active_sessions: dict[str, ChatSession] = {}
+        self.therapeutic_contexts: dict[str, TherapeuticContext] = {}
+        self.conversation_flows: dict[str, ConversationFlow] = {}
+        self.message_history: dict[str, list[ChatMessage]] = defaultdict(list)
 
         # Message processing
-        self.message_processors: Dict[MessageType, Callable] = {}
-        self.response_generators: Dict[TherapeuticFramework, Callable] = {}
-        self.intervention_handlers: Dict[str, Callable] = {}
+        self.message_processors: dict[MessageType, Callable] = {}
+        self.response_generators: dict[TherapeuticFramework, Callable] = {}
+        self.intervention_handlers: dict[str, Callable] = {}
 
         # System integrations (injected)
         self.accessibility_system = None
@@ -229,9 +229,9 @@ class TherapeuticChatInterface:
         self.cloud_deployment_manager = None
 
         # Real-time messaging
-        self.websocket_connections: Dict[str, Any] = {}
+        self.websocket_connections: dict[str, Any] = {}
         self.message_queue: asyncio.Queue = asyncio.Queue()
-        self.broadcast_channels: Dict[str, Set[str]] = defaultdict(set)
+        self.broadcast_channels: dict[str, set[str]] = defaultdict(set)
 
         # Background tasks
         self._message_processing_task = None
@@ -337,8 +337,8 @@ class TherapeuticChatInterface:
     async def start_chat_session(
         self,
         user_id: str,
-        therapeutic_goals: List[str],
-        session_config: Optional[Dict[str, Any]] = None
+        therapeutic_goals: list[str],
+        session_config: dict[str, Any] | None = None
     ) -> ChatSession:
         """Start a new therapeutic chat session."""
         try:
@@ -380,7 +380,7 @@ class TherapeuticChatInterface:
         self,
         session_id: str,
         message_content: str,
-        message_metadata: Optional[Dict[str, Any]] = None
+        message_metadata: dict[str, Any] | None = None
     ) -> ChatMessage:
         """Process user message and generate therapeutic response."""
         try:
@@ -463,8 +463,8 @@ class TherapeuticChatInterface:
     async def get_session_history(
         self,
         session_id: str,
-        limit: Optional[int] = None
-    ) -> List[ChatMessage]:
+        limit: int | None = None
+    ) -> list[ChatMessage]:
         """Get chat session message history."""
         try:
             session = self.active_sessions.get(session_id)
@@ -484,7 +484,7 @@ class TherapeuticChatInterface:
     async def update_therapeutic_goals(
         self,
         session_id: str,
-        new_goals: List[str]
+        new_goals: list[str]
     ) -> bool:
         """Update therapeutic goals for active session."""
         try:
@@ -521,8 +521,8 @@ class TherapeuticChatInterface:
     async def end_chat_session(
         self,
         session_id: str,
-        session_summary: Optional[str] = None
-    ) -> Dict[str, Any]:
+        session_summary: str | None = None
+    ) -> dict[str, Any]:
         """End therapeutic chat session and generate summary."""
         try:
             session = self.active_sessions.get(session_id)
@@ -574,7 +574,7 @@ class TherapeuticChatInterface:
     async def get_therapeutic_insights(
         self,
         session_id: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Get therapeutic insights for current session."""
         try:
             session = self.active_sessions.get(session_id)
@@ -606,7 +606,7 @@ class TherapeuticChatInterface:
             logger.error(f"Error getting therapeutic insights: {e}")
             return {"error": str(e)}
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform comprehensive health check of the chat interface system."""
         try:
             health_status = {
@@ -805,7 +805,113 @@ class TherapeuticChatInterface:
                     "I'm concerned about your safety right now. Let's talk about how to keep you safe.",
                     "Thank you for telling me about these thoughts. You're not alone, and we can work through this together.",
                     "I want to help you through this difficult time. Let's focus on your immediate safety.",
-                ]
+                ],
+                # Framework-specific response templates
+                "framework_responses": {
+                    "narrative_therapy": [
+                        "That's an important part of your story. How would you like this chapter to unfold?",
+                        "I'm curious about the unique outcomes in your story - times when things were different.",
+                        "It sounds like you're the author of your own story. What would you like to rewrite?",
+                        "How would you externalize this problem? What would you call it if it were separate from you?",
+                        "What would the people who know you best say about your character strengths?",
+                        "If this were a story being told, what themes would emerge about your resilience?",
+                        "What meaning are you making from this experience in your life narrative?",
+                        "How does this fit into the larger story of who you're becoming?",
+                        "Let's explore this story together. What details would help me understand your experience better?",
+                        "I can see this is a significant chapter. What would you want readers to know about this part of your journey?",
+                        "Your story has many layers. Which aspect feels most important to develop right now?",
+                        "If we were co-writing this story, what direction would you want to take it next?"
+                    ],
+                    "cognitive_behavioral_therapy": [
+                        "I notice you mentioned some thoughts. Let's explore how those thoughts might be affecting how you feel.",
+                        "What evidence do you have for and against this thought?",
+                        "How might we challenge this thinking pattern together?",
+                        "What would you tell a friend who had this same thought?",
+                        "Let's examine the connection between your thoughts, feelings, and behaviors here.",
+                        "What alternative ways could we look at this situation?"
+                    ],
+                    "dialectical_behavior_therapy": [
+                        "It sounds like you're experiencing some intense emotions. Let's practice some distress tolerance skills.",
+                        "Can you try taking three deep breaths with me right now?",
+                        "What would wise mind tell you about this situation?",
+                        "Let's practice radical acceptance - what would that look like here?",
+                        "How might we use some interpersonal effectiveness skills in this situation?",
+                        "What emotion regulation strategies have worked for you before?"
+                    ],
+                    "mindfulness_based": [
+                        "Let's take a moment to be present. Can you notice three things you can see right now?",
+                        "What do you notice in your body as you share this with me?",
+                        "How might we bring some mindful awareness to this experience?",
+                        "Can you observe these thoughts and feelings without judgment?",
+                        "What would it be like to approach this with beginner's mind?",
+                        "Let's practice grounding together - what can you feel, hear, and see?"
+                    ],
+                    "solution_focused_therapy": [
+                        "What has worked for you in similar situations before?",
+                        "What strengths can you draw upon here?",
+                        "On a scale of 1-10, where are you now, and what would move you up just one point?",
+                        "Tell me about a time when this problem wasn't as present in your life.",
+                        "What would your best friend say are your greatest resources?",
+                        "If this issue were resolved, what would be different in your daily life?"
+                    ],
+                    "humanistic_therapy": [
+                        "I'm curious about your authentic experience of this situation.",
+                        "What feels most true for you right now?",
+                        "How does this align with your core values and sense of self?",
+                        "What would it mean to honor your feelings fully here?",
+                        "I sense there's something important you're trying to express.",
+                        "What would self-compassion look like in this moment?"
+                    ],
+                    "psychodynamic_therapy": [
+                        "I'm curious about the patterns you're noticing. Have you experienced similar feelings before?",
+                        "What comes up for you when you think about the relationships in your life?",
+                        "How might your past experiences be influencing this current situation?",
+                        "What themes do you notice recurring in your relationships?",
+                        "I wonder what this might represent on a deeper level.",
+                        "What feelings or memories does this bring up from earlier in your life?"
+                    ],
+                    "acceptance_commitment_therapy": [
+                        "What values are most important to you in this situation?",
+                        "How might you move toward what matters most, even with these difficult feelings?",
+                        "What would psychological flexibility look like here?",
+                        "Can you make room for these feelings while still taking valued action?",
+                        "What metaphor might help us understand your experience?",
+                        "How might you defuse from these thoughts and connect with your values?"
+                    ]
+                },
+                # Interactive storytelling templates
+                "interactive_storytelling": {
+                    "story_starters": [
+                        "Let's begin your story. What's the setting where this important experience takes place?",
+                        "Every story has a beginning. Where would you like to start telling yours?",
+                        "I'm ready to listen to your story. What's the first thing you'd like me to know?",
+                        "Let's create this story together. What scene would you like to set first?"
+                    ],
+                    "story_development": [
+                        "That's a compelling beginning. What happens next in your story?",
+                        "I can picture that scene. What details would help me understand it even better?",
+                        "This story is developing beautifully. What would you like to explore next?",
+                        "I'm following your narrative. What other characters or elements are important to include?"
+                    ],
+                    "story_deepening": [
+                        "There's so much depth to this story. What emotions were you experiencing during this part?",
+                        "I sense there's more to this chapter. What wasn't said or expressed at the time?",
+                        "This part of your story seems particularly significant. What made it so meaningful?",
+                        "I'm curious about the inner experience during this part of your story. What was going on inside?"
+                    ],
+                    "story_reflection": [
+                        "As we pause in your story, what stands out most to you about what you've shared?",
+                        "Looking at this story from where you are now, what do you notice?",
+                        "What themes are emerging as you tell this story?",
+                        "How does it feel to put this experience into story form?"
+                    ],
+                    "story_continuation": [
+                        "Your story doesn't end there. What would you like to explore next?",
+                        "This story has more chapters. Which one calls to you now?",
+                        "I sense there's more to this narrative. What other parts want to be told?",
+                        "Your story is rich with possibilities. What direction feels right to explore?"
+                    ]
+                }
             }
 
             logger.info("Therapeutic templates initialized")
@@ -813,6 +919,649 @@ class TherapeuticChatInterface:
         except Exception as e:
             logger.error(f"Error initializing therapeutic templates: {e}")
             raise
+
+    def _get_framework_response_template(self, framework: TherapeuticFramework) -> str:
+        """Get a random response template for the specified therapeutic framework."""
+        import random
+
+        framework_key = framework.value
+        framework_responses = self.therapeutic_templates.get("framework_responses", {})
+
+        if framework_key in framework_responses:
+            templates = framework_responses[framework_key]
+            return random.choice(templates)
+
+        # Fallback to empathy response if framework not found
+        empathy_responses = self.therapeutic_templates.get("empathy_responses", [
+            "I can hear that this is really difficult for you."
+        ])
+        return random.choice(empathy_responses)
+
+    def _detect_story_context(self, message: ChatMessage) -> dict[str, Any]:
+        """Detect story context and narrative elements in user message."""
+        content = message.content.lower()
+        story_context = {
+            "has_narrative_elements": False,
+            "story_indicators": [],
+            "narrative_elements": {},
+            "emotional_tone": "neutral",
+            "story_type": None
+        }
+
+        # Story structure indicators (enhanced patterns)
+        story_structure_patterns = {
+            "temporal_markers": ["when i was", "yesterday", "last week", "growing up", "back then", "once upon", "there was a time", "childhood", "one time", "this time"],
+            "character_references": ["my mother", "my father", "my friend", "someone", "this person", "he said", "she told me", "she always", "he always"],
+            "plot_elements": ["what happened was", "then", "after that", "suddenly", "it turned out", "in the end", "what happened", "then i"],
+            "setting_descriptions": ["at home", "at work", "in school", "where i lived", "this place", "in class"]
+        }
+
+        # Narrative therapy specific elements (enhanced patterns)
+        narrative_therapy_elements = {
+            "externalization_language": ["the depression", "the anxiety", "this problem", "it makes me", "it tells me", "keeps telling me"],
+            "identity_statements": ["i am", "i'm the kind of person", "people see me as", "i've always been", "who i am", "figure out who"],
+            "meaning_making": ["what this means", "the significance", "why this matters", "what i learned"],
+            "unique_outcomes": ["except when", "but there was this time", "different from usual", "surprisingly", "there was this one time", "one time when"]
+        }
+
+        detected_elements = []
+        narrative_elements = {}
+
+        # Check for story structure patterns
+        for category, patterns in story_structure_patterns.items():
+            matches = [pattern for pattern in patterns if pattern in content]
+            if matches:
+                detected_elements.extend(matches)
+                narrative_elements[category] = matches
+
+        # Check for narrative therapy elements
+        for category, patterns in narrative_therapy_elements.items():
+            matches = [pattern for pattern in patterns if pattern in content]
+            if matches:
+                detected_elements.extend(matches)
+                narrative_elements[category] = matches
+
+        # Determine if message has significant narrative content (lowered threshold)
+        story_context["has_narrative_elements"] = len(detected_elements) >= 1
+        story_context["story_indicators"] = detected_elements
+        story_context["narrative_elements"] = narrative_elements
+
+        # Determine story type
+        if narrative_elements.get("temporal_markers"):
+            story_context["story_type"] = "personal_history"
+        elif narrative_elements.get("externalization_language"):
+            story_context["story_type"] = "problem_externalization"
+        elif narrative_elements.get("identity_statements"):
+            story_context["story_type"] = "identity_narrative"
+        elif narrative_elements.get("unique_outcomes"):
+            story_context["story_type"] = "exception_story"
+
+        return story_context
+
+    def _extract_narrative_elements(self, message: ChatMessage, story_context: dict[str, Any]) -> dict[str, Any]:
+        """Extract and categorize specific narrative elements from the message."""
+        content = message.content
+        narrative_elements = {
+            "characters": [],
+            "plot_points": [],
+            "themes": [],
+            "emotions": [],
+            "settings": [],
+            "conflicts": [],
+            "resolutions": []
+        }
+
+        # Character extraction patterns
+        character_patterns = [
+            r"my (?:mother|mom|father|dad|sister|brother|friend|partner|spouse|boss|teacher|therapist)",
+            r"(?:he|she|they) (?:said|told|asked|did|was|were)",
+            r"someone (?:who|that)",
+            r"this person (?:who|that)"
+        ]
+
+        # Plot point indicators
+        plot_indicators = [
+            "what happened", "then", "after that", "suddenly", "meanwhile",
+            "it turned out", "in the end", "finally", "eventually"
+        ]
+
+        # Theme extraction (therapeutic themes)
+        therapeutic_themes = {
+            "loss": ["lost", "grief", "missing", "gone", "died", "ended"],
+            "growth": ["learned", "grew", "developed", "changed", "became"],
+            "struggle": ["difficult", "hard", "challenging", "tough", "struggled"],
+            "resilience": ["overcame", "survived", "endured", "persevered", "strong"],
+            "relationships": ["connected", "loved", "supported", "together", "alone"],
+            "identity": ["who i am", "myself", "identity", "self", "person i am"]
+        }
+
+        # Emotional indicators
+        emotion_words = {
+            "positive": ["happy", "joy", "excited", "proud", "grateful", "hopeful"],
+            "negative": ["sad", "angry", "frustrated", "disappointed", "hurt", "afraid"],
+            "complex": ["confused", "conflicted", "ambivalent", "uncertain", "mixed"]
+        }
+
+        content_lower = content.lower()
+
+        # Extract characters (simplified)
+        import re
+        for pattern in character_patterns:
+            matches = re.findall(pattern, content_lower)
+            narrative_elements["characters"].extend(matches)
+
+        # Extract plot points
+        for indicator in plot_indicators:
+            if indicator in content_lower:
+                narrative_elements["plot_points"].append(indicator)
+
+        # Extract themes
+        for theme, keywords in therapeutic_themes.items():
+            if any(keyword in content_lower for keyword in keywords):
+                narrative_elements["themes"].append(theme)
+
+        # Extract emotions
+        for emotion_type, words in emotion_words.items():
+            found_emotions = [word for word in words if word in content_lower]
+            if found_emotions:
+                narrative_elements["emotions"].extend([(emotion_type, word) for word in found_emotions])
+
+        # Extract conflicts and resolutions
+        conflict_indicators = ["problem", "issue", "struggle", "difficulty", "challenge", "conflict"]
+        resolution_indicators = ["solved", "resolved", "overcame", "figured out", "worked through"]
+
+        narrative_elements["conflicts"] = [word for word in conflict_indicators if word in content_lower]
+        narrative_elements["resolutions"] = [word for word in resolution_indicators if word in content_lower]
+
+        return narrative_elements
+
+    def _track_narrative_progression(self, session_id: str, narrative_elements: dict[str, Any]) -> None:
+        """Track narrative progression across conversation turns."""
+        if not hasattr(self, 'narrative_tracking'):
+            self.narrative_tracking = {}
+
+        if session_id not in self.narrative_tracking:
+            self.narrative_tracking[session_id] = {
+                "story_threads": [],
+                "character_mentions": {},
+                "recurring_themes": {},
+                "emotional_journey": [],
+                "narrative_coherence_score": 0.0
+            }
+
+        session_narrative = self.narrative_tracking[session_id]
+
+        # Track character mentions
+        for character in narrative_elements.get("characters", []):
+            if character not in session_narrative["character_mentions"]:
+                session_narrative["character_mentions"][character] = 0
+            session_narrative["character_mentions"][character] += 1
+
+        # Track recurring themes
+        for theme in narrative_elements.get("themes", []):
+            if theme not in session_narrative["recurring_themes"]:
+                session_narrative["recurring_themes"][theme] = 0
+            session_narrative["recurring_themes"][theme] += 1
+
+        # Track emotional journey
+        emotions = narrative_elements.get("emotions", [])
+        if emotions:
+            session_narrative["emotional_journey"].append({
+                "turn": len(session_narrative["emotional_journey"]) + 1,
+                "emotions": emotions
+            })
+
+        # Update narrative coherence score (simplified)
+        coherence_factors = [
+            len(session_narrative["character_mentions"]) > 0,  # Has characters
+            len(session_narrative["recurring_themes"]) > 0,   # Has themes
+            len(session_narrative["emotional_journey"]) > 1   # Emotional progression
+        ]
+        session_narrative["narrative_coherence_score"] = sum(coherence_factors) / len(coherence_factors)
+
+    def _enhance_narrative_state_management(self, session_id: str) -> dict[str, Any]:
+        """Enhanced narrative state management for sustained story contexts."""
+        if not hasattr(self, 'narrative_tracking'):
+            self.narrative_tracking = {}
+
+        if session_id not in self.narrative_tracking:
+            self.narrative_tracking[session_id] = {
+                "story_threads": [],
+                "character_mentions": {},
+                "recurring_themes": {},
+                "emotional_journey": [],
+                "narrative_coherence_score": 0.0,
+                "world_building_elements": {},
+                "therapeutic_progress": {},
+                "story_arcs": [],
+                "session_continuity": {}
+            }
+
+        session_narrative = self.narrative_tracking[session_id]
+
+        # Enhanced world building tracking
+        if "world_building_elements" not in session_narrative:
+            session_narrative["world_building_elements"] = {
+                "settings": [],
+                "relationships": {},
+                "conflicts": [],
+                "resolutions": [],
+                "symbolic_elements": [],
+                "therapeutic_metaphors": []
+            }
+
+        # Enhanced therapeutic progress tracking
+        if "therapeutic_progress" not in session_narrative:
+            session_narrative["therapeutic_progress"] = {
+                "externalization_progress": 0.0,
+                "reauthoring_attempts": 0,
+                "unique_outcomes_identified": 0,
+                "identity_exploration_depth": 0.0,
+                "meaning_making_instances": 0
+            }
+
+        # Story arc tracking for sustained narratives
+        if "story_arcs" not in session_narrative:
+            session_narrative["story_arcs"] = []
+
+        return session_narrative
+
+    def _maintain_story_continuity(self, session_id: str, current_narrative_elements: dict[str, Any]) -> dict[str, Any]:
+        """Maintain story continuity across conversation turns."""
+        session_narrative = self._enhance_narrative_state_management(session_id)
+
+        # Update world building elements
+        world_elements = session_narrative["world_building_elements"]
+
+        # Track settings mentioned
+        if current_narrative_elements.get("settings"):
+            for setting in current_narrative_elements["settings"]:
+                if setting not in world_elements["settings"]:
+                    world_elements["settings"].append(setting)
+
+        # Track relationship dynamics
+        if current_narrative_elements.get("characters"):
+            for character in current_narrative_elements["characters"]:
+                if character not in world_elements["relationships"]:
+                    world_elements["relationships"][character] = {
+                        "first_mentioned": len(session_narrative["emotional_journey"]) + 1,
+                        "relationship_type": "unknown",
+                        "significance": "emerging"
+                    }
+
+        # Track conflicts and resolutions
+        if current_narrative_elements.get("conflicts"):
+            world_elements["conflicts"].extend(current_narrative_elements["conflicts"])
+
+        if current_narrative_elements.get("resolutions"):
+            world_elements["resolutions"].extend(current_narrative_elements["resolutions"])
+
+        # Update therapeutic progress metrics
+        therapeutic_progress = session_narrative["therapeutic_progress"]
+
+        # Track externalization progress
+        if "externalization_language" in current_narrative_elements:
+            therapeutic_progress["externalization_progress"] += 0.1
+
+        # Track reauthoring attempts
+        if any(theme in ["growth", "resilience"] for theme in current_narrative_elements.get("themes", [])):
+            therapeutic_progress["reauthoring_attempts"] += 1
+
+        # Track unique outcomes
+        if "unique_outcomes" in current_narrative_elements:
+            therapeutic_progress["unique_outcomes_identified"] += len(current_narrative_elements["unique_outcomes"])
+
+        # Track identity exploration
+        if "identity_statements" in current_narrative_elements:
+            therapeutic_progress["identity_exploration_depth"] += 0.2
+
+        # Track meaning making
+        if current_narrative_elements.get("themes"):
+            therapeutic_progress["meaning_making_instances"] += 1
+
+        return session_narrative
+
+    def _generate_continuity_aware_response(self, session_id: str, current_story_context: dict[str, Any]) -> str:
+        """Generate response that maintains awareness of ongoing story continuity."""
+        session_narrative = self._enhance_narrative_state_management(session_id)
+
+        # Check for recurring elements
+        recurring_characters = [char for char, count in session_narrative["character_mentions"].items() if count > 1]
+        recurring_themes = [theme for theme, count in session_narrative["recurring_themes"].items() if count > 1]
+
+        continuity_responses = []
+
+        # Reference recurring characters
+        if recurring_characters:
+            char = recurring_characters[0]
+            continuity_responses.append(f"I notice {char} has been an important figure in your story. How does this current experience connect to what you've shared about them before?")
+
+        # Reference recurring themes
+        if recurring_themes:
+            theme = recurring_themes[0]
+            continuity_responses.append(f"This connects to the theme of {theme} that's been present throughout your story. How do you see this pattern developing?")
+
+        # Reference therapeutic progress
+        therapeutic_progress = session_narrative.get("therapeutic_progress", {})
+        if therapeutic_progress.get("externalization_progress", 0) > 0.3:
+            continuity_responses.append("I can see how you've been working to separate yourself from the problem in your story. How does this current experience fit with that process?")
+
+        if therapeutic_progress.get("reauthoring_attempts", 0) > 2:
+            continuity_responses.append("You've been exploring different ways to tell your story. What new perspective might this experience add?")
+
+        # Default continuity response
+        if not continuity_responses:
+            continuity_responses.append("This adds another layer to the story you've been sharing. How does this connect to the larger narrative of your journey?")
+
+        import random
+        return random.choice(continuity_responses)
+
+    def _generate_story_engaged_response(self, message: ChatMessage, story_context: dict[str, Any], narrative_elements: dict[str, Any]) -> str:
+        """Generate response that actively engages with story elements."""
+        import random
+
+        # Story-specific response templates based on story type
+        story_type = story_context.get("story_type")
+
+        if story_type == "personal_history":
+            templates = [
+                "That sounds like a significant moment in your story. What did that experience teach you about yourself?",
+                "I can hear how important this memory is to you. How does it connect to who you are today?",
+                "Thank you for sharing that part of your journey. What would you want others to know about that experience?",
+                "That chapter of your life sounds meaningful. How has it shaped the story you're writing now?"
+            ]
+        elif story_type == "problem_externalization":
+            templates = [
+                "I notice you're talking about [the problem] as something separate from you. What would you call this problem if you gave it a name?",
+                "It sounds like this problem has been trying to convince you of certain things. What has it been telling you?",
+                "When this problem isn't so present, what's different about your story?",
+                "What would it look like to not let this problem be the author of your story?"
+            ]
+        elif story_type == "identity_narrative":
+            templates = [
+                "You're sharing something important about who you are. What other aspects of your identity feel significant?",
+                "I hear you describing yourself in a particular way. Are there other ways people who know you well might describe you?",
+                "That's one part of your identity story. What other chapters would you want to include?",
+                "How would you like this aspect of your identity to evolve in your ongoing story?"
+            ]
+        elif story_type == "exception_story":
+            templates = [
+                "That sounds like a unique outcome - a time when things were different. What made that possible?",
+                "I'm curious about this exception to the usual pattern. What was happening differently then?",
+                "That's an interesting plot twist in your story. What does it tell you about your capabilities?",
+                "These exceptions are important - they show other possibilities in your story. What can we learn from them?"
+            ]
+        else:
+            # General narrative engagement templates
+            templates = [
+                "I can hear the story you're telling. What feels most important about this part of your narrative?",
+                "Thank you for sharing your story with me. What meaning are you making from this experience?",
+                "Every story has multiple perspectives. How might this story look from a different angle?",
+                "What would you want the next chapter of this story to look like?"
+            ]
+
+        # Select base response
+        base_response = random.choice(templates)
+
+        # Enhance response based on narrative elements
+        if narrative_elements.get("themes"):
+            prominent_theme = narrative_elements["themes"][0]
+            if prominent_theme == "resilience":
+                base_response += " I'm struck by the strength I hear in your story."
+            elif prominent_theme == "growth":
+                base_response += " It sounds like this experience has been part of your growth journey."
+            elif prominent_theme == "struggle":
+                base_response += " I can hear how challenging this has been for you."
+
+        if narrative_elements.get("emotions"):
+            emotion_type, emotion_word = narrative_elements["emotions"][0]
+            if emotion_type == "complex":
+                base_response += f" I notice you mentioned feeling {emotion_word} - that sounds like a complex emotional experience."
+
+        return base_response
+
+    async def _integrate_story_context_in_response(self, message: ChatMessage, context: TherapeuticContext) -> str:
+        """Integrate story context detection into response generation."""
+        # Detect story context
+        story_context = self._detect_story_context(message)
+
+        # If significant narrative elements are detected, use story-engaged response
+        if story_context["has_narrative_elements"]:
+            narrative_elements = self._extract_narrative_elements(message, story_context)
+            self._track_narrative_progression(message.session_id, narrative_elements)
+
+            # Generate story-engaged response
+            return self._generate_story_engaged_response(message, story_context, narrative_elements)
+
+        # Otherwise, use standard framework response
+        framework = self._select_therapeutic_framework(message, context)
+        return self._get_framework_response_template(framework)
+
+    def _initiate_collaborative_narrative_building(self, message: ChatMessage, story_context: dict[str, Any]) -> str:
+        """Initiate collaborative narrative building with the user."""
+        import random
+
+        story_type = story_context.get("story_type")
+
+        # Collaborative prompts based on story type
+        collaborative_prompts = {
+            "personal_history": [
+                "I'd love to explore this story with you. What would you like to focus on - the characters, the setting, or what this experience meant to you?",
+                "This sounds like an important chapter in your life story. Should we explore what led up to this moment, or what happened next?",
+                "I'm curious about the different perspectives in this story. How might other people involved have experienced this?",
+                "What details about this story feel most significant to you right now?"
+            ],
+            "problem_externalization": [
+                "Let's work together to understand this problem better. If we gave it a character in your story, what would it look like?",
+                "I'm interested in exploring when this problem has less power in your story. Can we build that part together?",
+                "What would it look like if you were the director of this story instead of this problem?",
+                "Let's co-author a different ending to this story. What would need to change?"
+            ],
+            "identity_narrative": [
+                "I'd like to help you explore the different aspects of your identity story. Which part feels most important to develop?",
+                "Let's build a richer picture of who you are together. What other qualities would your story include?",
+                "If we were writing your character description, what strengths would we definitely include?",
+                "What would you want the next chapter of your identity story to emphasize?"
+            ],
+            "exception_story": [
+                "This exception sounds important - let's explore it together. What made this different outcome possible?",
+                "I'd like to help you build on this unique outcome. What other times have you experienced something similar?",
+                "Let's develop this part of your story more. What resources or strengths were you drawing on?",
+                "If we could recreate the conditions that made this exception possible, what would that look like?"
+            ]
+        }
+
+        # Default collaborative prompts
+        default_prompts = [
+            "I'd like to explore this story with you. What aspect feels most important to develop together?",
+            "Let's build on this narrative together. What would you like to focus on next?",
+            "I'm here to help you develop your story. What direction would you like to take it?",
+            "This story has many possibilities. What would you like to explore together?"
+        ]
+
+        prompts = collaborative_prompts.get(story_type, default_prompts)
+        return random.choice(prompts)
+
+    def _suggest_narrative_development_options(self, narrative_elements: dict[str, Any]) -> list[str]:
+        """Suggest specific options for developing the narrative further."""
+        options = []
+
+        # Character development options
+        if narrative_elements.get("characters"):
+            options.append("Explore the relationships and dynamics between the characters in your story")
+            options.append("Develop the backstory or motivations of key characters")
+
+        # Theme development options
+        if narrative_elements.get("themes"):
+            prominent_theme = narrative_elements["themes"][0]
+            if prominent_theme == "resilience":
+                options.append("Explore other times you've shown resilience in your story")
+            elif prominent_theme == "growth":
+                options.append("Identify the key moments of growth and transformation")
+            elif prominent_theme == "struggle":
+                options.append("Examine how struggles have shaped your character development")
+
+        # Plot development options
+        if narrative_elements.get("plot_points"):
+            options.append("Explore what led up to these key moments in your story")
+            options.append("Consider alternative ways these events could have unfolded")
+
+        # Emotional development options
+        if narrative_elements.get("emotions"):
+            options.append("Explore the emotional journey and how feelings evolved")
+            options.append("Identify moments of emotional strength or breakthrough")
+
+        # Conflict and resolution options
+        if narrative_elements.get("conflicts"):
+            options.append("Examine how conflicts have been resolved or could be resolved")
+            options.append("Explore what resources you've used to handle challenges")
+
+        # Default options if none specific found
+        if not options:
+            options = [
+                "Explore the meaning and significance of this experience",
+                "Consider different perspectives on this story",
+                "Identify the strengths and resources present in your narrative",
+                "Examine how this story connects to your larger life journey"
+            ]
+
+        return options[:3]  # Return top 3 options
+
+    def _facilitate_story_co_creation(self, message: ChatMessage, story_context: dict[str, Any], narrative_elements: dict[str, Any]) -> str:
+        """Facilitate collaborative story creation with therapeutic guidance."""
+
+        # Get collaborative prompt
+        base_response = self._initiate_collaborative_narrative_building(message, story_context)
+
+        # Add development options
+        development_options = self._suggest_narrative_development_options(narrative_elements)
+
+        if development_options:
+            base_response += "\n\nSome directions we could explore together:"
+            for i, option in enumerate(development_options, 1):
+                base_response += f"\n{i}. {option}"
+            base_response += "\n\nWhat feels most meaningful to you right now?"
+
+        return base_response
+
+    def _apply_narrative_therapeutic_interventions(self, message: ChatMessage, story_context: dict[str, Any], narrative_elements: dict[str, Any]) -> str:
+        """Apply specific narrative therapy interventions based on story content."""
+        import random
+
+        story_type = story_context.get("story_type")
+        interventions = []
+
+        # Externalization interventions
+        if story_type == "problem_externalization" or narrative_elements.get("conflicts"):
+            externalization_interventions = [
+                "Let's give this problem a name. What would you call it if it were a character in your story?",
+                "When this problem isn't around, what's different about your story? What becomes possible?",
+                "What tactics does this problem use to convince you of things? How does it operate in your story?",
+                "If you were to write a letter to this problem, what would you want to say to it?",
+                "What would it look like to not invite this problem to be the narrator of your story?"
+            ]
+            interventions.extend(externalization_interventions)
+
+        # Re-authoring interventions
+        if story_type == "identity_narrative" or narrative_elements.get("themes"):
+            reauthoring_interventions = [
+                "If you were rewriting this chapter of your story, what would you change?",
+                "What alternative story about yourself might be equally true?",
+                "If a close friend were telling your story, what strengths would they emphasize?",
+                "What would the preferred version of this story look like?",
+                "How might you author a different ending to this narrative?"
+            ]
+            interventions.extend(reauthoring_interventions)
+
+        # Unique outcomes interventions
+        if story_type == "exception_story" or "resilience" in narrative_elements.get("themes", []):
+            unique_outcomes_interventions = [
+                "This sounds like a unique outcome - tell me more about what made this different experience possible.",
+                "What does this exception tell us about your capabilities and resources?",
+                "How might we thicken this alternative story? What other examples support it?",
+                "What would need to happen for more of these unique outcomes to occur in your story?",
+                "Who else has witnessed these moments when you've shown this strength?"
+            ]
+            interventions.extend(unique_outcomes_interventions)
+
+        # Definitional ceremony interventions
+        if narrative_elements.get("characters") or story_type == "personal_history":
+            definitional_interventions = [
+                "Who in your life has witnessed your strength in this story? What would they say about you?",
+                "If we invited the people who know you best to comment on this story, what would they highlight?",
+                "What would your younger self think about how you've handled this situation?",
+                "Who would be least surprised by the resilience you've shown in this story?",
+                "What audience would you want to hear this story of your growth and strength?"
+            ]
+            interventions.extend(definitional_interventions)
+
+        # Landscape of action vs landscape of identity
+        if narrative_elements.get("plot_points"):
+            landscape_interventions = [
+                "We've talked about what happened (landscape of action). What does this say about who you are (landscape of identity)?",
+                "Beyond the events themselves, what do these actions reveal about your values and commitments?",
+                "What intentions and purposes were guiding you through these experiences?",
+                "How do these actions connect to your hopes and dreams for your life?",
+                "What do these choices say about what matters most to you?"
+            ]
+            interventions.extend(landscape_interventions)
+
+        # Default narrative interventions
+        if not interventions:
+            default_interventions = [
+                "What meaning are you making from this story?",
+                "How does this story connect to your values and what's important to you?",
+                "What would you want others to learn from your story?",
+                "How might this story be part of a larger narrative of growth and resilience?"
+            ]
+            interventions.extend(default_interventions)
+
+        return random.choice(interventions)
+
+    def _create_therapeutic_story_metaphor(self, narrative_elements: dict[str, Any]) -> str:
+        """Create therapeutic metaphors based on narrative elements."""
+        import random
+
+        themes = narrative_elements.get("themes", [])
+        emotions = narrative_elements.get("emotions", [])
+
+        metaphor_templates = {
+            "resilience": [
+                "Your story reminds me of a tree that bends in strong winds but doesn't break. What has helped you stay rooted?",
+                "Like a river that finds its way around obstacles, your story shows how you've navigated challenges. What keeps you flowing forward?",
+                "Your narrative is like a phoenix story - rising from difficult circumstances. What fuels your ability to rise?"
+            ],
+            "growth": [
+                "Your story is like a garden where new growth emerges from difficult seasons. What conditions help you flourish?",
+                "Like a butterfly emerging from its cocoon, your story shows transformation. What supports your metamorphosis?",
+                "Your narrative reminds me of a mountain climber who discovers new vistas with each challenge overcome."
+            ],
+            "struggle": [
+                "Your story is like a hero's journey - facing challenges that ultimately reveal your strength. What allies do you have on this journey?",
+                "Like a ship navigating stormy seas, your story shows courage in difficult waters. What serves as your compass?",
+                "Your narrative reminds me of a warrior who fights not just external battles, but discovers inner strength."
+            ],
+            "identity": [
+                "Your story is like an artist discovering their unique style - exploring different aspects of who you are. What colors feel most authentic?",
+                "Like an author finding their voice, your story shows you discovering what makes you uniquely you.",
+                "Your narrative reminds me of an explorer mapping new territory - the territory of your own identity and possibilities."
+            ]
+        }
+
+        # Select metaphor based on prominent theme
+        if themes:
+            prominent_theme = themes[0]
+            if prominent_theme in metaphor_templates:
+                return random.choice(metaphor_templates[prominent_theme])
+
+        # Default metaphor
+        default_metaphors = [
+            "Your story is like a book being written - each chapter adds depth and meaning to the whole narrative.",
+            "Like a tapestry being woven, your story shows how different threads come together to create something beautiful.",
+            "Your narrative reminds me of a journey where each step, even the difficult ones, leads to new discoveries."
+        ]
+
+        return random.choice(default_metaphors)
 
     # Background task methods
     async def _message_processing_loop(self):
@@ -956,7 +1705,7 @@ class TherapeuticChatInterface:
 
         return context
 
-    async def _create_conversation_flow(self, session_id: str, therapeutic_goals: List[str]) -> ConversationFlow:
+    async def _create_conversation_flow(self, session_id: str, therapeutic_goals: list[str]) -> ConversationFlow:
         """Create conversation flow for session."""
         flow = ConversationFlow(
             session_id=session_id,
@@ -1124,10 +1873,23 @@ class TherapeuticChatInterface:
 
     def _select_therapeutic_framework(self, message: ChatMessage, context: TherapeuticContext) -> TherapeuticFramework:
         """Select appropriate therapeutic framework for response."""
-        # Simple framework selection based on content and context
+        # Enhanced framework selection based on content and context
         content = message.content.lower()
 
-        if any(word in content for word in ["think", "thought", "believe", "assumption"]):
+        # Narrative therapy keywords (highest priority for story-based content)
+        narrative_keywords = [
+            "story", "narrative", "tale", "chapter", "plot", "character", "protagonist",
+            "identity", "meaning", "purpose", "values", "who i am", "define me",
+            "externalize", "separate from", "outside of me", "not me", "the problem",
+            "rewrite", "different ending", "new chapter", "alternative story", "preferred story",
+            "exception", "times when", "different experience", "when it wasn't", "unique outcome",
+            "witness", "audience", "tell others", "share my story", "others would say",
+            "journey", "path", "crossroads", "turning point", "transformation"
+        ]
+
+        if any(word in content for word in narrative_keywords):
+            return TherapeuticFramework.NARRATIVE
+        elif any(word in content for word in ["think", "thought", "believe", "assumption"]):
             return TherapeuticFramework.CBT
         elif any(word in content for word in ["feel", "emotion", "overwhelmed", "intense"]):
             return TherapeuticFramework.DBT
@@ -1141,39 +1903,87 @@ class TherapeuticChatInterface:
                 return context.preferred_therapeutic_approaches[0]
             return TherapeuticFramework.CBT
 
-    # Simplified response generators
+    # Enhanced response generators using template system
     async def _generate_cbt_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
         """Generate CBT-based therapeutic response."""
-        return "I notice you mentioned some thoughts. Let's explore how those thoughts might be affecting how you feel. What evidence do you have for and against this thought?"
+        return self._get_framework_response_template(TherapeuticFramework.CBT)
 
     async def _generate_dbt_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
         """Generate DBT-based therapeutic response."""
-        return "It sounds like you're experiencing some intense emotions. Let's practice some distress tolerance skills. Can you try taking three deep breaths with me?"
+        return self._get_framework_response_template(TherapeuticFramework.DBT)
 
     async def _generate_mindfulness_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
         """Generate mindfulness-based therapeutic response."""
-        return "Let's take a moment to be present. Can you notice three things you can see, two things you can hear, and one thing you can feel right now?"
+        return self._get_framework_response_template(TherapeuticFramework.MINDFULNESS)
 
     async def _generate_default_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
         """Generate default therapeutic response."""
+        import random
         empathy_responses = self.therapeutic_templates["empathy_responses"]
-        return empathy_responses[0] + " Can you tell me more about what you're experiencing?"
+        return random.choice(empathy_responses) + " Can you tell me more about what you're experiencing?"
 
-    # Placeholder methods for comprehensive functionality
     async def _generate_act_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
-        return "What values are most important to you in this situation? How can we align your actions with those values?"
+        """Generate ACT-based therapeutic response."""
+        return self._get_framework_response_template(TherapeuticFramework.ACT)
 
     async def _generate_humanistic_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
-        return "I hear you, and I want you to know that your feelings are valid. What feels most important for you right now?"
+        """Generate humanistic therapeutic response."""
+        return self._get_framework_response_template(TherapeuticFramework.HUMANISTIC)
 
     async def _generate_psychodynamic_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
-        return "I'm curious about the patterns you're noticing. Have you experienced similar feelings or situations before?"
+        """Generate psychodynamic therapeutic response."""
+        return self._get_framework_response_template(TherapeuticFramework.PSYCHODYNAMIC)
 
     async def _generate_solution_focused_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
-        return "What has worked for you in similar situations before? What strengths can you draw upon here?"
+        """Generate solution-focused therapeutic response."""
+        return self._get_framework_response_template(TherapeuticFramework.SOLUTION_FOCUSED)
 
     async def _generate_narrative_response(self, message: ChatMessage, context: TherapeuticContext, flow: ConversationFlow) -> str:
-        return "That's an important part of your story. How would you like this chapter to unfold?"
+        """Generate enhanced narrative therapy response with story engagement."""
+        # Detect story context and narrative elements
+        story_context = self._detect_story_context(message)
+
+        if story_context["has_narrative_elements"]:
+            # Extract narrative elements for deeper analysis
+            narrative_elements = self._extract_narrative_elements(message, story_context)
+
+            # Track narrative progression
+            self._track_narrative_progression(message.session_id, narrative_elements)
+
+            # Determine response approach based on conversation flow and story development
+            if hasattr(self, 'narrative_tracking') and message.session_id in self.narrative_tracking:
+                session_narrative = self.narrative_tracking[message.session_id]
+                coherence_score = session_narrative.get("narrative_coherence_score", 0.0)
+
+                # Use different approaches based on narrative development
+                if coherence_score < 0.3:
+                    # Early story development - use story starters
+                    templates = self.therapeutic_templates["interactive_storytelling"]["story_starters"]
+                elif coherence_score < 0.6:
+                    # Mid-story development - use development prompts
+                    templates = self.therapeutic_templates["interactive_storytelling"]["story_development"]
+                else:
+                    # Well-developed story - use deepening or reflection
+                    import random
+                    template_categories = ["story_deepening", "story_reflection"]
+                    category = random.choice(template_categories)
+                    templates = self.therapeutic_templates["interactive_storytelling"][category]
+
+                import random
+                base_response = random.choice(templates)
+
+                # Add therapeutic intervention if appropriate
+                if coherence_score > 0.5:
+                    intervention = self._apply_narrative_therapeutic_interventions(message, story_context, narrative_elements)
+                    base_response += f"\n\n{intervention}"
+
+                return base_response
+            else:
+                # First narrative interaction - use collaborative approach
+                return self._facilitate_story_co_creation(message, story_context, narrative_elements)
+        else:
+            # No significant narrative elements - use standard narrative therapy response
+            return self._get_framework_response_template(TherapeuticFramework.NARRATIVE)
 
     async def _update_conversation_flow(self, flow: ConversationFlow, user_message: ChatMessage, response_message: ChatMessage):
         """Update conversation flow based on interaction."""
@@ -1224,7 +2034,7 @@ class TherapeuticChatInterface:
             except Exception as e:
                 logger.warning(f"Could not track engagement: {e}")
 
-    async def _generate_session_summary(self, session: ChatSession) -> Dict[str, Any]:
+    async def _generate_session_summary(self, session: ChatSession) -> dict[str, Any]:
         """Generate comprehensive session summary."""
         summary = {
             "session_id": session.session_id,
@@ -1242,7 +2052,7 @@ class TherapeuticChatInterface:
 
         return summary
 
-    async def _generate_therapeutic_recommendations(self, session: ChatSession, context: TherapeuticContext) -> List[str]:
+    async def _generate_therapeutic_recommendations(self, session: ChatSession, context: TherapeuticContext) -> list[str]:
         """Generate therapeutic recommendations based on session."""
         recommendations = []
 

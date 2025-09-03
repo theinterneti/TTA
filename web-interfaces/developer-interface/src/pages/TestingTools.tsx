@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  UserIcon, 
-  KeyIcon, 
-  CogIcon, 
+import {
+  UserIcon,
+  KeyIcon,
+  CogIcon,
   BeakerIcon,
   ClipboardDocumentIcon,
   CheckCircleIcon,

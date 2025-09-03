@@ -6,30 +6,30 @@ This will be expanded in future development phases.
 """
 
 import logging
-from typing import Dict, Any
 from datetime import datetime
+from typing import Any
 
-from .e2e_test_orchestrator import TestSuiteReport, TestSuite, TestStatus, TestResult
+from .e2e_test_orchestrator import TestResult, TestStatus, TestSuite, TestSuiteReport
 
 logger = logging.getLogger(__name__)
 
 
 class SystemIntegrationTester:
     """Complete system integration testing across all components."""
-    
+
     def __init__(self):
         """Initialize the system integration tester."""
         pass
-    
+
     async def initialize(self):
         """Initialize the system integration tester."""
         logger.info("SystemIntegrationTester initialized (placeholder)")
-    
+
     async def execute_integration_tests(self, **system_components) -> TestSuiteReport:
         """Execute system integration tests."""
         # Create mock test results
         test_results = []
-        
+
         # Test therapeutic systems integration
         for i, (system_name, system) in enumerate(system_components.get('therapeutic_systems', {}).items()):
             if system:
@@ -44,7 +44,7 @@ class SystemIntegrationTester:
                     assertions_failed=0
                 )
                 test_results.append(test_result)
-        
+
         # Test Phase B components integration
         for component_name in ['clinical_dashboard_manager', 'cloud_deployment_manager', 'clinical_validation_manager']:
             component = system_components.get(component_name)
@@ -60,7 +60,7 @@ class SystemIntegrationTester:
                     assertions_failed=0
                 )
                 test_results.append(test_result)
-        
+
         # Create suite report
         suite_report = TestSuiteReport(
             suite_type=TestSuite.SYSTEM_INTEGRATION,
@@ -75,9 +75,9 @@ class SystemIntegrationTester:
             success_rate=100.0,
             end_time=datetime.utcnow()
         )
-        
+
         return suite_report
-    
-    async def health_check(self) -> Dict[str, Any]:
+
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check."""
         return {"status": "healthy", "service": "system_integration_tester"}

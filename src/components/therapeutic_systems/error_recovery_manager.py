@@ -6,14 +6,14 @@ for all therapeutic systems with graceful degradation under system stress
 and therapeutic continuity maintenance during errors.
 """
 
+import asyncio
 import logging
 import traceback
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 from uuid import uuid4
-from dataclasses import dataclass, field
-import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -55,9 +55,9 @@ class ErrorContext:
     function: str = ""
 
     # User and session context
-    user_id: Optional[str] = None
-    session_id: Optional[str] = None
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
+    user_id: str | None = None
+    session_id: str | None = None
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
 
     # Error details
     severity: ErrorSeverity = ErrorSeverity.MEDIUM
@@ -67,7 +67,7 @@ class ErrorContext:
     # Recovery tracking
     recovery_attempts: int = 0
     max_recovery_attempts: int = 3
-    recovery_strategies_tried: List[RecoveryStrategy] = field(default_factory=list)
+    recovery_strategies_tried: list[RecoveryStrategy] = field(default_factory=list)
 
     # Impact assessment
     affects_therapeutic_continuity: bool = False
@@ -87,13 +87,13 @@ class RecoveryResult:
     recovery_time_seconds: float = 0.0
 
     # Actions taken
-    actions_taken: List[str] = field(default_factory=list)
-    fallback_systems_activated: List[str] = field(default_factory=list)
-    degraded_functionality: List[str] = field(default_factory=list)
+    actions_taken: list[str] = field(default_factory=list)
+    fallback_systems_activated: list[str] = field(default_factory=list)
+    degraded_functionality: list[str] = field(default_factory=list)
 
     # User communication
-    user_message: Optional[str] = None
-    therapeutic_message: Optional[str] = None
+    user_message: str | None = None
+    therapeutic_message: str | None = None
     requires_user_notification: bool = False
 
     # Follow-up requirements
@@ -127,7 +127,7 @@ class SystemHealthStatus:
     user_safety_compromised: bool = False
 
     # Additional context
-    details: Dict[str, Any] = field(default_factory=dict)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class TherapeuticErrorRecoveryManager:
@@ -137,7 +137,7 @@ class TherapeuticErrorRecoveryManager:
     and therapeutic continuity maintenance.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic error recovery manager."""
         self.config = config or {}
 
@@ -262,9 +262,9 @@ class TherapeuticErrorRecoveryManager:
         exception: Exception,
         component: str,
         function: str,
-        user_id: Optional[str] = None,
-        session_id: Optional[str] = None,
-        therapeutic_context: Optional[Dict[str, Any]] = None,
+        user_id: str | None = None,
+        session_id: str | None = None,
+        therapeutic_context: dict[str, Any] | None = None,
     ) -> RecoveryResult:
         """
         Handle an error with comprehensive recovery mechanisms.
@@ -353,7 +353,7 @@ class TherapeuticErrorRecoveryManager:
         self,
         exception: Exception,
         component: str,
-        therapeutic_context: Optional[Dict[str, Any]]
+        therapeutic_context: dict[str, Any] | None
     ) -> ErrorSeverity:
         """Assess the severity of an error."""
         try:
@@ -898,7 +898,7 @@ class TherapeuticErrorRecoveryManager:
         except Exception as e:
             logger.error(f"Error cleaning up old errors: {e}")
 
-    async def get_system_health_status(self) -> Dict[str, Any]:
+    async def get_system_health_status(self) -> dict[str, Any]:
         """Get comprehensive system health status."""
         try:
             # Calculate overall health metrics
@@ -979,7 +979,7 @@ class TherapeuticErrorRecoveryManager:
             logger.error(f"Error calculating recovery success rate: {e}")
             return 0.0
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the error recovery manager."""
         try:
             # Check therapeutic system availability
@@ -1017,7 +1017,7 @@ class TherapeuticErrorRecoveryManager:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get error recovery manager metrics."""
         # Calculate additional metrics
         total_errors = len(self.error_history)

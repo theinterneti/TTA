@@ -217,6 +217,7 @@ class WBAAdapter:
         self.tools = tools or {}
         self._available = WorldBuildingAgent is not None
         self._wba_instance = None
+        self._mock_cache = {}  # Cache for mock implementation
 
         if self._available and neo4j_manager:
             try:
@@ -289,17 +290,34 @@ class WBAAdapter:
         self, world_id: str, updates: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Fallback mock implementation for WBA processing."""
+        cached = world_id in self._mock_cache and updates is None
+
+        if cached:
+            # Return cached result
+            result = self._mock_cache[world_id].copy()
+            result["cached"] = True
+            return result
+
+        # Create new world state
         world_state = {"id": world_id, "regions": [], "entities": []}
         if updates:
+            # Apply updates to existing cached state if available
+            if world_id in self._mock_cache:
+                world_state = self._mock_cache[world_id]["world_state"].copy()
             world_state.update(updates)
 
-        return {
+        result = {
             "world_id": world_id,
             "world_state": world_state,
             "updated": updates is not None,
             "cached": False,
             "source": "mock_fallback",
         }
+
+        # Cache the result for future requests
+        self._mock_cache[world_id] = result.copy()
+
+        return result
 
 
 class NGAAdapter:
@@ -380,7 +398,14 @@ class NGAAdapter:
         self, prompt: str, context: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Fallback mock implementation for NGA processing."""
+        # Basic content filtering for mock implementation
+        filtered_words = ["violence", "violent", "harm", "hurt", "kill", "death", "blood"]
         story = f"Generated story for: {prompt[:64]}..."
+
+        # Check if prompt contains filtered content
+        prompt_lower = prompt.lower()
+        if any(word in prompt_lower for word in filtered_words):
+            story = f"Generated story for: [redacted] - {prompt[:20]}..."
 
         return {
             "story": story,

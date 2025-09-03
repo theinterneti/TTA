@@ -233,7 +233,11 @@ class CircuitBreaker:
                 f"after {self.metrics.consecutive_failures} consecutive failures"
             )
             self.state = CircuitBreakerState.OPEN
-            self.metrics.state_change_time = time.time()
+            current_time = time.time()
+            self.metrics.state_change_time = current_time
+            # Ensure last_failure_time is set to prevent immediate recovery
+            if self.metrics.last_failure_time == 0:
+                self.metrics.last_failure_time = current_time
 
     async def _transition_to_half_open(self):
         """Transition circuit breaker to half-open state."""
@@ -269,7 +273,11 @@ class CircuitBreaker:
         if self.state == CircuitBreakerState.OPEN:
             return False
 
-        # Consider service healthy if success rate is above threshold
+        # If circuit is closed, service is considered healthy (has recovered)
+        if self.state == CircuitBreakerState.CLOSED:
+            return True
+
+        # For half-open state, check recent success rate
         if self.metrics.total_requests > 0:
             success_rate = (
                 self.metrics.successful_requests / self.metrics.total_requests

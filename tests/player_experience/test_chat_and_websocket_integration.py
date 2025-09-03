@@ -17,8 +17,8 @@ from src.player_experience.models.gameplay_messages import (
     GameplayMessageType,
     NarrativeResponseMessage,
 )
-from src.player_experience.routers.gameplay_websocket_router import (
-    GameplayWebSocketRouter,
+from src.player_experience.api.routers.chat import (
+    router as chat_router,
 )
 from src.player_experience.services.gameplay_chat_manager import GameplayChatManager
 

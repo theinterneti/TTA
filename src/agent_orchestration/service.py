@@ -590,8 +590,8 @@ class AgentOrchestrationService:
                         f"{session_context.session_id}: {reason} (level: {safety_level})"
                     )
 
-                    # For blocked content or crisis situations, raise an error with alternative
-                    if safety_level == "blocked" or crisis_detected:
+                    # For blocked content, high risk, or crisis situations, raise an error with alternative
+                    if safety_level in ["blocked", "high_risk"] or crisis_detected:
                         error_message = (
                             f"Content blocked due to safety concerns: {reason}"
                         )

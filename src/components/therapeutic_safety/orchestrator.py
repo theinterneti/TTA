@@ -20,10 +20,9 @@ from .enums import (
     ValidationComponent,
     ValidationStatus,
 )
-from .events import (
+from .event_types import (
     create_safety_event,
     create_validation_failure_event,
-    create_validation_timeout_event,
 )
 from .models import (
     ContentPayload,

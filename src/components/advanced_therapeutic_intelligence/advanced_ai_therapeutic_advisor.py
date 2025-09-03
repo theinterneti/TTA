@@ -9,15 +9,13 @@ AI decision-making and evidence-based therapeutic recommendations.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
+
 import numpy as np
-from collections import defaultdict, deque
-import statistics
 
 logger = logging.getLogger(__name__)
 
@@ -77,35 +75,35 @@ class TherapeuticGuidance:
     title: str = ""
     description: str = ""
     rationale: str = ""
-    evidence_base: List[str] = field(default_factory=list)
+    evidence_base: list[str] = field(default_factory=list)
 
     # Recommendations
-    recommended_actions: List[Dict[str, Any]] = field(default_factory=list)
+    recommended_actions: list[dict[str, Any]] = field(default_factory=list)
     therapeutic_approach: TherapeuticApproach = TherapeuticApproach.COGNITIVE_BEHAVIORAL
-    intervention_strategies: List[str] = field(default_factory=list)
+    intervention_strategies: list[str] = field(default_factory=list)
 
     # Implementation details
     priority: InterventionPriority = InterventionPriority.MODERATE
     estimated_duration: int = 30  # minutes
-    required_resources: List[str] = field(default_factory=list)
-    contraindications: List[str] = field(default_factory=list)
+    required_resources: list[str] = field(default_factory=list)
+    contraindications: list[str] = field(default_factory=list)
 
     # Confidence and validation
     confidence: GuidanceConfidence = GuidanceConfidence.MODERATE
     confidence_score: float = 0.0
-    supporting_data: Dict[str, Any] = field(default_factory=dict)
-    clinical_validation: Dict[str, Any] = field(default_factory=dict)
+    supporting_data: dict[str, Any] = field(default_factory=dict)
+    clinical_validation: dict[str, Any] = field(default_factory=dict)
 
     # Monitoring and follow-up
-    success_indicators: List[str] = field(default_factory=list)
-    monitoring_parameters: List[str] = field(default_factory=list)
-    follow_up_recommendations: List[str] = field(default_factory=list)
+    success_indicators: list[str] = field(default_factory=list)
+    monitoring_parameters: list[str] = field(default_factory=list)
+    follow_up_recommendations: list[str] = field(default_factory=list)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: datetime = field(default_factory=lambda: datetime.utcnow() + timedelta(hours=24))
     status: str = "active"
-    effectiveness_score: Optional[float] = None
+    effectiveness_score: float | None = None
 
 
 @dataclass
@@ -118,27 +116,27 @@ class InterventionStrategy:
     # Strategy details
     description: str = ""
     therapeutic_framework: TherapeuticApproach = TherapeuticApproach.COGNITIVE_BEHAVIORAL
-    target_outcomes: List[str] = field(default_factory=list)
+    target_outcomes: list[str] = field(default_factory=list)
 
     # Implementation
-    intervention_steps: List[Dict[str, Any]] = field(default_factory=list)
-    timing_recommendations: Dict[str, Any] = field(default_factory=dict)
+    intervention_steps: list[dict[str, Any]] = field(default_factory=list)
+    timing_recommendations: dict[str, Any] = field(default_factory=dict)
     intensity_level: str = "moderate"
 
     # Personalization
-    user_preferences: Dict[str, Any] = field(default_factory=dict)
-    adaptation_parameters: Dict[str, Any] = field(default_factory=dict)
-    contraindications: List[str] = field(default_factory=list)
+    user_preferences: dict[str, Any] = field(default_factory=dict)
+    adaptation_parameters: dict[str, Any] = field(default_factory=dict)
+    contraindications: list[str] = field(default_factory=list)
 
     # Evidence and validation
     evidence_strength: float = 0.0
-    clinical_support: List[str] = field(default_factory=list)
+    clinical_support: list[str] = field(default_factory=list)
     expected_effectiveness: float = 0.0
 
     # Monitoring
-    progress_indicators: List[str] = field(default_factory=list)
-    risk_factors: List[str] = field(default_factory=list)
-    safety_considerations: List[str] = field(default_factory=list)
+    progress_indicators: list[str] = field(default_factory=list)
+    risk_factors: list[str] = field(default_factory=list)
+    safety_considerations: list[str] = field(default_factory=list)
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -155,18 +153,18 @@ class TherapeuticDecision:
 
     # Decision details
     primary_recommendation: str = ""
-    alternative_options: List[str] = field(default_factory=list)
+    alternative_options: list[str] = field(default_factory=list)
     decision_rationale: str = ""
 
     # Supporting evidence
-    evidence_summary: Dict[str, Any] = field(default_factory=dict)
-    risk_benefit_analysis: Dict[str, Any] = field(default_factory=dict)
-    contraindications: List[str] = field(default_factory=list)
+    evidence_summary: dict[str, Any] = field(default_factory=dict)
+    risk_benefit_analysis: dict[str, Any] = field(default_factory=dict)
+    contraindications: list[str] = field(default_factory=list)
 
     # Implementation guidance
-    implementation_steps: List[str] = field(default_factory=list)
-    monitoring_plan: Dict[str, Any] = field(default_factory=dict)
-    contingency_plans: List[str] = field(default_factory=list)
+    implementation_steps: list[str] = field(default_factory=list)
+    monitoring_plan: dict[str, Any] = field(default_factory=dict)
+    contingency_plans: list[str] = field(default_factory=list)
 
     # Validation
     confidence_level: GuidanceConfidence = GuidanceConfidence.MODERATE
@@ -189,19 +187,19 @@ class AdvancedAITherapeuticAdvisor:
     def __init__(self):
         """Initialize the Advanced AI Therapeutic Advisor."""
         self.status = "initializing"
-        self.active_guidance: Dict[str, List[TherapeuticGuidance]] = {}
-        self.intervention_strategies: Dict[str, List[InterventionStrategy]] = {}
-        self.therapeutic_decisions: Dict[str, List[TherapeuticDecision]] = {}
+        self.active_guidance: dict[str, list[TherapeuticGuidance]] = {}
+        self.intervention_strategies: dict[str, list[InterventionStrategy]] = {}
+        self.therapeutic_decisions: dict[str, list[TherapeuticDecision]] = {}
 
         # AI decision-making models
-        self.guidance_models: Dict[str, Any] = {}
-        self.strategy_optimization_models: Dict[str, Any] = {}
-        self.decision_support_models: Dict[str, Any] = {}
+        self.guidance_models: dict[str, Any] = {}
+        self.strategy_optimization_models: dict[str, Any] = {}
+        self.decision_support_models: dict[str, Any] = {}
 
         # Knowledge base and evidence
-        self.therapeutic_knowledge_base: Dict[str, Any] = {}
-        self.evidence_database: Dict[str, Any] = {}
-        self.clinical_guidelines: Dict[str, Any] = {}
+        self.therapeutic_knowledge_base: dict[str, Any] = {}
+        self.evidence_database: dict[str, Any] = {}
+        self.clinical_guidelines: dict[str, Any] = {}
 
         # System references (injected)
         self.personalization_engine = None
@@ -293,7 +291,7 @@ class AdvancedAITherapeuticAdvisor:
         self,
         user_id: str,
         guidance_type: TherapeuticGuidanceType,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> TherapeuticGuidance:
         """Generate AI-powered therapeutic guidance."""
         try:
@@ -351,8 +349,8 @@ class AdvancedAITherapeuticAdvisor:
     async def suggest_optimal_intervention_strategy(
         self,
         user_id: str,
-        target_outcomes: List[str],
-        constraints: Optional[Dict[str, Any]] = None
+        target_outcomes: list[str],
+        constraints: dict[str, Any] | None = None
     ) -> InterventionStrategy:
         """Suggest optimal intervention strategy based on evidence and user data."""
         try:
@@ -426,7 +424,7 @@ class AdvancedAITherapeuticAdvisor:
         self,
         user_id: str,
         current_approach: TherapeuticApproach,
-        progress_data: Dict[str, Any]
+        progress_data: dict[str, Any]
     ) -> TherapeuticGuidance:
         """Adapt therapeutic approach based on user progress."""
         try:
@@ -508,8 +506,8 @@ class AdvancedAITherapeuticAdvisor:
         self,
         user_id: str,
         decision_context: str,
-        available_options: List[str],
-        decision_criteria: Dict[str, Any]
+        available_options: list[str],
+        decision_criteria: dict[str, Any]
     ) -> TherapeuticDecision:
         """Make AI-powered therapeutic decision with evidence-based reasoning."""
         try:
@@ -614,8 +612,8 @@ class AdvancedAITherapeuticAdvisor:
     async def get_real_time_guidance(
         self,
         user_id: str,
-        current_session_data: Dict[str, Any]
-    ) -> List[TherapeuticGuidance]:
+        current_session_data: dict[str, Any]
+    ) -> list[TherapeuticGuidance]:
         """Get real-time therapeutic guidance during active session."""
         try:
             guidance_list = []
@@ -660,7 +658,7 @@ class AdvancedAITherapeuticAdvisor:
     async def validate_guidance_effectiveness(
         self,
         guidance_id: str,
-        outcome_data: Dict[str, Any]
+        outcome_data: dict[str, Any]
     ):
         """Validate guidance effectiveness against actual outcomes."""
         try:
@@ -699,7 +697,7 @@ class AdvancedAITherapeuticAdvisor:
         except Exception as e:
             logger.error(f"Error validating guidance effectiveness: {e}")
 
-    async def get_advisor_insights(self, user_id: str) -> Dict[str, Any]:
+    async def get_advisor_insights(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive AI therapeutic advisor insights."""
         try:
             # Get user guidance history
@@ -847,9 +845,9 @@ class AdvancedAITherapeuticAdvisor:
     async def _generate_crisis_intervention_guidance(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate crisis intervention guidance."""
         try:
@@ -949,9 +947,9 @@ class AdvancedAITherapeuticAdvisor:
     async def _generate_intervention_strategy_guidance(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate intervention strategy guidance."""
         try:
@@ -1051,9 +1049,9 @@ class AdvancedAITherapeuticAdvisor:
     async def _generate_therapeutic_approach_guidance(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate therapeutic approach guidance."""
         try:
@@ -1130,9 +1128,9 @@ class AdvancedAITherapeuticAdvisor:
     async def _generate_progress_optimization_guidance(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate progress optimization guidance."""
         try:
@@ -1213,9 +1211,9 @@ class AdvancedAITherapeuticAdvisor:
     async def _generate_session_planning_guidance(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate session planning guidance."""
         try:
@@ -1293,9 +1291,9 @@ class AdvancedAITherapeuticAdvisor:
         self,
         user_id: str,
         guidance_type: TherapeuticGuidanceType,
-        context: Optional[Dict[str, Any]],
+        context: dict[str, Any] | None,
         user_profile: Any,
-        predictions: List[Any]
+        predictions: list[Any]
     ) -> TherapeuticGuidance:
         """Generate general therapeutic guidance."""
         try:
@@ -1455,7 +1453,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error updating model accuracies: {e}")
 
     # Simplified helper methods
-    async def _determine_optimal_framework(self, user_id: str, target_outcomes: List[str], user_profile: Any, predictions: List[Any]) -> TherapeuticApproach:
+    async def _determine_optimal_framework(self, user_id: str, target_outcomes: list[str], user_profile: Any, predictions: list[Any]) -> TherapeuticApproach:
         """Determine optimal therapeutic framework."""
         # Simplified framework selection
         if "anxiety" in target_outcomes:
@@ -1467,7 +1465,7 @@ class AdvancedAITherapeuticAdvisor:
         else:
             return TherapeuticApproach.COGNITIVE_BEHAVIORAL
 
-    async def _generate_intervention_steps(self, user_id: str, framework: TherapeuticApproach, target_outcomes: List[str], constraints: Optional[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    async def _generate_intervention_steps(self, user_id: str, framework: TherapeuticApproach, target_outcomes: list[str], constraints: dict[str, Any] | None) -> list[dict[str, Any]]:
         """Generate intervention steps."""
         return [
             {"step": 1, "action": "Assessment and goal setting", "duration": 50},
@@ -1477,7 +1475,7 @@ class AdvancedAITherapeuticAdvisor:
             {"step": 5, "action": "Progress review and adjustment", "duration": 50}
         ]
 
-    async def _calculate_evidence_strength(self, framework: TherapeuticApproach, target_outcomes: List[str]) -> float:
+    async def _calculate_evidence_strength(self, framework: TherapeuticApproach, target_outcomes: list[str]) -> float:
         """Calculate evidence strength for framework and outcomes."""
         # Simplified evidence calculation
         base_strength = 0.7
@@ -1485,7 +1483,7 @@ class AdvancedAITherapeuticAdvisor:
             base_strength = 0.85
         return min(0.95, base_strength + len(target_outcomes) * 0.05)
 
-    async def _predict_intervention_effectiveness(self, user_id: str, framework: TherapeuticApproach, intervention_steps: List[Dict[str, Any]]) -> float:
+    async def _predict_intervention_effectiveness(self, user_id: str, framework: TherapeuticApproach, intervention_steps: list[dict[str, Any]]) -> float:
         """Predict intervention effectiveness."""
         # Simplified effectiveness prediction
         base_effectiveness = 0.65
@@ -1493,7 +1491,7 @@ class AdvancedAITherapeuticAdvisor:
         step_bonus = len(intervention_steps) * 0.02
         return min(0.9, base_effectiveness + framework_bonus + step_bonus)
 
-    async def _generate_timing_recommendations(self, user_id: str, intervention_steps: List[Dict[str, Any]]) -> Dict[str, Any]:
+    async def _generate_timing_recommendations(self, user_id: str, intervention_steps: list[dict[str, Any]]) -> dict[str, Any]:
         """Generate timing recommendations."""
         return {
             "session_frequency": "weekly",
@@ -1507,7 +1505,7 @@ class AdvancedAITherapeuticAdvisor:
         # Simplified intensity determination
         return "moderate"
 
-    async def _generate_adaptation_parameters(self, user_id: str, user_profile: Any) -> Dict[str, Any]:
+    async def _generate_adaptation_parameters(self, user_id: str, user_profile: Any) -> dict[str, Any]:
         """Generate adaptation parameters."""
         return {
             "flexibility_level": "moderate",
@@ -1515,7 +1513,7 @@ class AdvancedAITherapeuticAdvisor:
             "cultural_adaptations": "as_needed"
         }
 
-    async def _generate_progress_indicators(self, target_outcomes: List[str]) -> List[str]:
+    async def _generate_progress_indicators(self, target_outcomes: list[str]) -> list[str]:
         """Generate progress indicators."""
         return [
             f"Improvement in {outcome}" for outcome in target_outcomes
@@ -1525,7 +1523,7 @@ class AdvancedAITherapeuticAdvisor:
             "Enhanced quality of life"
         ]
 
-    async def _identify_risk_factors(self, user_id: str, framework: TherapeuticApproach) -> List[str]:
+    async def _identify_risk_factors(self, user_id: str, framework: TherapeuticApproach) -> list[str]:
         """Identify risk factors."""
         return [
             "Treatment non-adherence",
@@ -1534,7 +1532,7 @@ class AdvancedAITherapeuticAdvisor:
             "Social support limitations"
         ]
 
-    async def _generate_safety_considerations(self, user_id: str, framework: TherapeuticApproach) -> List[str]:
+    async def _generate_safety_considerations(self, user_id: str, framework: TherapeuticApproach) -> list[str]:
         """Generate safety considerations."""
         return [
             "Monitor for crisis indicators",
@@ -1543,7 +1541,7 @@ class AdvancedAITherapeuticAdvisor:
             "Emergency contact protocols"
         ]
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Advanced AI Therapeutic Advisor."""
         try:
             therapeutic_systems_available = len([
@@ -1618,7 +1616,7 @@ class AdvancedAITherapeuticAdvisor:
             raise
 
     # Missing helper methods implementation
-    async def _analyze_progress_data(self, progress_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_progress_data(self, progress_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze progress data for adaptation decisions."""
         try:
             effectiveness_score = progress_data.get("effectiveness_score", 0.5)
@@ -1639,7 +1637,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error analyzing progress data: {e}")
             return {"overall_progress": 0.5, "adaptation_needed": False}
 
-    async def _assess_adaptation_need(self, current_approach: TherapeuticApproach, progress_analysis: Dict[str, Any], predictions: List[Any]) -> bool:
+    async def _assess_adaptation_need(self, current_approach: TherapeuticApproach, progress_analysis: dict[str, Any], predictions: list[Any]) -> bool:
         """Assess if therapeutic approach adaptation is needed."""
         try:
             # Check progress analysis
@@ -1661,7 +1659,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error assessing adaptation need: {e}")
             return False
 
-    async def _suggest_adapted_approach(self, user_id: str, current_approach: TherapeuticApproach, progress_analysis: Dict[str, Any], predictions: List[Any]) -> TherapeuticApproach:
+    async def _suggest_adapted_approach(self, user_id: str, current_approach: TherapeuticApproach, progress_analysis: dict[str, Any], predictions: list[Any]) -> TherapeuticApproach:
         """Suggest adapted therapeutic approach."""
         try:
             # Simple adaptation logic based on current approach
@@ -1684,7 +1682,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error suggesting adapted approach: {e}")
             return TherapeuticApproach.COGNITIVE_BEHAVIORAL
 
-    async def _generate_adaptation_rationale(self, current_approach: TherapeuticApproach, adapted_approach: TherapeuticApproach, progress_analysis: Dict[str, Any]) -> str:
+    async def _generate_adaptation_rationale(self, current_approach: TherapeuticApproach, adapted_approach: TherapeuticApproach, progress_analysis: dict[str, Any]) -> str:
         """Generate rationale for therapeutic approach adaptation."""
         try:
             overall_progress = progress_analysis.get("overall_progress", 0.5)
@@ -1697,7 +1695,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error generating adaptation rationale: {e}")
             return "Adaptation recommended based on progress analysis"
 
-    async def _generate_adaptation_actions(self, current_approach: TherapeuticApproach, adapted_approach: TherapeuticApproach) -> List[Dict[str, Any]]:
+    async def _generate_adaptation_actions(self, current_approach: TherapeuticApproach, adapted_approach: TherapeuticApproach) -> list[dict[str, Any]]:
         """Generate adaptation actions."""
         return [
             {"action": "discuss_approach_change", "priority": "high", "timeframe": "next_session"},
@@ -1706,7 +1704,7 @@ class AdvancedAITherapeuticAdvisor:
             {"action": "monitor_adaptation_response", "priority": "high", "timeframe": "ongoing"}
         ]
 
-    async def _generate_adaptation_strategies(self, adapted_approach: TherapeuticApproach) -> List[str]:
+    async def _generate_adaptation_strategies(self, adapted_approach: TherapeuticApproach) -> list[str]:
         """Generate adaptation strategies."""
         strategy_map = {
             TherapeuticApproach.COGNITIVE_BEHAVIORAL: ["cognitive_restructuring", "behavioral_experiments", "thought_records"],
@@ -1723,7 +1721,7 @@ class AdvancedAITherapeuticAdvisor:
 
         return strategy_map.get(adapted_approach, ["supportive_counseling", "psychoeducation"])
 
-    async def _generate_adaptation_success_indicators(self, adapted_approach: TherapeuticApproach) -> List[str]:
+    async def _generate_adaptation_success_indicators(self, adapted_approach: TherapeuticApproach) -> list[str]:
         """Generate success indicators for adaptation."""
         return [
             "Improved therapeutic engagement",
@@ -1733,7 +1731,7 @@ class AdvancedAITherapeuticAdvisor:
             "Progress toward treatment goals"
         ]
 
-    async def _generate_adaptation_monitoring(self, adapted_approach: TherapeuticApproach) -> List[str]:
+    async def _generate_adaptation_monitoring(self, adapted_approach: TherapeuticApproach) -> list[str]:
         """Generate monitoring parameters for adaptation."""
         return [
             "Session engagement levels",
@@ -1743,7 +1741,7 @@ class AdvancedAITherapeuticAdvisor:
             "Therapeutic alliance strength"
         ]
 
-    async def _analyze_session_data(self, session_data: Dict[str, Any]) -> Dict[str, Any]:
+    async def _analyze_session_data(self, session_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze current session data."""
         try:
             crisis_indicators = session_data.get("crisis_indicators", {})
@@ -1773,7 +1771,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error analyzing session data: {e}")
             return {"crisis_indicators": {"immediate_risk": False}}
 
-    async def _generate_comprehensive_therapeutic_recommendations(self, user_id: str) -> List[str]:
+    async def _generate_comprehensive_therapeutic_recommendations(self, user_id: str) -> list[str]:
         """Generate comprehensive therapeutic recommendations."""
         try:
             recommendations = []
@@ -1807,7 +1805,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error generating comprehensive recommendations: {e}")
             return ["Continue therapeutic support with regular assessment"]
 
-    async def _generate_risk_assessment(self, user_id: str) -> Dict[str, Any]:
+    async def _generate_risk_assessment(self, user_id: str) -> dict[str, Any]:
         """Generate risk assessment for user."""
         try:
             user_guidance = self.active_guidance.get(user_id, [])
@@ -1839,7 +1837,7 @@ class AdvancedAITherapeuticAdvisor:
             logger.error(f"Error generating risk assessment: {e}")
             return {"overall_risk_level": "unknown", "risk_factors": []}
 
-    async def _generate_progress_indicators_summary(self, user_id: str) -> Dict[str, Any]:
+    async def _generate_progress_indicators_summary(self, user_id: str) -> dict[str, Any]:
         """Generate progress indicators summary."""
         try:
             user_strategies = self.intervention_strategies.get(user_id, [])

@@ -15,11 +15,13 @@ from .enums import (
     ValidationAction,
     ValidationStatus,
 )
-from .events import (
+from .event_types import (
     CrisisDetectionEvent,
     SafetyValidationEvent,
     ValidationFailureEvent,
+    create_crisis_event,
     create_safety_event,
+    create_validation_failure_event,
 )
 from .models import (
     BiasDetectionResult,

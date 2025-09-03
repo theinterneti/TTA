@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  ComputerDesktopIcon, 
-  HeartIcon, 
-  UserGroupIcon, 
+import {
+  ComputerDesktopIcon,
+  HeartIcon,
+  UserGroupIcon,
   CogIcon,
   GlobeAltIcon,
   ChartBarIcon,
@@ -147,14 +147,14 @@ const InterfaceHub: React.FC = () => {
             Navigate and preview all TTA web interfaces from a single dashboard
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
-          <HealthStatus 
-            isLoading={isLoading} 
+          <HealthStatus
+            isLoading={isLoading}
             onRefresh={refetch}
             healthData={healthStatus}
           />
-          
+
           <div className="flex bg-gray-100 rounded-lg p-1">
             <button
               onClick={() => setPreviewMode('grid')}
@@ -229,7 +229,7 @@ const InterfaceHub: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   selectedInterfaceData.status === 'healthy'
@@ -240,7 +240,7 @@ const InterfaceHub: React.FC = () => {
                 }`}>
                   {selectedInterfaceData.status}
                 </span>
-                
+
                 <button
                   onClick={() => window.open(selectedInterfaceData.directUrl, '_blank')}
                   className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"

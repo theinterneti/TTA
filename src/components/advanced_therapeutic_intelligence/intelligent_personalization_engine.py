@@ -8,14 +8,13 @@ adaptive content delivery, and predictive therapeutic recommendations.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
+
 import numpy as np
-from collections import defaultdict
 
 logger = logging.getLogger(__name__)
 
@@ -61,29 +60,29 @@ class UserPersonalizationProfile:
 
     # Learning characteristics
     learning_style: str = "adaptive"
-    preferred_therapeutic_approaches: List[str] = field(default_factory=list)
-    interaction_preferences: Dict[str, Any] = field(default_factory=dict)
-    emotional_patterns: Dict[str, float] = field(default_factory=dict)
+    preferred_therapeutic_approaches: list[str] = field(default_factory=list)
+    interaction_preferences: dict[str, Any] = field(default_factory=dict)
+    emotional_patterns: dict[str, float] = field(default_factory=dict)
 
     # Behavioral patterns
-    engagement_patterns: Dict[str, Any] = field(default_factory=dict)
-    response_patterns: Dict[str, Any] = field(default_factory=dict)
-    progress_patterns: Dict[str, Any] = field(default_factory=dict)
-    crisis_indicators: Dict[str, Any] = field(default_factory=dict)
+    engagement_patterns: dict[str, Any] = field(default_factory=dict)
+    response_patterns: dict[str, Any] = field(default_factory=dict)
+    progress_patterns: dict[str, Any] = field(default_factory=dict)
+    crisis_indicators: dict[str, Any] = field(default_factory=dict)
 
     # Personalization settings
     personalization_level: PersonalizationLevel = PersonalizationLevel.ADAPTIVE
     learning_mode: LearningMode = LearningMode.ACTIVE
-    enabled_domains: Set[PersonalizationDomain] = field(default_factory=set)
+    enabled_domains: set[PersonalizationDomain] = field(default_factory=set)
 
     # System interactions
-    system_interactions: Dict[str, Dict[str, Any]] = field(default_factory=dict)
-    therapeutic_outcomes: Dict[str, List[float]] = field(default_factory=dict)
-    adaptation_history: List[Dict[str, Any]] = field(default_factory=list)
+    system_interactions: dict[str, dict[str, Any]] = field(default_factory=dict)
+    therapeutic_outcomes: dict[str, list[float]] = field(default_factory=dict)
+    adaptation_history: list[dict[str, Any]] = field(default_factory=list)
 
     # Privacy and consent
     consent_level: str = "full"
-    privacy_settings: Dict[str, bool] = field(default_factory=dict)
+    privacy_settings: dict[str, bool] = field(default_factory=dict)
     data_retention_days: int = 365
 
 
@@ -97,14 +96,14 @@ class PersonalizationRecommendation:
 
     # Recommendation details
     recommendation_type: str = ""
-    recommendation_data: Dict[str, Any] = field(default_factory=dict)
+    recommendation_data: dict[str, Any] = field(default_factory=dict)
     confidence_score: float = 0.0
     expected_impact: float = 0.0
 
     # Context and reasoning
     reasoning: str = ""
-    supporting_evidence: List[str] = field(default_factory=list)
-    contextual_factors: Dict[str, Any] = field(default_factory=dict)
+    supporting_evidence: list[str] = field(default_factory=list)
+    contextual_factors: dict[str, Any] = field(default_factory=dict)
 
     # Implementation
     priority: int = 5  # 1-10 scale
@@ -113,7 +112,7 @@ class PersonalizationRecommendation:
 
     # Validation
     created_at: datetime = field(default_factory=datetime.utcnow)
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
     validation_status: str = "pending"
 
 
@@ -128,9 +127,9 @@ class IntelligentPersonalizationEngine:
     def __init__(self):
         """Initialize the Intelligent Personalization Engine."""
         self.status = "initializing"
-        self.user_profiles: Dict[str, UserPersonalizationProfile] = {}
-        self.active_recommendations: Dict[str, List[PersonalizationRecommendation]] = {}
-        self.learning_models: Dict[str, Any] = {}
+        self.user_profiles: dict[str, UserPersonalizationProfile] = {}
+        self.active_recommendations: dict[str, list[PersonalizationRecommendation]] = {}
+        self.learning_models: dict[str, Any] = {}
 
         # Therapeutic system references (injected)
         self.consequence_system = None
@@ -228,7 +227,7 @@ class IntelligentPersonalizationEngine:
     async def create_user_personalization_profile(
         self,
         user_id: str,
-        initial_preferences: Optional[Dict[str, Any]] = None,
+        initial_preferences: dict[str, Any] | None = None,
         consent_level: str = "full"
     ) -> UserPersonalizationProfile:
         """Create comprehensive user personalization profile."""
@@ -282,8 +281,8 @@ class IntelligentPersonalizationEngine:
     async def generate_personalization_recommendations(
         self,
         user_id: str,
-        context: Optional[Dict[str, Any]] = None
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None = None
+    ) -> list[PersonalizationRecommendation]:
         """Generate personalized recommendations for therapeutic systems."""
         try:
             if user_id not in self.user_profiles:
@@ -320,7 +319,7 @@ class IntelligentPersonalizationEngine:
         self,
         user_id: str,
         recommendation: PersonalizationRecommendation
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Apply personalization adaptation to therapeutic systems."""
         try:
             if user_id not in self.user_profiles:
@@ -365,8 +364,8 @@ class IntelligentPersonalizationEngine:
         self,
         user_id: str,
         system_name: str,
-        interaction_data: Dict[str, Any],
-        outcome_data: Dict[str, Any]
+        interaction_data: dict[str, Any],
+        outcome_data: dict[str, Any]
     ):
         """Learn from user interaction to improve personalization."""
         try:
@@ -406,7 +405,7 @@ class IntelligentPersonalizationEngine:
         except Exception as e:
             logger.error(f"Error learning from user interaction: {e}")
 
-    async def get_personalization_insights(self, user_id: str) -> Dict[str, Any]:
+    async def get_personalization_insights(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive personalization insights for user."""
         try:
             if user_id not in self.user_profiles:
@@ -454,7 +453,7 @@ class IntelligentPersonalizationEngine:
             logger.error(f"Error initializing learning models: {e}")
             raise
 
-    async def _apply_initial_preferences(self, profile: UserPersonalizationProfile, preferences: Dict[str, Any]):
+    async def _apply_initial_preferences(self, profile: UserPersonalizationProfile, preferences: dict[str, Any]):
         """Apply initial user preferences to profile."""
         try:
             # Apply therapeutic approach preferences
@@ -484,8 +483,8 @@ class IntelligentPersonalizationEngine:
         self,
         profile: UserPersonalizationProfile,
         domain: PersonalizationDomain,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate recommendations for specific personalization domain."""
         try:
             recommendations = []
@@ -512,8 +511,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_therapeutic_approach_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate therapeutic approach recommendations."""
         recommendations = []
 
@@ -547,8 +546,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_difficulty_adaptation_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate difficulty adaptation recommendations."""
         recommendations = []
 
@@ -598,8 +597,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_emotional_support_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate emotional support recommendations."""
         recommendations = []
 
@@ -630,8 +629,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_interaction_style_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate interaction style recommendations."""
         recommendations = []
 
@@ -674,8 +673,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_crisis_prevention_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate crisis prevention recommendations."""
         recommendations = []
 
@@ -705,8 +704,8 @@ class IntelligentPersonalizationEngine:
     async def _generate_content_delivery_recommendations(
         self,
         profile: UserPersonalizationProfile,
-        context: Optional[Dict[str, Any]]
-    ) -> List[PersonalizationRecommendation]:
+        context: dict[str, Any] | None
+    ) -> list[PersonalizationRecommendation]:
         """Generate content delivery recommendations."""
         recommendations = []
 
@@ -738,9 +737,9 @@ class IntelligentPersonalizationEngine:
 
     async def _prioritize_recommendations(
         self,
-        recommendations: List[PersonalizationRecommendation],
+        recommendations: list[PersonalizationRecommendation],
         profile: UserPersonalizationProfile
-    ) -> List[PersonalizationRecommendation]:
+    ) -> list[PersonalizationRecommendation]:
         """Prioritize and filter recommendations."""
         try:
             # Sort by priority and expected impact
@@ -767,9 +766,9 @@ class IntelligentPersonalizationEngine:
         self,
         target_system: str,
         domain: PersonalizationDomain,
-        adaptation_data: Dict[str, Any],
+        adaptation_data: dict[str, Any],
         profile: UserPersonalizationProfile
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Apply adaptation to specific therapeutic system."""
         try:
             # Get target system reference
@@ -814,8 +813,8 @@ class IntelligentPersonalizationEngine:
         self,
         user_id: str,
         system_name: str,
-        interaction_data: Dict[str, Any],
-        outcome_data: Dict[str, Any]
+        interaction_data: dict[str, Any],
+        outcome_data: dict[str, Any]
     ):
         """Update learning models with new interaction data."""
         try:
@@ -833,7 +832,7 @@ class IntelligentPersonalizationEngine:
         except Exception as e:
             logger.error(f"Error updating learning models: {e}")
 
-    async def _calculate_interaction_summary(self, profile: UserPersonalizationProfile) -> Dict[str, Any]:
+    async def _calculate_interaction_summary(self, profile: UserPersonalizationProfile) -> dict[str, Any]:
         """Calculate interaction summary for user profile."""
         try:
             total_interactions = sum(
@@ -866,7 +865,7 @@ class IntelligentPersonalizationEngine:
             logger.error(f"Error calculating interaction summary: {e}")
             return {}
 
-    async def _calculate_therapeutic_effectiveness(self, profile: UserPersonalizationProfile) -> Dict[str, Any]:
+    async def _calculate_therapeutic_effectiveness(self, profile: UserPersonalizationProfile) -> dict[str, Any]:
         """Calculate therapeutic effectiveness metrics."""
         try:
             # Calculate effectiveness based on outcomes
@@ -911,7 +910,7 @@ class IntelligentPersonalizationEngine:
             logger.error(f"Error calculating therapeutic effectiveness: {e}")
             return {}
 
-    async def _calculate_personalization_accuracy(self, profile: UserPersonalizationProfile) -> Dict[str, Any]:
+    async def _calculate_personalization_accuracy(self, profile: UserPersonalizationProfile) -> dict[str, Any]:
         """Calculate personalization accuracy metrics."""
         try:
             # Calculate accuracy based on adaptation history
@@ -933,7 +932,7 @@ class IntelligentPersonalizationEngine:
             logger.error(f"Error calculating personalization accuracy: {e}")
             return {}
 
-    async def _get_recommendations_summary(self, user_id: str) -> Dict[str, Any]:
+    async def _get_recommendations_summary(self, user_id: str) -> dict[str, Any]:
         """Get recommendations summary for user."""
         try:
             user_recommendations = self.active_recommendations.get(user_id, [])
@@ -954,7 +953,7 @@ class IntelligentPersonalizationEngine:
             logger.error(f"Error getting recommendations summary: {e}")
             return {}
 
-    async def _calculate_learning_progress(self, profile: UserPersonalizationProfile) -> Dict[str, Any]:
+    async def _calculate_learning_progress(self, profile: UserPersonalizationProfile) -> dict[str, Any]:
         """Calculate learning progress metrics."""
         try:
             profile_age_days = (datetime.utcnow() - profile.created_at).days
@@ -1056,7 +1055,7 @@ class IntelligentPersonalizationEngine:
         # Placeholder for proactive recommendation generation
         pass
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Intelligent Personalization Engine."""
         try:
             therapeutic_systems_available = sum([

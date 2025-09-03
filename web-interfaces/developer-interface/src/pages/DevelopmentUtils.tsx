@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  BoltIcon, 
-  BuildingOfficeIcon, 
-  ChartBarIcon, 
+import {
+  BoltIcon,
+  BuildingOfficeIcon,
+  ChartBarIcon,
   ExclamationTriangleIcon,
   ClockIcon,
   CpuChipIcon,
@@ -26,38 +26,38 @@ const DevelopmentUtils: React.FC = () => {
   });
 
   const tabs = [
-    { 
-      id: 'reload', 
-      name: 'Live Reload', 
-      icon: BoltIcon, 
+    {
+      id: 'reload',
+      name: 'Live Reload',
+      icon: BoltIcon,
       description: 'Monitor live reload status across interfaces',
       color: 'text-yellow-600'
     },
-    { 
-      id: 'build', 
-      name: 'Build Status', 
-      icon: BuildingOfficeIcon, 
+    {
+      id: 'build',
+      name: 'Build Status',
+      icon: BuildingOfficeIcon,
       description: 'Track build status and compilation errors',
       color: 'text-blue-600'
     },
-    { 
-      id: 'performance', 
-      name: 'Performance', 
-      icon: ChartBarIcon, 
+    {
+      id: 'performance',
+      name: 'Performance',
+      icon: ChartBarIcon,
       description: 'Monitor performance metrics and optimization',
       color: 'text-green-600'
     },
-    { 
-      id: 'errors', 
-      name: 'Error Reporting', 
-      icon: ExclamationTriangleIcon, 
+    {
+      id: 'errors',
+      name: 'Error Reporting',
+      icon: ExclamationTriangleIcon,
       description: 'View and manage runtime errors',
       color: 'text-red-600'
     },
-    { 
-      id: 'logs', 
-      name: 'Log Viewer', 
-      icon: DocumentTextIcon, 
+    {
+      id: 'logs',
+      name: 'Log Viewer',
+      icon: DocumentTextIcon,
       description: 'Real-time log monitoring and filtering',
       color: 'text-purple-600'
     }
@@ -104,7 +104,7 @@ const DevelopmentUtils: React.FC = () => {
             Monitor and debug TTA interfaces during development
           </p>
         </div>
-        
+
         {/* Real-time Status Indicators */}
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 shadow-sm">
@@ -118,14 +118,14 @@ const DevelopmentUtils: React.FC = () => {
               {realTimeData.buildStatus === 'building' ? 'Building' : 'Ready'}
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 shadow-sm">
             <ExclamationTriangleIcon className="h-4 w-4 text-red-500" />
             <span className="text-sm font-medium text-gray-700">
               {realTimeData.errorCount} errors
             </span>
           </div>
-          
+
           <div className="flex items-center space-x-2 bg-white rounded-lg px-3 py-2 shadow-sm">
             <ClockIcon className="h-4 w-4 text-gray-500" />
             <span className="text-sm text-gray-600">

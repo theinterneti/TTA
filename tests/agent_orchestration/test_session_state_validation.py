@@ -16,10 +16,10 @@ from src.agent_orchestration.proxies import (
     WorldBuilderAgentProxy,
 )
 from src.agent_orchestration.service import AgentOrchestrationService
-from src.agent_orchestration.therapeutic_safety.crisis_intervention import (
+from src.agent_orchestration.therapeutic_safety import (
     CrisisInterventionManager,
+    TherapeuticValidator,
 )
-from src.agent_orchestration.therapeutic_safety.validator import TherapeuticValidator
 
 
 @pytest.mark.integration

@@ -7,11 +7,11 @@ approaches and personalized therapeutic recommendations.
 """
 
 import logging
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional
-from uuid import uuid4
 from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
@@ -66,10 +66,10 @@ class TherapeuticRecommendation:
     integration_strategy: IntegrationStrategy
     priority_score: float
     rationale: str
-    expected_outcomes: List[str]
+    expected_outcomes: list[str]
     estimated_duration: int  # minutes
     difficulty_level: str
-    character_alignment: Dict[str, float]
+    character_alignment: dict[str, float]
     created_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -83,11 +83,11 @@ class TherapeuticScenario:
     title: str
     description: str
     narrative_context: str
-    therapeutic_goals: List[str]
-    practice_opportunities: List[str]
-    reflection_prompts: List[str]
-    success_criteria: List[str]
-    character_involvement: Dict[str, str]
+    therapeutic_goals: list[str]
+    practice_opportunities: list[str]
+    reflection_prompts: list[str]
+    success_criteria: list[str]
+    character_involvement: dict[str, str]
     difficulty_level: str
     estimated_duration: int
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -98,11 +98,11 @@ class IntegrationSession:
     """Tracks a therapeutic integration session."""
     session_id: str
     user_id: str
-    scenarios_completed: List[str]
-    frameworks_used: List[TherapeuticFramework]
+    scenarios_completed: list[str]
+    frameworks_used: list[TherapeuticFramework]
     total_therapeutic_value: float
-    character_progression: Dict[str, float]
-    milestones_achieved: List[str]
+    character_progression: dict[str, float]
+    milestones_achieved: list[str]
     session_duration: int  # minutes
     effectiveness_score: float
     created_at: datetime = field(default_factory=datetime.utcnow)
@@ -114,7 +114,7 @@ class TherapeuticIntegrationSystem:
     therapeutic framework integration and personalized recommendations.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic integration system."""
         self.config = config or {}
 
@@ -153,11 +153,11 @@ class TherapeuticIntegrationSystem:
     async def generate_personalized_recommendations(
         self,
         user_id: str,
-        therapeutic_goals: Optional[List[str]] = None,
-        character_data: Optional[Dict[str, Any]] = None,
-        user_progress: Optional[Dict[str, Any]] = None,
-        emotional_state: Optional[Dict[str, Any]] = None,
-    ) -> List[TherapeuticRecommendation]:
+        therapeutic_goals: list[str] | None = None,
+        character_data: dict[str, Any] | None = None,
+        user_progress: dict[str, Any] | None = None,
+        emotional_state: dict[str, Any] | None = None,
+    ) -> list[TherapeuticRecommendation]:
         """
         Generate personalized therapeutic recommendations based on user data.
 
@@ -227,9 +227,9 @@ class TherapeuticIntegrationSystem:
         user_id: str,
         framework: TherapeuticFramework,
         scenario_type: ScenarioType,
-        difficulty_level: Optional[str] = None,
-        character_data: Optional[Dict[str, Any]] = None,
-        session_context: Optional[Dict[str, Any]] = None,
+        difficulty_level: str | None = None,
+        character_data: dict[str, Any] | None = None,
+        session_context: dict[str, Any] | None = None,
     ) -> TherapeuticScenario:
         """
         Create a therapeutic scenario based on framework and user context.
@@ -300,7 +300,7 @@ class TherapeuticIntegrationSystem:
             # Return fallback scenario
             return self._create_fallback_scenario(user_id, framework, scenario_type)
 
-    def _initialize_framework_configurations(self) -> Dict[TherapeuticFramework, Dict[str, Any]]:
+    def _initialize_framework_configurations(self) -> dict[TherapeuticFramework, dict[str, Any]]:
         """Initialize therapeutic framework configurations."""
         return {
             TherapeuticFramework.CBT: {
@@ -385,7 +385,7 @@ class TherapeuticIntegrationSystem:
             },
         }
 
-    def _initialize_integration_strategies(self) -> Dict[IntegrationStrategy, Dict[str, Any]]:
+    def _initialize_integration_strategies(self) -> dict[IntegrationStrategy, dict[str, Any]]:
         """Initialize integration strategy configurations."""
         return {
             IntegrationStrategy.DIRECT_TEACHING: {
@@ -438,7 +438,7 @@ class TherapeuticIntegrationSystem:
             },
         }
 
-    def _initialize_scenario_templates(self) -> Dict[ScenarioType, Dict[str, Any]]:
+    def _initialize_scenario_templates(self) -> dict[ScenarioType, dict[str, Any]]:
         """Initialize scenario templates for different therapeutic focuses."""
         return {
             ScenarioType.ANXIETY_MANAGEMENT: {
@@ -484,10 +484,10 @@ class TherapeuticIntegrationSystem:
         }
 
     def _analyze_user_context(
-        self, user_id: str, therapeutic_goals: Optional[List[str]],
-        character_data: Optional[Dict[str, Any]], user_progress: Optional[Dict[str, Any]],
-        emotional_state: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, user_id: str, therapeutic_goals: list[str] | None,
+        character_data: dict[str, Any] | None, user_progress: dict[str, Any] | None,
+        emotional_state: dict[str, Any] | None
+    ) -> dict[str, Any]:
         """Analyze user context for personalized recommendations."""
         context = {
             "user_id": user_id,
@@ -523,7 +523,7 @@ class TherapeuticIntegrationSystem:
 
         return context
 
-    def _calculate_framework_suitability(self, user_context: Dict[str, Any]) -> Dict[TherapeuticFramework, float]:
+    def _calculate_framework_suitability(self, user_context: dict[str, Any]) -> dict[TherapeuticFramework, float]:
         """Calculate suitability scores for each therapeutic framework."""
         scores = {}
 
@@ -566,7 +566,7 @@ class TherapeuticIntegrationSystem:
         return scores
 
     def _create_recommendation(
-        self, user_id: str, framework: TherapeuticFramework, score: float, user_context: Dict[str, Any]
+        self, user_id: str, framework: TherapeuticFramework, score: float, user_context: dict[str, Any]
     ) -> TherapeuticRecommendation:
         """Create a therapeutic recommendation."""
         config = self.framework_configurations[framework]
@@ -598,7 +598,7 @@ class TherapeuticIntegrationSystem:
             character_alignment=character_alignment,
         )
 
-    def _determine_scenario_type(self, therapeutic_goals: List[str], framework: TherapeuticFramework) -> ScenarioType:
+    def _determine_scenario_type(self, therapeutic_goals: list[str], framework: TherapeuticFramework) -> ScenarioType:
         """Determine appropriate scenario type based on goals and framework."""
         # Goal to scenario type mapping
         goal_mappings = {
@@ -630,7 +630,7 @@ class TherapeuticIntegrationSystem:
 
         return framework_defaults.get(framework, ScenarioType.CONFIDENCE_BUILDING)
 
-    def _determine_integration_strategy(self, user_context: Dict[str, Any], framework: TherapeuticFramework) -> IntegrationStrategy:
+    def _determine_integration_strategy(self, user_context: dict[str, Any], framework: TherapeuticFramework) -> IntegrationStrategy:
         """Determine appropriate integration strategy."""
         # Crisis situations need direct, supportive approaches
         if user_context.get("crisis_risk", False):
@@ -654,7 +654,7 @@ class TherapeuticIntegrationSystem:
 
         return framework_strategies.get(framework, IntegrationStrategy.EXPERIENTIAL_LEARNING)
 
-    def _calculate_character_alignment(self, user_context: Dict[str, Any], framework: TherapeuticFramework) -> Dict[str, float]:
+    def _calculate_character_alignment(self, user_context: dict[str, Any], framework: TherapeuticFramework) -> dict[str, float]:
         """Calculate character attribute alignment with framework."""
         config = self.framework_configurations[framework]
         framework_attributes = config["character_attributes"]
@@ -669,7 +669,7 @@ class TherapeuticIntegrationSystem:
 
         return alignment
 
-    def _generate_recommendation_rationale(self, framework: TherapeuticFramework, score: float, user_context: Dict[str, Any]) -> str:
+    def _generate_recommendation_rationale(self, framework: TherapeuticFramework, score: float, user_context: dict[str, Any]) -> str:
         """Generate human-readable rationale for recommendation."""
         config = self.framework_configurations[framework]
         framework_name = config["name"]
@@ -720,7 +720,7 @@ class TherapeuticIntegrationSystem:
 
         return int(base_duration * modifier)
 
-    def _get_scenario_template(self, framework: TherapeuticFramework, scenario_type: ScenarioType) -> Dict[str, Any]:
+    def _get_scenario_template(self, framework: TherapeuticFramework, scenario_type: ScenarioType) -> dict[str, Any]:
         """Get scenario template for framework and type combination."""
         base_template = self.scenario_templates.get(scenario_type, {})
         framework_config = self.framework_configurations.get(framework, {})
@@ -734,9 +734,9 @@ class TherapeuticIntegrationSystem:
         return template
 
     def _personalize_scenario(
-        self, template: Dict[str, Any], character_data: Optional[Dict[str, Any]],
-        difficulty_level: Optional[str], session_context: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self, template: dict[str, Any], character_data: dict[str, Any] | None,
+        difficulty_level: str | None, session_context: dict[str, Any] | None
+    ) -> dict[str, Any]:
         """Personalize scenario based on character data and context."""
         personalized = template.copy()
 
@@ -777,7 +777,7 @@ class TherapeuticIntegrationSystem:
         return personalized
 
     def _create_narrative_context(
-        self, template: Dict[str, Any], character_data: Optional[Dict[str, Any]], difficulty_level: Optional[str]
+        self, template: dict[str, Any], character_data: dict[str, Any] | None, difficulty_level: str | None
     ) -> str:
         """Create narrative context for the scenario."""
         framework = template.get("framework", TherapeuticFramework.CBT)
@@ -804,7 +804,7 @@ class TherapeuticIntegrationSystem:
 
         return " ".join(context_parts)
 
-    def _adapt_practice_opportunities(self, base_opportunities: List[str], difficulty_level: Optional[str]) -> List[str]:
+    def _adapt_practice_opportunities(self, base_opportunities: list[str], difficulty_level: str | None) -> list[str]:
         """Adapt practice opportunities based on difficulty level."""
         if not difficulty_level or difficulty_level in ["moderate", "challenging"]:
             return base_opportunities
@@ -828,7 +828,7 @@ class TherapeuticIntegrationSystem:
 
         return base_opportunities
 
-    def _create_character_involvement(self, character_data: Optional[Dict[str, Any]], template: Dict[str, Any]) -> Dict[str, str]:
+    def _create_character_involvement(self, character_data: dict[str, Any] | None, template: dict[str, Any]) -> dict[str, str]:
         """Create character involvement in the scenario."""
         involvement = {
             "role": "therapeutic_guide",
@@ -849,7 +849,7 @@ class TherapeuticIntegrationSystem:
 
         return involvement
 
-    def _create_success_criteria(self, template: Dict[str, Any], difficulty_level: Optional[str]) -> List[str]:
+    def _create_success_criteria(self, template: dict[str, Any], difficulty_level: str | None) -> list[str]:
         """Create success criteria for the scenario."""
         base_criteria = [
             "Engage with therapeutic concepts",
@@ -907,7 +907,7 @@ class TherapeuticIntegrationSystem:
             estimated_duration=15,
         )
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the therapeutic integration system."""
         try:
             return {
@@ -928,7 +928,7 @@ class TherapeuticIntegrationSystem:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get therapeutic integration system metrics."""
         # Calculate additional metrics
         total_recommendations = sum(len(recs) for recs in self.user_recommendations.values())

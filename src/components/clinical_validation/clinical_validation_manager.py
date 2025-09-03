@@ -8,12 +8,11 @@ data collection for the TTA therapeutic platform.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -68,7 +67,7 @@ class ClinicalOutcome:
     evidence_level: EvidenceLevel = EvidenceLevel.LEVEL_6
     clinical_significance: bool = False
     statistical_significance: float = 0.0
-    therapeutic_context: Dict[str, Any] = field(default_factory=dict)
+    therapeutic_context: dict[str, Any] = field(default_factory=dict)
     validation_notes: str = ""
 
 
@@ -77,13 +76,13 @@ class TherapeuticEffectivenessReport:
     """Therapeutic effectiveness validation report."""
     report_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str = ""
-    session_ids: List[str] = field(default_factory=list)
+    session_ids: list[str] = field(default_factory=list)
     evaluation_period_days: int = 30
-    outcomes_measured: List[ClinicalOutcome] = field(default_factory=list)
+    outcomes_measured: list[ClinicalOutcome] = field(default_factory=list)
     overall_effectiveness_score: float = 0.0
     evidence_based_rating: EvidenceLevel = EvidenceLevel.LEVEL_6
-    clinical_recommendations: List[str] = field(default_factory=list)
-    statistical_analysis: Dict[str, Any] = field(default_factory=dict)
+    clinical_recommendations: list[str] = field(default_factory=list)
+    statistical_analysis: dict[str, Any] = field(default_factory=dict)
     generated_at: datetime = field(default_factory=datetime.utcnow)
     validated_by: str = ""
     compliance_status: str = "pending"
@@ -96,7 +95,7 @@ class ClinicalResearchData:
     study_id: str = ""
     participant_id: str = ""
     data_type: str = ""
-    data_points: Dict[str, Any] = field(default_factory=dict)
+    data_points: dict[str, Any] = field(default_factory=dict)
     collection_timestamp: datetime = field(default_factory=datetime.utcnow)
     data_quality_score: float = 1.0
     anonymized: bool = True
@@ -114,10 +113,10 @@ class ClinicalValidationManager:
     def __init__(self):
         """Initialize the Clinical Validation Manager."""
         self.status = ValidationStatus.INITIALIZING
-        self.clinical_outcomes: Dict[str, ClinicalOutcome] = {}
-        self.effectiveness_reports: Dict[str, TherapeuticEffectivenessReport] = {}
-        self.research_data: Dict[str, ClinicalResearchData] = {}
-        self.active_validations: Dict[str, Dict[str, Any]] = {}
+        self.clinical_outcomes: dict[str, ClinicalOutcome] = {}
+        self.effectiveness_reports: dict[str, TherapeuticEffectivenessReport] = {}
+        self.research_data: dict[str, ClinicalResearchData] = {}
+        self.active_validations: dict[str, dict[str, Any]] = {}
 
         # Clinical validation components (injected)
         self.outcome_measurement_system = None
@@ -213,9 +212,9 @@ class ClinicalValidationManager:
         outcome_type: OutcomeType,
         measurement_name: str,
         current_value: float,
-        baseline_value: Optional[float] = None,
-        target_value: Optional[float] = None,
-        therapeutic_context: Optional[Dict[str, Any]] = None
+        baseline_value: float | None = None,
+        target_value: float | None = None,
+        therapeutic_context: dict[str, Any] | None = None
     ) -> ClinicalOutcome:
         """Measure and record a clinical outcome."""
         try:
@@ -277,7 +276,7 @@ class ClinicalValidationManager:
     async def validate_therapeutic_effectiveness(
         self,
         user_id: str,
-        session_ids: List[str],
+        session_ids: list[str],
         evaluation_period_days: int = 30
     ) -> TherapeuticEffectivenessReport:
         """Validate therapeutic effectiveness for a user over a specified period."""
@@ -359,7 +358,7 @@ class ClinicalValidationManager:
         study_id: str,
         participant_id: str,
         data_type: str,
-        data_points: Dict[str, Any],
+        data_points: dict[str, Any],
         consent_status: str = "obtained"
     ) -> ClinicalResearchData:
         """Collect research-grade data for clinical studies."""
@@ -405,8 +404,8 @@ class ClinicalValidationManager:
     async def validate_clinical_compliance(
         self,
         validation_type: str,
-        compliance_criteria: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        compliance_criteria: dict[str, Any]
+    ) -> dict[str, Any]:
         """Validate clinical compliance against healthcare regulations."""
         try:
             self.status = ValidationStatus.VALIDATING
@@ -445,8 +444,8 @@ class ClinicalValidationManager:
     async def generate_evidence_based_analytics(
         self,
         analysis_type: str,
-        data_scope: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        data_scope: dict[str, Any]
+    ) -> dict[str, Any]:
         """Generate evidence-based analytics for clinical decision making."""
         try:
             self.status = ValidationStatus.ANALYZING
@@ -489,7 +488,7 @@ class ClinicalValidationManager:
             self.status = ValidationStatus.ERROR
             raise
 
-    async def get_clinical_validation_overview(self) -> Dict[str, Any]:
+    async def get_clinical_validation_overview(self) -> dict[str, Any]:
         """Get comprehensive clinical validation overview."""
         try:
             return {
@@ -589,7 +588,7 @@ class ClinicalValidationManager:
         import hashlib
         return hashlib.sha256(participant_id.encode()).hexdigest()[:16]
 
-    async def _assess_data_quality(self, data_points: Dict[str, Any]) -> float:
+    async def _assess_data_quality(self, data_points: dict[str, Any]) -> float:
         """Assess data quality score."""
         # Simple quality assessment based on completeness and validity
         total_points = len(data_points)
@@ -667,7 +666,7 @@ class ClinicalValidationManager:
             logger.error(f"Error assessing clinical significance: {e}")
             return False
 
-    async def _generate_data_integrity_hash(self, data_points: Dict[str, Any]) -> str:
+    async def _generate_data_integrity_hash(self, data_points: dict[str, Any]) -> str:
         """Generate data integrity hash."""
         import hashlib
         import json
@@ -805,7 +804,7 @@ class ClinicalValidationManager:
         # Placeholder for periodic compliance checking
         pass
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Clinical Validation Manager."""
         try:
             components_available = sum([

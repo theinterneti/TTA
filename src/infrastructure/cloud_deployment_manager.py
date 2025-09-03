@@ -8,12 +8,11 @@ for 1000+ concurrent therapeutic sessions.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -59,8 +58,8 @@ class ServiceInstance:
     active_connections: int = 0
     therapeutic_sessions: int = 0
     created_at: datetime = field(default_factory=datetime.utcnow)
-    last_health_check: Optional[datetime] = None
-    configuration: Dict[str, Any] = field(default_factory=dict)
+    last_health_check: datetime | None = None
+    configuration: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -70,7 +69,7 @@ class DeploymentConfiguration:
     deployment_name: str = "tta-therapeutic-platform"
     environment: str = "production"
     region: str = "us-east-1"
-    availability_zones: List[str] = field(default_factory=lambda: ["us-east-1a", "us-east-1b", "us-east-1c"])
+    availability_zones: list[str] = field(default_factory=lambda: ["us-east-1a", "us-east-1b", "us-east-1c"])
 
     # Scaling configuration
     min_instances: int = 3
@@ -89,8 +88,8 @@ class DeploymentConfiguration:
     encryption_enabled: bool = True
     ssl_certificate_arn: str = ""
     vpc_id: str = ""
-    subnet_ids: List[str] = field(default_factory=list)
-    security_group_ids: List[str] = field(default_factory=list)
+    subnet_ids: list[str] = field(default_factory=list)
+    security_group_ids: list[str] = field(default_factory=list)
 
     # Database configuration
     database_engine: str = "postgresql"
@@ -112,13 +111,13 @@ class CloudDeploymentManager:
     for the TTA therapeutic platform with support for 1000+ concurrent sessions.
     """
 
-    def __init__(self, configuration: Optional[DeploymentConfiguration] = None):
+    def __init__(self, configuration: DeploymentConfiguration | None = None):
         """Initialize the Cloud Deployment Manager."""
         self.configuration = configuration or DeploymentConfiguration()
         self.status = DeploymentStatus.INITIALIZING
-        self.service_instances: Dict[str, ServiceInstance] = {}
-        self.active_deployments: Dict[str, Dict[str, Any]] = {}
-        self.deployment_history: List[Dict[str, Any]] = []
+        self.service_instances: dict[str, ServiceInstance] = {}
+        self.active_deployments: dict[str, dict[str, Any]] = {}
+        self.deployment_history: list[dict[str, Any]] = []
 
         # Infrastructure components (injected)
         self.high_availability_controller = None
@@ -210,10 +209,10 @@ class CloudDeploymentManager:
 
     async def deploy_therapeutic_platform(
         self,
-        deployment_name: Optional[str] = None,
+        deployment_name: str | None = None,
         environment: str = "production",
-        custom_configuration: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        custom_configuration: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Deploy the complete TTA therapeutic platform to cloud infrastructure."""
         try:
             deployment_id = str(uuid.uuid4())
@@ -333,7 +332,7 @@ class CloudDeploymentManager:
             logger.error(f"Error initializing infrastructure components: {e}")
             raise
 
-    async def _deploy_core_infrastructure(self, deployment_id: str) -> Dict[str, Any]:
+    async def _deploy_core_infrastructure(self, deployment_id: str) -> dict[str, Any]:
         """Deploy core infrastructure components."""
         try:
             logger.info("Deploying core infrastructure")
@@ -367,7 +366,7 @@ class CloudDeploymentManager:
                 "deployed_at": datetime.utcnow().isoformat(),
             }
 
-    async def _deploy_therapeutic_systems(self, deployment_id: str) -> Dict[str, Any]:
+    async def _deploy_therapeutic_systems(self, deployment_id: str) -> dict[str, Any]:
         """Deploy therapeutic systems to cloud infrastructure."""
         try:
             logger.info("Deploying therapeutic systems")
@@ -399,7 +398,7 @@ class CloudDeploymentManager:
                 "deployed_at": datetime.utcnow().isoformat(),
             }
 
-    async def _deploy_clinical_dashboard(self, deployment_id: str) -> Dict[str, Any]:
+    async def _deploy_clinical_dashboard(self, deployment_id: str) -> dict[str, Any]:
         """Deploy clinical dashboard to cloud infrastructure."""
         try:
             logger.info("Deploying clinical dashboard")
@@ -474,7 +473,7 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying service instance: {e}")
             raise
 
-    async def _validate_infrastructure_health(self) -> Dict[str, Any]:
+    async def _validate_infrastructure_health(self) -> dict[str, Any]:
         """Validate infrastructure health."""
         try:
             healthy_instances = 0
@@ -497,7 +496,7 @@ class CloudDeploymentManager:
             logger.error(f"Error validating infrastructure health: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_service_connectivity(self) -> Dict[str, Any]:
+    async def _validate_service_connectivity(self) -> dict[str, Any]:
         """Validate service connectivity."""
         try:
             # Simulate connectivity checks
@@ -523,7 +522,7 @@ class CloudDeploymentManager:
             logger.error(f"Error validating service connectivity: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_performance_benchmarks(self) -> Dict[str, Any]:
+    async def _validate_performance_benchmarks(self) -> dict[str, Any]:
         """Validate performance benchmarks."""
         try:
             # Simulate performance tests
@@ -559,7 +558,7 @@ class CloudDeploymentManager:
             logger.error(f"Error validating performance benchmarks: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_security_compliance(self) -> Dict[str, Any]:
+    async def _validate_security_compliance(self) -> dict[str, Any]:
         """Validate security compliance."""
         try:
             security_checks = {
@@ -587,7 +586,7 @@ class CloudDeploymentManager:
             logger.error(f"Error validating security compliance: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _validate_therapeutic_systems_integration(self) -> Dict[str, Any]:
+    async def _validate_therapeutic_systems_integration(self) -> dict[str, Any]:
         """Validate therapeutic systems integration."""
         try:
             integration_results = {}
@@ -791,7 +790,7 @@ class CloudDeploymentManager:
         except Exception as e:
             logger.error(f"Error checking scaling requirements: {e}")
 
-    async def _apply_custom_configuration(self, custom_configuration: Dict[str, Any]):
+    async def _apply_custom_configuration(self, custom_configuration: dict[str, Any]):
         """Apply custom configuration to deployment."""
         try:
             # Apply custom configuration settings
@@ -804,7 +803,7 @@ class CloudDeploymentManager:
             logger.error(f"Error applying custom configuration: {e}")
             raise
 
-    async def _deploy_database_cluster(self) -> List[ServiceInstance]:
+    async def _deploy_database_cluster(self) -> list[ServiceInstance]:
         """Deploy database cluster with high availability."""
         try:
             database_instances = []
@@ -850,7 +849,7 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying database cluster: {e}")
             raise
 
-    async def _deploy_cache_cluster(self) -> List[ServiceInstance]:
+    async def _deploy_cache_cluster(self) -> list[ServiceInstance]:
         """Deploy cache cluster for performance optimization."""
         try:
             cache_instances = []
@@ -880,7 +879,7 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying cache cluster: {e}")
             raise
 
-    async def _deploy_load_balancers(self) -> List[ServiceInstance]:
+    async def _deploy_load_balancers(self) -> list[ServiceInstance]:
         """Deploy load balancers for high availability and performance."""
         try:
             load_balancer_instances = []
@@ -923,7 +922,7 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying load balancers: {e}")
             raise
 
-    async def _deploy_networking(self) -> Dict[str, Any]:
+    async def _deploy_networking(self) -> dict[str, Any]:
         """Deploy networking infrastructure."""
         try:
             networking_config = {
@@ -950,7 +949,7 @@ class CloudDeploymentManager:
             logger.error(f"Error deploying networking: {e}")
             raise
 
-    async def _configure_scaling_and_load_balancing(self, deployment_id: str) -> Dict[str, Any]:
+    async def _configure_scaling_and_load_balancing(self, deployment_id: str) -> dict[str, Any]:
         """Configure auto-scaling and load balancing."""
         try:
             if self.scalability_manager:
@@ -995,7 +994,7 @@ class CloudDeploymentManager:
                 "configured_at": datetime.utcnow().isoformat(),
             }
 
-    async def _configure_monitoring_and_security(self, deployment_id: str) -> Dict[str, Any]:
+    async def _configure_monitoring_and_security(self, deployment_id: str) -> dict[str, Any]:
         """Configure monitoring and security systems."""
         try:
             monitoring_config = {}
@@ -1044,7 +1043,7 @@ class CloudDeploymentManager:
                 "configured_at": datetime.utcnow().isoformat(),
             }
 
-    async def _validate_deployment(self, deployment_id: str) -> Dict[str, Any]:
+    async def _validate_deployment(self, deployment_id: str) -> dict[str, Any]:
         """Validate deployment success and readiness."""
         try:
             validation_results = {
@@ -1077,7 +1076,7 @@ class CloudDeploymentManager:
                 "validated_at": datetime.utcnow().isoformat(),
             }
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Cloud Deployment Manager."""
         try:
             # Check infrastructure component availability

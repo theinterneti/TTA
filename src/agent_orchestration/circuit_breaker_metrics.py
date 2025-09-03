@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Any
 
-from .circuit_breaker import CircuitBreakerState
+from .circuit_breaker_types import CircuitBreakerState
 
 logger = logging.getLogger(__name__)
 

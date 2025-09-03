@@ -31,10 +31,12 @@ class AgentEventIntegrator:
         self,
         event_publisher: EventPublisher | None = None,
         agent_id: str = "unknown",
+        agent_type: str = "unknown",
         enabled: bool = True,
     ):
         self.event_publisher = event_publisher
         self.agent_id = agent_id
+        self.agent_type = agent_type
         self.enabled = enabled and event_publisher is not None
 
         # Operation tracking
@@ -83,12 +85,13 @@ class AgentEventIntegrator:
         # Send start event
         start_event = create_agent_status_event(
             agent_id=self.agent_id,
+            agent_type=self.agent_type,
             status=AgentStatus.PROCESSING,
-            message=f"Started {operation_type}",
             metadata={
                 "operation_id": operation_id,
                 "operation_type": operation_type,
                 "workflow_id": workflow_id,
+                "message": f"Started {operation_type}",
                 **self.active_operations[operation_id]["data"],
             },
         )
@@ -110,13 +113,14 @@ class AgentEventIntegrator:
             duration = time.time() - start_time
             completion_event = create_agent_status_event(
                 agent_id=self.agent_id,
+                agent_type=self.agent_type,
                 status=AgentStatus.COMPLETED,
-                message=f"Completed {operation_type}",
                 metadata={
                     "operation_id": operation_id,
                     "operation_type": operation_type,
                     "duration": duration,
                     "workflow_id": workflow_id,
+                    "message": f"Completed {operation_type}",
                 },
             )
             await self._publish_event(completion_event)
@@ -126,14 +130,15 @@ class AgentEventIntegrator:
             duration = time.time() - start_time
             error_event = create_agent_status_event(
                 agent_id=self.agent_id,
+                agent_type=self.agent_type,
                 status=AgentStatus.ERROR,
-                message=f"Error in {operation_type}: {str(e)}",
                 metadata={
                     "operation_id": operation_id,
                     "operation_type": operation_type,
                     "duration": duration,
                     "error": str(e),
                     "workflow_id": workflow_id,
+                    "message": f"Error in {operation_type}: {str(e)}",
                 },
             )
             await self._publish_event(error_event)
@@ -158,10 +163,12 @@ class AgentEventIntegrator:
         progress_event = ProgressiveFeedbackEvent(
             agent_id=self.agent_id,
             operation_id=operation_id,
-            progress=progress,
+            operation_type=operation["type"],
+            stage="processing",
+            progress_percentage=progress * 100,  # Convert to percentage
             message=message or f"Progress: {progress:.1%}",
             intermediate_result=None,
-            metadata={"operation_type": operation["type"], "workflow_id": workflow_id},
+            metadata={"workflow_id": workflow_id},
             source=f"agent_{self.agent_id}",
         )
 
@@ -201,11 +208,14 @@ class AgentEventIntegrator:
         metadata: dict[str, Any] | None = None,
     ) -> bool:
         """Publish agent status change event."""
+        event_metadata = metadata or {}
+        if message:
+            event_metadata["message"] = message
         event = create_agent_status_event(
             agent_id=self.agent_id,
+            agent_type=self.agent_type,
             status=status,
-            message=message,
-            metadata=metadata or {},
+            metadata=event_metadata,
         )
         return await self._publish_event(event)
 
@@ -374,6 +384,7 @@ _workflow_integrator: WorkflowEventIntegrator | None = None
 
 def get_agent_event_integrator(
     agent_id: str,
+    agent_type: str = "unknown",
     event_publisher: EventPublisher | None = None,
     enabled: bool = True,
 ) -> AgentEventIntegrator:
@@ -382,7 +393,10 @@ def get_agent_event_integrator(
 
     if agent_id not in _agent_integrators or event_publisher is not None:
         _agent_integrators[agent_id] = AgentEventIntegrator(
-            event_publisher=event_publisher, agent_id=agent_id, enabled=enabled
+            event_publisher=event_publisher,
+            agent_id=agent_id,
+            agent_type=agent_type,
+            enabled=enabled
         )
 
     return _agent_integrators[agent_id]

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
-  UserIcon, 
-  HeartIcon, 
-  CogIcon, 
-  ChartBarIcon, 
+import {
+  UserIcon,
+  HeartIcon,
+  CogIcon,
+  ChartBarIcon,
   CodeBracketIcon,
   GlobeAltIcon,
   CheckCircleIcon,
@@ -139,7 +139,7 @@ export const AuthSwitcher: React.FC = () => {
 
       // Add some delay to simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setGeneratedToken(`dev.${mockToken}.signature`);
       toast.success(`Generated ${selectedRoleData.name} token`);
     } catch (error) {

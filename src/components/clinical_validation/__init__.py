@@ -14,12 +14,12 @@ Components:
 - EvidenceBasedAnalytics: Evidence-based therapeutic outcome analytics
 """
 
+from .clinical_compliance_framework import ClinicalComplianceFramework
+from .clinical_research_data_collector import ClinicalResearchDataCollector
 from .clinical_validation_manager import ClinicalValidationManager
+from .evidence_based_analytics import EvidenceBasedAnalytics
 from .outcome_measurement_system import OutcomeMeasurementSystem
 from .therapeutic_effectiveness_validator import TherapeuticEffectivenessValidator
-from .clinical_research_data_collector import ClinicalResearchDataCollector
-from .clinical_compliance_framework import ClinicalComplianceFramework
-from .evidence_based_analytics import EvidenceBasedAnalytics
 
 __all__ = [
     "ClinicalValidationManager",

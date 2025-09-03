@@ -7,11 +7,11 @@ attribute systems aligned with therapeutic goals and frameworks.
 """
 
 import logging
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 from uuid import uuid4
-from dataclasses import dataclass, field
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,7 @@ class CharacterAttributes:
     adaptability: float = 5.0
     integrity: float = 5.0
 
-    def to_dict(self) -> Dict[str, float]:
+    def to_dict(self) -> dict[str, float]:
         """Convert attributes to dictionary format."""
         return {
             "courage": self.courage,
@@ -95,9 +95,9 @@ class TherapeuticMilestone:
     title: str
     description: str
     therapeutic_value: float
-    attributes_impacted: List[TherapeuticAttribute]
+    attributes_impacted: list[TherapeuticAttribute]
     achievement_date: datetime
-    session_context: Dict[str, Any] = field(default_factory=dict)
+    session_context: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -106,9 +106,9 @@ class CharacterProgressionEvent:
     event_id: str
     character_id: str
     event_type: str
-    attribute_changes: Dict[str, float]
-    milestone_achieved: Optional[TherapeuticMilestone]
-    therapeutic_context: Dict[str, Any]
+    attribute_changes: dict[str, float]
+    milestone_achieved: TherapeuticMilestone | None
+    therapeutic_context: dict[str, Any]
     timestamp: datetime
 
 
@@ -119,9 +119,9 @@ class TherapeuticCharacter:
     user_id: str
     name: str
     attributes: CharacterAttributes
-    milestones: List[TherapeuticMilestone] = field(default_factory=list)
-    progression_events: List[CharacterProgressionEvent] = field(default_factory=list)
-    therapeutic_goals: List[str] = field(default_factory=list)
+    milestones: list[TherapeuticMilestone] = field(default_factory=list)
+    progression_events: list[CharacterProgressionEvent] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.utcnow)
     last_updated: datetime = field(default_factory=datetime.utcnow)
     total_therapeutic_value: float = 0.0
@@ -134,7 +134,7 @@ class TherapeuticCharacterDevelopmentSystem:
     development aligned with therapeutic goals and frameworks.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic character development system."""
         self.config = config or {}
 
@@ -179,10 +179,10 @@ class TherapeuticCharacterDevelopmentSystem:
     async def create_character(
         self,
         user_id: str,
-        session_id: Optional[str] = None,
-        therapeutic_goals: Optional[List[str]] = None,
-        character_name: Optional[str] = None,
-        initial_attributes: Optional[Dict[str, float]] = None,
+        session_id: str | None = None,
+        therapeutic_goals: list[str] | None = None,
+        character_name: str | None = None,
+        initial_attributes: dict[str, float] | None = None,
     ) -> TherapeuticCharacter:
         """
         Create a new therapeutic character for the user.
@@ -273,7 +273,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
             return fallback_character
 
-    def _generate_character_name(self, therapeutic_goals: Optional[List[str]]) -> str:
+    def _generate_character_name(self, therapeutic_goals: list[str] | None) -> str:
         """Generate a character name based on therapeutic goals."""
         if not therapeutic_goals:
             return "Therapeutic Character"
@@ -296,7 +296,7 @@ class TherapeuticCharacterDevelopmentSystem:
         return goal_names.get(primary_goal, "Journey")
 
     def _initialize_character_attributes(
-        self, therapeutic_goals: Optional[List[str]], initial_attributes: Optional[Dict[str, float]]
+        self, therapeutic_goals: list[str] | None, initial_attributes: dict[str, float] | None
     ) -> CharacterAttributes:
         """Initialize character attributes with therapeutic goal alignment."""
         # Start with base attributes
@@ -318,7 +318,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return attributes
 
-    def _calculate_therapeutic_goal_bonuses(self, therapeutic_goals: List[str]) -> Dict[str, float]:
+    def _calculate_therapeutic_goal_bonuses(self, therapeutic_goals: list[str]) -> dict[str, float]:
         """Calculate attribute bonuses based on therapeutic goals."""
         bonuses = {}
 
@@ -344,7 +344,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return bonuses
 
-    def _initialize_milestone_templates(self) -> Dict[MilestoneType, Dict[str, Any]]:
+    def _initialize_milestone_templates(self) -> dict[MilestoneType, dict[str, Any]]:
         """Initialize milestone templates for therapeutic achievements."""
         return {
             MilestoneType.THERAPEUTIC_BREAKTHROUGH: {
@@ -400,9 +400,9 @@ class TherapeuticCharacterDevelopmentSystem:
     async def process_therapeutic_consequence(
         self,
         user_id: str,
-        consequence_data: Dict[str, Any],
-        session_context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        consequence_data: dict[str, Any],
+        session_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Process therapeutic consequences and update character development.
 
@@ -501,7 +501,7 @@ class TherapeuticCharacterDevelopmentSystem:
                 "attribute_changes": {},
             }
 
-    def _calculate_alignment_bonus(self, attribute_name: str, therapeutic_goals: List[str]) -> float:
+    def _calculate_alignment_bonus(self, attribute_name: str, therapeutic_goals: list[str]) -> float:
         """Calculate therapeutic alignment bonus for attribute growth."""
         if not therapeutic_goals:
             return 0.0
@@ -516,8 +516,8 @@ class TherapeuticCharacterDevelopmentSystem:
         return min(0.5, alignment_score)  # Cap bonus at 50%
 
     def _check_milestone_achievement(
-        self, character: TherapeuticCharacter, attribute_changes: Dict[str, float], therapeutic_value: float
-    ) -> Optional[TherapeuticMilestone]:
+        self, character: TherapeuticCharacter, attribute_changes: dict[str, float], therapeutic_value: float
+    ) -> TherapeuticMilestone | None:
         """Check if character has achieved a therapeutic milestone."""
         # Check if therapeutic value meets milestone threshold
         if therapeutic_value < self.milestone_threshold:
@@ -546,7 +546,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return milestone
 
-    def _determine_milestone_type(self, attribute_changes: Dict[str, float], therapeutic_value: float) -> Optional[MilestoneType]:
+    def _determine_milestone_type(self, attribute_changes: dict[str, float], therapeutic_value: float) -> MilestoneType | None:
         """Determine the type of milestone based on attribute changes."""
         if not attribute_changes:
             return None
@@ -579,7 +579,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return attr_milestone_mapping.get(max_attr_name, MilestoneType.SKILL_MASTERY)
 
-    async def get_character_summary(self, user_id: str) -> Dict[str, Any]:
+    async def get_character_summary(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive character development summary for a user."""
         try:
             if user_id not in self.characters:
@@ -652,7 +652,7 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return total_value / len(recent_events)
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the character development system."""
         try:
             return {
@@ -673,7 +673,7 @@ class TherapeuticCharacterDevelopmentSystem:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get character development system metrics."""
         # Calculate additional metrics
         total_attributes_tracked = sum(

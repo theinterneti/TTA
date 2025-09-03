@@ -56,13 +56,13 @@ export class ErrorBoundary extends Component<Props, State> {
                 <ExclamationTriangleIcon className="h-8 w-8 text-red-600" />
               </div>
             </div>
-            
+
             <h1 className="text-xl font-semibold text-gray-900 mb-2">
               Something went wrong
             </h1>
-            
+
             <p className="text-gray-600 mb-6">
-              The Developer Interface encountered an unexpected error. This might be due to a 
+              The Developer Interface encountered an unexpected error. This might be due to a
               development issue or a temporary problem.
             </p>
 
@@ -87,7 +87,7 @@ export class ErrorBoundary extends Component<Props, State> {
               >
                 Try Again
               </button>
-              
+
               <button
                 onClick={this.handleReload}
                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors"
@@ -99,7 +99,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <div className="mt-6 pt-4 border-t border-gray-200">
               <p className="text-xs text-gray-500">
-                If this problem persists, check the browser console for more details or 
+                If this problem persists, check the browser console for more details or
                 restart the development server.
               </p>
             </div>

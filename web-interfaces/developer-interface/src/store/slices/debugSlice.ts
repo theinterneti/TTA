@@ -63,31 +63,31 @@ interface DebugState {
     status: string[];
     url: string;
   };
-  
+
   // Error tracking
   errorEvents: ErrorEvent[];
   errorFilters: {
     severity: string[];
     context: string;
   };
-  
+
   // Console logs
   consoleLogs: ConsoleLog[];
   consoleFilters: {
     level: string[];
     source: string;
   };
-  
+
   // Performance monitoring
   performanceMetrics: PerformanceMetric[];
   memoryUsage: MemoryUsage[];
   componentRenderInfo: ComponentRenderInfo[];
-  
+
   // Debug tools state
   isDebugPanelOpen: boolean;
   activeDebugTab: 'network' | 'errors' | 'console' | 'performance' | 'components';
   isRecording: boolean;
-  
+
   // WebSocket connection status
   webSocketConnections: {
     [serviceId: string]: {
@@ -105,27 +105,27 @@ const initialState: DebugState = {
     status: [],
     url: '',
   },
-  
+
   errorEvents: [],
   errorFilters: {
     severity: [],
     context: '',
   },
-  
+
   consoleLogs: [],
   consoleFilters: {
     level: [],
     source: '',
   },
-  
+
   performanceMetrics: [],
   memoryUsage: [],
   componentRenderInfo: [],
-  
+
   isDebugPanelOpen: false,
   activeDebugTab: 'network',
   isRecording: true,
-  
+
   webSocketConnections: {},
 };
 
@@ -140,21 +140,21 @@ const debugSlice = createSlice({
         id: `net_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
       state.networkEvents.unshift(event);
-      
+
       // Keep only last 100 events
       if (state.networkEvents.length > 100) {
         state.networkEvents = state.networkEvents.slice(0, 100);
       }
     },
-    
+
     setNetworkFilters: (state, action: PayloadAction<Partial<DebugState['networkFilters']>>) => {
       state.networkFilters = { ...state.networkFilters, ...action.payload };
     },
-    
+
     clearNetworkEvents: (state) => {
       state.networkEvents = [];
     },
-    
+
     // Error events
     addErrorEvent: (state, action: PayloadAction<Omit<ErrorEvent, 'id'>>) => {
       const event: ErrorEvent = {
@@ -162,21 +162,21 @@ const debugSlice = createSlice({
         id: `err_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
       state.errorEvents.unshift(event);
-      
+
       // Keep only last 50 errors
       if (state.errorEvents.length > 50) {
         state.errorEvents = state.errorEvents.slice(0, 50);
       }
     },
-    
+
     setErrorFilters: (state, action: PayloadAction<Partial<DebugState['errorFilters']>>) => {
       state.errorFilters = { ...state.errorFilters, ...action.payload };
     },
-    
+
     clearErrorEvents: (state) => {
       state.errorEvents = [];
     },
-    
+
     // Console logs
     addConsoleLog: (state, action: PayloadAction<Omit<ConsoleLog, 'id'>>) => {
       const log: ConsoleLog = {
@@ -184,21 +184,21 @@ const debugSlice = createSlice({
         id: `log_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
       state.consoleLogs.unshift(log);
-      
+
       // Keep only last 200 logs
       if (state.consoleLogs.length > 200) {
         state.consoleLogs = state.consoleLogs.slice(0, 200);
       }
     },
-    
+
     setConsoleFilters: (state, action: PayloadAction<Partial<DebugState['consoleFilters']>>) => {
       state.consoleFilters = { ...state.consoleFilters, ...action.payload };
     },
-    
+
     clearConsoleLogs: (state) => {
       state.consoleLogs = [];
     },
-    
+
     // Performance metrics
     addPerformanceMetric: (state, action: PayloadAction<Omit<PerformanceMetric, 'id'>>) => {
       const metric: PerformanceMetric = {
@@ -206,47 +206,47 @@ const debugSlice = createSlice({
         id: `perf_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
       };
       state.performanceMetrics.unshift(metric);
-      
+
       // Keep only last 100 metrics
       if (state.performanceMetrics.length > 100) {
         state.performanceMetrics = state.performanceMetrics.slice(0, 100);
       }
     },
-    
+
     addMemoryUsage: (state, action: PayloadAction<MemoryUsage>) => {
       state.memoryUsage.unshift(action.payload);
-      
+
       // Keep only last 50 memory snapshots
       if (state.memoryUsage.length > 50) {
         state.memoryUsage = state.memoryUsage.slice(0, 50);
       }
     },
-    
+
     updateComponentRenderInfo: (state, action: PayloadAction<ComponentRenderInfo>) => {
       const index = state.componentRenderInfo.findIndex(
         info => info.componentName === action.payload.componentName
       );
-      
+
       if (index >= 0) {
         state.componentRenderInfo[index] = action.payload;
       } else {
         state.componentRenderInfo.push(action.payload);
       }
     },
-    
+
     // Debug panel state
     setDebugPanelOpen: (state, action: PayloadAction<boolean>) => {
       state.isDebugPanelOpen = action.payload;
     },
-    
+
     setActiveDebugTab: (state, action: PayloadAction<DebugState['activeDebugTab']>) => {
       state.activeDebugTab = action.payload;
     },
-    
+
     setRecording: (state, action: PayloadAction<boolean>) => {
       state.isRecording = action.payload;
     },
-    
+
     // WebSocket connections
     updateWebSocketConnection: (state, action: PayloadAction<{
       serviceId: string;
@@ -254,7 +254,7 @@ const debugSlice = createSlice({
       reconnectAttempts?: number;
     }>) => {
       const { serviceId, status, reconnectAttempts } = action.payload;
-      
+
       if (!state.webSocketConnections[serviceId]) {
         state.webSocketConnections[serviceId] = {
           status,
@@ -266,13 +266,13 @@ const debugSlice = createSlice({
           state.webSocketConnections[serviceId].reconnectAttempts = reconnectAttempts;
         }
       }
-      
+
       if (status === 'connected') {
         state.webSocketConnections[serviceId].lastConnected = new Date().toISOString();
         state.webSocketConnections[serviceId].reconnectAttempts = 0;
       }
     },
-    
+
     // Clear all debug data
     clearAllDebugData: (state) => {
       state.networkEvents = [];

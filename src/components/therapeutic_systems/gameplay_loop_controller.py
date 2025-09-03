@@ -7,17 +7,18 @@ orchestration.
 """
 
 import logging
-from datetime import datetime, timedelta
-from enum import Enum
-from typing import Any, Dict, List, Optional
-from uuid import uuid4
 from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
 
 
 class SessionPhase(Enum):
     """Phases of a therapeutic gameplay session."""
+
     INITIALIZATION = "initialization"
     CHARACTER_CREATION = "character_creation"
     THERAPEUTIC_ASSESSMENT = "therapeutic_assessment"
@@ -31,6 +32,7 @@ class SessionPhase(Enum):
 
 class SessionStatus(Enum):
     """Status of a therapeutic session."""
+
     INITIALIZING = "initializing"
     ACTIVE = "active"
     PAUSED = "paused"
@@ -42,13 +44,14 @@ class SessionStatus(Enum):
 @dataclass
 class SessionConfiguration:
     """Configuration for a therapeutic gameplay session."""
+
     session_id: str = field(default_factory=lambda: str(uuid4()))
     user_id: str = ""
-    therapeutic_goals: List[str] = field(default_factory=list)
+    therapeutic_goals: list[str] = field(default_factory=list)
     target_duration_minutes: int = 45
     difficulty_level: str = "moderate"
-    framework_preferences: List[str] = field(default_factory=list)
-    character_preferences: Dict[str, Any] = field(default_factory=dict)
+    framework_preferences: list[str] = field(default_factory=list)
+    character_preferences: dict[str, Any] = field(default_factory=dict)
     safety_monitoring_enabled: bool = True
     adaptive_difficulty_enabled: bool = True
     auto_save_enabled: bool = True
@@ -58,6 +61,7 @@ class SessionConfiguration:
 @dataclass
 class SessionState:
     """Current state of a therapeutic gameplay session."""
+
     session_id: str
     user_id: str
     status: SessionStatus
@@ -66,9 +70,9 @@ class SessionState:
     last_updated: datetime = field(default_factory=datetime.utcnow)
 
     # Therapeutic context
-    therapeutic_goals: List[str] = field(default_factory=list)
-    character_id: Optional[str] = None
-    current_scenario_id: Optional[str] = None
+    therapeutic_goals: list[str] = field(default_factory=list)
+    character_id: str | None = None
+    current_scenario_id: str | None = None
 
     # Progress tracking
     choices_made: int = 0
@@ -77,9 +81,9 @@ class SessionState:
     therapeutic_value_accumulated: float = 0.0
 
     # System states
-    emotional_safety_status: Dict[str, Any] = field(default_factory=dict)
+    emotional_safety_status: dict[str, Any] = field(default_factory=dict)
     difficulty_level: str = "moderate"
-    character_attributes: Dict[str, float] = field(default_factory=dict)
+    character_attributes: dict[str, float] = field(default_factory=dict)
 
     # Session metrics
     session_duration_minutes: float = 0.0
@@ -90,16 +94,17 @@ class SessionState:
 @dataclass
 class SessionOutcome:
     """Outcome summary of a completed therapeutic session."""
+
     session_id: str
     user_id: str
     duration_minutes: float
-    therapeutic_goals_addressed: List[str]
-    milestones_achieved: List[str]
-    character_progression: Dict[str, float]
+    therapeutic_goals_addressed: list[str]
+    milestones_achieved: list[str]
+    character_progression: dict[str, float]
     therapeutic_value_total: float
-    engagement_metrics: Dict[str, float]
+    engagement_metrics: dict[str, float]
     safety_incidents: int
-    recommendations_for_next_session: List[str]
+    recommendations_for_next_session: list[str]
     created_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -109,7 +114,7 @@ class TherapeuticGameplayLoopController:
     lifecycle management with seamless integration of all therapeutic systems.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the therapeutic gameplay loop controller."""
         self.config = config or {}
 
@@ -125,11 +130,16 @@ class TherapeuticGameplayLoopController:
         self.character_development_system = None
         self.therapeutic_integration_system = None
 
+        # Adventure enhancement system
+        self.adventure_enhancer = None
+
         # Configuration parameters
         self.max_concurrent_sessions = self.config.get("max_concurrent_sessions", 100)
         self.session_timeout_minutes = self.config.get("session_timeout_minutes", 120)
         self.auto_save_enabled = self.config.get("auto_save_enabled", True)
-        self.safety_monitoring_interval = self.config.get("safety_monitoring_interval", 30)
+        self.safety_monitoring_interval = self.config.get(
+            "safety_monitoring_interval", 30
+        )
 
         # Performance metrics
         self.metrics = {
@@ -155,6 +165,7 @@ class TherapeuticGameplayLoopController:
         adaptive_difficulty_engine=None,
         character_development_system=None,
         therapeutic_integration_system=None,
+        adventure_enhancer=None,
     ):
         """Inject therapeutic system dependencies."""
         self.consequence_system = consequence_system
@@ -162,14 +173,15 @@ class TherapeuticGameplayLoopController:
         self.adaptive_difficulty_engine = adaptive_difficulty_engine
         self.character_development_system = character_development_system
         self.therapeutic_integration_system = therapeutic_integration_system
+        self.adventure_enhancer = adventure_enhancer
 
         logger.info("Therapeutic systems injected into GameplayLoopController")
 
     async def start_session(
         self,
         user_id: str,
-        session_config: Optional[SessionConfiguration] = None,
-        therapeutic_goals: Optional[List[str]] = None,
+        session_config: SessionConfiguration | None = None,
+        therapeutic_goals: list[str] | None = None,
     ) -> SessionState:
         """
         Start a new therapeutic gameplay session with comprehensive initialization.
@@ -222,7 +234,9 @@ class TherapeuticGameplayLoopController:
             await self._handle_character_creation_phase(session_state, session_config)
 
             # Phase 3: Therapeutic assessment
-            await self._handle_therapeutic_assessment_phase(session_state, session_config)
+            await self._handle_therapeutic_assessment_phase(
+                session_state, session_config
+            )
 
             # Phase 4: Transition to active gameplay
             session_state.status = SessionStatus.ACTIVE
@@ -244,7 +258,7 @@ class TherapeuticGameplayLoopController:
             logger.error(f"Error starting session for user {user_id}: {e}")
 
             # Clean up failed session
-            if 'session_id' in locals():
+            if "session_id" in locals():
                 self.active_sessions.pop(session_id, None)
                 self.session_configurations.pop(session_id, None)
 
@@ -261,8 +275,8 @@ class TherapeuticGameplayLoopController:
         self,
         session_id: str,
         user_choice: str,
-        choice_context: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        choice_context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """
         Process a user choice through all therapeutic systems.
 
@@ -286,9 +300,13 @@ class TherapeuticGameplayLoopController:
                 raise ValueError(f"Invalid or inactive session: {session_id}")
 
             # Safety check first
-            safety_result = await self._assess_safety(session_state, user_choice, choice_context)
+            safety_result = await self._assess_safety(
+                session_state, user_choice, choice_context
+            )
             if safety_result.get("crisis_detected", False):
-                return await self._handle_crisis_intervention(session_state, safety_result)
+                return await self._handle_crisis_intervention(
+                    session_state, safety_result
+                )
 
             # Process choice through consequence system
             consequence_result = await self._process_choice_consequence(
@@ -313,11 +331,15 @@ class TherapeuticGameplayLoopController:
             # Update session state
             session_state.choices_made += 1
             session_state.consequences_processed += 1
-            session_state.therapeutic_value_accumulated += consequence_result.get("therapeutic_value", 0.0)
+            session_state.therapeutic_value_accumulated += consequence_result.get(
+                "therapeutic_value", 0.0
+            )
             session_state.last_updated = datetime.utcnow()
 
             # Check for milestones
-            milestone_check = await self._check_milestones(session_state, consequence_result)
+            milestone_check = await self._check_milestones(
+                session_state, consequence_result
+            )
 
             # Compile comprehensive response
             response = {
@@ -337,7 +359,24 @@ class TherapeuticGameplayLoopController:
                 "processing_time": (datetime.utcnow() - start_time).total_seconds(),
             }
 
-            logger.info(f"Processed choice for session {session_id} in {response['processing_time']:.3f}s")
+            # Enhance response with adventure elements if adventure enhancer is available
+            if self.adventure_enhancer:
+                try:
+                    response = self.adventure_enhancer.enhance_choice_response(
+                        session_id=session_id,
+                        user_choice=user_choice,
+                        choice_context=choice_context or {},
+                        base_response=response,
+                    )
+                except Exception as e:
+                    logger.warning(
+                        f"Adventure enhancement failed for session {session_id}: {e}"
+                    )
+                    # Continue with base response if enhancement fails
+
+            logger.info(
+                f"Processed choice for session {session_id} in {response['processing_time']:.3f}s"
+            )
 
             return response
 
@@ -374,13 +413,19 @@ class TherapeuticGameplayLoopController:
                 raise ValueError(f"Session {session_id} not found")
 
             # Calculate session duration
-            session_duration = (datetime.utcnow() - session_state.created_at).total_seconds() / 60.0
+            session_duration = (
+                datetime.utcnow() - session_state.created_at
+            ).total_seconds() / 60.0
 
             # Generate character progression summary
-            character_progression = await self._generate_character_progression_summary(session_state)
+            character_progression = await self._generate_character_progression_summary(
+                session_state
+            )
 
             # Generate therapeutic recommendations
-            recommendations = await self._generate_session_recommendations(session_state)
+            recommendations = await self._generate_session_recommendations(
+                session_state
+            )
 
             # Create session outcome
             outcome = SessionOutcome(
@@ -396,7 +441,9 @@ class TherapeuticGameplayLoopController:
                     "engagement_score": session_state.engagement_score,
                     "therapeutic_progress_score": session_state.therapeutic_progress_score,
                 },
-                safety_incidents=session_state.emotional_safety_status.get("incidents", 0),
+                safety_incidents=session_state.emotional_safety_status.get(
+                    "incidents", 0
+                ),
                 recommendations_for_next_session=recommendations,
             )
 
@@ -440,7 +487,9 @@ class TherapeuticGameplayLoopController:
                 therapeutic_value_total=0.0,
                 engagement_metrics={},
                 safety_incidents=0,
-                recommendations_for_next_session=["Session ended with error - please try again"],
+                recommendations_for_next_session=[
+                    "Session ended with error - please try again"
+                ],
             )
 
     # Helper methods for therapeutic system integration
@@ -451,23 +500,33 @@ class TherapeuticGameplayLoopController:
         """Initialize all therapeutic systems for the session."""
         try:
             # Initialize emotional safety monitoring
-            if self.emotional_safety_system and session_config.safety_monitoring_enabled:
-                safety_init = await self.emotional_safety_system.initialize_user_monitoring(
-                    user_id=session_state.user_id,
-                    session_id=session_state.session_id,
-                    monitoring_level="standard",
+            if (
+                self.emotional_safety_system
+                and session_config.safety_monitoring_enabled
+            ):
+                safety_init = (
+                    await self.emotional_safety_system.initialize_user_monitoring(
+                        user_id=session_state.user_id,
+                        session_id=session_state.session_id,
+                        monitoring_level="standard",
+                    )
                 )
                 session_state.emotional_safety_status = safety_init
 
             # Initialize adaptive difficulty
-            if self.adaptive_difficulty_engine and session_config.adaptive_difficulty_enabled:
+            if (
+                self.adaptive_difficulty_engine
+                and session_config.adaptive_difficulty_enabled
+            ):
                 await self.adaptive_difficulty_engine.initialize_user_profile(
                     user_id=session_state.user_id,
                     initial_difficulty=session_config.difficulty_level,
                     therapeutic_goals=session_config.therapeutic_goals,
                 )
 
-            logger.info(f"Therapeutic systems initialized for session {session_state.session_id}")
+            logger.info(
+                f"Therapeutic systems initialized for session {session_state.session_id}"
+            )
 
         except Exception as e:
             logger.error(f"Error initializing therapeutic systems: {e}")
@@ -490,7 +549,9 @@ class TherapeuticGameplayLoopController:
                 session_state.character_id = character.character_id
                 session_state.character_attributes = character.attributes
 
-                logger.info(f"Character created for session {session_state.session_id}: {character.character_id}")
+                logger.info(
+                    f"Character created for session {session_state.session_id}: {character.character_id}"
+                )
 
         except Exception as e:
             logger.error(f"Error in character creation phase: {e}")
@@ -514,16 +575,23 @@ class TherapeuticGameplayLoopController:
                 )
 
                 # Store recommendations in session context
-                session_state.therapeutic_goals.extend([rec.framework.value for rec in recommendations[:3]])
+                session_state.therapeutic_goals.extend(
+                    [rec.framework.value for rec in recommendations[:3]]
+                )
 
-                logger.info(f"Therapeutic assessment completed for session {session_state.session_id}")
+                logger.info(
+                    f"Therapeutic assessment completed for session {session_state.session_id}"
+                )
 
         except Exception as e:
             logger.error(f"Error in therapeutic assessment phase: {e}")
 
     async def _assess_safety(
-        self, session_state: SessionState, user_input: str, context: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self,
+        session_state: SessionState,
+        user_input: str,
+        context: dict[str, Any] | None,
+    ) -> dict[str, Any]:
         """Assess emotional safety of user input."""
         try:
             if self.emotional_safety_system:
@@ -538,16 +606,22 @@ class TherapeuticGameplayLoopController:
 
         except Exception as e:
             logger.error(f"Error in safety assessment: {e}")
-            return {"crisis_detected": False, "safety_level": "standard", "error": str(e)}
+            return {
+                "crisis_detected": False,
+                "safety_level": "standard",
+                "error": str(e),
+            }
 
     async def _handle_crisis_intervention(
-        self, session_state: SessionState, safety_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, session_state: SessionState, safety_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Handle crisis intervention when safety issues are detected."""
         try:
             # Update session state
             session_state.current_phase = SessionPhase.CONCLUSION
-            session_state.emotional_safety_status["incidents"] = session_state.emotional_safety_status.get("incidents", 0) + 1
+            session_state.emotional_safety_status["incidents"] = (
+                session_state.emotional_safety_status.get("incidents", 0) + 1
+            )
 
             # Update metrics
             self.metrics["safety_interventions"] += 1
@@ -572,8 +646,11 @@ class TherapeuticGameplayLoopController:
             }
 
     async def _process_choice_consequence(
-        self, session_state: SessionState, user_choice: str, context: Optional[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        self,
+        session_state: SessionState,
+        user_choice: str,
+        context: dict[str, Any] | None,
+    ) -> dict[str, Any]:
         """Process user choice through consequence system."""
         try:
             if self.consequence_system:
@@ -600,8 +677,8 @@ class TherapeuticGameplayLoopController:
             }
 
     async def _update_character_development(
-        self, session_state: SessionState, consequence_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, session_state: SessionState, consequence_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Update character development based on consequence."""
         try:
             if self.character_development_system and session_state.character_id:
@@ -612,46 +689,60 @@ class TherapeuticGameplayLoopController:
 
                 # Update session state with new attributes
                 if "updated_attributes" in character_update:
-                    session_state.character_attributes.update(character_update["updated_attributes"])
+                    session_state.character_attributes.update(
+                        character_update["updated_attributes"]
+                    )
 
                 return character_update
             else:
-                return {"character_updated": False, "reason": "No character development system"}
+                return {
+                    "character_updated": False,
+                    "reason": "No character development system",
+                }
 
         except Exception as e:
             logger.error(f"Error updating character development: {e}")
             return {"character_updated": False, "error": str(e)}
 
     async def _adjust_difficulty(
-        self, session_state: SessionState, consequence_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, session_state: SessionState, consequence_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Adjust difficulty based on user performance."""
         try:
             if self.adaptive_difficulty_engine:
-                difficulty_adjustment = await self.adaptive_difficulty_engine.adjust_difficulty(
-                    user_id=session_state.user_id,
-                    performance_data={
-                        "therapeutic_value": consequence_result.get("therapeutic_value", 0.0),
-                        "engagement_level": session_state.engagement_score,
-                        "choices_made": session_state.choices_made,
-                    },
+                difficulty_adjustment = (
+                    await self.adaptive_difficulty_engine.adjust_difficulty(
+                        user_id=session_state.user_id,
+                        performance_data={
+                            "therapeutic_value": consequence_result.get(
+                                "therapeutic_value", 0.0
+                            ),
+                            "engagement_level": session_state.engagement_score,
+                            "choices_made": session_state.choices_made,
+                        },
+                    )
                 )
 
                 # Update session difficulty if changed
                 if "new_difficulty" in difficulty_adjustment:
-                    session_state.difficulty_level = difficulty_adjustment["new_difficulty"]
+                    session_state.difficulty_level = difficulty_adjustment[
+                        "new_difficulty"
+                    ]
 
                 return difficulty_adjustment
             else:
-                return {"difficulty_adjusted": False, "current_difficulty": session_state.difficulty_level}
+                return {
+                    "difficulty_adjusted": False,
+                    "current_difficulty": session_state.difficulty_level,
+                }
 
         except Exception as e:
             logger.error(f"Error adjusting difficulty: {e}")
             return {"difficulty_adjusted": False, "error": str(e)}
 
     async def _integrate_therapeutic_content(
-        self, session_state: SessionState, consequence_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, session_state: SessionState, consequence_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Integrate therapeutic content based on session progress."""
         try:
             if self.therapeutic_integration_system:
@@ -695,49 +786,68 @@ class TherapeuticGameplayLoopController:
                         },
                     }
 
-            return {"therapeutic_integration": False, "reason": "No therapeutic integration system"}
+            return {
+                "therapeutic_integration": False,
+                "reason": "No therapeutic integration system",
+            }
 
         except Exception as e:
             logger.error(f"Error integrating therapeutic content: {e}")
             return {"therapeutic_integration": False, "error": str(e)}
 
     async def _check_milestones(
-        self, session_state: SessionState, consequence_result: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        self, session_state: SessionState, consequence_result: dict[str, Any]
+    ) -> dict[str, Any]:
         """Check for milestone achievements."""
         try:
             milestones_achieved = []
 
             # Check therapeutic value milestones
-            if session_state.therapeutic_value_accumulated >= 10.0 and session_state.milestones_achieved == 0:
+            if (
+                session_state.therapeutic_value_accumulated >= 10.0
+                and session_state.milestones_achieved == 0
+            ):
                 milestones_achieved.append("first_therapeutic_breakthrough")
                 session_state.milestones_achieved += 1
 
             # Check choice engagement milestones
-            if session_state.choices_made >= 5 and "engagement_milestone" not in milestones_achieved:
+            if (
+                session_state.choices_made >= 5
+                and "engagement_milestone" not in milestones_achieved
+            ):
                 milestones_achieved.append("active_engagement")
 
             # Check character development milestones
             if self.character_development_system and session_state.character_id:
                 try:
-                    character_milestones = await self.character_development_system.check_milestones(
-                        character_id=session_state.character_id
+                    character_milestones = (
+                        await self.character_development_system.check_milestones(
+                            character_id=session_state.character_id
+                        )
                     )
-                    if character_milestones and "new_milestones" in character_milestones:
-                        milestones_achieved.extend(character_milestones["new_milestones"])
+                    if (
+                        character_milestones
+                        and "new_milestones" in character_milestones
+                    ):
+                        milestones_achieved.extend(
+                            character_milestones["new_milestones"]
+                        )
                 except Exception as e:
                     logger.debug(f"Error checking character milestones: {e}")
 
             return {
                 "milestones_achieved": milestones_achieved,
-                "total_milestones": session_state.milestones_achieved + len(milestones_achieved),
+                "total_milestones": session_state.milestones_achieved
+                + len(milestones_achieved),
             }
 
         except Exception as e:
             logger.error(f"Error checking milestones: {e}")
             return {"milestones_achieved": [], "total_milestones": 0}
 
-    async def _generate_character_progression_summary(self, session_state: SessionState) -> Dict[str, float]:
+    async def _generate_character_progression_summary(
+        self, session_state: SessionState
+    ) -> dict[str, float]:
         """Generate character progression summary for session outcome."""
         try:
             if self.character_development_system and session_state.character_id:
@@ -752,25 +862,35 @@ class TherapeuticGameplayLoopController:
             logger.error(f"Error generating character progression summary: {e}")
             return {}
 
-    async def _generate_session_recommendations(self, session_state: SessionState) -> List[str]:
+    async def _generate_session_recommendations(
+        self, session_state: SessionState
+    ) -> list[str]:
         """Generate recommendations for next session."""
         try:
             recommendations = []
 
             # Therapeutic value recommendations
             if session_state.therapeutic_value_accumulated < 5.0:
-                recommendations.append("Focus on deeper therapeutic engagement in next session")
+                recommendations.append(
+                    "Focus on deeper therapeutic engagement in next session"
+                )
 
             # Character development recommendations
             if session_state.character_attributes:
-                lowest_attribute = min(session_state.character_attributes.items(), key=lambda x: x[1])
-                recommendations.append(f"Consider working on {lowest_attribute[0]} development")
+                lowest_attribute = min(
+                    session_state.character_attributes.items(), key=lambda x: x[1]
+                )
+                recommendations.append(
+                    f"Consider working on {lowest_attribute[0]} development"
+                )
 
             # Difficulty recommendations
             if session_state.choices_made < 3:
                 recommendations.append("Try making more choices to increase engagement")
             elif session_state.choices_made > 10:
-                recommendations.append("Great engagement! Consider exploring more complex scenarios")
+                recommendations.append(
+                    "Great engagement! Consider exploring more complex scenarios"
+                )
 
             # Therapeutic integration recommendations
             if self.therapeutic_integration_system:
@@ -784,7 +904,9 @@ class TherapeuticGameplayLoopController:
                 )
 
                 if integration_recs:
-                    recommendations.append(f"Consider exploring {integration_recs[0].framework.value} approaches")
+                    recommendations.append(
+                        f"Consider exploring {integration_recs[0].framework.value} approaches"
+                    )
 
             return recommendations[:5]  # Limit to top 5 recommendations
 
@@ -799,13 +921,15 @@ class TherapeuticGameplayLoopController:
             sessions_completed = self.metrics.get("sessions_completed", 1)
 
             # Calculate new average
-            new_avg = ((current_avg * (sessions_completed - 1)) + session_duration) / sessions_completed
+            new_avg = (
+                (current_avg * (sessions_completed - 1)) + session_duration
+            ) / sessions_completed
             self.metrics["average_session_duration"] = new_avg
 
         except Exception as e:
             logger.error(f"Error updating average session duration: {e}")
 
-    async def get_session_status(self, session_id: str) -> Optional[Dict[str, Any]]:
+    async def get_session_status(self, session_id: str) -> dict[str, Any] | None:
         """Get current status of a session."""
         try:
             session_state = self.active_sessions.get(session_id)
@@ -834,16 +958,20 @@ class TherapeuticGameplayLoopController:
             logger.error(f"Error getting session status: {e}")
             return None
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the gameplay loop controller."""
         try:
             # Check therapeutic system availability
             systems_status = {
                 "consequence_system": self.consequence_system is not None,
                 "emotional_safety_system": self.emotional_safety_system is not None,
-                "adaptive_difficulty_engine": self.adaptive_difficulty_engine is not None,
-                "character_development_system": self.character_development_system is not None,
-                "therapeutic_integration_system": self.therapeutic_integration_system is not None,
+                "adaptive_difficulty_engine": self.adaptive_difficulty_engine
+                is not None,
+                "character_development_system": self.character_development_system
+                is not None,
+                "therapeutic_integration_system": self.therapeutic_integration_system
+                is not None,
+                "adventure_enhancer": self.adventure_enhancer is not None,
             }
 
             systems_available = sum(systems_status.values())
@@ -853,7 +981,7 @@ class TherapeuticGameplayLoopController:
                 "active_sessions": len(self.active_sessions),
                 "max_concurrent_sessions": self.max_concurrent_sessions,
                 "therapeutic_systems": systems_status,
-                "systems_available": f"{systems_available}/5",
+                "systems_available": f"{systems_available}/6",
                 "metrics": self.get_metrics(),
             }
 
@@ -864,13 +992,15 @@ class TherapeuticGameplayLoopController:
                 "error": str(e),
             }
 
-    def get_metrics(self) -> Dict[str, Any]:
+    def get_metrics(self) -> dict[str, Any]:
         """Get gameplay loop controller metrics."""
         return {
             **self.metrics,
             "active_sessions_count": len(self.active_sessions),
             "session_outcomes_stored": len(self.session_outcomes),
             "completion_rate": (
-                self.metrics["sessions_completed"] / max(self.metrics["sessions_started"], 1)
-            ) * 100,
+                self.metrics["sessions_completed"]
+                / max(self.metrics["sessions_started"], 1)
+            )
+            * 100,
         }

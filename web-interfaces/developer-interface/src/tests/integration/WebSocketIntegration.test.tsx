@@ -122,7 +122,7 @@ describe('WebSocket Integration Tests', () => {
 
     // Initialize WebSocket manager
     const manager = webSocketManager;
-    
+
     await waitFor(() => {
       expect(manager.isConnected()).toBe(false); // Initially not connected
     });

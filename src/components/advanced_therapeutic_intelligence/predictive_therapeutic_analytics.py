@@ -9,15 +9,15 @@ learning and statistical analysis.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
-import uuid
-import json
-import numpy as np
-from collections import defaultdict, deque
 import statistics
+import uuid
+from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from enum import Enum
+from typing import Any
+
+import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -66,14 +66,14 @@ class TherapeuticPattern:
     significance: float = 0.0
 
     # Pattern data
-    data_points: List[Dict[str, Any]] = field(default_factory=list)
-    temporal_features: Dict[str, Any] = field(default_factory=dict)
-    contextual_factors: Dict[str, Any] = field(default_factory=dict)
+    data_points: list[dict[str, Any]] = field(default_factory=list)
+    temporal_features: dict[str, Any] = field(default_factory=dict)
+    contextual_factors: dict[str, Any] = field(default_factory=dict)
 
     # Pattern outcomes
-    associated_outcomes: List[str] = field(default_factory=list)
-    predictive_indicators: List[str] = field(default_factory=list)
-    intervention_responses: Dict[str, float] = field(default_factory=dict)
+    associated_outcomes: list[str] = field(default_factory=list)
+    predictive_indicators: list[str] = field(default_factory=list)
+    intervention_responses: dict[str, float] = field(default_factory=dict)
 
     # Metadata
     discovered_at: datetime = field(default_factory=datetime.utcnow)
@@ -96,20 +96,20 @@ class TherapeuticPrediction:
     confidence_score: float = 0.0
 
     # Supporting evidence
-    supporting_patterns: List[str] = field(default_factory=list)
-    risk_factors: List[str] = field(default_factory=list)
-    protective_factors: List[str] = field(default_factory=list)
+    supporting_patterns: list[str] = field(default_factory=list)
+    risk_factors: list[str] = field(default_factory=list)
+    protective_factors: list[str] = field(default_factory=list)
 
     # Recommendations
-    recommended_interventions: List[Dict[str, Any]] = field(default_factory=list)
-    preventive_actions: List[str] = field(default_factory=list)
-    monitoring_suggestions: List[str] = field(default_factory=list)
+    recommended_interventions: list[dict[str, Any]] = field(default_factory=list)
+    preventive_actions: list[str] = field(default_factory=list)
+    monitoring_suggestions: list[str] = field(default_factory=list)
 
     # Validation
     created_at: datetime = field(default_factory=datetime.utcnow)
     expires_at: datetime = field(default_factory=lambda: datetime.utcnow() + timedelta(hours=24))
     validation_status: str = "pending"
-    actual_outcome: Optional[float] = None
+    actual_outcome: float | None = None
 
 
 @dataclass
@@ -125,14 +125,14 @@ class InterventionOptimization:
     improvement_potential: float = 0.0
 
     # Optimization recommendations
-    parameter_adjustments: Dict[str, Any] = field(default_factory=dict)
-    timing_recommendations: Dict[str, Any] = field(default_factory=dict)
-    intensity_adjustments: Dict[str, float] = field(default_factory=dict)
+    parameter_adjustments: dict[str, Any] = field(default_factory=dict)
+    timing_recommendations: dict[str, Any] = field(default_factory=dict)
+    intensity_adjustments: dict[str, float] = field(default_factory=dict)
 
     # Evidence and reasoning
     optimization_rationale: str = ""
-    supporting_evidence: List[str] = field(default_factory=list)
-    expected_outcomes: Dict[str, float] = field(default_factory=dict)
+    supporting_evidence: list[str] = field(default_factory=list)
+    expected_outcomes: dict[str, float] = field(default_factory=dict)
 
     # Implementation
     priority: int = 5  # 1-10 scale
@@ -154,19 +154,19 @@ class PredictiveTherapeuticAnalytics:
     def __init__(self):
         """Initialize the Predictive Therapeutic Analytics."""
         self.status = "initializing"
-        self.therapeutic_patterns: Dict[str, TherapeuticPattern] = {}
-        self.active_predictions: Dict[str, List[TherapeuticPrediction]] = {}
-        self.intervention_optimizations: Dict[str, List[InterventionOptimization]] = {}
+        self.therapeutic_patterns: dict[str, TherapeuticPattern] = {}
+        self.active_predictions: dict[str, list[TherapeuticPrediction]] = {}
+        self.intervention_optimizations: dict[str, list[InterventionOptimization]] = {}
 
         # Predictive models
-        self.prediction_models: Dict[str, Any] = {}
-        self.pattern_recognition_models: Dict[str, Any] = {}
-        self.optimization_models: Dict[str, Any] = {}
+        self.prediction_models: dict[str, Any] = {}
+        self.pattern_recognition_models: dict[str, Any] = {}
+        self.optimization_models: dict[str, Any] = {}
 
         # Data storage for analysis
-        self.user_interaction_history: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
-        self.therapeutic_outcome_history: Dict[str, deque] = defaultdict(lambda: deque(maxlen=500))
-        self.crisis_event_history: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+        self.user_interaction_history: dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
+        self.therapeutic_outcome_history: dict[str, deque] = defaultdict(lambda: deque(maxlen=500))
+        self.crisis_event_history: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
         # System references (injected)
         self.personalization_engine = None
@@ -251,8 +251,8 @@ class PredictiveTherapeuticAnalytics:
         self,
         user_id: str,
         analysis_timeframe: AnalyticsTimeframe = AnalyticsTimeframe.MEDIUM_TERM,
-        pattern_types: Optional[List[str]] = None
-    ) -> List[TherapeuticPattern]:
+        pattern_types: list[str] | None = None
+    ) -> list[TherapeuticPattern]:
         """Analyze therapeutic patterns for user."""
         try:
             # Get user interaction history
@@ -310,9 +310,9 @@ class PredictiveTherapeuticAnalytics:
     async def generate_therapeutic_predictions(
         self,
         user_id: str,
-        prediction_types: Optional[List[PredictionType]] = None,
+        prediction_types: list[PredictionType] | None = None,
         timeframe: AnalyticsTimeframe = AnalyticsTimeframe.SHORT_TERM
-    ) -> List[TherapeuticPrediction]:
+    ) -> list[TherapeuticPrediction]:
         """Generate therapeutic predictions for user."""
         try:
             if prediction_types is None:
@@ -474,8 +474,8 @@ class PredictiveTherapeuticAnalytics:
     async def optimize_therapeutic_interventions(
         self,
         user_id: str,
-        target_systems: Optional[List[str]] = None
-    ) -> List[InterventionOptimization]:
+        target_systems: list[str] | None = None
+    ) -> list[InterventionOptimization]:
         """Optimize therapeutic interventions for user."""
         try:
             if target_systems is None:
@@ -505,7 +505,7 @@ class PredictiveTherapeuticAnalytics:
     async def record_user_interaction(
         self,
         user_id: str,
-        interaction_data: Dict[str, Any]
+        interaction_data: dict[str, Any]
     ):
         """Record user interaction for predictive analysis."""
         try:
@@ -527,7 +527,7 @@ class PredictiveTherapeuticAnalytics:
     async def record_therapeutic_outcome(
         self,
         user_id: str,
-        outcome_data: Dict[str, Any]
+        outcome_data: dict[str, Any]
     ):
         """Record therapeutic outcome for predictive analysis."""
         try:
@@ -549,7 +549,7 @@ class PredictiveTherapeuticAnalytics:
     async def record_crisis_event(
         self,
         user_id: str,
-        crisis_data: Dict[str, Any]
+        crisis_data: dict[str, Any]
     ):
         """Record crisis event for predictive analysis."""
         try:
@@ -568,7 +568,7 @@ class PredictiveTherapeuticAnalytics:
         except Exception as e:
             logger.error(f"Error recording crisis event: {e}")
 
-    async def get_predictive_insights(self, user_id: str) -> Dict[str, Any]:
+    async def get_predictive_insights(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive predictive insights for user."""
         try:
             # Get user patterns and predictions
@@ -673,8 +673,8 @@ class PredictiveTherapeuticAnalytics:
     async def _identify_engagement_patterns(
         self,
         user_id: str,
-        history: List[Dict[str, Any]]
-    ) -> Optional[TherapeuticPattern]:
+        history: list[dict[str, Any]]
+    ) -> TherapeuticPattern | None:
         """Identify engagement patterns from user history."""
         try:
             engagement_scores = [
@@ -726,8 +726,8 @@ class PredictiveTherapeuticAnalytics:
     async def _identify_response_patterns(
         self,
         user_id: str,
-        history: List[Dict[str, Any]]
-    ) -> Optional[TherapeuticPattern]:
+        history: list[dict[str, Any]]
+    ) -> TherapeuticPattern | None:
         """Identify therapeutic response patterns."""
         try:
             response_scores = [
@@ -777,8 +777,8 @@ class PredictiveTherapeuticAnalytics:
     async def _identify_crisis_patterns(
         self,
         user_id: str,
-        history: List[Dict[str, Any]]
-    ) -> Optional[TherapeuticPattern]:
+        history: list[dict[str, Any]]
+    ) -> TherapeuticPattern | None:
         """Identify crisis risk patterns."""
         try:
             crisis_indicators = [
@@ -838,8 +838,8 @@ class PredictiveTherapeuticAnalytics:
     async def _identify_intervention_patterns(
         self,
         user_id: str,
-        history: List[Dict[str, Any]]
-    ) -> Optional[TherapeuticPattern]:
+        history: list[dict[str, Any]]
+    ) -> TherapeuticPattern | None:
         """Identify intervention effectiveness patterns."""
         try:
             intervention_data = [
@@ -895,7 +895,7 @@ class PredictiveTherapeuticAnalytics:
             logger.error(f"Error identifying intervention patterns: {e}")
             return None
 
-    def _calculate_trend(self, values: List[float]) -> float:
+    def _calculate_trend(self, values: list[float]) -> float:
         """Calculate trend in values using simple linear regression."""
         try:
             if len(values) < 2:
@@ -926,7 +926,7 @@ class PredictiveTherapeuticAnalytics:
         user_id: str,
         prediction_type: PredictionType,
         timeframe: AnalyticsTimeframe
-    ) -> Optional[TherapeuticPrediction]:
+    ) -> TherapeuticPrediction | None:
         """Generate specific type of prediction."""
         try:
             if prediction_type == PredictionType.CRISIS_RISK:
@@ -948,7 +948,7 @@ class PredictiveTherapeuticAnalytics:
         self,
         user_id: str,
         timeframe: AnalyticsTimeframe
-    ) -> Optional[TherapeuticPrediction]:
+    ) -> TherapeuticPrediction | None:
         """Predict user engagement levels."""
         try:
             user_history = list(self.user_interaction_history.get(user_id, []))
@@ -995,7 +995,7 @@ class PredictiveTherapeuticAnalytics:
         self,
         user_id: str,
         timeframe: AnalyticsTimeframe
-    ) -> Optional[TherapeuticPrediction]:
+    ) -> TherapeuticPrediction | None:
         """Predict therapeutic outcomes."""
         try:
             outcome_history = list(self.therapeutic_outcome_history.get(user_id, []))
@@ -1042,7 +1042,7 @@ class PredictiveTherapeuticAnalytics:
         self,
         user_id: str,
         timeframe: AnalyticsTimeframe
-    ) -> Optional[TherapeuticPrediction]:
+    ) -> TherapeuticPrediction | None:
         """Predict intervention effectiveness."""
         try:
             user_history = list(self.user_interaction_history.get(user_id, []))
@@ -1111,7 +1111,7 @@ class PredictiveTherapeuticAnalytics:
         self,
         user_id: str,
         system_name: str
-    ) -> Optional[InterventionOptimization]:
+    ) -> InterventionOptimization | None:
         """Optimize intervention for specific system."""
         try:
             # Get user interaction history with this system
@@ -1159,7 +1159,7 @@ class PredictiveTherapeuticAnalytics:
                 timing_recommendations=timing_recommendations,
                 intensity_adjustments=intensity_adjustments,
                 optimization_rationale=f"Based on {len(system_interactions)} interactions with average effectiveness {current_effectiveness:.2f}",
-                supporting_evidence=[f"Historical effectiveness trend", f"User response patterns"],
+                supporting_evidence=["Historical effectiveness trend", "User response patterns"],
                 expected_outcomes={"effectiveness_improvement": improvement_potential},
                 priority=8 if improvement_potential > 0.2 else 5,
                 estimated_impact=improvement_potential
@@ -1171,7 +1171,7 @@ class PredictiveTherapeuticAnalytics:
             logger.error(f"Error optimizing system intervention: {e}")
             return None
 
-    def _get_current_crisis_risk_level(self, predictions: List[TherapeuticPrediction]) -> str:
+    def _get_current_crisis_risk_level(self, predictions: list[TherapeuticPrediction]) -> str:
         """Get current crisis risk level from predictions."""
         crisis_predictions = [
             p for p in predictions
@@ -1184,7 +1184,7 @@ class PredictiveTherapeuticAnalytics:
         latest_prediction = max(crisis_predictions, key=lambda p: p.created_at)
         return latest_prediction.predicted_category
 
-    def _get_therapeutic_outlook(self, predictions: List[TherapeuticPrediction]) -> str:
+    def _get_therapeutic_outlook(self, predictions: list[TherapeuticPrediction]) -> str:
         """Get therapeutic outlook from predictions."""
         outcome_predictions = [
             p for p in predictions
@@ -1197,7 +1197,7 @@ class PredictiveTherapeuticAnalytics:
         latest_prediction = max(outcome_predictions, key=lambda p: p.created_at)
         return latest_prediction.predicted_category
 
-    async def _analyze_interaction_trends(self, user_id: str) -> Dict[str, Any]:
+    async def _analyze_interaction_trends(self, user_id: str) -> dict[str, Any]:
         """Analyze interaction trends for user."""
         try:
             user_history = list(self.user_interaction_history.get(user_id, []))
@@ -1226,7 +1226,7 @@ class PredictiveTherapeuticAnalytics:
             logger.error(f"Error analyzing interaction trends: {e}")
             return {"error": str(e)}
 
-    def _get_most_active_systems(self, history: List[Dict[str, Any]]) -> List[str]:
+    def _get_most_active_systems(self, history: list[dict[str, Any]]) -> list[str]:
         """Get most active systems from interaction history."""
         system_counts = defaultdict(int)
 
@@ -1236,7 +1236,7 @@ class PredictiveTherapeuticAnalytics:
 
         return sorted(system_counts.keys(), key=lambda s: system_counts[s], reverse=True)[:3]
 
-    async def _generate_comprehensive_recommendations(self, user_id: str) -> List[str]:
+    async def _generate_comprehensive_recommendations(self, user_id: str) -> list[str]:
         """Generate comprehensive recommendations for user."""
         recommendations = []
 
@@ -1276,7 +1276,7 @@ class PredictiveTherapeuticAnalytics:
             logger.error(f"Error generating comprehensive recommendations: {e}")
             return ["Error generating recommendations - manual review required"]
 
-    async def _update_models_with_interaction(self, user_id: str, interaction_data: Dict[str, Any]):
+    async def _update_models_with_interaction(self, user_id: str, interaction_data: dict[str, Any]):
         """Update models with new interaction data."""
         try:
             # Update model accuracy metrics (placeholder for ML implementation)
@@ -1293,7 +1293,7 @@ class PredictiveTherapeuticAnalytics:
         except Exception as e:
             logger.error(f"Error updating models with interaction: {e}")
 
-    async def _validate_predictions_against_outcome(self, user_id: str, outcome_data: Dict[str, Any]):
+    async def _validate_predictions_against_outcome(self, user_id: str, outcome_data: dict[str, Any]):
         """Validate predictions against actual outcomes."""
         try:
             user_predictions = self.active_predictions.get(user_id, [])
@@ -1320,7 +1320,7 @@ class PredictiveTherapeuticAnalytics:
         except Exception as e:
             logger.error(f"Error validating predictions: {e}")
 
-    async def _update_crisis_models(self, user_id: str, crisis_data: Dict[str, Any]):
+    async def _update_crisis_models(self, user_id: str, crisis_data: dict[str, Any]):
         """Update crisis prediction models with crisis event."""
         try:
             # Update crisis prediction accuracy
@@ -1457,7 +1457,7 @@ class PredictiveTherapeuticAnalytics:
         except Exception as e:
             logger.error(f"Error updating model accuracies: {e}")
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Predictive Therapeutic Analytics."""
         try:
             therapeutic_systems_available = len([

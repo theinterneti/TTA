@@ -12,7 +12,7 @@ from typing import Any
 
 from ..managers.world_management_module import WorldManagementModule
 from ..models.character import Character
-from ..models.world import World
+from ..models.world import WorldDetails as World
 
 logger = logging.getLogger(__name__)
 

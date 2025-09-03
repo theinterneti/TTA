@@ -9,14 +9,11 @@ therapeutic platform.
 
 import asyncio
 import logging
-from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional, Set, Tuple, Union
-from dataclasses import dataclass, field
-from enum import Enum
 import uuid
-import json
-import numpy as np
-from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -77,21 +74,21 @@ class AccessibilityProfile:
     user_id: str = ""
 
     # Disability information
-    disability_types: List[DisabilityType] = field(default_factory=list)
-    severity_levels: Dict[DisabilityType, float] = field(default_factory=dict)  # 0.0-1.0
+    disability_types: list[DisabilityType] = field(default_factory=list)
+    severity_levels: dict[DisabilityType, float] = field(default_factory=dict)  # 0.0-1.0
 
     # Accessibility preferences
-    enabled_features: Set[AccessibilityFeature] = field(default_factory=set)
-    feature_settings: Dict[AccessibilityFeature, Dict[str, Any]] = field(default_factory=dict)
+    enabled_features: set[AccessibilityFeature] = field(default_factory=set)
+    feature_settings: dict[AccessibilityFeature, dict[str, Any]] = field(default_factory=dict)
 
     # Language and localization
     primary_language: LanguageCode = LanguageCode.EN_US
-    secondary_languages: List[LanguageCode] = field(default_factory=list)
+    secondary_languages: list[LanguageCode] = field(default_factory=list)
 
     # Visual accessibility
     font_size_multiplier: float = 1.0
     contrast_ratio: float = 4.5  # WCAG AA minimum
-    color_blind_type: Optional[str] = None
+    color_blind_type: str | None = None
 
     # Motor accessibility
     click_delay: float = 0.0  # seconds
@@ -104,7 +101,7 @@ class AccessibilityProfile:
     memory_assistance: bool = False
 
     # Assistive technology
-    screen_reader_type: Optional[str] = None
+    screen_reader_type: str | None = None
     voice_control_enabled: bool = False
     switch_navigation: bool = False
 
@@ -133,9 +130,9 @@ class AccessibilityAudit:
     semantic_markup_pass: bool = False
 
     # Issues found
-    violations: List[Dict[str, Any]] = field(default_factory=list)
-    warnings: List[Dict[str, Any]] = field(default_factory=list)
-    recommendations: List[str] = field(default_factory=list)
+    violations: list[dict[str, Any]] = field(default_factory=list)
+    warnings: list[dict[str, Any]] = field(default_factory=list)
+    recommendations: list[str] = field(default_factory=list)
 
     # Metadata
     audit_timestamp: datetime = field(default_factory=datetime.utcnow)
@@ -146,8 +143,8 @@ class AccessibilityAudit:
 class LocalizationData:
     """Localization data for multi-language support."""
     language_code: LanguageCode = LanguageCode.EN_US
-    translations: Dict[str, str] = field(default_factory=dict)
-    cultural_adaptations: Dict[str, Any] = field(default_factory=dict)
+    translations: dict[str, str] = field(default_factory=dict)
+    cultural_adaptations: dict[str, Any] = field(default_factory=dict)
 
     # Text direction and formatting
     text_direction: str = "ltr"  # ltr, rtl
@@ -156,8 +153,8 @@ class LocalizationData:
     currency_symbol: str = "$"
 
     # Therapeutic content adaptations
-    therapeutic_frameworks: List[str] = field(default_factory=list)
-    cultural_considerations: List[str] = field(default_factory=list)
+    therapeutic_frameworks: list[str] = field(default_factory=list)
+    cultural_considerations: list[str] = field(default_factory=list)
 
     # Metadata
     completion_percentage: float = 0.0
@@ -174,14 +171,14 @@ class UniversalAccessibilitySystem:
     def __init__(self):
         """Initialize the Universal Accessibility System."""
         self.status = "initializing"
-        self.accessibility_profiles: Dict[str, AccessibilityProfile] = {}
-        self.localization_data: Dict[LanguageCode, LocalizationData] = {}
-        self.audit_results: Dict[str, List[AccessibilityAudit]] = {}
+        self.accessibility_profiles: dict[str, AccessibilityProfile] = {}
+        self.localization_data: dict[LanguageCode, LocalizationData] = {}
+        self.audit_results: dict[str, list[AccessibilityAudit]] = {}
 
         # Accessibility features and configurations
-        self.wcag_guidelines: Dict[str, Any] = {}
-        self.assistive_technology_configs: Dict[str, Any] = {}
-        self.accessibility_adaptations: Dict[str, Any] = {}
+        self.wcag_guidelines: dict[str, Any] = {}
+        self.assistive_technology_configs: dict[str, Any] = {}
+        self.accessibility_adaptations: dict[str, Any] = {}
 
         # System references (injected)
         self.therapeutic_systems = {}
@@ -265,8 +262,8 @@ class UniversalAccessibilitySystem:
     async def create_accessibility_profile(
         self,
         user_id: str,
-        disability_types: List[DisabilityType],
-        preferences: Dict[str, Any]
+        disability_types: list[DisabilityType],
+        preferences: dict[str, Any]
     ) -> AccessibilityProfile:
         """Create comprehensive accessibility profile for user."""
         try:
@@ -306,8 +303,8 @@ class UniversalAccessibilitySystem:
         self,
         user_id: str,
         component_type: str,
-        component_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        component_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Adapt interface components for user accessibility needs."""
         try:
             # Get user accessibility profile
@@ -348,7 +345,7 @@ class UniversalAccessibilitySystem:
         self,
         component_id: str,
         component_type: str,
-        component_data: Dict[str, Any]
+        component_data: dict[str, Any]
     ) -> AccessibilityAudit:
         """Validate WCAG 2.1 compliance for component."""
         try:
@@ -406,7 +403,7 @@ class UniversalAccessibilitySystem:
         self,
         content_key: str,
         language: LanguageCode,
-        context: Optional[Dict[str, Any]] = None
+        context: dict[str, Any] | None = None
     ) -> str:
         """Get localized content for specified language."""
         try:
@@ -437,8 +434,8 @@ class UniversalAccessibilitySystem:
         self,
         user_id: str,
         assistive_tech_type: str,
-        component_data: Dict[str, Any]
-    ) -> Dict[str, Any]:
+        component_data: dict[str, Any]
+    ) -> dict[str, Any]:
         """Optimize component for specific assistive technology."""
         try:
             profile = self.accessibility_profiles.get(user_id)
@@ -470,7 +467,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error optimizing for assistive technology: {e}")
             return component_data
 
-    async def get_accessibility_insights(self, user_id: str) -> Dict[str, Any]:
+    async def get_accessibility_insights(self, user_id: str) -> dict[str, Any]:
         """Get comprehensive accessibility insights for user."""
         try:
             profile = self.accessibility_profiles.get(user_id)
@@ -682,7 +679,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error loading basic translations: {e}")
 
     # Accessibility configuration methods
-    async def _configure_accessibility_features(self, profile: AccessibilityProfile, preferences: Dict[str, Any]):
+    async def _configure_accessibility_features(self, profile: AccessibilityProfile, preferences: dict[str, Any]):
         """Configure accessibility features based on user preferences."""
         try:
             # Visual accessibility features
@@ -723,7 +720,7 @@ class UniversalAccessibilitySystem:
         except Exception as e:
             logger.error(f"Error configuring accessibility features: {e}")
 
-    async def _setup_assistive_technology(self, profile: AccessibilityProfile, preferences: Dict[str, Any]):
+    async def _setup_assistive_technology(self, profile: AccessibilityProfile, preferences: dict[str, Any]):
         """Set up assistive technology integration."""
         try:
             # Screen reader setup
@@ -744,7 +741,7 @@ class UniversalAccessibilitySystem:
         except Exception as e:
             logger.error(f"Error setting up assistive technology: {e}")
 
-    async def _configure_cognitive_accessibility(self, profile: AccessibilityProfile, preferences: Dict[str, Any]):
+    async def _configure_cognitive_accessibility(self, profile: AccessibilityProfile, preferences: dict[str, Any]):
         """Configure cognitive accessibility features."""
         try:
             # Reading level adaptation
@@ -764,7 +761,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error configuring cognitive accessibility: {e}")
 
     # Interface adaptation methods
-    async def _apply_visual_adaptations(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _apply_visual_adaptations(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Apply visual accessibility adaptations."""
         try:
             adapted_data = component_data.copy()
@@ -792,7 +789,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error applying visual adaptations: {e}")
             return component_data
 
-    async def _apply_motor_adaptations(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _apply_motor_adaptations(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Apply motor accessibility adaptations."""
         try:
             adapted_data = component_data.copy()
@@ -813,7 +810,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error applying motor adaptations: {e}")
             return component_data
 
-    async def _apply_cognitive_adaptations(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _apply_cognitive_adaptations(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Apply cognitive accessibility adaptations."""
         try:
             adapted_data = component_data.copy()
@@ -837,7 +834,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error applying cognitive adaptations: {e}")
             return component_data
 
-    async def _apply_hearing_adaptations(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _apply_hearing_adaptations(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Apply hearing accessibility adaptations."""
         try:
             adapted_data = component_data.copy()
@@ -859,7 +856,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error applying hearing adaptations: {e}")
             return component_data
 
-    async def _apply_localization(self, component_data: Dict[str, Any], language: LanguageCode) -> Dict[str, Any]:
+    async def _apply_localization(self, component_data: dict[str, Any], language: LanguageCode) -> dict[str, Any]:
         """Apply language localization to component."""
         try:
             adapted_data = component_data.copy()
@@ -889,7 +886,7 @@ class UniversalAccessibilitySystem:
             return component_data
 
     # WCAG compliance checking methods
-    async def _check_color_contrast(self, component_data: Dict[str, Any]) -> bool:
+    async def _check_color_contrast(self, component_data: dict[str, Any]) -> bool:
         """Check color contrast compliance."""
         try:
             # Simplified contrast checking (would use actual color analysis in production)
@@ -899,7 +896,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error checking color contrast: {e}")
             return False
 
-    async def _check_keyboard_navigation(self, component_data: Dict[str, Any]) -> bool:
+    async def _check_keyboard_navigation(self, component_data: dict[str, Any]) -> bool:
         """Check keyboard navigation compliance."""
         try:
             # Check for keyboard navigation support
@@ -910,7 +907,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error checking keyboard navigation: {e}")
             return False
 
-    async def _check_screen_reader_support(self, component_data: Dict[str, Any]) -> bool:
+    async def _check_screen_reader_support(self, component_data: dict[str, Any]) -> bool:
         """Check screen reader support compliance."""
         try:
             # Check for ARIA labels and semantic markup
@@ -921,7 +918,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error checking screen reader support: {e}")
             return False
 
-    async def _check_focus_management(self, component_data: Dict[str, Any]) -> bool:
+    async def _check_focus_management(self, component_data: dict[str, Any]) -> bool:
         """Check focus management compliance."""
         try:
             # Check for proper focus management
@@ -932,7 +929,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error checking focus management: {e}")
             return False
 
-    async def _check_semantic_markup(self, component_data: Dict[str, Any]) -> bool:
+    async def _check_semantic_markup(self, component_data: dict[str, Any]) -> bool:
         """Check semantic markup compliance."""
         try:
             # Check for semantic HTML structure
@@ -943,7 +940,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error checking semantic markup: {e}")
             return False
 
-    async def _generate_accessibility_recommendations(self, audit: AccessibilityAudit) -> List[str]:
+    async def _generate_accessibility_recommendations(self, audit: AccessibilityAudit) -> list[str]:
         """Generate accessibility improvement recommendations."""
         try:
             recommendations = []
@@ -970,7 +967,7 @@ class UniversalAccessibilitySystem:
             return []
 
     # Assistive technology optimization methods
-    async def _optimize_for_screen_reader(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _optimize_for_screen_reader(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Optimize component for screen reader."""
         try:
             optimized_data = component_data.copy()
@@ -992,7 +989,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error optimizing for screen reader: {e}")
             return component_data
 
-    async def _optimize_for_voice_control(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _optimize_for_voice_control(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Optimize component for voice control."""
         try:
             optimized_data = component_data.copy()
@@ -1010,7 +1007,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error optimizing for voice control: {e}")
             return component_data
 
-    async def _optimize_for_switch_navigation(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _optimize_for_switch_navigation(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Optimize component for switch navigation."""
         try:
             optimized_data = component_data.copy()
@@ -1028,7 +1025,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error optimizing for switch navigation: {e}")
             return component_data
 
-    async def _optimize_for_eye_tracking(self, component_data: Dict[str, Any], profile: AccessibilityProfile) -> Dict[str, Any]:
+    async def _optimize_for_eye_tracking(self, component_data: dict[str, Any], profile: AccessibilityProfile) -> dict[str, Any]:
         """Optimize component for eye tracking."""
         try:
             optimized_data = component_data.copy()
@@ -1174,7 +1171,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error updating localization data: {e}")
 
     # Analysis methods
-    async def _analyze_adaptation_effectiveness(self, user_id: str) -> Dict[str, Any]:
+    async def _analyze_adaptation_effectiveness(self, user_id: str) -> dict[str, Any]:
         """Analyze accessibility adaptation effectiveness."""
         try:
             profile = self.accessibility_profiles.get(user_id)
@@ -1195,7 +1192,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error analyzing adaptation effectiveness: {e}")
             return {"effectiveness": 0.0}
 
-    async def _analyze_compliance_status(self, user_id: str) -> Dict[str, Any]:
+    async def _analyze_compliance_status(self, user_id: str) -> dict[str, Any]:
         """Analyze WCAG compliance status for user."""
         try:
             # Get user-related audit results
@@ -1219,7 +1216,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error analyzing compliance status: {e}")
             return {"compliance_score": 0.8, "level": "AA"}
 
-    async def _generate_user_recommendations(self, user_id: str) -> List[str]:
+    async def _generate_user_recommendations(self, user_id: str) -> list[str]:
         """Generate personalized accessibility recommendations."""
         try:
             profile = self.accessibility_profiles.get(user_id)
@@ -1249,7 +1246,7 @@ class UniversalAccessibilitySystem:
             logger.error(f"Error generating user recommendations: {e}")
             return []
 
-    async def health_check(self) -> Dict[str, Any]:
+    async def health_check(self) -> dict[str, Any]:
         """Perform health check of the Universal Accessibility System."""
         try:
             return {

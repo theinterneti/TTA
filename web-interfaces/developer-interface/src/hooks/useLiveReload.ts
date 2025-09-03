@@ -113,9 +113,9 @@ export const useLiveReload = () => {
       }
     };
 
-    const handleConnectionStatus = ({ serviceId, status: connectionStatus }: { 
-      serviceId: string; 
-      status: string; 
+    const handleConnectionStatus = ({ serviceId, status: connectionStatus }: {
+      serviceId: string;
+      status: string;
     }) => {
       setStatus(prev => ({
         ...prev,
@@ -175,8 +175,8 @@ export const useLiveReload = () => {
     const hasErrors = statuses.some(s => s.buildStatus === 'error' || s.errors.length > 0);
     const isBuilding = statuses.some(s => s.buildStatus === 'building');
     const totalReloads = statuses.reduce((sum, s) => sum + s.reloadCount, 0);
-    const avgBuildTime = statuses.length > 0 
-      ? statuses.reduce((sum, s) => sum + s.buildTime, 0) / statuses.length 
+    const avgBuildTime = statuses.length > 0
+      ? statuses.reduce((sum, s) => sum + s.buildTime, 0) / statuses.length
       : 0;
 
     return {
