@@ -200,7 +200,7 @@ class AgentOrchestrationMonitoringManager:
                 current_task=None,  # Would be populated with actual current task
             )
         except Exception as e:
-            raise Exception(f"Failed to get agent status: {e}")
+            raise Exception(f"Failed to get agent status: {e}") from e
 
     async def _broadcast_workflow_progress(self):
         """Broadcast workflow execution progress."""
@@ -470,7 +470,7 @@ async def create_monitoring_websocket_endpoint(
     @router.websocket("/monitoring")
     async def websocket_monitoring_endpoint(websocket: WebSocket):
         """
-        WebSocket endpoint for real-time Agent Orchestration monitoring data.
+        Real-time WebSocket endpoint for Agent Orchestration monitoring data.
 
         Provides orchestration monitoring information including:
         - Agent status updates and workflow progress events

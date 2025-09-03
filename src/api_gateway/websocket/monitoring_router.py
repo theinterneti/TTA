@@ -434,7 +434,7 @@ async def create_monitoring_websocket_endpoint(
     @router.websocket("/monitoring")
     async def websocket_monitoring_endpoint(websocket: WebSocket):
         """
-        WebSocket endpoint for real-time API Gateway monitoring data.
+        Real-time WebSocket endpoint for API Gateway monitoring data.
 
         Provides aggregated monitoring information including:
         - Service health status and discovery metrics

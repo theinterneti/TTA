@@ -315,7 +315,7 @@ def _authenticate_websocket(websocket: WebSocket) -> dict[str, Any] | None:
 @router.websocket("/monitoring")
 async def websocket_monitoring_endpoint(websocket: WebSocket):
     """
-    WebSocket endpoint for real-time monitoring data.
+    Real-time WebSocket endpoint for monitoring data.
 
     Provides real-time monitoring information for the Developer Interface including:
     - Interface health status and performance metrics
