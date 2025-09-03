@@ -165,3 +165,14 @@ huggingface-cache/
 # Corrected prototype ignore (case-sensitive fix); keep the old line for safety below
 /tta.prototype/*
 /TTA.prototype/*
+node_modules/
+dist/
+build/
+*.log
+.env
+.env.local
+.DS_Store
+coverage/
+.nyc_output/
+*.tgz
+*.tar.gz
