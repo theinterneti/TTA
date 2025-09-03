@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 class DashboardRequest(BaseModel):
     """Dashboard data request model."""
+
     user_id: str
     timeframe: str = "weekly"
     include_real_time: bool = True
@@ -35,6 +36,7 @@ class DashboardRequest(BaseModel):
 
 class MetricCollectionRequest(BaseModel):
     """Metric collection request model."""
+
     user_id: str
     session_id: str
     metric_type: str
@@ -44,6 +46,7 @@ class MetricCollectionRequest(BaseModel):
 
 class OutcomeMeasurementRequest(BaseModel):
     """Outcome measurement request model."""
+
     user_id: str
     measure_type: str
     current_score: float
@@ -65,8 +68,7 @@ class ClinicalDashboardController:
         # Initialize services
         self.monitoring_service = TherapeuticMonitoringService()
         self.api_service = ClinicalDashboardAPIService(
-            monitoring_service=self.monitoring_service,
-            api_config=api_config
+            monitoring_service=self.monitoring_service, api_config=api_config
         )
 
         # Service state
@@ -135,8 +137,10 @@ class ClinicalDashboardController:
 
             # Get analytics report if requested
             if request.include_analytics:
-                analytics_report = await self.monitoring_service.generate_analytics_report(
-                    request.user_id, timeframe
+                analytics_report = (
+                    await self.monitoring_service.generate_analytics_report(
+                        request.user_id, timeframe
+                    )
                 )
                 dashboard_data["analytics_report"] = (
                     analytics_report.__dict__ if analytics_report else None
@@ -161,7 +165,7 @@ class ClinicalDashboardController:
         except Exception as e:
             logger.error(f"Error getting dashboard data: {e}")
             self.controller_metrics["errors"] += 1
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     async def collect_metric(self, request: MetricCollectionRequest) -> dict[str, Any]:
         """Collect a therapeutic metric."""
@@ -174,8 +178,11 @@ class ClinicalDashboardController:
             # Parse metric type
             try:
                 metric_type = MetricType(request.metric_type.lower())
-            except ValueError:
-                raise HTTPException(status_code=400, detail=f"Invalid metric type: {request.metric_type}")
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Invalid metric type: {request.metric_type}",
+                ) from e
 
             # Collect metric
             success = await self.monitoring_service.collect_metric(
@@ -221,7 +228,7 @@ class ClinicalDashboardController:
             except ValueError:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"Invalid outcome measure type: {request.measure_type}"
+                    detail=f"Invalid outcome measure type: {request.measure_type}",
                 )
 
             # Record outcome measurement
@@ -245,7 +252,9 @@ class ClinicalDashboardController:
                     "timestamp": datetime.now(timezone.utc).isoformat(),
                 }
             else:
-                raise HTTPException(status_code=500, detail="Failed to record outcome measurement")
+                raise HTTPException(
+                    status_code=500, detail="Failed to record outcome measurement"
+                )
 
         except HTTPException:
             raise
@@ -264,16 +273,18 @@ class ClinicalDashboardController:
             api_health = await self.api_service.health_check()
 
             # Calculate uptime
-            uptime = datetime.now(timezone.utc) - self.controller_metrics["uptime_start"]
+            uptime = (
+                datetime.now(timezone.utc) - self.controller_metrics["uptime_start"]
+            )
 
             return {
                 "status": "healthy" if self.initialized else "initializing",
                 "controller": {
                     "initialized": self.initialized,
                     "uptime_seconds": uptime.total_seconds(),
-                    "background_tasks_running": len([
-                        task for task in self.background_tasks if not task.done()
-                    ]),
+                    "background_tasks_running": len(
+                        [task for task in self.background_tasks if not task.done()]
+                    ),
                     "metrics": self.controller_metrics,
                 },
                 "monitoring_service": monitoring_health,
@@ -296,7 +307,9 @@ class ClinicalDashboardController:
             while True:
                 try:
                     # Get authenticated users from API service
-                    authenticated_users = list(self.api_service.authenticated_users.keys())
+                    authenticated_users = list(
+                        self.api_service.authenticated_users.keys()
+                    )
 
                     # Collect metrics for each authenticated user
                     for user_id in authenticated_users:
@@ -313,7 +326,9 @@ class ClinicalDashboardController:
                                     )
 
                         except Exception as e:
-                            logger.error(f"Error collecting data for user {user_id}: {e}")
+                            logger.error(
+                                f"Error collecting data for user {user_id}: {e}"
+                            )
 
                     # Wait before next collection cycle (5 minutes)
                     await asyncio.sleep(300)
