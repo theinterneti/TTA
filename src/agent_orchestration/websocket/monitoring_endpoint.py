@@ -114,21 +114,44 @@ class AgentOrchestrationMonitoringManager:
 
     async def _monitoring_loop(self):
         """Background monitoring loop that broadcasts orchestration metrics."""
+        consecutive_errors = 0
+        max_consecutive_errors = 5
+
         while True:
             try:
-                if self.connections:
-                    # Broadcast different types of orchestration monitoring data
-                    await self._broadcast_agent_status()
-                    await self._broadcast_workflow_progress()
-                    await self._broadcast_orchestration_metrics()
-                    await self._broadcast_system_performance()
+                # Only broadcast if there are active connections
+                if not self.connections:
+                    await asyncio.sleep(10)  # Longer sleep when no connections
+                    continue
+
+                # Broadcast different types of orchestration monitoring data
+                await self._broadcast_agent_status()
+                await self._broadcast_workflow_progress()
+                await self._broadcast_orchestration_metrics()
+                await self._broadcast_system_performance()
+
+                # Reset error counter on successful broadcast
+                consecutive_errors = 0
 
                 # Wait 5 seconds before next broadcast
                 await asyncio.sleep(5)
 
+            except asyncio.CancelledError:
+                logger.info("Agent orchestration monitoring loop cancelled")
+                break
             except Exception as e:
+                consecutive_errors += 1
                 logger.error(f"Error in orchestration monitoring loop: {e}")
-                await asyncio.sleep(10)
+
+                # Exponential backoff for consecutive errors
+                if consecutive_errors >= max_consecutive_errors:
+                    logger.error(
+                        f"Too many consecutive errors ({consecutive_errors}), stopping monitoring loop"
+                    )
+                    break
+
+                backoff_time = min(10 * (2**consecutive_errors), 60)  # Max 60 seconds
+                await asyncio.sleep(backoff_time)
 
     async def _broadcast_agent_status(self):
         """Broadcast agent status and health information."""

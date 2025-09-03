@@ -86,28 +86,131 @@ def test_uv_dependencies():
     try:
         import subprocess
 
+        # Test UV availability
         result = subprocess.run(
             ["uv", "--version"], capture_output=True, text=True, timeout=10
         )
 
-        if result.returncode == 0:
-            logger.info(f"✅ UV package manager: Available - {result.stdout.strip()}")
-            return True
-        else:
+        if result.returncode != 0:
             logger.error(f"❌ UV package manager: Not available - {result.stderr}")
             return False
+
+        uv_version = result.stdout.strip()
+        logger.info(f"✅ UV package manager: Available - {uv_version}")
+
+        # Test dependency resolution
+        logger.info("🔍 Testing dependency resolution...")
+        sync_result = subprocess.run(
+            ["uv", "sync", "--dry-run"], capture_output=True, text=True, timeout=30
+        )
+
+        if sync_result.returncode == 0:
+            logger.info("✅ UV dependency resolution: Working correctly")
+            return True
+        else:
+            logger.error(f"❌ UV dependency resolution: Failed - {sync_result.stderr}")
+            return False
+
+    except subprocess.TimeoutExpired:
+        logger.error("❌ UV package manager: Timeout during testing")
+        return False
     except Exception as e:
         logger.error(f"❌ UV package manager: Error - {e}")
         return False
 
 
+def test_debug_tools_files():
+    """Test that debug tools implementation files exist and are valid."""
+    try:
+        # Backend WebSocket monitoring endpoints
+        backend_files = [
+            "src/agent_orchestration/websocket/monitoring_endpoint.py",
+            "src/api_gateway/websocket/monitoring_router.py",
+            "src/player_experience/api/routers/monitoring_websocket.py",
+        ]
+
+        # Frontend debug components (check for actual files that exist)
+        frontend_files = [
+            "web-interfaces/developer-interface/src/components/debug/DebugToolsPanel.tsx",
+            "web-interfaces/developer-interface/src/components/debug/NetworkMonitor.tsx",
+            "web-interfaces/developer-interface/src/components/debug/PerformanceProfiler.tsx",
+            "web-interfaces/developer-interface/src/components/debug/ErrorTracker.tsx",
+        ]
+
+        all_files = backend_files + frontend_files
+        missing_files = []
+        existing_files = []
+
+        for file_path in all_files:
+            full_path = project_root / file_path
+            if not full_path.exists():
+                missing_files.append(file_path)
+            else:
+                existing_files.append(file_path)
+
+        if missing_files:
+            logger.warning(f"⚠️ Debug Tools Files: Some files missing - {missing_files}")
+            logger.info(
+                f"✅ Debug Tools Files: Found {len(existing_files)} implementation files"
+            )
+            # Don't fail if we have the core backend files
+            if all(
+                f
+                in [
+                    str(p)
+                    for p in [
+                        project_root / f
+                        for f in backend_files
+                        if (project_root / f).exists()
+                    ]
+                ]
+                for f in backend_files
+            ):
+                logger.info(
+                    "✅ Debug Tools Files: All backend monitoring endpoints present"
+                )
+                return True
+            return False
+
+        logger.info("✅ Debug Tools Files: All implementation files present")
+        return True
+    except Exception as e:
+        logger.error(f"❌ Debug Tools Files: Error - {e}")
+        return False
+
+
+def test_service_configurations():
+    """Test that service configurations are valid."""
+    try:
+        # Test API Gateway config
+        from src.api_gateway.config import get_gateway_settings
+
+        gateway_settings = get_gateway_settings()
+        assert hasattr(gateway_settings, "host"), "Gateway settings missing host"
+        assert hasattr(gateway_settings, "port"), "Gateway settings missing port"
+
+        # Test that secure defaults are used
+        if gateway_settings.host == "0.0.0.0":
+            logger.warning(
+                "⚠️ API Gateway: Using 0.0.0.0 binding (ensure this is intentional)"
+            )
+
+        logger.info("✅ Service Configurations: All configurations valid")
+        return True
+    except Exception as e:
+        logger.error(f"❌ Service Configurations: Error - {e}")
+        return False
+
+
 def main():
     """Run all CI pipeline tests."""
-    logger.info("🚀 Starting CI Pipeline Tests...")
+    logger.info("🚀 Starting Enhanced CI Pipeline Tests...")
 
     tests = [
         ("YAML Syntax", test_workflow_yaml_syntax),
         ("UV Dependencies", test_uv_dependencies),
+        ("Debug Tools Files", test_debug_tools_files),
+        ("Service Configurations", test_service_configurations),
         ("Player Experience API", test_player_experience_import),
         ("API Gateway", test_api_gateway_import),
         ("Agent Orchestration", test_agent_orchestration_import),

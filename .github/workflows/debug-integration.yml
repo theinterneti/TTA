@@ -70,21 +70,43 @@ jobs:
 
       - name: Start backend services
         run: |
-          # Start Player Experience API
-          uv run python -m uvicorn src.player_experience.api.main:app --host 0.0.0.0 --port 8080 &
+          echo "🚀 Starting TTA backend services..."
 
-          # Start API Gateway
-          uv run python src/api_gateway/main.py &
+          # Create log directory
+          mkdir -p logs
 
-          # Start Agent Orchestration
-          uv run python src/agent_orchestration/main.py &
+          # Start Player Experience API with logging
+          echo "Starting Player Experience API on port 8080..."
+          uv run python -m uvicorn src.player_experience.api.main:app --host 0.0.0.0 --port 8080 > logs/player_experience.log 2>&1 &
+          PLAYER_PID=$!
+          echo "Player Experience API started with PID: $PLAYER_PID"
 
-          # Wait for services to start
-          sleep 30
+          # Start API Gateway with logging (override host for CI)
+          echo "Starting API Gateway on port 8000..."
+          API_GATEWAY_HOST=0.0.0.0 uv run python src/api_gateway/main.py > logs/api_gateway.log 2>&1 &
+          GATEWAY_PID=$!
+          echo "API Gateway started with PID: $GATEWAY_PID"
 
-          # Check if services are running
-          echo "🔍 Checking service status..."
-          ps aux | grep -E "(uvicorn|python.*main\.py)" | grep -v grep || echo "No services found in process list"
+          # Start Agent Orchestration with logging (allow all interfaces for CI)
+          echo "Starting Agent Orchestration on port 8503..."
+          AGENT_ORCHESTRATION_ALLOW_ALL_INTERFACES=true uv run python src/agent_orchestration/main.py > logs/agent_orchestration.log 2>&1 &
+          ORCHESTRATION_PID=$!
+          echo "Agent Orchestration started with PID: $ORCHESTRATION_PID"
+
+          # Store PIDs for later cleanup
+          echo "$PLAYER_PID" > logs/player_experience.pid
+          echo "$GATEWAY_PID" > logs/api_gateway.pid
+          echo "$ORCHESTRATION_PID" > logs/agent_orchestration.pid
+
+          echo "✅ All services started, PIDs stored in logs/ directory"
+          echo "📋 Service startup summary:"
+          echo "  - Player Experience API: PID $PLAYER_PID, Port 8080"
+          echo "  - API Gateway: PID $GATEWAY_PID, Port 8000"
+          echo "  - Agent Orchestration: PID $ORCHESTRATION_PID, Port 8503"
+
+          # Brief initial wait before health checks
+          echo "⏳ Waiting 10 seconds for initial service startup..."
+          sleep 10
 
       - name: Initialize Debug Tools Integration
         run: |
@@ -108,13 +130,57 @@ jobs:
             echo "Mock CI test run created with ID: $TTA_TEST_RUN_ID"
           fi
 
+      - name: Wait for Services and Test Health Endpoints
+        run: |
+          echo "🔍 Waiting for services to be ready..."
+
+          # Enhanced health check with retry logic
+          check_service() {
+            local service_name=$1
+            local port=$2
+            local max_attempts=30
+            local attempt=1
+
+            while [ $attempt -le $max_attempts ]; do
+              if curl -f --max-time 2 http://localhost:$port/health > /dev/null 2>&1; then
+                echo "✅ $service_name (port $port) is ready"
+                return 0
+              fi
+              echo "⏳ Attempt $attempt/$max_attempts: $service_name not ready, waiting..."
+              sleep 2
+              attempt=$((attempt + 1))
+            done
+
+            echo "❌ $service_name failed to start after $max_attempts attempts"
+            return 1
+          }
+
+          # Check all services in parallel
+          check_service "Player Experience API" 8080 &
+          pid1=$!
+          check_service "API Gateway" 8000 &
+          pid2=$!
+          check_service "Agent Orchestration" 8503 &
+          pid3=$!
+
+          # Wait for all health checks
+          wait $pid1 && wait $pid2 && wait $pid3
+          health_check_result=$?
+
+          if [ $health_check_result -eq 0 ]; then
+            echo "🎉 All services are healthy and ready for testing"
+          else
+            echo "💥 Some services failed health checks"
+            echo "📊 Service status summary:"
+            curl -f http://localhost:8080/health && echo " - Player Experience: OK" || echo " - Player Experience: FAILED"
+            curl -f http://localhost:8000/health && echo " - API Gateway: OK" || echo " - API Gateway: FAILED"
+            curl -f http://localhost:8503/health && echo " - Agent Orchestration: OK" || echo " - Agent Orchestration: FAILED"
+            exit 1
+          fi
+
       - name: Test WebSocket Connections
         run: |
           cd web-interfaces/developer-interface
-          # Test WebSocket endpoints are accessible
-          timeout 10 bash -c 'until curl -f http://localhost:8080/health; do sleep 1; done' || echo "Player Experience API not ready"
-          timeout 10 bash -c 'until curl -f http://localhost:8000/health; do sleep 1; done' || echo "API Gateway not ready"
-          timeout 10 bash -c 'until curl -f http://localhost:8503/health; do sleep 1; done' || echo "Agent Orchestration not ready"
 
           # Run WebSocket integration tests if they exist
           if npm run | grep -q "test:websocket"; then

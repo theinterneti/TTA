@@ -32,8 +32,13 @@ def setup_logging() -> None:
 
 def get_config() -> dict:
     """Get configuration from environment variables."""
+    # Default to localhost for security, allow override via environment
+    default_host = "127.0.0.1"  # More secure default than 0.0.0.0
+    if os.getenv("AGENT_ORCHESTRATION_ALLOW_ALL_INTERFACES", "false").lower() == "true":
+        default_host = "0.0.0.0"
+
     return {
-        "host": os.getenv("AGENT_ORCHESTRATION_HOST", "0.0.0.0"),
+        "host": os.getenv("AGENT_ORCHESTRATION_HOST", default_host),
         "port": int(os.getenv("AGENT_ORCHESTRATION_PORT", "8503")),
         "debug": os.getenv("AGENT_ORCHESTRATION_DEBUG", "false").lower() == "true",
         "workers": int(os.getenv("AGENT_ORCHESTRATION_WORKERS", "1")),

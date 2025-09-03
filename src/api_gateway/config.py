@@ -25,6 +25,7 @@ class GatewaySettings(BaseSettings):
         env_file=".env",
         env_file_encoding="utf-8",
         case_sensitive=False,
+        extra="ignore",  # Allow extra environment variables to be ignored
     )
 
     def __init__(self, **kwargs):
@@ -49,7 +50,10 @@ class GatewaySettings(BaseSettings):
         super().__init__(**kwargs)
 
     # Server Configuration
-    host: str = Field(default="0.0.0.0", description="Gateway server host")
+    host: str = Field(
+        default="127.0.0.1",
+        description="Gateway server host (use 0.0.0.0 for all interfaces)",
+    )
     port: int = Field(default=8000, description="Gateway server port")
     debug: bool = Field(default=False, description="Enable debug mode")
 

@@ -15,6 +15,7 @@ import uvicorn
 # Add the src directory to the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
+from src.api_gateway.app import create_gateway_app
 from src.api_gateway.config import get_gateway_settings
 
 
