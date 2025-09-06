@@ -43,7 +43,7 @@ class ServiceDiscoveryManager:
             logger.info("Service discovery manager initialized")
         except Exception as e:
             logger.error(f"Failed to initialize service discovery manager: {e}")
-            raise ServiceDiscoveryError(f"Initialization failed: {e}")
+            raise ServiceDiscoveryError(f"Initialization failed: {e}") from e
 
     async def close(self) -> None:
         """Close the service discovery manager."""

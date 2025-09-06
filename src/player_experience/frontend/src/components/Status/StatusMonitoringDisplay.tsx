@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useStatusMonitoring, StatusAlert } from '../../hooks/useStatusMonitoring';
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  useStatusMonitoring,
+  StatusAlert,
+} from "../../hooks/useStatusMonitoring";
 
 interface StatusMonitoringDisplayProps {
-  variant?: 'full' | 'compact' | 'alerts-only';
+  variant?: "full" | "compact" | "alerts-only";
   className?: string;
   showAlerts?: boolean;
   showHealthCheck?: boolean;
@@ -11,8 +14,8 @@ interface StatusMonitoringDisplayProps {
 }
 
 const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
-  variant = 'full',
-  className = '',
+  variant = "full",
+  className = "",
   showAlerts = true,
   showHealthCheck = true,
   autoHideAlerts = true,
@@ -42,61 +45,71 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'healthy':
-      case 'connected':
-      case 'active':
-        return 'text-green-600 bg-green-100';
-      case 'degraded':
-      case 'maintenance':
-        return 'text-yellow-600 bg-yellow-100';
-      case 'critical':
-      case 'error':
-        return 'text-red-600 bg-red-100';
-      case 'offline':
-      case 'disconnected':
-        return 'text-gray-600 bg-gray-100';
+      case "healthy":
+      case "connected":
+      case "active":
+        return "text-green-600 bg-green-100";
+      case "degraded":
+      case "maintenance":
+        return "text-yellow-600 bg-yellow-100";
+      case "critical":
+      case "error":
+        return "text-red-600 bg-red-100";
+      case "offline":
+      case "disconnected":
+        return "text-gray-600 bg-gray-100";
       default:
-        return 'text-gray-600 bg-gray-100';
+        return "text-gray-600 bg-gray-100";
     }
   };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'healthy':
-      case 'connected':
-      case 'active':
-        return '✅';
-      case 'degraded':
-      case 'maintenance':
-        return '⚠️';
-      case 'critical':
-      case 'error':
-        return '🚨';
-      case 'offline':
-      case 'disconnected':
-        return '🔴';
+      case "healthy":
+      case "connected":
+      case "active":
+        return "✅";
+      case "degraded":
+      case "maintenance":
+        return "⚠️";
+      case "critical":
+      case "error":
+        return "🚨";
+      case "offline":
+      case "disconnected":
+        return "🔴";
       default:
-        return '❓';
+        return "❓";
     }
   };
 
-  const getAlertIcon = (type: StatusAlert['type']) => {
+  const getAlertIcon = (type: StatusAlert["type"]) => {
     switch (type) {
-      case 'success': return '✅';
-      case 'info': return 'ℹ️';
-      case 'warning': return '⚠️';
-      case 'error': return '🚨';
-      default: return 'ℹ️';
+      case "success":
+        return "✅";
+      case "info":
+        return "ℹ️";
+      case "warning":
+        return "⚠️";
+      case "error":
+        return "🚨";
+      default:
+        return "ℹ️";
     }
   };
 
-  const getAlertColor = (type: StatusAlert['type']) => {
+  const getAlertColor = (type: StatusAlert["type"]) => {
     switch (type) {
-      case 'success': return 'border-green-200 bg-green-50 text-green-800';
-      case 'info': return 'border-blue-200 bg-blue-50 text-blue-800';
-      case 'warning': return 'border-yellow-200 bg-yellow-50 text-yellow-800';
-      case 'error': return 'border-red-200 bg-red-50 text-red-800';
-      default: return 'border-gray-200 bg-gray-50 text-gray-800';
+      case "success":
+        return "border-green-200 bg-green-50 text-green-800";
+      case "info":
+        return "border-blue-200 bg-blue-50 text-blue-800";
+      case "warning":
+        return "border-yellow-200 bg-yellow-50 text-yellow-800";
+      case "error":
+        return "border-red-200 bg-red-50 text-red-800";
+      default:
+        return "border-gray-200 bg-gray-50 text-gray-800";
     }
   };
 
@@ -128,8 +141,18 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
             onClick={() => dismissAlert(alert.id)}
             className="text-current opacity-60 hover:opacity-100 transition-opacity"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M6 18L18 6M6 6l12 12"
+              />
             </svg>
           </button>
         )}
@@ -140,8 +163,13 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
   const renderCompactView = () => (
     <div className="flex items-center space-x-3">
       {systemStatus && (
-        <div className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(systemStatus.api_status)}`}>
-          {getStatusIcon(systemStatus.api_status)} System {systemStatus.api_status}
+        <div
+          className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+            systemStatus.api_status
+          )}`}
+        >
+          {getStatusIcon(systemStatus.api_status)} System{" "}
+          {systemStatus.api_status}
         </div>
       )}
 
@@ -195,38 +223,57 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
       </div>
 
       {/* Overall Status */}
-      <div className={`p-4 rounded-lg border-2 ${isHealthy ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+      <div
+        className={`p-4 rounded-lg border-2 ${
+          isHealthy
+            ? "border-green-200 bg-green-50"
+            : "border-red-200 bg-red-50"
+        }`}
+      >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="text-2xl">
-              {isHealthy ? '✅' : '🚨'}
-            </div>
+            <div className="text-2xl">{isHealthy ? "✅" : "🚨"}</div>
             <div>
-              <h4 className={`font-semibold ${isHealthy ? 'text-green-800' : 'text-red-800'}`}>
-                System {isHealthy ? 'Healthy' : 'Issues Detected'}
+              <h4
+                className={`font-semibold ${
+                  isHealthy ? "text-green-800" : "text-red-800"
+                }`}
+              >
+                System {isHealthy ? "Healthy" : "Issues Detected"}
               </h4>
-              <p className={`text-sm ${isHealthy ? 'text-green-600' : 'text-red-600'}`}>
+              <p
+                className={`text-sm ${
+                  isHealthy ? "text-green-600" : "text-red-600"
+                }`}
+              >
                 {isHealthy
-                  ? 'All systems operational'
-                  : 'Some services may be experiencing issues'
-                }
+                  ? "All systems operational"
+                  : "Some services may be experiencing issues"}
               </p>
             </div>
           </div>
 
-          {lastHealthCheck && (
-            <div className="text-right">
-              <p className="text-xs text-gray-600">Last checked</p>
-              <p className="text-sm font-medium text-gray-900">
-                {lastHealthCheck.toLocaleTimeString()}
-              </p>
-            </div>
-          )}
+          <div className="flex items-center space-x-4">
+            {lastHealthCheck && (
+              <div className="text-right">
+                <p className="text-xs text-gray-600">Last checked</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {lastHealthCheck.toLocaleTimeString()}
+                </p>
+              </div>
+            )}
+            <button
+              onClick={() => setShowDetails(!showDetails)}
+              className="px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded transition-colors"
+            >
+              {showDetails ? "Hide Details" : "Show Details"}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Detailed Status */}
-      {systemStatus && (
+      {showDetails && systemStatus && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-3">
             <h4 className="font-medium text-gray-900">Service Status</h4>
@@ -234,22 +281,37 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">API Server</span>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(systemStatus.api_status)}`}>
-                  {getStatusIcon(systemStatus.api_status)} {systemStatus.api_status}
+                <div
+                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                    systemStatus.api_status
+                  )}`}
+                >
+                  {getStatusIcon(systemStatus.api_status)}{" "}
+                  {systemStatus.api_status}
                 </div>
               </div>
 
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Database</span>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(systemStatus.database_status)}`}>
-                  {getStatusIcon(systemStatus.database_status)} {systemStatus.database_status}
+                <div
+                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                    systemStatus.database_status
+                  )}`}
+                >
+                  {getStatusIcon(systemStatus.database_status)}{" "}
+                  {systemStatus.database_status}
                 </div>
               </div>
 
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Nexus Hub</span>
-                <div className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(systemStatus.nexus_hub_status)}`}>
-                  {getStatusIcon(systemStatus.nexus_hub_status)} {systemStatus.nexus_hub_status}
+                <div
+                  className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
+                    systemStatus.nexus_hub_status
+                  )}`}
+                >
+                  {getStatusIcon(systemStatus.nexus_hub_status)}{" "}
+                  {systemStatus.nexus_hub_status}
                 </div>
               </div>
             </div>
@@ -275,8 +337,12 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
 
               <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
                 <span className="text-sm text-gray-700">Monitoring</span>
-                <span className={`text-sm font-medium ${isMonitoring ? 'text-green-600' : 'text-gray-600'}`}>
-                  {isMonitoring ? 'Active' : 'Inactive'}
+                <span
+                  className={`text-sm font-medium ${
+                    isMonitoring ? "text-green-600" : "text-gray-600"
+                  }`}
+                >
+                  {isMonitoring ? "Active" : "Inactive"}
                 </span>
               </div>
             </div>
@@ -291,7 +357,9 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
             <div className="flex items-center space-x-2">
               <span className="text-red-500">🚨</span>
               <div>
-                <h4 className="text-sm font-medium text-red-800">System Error</h4>
+                <h4 className="text-sm font-medium text-red-800">
+                  System Error
+                </h4>
                 <p className="text-sm text-red-600">{error}</p>
               </div>
             </div>
@@ -311,7 +379,9 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
     <div className="space-y-2">
       {alerts.length > 0 && (
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-medium text-gray-900">System Alerts ({alerts.length})</h4>
+          <h4 className="font-medium text-gray-900">
+            System Alerts ({alerts.length})
+          </h4>
           <button
             onClick={clearAllAlerts}
             className="text-xs text-gray-600 hover:text-gray-800 underline"
@@ -337,8 +407,8 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
 
   return (
     <div className={`bg-white rounded-lg shadow-sm ${className}`}>
-      {variant === 'compact' && renderCompactView()}
-      {variant === 'full' && (
+      {variant === "compact" && renderCompactView()}
+      {variant === "full" && (
         <div className="p-6">
           {renderFullView()}
 
@@ -366,10 +436,8 @@ const StatusMonitoringDisplay: React.FC<StatusMonitoringDisplayProps> = ({
           )}
         </div>
       )}
-      {variant === 'alerts-only' && (
-        <div className="p-4">
-          {renderAlertsOnly()}
-        </div>
+      {variant === "alerts-only" && (
+        <div className="p-4">{renderAlertsOnly()}</div>
       )}
     </div>
   );

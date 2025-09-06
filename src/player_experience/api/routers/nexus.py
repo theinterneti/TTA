@@ -92,7 +92,7 @@ async def get_nexus_state(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve Nexus state: {str(e)}",
-        )
+        ) from None
 
 
 @router.get("/spheres")
@@ -169,7 +169,7 @@ async def get_story_spheres(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve story spheres: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/worlds", status_code=status.HTTP_201_CREATED)
@@ -268,7 +268,7 @@ async def create_world(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to create world: {str(e)}",
-        )
+        ) from None
 
 
 @router.get("/worlds/search")
@@ -419,7 +419,7 @@ async def search_worlds(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to search worlds: {str(e)}",
-        )
+        ) from None
 
 
 @router.get("/worlds/{world_id}")
@@ -494,7 +494,7 @@ async def get_world(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve world: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/worlds/{world_id}/enter")
@@ -583,4 +583,4 @@ async def enter_world(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to enter world: {str(e)}",
-        )
+        ) from None

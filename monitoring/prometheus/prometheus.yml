@@ -1,0 +1,180 @@
+# TTA Production Monitoring Configuration
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'tta-production'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  - "alert_rules.yml"
+  - "recording_rules.yml"
+
+# Scrape configuration
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # TTA API Gateway monitoring
+  - job_name: 'tta-api'
+    static_configs:
+      - targets: ['tta-api:8080']
+    scrape_interval: 15s
+    metrics_path: /metrics
+    scrape_timeout: 10s
+    honor_labels: true
+    params:
+      format: ['prometheus']
+
+  # Neo4j Database monitoring
+  - job_name: 'neo4j'
+    static_configs:
+      - targets: ['neo4j:2004']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    scrape_timeout: 10s
+
+  # Redis monitoring
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+    scrape_interval: 30s
+    metrics_path: /metrics
+    scrape_timeout: 10s
+
+  # Nginx monitoring
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['nginx:9113']
+    scrape_interval: 30s
+    metrics_path: /metrics
+
+  # Node Exporter for system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
+    scrape_interval: 30s
+
+  # TTA Web Interfaces Health Monitoring
+  - job_name: 'tta-patient-interface'
+    static_configs:
+      - targets: ['patient-interface:5173']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-clinical-dashboard'
+    static_configs:
+      - targets: ['clinical-dashboard:3001']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-admin-interface'
+    static_configs:
+      - targets: ['admin-interface:3002']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-public-portal'
+    static_configs:
+      - targets: ['public-portal:3003']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-stakeholder-dashboard'
+    static_configs:
+      - targets: ['stakeholder-dashboard:3004']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-api-docs'
+    static_configs:
+      - targets: ['api-docs:3005']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  - job_name: 'tta-developer-interface'
+    static_configs:
+      - targets: ['developer-interface:3006']
+    scrape_interval: 60s
+    metrics_path: /health
+    scheme: http
+
+  # Crisis Support Monitoring (Critical)
+  - job_name: 'crisis-support-monitoring'
+    static_configs:
+      - targets: ['tta-api:8080']
+    scrape_interval: 5s  # High frequency for crisis monitoring
+    metrics_path: /metrics/crisis
+    scrape_timeout: 3s
+    honor_labels: true
+
+  # Therapeutic Systems Monitoring
+  - job_name: 'therapeutic-systems'
+    static_configs:
+      - targets: ['tta-api:8080']
+    scrape_interval: 30s
+    metrics_path: /metrics/therapeutic
+    scrape_timeout: 10s
+
+  # HIPAA Compliance Monitoring
+  - job_name: 'hipaa-compliance'
+    static_configs:
+      - targets: ['tta-api:8080']
+    scrape_interval: 60s
+    metrics_path: /metrics/compliance
+    scrape_timeout: 10s
+
+  # Backup System Monitoring
+  - job_name: 'backup-service'
+    static_configs:
+      - targets: ['backup-service:8080']
+    scrape_interval: 300s  # Every 5 minutes
+    metrics_path: /metrics
+    scrape_timeout: 30s
+
+  # Custom TTA Metrics
+  - job_name: 'tta-custom-metrics'
+    static_configs:
+      - targets: ['tta-api:8080']
+    scrape_interval: 30s
+    metrics_path: /metrics/custom
+    params:
+      module: ['tta_therapeutic']
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: tta-api:8080
+
+# Remote write configuration for long-term storage
+remote_write:
+  - url: "http://prometheus-remote-storage:9201/write"
+    queue_config:
+      max_samples_per_send: 1000
+      max_shards: 200
+      capacity: 2500
+
+# Remote read configuration
+remote_read:
+  - url: "http://prometheus-remote-storage:9201/read"
+    read_recent: true

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+// useDispatch removed - not used in this component
 import { RootState } from "../../store/store";
 import websocketService from "../../services/websocket";
 import ChatMessage from "../../components/Chat/ChatMessage";
@@ -13,9 +14,9 @@ import useMobile from "../../hooks/useMobile";
 const Chat: React.FC = () => {
   const { sessionId } = useParams<{ sessionId?: string }>();
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // Dispatch removed - not used in this component
   const {
-    currentSession,
+    // currentSession, // Not used in this component
     messageHistory,
     isConnected,
     isTyping,
@@ -34,7 +35,8 @@ const Chat: React.FC = () => {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const { preferences, announce } = useAccessibility();
-  const { isMobile, isTablet, touchSupported, orientation } = useMobile();
+  const { isMobile, touchSupported } = useMobile();
+  // isTablet and orientation removed - not used in this component
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -24,7 +24,7 @@ from ..orchestration.component import Component
 logger = logging.getLogger(__name__)
 
 # Import interfaces instead of concrete integration
-from components.character_arc_interfaces import (
+from .character_arc_interfaces import (
     ArcStage,
     CharacterArc,
     InteractionContext,
@@ -33,14 +33,8 @@ from components.character_arc_interfaces import (
     RelationshipType,
 )
 
-# Try to import CharacterArcIntegration if available
-try:
-    from components.character_arc_integration import CharacterArcIntegration
-
-    INTEGRATION_AVAILABLE = True
-except ImportError:
-    CharacterArcIntegration = None
-    INTEGRATION_AVAILABLE = False
+# Integration will be injected via dependency injection
+INTEGRATION_AVAILABLE = True
 
 
 @dataclass
@@ -186,7 +180,7 @@ class CharacterArcManagerComponent(Component):
 
         # Initialize integration with Character Development System
         self.integration = None
-        if INTEGRATION_AVAILABLE and CharacterArcIntegration is not None:
+        if INTEGRATION_AVAILABLE:
             try:
                 self.integration = CharacterArcIntegration(self)
                 logger.info("Character Development System integration enabled")
@@ -295,9 +289,9 @@ class CharacterArcManagerComponent(Component):
             self.active_arcs[character_id] = character_arc
 
             # Initialize personality model for consistent responses
-            self.personality_models[character_id] = (
-                await self._create_personality_model(character_arc)
-            )
+            self.personality_models[
+                character_id
+            ] = await self._create_personality_model(character_arc)
 
             logger.info(
                 f"Character arc initialized for {character_id} with {len(trajectory)} milestones"
@@ -343,7 +337,9 @@ class CharacterArcManagerComponent(Component):
             await self._update_relationship_dynamics(character_arc, interaction)
 
             # Check for milestone progression
-            await self._check_milestone_progression(character_arc, interaction)
+            milestone_progress = await self._check_milestone_progression(
+                character_arc, interaction
+            )
 
             # Update therapeutic modeling
             await self._update_therapeutic_modeling(character_arc, interaction)
@@ -891,6 +887,8 @@ class CharacterArcManagerComponent(Component):
             therapeutic_modeling = []
 
             # Match character traits to therapeutic concepts
+            personality = character_arc.base_personality
+
             for concept_data in self.therapeutic_concepts:
                 concept = TherapeuticConcept(
                     concept_id=concept_data["id"],
@@ -1175,8 +1173,9 @@ class CharacterArcManagerComponent(Component):
             # For now, we'll return a placeholder that reflects the character's current state
 
             stage = character_arc.current_stage
+            personality = character_arc.personality_evolution
 
-            # Generate response based on stage and personality evolution
+            # Generate response based on stage and personality
             if stage == ArcStage.INTRODUCTION:
                 response = f"Hello there! I'm {character_arc.character_name}. Nice to meet you."
             elif stage == ArcStage.ESTABLISHMENT:

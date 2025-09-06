@@ -7,6 +7,7 @@ decoupled communication between components and external integrations.
 
 from __future__ import annotations
 
+import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -283,9 +284,6 @@ class SafetyEvent(NarrativeEvent):
                 "intervention_needed": self.intervention_needed,
             }
         )
-
-
-import asyncio
 
 
 class EventBus:

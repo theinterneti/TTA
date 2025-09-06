@@ -175,46 +175,9 @@ class MockNeo4jSession:
         if self.transaction_active:
             self.transaction_active = False
 
-    async def run(self, query: str, **parameters):
-        """Enhanced mock query execution with realistic processing."""
-        time.time()
-
-        try:
-            # Update metrics
-            self.driver.metrics.total_operations += 1
-            self.driver._update_state()
-
-            # Simulate latency
-            latency = await self.driver._simulate_latency()
-
-            # Check for failure simulation
-            if self.driver._should_fail():
-                self.driver.metrics.failed_operations += 1
-                raise Exception("Simulated Neo4j failure")
-
-            # Log operation if enabled
-            if self.driver.config.log_operations:
-                logger.debug(
-                    f"Mock Neo4j query: {query[:100]}... with params: {parameters}"
-                )
-
-            # Process query based on type
-            result = await self._process_query(query, parameters)
-
-            # Update success metrics
-            self.driver.metrics.successful_operations += 1
-            self.driver.metrics.total_latency_ms += latency
-
-            return result
-
-        except Exception as e:
-            self.driver.metrics.failed_operations += 1
-            logger.error(f"Mock Neo4j query failed: {e}")
-            raise
-
     def run_sync(self, query: str, **parameters):
         """Synchronous version for compatibility."""
-        return asyncio.run(self.run(query, **parameters))
+        return asyncio.run(self._async_run(query, **parameters))
 
     # Alias for backward compatibility
     def run(self, query: str, **parameters):

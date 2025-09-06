@@ -11,7 +11,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from ...database.user_auth_schema import UserAuthSchemaManager
 from ...database.user_repository import UserRepository
@@ -144,7 +144,9 @@ def require_permission(permission: Permission):
             auth_service.require_permission(user, permission)
             return user
         except AuthorizationError as e:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+            ) from None
 
     return check_permission
 
@@ -159,7 +161,9 @@ def require_mfa_verification():
             auth_service.require_mfa_verification(user)
             return user
         except AuthenticationError as e:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+            ) from None
 
     return check_mfa
 
@@ -202,7 +206,7 @@ async def register(registration: UserRegistration, request: Request) -> dict[str
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Registration failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -287,7 +291,7 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
     except HTTPException as e:
         # Preserve explicitly raised HTTP errors
         raise e
@@ -295,7 +299,7 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Login failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/mfa/verify", response_model=LoginResponse)
@@ -345,14 +349,16 @@ async def verify_mfa(verification: MFAVerification, request: Request) -> LoginRe
         )
 
     except MFAError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+        ) from None
     except HTTPException as e:
         raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"MFA verification failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/mfa/setup", response_model=MFASetupResponse)
@@ -383,14 +389,16 @@ async def setup_mfa(
         )
 
     except MFAError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from None
     except HTTPException as e:
         raise e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"MFA setup failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/refresh", response_model=Token)
@@ -414,7 +422,7 @@ async def refresh_token(refresh_request: RefreshTokenRequest) -> Token:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
 
 
 @router.post("/logout")
@@ -454,7 +462,7 @@ async def logout(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Logout failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/logout-all")
@@ -493,7 +501,7 @@ async def logout_all_sessions(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Logout all failed: {str(e)}",
-        )
+        ) from None
 
 
 @router.get("/me", response_model=dict[str, Any])
@@ -553,7 +561,7 @@ async def verify_token_endpoint(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from None
 
 
 # Role-based access control endpoints
@@ -757,3 +765,134 @@ async def change_password(
     )
 
     return {"message": "Password changed successfully"}
+
+
+# OAuth 2.0 Endpoints for Dual Authentication System
+
+
+@router.get("/oauth/providers", response_model=list[dict[str, Any]])
+async def get_oauth_providers() -> list[dict[str, Any]]:
+    """
+    Get list of available OAuth providers.
+
+    Returns:
+        List of OAuth provider configurations
+    """
+    try:
+        providers = auth_service.get_oauth_providers()
+        return providers
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to get OAuth providers: {str(e)}",
+        ) from None
+
+
+@router.get("/oauth/{provider}/authorize", response_model=dict[str, str])
+async def get_oauth_authorization_url(
+    provider: str,
+    interface_type: str = "patient",
+    redirect_uri: str | None = None,
+) -> dict[str, str]:
+    """
+    Get OAuth authorization URL for specified provider.
+
+    Args:
+        provider: OAuth provider (google, microsoft, apple, facebook)
+        interface_type: Interface type (patient, clinical, admin)
+        redirect_uri: Custom redirect URI (optional)
+
+    Returns:
+        Dict with authorization URL and state
+
+    Raises:
+        HTTPException: If provider is invalid or OAuth not available
+    """
+    try:
+        auth_data = auth_service.get_oauth_authorization_url(
+            provider, interface_type, redirect_uri
+        )
+        return auth_data
+    except AuthenticationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        ) from None
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate OAuth URL: {str(e)}",
+        ) from None
+
+
+class OAuthCallbackRequest(BaseModel):
+    """OAuth callback request model."""
+
+    code: str = Field(..., description="Authorization code from OAuth provider")
+    state: str = Field(..., description="OAuth state parameter for CSRF protection")
+    interface_type: str = Field(default="patient", description="Interface type")
+
+
+@router.post("/oauth/{provider}/callback", response_model=LoginResponse)
+async def oauth_callback(
+    provider: str,
+    callback_data: OAuthCallbackRequest,
+    request: Request,
+) -> LoginResponse:
+    """
+    Handle OAuth callback and authenticate user.
+
+    Args:
+        provider: OAuth provider (google, microsoft, apple, facebook)
+        callback_data: OAuth callback data with code and state
+        request: HTTP request for IP tracking
+
+    Returns:
+        LoginResponse: Access tokens and user information
+
+    Raises:
+        HTTPException: If OAuth authentication fails
+    """
+    try:
+        # Get client IP and user agent
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "unknown")
+
+        # Authenticate with OAuth
+        user = await auth_service.authenticate_with_oauth(
+            provider,
+            callback_data.code,
+            callback_data.state,
+            callback_data.interface_type,
+        )
+
+        # Create access token
+        access_token = auth_service.create_access_token(user, user.session_id)
+
+        return LoginResponse(
+            access_token=access_token,
+            refresh_token="",  # TODO: Implement OAuth refresh token
+            token_type="bearer",
+            expires_in=auth_service.access_token_expire_minutes * 60,
+            mfa_required=False,  # OAuth providers handle MFA
+            user_info={
+                "user_id": user.user_id,
+                "username": user.username,
+                "email": user.email,
+                "role": user.role.value,
+                "permissions": [perm.value for perm in user.permissions],
+                "authentication_method": "oauth",
+                "oauth_provider": provider,
+            },
+        )
+
+    except AuthenticationError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(e),
+        ) from None
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"OAuth authentication failed: {str(e)}",
+        ) from None

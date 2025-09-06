@@ -15,12 +15,12 @@ import * as THREE from "three";
 import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useNexusState } from "../../hooks/useNexusState";
 import { StorySphereData, useStorySpheres } from "../../hooks/useStorySpheres";
-import { nexusAPI } from "../../services/api";
+// import { nexusAPI } from "../../services/api"; // TODO: Implement nexus API integration
 import GenreFilter from "../UI/GenreFilter";
 import { WorldEntryModal } from "../World";
-import { useWorldEntry } from "../../hooks/useWorldEntry";
+// import { useWorldEntry } from "../../hooks/useWorldEntry"; // TODO: Implement world entry functionality
 import { NexusStateDisplay } from "../Nexus";
-import { ThreeDErrorBoundary } from "../ErrorBoundary";
+// import { ThreeDErrorBoundary } from "../ErrorBoundary"; // TODO: Implement 3D error boundary
 
 // Error Boundary for 3D Canvas
 class Canvas3DErrorBoundary extends React.Component<
@@ -208,19 +208,20 @@ const NexusHub: React.FC<NexusHubProps> = ({
   const [showEntryModal, setShowEntryModal] = useState(false);
   const [entryWorldId, setEntryWorldId] = useState<string | null>(null);
 
-  const {
-    enterWorld,
-    entering,
-    error: entryError,
-  } = useWorldEntry({
-    onSuccess: (response) => {
-      console.log("Successfully entered world:", response);
-      // Handle successful world entry - could navigate to game session
-    },
-    onError: (error) => {
-      console.error("Failed to enter world:", error);
-    },
-  });
+  // World entry functionality disabled for now - TODO: Implement world entry functionality
+  // const {
+  //   enterWorld,
+  //   entering,
+  //   error: entryError,
+  // } = useWorldEntry({
+  //   onSuccess: (response) => {
+  //     console.log("Successfully entered world:", response);
+  //     // Handle successful world entry - could navigate to game session
+  //   },
+  //   onError: (error) => {
+  //     console.error("Failed to enter world:", error);
+  //   },
+  // });
 
   // Use custom hooks for data management
   const {
@@ -243,7 +244,7 @@ const NexusHub: React.FC<NexusHubProps> = ({
   });
 
   const {
-    state: nexusState,
+    // state: nexusState, // TODO: Implement nexus state display
     loading: nexusLoading,
     error: nexusError,
     refetch: refetchNexusState,

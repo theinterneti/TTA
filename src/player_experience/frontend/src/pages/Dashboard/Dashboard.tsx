@@ -66,7 +66,7 @@ const Dashboard: React.FC = () => {
       {/* Welcome Section */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h1 className="text-2xl font-bold text-gray-900 mb-2">
-          Welcome back, {profile?.username}!
+          Welcome back, {profile?.username || "User"}!
         </h1>
         <p className="text-gray-600">
           Ready to continue your therapeutic journey? Here's what's happening in

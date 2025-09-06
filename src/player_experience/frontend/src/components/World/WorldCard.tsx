@@ -38,7 +38,7 @@ const WorldCard: React.FC<WorldCardProps> = ({
   const [worldData, setWorldData] = useState<WorldData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [imageError, setImageError] = useState(false);
+  // Image error handling removed - no images in this component
 
   // Real-time updates for this specific world
   const { worldStats, isConnected: realtimeConnected } =
@@ -246,10 +246,18 @@ const WorldCard: React.FC<WorldCardProps> = ({
                 </div>
               </div>
             )}
-            {worldData.player_count !== undefined && (
+            {(worldData.player_count !== undefined ||
+              worldStats?.active_players) && (
               <div>
                 <span className="text-gray-500">Active Players:</span>
-                <div className="font-semibold">{worldData.player_count}</div>
+                <div
+                  className={`font-semibold ${
+                    realtimeConnected ? "text-green-600" : ""
+                  }`}
+                >
+                  {worldStats?.active_players ?? worldData.player_count}
+                  {realtimeConnected && <span className="text-xs ml-1">●</span>}
+                </div>
               </div>
             )}
             {worldData.completion_rate !== undefined && (

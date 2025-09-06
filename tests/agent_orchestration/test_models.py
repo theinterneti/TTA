@@ -1,4 +1,5 @@
 import pytest
+from pydantic import ValidationError
 
 from src.agent_orchestration import (
     AgentId,
@@ -22,9 +23,6 @@ def test_agent_message_valid():
     ok, err = validate_agent_message(msg)
     assert ok is True
     assert err is None
-
-
-from pydantic import ValidationError
 
 
 def test_agent_message_min_length_invalid():

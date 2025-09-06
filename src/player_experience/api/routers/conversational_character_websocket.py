@@ -132,7 +132,7 @@ def _auth_from_ws(websocket: WebSocket) -> Any:
         token_data = decode_jwt_token(token)
         return token_data
     except Exception:
-        raise PermissionError("Invalid authentication token")
+        raise PermissionError("Invalid authentication token") from None
 
 
 def _serialize_message(message: Any) -> dict[str, Any]:

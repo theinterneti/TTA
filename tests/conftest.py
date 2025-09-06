@@ -2,6 +2,7 @@ import os
 from unittest.mock import Mock
 
 import pytest
+import pytest_asyncio
 
 
 def has_neo4j():
@@ -289,22 +290,6 @@ def redis_container(pytestconfig):
             os.environ.pop("TEST_REDIS_URI", None)
         else:
             os.environ["TEST_REDIS_URI"] = prev_env
-
-
-import pytest_asyncio
-
-
-@pytest.fixture(scope="session")
-def redis_client_sync(redis_container):
-    # Synchronous client for sync tests
-    import redis
-
-    client = redis.Redis.from_url(redis_container)
-    try:
-        client.ping()
-        yield client
-    finally:
-        client.close()
 
 
 @pytest_asyncio.fixture()

@@ -188,7 +188,10 @@ const WorldCreationForm: React.FC<WorldCreationFormProps> = ({
       setIsSubmitting(true);
       setSubmitError(null);
 
-      const response = await nexusAPI.createWorld(formData);
+      const response = await nexusAPI.createWorld({
+        ...formData,
+        creator_id: user?.id,
+      });
       const worldId = (response as any).world_id || (response as any).id;
 
       if (onSuccess) {

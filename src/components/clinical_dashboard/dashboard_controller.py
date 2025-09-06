@@ -261,7 +261,7 @@ class ClinicalDashboardController:
         except Exception as e:
             logger.error(f"Error recording outcome measurement: {e}")
             self.controller_metrics["errors"] += 1
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from e
 
     async def get_service_status(self) -> dict[str, Any]:
         """Get comprehensive service status."""

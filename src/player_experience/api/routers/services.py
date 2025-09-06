@@ -131,7 +131,7 @@ async def get_system_health(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve system health: {str(e)}",
-        )
+        ) from None
 
 
 @router.get("/health/{service_name}", response_model=ServiceHealthResponse)
@@ -180,7 +180,7 @@ async def get_service_health(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve service health: {str(e)}",
-        )
+        ) from None
 
 
 @router.post("/reconnect", response_model=ServiceOperationResponse)
@@ -224,7 +224,7 @@ async def reconnect_services(
         logger.error(error_msg)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_msg
-        )
+        ) from None
 
 
 @router.post("/{service_name}/reconnect", response_model=ServiceOperationResponse)
@@ -291,7 +291,7 @@ async def reconnect_service(
         logger.error(error_msg)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=error_msg
-        )
+        ) from None
 
 
 @router.get("/config", response_model=dict[str, Any])
@@ -345,4 +345,4 @@ async def get_service_configuration(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to retrieve service configuration: {str(e)}",
-        )
+        ) from None

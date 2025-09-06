@@ -7,7 +7,7 @@ import {
   useWatch,
 } from "react-hook-form";
 import { CharacterFormData } from "../characterFormSchema";
-import { IntensityLevel } from "../../../types";
+// import { IntensityLevel } from "../../../types"; // TODO: Implement intensity level selection
 
 interface TherapeuticProfileStepProps {
   control: Control<CharacterFormData, any>;

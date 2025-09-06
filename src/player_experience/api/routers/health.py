@@ -281,7 +281,7 @@ async def readiness_check() -> dict[str, Any]:
                 "status": "not_ready",
                 "reason": f"Readiness check error: {str(e)}",
             },
-        )
+        ) from None
 
 
 @router.get("/health/live")

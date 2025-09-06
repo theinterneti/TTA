@@ -60,7 +60,7 @@ class RedisServiceRegistry:
                 logger.info("Connected to Redis for service discovery")
             except Exception as e:
                 logger.error(f"Failed to connect to Redis: {e}")
-                raise ServiceDiscoveryError(f"Redis connection failed: {e}")
+                raise ServiceDiscoveryError(f"Redis connection failed: {e}") from e
 
         # Start cleanup task
         if self._cleanup_task is None:

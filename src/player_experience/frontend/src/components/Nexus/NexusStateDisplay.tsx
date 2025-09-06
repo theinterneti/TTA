@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { useNexusState, NexusState } from "../../hooks/useNexusState";
+import { useNexusState } from "../../hooks/useNexusState";
+// import { NexusState } from "../../hooks/useNexusState"; // TODO: Implement NexusState type usage
 import { useRealTimeUpdates } from "../../hooks/useRealTimeUpdates";
 
 interface NexusStateDisplayProps {
@@ -104,6 +105,11 @@ const NexusStateDisplay: React.FC<NexusStateDisplayProps> = ({
             Connection Error
           </h3>
           <p className="text-xs text-red-600 mb-3">{error}</p>
+          {realtimeError && (
+            <p className="text-xs text-orange-600 mb-3">
+              Real-time updates unavailable: {realtimeError}
+            </p>
+          )}
           <button
             onClick={() => {
               clearError();

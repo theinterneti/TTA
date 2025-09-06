@@ -225,7 +225,7 @@ class GatewayAuthService:
                 self._tta_auth_service = AuthService()
             except ImportError as e:
                 logger.error(f"Failed to import TTA AuthService: {e}")
-                raise Exception("TTA authentication service not available")
+                raise Exception("TTA authentication service not available") from e
 
         return self._tta_auth_service
 

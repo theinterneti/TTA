@@ -2,6 +2,17 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 import { jwtDecode } from 'jose';
 import { apiClient } from '../api/client';
 
+// Import unified auth types and provider
+import {
+  UnifiedAuthProvider,
+  useUnifiedAuth,
+  UnifiedUser,
+  UserRole,
+  InterfaceType,
+  Permission
+} from './UnifiedAuthProvider';
+
+// Backward compatibility types
 export interface User {
   id: string;
   username: string;

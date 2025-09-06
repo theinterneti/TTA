@@ -1,0 +1,265 @@
+# TTA Production Alert Rules
+groups:
+  # Critical System Health Alerts
+  - name: tta-critical-alerts
+    rules:
+      # Crisis Support System - CRITICAL
+      - alert: CrisisSupportSystemDown
+        expr: up{job="crisis-support-monitoring"} == 0
+        for: 10s
+        labels:
+          severity: critical
+          service: crisis-support
+          priority: P0
+        annotations:
+          summary: "CRITICAL: Crisis Support System is DOWN"
+          description: "The crisis support monitoring system has been down for {{ $value }} seconds. This is a CRITICAL therapeutic safety issue."
+          runbook_url: "https://docs.tta.dev/runbooks/crisis-support-down"
+          escalation: "immediate"
+
+      - alert: CrisisResponseTimeHigh
+        expr: tta_crisis_response_time_seconds > 1.0
+        for: 30s
+        labels:
+          severity: critical
+          service: crisis-support
+          priority: P0
+        annotations:
+          summary: "CRITICAL: Crisis response time exceeds 1 second"
+          description: "Crisis response time is {{ $value }}s, exceeding the 1s therapeutic safety requirement."
+          runbook_url: "https://docs.tta.dev/runbooks/crisis-response-slow"
+
+      # Database Health - HIGH PRIORITY
+      - alert: Neo4jDatabaseDown
+        expr: up{job="neo4j"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: database
+          priority: P1
+        annotations:
+          summary: "Neo4j database is down"
+          description: "Neo4j database has been unreachable for more than 1 minute."
+          runbook_url: "https://docs.tta.dev/runbooks/neo4j-down"
+
+      - alert: RedisCacheDown
+        expr: up{job="redis"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: cache
+          priority: P1
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis cache has been unreachable for more than 1 minute."
+          runbook_url: "https://docs.tta.dev/runbooks/redis-down"
+
+      # API Gateway Health
+      - alert: TTAAPIGatewayDown
+        expr: up{job="tta-api"} == 0
+        for: 30s
+        labels:
+          severity: critical
+          service: api-gateway
+          priority: P1
+        annotations:
+          summary: "TTA API Gateway is down"
+          description: "The main TTA API Gateway has been down for {{ $value }} seconds."
+          runbook_url: "https://docs.tta.dev/runbooks/api-gateway-down"
+
+  # Therapeutic System Alerts
+  - name: tta-therapeutic-alerts
+    rules:
+      - alert: TherapeuticSystemError
+        expr: rate(tta_therapeutic_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: warning
+          service: therapeutic-systems
+          priority: P2
+        annotations:
+          summary: "High error rate in therapeutic systems"
+          description: "Therapeutic system error rate is {{ $value }} errors per second over the last 5 minutes."
+
+      - alert: PatientSessionFailure
+        expr: rate(tta_patient_session_failures_total[5m]) > 0.05
+        for: 1m
+        labels:
+          severity: warning
+          service: patient-interface
+          priority: P2
+        annotations:
+          summary: "Patient session failures detected"
+          description: "Patient session failure rate is {{ $value }} failures per second."
+
+      - alert: HIPAAComplianceViolation
+        expr: tta_hipaa_compliance_violations_total > 0
+        for: 0s
+        labels:
+          severity: critical
+          service: compliance
+          priority: P0
+        annotations:
+          summary: "HIPAA compliance violation detected"
+          description: "{{ $value }} HIPAA compliance violations have been detected."
+          runbook_url: "https://docs.tta.dev/runbooks/hipaa-violation"
+
+  # Performance Alerts
+  - name: tta-performance-alerts
+    rules:
+      - alert: HighResponseTime
+        expr: tta_http_request_duration_seconds{quantile="0.95"} > 2.0
+        for: 5m
+        labels:
+          severity: warning
+          service: api-performance
+          priority: P3
+        annotations:
+          summary: "High API response time"
+          description: "95th percentile response time is {{ $value }}s, exceeding 2s threshold."
+
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+          service: system-resources
+          priority: P3
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is above 85% ({{ $value | humanizePercentage }})"
+
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          service: system-resources
+          priority: P3
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is above 80% ({{ $value | humanizePercentage }})"
+
+  # Interface Health Alerts
+  - name: tta-interface-alerts
+    rules:
+      - alert: PatientInterfaceDown
+        expr: up{job="tta-patient-interface"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: patient-interface
+          priority: P2
+        annotations:
+          summary: "Patient Interface is down"
+          description: "The patient interface has been unreachable for more than 2 minutes."
+
+      - alert: ClinicalDashboardDown
+        expr: up{job="tta-clinical-dashboard"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          service: clinical-dashboard
+          priority: P2
+        annotations:
+          summary: "Clinical Dashboard is down"
+          description: "The clinical dashboard has been unreachable for more than 2 minutes."
+
+      - alert: AdminInterfaceDown
+        expr: up{job="tta-admin-interface"} == 0
+        for: 5m
+        labels:
+          severity: warning
+          service: admin-interface
+          priority: P3
+        annotations:
+          summary: "Admin Interface is down"
+          description: "The admin interface has been unreachable for more than 5 minutes."
+
+  # Backup and Recovery Alerts
+  - name: tta-backup-alerts
+    rules:
+      - alert: BackupServiceDown
+        expr: up{job="backup-service"} == 0
+        for: 10m
+        labels:
+          severity: warning
+          service: backup
+          priority: P3
+        annotations:
+          summary: "Backup service is down"
+          description: "The backup service has been down for more than 10 minutes."
+
+      - alert: BackupFailure
+        expr: tta_backup_failures_total > 0
+        for: 0s
+        labels:
+          severity: critical
+          service: backup
+          priority: P1
+        annotations:
+          summary: "Backup failure detected"
+          description: "{{ $value }} backup failures have been detected in the last 24 hours."
+          runbook_url: "https://docs.tta.dev/runbooks/backup-failure"
+
+      - alert: BackupAge
+        expr: time() - tta_last_successful_backup_timestamp > 86400
+        for: 1h
+        labels:
+          severity: warning
+          service: backup
+          priority: P2
+        annotations:
+          summary: "Backup is older than 24 hours"
+          description: "The last successful backup was {{ $value | humanizeDuration }} ago."
+
+  # Security Alerts
+  - name: tta-security-alerts
+    rules:
+      - alert: HighFailedLoginAttempts
+        expr: rate(tta_failed_login_attempts_total[5m]) > 0.5
+        for: 2m
+        labels:
+          severity: warning
+          service: security
+          priority: P2
+        annotations:
+          summary: "High rate of failed login attempts"
+          description: "Failed login attempt rate is {{ $value }} attempts per second."
+
+      - alert: SecurityEventDetected
+        expr: tta_security_events_total > 0
+        for: 0s
+        labels:
+          severity: critical
+          service: security
+          priority: P1
+        annotations:
+          summary: "Security event detected"
+          description: "{{ $value }} security events have been detected."
+          runbook_url: "https://docs.tta.dev/runbooks/security-incident"
+
+  # Disk Space Alerts
+  - name: tta-storage-alerts
+    rules:
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.1
+        for: 5m
+        labels:
+          severity: warning
+          service: storage
+          priority: P2
+        annotations:
+          summary: "Disk space is low"
+          description: "Disk space usage is above 90% on {{ $labels.device }} ({{ $value | humanizePercentage }} remaining)"
+
+      - alert: DiskSpaceCritical
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) < 0.05
+        for: 1m
+        labels:
+          severity: critical
+          service: storage
+          priority: P1
+        annotations:
+          summary: "Disk space is critically low"
+          description: "Disk space usage is above 95% on {{ $labels.device }} ({{ $value | humanizePercentage }} remaining)"

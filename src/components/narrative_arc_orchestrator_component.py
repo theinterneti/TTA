@@ -19,22 +19,12 @@ from datetime import datetime
 from typing import Any
 
 from ..orchestration.component import Component
+from .narrative_arc_orchestrator.models import NarrativeScale
 
 logger = logging.getLogger(__name__)
 
 
 # NOTE: Models moved to src/components/narrative_arc_orchestrator/models.py
-from .narrative_arc_orchestrator.models import (
-    EmergentEvent,
-    ImpactAssessment,
-    NarrativeEvent,
-    NarrativeResponse,
-    NarrativeScale,
-    NarrativeStatus,
-    PlayerChoice,
-    Resolution,
-    ScaleConflict,
-)
 
 # NarrativeScale is imported from narrative_arc_interfaces
 
@@ -220,9 +210,9 @@ class ScaleManager:
         }
 
         # Causal relationship tracking
-        self.causal_graph: dict[str, set[str]] = (
-            {}
-        )  # event_id -> set of caused event_ids
+        self.causal_graph: dict[
+            str, set[str]
+        ] = {}  # event_id -> set of caused event_ids
 
         # Conflict tracking
         self.active_conflicts: list[ScaleConflict] = []

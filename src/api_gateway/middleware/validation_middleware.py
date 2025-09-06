@@ -363,7 +363,7 @@ class ValidationMiddleware:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Validation processing error",
-                )
+                ) from e
             return gateway_request
 
     def _find_applicable_rules(self, path: str, method: str) -> list[ValidationRule]:
@@ -405,9 +405,9 @@ class ValidationMiddleware:
             validate(instance=body_data, schema=rule.json_schema)
 
         except json.JSONDecodeError as e:
-            raise ValidationError(f"Invalid JSON format: {e}")
+            raise ValidationError(f"Invalid JSON format: {e}") from e
         except JsonSchemaValidationError as e:
-            raise ValidationError(f"Schema validation failed: {e.message}")
+            raise ValidationError(f"Schema validation failed: {e.message}") from e
 
     async def _validate_format(
         self, request: GatewayRequest, rule: ValidationRule

@@ -27,12 +27,14 @@ router = APIRouter(prefix="/api/v1/clinical", tags=["clinical_dashboard"])
 
 class AuthenticationRequest(BaseModel):
     """Authentication request for clinical dashboard access."""
+
     username: str = Field(..., description="Username for authentication")
     password: str = Field(..., description="Password for authentication")
 
 
 class DashboardResponse(BaseModel):
     """Dashboard data response model."""
+
     status: str = Field(..., description="Response status")
     data: dict[str, Any] = Field(..., description="Dashboard data")
     timestamp: str = Field(..., description="Response timestamp")
@@ -40,6 +42,7 @@ class DashboardResponse(BaseModel):
 
 class MetricResponse(BaseModel):
     """Metric collection response model."""
+
     status: str = Field(..., description="Response status")
     message: str = Field(..., description="Response message")
     metric_id: str | None = Field(None, description="Metric identifier")
@@ -47,6 +50,7 @@ class MetricResponse(BaseModel):
 
 class ServiceStatusResponse(BaseModel):
     """Service status response model."""
+
     status: str = Field(..., description="Overall service status")
     services: dict[str, Any] = Field(..., description="Individual service statuses")
     timestamp: str = Field(..., description="Status check timestamp")
@@ -82,16 +86,15 @@ async def authenticate_user(
                 "authenticated": True,
             }
         else:
-            raise HTTPException(
-                status_code=401,
-                detail="Invalid username or password"
-            )
+            raise HTTPException(status_code=401, detail="Invalid username or password")
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error during authentication: {e}")
-        raise HTTPException(status_code=500, detail="Authentication service error")
+        raise HTTPException(
+            status_code=500, detail="Authentication service error"
+        ) from e
 
 
 @router.get("/dashboard/{user_id}", response_model=DashboardResponse)
@@ -134,7 +137,7 @@ async def get_dashboard_data(
         raise
     except Exception as e:
         logger.error(f"Error getting dashboard data: {e}")
-        raise HTTPException(status_code=500, detail="Dashboard service error")
+        raise HTTPException(status_code=500, detail="Dashboard service error") from e
 
 
 @router.post("/metrics/collect", response_model=MetricResponse)
@@ -149,7 +152,9 @@ async def collect_metric(
     and analytics processing.
     """
     try:
-        logger.info(f"Metric collection for user {request.user_id}: {request.metric_type}")
+        logger.info(
+            f"Metric collection for user {request.user_id}: {request.metric_type}"
+        )
 
         # Collect metric
         result = await controller.collect_metric(request)
@@ -164,7 +169,9 @@ async def collect_metric(
         raise
     except Exception as e:
         logger.error(f"Error collecting metric: {e}")
-        raise HTTPException(status_code=500, detail="Metric collection service error")
+        raise HTTPException(
+            status_code=500, detail="Metric collection service error"
+        ) from e
 
 
 @router.post("/outcomes/record", response_model=dict[str, Any])
@@ -179,7 +186,9 @@ async def record_outcome_measurement(
     and treatment effectiveness tracking.
     """
     try:
-        logger.info(f"Outcome measurement for user {request.user_id}: {request.measure_type}")
+        logger.info(
+            f"Outcome measurement for user {request.user_id}: {request.measure_type}"
+        )
 
         # Record outcome measurement
         result = await controller.record_outcome_measurement(request)
@@ -190,13 +199,17 @@ async def record_outcome_measurement(
         raise
     except Exception as e:
         logger.error(f"Error recording outcome measurement: {e}")
-        raise HTTPException(status_code=500, detail="Outcome measurement service error")
+        raise HTTPException(
+            status_code=500, detail="Outcome measurement service error"
+        ) from e
 
 
 @router.get("/metrics/real-time/{user_id}", response_model=dict[str, Any])
 async def get_real_time_metrics(
     user_id: str,
-    metric_types: list[str] | None = Query(None, description="Specific metric types to retrieve"),
+    metric_types: list[str] | None = Query(
+        None, description="Specific metric types to retrieve"
+    ),
     controller: ClinicalDashboardController = Depends(get_dashboard_controller),
 ) -> dict[str, Any]:
     """
@@ -217,7 +230,9 @@ async def get_real_time_metrics(
             try:
                 parsed_metric_types = [MetricType(mt.lower()) for mt in metric_types]
             except ValueError as e:
-                raise HTTPException(status_code=400, detail=f"Invalid metric type: {e}")
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid metric type: {e}"
+                ) from e
 
         # Get metrics
         metrics = await controller.monitoring_service.get_real_time_metrics(
@@ -235,7 +250,9 @@ async def get_real_time_metrics(
         raise
     except Exception as e:
         logger.error(f"Error getting real-time metrics: {e}")
-        raise HTTPException(status_code=500, detail="Real-time metrics service error")
+        raise HTTPException(
+            status_code=500, detail="Real-time metrics service error"
+        ) from e
 
 
 @router.get("/analytics/{user_id}", response_model=dict[str, Any])
@@ -255,10 +272,13 @@ async def get_analytics_report(
 
         # Parse timeframe
         from .therapeutic_monitoring_service import AnalyticsTimeframe
+
         try:
             parsed_timeframe = AnalyticsTimeframe(timeframe.lower())
-        except ValueError:
-            raise HTTPException(status_code=400, detail=f"Invalid timeframe: {timeframe}")
+        except ValueError as e:
+            raise HTTPException(
+                status_code=400, detail=f"Invalid timeframe: {timeframe}"
+            ) from e
 
         # Generate analytics report
         report = await controller.monitoring_service.generate_analytics_report(
@@ -284,7 +304,7 @@ async def get_analytics_report(
         raise
     except Exception as e:
         logger.error(f"Error getting analytics report: {e}")
-        raise HTTPException(status_code=500, detail="Analytics service error")
+        raise HTTPException(status_code=500, detail="Analytics service error") from e
 
 
 @router.get("/outcomes/{user_id}", response_model=dict[str, Any])
@@ -306,10 +326,13 @@ async def get_outcome_progress(
         parsed_measure_type = None
         if measure_type:
             from .therapeutic_monitoring_service import OutcomeMeasure
+
             try:
                 parsed_measure_type = OutcomeMeasure(measure_type.lower())
-            except ValueError:
-                raise HTTPException(status_code=400, detail=f"Invalid measure type: {measure_type}")
+            except ValueError as e:
+                raise HTTPException(
+                    status_code=400, detail=f"Invalid measure type: {measure_type}"
+                ) from e
 
         # Get outcome progress
         progress = await controller.monitoring_service.get_outcome_progress(
@@ -327,7 +350,9 @@ async def get_outcome_progress(
         raise
     except Exception as e:
         logger.error(f"Error getting outcome progress: {e}")
-        raise HTTPException(status_code=500, detail="Outcome progress service error")
+        raise HTTPException(
+            status_code=500, detail="Outcome progress service error"
+        ) from e
 
 
 @router.get("/status", response_model=ServiceStatusResponse)

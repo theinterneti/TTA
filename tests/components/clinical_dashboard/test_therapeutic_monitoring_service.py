@@ -10,12 +10,6 @@ from datetime import datetime, timedelta, timezone
 import pytest
 import pytest_asyncio
 
-
-def utc_now() -> datetime:
-    """Get current UTC time with timezone awareness."""
-    return datetime.now(timezone.utc)
-
-
 from src.components.clinical_dashboard.therapeutic_monitoring_service import (
     AnalyticsTimeframe,
     MetricDataPoint,
@@ -23,6 +17,11 @@ from src.components.clinical_dashboard.therapeutic_monitoring_service import (
     OutcomeMeasure,
     TherapeuticMonitoringService,
 )
+
+
+def utc_now() -> datetime:
+    """Get current UTC time with timezone awareness."""
+    return datetime.now(timezone.utc)
 
 
 class TestTherapeuticMonitoringService:
@@ -236,10 +235,11 @@ class TestTherapeuticMonitoringService:
             "progress": {"latest_value": 0.7},  # Good progress - protective
         }
 
-        risk_factors, protective_factors = (
-            await monitoring_service._identify_risk_protective_factors(
-                user_id, metrics_summary
-            )
+        (
+            risk_factors,
+            protective_factors,
+        ) = await monitoring_service._identify_risk_protective_factors(
+            user_id, metrics_summary
         )
 
         # Verify risk factors identified

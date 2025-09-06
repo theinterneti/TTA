@@ -392,7 +392,6 @@ class GatewayCore:
                 data=gateway_request.body,
                 timeout=aiohttp.ClientTimeout(total=route_rule.timeout),
             ) as response:
-
                 # Read response
                 response_body = await response.read()
 
@@ -421,7 +420,7 @@ class GatewayCore:
                     "error": str(e),
                 },
             )
-            raise Exception(f"Service connection error: {target_service.name}")
+            raise Exception(f"Service connection error: {target_service.name}") from e
 
     def _transform_request_path(self, original_path: str, route_rule: RouteRule) -> str:
         """
@@ -444,7 +443,7 @@ class GatewayCore:
                 # Replace placeholders in rewrite pattern
                 transformed_path = route_rule.path_rewrite
                 for i, group in enumerate(match.groups()):
-                    transformed_path = transformed_path.replace(f"${i+1}", group)
+                    transformed_path = transformed_path.replace(f"${i + 1}", group)
                 return transformed_path
 
         return original_path

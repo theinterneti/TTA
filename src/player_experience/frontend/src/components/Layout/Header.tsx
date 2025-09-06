@@ -7,7 +7,7 @@ import { logout } from "../../store/slices/authSlice";
 const Header: React.FC = () => {
   const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-  const { profile } = useSelector((state: RootState) => state.player);
+  // Profile data removed - not used in header component
   const { selectedCharacter } = useSelector(
     (state: RootState) => state.character
   );

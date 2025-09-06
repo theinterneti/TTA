@@ -18,6 +18,16 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from .character_arc_interfaces import (
+    CharacterArc,
+    CharacterArcIntegrationInterface,
+    CharacterArcManagerInterface,
+    InteractionContext,
+    PlayerInteraction,
+    RelationshipState,
+    RelationshipType,
+)
+
 # Add tta.prototype path for imports
 prototype_path = Path(__file__).parent.parent.parent / "tta.prototype"
 if str(prototype_path) not in sys.path:
@@ -56,16 +66,6 @@ except ImportError as e:
             for k, v in kwargs.items():
                 setattr(self, k, v)
 
-
-from components.character_arc_interfaces import (
-    CharacterArc,
-    CharacterArcIntegrationInterface,
-    CharacterArcManagerInterface,
-    InteractionContext,
-    PlayerInteraction,
-    RelationshipState,
-    RelationshipType,
-)
 
 logger = logging.getLogger(__name__)
 

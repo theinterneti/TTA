@@ -24,12 +24,12 @@ interface WorldDetails extends WorldSummary {
   };
 }
 
-interface CompatibilityReport {
-  compatibility_score: number;
-  strengths: string[];
-  concerns: string[];
-  recommendations: string[];
-}
+// interface CompatibilityReport {
+//   compatibility_score: number;
+//   strengths: string[];
+//   concerns: string[];
+//   recommendations: string[];
+// } // TODO: Implement compatibility reporting feature
 
 interface WorldParameters {
   therapeutic_intensity: "LOW" | "MEDIUM" | "HIGH";

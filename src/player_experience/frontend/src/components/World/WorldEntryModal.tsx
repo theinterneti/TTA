@@ -110,7 +110,10 @@ const WorldEntryModal: React.FC<WorldEntryModalProps> = ({
       setEntering(true);
       setEntryError(null);
 
-      const response = await nexusAPI.enterWorld(worldId, entryData);
+      const response = await nexusAPI.enterWorld(worldId, {
+        ...entryData,
+        user_id: user?.id,
+      });
 
       // Handle successful entry
       onEntrySuccess(response as any);

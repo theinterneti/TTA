@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useAuthGuard } from './useAuthGuard';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useAuthGuard } from "./useAuthGuard";
 
 export interface RealTimeUpdate {
-  type: 'world_stats' | 'narrative_strength' | 'player_count' | 'system_status';
+  type: "world_stats" | "narrative_strength" | "player_count" | "system_status";
   data: any;
   timestamp: string;
-  source: 'websocket' | 'polling';
+  source: "websocket" | "polling";
 }
 
 export interface WorldStatistics {
@@ -38,7 +38,7 @@ export interface UseRealTimeUpdatesResult {
     narrativeStrength: number;
     systemHealth: string;
   } | null;
-  connectionType: 'websocket' | 'polling' | 'none';
+  connectionType: "websocket" | "polling" | "none";
   error: string | null;
   reconnect: () => void;
   clearError: () => void;
@@ -73,14 +73,18 @@ export const useRealTimeUpdates = (
 
   const [isConnected, setIsConnected] = useState(false);
   const [lastUpdate, setLastUpdate] = useState<RealTimeUpdate | null>(null);
-  const [worldStats, setWorldStats] = useState<Map<string, WorldStatistics>>(new Map());
+  const [worldStats, setWorldStats] = useState<Map<string, WorldStatistics>>(
+    new Map()
+  );
   const [globalStats, setGlobalStats] = useState<{
     totalPlayers: number;
     activeWorlds: number;
     narrativeStrength: number;
     systemHealth: string;
   } | null>(null);
-  const [connectionType, setConnectionType] = useState<'websocket' | 'polling' | 'none'>('none');
+  const [connectionType, setConnectionType] = useState<
+    "websocket" | "polling" | "none"
+  >("none");
   const [error, setError] = useState<string | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
@@ -92,134 +96,48 @@ export const useRealTimeUpdates = (
   /**
    * Process incoming real-time update
    */
-  const processUpdate = useCallback((update: RealTimeUpdate) => {
-    if (!mountedRef.current) return;
+  const processUpdate = useCallback(
+    (update: RealTimeUpdate) => {
+      if (!mountedRef.current) return;
 
-    setLastUpdate(update);
+      setLastUpdate(update);
 
-    switch (update.type) {
-      case 'world_stats':
-        if (update.data.world_id) {
-          setWorldStats(prev => {
-            const newMap = new Map(prev);
-            newMap.set(update.data.world_id, update.data);
-            return newMap;
-          });
-        }
-        break;
+      switch (update.type) {
+        case "world_stats":
+          if (update.data.world_id) {
+            setWorldStats((prev) => {
+              const newMap = new Map(prev);
+              newMap.set(update.data.world_id, update.data);
+              return newMap;
+            });
+          }
+          break;
 
-      case 'narrative_strength':
-      case 'player_count':
-      case 'system_status':
-        setGlobalStats(prev => ({
-          ...prev,
-          ...update.data,
-        }));
-        break;
-    }
-
-    onUpdate?.(update);
-  }, [onUpdate]);
-
-  /**
-   * WebSocket connection management
-   */
-  const connectWebSocket = useCallback(() => {
-    if (!enableWebSocket || !isAuthenticated) return;
-
-    try {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/api/v1/ws/updates`;
-
-      wsRef.current = new WebSocket(wsUrl);
-
-      wsRef.current.onopen = () => {
-        if (!mountedRef.current) return;
-
-        console.log('WebSocket connected for real-time updates');
-        setIsConnected(true);
-        setConnectionType('websocket');
-        setError(null);
-        reconnectCountRef.current = 0;
-        onConnectionChange?.(true);
-      };
-
-      wsRef.current.onmessage = (event) => {
-        if (!mountedRef.current) return;
-
-        try {
-          const update: RealTimeUpdate = {
-            ...JSON.parse(event.data),
-            source: 'websocket',
-            timestamp: new Date().toISOString(),
-          };
-          processUpdate(update);
-        } catch (err) {
-          console.error('Failed to parse WebSocket message:', err);
-        }
-      };
-
-      wsRef.current.onclose = (event) => {
-        if (!mountedRef.current) return;
-
-        console.log('WebSocket disconnected:', event.code, event.reason);
-        setIsConnected(false);
-        onConnectionChange?.(false);
-
-        // Attempt reconnection if not a clean close
-        if (event.code !== 1000 && reconnectCountRef.current < reconnectAttempts) {
-          reconnectCountRef.current++;
-          const delay = reconnectDelay * Math.pow(2, reconnectCountRef.current - 1);
-
-          console.log(`Attempting WebSocket reconnection ${reconnectCountRef.current}/${reconnectAttempts} in ${delay}ms`);
-
-          reconnectTimeoutRef.current = setTimeout(() => {
-            if (mountedRef.current) {
-              connectWebSocket();
-            }
-          }, delay);
-        } else if (enablePolling) {
-          // Fallback to polling
-          console.log('WebSocket reconnection failed, falling back to polling');
-          setConnectionType('polling');
-          startPolling();
-        } else {
-          setConnectionType('none');
-        }
-      };
-
-      wsRef.current.onerror = (error) => {
-        if (!mountedRef.current) return;
-
-        console.error('WebSocket error:', error);
-        const errorMessage = 'WebSocket connection failed';
-        setError(errorMessage);
-        onError?.(new Error(errorMessage));
-      };
-
-    } catch (err: any) {
-      console.error('Failed to create WebSocket connection:', err);
-      setError(err.message);
-      onError?.(err);
-
-      if (enablePolling) {
-        setConnectionType('polling');
-        startPolling();
+        case "narrative_strength":
+        case "player_count":
+        case "system_status":
+          setGlobalStats((prev) => ({
+            ...prev,
+            ...update.data,
+          }));
+          break;
       }
-    }
-  }, [enableWebSocket, isAuthenticated, reconnectAttempts, reconnectDelay, enablePolling, onConnectionChange, onError, processUpdate]);
+
+      onUpdate?.(update);
+    },
+    [onUpdate]
+  );
 
   /**
-   * Polling mechanism for real-time updates
+   * Polling functions - defined before useEffect to avoid hoisting issues
    */
   const fetchUpdates = useCallback(async () => {
     if (!isAuthenticated) return;
 
     try {
-      // Fetch global stats
-      const response = await fetch('/api/v1/nexus/stats/realtime', {
+      const response = await fetch("/api/nexus/status", {
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -230,10 +148,10 @@ export const useRealTimeUpdates = (
       const data = await response.json();
 
       const update: RealTimeUpdate = {
-        type: 'system_status',
+        type: "system_status",
         data,
         timestamp: new Date().toISOString(),
-        source: 'polling',
+        source: "polling",
       };
 
       processUpdate(update);
@@ -245,7 +163,7 @@ export const useRealTimeUpdates = (
 
       setError(null);
     } catch (err: any) {
-      console.error('Polling update failed:', err);
+      console.error("Polling update failed:", err);
       setError(err.message);
       onError?.(err);
 
@@ -254,7 +172,13 @@ export const useRealTimeUpdates = (
         onConnectionChange?.(false);
       }
     }
-  }, [isAuthenticated, isConnected, processUpdate, onConnectionChange, onError]);
+  }, [
+    isAuthenticated,
+    isConnected,
+    processUpdate,
+    onConnectionChange,
+    onError,
+  ]);
 
   const startPolling = useCallback(() => {
     if (!enablePolling || pollingIntervalRef.current) return;
@@ -272,6 +196,113 @@ export const useRealTimeUpdates = (
       pollingIntervalRef.current = null;
     }
   }, []);
+
+  /**
+   * WebSocket connection management
+   */
+  const connectWebSocket = useCallback(() => {
+    if (!enableWebSocket || !isAuthenticated) return;
+
+    try {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const wsUrl = `${protocol}//${window.location.host}/api/v1/ws/updates`;
+
+      wsRef.current = new WebSocket(wsUrl);
+
+      wsRef.current.onopen = () => {
+        if (!mountedRef.current) return;
+
+        console.log("WebSocket connected for real-time updates");
+        setIsConnected(true);
+        setConnectionType("websocket");
+        setError(null);
+        reconnectCountRef.current = 0;
+        onConnectionChange?.(true);
+      };
+
+      wsRef.current.onmessage = (event) => {
+        if (!mountedRef.current) return;
+
+        try {
+          const update: RealTimeUpdate = {
+            ...JSON.parse(event.data),
+            source: "websocket",
+            timestamp: new Date().toISOString(),
+          };
+          processUpdate(update);
+        } catch (err) {
+          console.error("Failed to parse WebSocket message:", err);
+        }
+      };
+
+      wsRef.current.onclose = (event) => {
+        if (!mountedRef.current) return;
+
+        console.log("WebSocket disconnected:", event.code, event.reason);
+        setIsConnected(false);
+        onConnectionChange?.(false);
+
+        // Attempt reconnection if not a clean close
+        if (
+          event.code !== 1000 &&
+          reconnectCountRef.current < reconnectAttempts
+        ) {
+          reconnectCountRef.current++;
+          const delay =
+            reconnectDelay * Math.pow(2, reconnectCountRef.current - 1);
+
+          console.log(
+            `Attempting WebSocket reconnection ${reconnectCountRef.current}/${reconnectAttempts} in ${delay}ms`
+          );
+
+          reconnectTimeoutRef.current = setTimeout(() => {
+            if (mountedRef.current) {
+              connectWebSocket();
+            }
+          }, delay);
+        } else if (enablePolling) {
+          // Fallback to polling
+          console.log("WebSocket reconnection failed, falling back to polling");
+          setConnectionType("polling");
+          startPolling();
+        } else {
+          setConnectionType("none");
+        }
+      };
+
+      wsRef.current.onerror = (error) => {
+        if (!mountedRef.current) return;
+
+        console.error("WebSocket error:", error);
+        const errorMessage = "WebSocket connection failed";
+        setError(errorMessage);
+        onError?.(new Error(errorMessage));
+      };
+    } catch (err: any) {
+      console.error("Failed to create WebSocket connection:", err);
+      setError(err.message);
+      onError?.(err);
+
+      if (enablePolling) {
+        setConnectionType("polling");
+        startPolling();
+      }
+    }
+  }, [
+    enableWebSocket,
+    isAuthenticated,
+    reconnectAttempts,
+    reconnectDelay,
+    enablePolling,
+    onConnectionChange,
+    onError,
+    processUpdate,
+    startPolling,
+  ]);
+
+  // fetchUpdates function moved above to avoid hoisting issues
+
+  // Polling functions moved above to avoid hoisting issues
 
   /**
    * Manual reconnection
@@ -295,10 +326,16 @@ export const useRealTimeUpdates = (
     if (enableWebSocket) {
       connectWebSocket();
     } else if (enablePolling) {
-      setConnectionType('polling');
+      setConnectionType("polling");
       startPolling();
     }
-  }, [enableWebSocket, enablePolling, connectWebSocket, startPolling, stopPolling]);
+  }, [
+    enableWebSocket,
+    enablePolling,
+    connectWebSocket,
+    startPolling,
+    stopPolling,
+  ]);
 
   /**
    * Clear error state
@@ -313,14 +350,14 @@ export const useRealTimeUpdates = (
   useEffect(() => {
     if (!isAuthenticated) {
       setIsConnected(false);
-      setConnectionType('none');
+      setConnectionType("none");
       return;
     }
 
     if (enableWebSocket) {
       connectWebSocket();
     } else if (enablePolling) {
-      setConnectionType('polling');
+      setConnectionType("polling");
       startPolling();
     }
 
@@ -337,7 +374,14 @@ export const useRealTimeUpdates = (
         clearTimeout(reconnectTimeoutRef.current);
       }
     };
-  }, [isAuthenticated, enableWebSocket, enablePolling, connectWebSocket, startPolling, stopPolling]);
+  }, [
+    isAuthenticated,
+    enableWebSocket,
+    enablePolling,
+    connectWebSocket,
+    startPolling,
+    stopPolling,
+  ]);
 
   /**
    * Cleanup on unmount

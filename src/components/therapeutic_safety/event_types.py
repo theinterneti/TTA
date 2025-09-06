@@ -24,16 +24,19 @@ from .enums import (
 
 class EventType(Enum):
     """Event types for safety validation."""
+
     SAFETY_VALIDATION_STARTED = "safety_validation_started"
     SAFETY_VALIDATION_COMPLETED = "safety_validation_completed"
     CRISIS_DETECTED = "crisis_detected"
     VALIDATION_FAILED = "validation_failed"
+    VALIDATION_TIMEOUT = "validation_timeout"
     BIAS_DETECTED = "bias_detected"
     THERAPEUTIC_ALIGNMENT_CHECKED = "therapeutic_alignment_checked"
 
 
 class EventPriority(Enum):
     """Priority levels for events."""
+
     LOW = "low"
     NORMAL = "normal"
     HIGH = "high"
@@ -66,12 +69,14 @@ class BaseSafetyEvent:
             self.context = {}
 
         # Add basic event metadata to context
-        self.context.update({
-            "event_id": self.event_id,
-            "event_type": self.event_type.value,
-            "timestamp": self.timestamp.isoformat(),
-            "priority": self.priority.value,
-        })
+        self.context.update(
+            {
+                "event_id": self.event_id,
+                "event_type": self.event_type.value,
+                "timestamp": self.timestamp.isoformat(),
+                "priority": self.priority.value,
+            }
+        )
 
 
 @dataclass
@@ -87,13 +92,15 @@ class SafetyValidationEvent(BaseSafetyEvent):
     def __post_init__(self):
         super().__post_init__()
         # Add safety-specific data to context
-        self.context.update({
-            "content_id": self.content_id,
-            "validation_id": self.validation_id,
-            "validation_action": self.validation_action.value,
-            "safety_level": self.safety_level.value,
-            "confidence_score": self.confidence_score,
-        })
+        self.context.update(
+            {
+                "content_id": self.content_id,
+                "validation_id": self.validation_id,
+                "validation_action": self.validation_action.value,
+                "safety_level": self.safety_level.value,
+                "confidence_score": self.confidence_score,
+            }
+        )
 
 
 @dataclass
@@ -110,15 +117,19 @@ class CrisisDetectionEvent(BaseSafetyEvent):
 
     def __post_init__(self):
         super().__post_init__()
-        self.context.update({
-            "content_id": self.content_id,
-            "validation_id": self.validation_id,
-            "crisis_level": self.crisis_level.value,
-            "risk_categories": [risk.value for risk in self.risk_categories],
-            "protective_factors": [factor.value for factor in self.protective_factors],
-            "immediate_intervention_needed": self.immediate_intervention_needed,
-            "crisis_indicators": self.crisis_indicators,
-        })
+        self.context.update(
+            {
+                "content_id": self.content_id,
+                "validation_id": self.validation_id,
+                "crisis_level": self.crisis_level.value,
+                "risk_categories": [risk.value for risk in self.risk_categories],
+                "protective_factors": [
+                    factor.value for factor in self.protective_factors
+                ],
+                "immediate_intervention_needed": self.immediate_intervention_needed,
+                "crisis_indicators": self.crisis_indicators,
+            }
+        )
 
 
 @dataclass
@@ -134,14 +145,41 @@ class ValidationFailureEvent(BaseSafetyEvent):
 
     def __post_init__(self):
         super().__post_init__()
-        self.context.update({
-            "content_id": self.content_id,
-            "validation_id": self.validation_id,
-            "failure_reason": self.failure_reason,
-            "component_failures": [comp.value for comp in self.component_failures],
-            "retry_count": self.retry_count,
-            "max_retries_exceeded": self.max_retries_exceeded,
-        })
+        self.context.update(
+            {
+                "content_id": self.content_id,
+                "validation_id": self.validation_id,
+                "failure_reason": self.failure_reason,
+                "component_failures": [comp.value for comp in self.component_failures],
+                "retry_count": self.retry_count,
+                "max_retries_exceeded": self.max_retries_exceeded,
+            }
+        )
+
+
+@dataclass
+class ValidationTimeoutEvent(BaseSafetyEvent):
+    """Event for validation timeouts."""
+
+    content_id: str = field(default="")
+    validation_id: str = field(default="")
+    timeout_ms: int = field(default=0)
+    completed_components: list[ValidationComponent] = field(default_factory=list)
+    pending_components: list[ValidationComponent] = field(default_factory=list)
+
+    def __post_init__(self):
+        super().__post_init__()
+        self.context.update(
+            {
+                "content_id": self.content_id,
+                "validation_id": self.validation_id,
+                "timeout_ms": self.timeout_ms,
+                "completed_components": [
+                    comp.value for comp in self.completed_components
+                ],
+                "pending_components": [comp.value for comp in self.pending_components],
+            }
+        )
 
 
 @dataclass
@@ -157,14 +195,16 @@ class BiasDetectionEvent(BaseSafetyEvent):
 
     def __post_init__(self):
         super().__post_init__()
-        self.context.update({
-            "content_id": self.content_id,
-            "validation_id": self.validation_id,
-            "bias_types": [bias.value for bias in self.bias_types],
-            "bias_confidence": self.bias_confidence,
-            "bias_indicators": self.bias_indicators,
-            "mitigation_suggestions": self.mitigation_suggestions,
-        })
+        self.context.update(
+            {
+                "content_id": self.content_id,
+                "validation_id": self.validation_id,
+                "bias_types": [bias.value for bias in self.bias_types],
+                "bias_confidence": self.bias_confidence,
+                "bias_indicators": self.bias_indicators,
+                "mitigation_suggestions": self.mitigation_suggestions,
+            }
+        )
 
 
 # Event factory functions
@@ -245,6 +285,28 @@ def create_validation_failure_event(
     )
 
 
+def create_validation_timeout_event(
+    session_id: str,
+    user_id: str,
+    content_id: str,
+    validation_id: str,
+    timeout_ms: int,
+    completed_components: list[ValidationComponent] = None,
+    **kwargs,
+) -> ValidationTimeoutEvent:
+    """Create a validation timeout event."""
+    return ValidationTimeoutEvent(
+        event_type=EventType.VALIDATION_TIMEOUT,
+        session_id=session_id,
+        user_id=user_id,
+        content_id=content_id,
+        validation_id=validation_id,
+        timeout_ms=timeout_ms,
+        completed_components=completed_components or [],
+        **kwargs,
+    )
+
+
 # Export all event types and utilities
 __all__ = [
     "EventType",
@@ -253,8 +315,10 @@ __all__ = [
     "SafetyValidationEvent",
     "CrisisDetectionEvent",
     "ValidationFailureEvent",
+    "ValidationTimeoutEvent",
     "BiasDetectionEvent",
     "create_safety_event",
     "create_crisis_event",
     "create_validation_failure_event",
+    "create_validation_timeout_event",
 ]

@@ -5,7 +5,12 @@ Tool execution metrics aggregator for dynamic tools.
 from __future__ import annotations
 
 import time
+import time as _time
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import wraps
+from typing import Any, TypeVar
 
 
 @dataclass
@@ -79,11 +84,6 @@ class ToolMetrics:
 
 
 # Lightweight decorator and context manager for automatic metrics
-import time as _time
-from collections.abc import Callable, Generator
-from contextlib import contextmanager
-from functools import wraps
-from typing import Any, TypeVar
 
 F = TypeVar("F", bound=Callable[..., Any])
 

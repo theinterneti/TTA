@@ -5,7 +5,8 @@ import { WorldDetailsModal } from "../components/World";
 import { useAuthGuard } from "../hooks/useAuthGuard";
 
 const SearchPage: React.FC = () => {
-  const { isAuthenticated, user } = useAuthGuard({ autoRedirect: true });
+  const { isAuthenticated } = useAuthGuard({ autoRedirect: true });
+  // user removed - not used in this component
   const [selectedWorldId, setSelectedWorldId] = useState<string | null>(null);
   const [showWorldDetails, setShowWorldDetails] = useState(false);
 

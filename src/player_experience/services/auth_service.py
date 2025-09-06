@@ -247,7 +247,7 @@ class MFAService:
 
 
 class EnhancedAuthService:
-    """Enhanced authentication service with MFA and RBAC."""
+    """Enhanced authentication service with MFA, RBAC, and OAuth support."""
 
     def __init__(
         self,
@@ -258,6 +258,7 @@ class EnhancedAuthService:
         refresh_token_expire_days: int = 7,
         security_settings: SecuritySettings | None = None,
         mfa_config: MFAConfig | None = None,
+        enable_oauth: bool = True,
     ):
         """
         Initialize the Enhanced Authentication Service.
@@ -283,6 +284,17 @@ class EnhancedAuthService:
         self.security_service = SecurityService(self.security_settings)
         self.mfa_service = MFAService(self.mfa_config)
 
+        # Initialize OAuth service if enabled
+        self.oauth_service = None
+        if enable_oauth:
+            try:
+                from .oauth_service import OAuthService
+
+                self.oauth_service = OAuthService()
+                logger.info("OAuth service initialized for dual authentication")
+            except ImportError as e:
+                logger.warning(f"OAuth service not available: {e}")
+
         # In-memory stores (in production, use Redis or database)
         self.active_sessions: dict[str, SessionInfo] = {}
         self.failed_login_attempts: dict[str, list[datetime]] = {}
@@ -291,6 +303,9 @@ class EnhancedAuthService:
 
         # In-memory user store fallback when database is unavailable
         self.in_memory_users: dict[str, User] = {}
+
+        # OAuth user linking storage (provider_id -> user_id mapping)
+        self.oauth_user_links: dict[str, str] = {}
 
     def register_user(self, registration: UserRegistration) -> tuple[bool, list[str]]:
         """
@@ -824,3 +839,262 @@ class EnhancedAuthService:
         for session in self.active_sessions.values():
             if session.user_id == user_id:
                 session.is_active = False
+
+    # OAuth Authentication Methods
+    def get_oauth_authorization_url(
+        self,
+        provider: str,
+        interface_type: str = "patient",
+        custom_redirect_uri: str | None = None,
+    ) -> dict[str, str]:
+        """Get OAuth authorization URL for dual authentication system."""
+        if not self.oauth_service:
+            raise AuthenticationError("OAuth service not available")
+
+        try:
+            from .oauth_service import OAuthProvider
+
+            oauth_provider = OAuthProvider(provider)
+
+            return self.oauth_service.get_authorization_url(
+                oauth_provider, interface_type, custom_redirect_uri
+            )
+        except ValueError as e:
+            raise AuthenticationError(f"Invalid OAuth provider: {e}")
+
+    async def authenticate_with_oauth(
+        self,
+        provider: str,
+        authorization_code: str,
+        state: str,
+        interface_type: str = "patient",
+    ) -> AuthenticatedUser:
+        """Authenticate user with OAuth and convert to internal JWT."""
+        if not self.oauth_service:
+            raise AuthenticationError("OAuth service not available")
+
+        try:
+            from .oauth_service import OAuthProvider
+
+            oauth_provider = OAuthProvider(provider)
+
+            # Exchange code for tokens
+            oauth_tokens = await self.oauth_service.exchange_code_for_tokens(
+                oauth_provider, authorization_code, state
+            )
+
+            # Get user info from OAuth provider
+            oauth_user_info = await self.oauth_service.get_user_info(
+                oauth_provider, oauth_tokens
+            )
+
+            # Find or create user
+            user = await self._find_or_create_oauth_user(
+                oauth_user_info, interface_type
+            )
+
+            # Get role permissions
+            role_permissions = DEFAULT_ROLE_PERMISSIONS.get(user.role)
+            permissions = role_permissions.permissions if role_permissions else []
+
+            # Create authenticated user first
+            authenticated_user = AuthenticatedUser(
+                user_id=user.user_id,
+                username=user.username,
+                email=user.email,
+                role=user.role,
+                permissions=permissions,
+                mfa_verified=True,  # OAuth providers handle MFA
+            )
+
+            # Create session
+            session_id = self.create_session(
+                authenticated_user, "oauth", "oauth_client"
+            )
+            authenticated_user.session_id = session_id
+
+            # Log successful OAuth authentication
+            self.log_security_event(
+                SecurityEvent(
+                    event_type="oauth_authentication",
+                    user_id=user.user_id,
+                    details={
+                        "provider": provider,
+                        "interface_type": interface_type,
+                        "email": oauth_user_info.email,
+                    },
+                    severity="info",
+                )
+            )
+
+            return authenticated_user
+
+        except Exception as e:
+            logger.error(f"OAuth authentication failed: {e}")
+            raise AuthenticationError(f"OAuth authentication failed: {str(e)}")
+
+    def get_oauth_providers(self) -> list[dict[str, str]]:
+        """Get list of enabled OAuth providers."""
+        if not self.oauth_service:
+            return []
+
+        providers = []
+        for provider in self.oauth_service.get_enabled_providers():
+            providers.append(
+                {
+                    "id": provider.value,
+                    "name": provider.value.title(),
+                    "enabled": True,
+                }
+            )
+
+        return providers
+
+    async def _find_or_create_oauth_user(
+        self, oauth_user_info, interface_type: str = "patient"
+    ) -> User:
+        """Find existing user or create new user from OAuth info."""
+        # Create provider-specific user ID
+        provider_user_key = (
+            f"{oauth_user_info.provider.value}:{oauth_user_info.provider_user_id}"
+        )
+
+        # Check if user is already linked
+        if provider_user_key in self.oauth_user_links:
+            user_id = self.oauth_user_links[provider_user_key]
+
+            # Try to get user from database
+            if self.user_repository:
+                try:
+                    user = self.user_repository.get_user_by_id(user_id)
+                    if user:
+                        return user
+                except Exception as e:
+                    logger.warning(f"Failed to get linked OAuth user: {e}")
+
+            # Check in-memory store
+            for user in self.in_memory_users.values():
+                if user.user_id == user_id:
+                    return user
+
+        # Check if user exists by email
+        existing_user = None
+        if oauth_user_info.email:
+            if self.user_repository:
+                try:
+                    existing_user = self.user_repository.get_user_by_email(
+                        oauth_user_info.email
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to check existing user by email: {e}")
+
+            # Check in-memory store
+            if not existing_user:
+                for user in self.in_memory_users.values():
+                    if user.email == oauth_user_info.email:
+                        existing_user = user
+                        break
+
+        if existing_user:
+            # Link existing user to OAuth provider
+            self.oauth_user_links[provider_user_key] = existing_user.user_id
+            logger.info(
+                f"Linked existing user {existing_user.username} to OAuth provider {oauth_user_info.provider.value}"
+            )
+            return existing_user
+
+        # Create new user from OAuth info
+        return await self._create_oauth_user(oauth_user_info, interface_type)
+
+    async def _create_oauth_user(self, oauth_user_info, interface_type: str) -> User:
+        """Create new user from OAuth information."""
+        from uuid import uuid4
+
+        # Determine role based on interface type
+        if interface_type == "clinical":
+            role = UserRole.THERAPIST
+        elif interface_type == "admin":
+            role = UserRole.ADMIN
+        else:
+            role = UserRole.PLAYER  # Default for casual users/patients
+
+        # Generate username from OAuth info
+        username = self._generate_oauth_username(oauth_user_info)
+
+        # Create user
+        user = User(
+            user_id=str(uuid4()),
+            username=username,
+            email=oauth_user_info.email or f"{username}@oauth.local",
+            password_hash="",  # No password for OAuth users
+            role=role,
+            email_verified=oauth_user_info.verified_email,
+            created_at=datetime.now(timezone.utc),
+            account_status="active",
+            failed_login_attempts=0,
+        )
+
+        # Store user
+        if self.user_repository:
+            try:
+                self.user_repository.create_user(user)
+                logger.info(f"Created OAuth user in database: {username}")
+            except Exception as e:
+                logger.warning(f"Failed to store OAuth user in database: {e}")
+                # Fall back to in-memory storage
+                self.in_memory_users[username] = user
+        else:
+            self.in_memory_users[username] = user
+
+        # Link OAuth provider to user
+        provider_user_key = (
+            f"{oauth_user_info.provider.value}:{oauth_user_info.provider_user_id}"
+        )
+        self.oauth_user_links[provider_user_key] = user.user_id
+
+        logger.info(
+            f"Created new OAuth user: {username} ({oauth_user_info.provider.value})"
+        )
+        return user
+
+    def _generate_oauth_username(self, oauth_user_info) -> str:
+        """Generate unique username from OAuth user info."""
+        # Start with name or email prefix
+        if oauth_user_info.name:
+            base_username = oauth_user_info.name.lower().replace(" ", "_")
+        elif oauth_user_info.email:
+            base_username = oauth_user_info.email.split("@")[0].lower()
+        else:
+            base_username = f"{oauth_user_info.provider.value}_user"
+
+        # Remove special characters
+        import re
+
+        base_username = re.sub(r"[^a-z0-9_]", "", base_username)
+
+        # Ensure uniqueness
+        username = base_username
+        counter = 1
+        while self._username_exists(username):
+            username = f"{base_username}_{counter}"
+            counter += 1
+
+        return username
+
+    def _username_exists(self, username: str) -> bool:
+        """Check if username already exists."""
+        # Check database
+        if self.user_repository:
+            try:
+                user = self.user_repository.get_user_by_username(username)
+                if user:
+                    return True
+            except Exception:
+                pass
+
+        # Check in-memory store
+        return username in self.in_memory_users
+
+    def get_session_info(self, session_id: str) -> SessionInfo | None:
+        """Get session information by session ID."""
+        return self.active_sessions.get(session_id)

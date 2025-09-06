@@ -152,7 +152,7 @@ class DockerComponent(Component):
             return True
         except Exception as e:
             logger.error(f"Error checking Docker installation: {e}")
-            raise RuntimeError(f"Docker is not installed or not accessible: {e}")
+            raise RuntimeError(f"Docker is not installed or not accessible: {e}") from e
 
     @log_entry_exit
     @timing_decorator

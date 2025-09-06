@@ -366,7 +366,7 @@ export const useStatusMonitoring = (
         stopMonitoring();
       }
     };
-  }, [enableHealthChecks]); // Only depend on enableHealthChecks
+  }, [enableHealthChecks, startMonitoring, stopMonitoring]);
 
   // Computed values
   const isHealthy =

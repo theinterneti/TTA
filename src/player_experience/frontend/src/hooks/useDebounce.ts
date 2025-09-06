@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook for debouncing values
@@ -46,7 +46,7 @@ export function useDebouncedCallback<T extends (...args: any[]) => any>(
     return () => {
       clearTimeout(handler);
     };
-  }, [callback, delay, ...deps]);
+  }, [callback, delay, ...deps]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return debouncedCallback;
 }

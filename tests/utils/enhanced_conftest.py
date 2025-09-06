@@ -7,6 +7,7 @@ for the existing conftest.py fixtures, with improved error handling and reliabil
 
 import logging
 import os
+from functools import wraps
 
 import pytest
 

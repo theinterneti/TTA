@@ -477,9 +477,7 @@ class PerformanceAnalytics:
                             period_trends.values(),
                             key=lambda t: abs(t.change_percentage),
                             reverse=True,
-                        )[
-                            :10
-                        ]  # Top 10 most significant trends
+                        )[:10]  # Top 10 most significant trends
                     ],
                 }
 
@@ -710,7 +708,9 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             )
         except Exception as e:
             logger.error(f"Error getting dashboard: {e}")
-            raise HTTPException(status_code=500, detail="Failed to get dashboard data")
+            raise HTTPException(
+                status_code=500, detail="Failed to get dashboard data"
+            ) from e
 
     @router.get("/health")
     async def get_system_health():
@@ -720,7 +720,9 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return health.to_dict()
         except Exception as e:
             logger.error(f"Error getting system health: {e}")
-            raise HTTPException(status_code=500, detail="Failed to get system health")
+            raise HTTPException(
+                status_code=500, detail="Failed to get system health"
+            ) from e
 
     @router.get("/trends/{period}")
     async def get_performance_trends(period: str):
@@ -732,7 +734,7 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             logger.error(f"Error getting trends: {e}")
             raise HTTPException(
                 status_code=500, detail="Failed to get performance trends"
-            )
+            ) from e
 
     @router.get("/recommendations")
     async def get_recommendations():
@@ -741,7 +743,9 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             return await analytics._generate_recommendations()
         except Exception as e:
             logger.error(f"Error getting recommendations: {e}")
-            raise HTTPException(status_code=500, detail="Failed to get recommendations")
+            raise HTTPException(
+                status_code=500, detail="Failed to get recommendations"
+            ) from e
 
     @router.get("/statistics")
     async def get_analytics_statistics():
@@ -752,6 +756,6 @@ def create_analytics_endpoints(analytics: PerformanceAnalytics):
             logger.error(f"Error getting statistics: {e}")
             raise HTTPException(
                 status_code=500, detail="Failed to get analytics statistics"
-            )
+            ) from e
 
     return router
