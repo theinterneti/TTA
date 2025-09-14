@@ -1,0 +1,64 @@
+{
+  "integration_status": "validation_failed",
+  "overall_health_score": 0.0,
+  "component_statuses": [
+    {
+      "component_name": "narrative_engine",
+      "status": "healthy",
+      "health_score": 1.0,
+      "last_check": "2025-08-06T18:05:04.117392",
+      "error_details": null,
+      "performance_metrics": {}
+    },
+    {
+      "component_name": "character_system",
+      "status": "healthy",
+      "health_score": 1.0,
+      "last_check": "2025-08-06T18:05:04.117495",
+      "error_details": null,
+      "performance_metrics": {}
+    },
+    {
+      "component_name": "database_components",
+      "status": "error",
+      "health_score": 0.0,
+      "last_check": "2025-08-06T18:05:04.117670",
+      "error_details": "name 'RedisCache' is not defined",
+      "performance_metrics": {}
+    },
+    {
+      "component_name": "prototype_component",
+      "status": "error",
+      "health_score": 0.0,
+      "last_check": "2025-08-06T18:05:04.117778",
+      "error_details": "name 'PrototypeComponent' is not defined",
+      "performance_metrics": {}
+    },
+    {
+      "component_name": "validators",
+      "status": "healthy",
+      "health_score": 1.0,
+      "last_check": "2025-08-06T18:05:04.117832",
+      "error_details": null,
+      "performance_metrics": {}
+    }
+  ],
+  "validation_results": {
+    "error": "name 'RedisCache' is not defined"
+  },
+  "production_readiness": {
+    "error": "name 'RedisCache' is not defined"
+  },
+  "performance_metrics": {
+    "total_sessions_created": 0,
+    "total_interactions_processed": 0,
+    "average_response_time": 0.0,
+    "error_count": 0,
+    "uptime_percentage": 100.0
+  },
+  "recommendations": [
+    "Fix critical integration errors before proceeding"
+  ],
+  "generated_at": "2025-08-06T18:05:04.118093",
+  "system_uptime": "0:00:00"
+}

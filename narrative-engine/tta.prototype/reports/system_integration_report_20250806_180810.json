@@ -1,0 +1,187 @@
+{
+  "overall_status": "SYSTEM_READY_FOR_DEVELOPMENT",
+  "status_icon": "\ud83d\udee0\ufe0f",
+  "overall_score": 0.6734374999999999,
+  "execution_time": "0:00:00.074005",
+  "test_summary": {
+    "total_tests": 8,
+    "passed": 4,
+    "warnings": 2,
+    "failed": 2,
+    "success_rate": 0.5
+  },
+  "component_health": {
+    "narrative_engine": "healthy",
+    "character_system": "healthy",
+    "therapeutic_dialogue": "healthy",
+    "data_models": "error: No module named 'huggingface_hub'",
+    "database_components": "partial: cannot import name 'Neo4jManager' from 'database.neo4j_schema' (/home/thein/projects/projects/TTA/tta.prototype/database/neo4j_schema.py)"
+  },
+  "therapeutic_effectiveness": {
+    "overall_score": 0.26,
+    "scenarios_tested": 3,
+    "scenario_results": [
+      {
+        "scenario": "anxiety_management",
+        "effectiveness": 0.48,
+        "interactions": 3,
+        "total_therapeutic_value": 1.44
+      },
+      {
+        "scenario": "stress_reduction",
+        "effectiveness": 0.053333333333333344,
+        "interactions": 3,
+        "total_therapeutic_value": 0.16000000000000003
+      },
+      {
+        "scenario": "emotional_support",
+        "effectiveness": 0.24666666666666667,
+        "interactions": 3,
+        "total_therapeutic_value": 0.74
+      }
+    ]
+  },
+  "performance_metrics": {
+    "avg_session_creation_ms": 0.009059906005859375,
+    "avg_response_time_ms": 0.04311800003051758,
+    "sessions_tested": 10,
+    "responses_tested": 20,
+    "performance_score": 1.0
+  },
+  "security_validation": {
+    "overall_score": 0.8800000000000001,
+    "checks_performed": 5,
+    "security_checks": [
+      [
+        "Data Protection: Session data properly managed",
+        0.9
+      ],
+      [
+        "Privacy Compliance: User data anonymization implemented",
+        0.85
+      ],
+      [
+        "Access Control: Component access properly restricted",
+        0.8
+      ],
+      [
+        "Therapeutic Data Security: Sensitive data protected",
+        0.9
+      ],
+      [
+        "Crisis Intervention Security: Emergency protocols secure",
+        0.95
+      ]
+    ]
+  },
+  "test_results": {
+    "Component Integration": {
+      "score": 0.7,
+      "details": "Tested 5 components",
+      "components": [
+        "Interactive Narrative Engine",
+        "Character Development System",
+        "Therapeutic Dialogue System",
+        "Data Models (FAILED)",
+        "Database Components (PARTIAL)"
+      ],
+      "component_health": {
+        "narrative_engine": "healthy",
+        "character_system": "healthy",
+        "therapeutic_dialogue": "healthy",
+        "data_models": "error: No module named 'huggingface_hub'",
+        "database_components": "partial: cannot import name 'Neo4jManager' from 'database.neo4j_schema' (/home/thein/projects/projects/TTA/tta.prototype/database/neo4j_schema.py)"
+      }
+    },
+    "Therapeutic Journey Validation": {
+      "score": 0.26,
+      "details": "Tested 3 therapeutic scenarios",
+      "therapeutic_effectiveness": 0.26,
+      "scenarios": [
+        {
+          "scenario": "anxiety_management",
+          "effectiveness": 0.48,
+          "interactions": 3,
+          "total_therapeutic_value": 1.44
+        },
+        {
+          "scenario": "stress_reduction",
+          "effectiveness": 0.053333333333333344,
+          "interactions": 3,
+          "total_therapeutic_value": 0.16000000000000003
+        },
+        {
+          "scenario": "emotional_support",
+          "effectiveness": 0.24666666666666667,
+          "interactions": 3,
+          "total_therapeutic_value": 0.74
+        }
+      ]
+    },
+    "Security & Privacy Compliance": {
+      "score": 0.8800000000000001,
+      "details": "Performed 5 security checks",
+      "security_score": 0.8800000000000001,
+      "checks": [
+        "Data Protection: Session data properly managed",
+        "Privacy Compliance: User data anonymization implemented",
+        "Access Control: Component access properly restricted",
+        "Therapeutic Data Security: Sensitive data protected",
+        "Crisis Intervention Security: Emergency protocols secure"
+      ]
+    },
+    "Performance & Scalability": {
+      "score": 1.0,
+      "details": "Avg response time: 0ms, Session creation: 0ms",
+      "avg_response_time": 0.04311800003051758,
+      "avg_session_creation": 0.009059906005859375,
+      "performance_rating": "Excellent"
+    },
+    "Data Consistency": {
+      "score": 0.0,
+      "error": "No module named 'huggingface_hub'",
+      "details": "Data consistency testing failed"
+    },
+    "Error Handling & Recovery": {
+      "score": 0.8625,
+      "details": "Performed 4 error handling tests",
+      "error_handling_score": 0.8625,
+      "tests": [
+        "Invalid session handling: Exception properly caught",
+        "Empty input handling: Gracefully handled",
+        "Malformed input handling: Properly handled",
+        "System recovery: Handles rapid requests"
+      ]
+    },
+    "User Experience Validation": {
+      "score": 1.0,
+      "details": "Performed 4 user experience tests",
+      "ux_score": 1.0,
+      "tests": [
+        "User onboarding: Session creation successful",
+        "Interaction quality: 1.00",
+        "Crisis response: Appropriate supportive response",
+        "Session completion: Clean session termination"
+      ]
+    },
+    "Production Readiness": {
+      "score": 0.685,
+      "details": "Readiness Level: DEVELOPMENT_READY",
+      "readiness_level": "DEVELOPMENT_READY",
+      "readiness_score": 0.685,
+      "checks": [
+        "Component Health: 3/5 components healthy",
+        "Therapeutic Effectiveness: 0.26",
+        "Performance Score: 1.00",
+        "Security Score: 0.88"
+      ]
+    }
+  },
+  "recommendations": [
+    "Improve overall system integration before production deployment",
+    "Enhance therapeutic effectiveness and content quality",
+    "Fix component integration issues"
+  ],
+  "generated_at": "2025-08-06T18:08:10.298918",
+  "system_validated": false
+}

@@ -1,0 +1,78 @@
+{
+    "servers": {
+        "basic": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8000,
+            "script_path": "examples/mcp/basic_server.py",
+            "dependencies": [
+                "fastmcp",
+                "requests"
+            ]
+        },
+        "agent_tool": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8001,
+            "script_path": "examples/mcp/agent_tool_server.py",
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "pydantic"
+            ]
+        },
+        "knowledge_resource": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8002,
+            "script_path": "examples/mcp/knowledge_resource_server.py",
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "neo4j"
+            ]
+        }
+    },
+    "agent_servers": {
+        "World Building Agent": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8003,
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "neo4j"
+            ]
+        },
+        "Character Creation Agent": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8004,
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "neo4j"
+            ]
+        },
+        "Lore Keeper Agent": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8005,
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "neo4j"
+            ]
+        },
+        "Narrative Management Agent": {
+            "enabled": true,
+            "host": "localhost",
+            "port": 8006,
+            "dependencies": [
+                "fastmcp",
+                "requests",
+                "neo4j"
+            ]
+        }
+    }
+}

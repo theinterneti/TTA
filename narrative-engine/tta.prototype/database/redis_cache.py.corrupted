@@ -1,0 +1,982 @@
+"""
+Redis Caching Layer for TTA Prototype Session Management
+
+This module provides Redis connection management, session caching utilities,
+and cache invalidation mechanisms for the therapeutic text adventure system.
+
+Classes:
+    RedisConnectionManager: Manages Redis connections and configuration
+    SessionCacheManager: Handles session state caching and retrieval
+    CacheInvalidationManager: Manages cache cleanup and invalidation
+"""
+
+import json
+import logging
+import time
+from typing import Any, Dict, List, Optional, Union, Set
+from datetime import datetime, timedelta
+from dataclasses import asdict
+
+try:
+    import redis
+    from redis.exceptions import ConnectionError, TimeoutError, RedisError
+    REDIS_AVAILABLE = True
+except ImportError:
+    print("Warning: redis package not installed. Install with: pip install redis")
+    redis = None
+    ConnectionError = Exception
+    TimeoutError = Exception
+    RedisError = Exception
+    REDIS_AVAILABLE = False
+
+# Import data models
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'models'))
+
+try:
+    from data_models import SessionState, CharacterState, EmotionalState, NarrativeContext
+except ImportError:
+    # Fallback for different import contexts
+    SessionState = None
+    CharacterState = None
+    EmotionalState = None
+    NarrativeContext = None
+
+logger = logging.getLogger(__name__)
+
+
+class RedisCacheError(Exception):
+    """Raised when Redis cache operations fail."""
+    pass
+
+
+class RedisConnectionManager:
+    """
+    Manages Redis connections and configuration for therapeutic text adventure.
+    
+    This class handles Redis connection pooling, configuration management,
+    connection health monitoring, and automatic reconnection capabilities.
+    """
+    
+    def __init__(self, 
+                 host: str = "localhost", 
+                 port: int = 6379, 
+                 db: int = 0,
+                 password: Optional[str] = None,
+                 socket_timeout: float = 5.0,
+                 socket_connect_timeout: float = 5.0,
+                 max_connections: int = 50,
+                 decode_responses: bool = True,
+                 retry_on_timeout: bool = True,
+                 health_check_interval: int = 30):
+        """
+        Initialize Redis connection manager with enhanced configuration.
+        
+        Args:
+            host: Redis server host
+            port: Redis server port
+            db: Redis database number
+            password: Redis password (if required)
+            socket_timeout: Socket timeout in seconds
+            socket_connect_timeout: Socket connection timeout in seconds
+            max_connections: Maximum connections in pool
+            decode_responses: Whether to decode responses to strings
+            retry_on_timeout: Whether to retry operations on timeout
+            health_check_interval: Health check interval in seconds
+        """
+        if not REDIS_AVAILABLE:
+            raise ImportError("redis package is required. Install with: pip install redis")
+        
+        self.host = host
+        self.port = port
+        self.db = db
+        self.password = password
+        self.socket_timeout = socket_timeout
+        self.socket_connect_timeout = socket_connect_timeout
+        self.max_connections = max_connections
+        self.decode_responses = decode_responses
+        self.retry_on_timeout = retry_on_timeout
+        self.health_check_interval = health_check_interval
+        
+        self._connection_pool: Optional[redis.ConnectionPool] = None
+        self._redis_client: Optional[redis.Redis] = None
+        self._last_health_check: Optional[datetime] = None
+        self._connection_failures = 0
+        self._max_connection_failures = 3
+        
+        # Enhanced cache configuration with different TTLs for different data types
+        self.default_ttl = 3600  # 1 hour default TTL
+        self.session_ttl = 86400  # 24 hours for sessions
+        self.character_ttl = 7200  # 2 hours for character states
+        self.narrative_ttl = 1800  # 30 minutes for narrative context
+        self.emotional_ttl = 3600  # 1 hour for emotional states
+        self.therapeutic_ttl = 604800  # 1 week for therapeutic progress
+        self.user_preferences_ttl = 2592000  # 30 days for user preferences
+    
+    def connect(self) -> None:
+        """Establish connection to Redis server."""
+        try:
+            # Create connection pool
+            self._connection_pool = redis.ConnectionPool(
+                host=self.host,
+                port=self.port,
+                db=self.db,
+                password=self.password,
+                socket_timeout=self.socket_timeout,
+                socket_connect_timeout=self.socket_connect_timeout,
+                max_connections=self.max_connections,
+                decode_responses=self.decode_responses
+            )
+            
+            # Create Redis client
+            self._redis_client = redis.Redis(connection_pool=self._connection_pool)
+            
+            # Test connection
+            self._redis_client.ping()
+            
+            logger.info(f"Connected to Redis at {self.host}:{self.port}")
+            
+        except ConnectionError as e:
+            raise RedisCacheError(f"Failed to connect to Redis: {e}")
+        except Exception as e:
+            raise RedisCacheError(f"Unexpected error connecting to Redis: {e}")
+    
+    def disconnect(self) -> None:
+        """Close connection to Redis server."""
+        if self._connection_pool:
+            self._connection_pool.disconnect()
+            self._connection_pool = None
+        
+        if self._redis_client:
+            self._redis_client = None
+        
+        logger.info("Disconnected from Redis")
+    
+    def get_client(self) -> redis.Redis:
+        """
+        Get Redis client instance.
+        
+        Returns:
+            redis.Redis: Redis client instance
+            
+        Raises:
+            RedisCacheError: If not connected to Redis
+        """
+        if not self._redis_client:
+            raise RedisCacheError("Not connected to Redis. Call connect() first.")
+        return self._redis_client
+    
+    def is_connected(self) -> bool:
+        """
+        Check if connected to Redis with health monitoring.
+        
+        Returns:
+            bool: True if connected and responsive
+        """
+        if not self._redis_client:
+            return False
+        
+        try:
+            # Perform health check if interval has passed
+            now = datetime.now()
+            if (self._last_health_check is None or 
+                (now - self._last_health_check).seconds >= self.health_check_interval):
+                
+                self._redis_client.ping()
+                self._last_health_check = now
+                self._connection_failures = 0  # Reset failure count on successful ping
+                return True
+            
+            # If within health check interval, assume connected
+            return True
+            
+        except Exception as e:
+            self._connection_failures += 1
+            logger.warning(f"Redis health check failed (attempt {self._connection_failures}): {e}")
+            
+            # Attempt reconnection if failures exceed threshold
+            if self._connection_failures >= self._max_connection_failures:
+                logger.info("Attempting Redis reconnection due to repeated failures")
+                try:
+                    self.reconnect()
+                    return True
+                except Exception as reconnect_error:
+                    logger.error(f"Redis reconnection failed: {reconnect_error}")
+            
+            return False
+    
+    def reconnect(self) -> None:
+        """Attempt to reconnect to Redis server."""
+        try:
+            logger.info("Reconnecting to Redis...")
+            self.disconnect()
+            self.connect()
+            logger.info("Redis reconnection successful")
+        except Exception as e:
+            logger.error(f"Redis reconnection failed: {e}")
+            raise RedisCacheError(f"Failed to reconnect to Redis: {e}")
+    
+    def get_connection_stats(self) -> Dict[str, Any]:
+        """
+        Get detailed connection statistics.
+        
+        Returns:
+            Dict[str, Any]: Connection statistics and health metrics
+        """
+        stats = {
+            "host": self.host,
+            "port": self.port,
+            "db": self.db,
+            "connected": self.is_connected(),
+            "max_connections": self.max_connections,
+            "connection_failures": self._connection_failures,
+            "last_health_check": self._last_health_check.isoformat() if self._last_health_check else None,
+            "ttl_config": {
+                "default": self.default_ttl,
+                "session": self.session_ttl,
+                "character": self.character_ttl,
+                "narrative": self.narrative_ttl,
+                "emotional": self.emotional_ttl,
+                "therapeutic": self.therapeutic_ttl,
+                "user_preferences": self.user_preferences_ttl
+            }
+        }
+        
+        # Add Redis server info if connected
+        if self.is_connected():
+            try:
+                redis_info = self._redis_client.info()
+                stats.update({
+                    "redis_version": redis_info.get("redis_version", "unknown"),
+                    "used_memory": redis_info.get("used_memory", 0),
+                    "connected_clients": redis_info.get("connected_clients", 0),
+                    "total_commands_processed": redis_info.get("total_commands_processed", 0),
+                    "keyspace_hits": redis_info.get("keyspace_hits", 0),
+                    "keyspace_misses": redis_info.get("keyspace_misses", 0)
+                })
+            except Exception as e:
+                logger.warning(f"Could not retrieve Redis server info: {e}")
+        
+        return stats
+         
+    0),
+                    "con
+                    "total_commands_),
+                    "k0),
+                   , 0)
+        })
+            except Exception as e:
+                logger.warning(f"Co
+        
+urn stats    ret    info: {e}") server edisrieve Rot retuld n        "sesace_misget("keyspis_info.": redce_misses "keyspahits", e_"keyspacinfo.get(edis_ce_hits": reyspa 0",sed_procesdsal_commanoto.get("t": redis_infsedcesproents", 0),ected_cliget("connedis_info.ts": rted_cliennecd_memory", o.get("use_inf": redisymorsed_me"u                known"),un"ion", versget("redis_ redis_info.":onrsi  "redis_ve         (o if connerences_ttc_ttl,tiapeuther self.rapeutic":"thettl,otional_lf.emnal": seemotio"        ratiarer_ttself.charactharacter":      "cult_ttl,elf.defalt": s"defau            fig": {_con
+    
+    def get_connection_info(self) -> Dict[str, Any]:
+        """
+        Get connection information.
+        
+        Returns:
+            Dict[str, Any]: Connection information
+        """
+        return {
+            "host": self.host,
+            "port": self.port,
+            "db": self.db,
+            "connected": self.is_connected(),
+            "max_connections": self.max_connections,
+            "default_ttl": self.default_ttl
+        }
+    
+    def __enter__(self):
+        """Context manager entry."""
+        self.connect()
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Context manager exit."""
+        self.disconnect()
+
+
+class SessionCacheManager:
+    """
+    Handles session state caching and retrieval for therapeutic text adventure.
+    
+    This class provides methods for caching session states, character states,
+    narrative context, and other session-related data in Redis.
+    """
+    
+    def __init__(self, connection_manager: RedisConnectionManager):
+        """
+        Initialize session cache manager.
+        
+        Args:
+            connection_manager: Redis connection manager instance
+        """
+        self.connection_manager = connection_manager
+        self.redis_client = connection_manager.get_client()
+        
+        # Key prefixes for different data types
+        self.session_prefix = "tta:session:"
+        self.character_prefix = "tta:character:"
+        self.narrative_prefix = "tta:narrative:"
+        self.emotional_prefix = "tta:emotional:"
+        self.user_prefix = "tta:user:"
+        
+        # Serialization settings
+        self.json_settings = {
+            'ensure_ascii': False,
+            'separators': (',', ':'),
+            'default': self._json_serializer
+        }
+    
+    def _json_serializer(self, obj: Any) -> Any:
+        """Custom JSON serializer for complex objects."""
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        elif hasattr(obj, '__dict__'):
+            return asdict(obj) if hasattr(obj, '__dataclass_fields__') else obj.__dict__
+        elif hasattr(obj, 'value'):  # For Enum objects
+            return obj.value
+        return str(obj)
+    
+    def _generate_session_key(self, session_id: str) -> str:
+        """Generate Redis key for session data."""
+        return f"{self.session_prefix}{session_id}"
+    
+    def _generate_character_key(self, character_id: str, session_id: str = None) -> str:
+        """Generate Redis key for character data."""
+        if session_id:
+            return f"{self.character_prefix}{session_id}:{character_id}"
+        return f"{self.character_prefix}{character_id}"
+    
+    def _generate_narrative_key(self, session_id: str) -> str:
+        """Generate Redis key for narrative context."""
+        return f"{self.narrative_prefix}{session_id}"
+    
+    def _generate_emotional_key(self, user_id: str) -> str:
+        """Generate Redis key for emotional state."""
+        return f"{self.emotional_prefix}{user_id}"
+    
+    def _generate_user_sessions_key(self, user_id: str) -> str:
+        """Generate Redis key for user sessions list."""
+        return f"{self.user_prefix}{user_id}:sessions"
+    
+    def cache_session_state(self, session_state: 'SessionState', ttl: Optional[int] = None) -> bool:
+        """
+        Cache session state in Redis.
+        
+        Args:
+            session_state: Session state object to cache
+            ttl: Time to live in seconds (uses default if None)
+            
+        Returns:
+            bool: True if caching was successful
+        """
+        if not SessionState:
+            logger.error("SessionState class not available")
+            return False
+        
+        try:
+            session_key = self._generate_session_key(session_state.session_id)
+            ttl = ttl or self.connection_manager.session_ttl
+            
+            # Serialize session state
+            session_data = session_state.to_json()
+            
+            # Cache in Redis
+            self.redis_client.setex(session_key, ttl, session_data)
+            
+            # Add to user's session list
+            user_sessions_key = self._generate_user_sessions_key(session_state.user_id)
+            self.redis_client.sadd(user_sessions_key, session_state.session_id)
+            self.redis_client.expire(user_sessions_key, ttl)
+            
+            logger.debug(f"Cached session state: {session_state.session_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error caching session state: {e}")
+            return False
+    
+    def get_session_state(self, session_id: str) -> Optional['SessionState']:
+        """
+        Retrieve session state from Redis.
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            Optional[SessionState]: Session state object or None if not found
+        """
+        if not SessionState:
+            logger.error("SessionState class not available")
+            return None
+        
+        try:
+            session_key = self._generate_session_key(session_id)
+            session_data = self.redis_client.get(session_key)
+            
+            if session_data:
+                return SessionState.from_json(session_data)
+            
+            logger.debug(f"Session state not found in cache: {session_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving session state: {e}")
+            return None
+    
+    def cache_character_state(self, character_state: 'CharacterState', session_id: str = None, ttl: Optional[int] = None) -> bool:
+        """
+        Cache character state in Redis.
+        
+        Args:
+            character_state: Character state object to cache
+            session_id: Session ID for session-specific character state
+            ttl: Time to live in seconds (uses default if None)
+            
+        Returns:
+            bool: True if caching was successful
+        """
+        if not CharacterState:
+            logger.error("CharacterState class not available")
+            return False
+        
+        try:
+            character_key = self._generate_character_key(character_state.character_id, session_id)
+            ttl = ttl or self.connection_manager.character_ttl
+            
+            # Serialize character state
+            character_data = json.dumps(asdict(character_state), **self.json_settings)
+            
+            # Cache in Redis
+            self.redis_client.setex(character_key, ttl, character_data)
+            
+            logger.debug(f"Cached character state: {character_state.character_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error caching character state: {e}")
+            return False
+    
+    def get_character_state(self, character_id: str, session_id: str = None) -> Optional['CharacterState']:
+        """
+        Retrieve character state from Redis.
+        
+        Args:
+            character_id: Character identifier
+            session_id: Session ID for session-specific character state
+            
+        Returns:
+            Optional[CharacterState]: Character state object or None if not found
+        """
+        if not CharacterState:
+            logger.error("CharacterState class not available")
+            return None
+        
+        try:
+            character_key = self._generate_character_key(character_id, session_id)
+            character_data = self.redis_client.get(character_key)
+            
+            if character_data:
+                data = json.loads(character_data)
+                # Reconstruct CharacterState object
+                return CharacterState(**data)
+            
+            logger.debug(f"Character state not found in cache: {character_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving character state: {e}")
+            return None
+    
+    def cache_narrative_context(self, narrative_context: 'NarrativeContext', ttl: Optional[int] = None) -> bool:
+        """
+        Cache narrative context in Redis.
+        
+        Args:
+            narrative_context: Narrative context object to cache
+            ttl: Time to live in seconds (uses default if None)
+            
+        Returns:
+            bool: True if caching was successful
+        """
+        if not NarrativeContext:
+            logger.error("NarrativeContext class not available")
+            return False
+        
+        try:
+            narrative_key = self._generate_narrative_key(narrative_context.session_id)
+            ttl = ttl or self.connection_manager.narrative_ttl
+            
+            # Serialize narrative context
+            narrative_data = json.dumps(asdict(narrative_context), **self.json_settings)
+            
+            # Cache in Redis
+            self.redis_client.setex(narrative_key, ttl, narrative_data)
+            
+            logger.debug(f"Cached narrative context: {narrative_context.session_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error caching narrative context: {e}")
+            return False
+    
+    def get_narrative_context(self, session_id: str) -> Optional['NarrativeContext']:
+        """
+        Retrieve narrative context from Redis.
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            Optional[NarrativeContext]: Narrative context object or None if not found
+        """
+        if not NarrativeContext:
+            logger.error("NarrativeContext class not available")
+            return None
+        
+        try:
+            narrative_key = self._generate_narrative_key(session_id)
+            narrative_data = self.redis_client.get(narrative_key)
+            
+            if narrative_data:
+                data = json.loads(narrative_data)
+                # Reconstruct NarrativeContext object
+                return NarrativeContext(**data)
+            
+            logger.debug(f"Narrative context not found in cache: {session_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving narrative context: {e}")
+            return None
+    
+    def cache_emotional_state(self, emotional_state: 'EmotionalState', user_id: str, ttl: Optional[int] = None) -> bool:
+        """
+        Cache emotional state in Redis.
+        
+        Args:
+            emotional_state: Emotional state object to cache
+            user_id: User identifier
+            ttl: Time to live in seconds (uses default if None)
+            
+        Returns:
+            bool: True if caching was successful
+        """
+        if not EmotionalState:
+            logger.error("EmotionalState class not available")
+            return False
+        
+        try:
+            emotional_key = self._generate_emotional_key(user_id)
+            ttl = ttl or self.connection_manager.default_ttl
+            
+            # Serialize emotional state
+            emotional_data = json.dumps(asdict(emotional_state), **self.json_settings)
+            
+            # Cache in Redis
+            self.redis_client.setex(emotional_key, ttl, emotional_data)
+            
+            logger.debug(f"Cached emotional state for user: {user_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error caching emotional state: {e}")
+            return False
+    
+    def get_emotional_state(self, user_id: str) -> Optional['EmotionalState']:
+        """
+        Retrieve emotional state from Redis.
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            Optional[EmotionalState]: Emotional state object or None if not found
+        """
+        if not EmotionalState:
+            logger.error("EmotionalState class not available")
+            return None
+        
+        try:
+            emotional_key = self._generate_emotional_key(user_id)
+            emotional_data = self.redis_client.get(emotional_key)
+            
+            if emotional_data:
+                data = json.loads(emotional_data)
+                # Reconstruct EmotionalState object
+                return EmotionalState(**data)
+            
+            logger.debug(f"Emotional state not found in cache: {user_id}")
+            return None
+            
+        except Exception as e:
+            logger.error(f"Error retrieving emotional state: {e}")
+            return None
+    
+    def get_user_sessions(self, user_id: str) -> List[str]:
+        """
+        Get list of session IDs for a user.
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            List[str]: List of session IDs
+        """
+        try:
+            user_sessions_key = self._generate_user_sessions_key(user_id)
+            sessions = self.redis_client.smembers(user_sessions_key)
+            return list(sessions) if sessions else []
+            
+        except Exception as e:
+            logger.error(f"Error retrieving user sessions: {e}")
+            return []
+    
+    def update_session_timestamp(self, session_id: str) -> bool:
+        """
+        Update session last access timestamp.
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            bool: True if update was successful
+        """
+        try:
+            session_key = self._generate_session_key(session_id)
+            
+            # Check if session exists
+            if self.redis_client.exists(session_key):
+                # Get current TTL
+                ttl = self.redis_client.ttl(session_key)
+                if ttl > 0:
+                    # Refresh TTL
+                    self.redis_client.expire(session_key, ttl)
+                    return True
+            
+            return False
+            
+        except Exception as e:
+            logger.error(f"Error updating session timestamp: {e}")
+            return False
+
+
+class CacheInvalidationManager:
+    """
+    Manages cache cleanup and invalidation for therapeutic text adventure.
+    
+    This class provides methods for cache invalidation, cleanup of expired data,
+    and maintenance of cache consistency.
+    """
+    
+    def __init__(self, connection_manager: RedisConnectionManager):
+        """
+        Initialize cache invalidation manager.
+        
+        Args:
+            connection_manager: Redis connection manager instance
+        """
+        self.connection_manager = connection_manager
+        self.redis_client = connection_manager.get_client()
+        
+        # Key patterns for different data types
+        self.session_pattern = "tta:session:*"
+        self.character_pattern = "tta:character:*"
+        self.narrative_pattern = "tta:narrative:*"
+        self.emotional_pattern = "tta:emotional:*"
+        self.user_pattern = "tta:user:*"
+    
+    def invalidate_session(self, session_id: str) -> bool:
+        """
+        Invalidate all cache entries for a session.
+        
+        Args:
+            session_id: Session identifier
+            
+        Returns:
+            bool: True if invalidation was successful
+        """
+        try:
+            keys_to_delete = []
+            
+            # Session state key
+            session_key = f"tta:session:{session_id}"
+            keys_to_delete.append(session_key)
+            
+            # Narrative context key
+            narrative_key = f"tta:narrative:{session_id}"
+            keys_to_delete.append(narrative_key)
+            
+            # Character state keys for this session
+            character_pattern = f"tta:character:{session_id}:*"
+            character_keys = self.redis_client.keys(character_pattern)
+            keys_to_delete.extend(character_keys)
+            
+            # Delete all keys
+            if keys_to_delete:
+                deleted_count = self.redis_client.delete(*keys_to_delete)
+                logger.info(f"Invalidated {deleted_count} cache entries for session: {session_id}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error invalidating session cache: {e}")
+            return False
+    
+    def invalidate_user_data(self, user_id: str) -> bool:
+        """
+        Invalidate all cache entries for a user.
+        
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            bool: True if invalidation was successful
+        """
+        try:
+            keys_to_delete = []
+            
+            # User sessions key
+            user_sessions_key = f"tta:user:{user_id}:sessions"
+            
+            # Get user sessions
+            sessions = self.redis_client.smembers(user_sessions_key)
+            
+            # Invalidate each session
+            for session_id in sessions:
+                self.invalidate_session(session_id)
+            
+            # Emotional state key
+            emotional_key = f"tta:emotional:{user_id}"
+            keys_to_delete.append(emotional_key)
+            
+            # User sessions key
+            keys_to_delete.append(user_sessions_key)
+            
+            # Delete remaining keys
+            if keys_to_delete:
+                deleted_count = self.redis_client.delete(*keys_to_delete)
+                logger.info(f"Invalidated {deleted_count} additional cache entries for user: {user_id}")
+            
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error invalidating user cache: {e}")
+            return False
+    
+    def invalidate_character(self, character_id: str, session_id: str = None) -> bool:
+        """
+        Invalidate cache entries for a character.
+        
+        Args:
+            character_id: Character identifier
+            session_id: Session ID (if None, invalidates all sessions)
+            
+        Returns:
+            bool: True if invalidation was successful
+        """
+        try:
+            if session_id:
+                # Invalidate specific session character
+                character_key = f"tta:character:{session_id}:{character_id}"
+                deleted_count = self.redis_client.delete(character_key)
+            else:
+                # Invalidate all sessions for this character
+                character_pattern = f"tta:character:*:{character_id}"
+                character_keys = self.redis_client.keys(character_pattern)
+                if character_keys:
+                    deleted_count = self.redis_client.delete(*character_keys)
+                else:
+                    deleted_count = 0
+            
+            logger.info(f"Invalidated {deleted_count} character cache entries: {character_id}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error invalidating character cache: {e}")
+            return False
+    
+    def cleanup_expired_sessions(self, max_age_hours: int = 24) -> int:
+        """
+        Clean up expired session data.
+        
+        Args:
+            max_age_hours: Maximum age in hours for session data
+            
+        Returns:
+            int: Number of sessions cleaned up
+        """
+        try:
+            cleaned_count = 0
+            cutoff_time = datetime.now() - timedelta(hours=max_age_hours)
+            
+            # Get all session keys
+            session_keys = self.redis_client.keys(self.session_pattern)
+            
+            for session_key in session_keys:
+                try:
+                    # Get session data
+                    session_data = self.redis_client.get(session_key)
+                    if session_data and SessionState:
+                        session_state = SessionState.from_json(session_data)
+                        
+                        # Check if session is too old
+                        if session_state.last_updated < cutoff_time:
+                            session_id = session_state.session_id
+                            self.invalidate_session(session_id)
+                            cleaned_count += 1
+                            
+                except Exception as e:
+                    logger.warning(f"Error processing session key {session_key}: {e}")
+                    continue
+            
+            logger.info(f"Cleaned up {cleaned_count} expired sessions")
+            return cleaned_count
+            
+        except Exception as e:
+            logger.error(f"Error cleaning up expired sessions: {e}")
+            return 0
+    
+    def get_cache_statistics(self) -> Dict[str, Any]:
+        """
+        Get cache statistics and information.
+        
+        Returns:
+            Dict[str, Any]: Cache statistics
+        """
+        try:
+            stats = {
+                "total_keys": 0,
+                "session_keys": 0,
+                "character_keys": 0,
+                "narrative_keys": 0,
+                "emotional_keys": 0,
+                "user_keys": 0,
+                "memory_usage": 0,
+                "connected_clients": 0
+            }
+            
+            # Count keys by pattern
+            stats["session_keys"] = len(self.redis_client.keys(self.session_pattern))
+            stats["character_keys"] = len(self.redis_client.keys(self.character_pattern))
+            stats["narrative_keys"] = len(self.redis_client.keys(self.narrative_pattern))
+            stats["emotional_keys"] = len(self.redis_client.keys(self.emotional_pattern))
+            stats["user_keys"] = len(self.redis_client.keys(self.user_pattern))
+            
+            stats["total_keys"] = sum([
+                stats["session_keys"],
+                stats["character_keys"],
+                stats["narrative_keys"],
+                stats["emotional_keys"],
+                stats["user_keys"]
+            ])
+            
+            # Get Redis info
+            redis_info = self.redis_client.info()
+            stats["memory_usage"] = redis_info.get("used_memory", 0)
+            stats["connected_clients"] = redis_info.get("connected_clients", 0)
+            
+            return stats
+            
+        except Exception as e:
+            logger.error(f"Error getting cache statistics: {e}")
+            return {}
+    
+    def clear_all_cache(self) -> bool:
+        """
+        Clear all TTA-related cache entries.
+        WARNING: This is destructive and should only be used for testing.
+        
+        Returns:
+            bool: True if clearing was successful
+        """
+        try:
+            patterns = [
+                self.session_pattern,
+                self.character_pattern,
+                self.narrative_pattern,
+                self.emotional_pattern,
+                self.user_pattern
+            ]
+            
+            total_deleted = 0
+            for pattern in patterns:
+                keys = self.redis_client.keys(pattern)
+                if keys:
+                    deleted_count = self.redis_client.delete(*keys)
+                    total_deleted += deleted_count
+            
+            logger.warning(f"Cleared all cache - deleted {total_deleted} keys")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error clearing cache: {e}")
+            return False
+
+
+# Utility functions for Redis cache operations
+def create_redis_connection(host: str = "localhost", port: int = 6379, **kwargs) -> RedisConnectionManager:
+    """
+    Create and return a Redis connection manager.
+    
+    Args:
+        host: Redis server host
+        port: Redis server port
+        **kwargs: Additional connection parameters
+        
+    Returns:
+        RedisConnectionManager: Configured connection manager
+    """
+    return RedisConnectionManager(host=host, port=port, **kwargs)
+
+
+def get_session_cache_manager(connection_manager: RedisConnectionManager) -> SessionCacheManager:
+    """
+    Create and return a session cache manager.
+    
+    Args:
+        connection_manager: Redis connection manager
+        
+    Returns:
+        SessionCacheManager: Session cache manager instance
+    """
+    return SessionCacheManager(connection_manager)
+
+
+def get_cache_invalidation_manager(connection_manager: RedisConnectionManager) -> CacheInvalidationManager:
+    """
+    Create and return a cache invalidation manager.
+    
+    Args:
+        connection_manager: Redis connection manager
+        
+    Returns:
+        CacheInvalidationManager: Cache invalidation manager instance
+    """
+    return CacheInvalidationManager(connection_manager)
+
+
+if __name__ == "__main__":
+    # Example usage
+    logging.basicConfig(level=logging.INFO)
+    
+    if REDIS_AVAILABLE:
+        try:
+            # Create connection manager
+            with create_redis_connection() as conn_manager:
+                # Create cache managers
+                session_cache = get_session_cache_manager(conn_manager)
+                invalidation_manager = get_cache_invalidation_manager(conn_manager)
+                
+                # Get cache statistics
+                stats = invalidation_manager.get_cache_statistics()
+                print(f"Cache statistics: {stats}")
+                
+                print("✅ Redis cache system is working correctly")
+                
+        except Exception as e:
+            print(f"❌ Redis cache system error: {e}")
+    else:
+        print("❌ Redis package not available")
