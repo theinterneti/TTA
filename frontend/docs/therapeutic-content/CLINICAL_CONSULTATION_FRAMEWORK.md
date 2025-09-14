@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/docs/therapeutic/CLINICAL_CONSULTATION_FRAMEWORK.md

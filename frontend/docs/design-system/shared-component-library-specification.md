@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/.kiro/specs/shared-component-library/shared-component-library-specification.md

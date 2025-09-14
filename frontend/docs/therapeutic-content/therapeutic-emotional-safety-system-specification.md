@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/.kiro/specs/therapeutic-emotional-safety-system/therapeutic-emotional-safety-system-specification.md

@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/.kiro/specs/core-gameplay-loop/core-gameplay-loop-specification.md

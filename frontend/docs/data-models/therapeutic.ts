@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/frontend/src/types/therapeutic.ts

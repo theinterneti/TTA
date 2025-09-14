@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/.kiro/specs/therapeutic-safety-content-validation/therapeutic-safety-content-validation-specification.md

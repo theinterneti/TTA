@@ -1,0 +1,1 @@
+/mnt/archived-tta/home/thein/projects/projects/TTA/.kiro/specs/player-experience-interface/player-experience-interface-specification.md
