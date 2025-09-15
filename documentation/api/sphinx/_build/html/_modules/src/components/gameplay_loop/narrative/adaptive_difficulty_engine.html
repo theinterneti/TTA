@@ -1,0 +1,1328 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.adaptive_difficulty_engine &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.adaptive_difficulty_engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.narrative.adaptive_difficulty_engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Adaptive Difficulty Engine for Therapeutic Narrative Engine</span>
+
+<span class="sd">This module provides intelligent difficulty calibration, performance monitoring,</span>
+<span class="sd">and adaptive challenge adjustment for therapeutic text adventures.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">statistics</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span><span class="p">,</span> <span class="n">IntEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.services.session_state</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionState</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventBus</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">NarrativeEvent</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="DifficultyLevel">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DifficultyLevel</span><span class="p">(</span><span class="n">IntEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Difficulty levels for adaptive calibration.&quot;&quot;&quot;</span>
+
+    <span class="n">VERY_EASY</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">EASY</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MODERATE</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">CHALLENGING</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">HARD</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">VERY_HARD</span> <span class="o">=</span> <span class="mi">6</span></div>
+
+
+
+<div class="viewcode-block" id="PerformanceMetric">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PerformanceMetric</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performance metrics for difficulty assessment.&quot;&quot;&quot;</span>
+
+    <span class="n">CHOICE_SUCCESS_RATE</span> <span class="o">=</span> <span class="s2">&quot;choice_success_rate&quot;</span>
+    <span class="n">THERAPEUTIC_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_progress&quot;</span>
+    <span class="n">EMOTIONAL_STABILITY</span> <span class="o">=</span> <span class="s2">&quot;emotional_stability&quot;</span>
+    <span class="n">ENGAGEMENT_LEVEL</span> <span class="o">=</span> <span class="s2">&quot;engagement_level&quot;</span>
+    <span class="n">COMPLETION_RATE</span> <span class="o">=</span> <span class="s2">&quot;completion_rate&quot;</span>
+    <span class="n">TIME_TO_DECISION</span> <span class="o">=</span> <span class="s2">&quot;time_to_decision&quot;</span>
+    <span class="n">HELP_SEEKING_FREQUENCY</span> <span class="o">=</span> <span class="s2">&quot;help_seeking_frequency&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="AdjustmentTrigger">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdjustmentTrigger</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Triggers for difficulty adjustment.&quot;&quot;&quot;</span>
+
+    <span class="n">POOR_PERFORMANCE</span> <span class="o">=</span> <span class="s2">&quot;poor_performance&quot;</span>
+    <span class="n">EXCELLENT_PERFORMANCE</span> <span class="o">=</span> <span class="s2">&quot;excellent_performance&quot;</span>
+    <span class="n">EMOTIONAL_DISTRESS</span> <span class="o">=</span> <span class="s2">&quot;emotional_distress&quot;</span>
+    <span class="n">USER_REQUEST</span> <span class="o">=</span> <span class="s2">&quot;user_request&quot;</span>
+    <span class="n">THERAPEUTIC_GOAL_CHANGE</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_goal_change&quot;</span>
+    <span class="n">PATTERN_RECOGNITION</span> <span class="o">=</span> <span class="s2">&quot;pattern_recognition&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="AdaptationStrategy">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdaptationStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Strategies for difficulty adaptation.&quot;&quot;&quot;</span>
+
+    <span class="n">GRADUAL_INCREASE</span> <span class="o">=</span> <span class="s2">&quot;gradual_increase&quot;</span>
+    <span class="n">GRADUAL_DECREASE</span> <span class="o">=</span> <span class="s2">&quot;gradual_decrease&quot;</span>
+    <span class="n">IMMEDIATE_ADJUSTMENT</span> <span class="o">=</span> <span class="s2">&quot;immediate_adjustment&quot;</span>
+    <span class="n">CONTEXTUAL_SUPPORT</span> <span class="o">=</span> <span class="s2">&quot;contextual_support&quot;</span>
+    <span class="n">ALTERNATIVE_PATH</span> <span class="o">=</span> <span class="s2">&quot;alternative_path&quot;</span>
+    <span class="n">SKILL_BUILDING</span> <span class="o">=</span> <span class="s2">&quot;skill_building&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PerformanceSnapshot">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PerformanceSnapshot</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Snapshot of user performance at a point in time.&quot;&quot;&quot;</span>
+
+    <span class="n">snapshot_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Performance metrics</span>
+    <span class="n">success_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">therapeutic_progress</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">emotional_stability</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">engagement_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">completion_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">average_decision_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">help_requests</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Context</span>
+    <span class="n">current_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span>
+    <span class="n">recent_choices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_goals</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="DifficultyAdjustment">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">DifficultyAdjustment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Record of a difficulty adjustment.&quot;&quot;&quot;</span>
+
+    <span class="n">adjustment_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Adjustment details</span>
+    <span class="n">from_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span>
+    <span class="n">to_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span>
+    <span class="n">trigger</span><span class="p">:</span> <span class="n">AdjustmentTrigger</span> <span class="o">=</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">POOR_PERFORMANCE</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">AdaptationStrategy</span> <span class="o">=</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span>
+
+    <span class="c1"># Reasoning</span>
+    <span class="n">performance_indicators</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">adjustment_reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">expected_impact</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Implementation</span>
+    <span class="n">story_explanation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">support_provided</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">effectiveness_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="UserPreferences">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserPreferences</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User preferences for difficulty and challenge.&quot;&quot;&quot;</span>
+
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Difficulty preferences</span>
+    <span class="n">preferred_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span>
+    <span class="n">challenge_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 0.0 = low tolerance, 1.0 = high tolerance</span>
+    <span class="n">adaptation_speed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 0.0 = slow adaptation, 1.0 = fast adaptation</span>
+
+    <span class="c1"># Support preferences</span>
+    <span class="n">wants_hints</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">wants_explanations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">wants_encouragement</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">wants_alternative_paths</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Therapeutic preferences</span>
+    <span class="n">therapeutic_focus</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">learning_style</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;balanced&quot;</span>  <span class="c1"># visual, auditory, kinesthetic, balanced</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveDifficultyEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main engine for adaptive difficulty calibration and adjustment.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_bus</span><span class="p">:</span> <span class="n">EventBus</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span> <span class="o">=</span> <span class="n">event_bus</span>
+
+        <span class="c1"># Performance tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PerformanceSnapshot</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">DifficultyAdjustment</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">UserPreferences</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Calibration parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">performance_window</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span>
+            <span class="n">minutes</span><span class="o">=</span><span class="mi">15</span>
+        <span class="p">)</span>  <span class="c1"># Window for performance analysis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_threshold</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># Threshold for triggering adjustments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_data_points</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Minimum data points before adjustment</span>
+
+        <span class="c1"># Difficulty mapping</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">difficulty_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_difficulty_parameters</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_strategies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_adaptation_strategies</span><span class="p">()</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;performance_snapshots_created&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;difficulty_adjustments_made&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;user_preferences_updated&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;successful_adaptations&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;failed_adaptations&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_difficulty_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">DifficultyLevel</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load difficulty parameters for each level.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">VERY_EASY</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">EASY</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">CHALLENGING</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">HARD</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.7</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">VERY_HARD</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;choice_complexity&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_intensity&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_challenge&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">,</span>
+                <span class="s2">&quot;time_pressure&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+                <span class="s2">&quot;support_availability&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;hint_frequency&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;explanation_detail&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_adaptation_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">AdaptationStrategy</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load adaptation strategies and their implementations.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradually increase difficulty over multiple interactions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;natural_progression&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_reduction&quot;</span><span class="p">:</span> <span class="s2">&quot;gradual&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_DECREASE</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Gradually decrease difficulty to build confidence&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;supportive_context&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_increase&quot;</span><span class="p">:</span> <span class="s2">&quot;gradual&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Make immediate difficulty adjustment for urgent situations&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;contextual_explanation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_change&quot;</span><span class="p">:</span> <span class="s2">&quot;immediate&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">CONTEXTUAL_SUPPORT</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Provide additional support without changing core difficulty&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;helper_character&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_increase&quot;</span><span class="p">:</span> <span class="s2">&quot;contextual&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">ALTERNATIVE_PATH</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Offer alternative path with different difficulty profile&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;branching_narrative&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_change&quot;</span><span class="p">:</span> <span class="s2">&quot;path_specific&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">SKILL_BUILDING</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Focus on building specific skills before increasing difficulty&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;adjustment_rate&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+                <span class="s2">&quot;story_integration&quot;</span><span class="p">:</span> <span class="s2">&quot;training_scenario&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_increase&quot;</span><span class="p">:</span> <span class="s2">&quot;skill_focused&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.monitor_performance">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.monitor_performance">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">monitor_performance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PerformanceSnapshot</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Monitor user performance and create performance snapshot.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create performance snapshot</span>
+            <span class="n">snapshot</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_performance_snapshot</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="p">,</span> <span class="n">interaction_data</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store snapshot</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+
+            <span class="c1"># Keep only recent snapshots</span>
+            <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">s</span>
+                <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">created_at</span> <span class="o">&gt;</span> <span class="n">cutoff_time</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Check if adjustment is needed</span>
+            <span class="k">if</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_should_adjust_difficulty</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_adjust_difficulty</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;performance_snapshots_created&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">snapshot</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to monitor performance for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Return minimal snapshot</span>
+            <span class="k">return</span> <span class="n">PerformanceSnapshot</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_success_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate success rate from recent choices and consequences.&quot;&quot;&quot;</span>
+        <span class="c1"># Get recent consequence history</span>
+        <span class="n">consequence_history</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;consequence_history&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">consequence_history</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span>  <span class="c1"># Default neutral success rate</span>
+
+        <span class="c1"># Analyze recent consequences (last 10)</span>
+        <span class="n">recent_consequences</span> <span class="o">=</span> <span class="n">consequence_history</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span>
+
+        <span class="n">success_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_consequences</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">consequence</span> <span class="ow">in</span> <span class="n">recent_consequences</span><span class="p">:</span>
+            <span class="c1"># Consider therapeutic outcomes as success indicators</span>
+            <span class="n">therapeutic_count</span> <span class="o">=</span> <span class="n">consequence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_outcomes_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">learning_count</span> <span class="o">=</span> <span class="n">consequence</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;learning_opportunities_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+            <span class="c1"># Success if there are therapeutic outcomes or learning opportunities</span>
+            <span class="k">if</span> <span class="n">therapeutic_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">learning_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">success_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">success_count</span> <span class="o">/</span> <span class="n">total_count</span> <span class="k">if</span> <span class="n">total_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.5</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_therapeutic_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate overall therapeutic progress.&quot;&quot;&quot;</span>
+        <span class="n">progress_metrics</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">progress_metrics</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">progress_metrics</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Calculate average progress across all therapeutic goals</span>
+        <span class="n">total_progress</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">progress_metrics</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">total_progress</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">progress_metrics</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_emotional_stability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate emotional stability from emotional state.&quot;&quot;&quot;</span>
+        <span class="n">emotional_state</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">emotional_state</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">emotional_state</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span>  <span class="c1"># Default neutral stability</span>
+
+        <span class="c1"># Calculate stability based on emotional balance</span>
+        <span class="n">positive_emotions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;calm&quot;</span><span class="p">,</span> <span class="s2">&quot;hopeful&quot;</span><span class="p">,</span> <span class="s2">&quot;confident&quot;</span><span class="p">,</span> <span class="s2">&quot;excited&quot;</span><span class="p">]</span>
+        <span class="n">negative_emotions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;anxious&quot;</span><span class="p">,</span> <span class="s2">&quot;depressed&quot;</span><span class="p">,</span> <span class="s2">&quot;angry&quot;</span><span class="p">,</span> <span class="s2">&quot;fearful&quot;</span><span class="p">,</span> <span class="s2">&quot;overwhelmed&quot;</span><span class="p">]</span>
+
+        <span class="n">positive_score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">emotional_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">emotion</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">emotion</span> <span class="ow">in</span> <span class="n">positive_emotions</span>
+        <span class="p">)</span>
+        <span class="n">negative_score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">emotional_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">emotion</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="k">for</span> <span class="n">emotion</span> <span class="ow">in</span> <span class="n">negative_emotions</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Stability is higher when positive emotions dominate and negative emotions are low</span>
+        <span class="k">if</span> <span class="n">positive_score</span> <span class="o">+</span> <span class="n">negative_score</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span>
+
+        <span class="n">stability</span> <span class="o">=</span> <span class="n">positive_score</span> <span class="o">/</span> <span class="p">(</span><span class="n">positive_score</span> <span class="o">+</span> <span class="n">negative_score</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">stability</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_engagement_level</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate user engagement level.&quot;&quot;&quot;</span>
+        <span class="n">engagement_indicators</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check response time (faster responses often indicate engagement)</span>
+        <span class="k">if</span> <span class="s2">&quot;response_time&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+            <span class="n">response_time</span> <span class="o">=</span> <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;response_time&quot;</span><span class="p">]</span>
+            <span class="c1"># Normalize response time (5-60 seconds is optimal range)</span>
+            <span class="k">if</span> <span class="mi">5</span> <span class="o">&lt;=</span> <span class="n">response_time</span> <span class="o">&lt;=</span> <span class="mi">60</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">response_time</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>  <span class="c1"># Too fast might indicate rushing</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="mf">0.3</span>
+                <span class="p">)</span>  <span class="c1"># Too slow might indicate disengagement</span>
+
+        <span class="c1"># Check choice complexity (choosing complex options indicates engagement)</span>
+        <span class="k">if</span> <span class="s2">&quot;choice_complexity&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+            <span class="n">complexity</span> <span class="o">=</span> <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;choice_complexity&quot;</span><span class="p">]</span>
+            <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">complexity</span><span class="p">)</span>
+
+        <span class="c1"># Check therapeutic relevance of choices</span>
+        <span class="k">if</span> <span class="s2">&quot;therapeutic_relevance&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+            <span class="n">relevance</span> <span class="o">=</span> <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">]</span>
+            <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">relevance</span><span class="p">)</span>
+
+        <span class="c1"># Check session duration (longer sessions often indicate engagement)</span>
+        <span class="n">session_duration</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_duration_minutes&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session_duration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Optimal session length is 20-45 minutes</span>
+            <span class="k">if</span> <span class="mi">20</span> <span class="o">&lt;=</span> <span class="n">session_duration</span> <span class="o">&lt;=</span> <span class="mi">45</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">session_duration</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">engagement_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.7</span><span class="p">)</span>  <span class="c1"># Long sessions still show engagement</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="nb">sum</span><span class="p">(</span><span class="n">engagement_indicators</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">engagement_indicators</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">engagement_indicators</span>
+            <span class="k">else</span> <span class="mf">0.5</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_completion_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate completion rate for scenes and choices.&quot;&quot;&quot;</span>
+        <span class="c1"># Get scene and choice history</span>
+        <span class="n">scenes_entered</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;scenes_visited&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">choices_made</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;choices_made&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+
+        <span class="c1"># Estimate expected completions based on session duration</span>
+        <span class="n">session_duration</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_duration_minutes&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">expected_scenes</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">session_duration</span> <span class="o">//</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># Expect 1 scene per 5 minutes</span>
+        <span class="n">expected_choices</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span> <span class="n">session_duration</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="p">)</span>  <span class="c1"># Expect 1 choice per 2 minutes</span>
+
+        <span class="n">scene_completion_rate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scenes_entered</span> <span class="o">/</span> <span class="n">expected_scenes</span><span class="p">)</span>
+        <span class="n">choice_completion_rate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">choices_made</span> <span class="o">/</span> <span class="n">expected_choices</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">scene_completion_rate</span> <span class="o">+</span> <span class="n">choice_completion_rate</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_decision_time</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate average decision time.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;response_time&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;response_time&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Get historical decision times from session context</span>
+        <span class="n">decision_times</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;decision_times&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="k">if</span> <span class="n">decision_times</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">decision_times</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:])</span>  <span class="c1"># Average of last 10 decisions</span>
+
+        <span class="k">return</span> <span class="mf">30.0</span>  <span class="c1"># Default 30 seconds</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_count_help_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Count help requests in current session.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;help_requests_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_current_difficulty</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DifficultyLevel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current difficulty level.&quot;&quot;&quot;</span>
+        <span class="n">difficulty_value</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;current_difficulty&quot;</span><span class="p">,</span> <span class="n">DifficultyLevel</span><span class="o">.</span><span class="n">MODERATE</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">DifficultyLevel</span><span class="p">(</span><span class="n">difficulty_value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recent_choices</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get recent choice IDs.&quot;&quot;&quot;</span>
+        <span class="n">choices_made</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;choices_made&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">return</span> <span class="n">choices_made</span><span class="p">[</span><span class="o">-</span><span class="mi">5</span><span class="p">:]</span>  <span class="c1"># Last 5 choices</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_snapshot_confidence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate confidence in performance snapshot.&quot;&quot;&quot;</span>
+        <span class="n">confidence</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># Base confidence</span>
+
+        <span class="c1"># Higher confidence with more data points</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshot</span><span class="o">.</span><span class="n">recent_choices</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">confidence</span> <span class="o">+=</span> <span class="mf">0.2</span>
+
+        <span class="c1"># Higher confidence with recent therapeutic progress</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">therapeutic_progress</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="n">confidence</span> <span class="o">+=</span> <span class="mf">0.2</span>
+
+        <span class="c1"># Lower confidence with extreme values (might be outliers)</span>
+        <span class="n">extreme_values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.1</span> <span class="ow">or</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&gt;</span> <span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&lt;</span> <span class="mf">0.1</span> <span class="ow">or</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&gt;</span> <span class="mf">0.9</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">extreme_values</span><span class="p">):</span>
+            <span class="n">confidence</span> <span class="o">-=</span> <span class="mf">0.1</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">confidence</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_should_adjust_difficulty</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine if difficulty should be adjusted.&quot;&quot;&quot;</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+
+        <span class="c1"># Need minimum data points</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">recent_snapshots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">][</span><span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">min_data_points</span> <span class="p">:]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_snapshots</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_data_points</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Calculate performance trends</span>
+        <span class="n">success_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">success_rate</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">engagement_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">engagement_level</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">stability_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">emotional_stability</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Check for adjustment triggers</span>
+        <span class="n">triggers</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Poor performance trigger</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.3</span> <span class="ow">and</span> <span class="n">success_trend</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&lt;</span> <span class="mf">0.3</span> <span class="ow">and</span> <span class="n">engagement_trend</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.1</span>
+        <span class="p">):</span>
+            <span class="n">triggers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">POOR_PERFORMANCE</span><span class="p">)</span>
+
+        <span class="c1"># Excellent performance trigger</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&gt;</span> <span class="mf">0.8</span> <span class="ow">and</span> <span class="n">success_trend</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+            <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&gt;</span> <span class="mf">0.7</span>
+        <span class="p">):</span>
+            <span class="n">triggers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EXCELLENT_PERFORMANCE</span><span class="p">)</span>
+
+        <span class="c1"># Emotional distress trigger</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">emotional_stability</span> <span class="o">&lt;</span> <span class="mf">0.3</span> <span class="ow">and</span> <span class="n">stability_trend</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">0.2</span><span class="p">:</span>
+            <span class="n">triggers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EMOTIONAL_DISTRESS</span><span class="p">)</span>
+
+        <span class="c1"># Pattern recognition trigger</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_performance_pattern</span><span class="p">(</span><span class="n">recent_snapshots</span><span class="p">):</span>
+            <span class="n">triggers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">PATTERN_RECOGNITION</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">triggers</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate trend in a series of values.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Simple linear trend calculation</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">x_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="n">y_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">xy_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="n">x2_sum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">n</span> <span class="o">*</span> <span class="n">x2_sum</span> <span class="o">-</span> <span class="n">x_sum</span> <span class="o">*</span> <span class="n">x_sum</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">slope</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">xy_sum</span> <span class="o">-</span> <span class="n">x_sum</span> <span class="o">*</span> <span class="n">y_sum</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">*</span> <span class="n">x2_sum</span> <span class="o">-</span> <span class="n">x_sum</span> <span class="o">*</span> <span class="n">x_sum</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slope</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_performance_pattern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PerformanceSnapshot</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect patterns in performance that warrant adjustment.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check for consistent poor performance</span>
+        <span class="n">poor_performance_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">snapshots</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.4</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">poor_performance_count</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.7</span><span class="p">:</span>  <span class="c1"># 70% poor performance</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check for consistent excellent performance</span>
+        <span class="n">excellent_performance_count</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">snapshots</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">excellent_performance_count</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.7</span>
+        <span class="p">):</span>  <span class="c1"># 70% excellent performance</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Check for declining engagement</span>
+        <span class="n">engagement_values</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">engagement_level</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">snapshots</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">engagement_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">engagement_values</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">engagement_values</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Consistently declining engagement</span>
+
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_adjust_difficulty</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Adjust difficulty based on performance analysis.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Determine adjustment trigger</span>
+            <span class="n">trigger</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_adjustment_trigger</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">)</span>
+
+            <span class="c1"># Select adaptation strategy</span>
+            <span class="n">strategy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_adaptation_strategy</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">trigger</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Calculate new difficulty level</span>
+            <span class="n">new_difficulty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_new_difficulty</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">,</span> <span class="n">strategy</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create adjustment record</span>
+            <span class="n">adjustment</span> <span class="o">=</span> <span class="n">DifficultyAdjustment</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">from_difficulty</span><span class="o">=</span><span class="n">snapshot</span><span class="o">.</span><span class="n">current_difficulty</span><span class="p">,</span>
+                <span class="n">to_difficulty</span><span class="o">=</span><span class="n">new_difficulty</span><span class="p">,</span>
+                <span class="n">trigger</span><span class="o">=</span><span class="n">trigger</span><span class="p">,</span>
+                <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+                <span class="n">performance_indicators</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;success_rate&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span><span class="p">,</span>
+                    <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span><span class="p">,</span>
+                    <span class="s2">&quot;emotional_stability&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">emotional_stability</span><span class="p">,</span>
+                    <span class="s2">&quot;therapeutic_progress&quot;</span><span class="p">:</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">therapeutic_progress</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="n">adjustment_reason</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_adjustment_reason</span><span class="p">(</span><span class="n">trigger</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">),</span>
+                <span class="n">expected_impact</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_expected_impact</span><span class="p">(</span>
+                    <span class="n">strategy</span><span class="p">,</span> <span class="n">new_difficulty</span>
+                <span class="p">),</span>
+                <span class="n">story_explanation</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_generate_story_explanation</span><span class="p">(</span>
+                    <span class="n">strategy</span><span class="p">,</span> <span class="n">new_difficulty</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Apply the adjustment</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_difficulty_adjustment</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">)</span>
+
+            <span class="c1"># Store adjustment record</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adjustment</span><span class="p">)</span>
+
+            <span class="c1"># Publish adjustment event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_publish_adjustment_event</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;difficulty_adjustments_made&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to adjust difficulty for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_adjustment_trigger</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdjustmentTrigger</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the primary trigger for difficulty adjustment.&quot;&quot;&quot;</span>
+        <span class="c1"># Check emotional distress first (highest priority)</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">emotional_stability</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EMOTIONAL_DISTRESS</span>
+
+        <span class="c1"># Check for poor performance</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.3</span> <span class="ow">or</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">POOR_PERFORMANCE</span>
+
+        <span class="c1"># Check for excellent performance</span>
+        <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&gt;</span> <span class="mf">0.8</span> <span class="ow">and</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EXCELLENT_PERFORMANCE</span>
+
+        <span class="c1"># Check for user request</span>
+        <span class="k">if</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;difficulty_adjustment_requested&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">USER_REQUEST</span>
+
+        <span class="c1"># Check for therapeutic goal changes</span>
+        <span class="k">if</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_goals_changed&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">THERAPEUTIC_GOAL_CHANGE</span>
+
+        <span class="c1"># Default to pattern recognition</span>
+        <span class="k">return</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">PATTERN_RECOGNITION</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_select_adaptation_strategy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span><span class="p">,</span>
+        <span class="n">trigger</span><span class="p">:</span> <span class="n">AdjustmentTrigger</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationStrategy</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select appropriate adaptation strategy.&quot;&quot;&quot;</span>
+        <span class="c1"># Get user preferences</span>
+        <span class="n">user_preferences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user_preferences</span><span class="p">(</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+        <span class="c1"># Strategy selection based on trigger</span>
+        <span class="k">if</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EMOTIONAL_DISTRESS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span>
+        <span class="k">elif</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">POOR_PERFORMANCE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user_preferences</span><span class="o">.</span><span class="n">adaptation_speed</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_DECREASE</span>
+        <span class="k">elif</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EXCELLENT_PERFORMANCE</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user_preferences</span><span class="o">.</span><span class="n">challenge_tolerance</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">CONTEXTUAL_SUPPORT</span>
+        <span class="k">elif</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">USER_REQUEST</span><span class="p">:</span>
+            <span class="n">requested_strategy</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;requested_strategy&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">requested_strategy</span> <span class="ow">in</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">AdaptationStrategy</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="p">(</span><span class="n">requested_strategy</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span>
+        <span class="k">elif</span> <span class="n">trigger</span> <span class="o">==</span> <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">THERAPEUTIC_GOAL_CHANGE</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">SKILL_BUILDING</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Pattern recognition or default</span>
+            <span class="k">if</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">ALTERNATIVE_PATH</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_new_difficulty</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">AdaptationStrategy</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DifficultyLevel</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate new difficulty level based on strategy.&quot;&quot;&quot;</span>
+        <span class="n">current_difficulty</span> <span class="o">=</span> <span class="n">snapshot</span><span class="o">.</span><span class="n">current_difficulty</span>
+        <span class="n">strategy_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_strategies</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span>
+
+        <span class="c1"># Get adjustment rate</span>
+        <span class="n">adjustment_rate</span> <span class="o">=</span> <span class="n">strategy_config</span><span class="p">[</span><span class="s2">&quot;adjustment_rate&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">adjustment_rate</span> <span class="o">==</span> <span class="s2">&quot;variable&quot;</span><span class="p">:</span>
+            <span class="c1"># For alternative path strategy, choose based on user preference</span>
+            <span class="n">user_preferences</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user_preferences</span><span class="p">(</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">user_preferences</span><span class="o">.</span><span class="n">preferred_difficulty</span> <span class="o">!=</span> <span class="n">current_difficulty</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">user_preferences</span><span class="o">.</span><span class="n">preferred_difficulty</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">current_difficulty</span>
+
+        <span class="k">if</span> <span class="n">adjustment_rate</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="c1"># No difficulty change for contextual support or skill building</span>
+            <span class="k">return</span> <span class="n">current_difficulty</span>
+
+        <span class="c1"># Calculate new difficulty level</span>
+        <span class="n">current_value</span> <span class="o">=</span> <span class="n">current_difficulty</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">adjustment</span> <span class="o">=</span> <span class="n">adjustment_rate</span> <span class="o">*</span> <span class="mi">6</span>  <span class="c1"># Scale to difficulty range (1-6)</span>
+
+        <span class="n">new_value</span> <span class="o">=</span> <span class="n">current_value</span> <span class="o">+</span> <span class="n">adjustment</span>
+        <span class="n">new_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">new_value</span><span class="p">)))</span>  <span class="c1"># Clamp to valid range</span>
+
+        <span class="k">return</span> <span class="n">DifficultyLevel</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">new_value</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_adjustment_reason</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">trigger</span><span class="p">:</span> <span class="n">AdjustmentTrigger</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="n">PerformanceSnapshot</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate human-readable reason for adjustment.&quot;&quot;&quot;</span>
+        <span class="n">reasons</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">POOR_PERFORMANCE</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;User showing difficulty with current challenges (success rate: </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EXCELLENT_PERFORMANCE</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;User excelling at current level (success rate: </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">EMOTIONAL_DISTRESS</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;User experiencing emotional distress (stability: </span><span class="si">{</span><span class="n">snapshot</span><span class="o">.</span><span class="n">emotional_stability</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">USER_REQUEST</span><span class="p">:</span> <span class="s2">&quot;User requested difficulty adjustment&quot;</span><span class="p">,</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">THERAPEUTIC_GOAL_CHANGE</span><span class="p">:</span> <span class="s2">&quot;Therapeutic goals have changed, requiring difficulty recalibration&quot;</span><span class="p">,</span>
+            <span class="n">AdjustmentTrigger</span><span class="o">.</span><span class="n">PATTERN_RECOGNITION</span><span class="p">:</span> <span class="s2">&quot;Performance patterns indicate need for difficulty adjustment&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">reasons</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">trigger</span><span class="p">,</span> <span class="s2">&quot;Difficulty adjustment needed based on performance analysis&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_expected_impact</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">AdaptationStrategy</span><span class="p">,</span> <span class="n">new_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate expected impact description.&quot;&quot;&quot;</span>
+        <span class="n">impacts</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Gradually increase challenge to </span><span class="si">{</span><span class="n">new_difficulty</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> level for continued growth&quot;</span><span class="p">,</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_DECREASE</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Reduce challenge to </span><span class="si">{</span><span class="n">new_difficulty</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> level to build confidence&quot;</span><span class="p">,</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Immediate adjustment to </span><span class="si">{</span><span class="n">new_difficulty</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> level for optimal experience&quot;</span><span class="p">,</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">CONTEXTUAL_SUPPORT</span><span class="p">:</span> <span class="s2">&quot;Provide additional support while maintaining current challenge level&quot;</span><span class="p">,</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">ALTERNATIVE_PATH</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Offer alternative approach at </span><span class="si">{</span><span class="n">new_difficulty</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> difficulty level&quot;</span><span class="p">,</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">SKILL_BUILDING</span><span class="p">:</span> <span class="s2">&quot;Focus on skill development before increasing difficulty&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">impacts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">strategy</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Adjust to </span><span class="si">{</span><span class="n">new_difficulty</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> difficulty level&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_story_explanation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">AdaptationStrategy</span><span class="p">,</span> <span class="n">new_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate story-appropriate explanation for difficulty change.&quot;&quot;&quot;</span>
+        <span class="n">explanations</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_INCREASE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;As you grow stronger and more confident, new challenges naturally present themselves.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Your developing skills open doors to more complex situations.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The world around you responds to your growing capabilities.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">GRADUAL_DECREASE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;You find yourself in a more supportive environment where you can build confidence.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;A helpful mentor appears to guide you through these challenges.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The situation becomes more manageable as you find your footing.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">IMMEDIATE_ADJUSTMENT</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;The situation suddenly shifts, requiring a different approach.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;New circumstances call for adapted strategies.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The environment changes to better match your current needs.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">CONTEXTUAL_SUPPORT</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;A wise companion joins you to offer guidance and support.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;You discover helpful resources that make the journey easier.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The community around you rallies to provide assistance.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">ALTERNATIVE_PATH</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;You discover an alternative route that better suits your style.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;A different approach becomes available that matches your strengths.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;New possibilities open up that align with your preferences.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">SKILL_BUILDING</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;You find an opportunity to practice and develop your abilities.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;A training ground appears where you can hone your skills.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Time is available to strengthen your foundation before moving forward.&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="n">strategy_explanations</span> <span class="o">=</span> <span class="n">explanations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">strategy</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;The path ahead adjusts to your journey.&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">strategy_explanations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Return first explanation for now</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_user_preferences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">UserPreferences</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get user preferences, creating defaults if not found.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_preferences</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user_preferences</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">UserPreferences</span><span class="p">(</span><span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_preferences</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_difficulty_adjustment</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">:</span> <span class="n">DifficultyAdjustment</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply difficulty adjustment to session state.&quot;&quot;&quot;</span>
+        <span class="c1"># Update current difficulty in session</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_difficulty&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">to_difficulty</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="c1"># Apply difficulty parameters</span>
+        <span class="n">difficulty_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">difficulty_parameters</span><span class="p">[</span><span class="n">adjustment</span><span class="o">.</span><span class="n">to_difficulty</span><span class="p">]</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;difficulty_parameters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">difficulty_params</span>
+
+        <span class="c1"># Provide support based on strategy</span>
+        <span class="n">support_provided</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">CONTEXTUAL_SUPPORT</span><span class="p">:</span>
+            <span class="n">support_provided</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;Additional hints available&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Detailed explanations provided&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Encouragement and validation&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">SKILL_BUILDING</span><span class="p">:</span>
+            <span class="n">support_provided</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;Skill-building exercises available&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Practice scenarios provided&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Progress tracking enabled&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="n">AdaptationStrategy</span><span class="o">.</span><span class="n">ALTERNATIVE_PATH</span><span class="p">:</span>
+            <span class="n">support_provided</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;Alternative approaches available&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Multiple solution paths&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Flexible goal achievement&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Store support information</span>
+        <span class="n">adjustment</span><span class="o">.</span><span class="n">support_provided</span> <span class="o">=</span> <span class="n">support_provided</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_support&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">support_provided</span>
+
+        <span class="c1"># Update story explanation</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;difficulty_explanation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">story_explanation</span>
+
+        <span class="c1"># Clear any adjustment request flags</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;difficulty_adjustment_requested&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;requested_strategy&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;therapeutic_goals_changed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_publish_adjustment_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">adjustment</span><span class="p">:</span> <span class="n">DifficultyAdjustment</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish difficulty adjustment event.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+            <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">DIFFICULTY_ADJUSTED</span><span class="p">,</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;adjustment_id&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">adjustment_id</span><span class="p">,</span>
+                <span class="s2">&quot;from_difficulty&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">from_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;to_difficulty&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">to_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;trigger&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;strategy&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;performance_indicators&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">performance_indicators</span><span class="p">,</span>
+                <span class="s2">&quot;story_explanation&quot;</span><span class="p">:</span> <span class="n">adjustment</span><span class="o">.</span><span class="n">story_explanation</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.update_user_preferences">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.update_user_preferences">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_user_preferences</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update user preferences for difficulty adaptation.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user_prefs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user_preferences</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+
+            <span class="c1"># Update preferences</span>
+            <span class="k">if</span> <span class="s2">&quot;preferred_difficulty&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">difficulty_value</span> <span class="o">=</span> <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;preferred_difficulty&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">difficulty_value</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="n">difficulty_value</span> <span class="o">&lt;=</span> <span class="mi">6</span><span class="p">:</span>
+                    <span class="n">user_prefs</span><span class="o">.</span><span class="n">preferred_difficulty</span> <span class="o">=</span> <span class="n">DifficultyLevel</span><span class="p">(</span><span class="n">difficulty_value</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;challenge_tolerance&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">tolerance</span> <span class="o">=</span> <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;challenge_tolerance&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">tolerance</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">user_prefs</span><span class="o">.</span><span class="n">challenge_tolerance</span> <span class="o">=</span> <span class="n">tolerance</span>
+
+            <span class="k">if</span> <span class="s2">&quot;adaptation_speed&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">speed</span> <span class="o">=</span> <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;adaptation_speed&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">speed</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">user_prefs</span><span class="o">.</span><span class="n">adaptation_speed</span> <span class="o">=</span> <span class="n">speed</span>
+
+            <span class="k">if</span> <span class="s2">&quot;wants_hints&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">wants_hints</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;wants_hints&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s2">&quot;wants_explanations&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">wants_explanations</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;wants_explanations&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s2">&quot;wants_encouragement&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">wants_encouragement</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
+                    <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;wants_encouragement&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;wants_alternative_paths&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">wants_alternative_paths</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span>
+                    <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;wants_alternative_paths&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;therapeutic_focus&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">therapeutic_focus</span> <span class="o">=</span> <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;learning_style&quot;</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+                <span class="n">user_prefs</span><span class="o">.</span><span class="n">learning_style</span> <span class="o">=</span> <span class="n">preferences</span><span class="p">[</span><span class="s2">&quot;learning_style&quot;</span><span class="p">]</span>
+
+            <span class="n">user_prefs</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;user_preferences_updated&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update user preferences for </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.request_difficulty_adjustment">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.request_difficulty_adjustment">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request_difficulty_adjustment</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">requested_difficulty</span><span class="p">:</span> <span class="n">DifficultyLevel</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">AdaptationStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Request manual difficulty adjustment.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Set adjustment request flags</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;difficulty_adjustment_requested&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">if</span> <span class="n">requested_difficulty</span><span class="p">:</span>
+                <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;requested_difficulty&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">requested_difficulty</span><span class="o">.</span><span class="n">value</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">strategy</span><span class="p">:</span>
+                <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;requested_strategy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">strategy</span><span class="o">.</span><span class="n">value</span>
+
+            <span class="c1"># Trigger immediate performance monitoring to process the request</span>
+            <span class="n">interaction_data</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;interaction_type&quot;</span><span class="p">:</span> <span class="s2">&quot;difficulty_adjustment_request&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;requested_difficulty&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="n">requested_difficulty</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">requested_difficulty</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;requested_strategy&quot;</span><span class="p">:</span> <span class="n">strategy</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">strategy</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">monitor_performance</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to request difficulty adjustment for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.get_current_difficulty_info">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_current_difficulty_info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_difficulty_info</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current difficulty information and parameters.&quot;&quot;&quot;</span>
+        <span class="n">current_difficulty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_difficulty</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+        <span class="n">difficulty_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">difficulty_parameters</span><span class="p">[</span><span class="n">current_difficulty</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;current_difficulty&quot;</span><span class="p">:</span> <span class="n">current_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="n">current_difficulty</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;parameters&quot;</span><span class="p">:</span> <span class="n">difficulty_params</span><span class="p">,</span>
+            <span class="s2">&quot;support_available&quot;</span><span class="p">:</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;current_support&quot;</span><span class="p">,</span> <span class="p">[]),</span>
+            <span class="s2">&quot;explanation&quot;</span><span class="p">:</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;difficulty_explanation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;user_preferences&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user_preferences</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+            <span class="p">)</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.get_performance_summary">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_performance_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_performance_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get performance summary for a user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No performance data available&quot;</span><span class="p">}</span>
+
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">)</span>
+        <span class="n">recent_snapshots</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">created_at</span> <span class="o">&gt;</span> <span class="n">cutoff_time</span>
+        <span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">recent_snapshots</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No recent performance data&quot;</span><span class="p">}</span>
+
+        <span class="c1"># Calculate summary statistics</span>
+        <span class="n">success_rates</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">success_rate</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+        <span class="n">engagement_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">engagement_level</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+        <span class="n">stability_levels</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">emotional_stability</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_snapshots</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;snapshots_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_snapshots</span><span class="p">),</span>
+            <span class="s2">&quot;time_period_hours&quot;</span><span class="p">:</span> <span class="n">hours</span><span class="p">,</span>
+            <span class="s2">&quot;success_rate&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;current&quot;</span><span class="p">:</span> <span class="n">success_rates</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;average&quot;</span><span class="p">:</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">success_rates</span><span class="p">),</span>
+                <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span><span class="n">success_rates</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;current&quot;</span><span class="p">:</span> <span class="n">engagement_levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;average&quot;</span><span class="p">:</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">engagement_levels</span><span class="p">),</span>
+                <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span><span class="n">engagement_levels</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;emotional_stability&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;current&quot;</span><span class="p">:</span> <span class="n">stability_levels</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                <span class="s2">&quot;average&quot;</span><span class="p">:</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">stability_levels</span><span class="p">),</span>
+                <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span><span class="n">stability_levels</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;current_difficulty&quot;</span><span class="p">:</span> <span class="n">recent_snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">current_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_progress&quot;</span><span class="p">:</span> <span class="n">recent_snapshots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">therapeutic_progress</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.get_adjustment_history">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_adjustment_history">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_adjustment_history</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get difficulty adjustment history for a user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="n">hours</span><span class="p">)</span>
+        <span class="n">recent_adjustments</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">adj</span>
+            <span class="k">for</span> <span class="n">adj</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">adj</span><span class="o">.</span><span class="n">created_at</span> <span class="o">&gt;</span> <span class="n">cutoff_time</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;adjustment_id&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">adjustment_id</span><span class="p">,</span>
+                <span class="s2">&quot;from_difficulty&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">from_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;to_difficulty&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">to_difficulty</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;trigger&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">trigger</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;strategy&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">adjustment_reason</span><span class="p">,</span>
+                <span class="s2">&quot;expected_impact&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">expected_impact</span><span class="p">,</span>
+                <span class="s2">&quot;story_explanation&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">story_explanation</span><span class="p">,</span>
+                <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="s2">&quot;effectiveness_score&quot;</span><span class="p">:</span> <span class="n">adj</span><span class="o">.</span><span class="n">effectiveness_score</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">adj</span> <span class="ow">in</span> <span class="n">recent_adjustments</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.get_metrics">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get adaptive difficulty engine metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;active_users_monitored&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="p">),</span>
+            <span class="s2">&quot;total_performance_snapshots&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">snapshots</span><span class="p">)</span> <span class="k">for</span> <span class="n">snapshots</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_history</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;total_adjustments&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">adjustments</span><span class="p">)</span> <span class="k">for</span> <span class="n">adjustments</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_history</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;user_preferences_configured&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_preferences</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveDifficultyEngine.health_check">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.html#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform health check of adaptive difficulty engine.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;difficulty_levels_configured&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">difficulty_parameters</span><span class="p">),</span>
+            <span class="s2">&quot;adaptation_strategies_available&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adaptation_strategies</span><span class="p">),</span>
+            <span class="s2">&quot;performance_window_minutes&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">performance_window</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span>
+            <span class="s2">&quot;adjustment_threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">adjustment_threshold</span><span class="p">,</span>
+            <span class="s2">&quot;min_data_points&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_data_points</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_performance_snapshot</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PerformanceSnapshot</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create performance snapshot from session data.&quot;&quot;&quot;</span>
+        <span class="n">snapshot</span> <span class="o">=</span> <span class="n">PerformanceSnapshot</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate success rate from recent choices</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">success_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_success_rate</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+        <span class="c1"># Get therapeutic progress</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">therapeutic_progress</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_therapeutic_progress</span><span class="p">(</span>
+            <span class="n">session_state</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get emotional stability</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">emotional_stability</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_emotional_stability</span><span class="p">(</span>
+            <span class="n">session_state</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate engagement level</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_engagement_level</span><span class="p">(</span>
+            <span class="n">session_state</span><span class="p">,</span> <span class="n">interaction_data</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate completion rate</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">completion_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_completion_rate</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+        <span class="c1"># Get average decision time</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">average_decision_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_decision_time</span><span class="p">(</span>
+            <span class="n">session_state</span><span class="p">,</span> <span class="n">interaction_data</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Count help requests</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">help_requests</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_count_help_requests</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+        <span class="c1"># Get current difficulty</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">current_difficulty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_difficulty</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+        <span class="c1"># Store recent choices</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">recent_choices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recent_choices</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+        <span class="c1"># Get therapeutic goals</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">therapeutic_goals</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">therapeutic_goals</span>
+
+        <span class="c1"># Calculate confidence</span>
+        <span class="n">snapshot</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_snapshot_confidence</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">snapshot</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

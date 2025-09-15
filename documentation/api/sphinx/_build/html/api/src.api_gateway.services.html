@@ -1,0 +1,750 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.services package &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.api_gateway.services.auth_service module" href="src.api_gateway.services.auth_service.html" />
+    <link rel="prev" title="src.api_gateway.security package" href="src.api_gateway.security.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.api_gateway.html">src.api_gateway package</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.services package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.api_gateway.services.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.api_gateway.services">
+<span id="src-api-gateway-services-package"></span><h1>src.api_gateway.services package<a class="headerlink" href="#module-src.api_gateway.services" title="Link to this heading"></a></h1>
+<p>Service layer for the API Gateway system.</p>
+<p>This module contains all the business logic services for the API Gateway,
+including service discovery, authentication, routing, and monitoring.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.services.AutoRegistrationService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.services.</span></span><span class="sig-name descname"><span class="pre">AutoRegistrationService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">discovery_manager</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auto_registration.html#AutoRegistrationService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.AutoRegistrationService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Automatic service registration for TTA components.</p>
+<p>Features:
+- Automatic discovery of TTA services
+- Registration based on configuration
+- Integration with existing TTA components
+- Health check configuration</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>discovery_manager</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager" title="src.api_gateway.services.discovery_manager.ServiceDiscoveryManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceDiscoveryManager</span></code></a></span>)</p>
+</dd>
+</dl>
+<p>Initialize the auto-registration service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>discovery_manager</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager" title="src.api_gateway.services.discovery_manager.ServiceDiscoveryManager"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceDiscoveryManager</span></code></a></span>) – Service discovery manager instance</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.AutoRegistrationService.deregister_all_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deregister_all_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auto_registration.html#AutoRegistrationService.deregister_all_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.AutoRegistrationService.deregister_all_services" title="Link to this definition"></a></dt>
+<dd><p>Deregister all auto-registered services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.AutoRegistrationService.get_registered_services">
+<span class="sig-name descname"><span class="pre">get_registered_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auto_registration.html#AutoRegistrationService.get_registered_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.AutoRegistrationService.get_registered_services" title="Link to this definition"></a></dt>
+<dd><p>Get all registered services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.AutoRegistrationService.refresh_service_registration">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refresh_service_registration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auto_registration.html#AutoRegistrationService.refresh_service_registration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.AutoRegistrationService.refresh_service_registration" title="Link to this definition"></a></dt>
+<dd><p>Refresh registration for a specific service.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the service to refresh</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if refresh successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.AutoRegistrationService.register_tta_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_tta_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auto_registration.html#AutoRegistrationService.register_tta_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.AutoRegistrationService.register_tta_services" title="Link to this definition"></a></dt>
+<dd><p>Register all configured TTA services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.services.</span></span><span class="sig-name descname"><span class="pre">GatewayAuthService</span></span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Gateway authentication service.</p>
+<p>Provides JWT token validation and authentication context management
+that integrates with the TTA Player Experience authentication system.</p>
+<p>Initialize the gateway authentication service.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.authenticate_request">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">authenticate_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auth_request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.authenticate_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.authenticate_request" title="Link to this definition"></a></dt>
+<dd><p>Authenticate a request using JWT token.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>auth_request</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.auth.html#src.api_gateway.models.auth.AuthenticationRequest" title="src.api_gateway.models.auth.AuthenticationRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthenticationRequest</span></code></a></span>) – Authentication request with token and context</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Authentication result</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.AuthenticationResponse" title="src.api_gateway.models.AuthenticationResponse">AuthenticationResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.check_crisis_mode">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_crisis_mode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auth_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.check_crisis_mode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.check_crisis_mode" title="Link to this definition"></a></dt>
+<dd><p>Check if the authentication context is in crisis mode.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>auth_context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.auth.html#src.api_gateway.models.auth.AuthContext" title="src.api_gateway.models.auth.AuthContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthContext</span></code></a></span>) – User authentication context</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if in crisis mode</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.check_therapeutic_context">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_therapeutic_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auth_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.check_therapeutic_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.check_therapeutic_context" title="Link to this definition"></a></dt>
+<dd><p>Check if the authentication context is in a therapeutic context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>auth_context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.auth.html#src.api_gateway.models.auth.AuthContext" title="src.api_gateway.models.auth.AuthContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthContext</span></code></a></span>) – User authentication context</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if in therapeutic context</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.refresh_token">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">refresh_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">refresh_token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.refresh_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.refresh_token" title="Link to this definition"></a></dt>
+<dd><p>Refresh an access token using a refresh token.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>refresh_token</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Refresh token</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>New access token if successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Optional[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.validate_token">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_token</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">token</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.validate_token"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.validate_token" title="Link to this definition"></a></dt>
+<dd><p>Validate a JWT token using the TTA authentication system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>token</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – JWT token to validate</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Token validation result</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.TokenValidationResult" title="src.api_gateway.models.TokenValidationResult">TokenValidationResult</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.GatewayAuthService.validate_user_permissions">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">validate_user_permissions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">auth_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_permission</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/auth_service.html#GatewayAuthService.validate_user_permissions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.GatewayAuthService.validate_user_permissions" title="Link to this definition"></a></dt>
+<dd><p>Validate user permissions for a specific action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>auth_context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.auth.html#src.api_gateway.models.auth.AuthContext" title="src.api_gateway.models.auth.AuthContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">AuthContext</span></code></a></span>) – User authentication context</p></li>
+<li><p><strong>required_permission</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Required permission level</p></li>
+<li><p><strong>service_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional service name for service-specific permissions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if user has required permissions</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.services.</span></span><span class="sig-name descname"><span class="pre">RedisServiceRegistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">redis_client</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Redis-backed service registry for service discovery.</p>
+<p>Features:
+- Service registration and deregistration
+- Health monitoring with TTL
+- Service lookup and filtering
+- Automatic cleanup of stale services</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>redis_client</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Redis</span></code> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p>
+</dd>
+</dl>
+<p>Initialize the Redis service registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>redis_client</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Redis</span></code> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional Redis client instance</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.close">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.close" title="Link to this definition"></a></dt>
+<dd><p>Close the service registry and cleanup resources.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.deregister_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deregister_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.deregister_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.deregister_service" title="Link to this definition"></a></dt>
+<dd><p>Deregister a service from the registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></span>) – Service ID to deregister</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if deregistration successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.get_all_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.get_all_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.get_all_services" title="Link to this definition"></a></dt>
+<dd><p>Get all registered services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of all services</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.get_healthy_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_healthy_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.get_healthy_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.get_healthy_services" title="Link to this definition"></a></dt>
+<dd><p>Get all healthy services, optionally filtered by type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceType" title="src.api_gateway.models.service.ServiceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional service type filter</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of healthy services</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.get_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.get_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.get_service" title="Link to this definition"></a></dt>
+<dd><p>Get a specific service by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></span>) – Service ID to retrieve</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Service information if found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.get_services_by_tag">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_services_by_tag</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tag</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.get_services_by_tag"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.get_services_by_tag" title="Link to this definition"></a></dt>
+<dd><p>Get services by tag.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tag</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Tag to filter by</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of services with the specified tag</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.get_services_by_type">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_services_by_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.get_services_by_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.get_services_by_type" title="Link to this definition"></a></dt>
+<dd><p>Get services by type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceType" title="src.api_gateway.models.service.ServiceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceType</span></code></a></span>) – Service type to filter by</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of services of the specified type</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.initialize">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.initialize" title="Link to this definition"></a></dt>
+<dd><p>Initialize the service registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.register_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.register_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.register_service" title="Link to this definition"></a></dt>
+<dd><p>Register a service in the registry.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a></span>) – Service information to register</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if registration successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.RedisServiceRegistry.update_service_health">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_service_health</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_healthy</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#RedisServiceRegistry.update_service_health"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.RedisServiceRegistry.update_service_health" title="Link to this definition"></a></dt>
+<dd><p>Update service health status.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></span>) – Service ID</p></li>
+<li><p><strong>is_healthy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Health status</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if update successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.services.</span></span><span class="sig-name descname"><span class="pre">ServiceDiscoveryError</span></span><a class="reference internal" href="../_modules/src/api_gateway/services/service_discovery.html#ServiceDiscoveryError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Service discovery related errors.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.services.</span></span><span class="sig-name descname"><span class="pre">ServiceDiscoveryManager</span></span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>High-level service discovery manager.</p>
+<p>Features:
+- Service registration and lifecycle management
+- Health monitoring and automatic failover
+- Load balancing across healthy services
+- Service event notifications</p>
+<p>Initialize the service discovery manager.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.add_event_callback">
+<span class="sig-name descname"><span class="pre">add_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.add_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.add_event_callback" title="Link to this definition"></a></dt>
+<dd><p>Add a callback for service events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>callback</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></span>) – Callback function that receives (event_type, service)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.close">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.close"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.close" title="Link to this definition"></a></dt>
+<dd><p>Close the service discovery manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.deregister_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">deregister_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.deregister_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.deregister_service" title="Link to this definition"></a></dt>
+<dd><p>Deregister a service and stop health monitoring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></span>) – Service ID to deregister</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if deregistration successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.get_all_healthy_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all_healthy_services</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.get_all_healthy_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.get_all_healthy_services" title="Link to this definition"></a></dt>
+<dd><p>Get all healthy services, optionally filtered by type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>service_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceType" title="src.api_gateway.models.service.ServiceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional service type filter</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of healthy services</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.get_service_for_request">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_service_for_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">service_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_priority</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.get_service_for_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.get_service_for_request" title="Link to this definition"></a></dt>
+<dd><p>Get a service for handling a request using load balancing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceType" title="src.api_gateway.models.service.ServiceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional service type filter</p></li>
+<li><p><strong>service_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional service name filter</p></li>
+<li><p><strong>tags</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Optional tags filter</p></li>
+<li><p><strong>therapeutic_priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to prioritize therapeutic services</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Selected service or None if no suitable service found</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.get_therapeutic_services">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_therapeutic_services</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.get_therapeutic_services"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.get_therapeutic_services" title="Link to this definition"></a></dt>
+<dd><p>Get all healthy therapeutic services.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>List of therapeutic services</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.ServiceInfo" title="src.api_gateway.models.ServiceInfo">ServiceInfo</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.initialize">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.initialize" title="Link to this definition"></a></dt>
+<dd><p>Initialize the service discovery manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.register_service">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">register_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_health_monitoring</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.register_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.register_service" title="Link to this definition"></a></dt>
+<dd><p>Register a service and optionally start health monitoring.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.service.html#src.api_gateway.models.service.ServiceInfo" title="src.api_gateway.models.service.ServiceInfo"><code class="xref py py-class docutils literal notranslate"><span class="pre">ServiceInfo</span></code></a></span>) – Service information to register</p></li>
+<li><p><strong>start_health_monitoring</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to start health monitoring</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>True if registration successful</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.remove_event_callback">
+<span class="sig-name descname"><span class="pre">remove_event_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">callback</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.remove_event_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.remove_event_callback" title="Link to this definition"></a></dt>
+<dd><p>Remove a service event callback.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>callback</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></span>) – Callback function to remove</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.services.ServiceDiscoveryManager.update_service_metrics">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_service_metrics</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">service_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">response_time</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/services/discovery_manager.html#ServiceDiscoveryManager.update_service_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.services.ServiceDiscoveryManager.update_service_metrics" title="Link to this definition"></a></dt>
+<dd><p>Update service metrics after a request.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>service_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/uuid.html#uuid.UUID" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UUID</span></code></a></span>) – Service ID</p></li>
+<li><p><strong>response_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>) – Response time in seconds</p></li>
+<li><p><strong>success</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether the request was successful</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.api_gateway.services.auth_service.html">src.api_gateway.services.auth_service module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.authenticate_request"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.authenticate_request()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.check_crisis_mode"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.check_crisis_mode()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.check_therapeutic_context"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.check_therapeutic_context()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.refresh_token"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.refresh_token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.validate_token"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.validate_token()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auth_service.html#src.api_gateway.services.auth_service.GatewayAuthService.validate_user_permissions"><code class="docutils literal notranslate"><span class="pre">GatewayAuthService.validate_user_permissions()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.api_gateway.services.auto_registration.html">src.api_gateway.services.auto_registration module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.api_gateway.services.auto_registration.html#src.api_gateway.services.auto_registration.AutoRegistrationService"><code class="docutils literal notranslate"><span class="pre">AutoRegistrationService</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auto_registration.html#src.api_gateway.services.auto_registration.AutoRegistrationService.deregister_all_services"><code class="docutils literal notranslate"><span class="pre">AutoRegistrationService.deregister_all_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auto_registration.html#src.api_gateway.services.auto_registration.AutoRegistrationService.get_registered_services"><code class="docutils literal notranslate"><span class="pre">AutoRegistrationService.get_registered_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auto_registration.html#src.api_gateway.services.auto_registration.AutoRegistrationService.refresh_service_registration"><code class="docutils literal notranslate"><span class="pre">AutoRegistrationService.refresh_service_registration()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.auto_registration.html#src.api_gateway.services.auto_registration.AutoRegistrationService.register_tta_services"><code class="docutils literal notranslate"><span class="pre">AutoRegistrationService.register_tta_services()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html">src.api_gateway.services.discovery_manager module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.add_event_callback"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.add_event_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.close"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.deregister_service"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.deregister_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.get_all_healthy_services"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.get_all_healthy_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.get_service_for_request"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.get_service_for_request()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.get_therapeutic_services"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.get_therapeutic_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.initialize"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.initialize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.register_service"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.register_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.remove_event_callback"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.remove_event_callback()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.discovery_manager.html#src.api_gateway.services.discovery_manager.ServiceDiscoveryManager.update_service_metrics"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryManager.update_service_metrics()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.api_gateway.services.service_discovery.html">src.api_gateway.services.service_discovery module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.close"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.close()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.deregister_service"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.deregister_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.get_all_services"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.get_all_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.get_healthy_services"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.get_healthy_services()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.get_service"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.get_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.get_services_by_tag"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.get_services_by_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.get_services_by_type"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.get_services_by_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.initialize"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.initialize()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.register_service"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.register_service()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.RedisServiceRegistry.update_service_health"><code class="docutils literal notranslate"><span class="pre">RedisServiceRegistry.update_service_health()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.api_gateway.services.service_discovery.html#src.api_gateway.services.service_discovery.ServiceDiscoveryError"><code class="docutils literal notranslate"><span class="pre">ServiceDiscoveryError</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.api_gateway.security.html" class="btn btn-neutral float-left" title="src.api_gateway.security package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.api_gateway.services.auth_service.html" class="btn btn-neutral float-right" title="src.api_gateway.services.auth_service module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

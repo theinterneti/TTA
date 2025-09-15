@@ -1,0 +1,664 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.session_integration_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.session_integration_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.session_integration_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Session management and context switching functionality.</span>
+
+<span class="sd">Handles session lifecycle management, character-world switching, and integration</span>
+<span class="sd">with the Interactive Narrative Engine for seamless therapeutic experiences.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.session_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionStatus</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressMarker</span><span class="p">,</span> <span class="n">SessionContext</span><span class="p">,</span> <span class="n">TherapeuticSettings</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionIntegrationManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages session context and character-world switching.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_repository</span><span class="p">:</span> <span class="n">SessionRepository</span><span class="p">,</span> <span class="n">interactive_narrative_engine</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Session Integration Manager.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_repository: Repository for session data persistence</span>
+<span class="sd">            interactive_narrative_engine: Engine for narrative interactions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span> <span class="o">=</span> <span class="n">session_repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span> <span class="o">=</span> <span class="n">interactive_narrative_engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SessionContext</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># player_id -&gt; session</span>
+
+<div class="viewcode-block" id="SessionIntegrationManager.create_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.create_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_session</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">therapeutic_settings</span><span class="p">:</span> <span class="n">TherapeuticSettings</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new therapeutic session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+<span class="sd">            character_id: ID of the character</span>
+<span class="sd">            world_id: ID of the world</span>
+<span class="sd">            therapeutic_settings: Optional therapeutic settings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Created session context or None if creation failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Generate unique session ID</span>
+            <span class="n">session_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;session_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Use default therapeutic settings if none provided</span>
+            <span class="k">if</span> <span class="n">therapeutic_settings</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">therapeutic_settings</span> <span class="o">=</span> <span class="n">TherapeuticSettings</span><span class="p">()</span>
+
+            <span class="c1"># Create session context</span>
+            <span class="n">session_context</span> <span class="o">=</span> <span class="n">SessionContext</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span><span class="p">,</span>
+                <span class="n">world_id</span><span class="o">=</span><span class="n">world_id</span><span class="p">,</span>
+                <span class="n">therapeutic_settings</span><span class="o">=</span><span class="n">therapeutic_settings</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Initialize with Interactive Narrative Engine if available</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_narrative_context</span><span class="p">(</span><span class="n">session_context</span><span class="p">)</span>
+
+            <span class="c1"># Persist session</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">session_context</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_context</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">session_context</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to persist session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create session for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.switch_character_world_context">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.switch_character_world_context">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">switch_character_world_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_world_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Switch to a different character-world combination, preserving session state.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+<span class="sd">            new_character_id: ID of the new character</span>
+<span class="sd">            new_world_id: ID of the new world</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            New session context or None if switch failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Pause current session if active</span>
+            <span class="n">current_session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_session</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pause_session</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+
+            <span class="c1"># Check if there&#39;s an existing session for this character-world combination</span>
+            <span class="n">existing_session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_session</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="n">new_character_id</span><span class="p">,</span> <span class="n">new_world_id</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">existing_session</span><span class="p">:</span>
+                <span class="c1"># Resume existing session</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resuming existing session </span><span class="si">{</span><span class="n">existing_session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">resume_session</span><span class="p">(</span><span class="n">existing_session</span><span class="o">.</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Create new session with preserved therapeutic settings</span>
+                <span class="n">therapeutic_settings</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">current_session</span><span class="o">.</span><span class="n">therapeutic_settings</span> <span class="k">if</span> <span class="n">current_session</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span>
+                    <span class="n">player_id</span><span class="p">,</span> <span class="n">new_character_id</span><span class="p">,</span> <span class="n">new_world_id</span><span class="p">,</span> <span class="n">therapeutic_settings</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to switch context for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.pause_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.pause_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pause_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pause the active session for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if session was paused successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No active session found for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Preserve current state with Interactive Narrative Engine</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_preserve_narrative_state</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+            <span class="c1"># Update session status</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">pause_session</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">PAUSED</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Paused session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to pause session for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.resume_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.resume_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">resume_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Resume a paused session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_id: ID of the session to resume</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Resumed session context or None if resume failed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get session from repository</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">status</span> <span class="o">!=</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> is not paused (status: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">status</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Resume with Interactive Narrative Engine</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_restore_narrative_state</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+            <span class="c1"># Update session status</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">resume_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">ACTIVE</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="p">[</span><span class="n">session</span><span class="o">.</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resumed session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">session</span>
+
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to resume session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.end_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.end_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        End the active session for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if session was ended successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No active session found for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Finalize with Interactive Narrative Engine</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_narrative_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+            <span class="c1"># Update session status</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">end_session</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">COMPLETED</span>
+                <span class="c1"># Remove from active sessions</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ended session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to end session for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.get_active_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.get_active_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_active_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the active session for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Active session context or None if no active session</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check in-memory cache first</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">session</span> <span class="ow">and</span> <span class="n">session</span><span class="o">.</span><span class="n">is_active</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">session</span>
+
+        <span class="c1"># Check repository for active sessions</span>
+        <span class="n">active_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_player_active_sessions</span><span class="p">(</span>
+            <span class="n">player_id</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">active_sessions</span><span class="p">:</span>
+            <span class="c1"># Use the most recent active session</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">active_sessions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_sessions</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span>
+            <span class="k">return</span> <span class="n">session</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.update_session_interaction">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.update_session_interaction">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_session_interaction</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update session with new interaction data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+<span class="sd">            interaction_data: Data from the interaction</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if session was updated successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_active_session</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No active session found for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Update interaction statistics</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">update_interaction</span><span class="p">()</span>
+
+            <span class="c1"># Process therapeutic interventions if present</span>
+            <span class="k">if</span> <span class="s2">&quot;therapeutic_intervention&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add_therapeutic_intervention</span><span class="p">(</span>
+                    <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;therapeutic_intervention&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Record emotional state if present</span>
+            <span class="k">if</span> <span class="s2">&quot;emotional_state&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">record_emotional_state</span><span class="p">(</span><span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;emotional_state&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Update session variables</span>
+            <span class="k">if</span> <span class="s2">&quot;session_variables&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">session_variables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;session_variables&quot;</span><span class="p">])</span>
+
+            <span class="c1"># Update current scene if present</span>
+            <span class="k">if</span> <span class="s2">&quot;current_scene_id&quot;</span> <span class="ow">in</span> <span class="n">interaction_data</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">current_scene_id</span> <span class="o">=</span> <span class="n">interaction_data</span><span class="p">[</span><span class="s2">&quot;current_scene_id&quot;</span><span class="p">]</span>
+
+            <span class="c1"># Persist changes</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to update session interaction for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.add_progress_marker">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.add_progress_marker">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_progress_marker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">marker</span><span class="p">:</span> <span class="n">ProgressMarker</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a progress marker to the active session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+<span class="sd">            marker: Progress marker to add</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if marker was added successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_active_session</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No active session found for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="n">session</span><span class="o">.</span><span class="n">add_progress_marker</span><span class="p">(</span><span class="n">marker</span><span class="p">)</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add progress marker for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.update_therapeutic_settings">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.update_therapeutic_settings">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_therapeutic_settings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_settings</span><span class="p">:</span> <span class="n">TherapeuticSettings</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update therapeutic settings for the active session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: ID of the player</span>
+<span class="sd">            new_settings: New therapeutic settings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if settings were updated successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_active_session</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No active session found for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="n">session</span><span class="o">.</span><span class="n">therapeutic_settings</span> <span class="o">=</span> <span class="n">new_settings</span>
+
+            <span class="c1"># Update Interactive Narrative Engine with new settings</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_narrative_therapeutic_settings</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">new_settings</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to update therapeutic settings for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionIntegrationManager.get_session_continuity_data">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.session_integration_manager.html#src.player_experience.managers.SessionIntegrationManager.get_session_continuity_data">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_session_continuity_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get data needed for session continuity across context switches.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_id: ID of the session</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary containing continuity data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{}</span>
+
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;therapeutic_settings&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">therapeutic_settings</span><span class="p">,</span>
+                <span class="s2">&quot;progress_markers&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">progress_markers</span><span class="p">,</span>
+                <span class="s2">&quot;session_variables&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">session_variables</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_interventions_used&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">therapeutic_interventions_used</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_state_history&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">emotional_state_history</span><span class="p">[</span>
+                    <span class="o">-</span><span class="mi">5</span><span class="p">:</span>
+                <span class="p">],</span>  <span class="c1"># Last 5 states</span>
+                <span class="s2">&quot;interaction_count&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">interaction_count</span><span class="p">,</span>
+                <span class="s2">&quot;total_duration_minutes&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">total_duration_minutes</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get continuity data for session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_find_existing_session</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find existing paused session for character-world combination.&quot;&quot;&quot;</span>
+        <span class="n">active_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_player_active_sessions</span><span class="p">(</span>
+            <span class="n">player_id</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">active_sessions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">character_id</span> <span class="o">==</span> <span class="n">character_id</span>
+                <span class="ow">and</span> <span class="n">session</span><span class="o">.</span><span class="n">world_id</span> <span class="o">==</span> <span class="n">world_id</span>
+                <span class="ow">and</span> <span class="n">session</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">SessionStatus</span><span class="o">.</span><span class="n">PAUSED</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">session</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_narrative_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize narrative context with Interactive Narrative Engine.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Initialize narrative engine with session context</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="o">.</span><span class="n">initialize_session</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">character_id</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+                <span class="n">world_id</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">world_id</span><span class="p">,</span>
+                <span class="n">therapeutic_settings</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">therapeutic_settings</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Initialized narrative context for session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initialize narrative context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_preserve_narrative_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Preserve narrative state when pausing session.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get current narrative state</span>
+            <span class="n">narrative_state</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="o">.</span><span class="n">get_session_state</span><span class="p">(</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">session_id</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store in session variables</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">session_variables</span><span class="p">[</span><span class="s2">&quot;narrative_state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">narrative_state</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preserved narrative state for session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to preserve narrative state: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_restore_narrative_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restore narrative state when resuming session.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get preserved narrative state</span>
+            <span class="n">narrative_state</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">session_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;narrative_state&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">narrative_state</span><span class="p">:</span>
+                <span class="c1"># Restore state in narrative engine</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="o">.</span><span class="n">restore_session_state</span><span class="p">(</span>
+                    <span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">narrative_state</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Restored narrative state for session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to restore narrative state: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_finalize_narrative_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Finalize narrative session when ending.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Finalize session with narrative engine</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="o">.</span><span class="n">finalize_session</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finalized narrative session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to finalize narrative session: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_update_narrative_therapeutic_settings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">TherapeuticSettings</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update therapeutic settings in narrative engine.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Update settings in narrative engine</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">interactive_narrative_engine</span><span class="o">.</span><span class="n">update_therapeutic_settings</span><span class="p">(</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">settings</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Updated narrative therapeutic settings for session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update narrative therapeutic settings: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

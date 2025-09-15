@@ -1,0 +1,1016 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.services.auth_service &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.services.auth_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.services.auth_service</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Enhanced authentication service with MFA and RBAC support.</span>
+
+<span class="sd">This service provides comprehensive authentication, authorization, and security</span>
+<span class="sd">features including multi-factor authentication and role-based access control.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">secrets</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">pyotp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">qrcode</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">jose</span><span class="w"> </span><span class="kn">import</span> <span class="n">JWTError</span><span class="p">,</span> <span class="n">jwt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">passlib.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">CryptContext</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.user_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">User</span><span class="p">,</span> <span class="n">UserRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DEFAULT_ROLE_PERMISSIONS</span><span class="p">,</span>
+    <span class="n">AuthenticatedUser</span><span class="p">,</span>
+    <span class="n">MFAChallenge</span><span class="p">,</span>
+    <span class="n">MFAConfig</span><span class="p">,</span>
+    <span class="n">MFAMethod</span><span class="p">,</span>
+    <span class="n">MFASecret</span><span class="p">,</span>
+    <span class="n">MFAVerification</span><span class="p">,</span>
+    <span class="n">Permission</span><span class="p">,</span>
+    <span class="n">SecurityEvent</span><span class="p">,</span>
+    <span class="n">SecuritySettings</span><span class="p">,</span>
+    <span class="n">SessionInfo</span><span class="p">,</span>
+    <span class="n">UserCredentials</span><span class="p">,</span>
+    <span class="n">UserRegistration</span><span class="p">,</span>
+    <span class="n">UserRole</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="AuthenticationError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.AuthenticationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthenticationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when authentication fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="AuthorizationError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.AuthorizationError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthorizationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when authorization fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="MFAError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when MFA operations fail.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="SecurityService">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecurityService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Service for security-related operations.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">SecuritySettings</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pwd_context</span> <span class="o">=</span> <span class="n">CryptContext</span><span class="p">(</span><span class="n">schemes</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bcrypt&quot;</span><span class="p">],</span> <span class="n">deprecated</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SecurityService.validate_password_strength">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService.validate_password_strength">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_password_strength</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate password strength according to security settings.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            password: The password to validate</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (is_valid, list_of_errors)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">password</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_min_length</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Password must be at least </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_min_length</span><span class="si">}</span><span class="s2"> characters long&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_require_uppercase</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">isupper</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">password</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Password must contain at least one uppercase letter&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_require_lowercase</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">islower</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">password</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Password must contain at least one lowercase letter&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_require_numbers</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">c</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">password</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Password must contain at least one number&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">password_require_special</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">c</span> <span class="ow">in</span> <span class="s2">&quot;!@#$%^&amp;*()_+-=[]</span><span class="si">{}</span><span class="s2">|;:,.&lt;&gt;?&quot;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">password</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Password must contain at least one special character&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">errors</span></div>
+
+
+<div class="viewcode-block" id="SecurityService.hash_password">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService.hash_password">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">hash_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Hash a password using bcrypt.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd_context</span><span class="o">.</span><span class="n">hash</span><span class="p">(</span><span class="n">password</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecurityService.verify_password">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService.verify_password">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_password</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">plain_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">hashed_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify a password against its hash.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">pwd_context</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">plain_password</span><span class="p">,</span> <span class="n">hashed_password</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecurityService.generate_secure_token">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService.generate_secure_token">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_secure_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a cryptographically secure random token.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">secrets</span><span class="o">.</span><span class="n">token_urlsafe</span><span class="p">(</span><span class="n">length</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SecurityService.generate_backup_codes">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.SecurityService.generate_backup_codes">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_backup_codes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate backup codes for MFA recovery.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">secrets</span><span class="o">.</span><span class="n">token_hex</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">count</span><span class="p">)]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="MFAService">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Service for multi-factor authentication operations.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">MFAConfig</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">MFAChallenge</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="MFAService.generate_totp_secret">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService.generate_totp_secret">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_totp_secret</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate TOTP secret and QR code for user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_id: The user ID</span>
+<span class="sd">            username: The username</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (secret, qr_code_data_url)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">pyotp</span><span class="o">.</span><span class="n">random_base32</span><span class="p">()</span>
+        <span class="n">totp_uri</span> <span class="o">=</span> <span class="n">pyotp</span><span class="o">.</span><span class="n">totp</span><span class="o">.</span><span class="n">TOTP</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span><span class="o">.</span><span class="n">provisioning_uri</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">username</span><span class="p">,</span> <span class="n">issuer_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">totp_issuer</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate QR code</span>
+        <span class="n">qr</span> <span class="o">=</span> <span class="n">qrcode</span><span class="o">.</span><span class="n">QRCode</span><span class="p">(</span><span class="n">version</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">box_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">qr</span><span class="o">.</span><span class="n">add_data</span><span class="p">(</span><span class="n">totp_uri</span><span class="p">)</span>
+        <span class="n">qr</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">fit</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="n">img</span> <span class="o">=</span> <span class="n">qr</span><span class="o">.</span><span class="n">make_image</span><span class="p">(</span><span class="n">fill_color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">back_color</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">)</span>
+        <span class="n">img_buffer</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">()</span>
+        <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">img_buffer</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;PNG&quot;</span><span class="p">)</span>
+        <span class="n">img_buffer</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">qr_code_data</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="n">img_buffer</span><span class="o">.</span><span class="n">getvalue</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="n">qr_code_data_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;data:image/png;base64,</span><span class="si">{</span><span class="n">qr_code_data</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">secret</span><span class="p">,</span> <span class="n">qr_code_data_url</span></div>
+
+
+<div class="viewcode-block" id="MFAService.verify_totp_code">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService.verify_totp_code">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_totp_code</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify TOTP code against secret.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            secret: The TOTP secret</span>
+<span class="sd">            code: The code to verify</span>
+<span class="sd">            window: Time window for verification (default 1 = 30 seconds)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if code is valid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">totp</span> <span class="o">=</span> <span class="n">pyotp</span><span class="o">.</span><span class="n">TOTP</span><span class="p">(</span><span class="n">secret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">totp</span><span class="o">.</span><span class="n">verify</span><span class="p">(</span><span class="n">code</span><span class="p">,</span> <span class="n">valid_window</span><span class="o">=</span><span class="n">window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MFAService.create_mfa_challenge">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService.create_mfa_challenge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_mfa_challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MFAChallenge</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an MFA challenge for a user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_id: The user ID</span>
+<span class="sd">            method: The MFA method</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MFAChallenge: The challenge object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">challenge_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># 5-minute expiry</span>
+
+        <span class="n">challenge</span> <span class="o">=</span> <span class="n">MFAChallenge</span><span class="p">(</span>
+            <span class="n">challenge_id</span><span class="o">=</span><span class="n">challenge_id</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="n">expires_at</span><span class="o">=</span><span class="n">expires_at</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">challenge_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">challenge</span>
+        <span class="k">return</span> <span class="n">challenge</span></div>
+
+
+<div class="viewcode-block" id="MFAService.verify_mfa_challenge">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService.verify_mfa_challenge">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_mfa_challenge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">verification</span><span class="p">:</span> <span class="n">MFAVerification</span><span class="p">,</span> <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify an MFA challenge response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            verification: The verification request</span>
+<span class="sd">            secret: The user&#39;s MFA secret</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if verification succeeds</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">challenge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">verification</span><span class="o">.</span><span class="n">challenge_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">challenge</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MFAError</span><span class="p">(</span><span class="s2">&quot;Invalid or expired challenge&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">challenge</span><span class="o">.</span><span class="n">expires_at</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">verification</span><span class="o">.</span><span class="n">challenge_id</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">MFAError</span><span class="p">(</span><span class="s2">&quot;Challenge has expired&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">challenge</span><span class="o">.</span><span class="n">attempts_remaining</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">verification</span><span class="o">.</span><span class="n">challenge_id</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="n">MFAError</span><span class="p">(</span><span class="s2">&quot;Too many failed attempts&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Verify the code based on method</span>
+        <span class="n">is_valid</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">verification</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="n">MFAMethod</span><span class="o">.</span><span class="n">TOTP</span><span class="p">:</span>
+            <span class="n">is_valid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">verify_totp_code</span><span class="p">(</span><span class="n">secret</span><span class="p">,</span> <span class="n">verification</span><span class="o">.</span><span class="n">code</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">verification</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="n">MFAMethod</span><span class="o">.</span><span class="n">BACKUP_CODES</span><span class="p">:</span>
+            <span class="c1"># TODO: Implement backup code verification</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">is_valid</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">verification</span><span class="o">.</span><span class="n">challenge_id</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">challenge</span><span class="o">.</span><span class="n">attempts_remaining</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">challenge</span><span class="o">.</span><span class="n">attempts_remaining</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">verification</span><span class="o">.</span><span class="n">challenge_id</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="MFAService.cleanup_expired_challenges">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.MFAService.cleanup_expired_challenges">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_expired_challenges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove expired challenges from memory.&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">expired_challenges</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">challenge_id</span>
+            <span class="k">for</span> <span class="n">challenge_id</span><span class="p">,</span> <span class="n">challenge</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">&gt;</span> <span class="n">challenge</span><span class="o">.</span><span class="n">expires_at</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">challenge_id</span> <span class="ow">in</span> <span class="n">expired_challenges</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_challenges</span><span class="p">[</span><span class="n">challenge_id</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EnhancedAuthService">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnhancedAuthService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced authentication service with MFA and RBAC.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">secret_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_repository</span><span class="p">:</span> <span class="n">UserRepository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">algorithm</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;HS256&quot;</span><span class="p">,</span>
+        <span class="n">access_token_expire_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">refresh_token_expire_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
+        <span class="n">security_settings</span><span class="p">:</span> <span class="n">SecuritySettings</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">mfa_config</span><span class="p">:</span> <span class="n">MFAConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Enhanced Authentication Service.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            secret_key: Secret key for JWT token signing</span>
+<span class="sd">            user_repository: User repository for database operations</span>
+<span class="sd">            algorithm: JWT algorithm to use</span>
+<span class="sd">            access_token_expire_minutes: Access token expiration time</span>
+<span class="sd">            refresh_token_expire_days: Refresh token expiration time</span>
+<span class="sd">            security_settings: Security configuration settings</span>
+<span class="sd">            mfa_config: Multi-factor authentication configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span> <span class="o">=</span> <span class="n">secret_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span> <span class="o">=</span> <span class="n">algorithm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">access_token_expire_minutes</span> <span class="o">=</span> <span class="n">access_token_expire_minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">refresh_token_expire_days</span> <span class="o">=</span> <span class="n">refresh_token_expire_days</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span> <span class="o">=</span> <span class="n">user_repository</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span> <span class="o">=</span> <span class="n">security_settings</span> <span class="ow">or</span> <span class="n">SecuritySettings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfa_config</span> <span class="o">=</span> <span class="n">mfa_config</span> <span class="ow">or</span> <span class="n">MFAConfig</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">security_service</span> <span class="o">=</span> <span class="n">SecurityService</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfa_service</span> <span class="o">=</span> <span class="n">MFAService</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mfa_config</span><span class="p">)</span>
+
+        <span class="c1"># In-memory stores (in production, use Redis or database)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SessionInfo</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">MFASecret</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">security_events</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SecurityEvent</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="EnhancedAuthService.register_user">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.register_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registration</span><span class="p">:</span> <span class="n">UserRegistration</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Register a new user with validation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            registration: User registration data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (success, errors)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Validate password strength</span>
+        <span class="n">is_valid</span><span class="p">,</span> <span class="n">password_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">validate_password_strength</span><span class="p">(</span>
+            <span class="n">registration</span><span class="o">.</span><span class="n">password</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">password_errors</span><span class="p">)</span>
+
+        <span class="c1"># Check if username/email already exists in database</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">username_exists</span><span class="p">(</span><span class="n">registration</span><span class="o">.</span><span class="n">username</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Username already exists&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">email_exists</span><span class="p">(</span><span class="n">registration</span><span class="o">.</span><span class="n">email</span><span class="p">):</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Email already exists&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+
+        <span class="c1"># Hash password</span>
+        <span class="n">hashed_password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">hash_password</span><span class="p">(</span><span class="n">registration</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+        <span class="c1"># Store user in database with hashed password</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+            <span class="n">user</span> <span class="o">=</span> <span class="n">User</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()),</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">registration</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="n">email</span><span class="o">=</span><span class="n">registration</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="n">password_hash</span><span class="o">=</span><span class="n">hashed_password</span><span class="p">,</span>
+                <span class="n">role</span><span class="o">=</span><span class="n">registration</span><span class="o">.</span><span class="n">role</span><span class="p">,</span>
+                <span class="n">email_verified</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+                <span class="n">account_status</span><span class="o">=</span><span class="s2">&quot;active&quot;</span><span class="p">,</span>
+                <span class="n">failed_login_attempts</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">create_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Failed to create user account&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating user in database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Failed to create user account&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">errors</span>
+
+        <span class="c1"># Log security event</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+            <span class="n">SecurityEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;user_registration&quot;</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.authenticate_user">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.authenticate_user">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">authenticate_user</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">credentials</span><span class="p">:</span> <span class="n">UserCredentials</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthenticatedUser</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Authenticate a user with username/password.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            credentials: User credentials</span>
+<span class="sd">            ip_address: Client IP address</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AuthenticatedUser if successful, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check for account lockout</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_account_locked</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+                <span class="n">SecurityEvent</span><span class="p">(</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;login_attempt_locked_account&quot;</span><span class="p">,</span>
+                    <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">},</span>
+                    <span class="n">ip_address</span><span class="o">=</span><span class="n">ip_address</span><span class="p">,</span>
+                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+                <span class="s2">&quot;Account is temporarily locked due to too many failed attempts&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Retrieve user from database</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_username</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error retrieving user from database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+                    <span class="s2">&quot;Authentication service temporarily unavailable&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">record_failed_login</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+                <span class="n">SecurityEvent</span><span class="p">(</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;login_failed&quot;</span><span class="p">,</span>
+                    <span class="n">details</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid_credentials&quot;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="n">ip_address</span><span class="o">=</span><span class="n">ip_address</span><span class="p">,</span>
+                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Verify password against stored hash</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">verify_password</span><span class="p">(</span>
+            <span class="n">credentials</span><span class="o">.</span><span class="n">password</span><span class="p">,</span> <span class="n">user</span><span class="o">.</span><span class="n">password_hash</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">record_failed_login</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+                <span class="n">SecurityEvent</span><span class="p">(</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;login_failed&quot;</span><span class="p">,</span>
+                    <span class="n">details</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                        <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;invalid_password&quot;</span><span class="p">,</span>
+                    <span class="p">},</span>
+                    <span class="n">ip_address</span><span class="o">=</span><span class="n">ip_address</span><span class="p">,</span>
+                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Clear failed login attempts on successful authentication</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clear_failed_login_attempts</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">)</span>
+
+        <span class="c1"># Update user&#39;s last login timestamp in database</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">last_login</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">failed_login_attempts</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># Reset failed attempts</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">update_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update user last login: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create authenticated user object</span>
+        <span class="n">role_permissions</span> <span class="o">=</span> <span class="n">DEFAULT_ROLE_PERMISSIONS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="p">,</span> <span class="n">DEFAULT_ROLE_PERMISSIONS</span><span class="p">[</span><span class="n">UserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">authenticated_user</span> <span class="o">=</span> <span class="n">AuthenticatedUser</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">role</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="p">,</span>
+            <span class="n">permissions</span><span class="o">=</span><span class="n">role_permissions</span><span class="o">.</span><span class="n">permissions</span><span class="p">,</span>
+            <span class="n">mfa_enabled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_mfa_enabled</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">),</span>
+            <span class="n">last_login</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">last_login</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+            <span class="n">SecurityEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;login_success&quot;</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">credentials</span><span class="o">.</span><span class="n">username</span><span class="p">},</span>
+                <span class="n">ip_address</span><span class="o">=</span><span class="n">ip_address</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">authenticated_user</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.create_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.create_session">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_session</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span><span class="p">,</span>
+        <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new session for an authenticated user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user: The authenticated user</span>
+<span class="sd">            ip_address: Client IP address</span>
+<span class="sd">            user_agent: Client user agent</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Session ID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="n">session</span> <span class="o">=</span> <span class="n">SessionInfo</span><span class="p">(</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="n">last_activity</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="n">ip_address</span><span class="o">=</span><span class="n">ip_address</span><span class="p">,</span>
+            <span class="n">user_agent</span><span class="o">=</span><span class="n">user_agent</span><span class="p">,</span>
+            <span class="n">mfa_verified</span><span class="o">=</span><span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_enabled</span><span class="p">,</span>  <span class="c1"># If MFA not enabled, consider it verified</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span>
+        <span class="k">return</span> <span class="n">session_id</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.create_access_token">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.create_access_token">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create JWT access token for authenticated user.&quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sub&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+            <span class="s2">&quot;mfa_verified&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">,</span>
+            <span class="s2">&quot;exp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">access_token_expire_minutes</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">jwt</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">algorithm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.verify_access_token">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.verify_access_token">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">verify_access_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthenticatedUser</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Verify and decode access token.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            token: JWT access token</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            AuthenticatedUser: The authenticated user</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AuthenticationError: If token is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">jwt</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">secret_key</span><span class="p">,</span> <span class="n">algorithms</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">algorithm</span><span class="p">])</span>
+
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;sub&quot;</span><span class="p">)</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+            <span class="n">email</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">)</span>
+            <span class="n">role_str</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">)</span>
+            <span class="n">permissions_str</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;permissions&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">session_id</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">)</span>
+            <span class="n">mfa_verified</span> <span class="o">=</span> <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mfa_verified&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">user_id</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">username</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;Invalid token payload&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Verify session is still active</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">session</span><span class="o">.</span><span class="n">is_active</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;Session is no longer active&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Update session activity</span>
+            <span class="n">session</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+            <span class="c1"># Convert role and permissions back to enums</span>
+            <span class="n">role</span> <span class="o">=</span> <span class="n">UserRole</span><span class="p">(</span><span class="n">role_str</span><span class="p">)</span>
+            <span class="n">permissions</span> <span class="o">=</span> <span class="p">[</span><span class="n">Permission</span><span class="p">(</span><span class="n">perm</span><span class="p">)</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permissions_str</span><span class="p">]</span>
+
+            <span class="k">return</span> <span class="n">AuthenticatedUser</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">username</span><span class="o">=</span><span class="n">username</span><span class="p">,</span>
+                <span class="n">email</span><span class="o">=</span><span class="n">email</span><span class="p">,</span>
+                <span class="n">role</span><span class="o">=</span><span class="n">role</span><span class="p">,</span>
+                <span class="n">permissions</span><span class="o">=</span><span class="n">permissions</span><span class="p">,</span>
+                <span class="n">mfa_enabled</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">is_mfa_enabled</span><span class="p">(</span><span class="n">user_id</span><span class="p">),</span>
+                <span class="n">mfa_verified</span><span class="o">=</span><span class="n">mfa_verified</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">JWTError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid token: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.require_permission">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.require_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">require_permission</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if user has required permission.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user: The authenticated user</span>
+<span class="sd">            permission: Required permission</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if user has permission</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AuthorizationError: If user lacks permission</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">has_permission</span><span class="p">(</span><span class="n">permission</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+                <span class="n">SecurityEvent</span><span class="p">(</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;authorization_denied&quot;</span><span class="p">,</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                    <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;required_permission&quot;</span><span class="p">:</span> <span class="n">permission</span><span class="o">.</span><span class="n">value</span><span class="p">},</span>
+                    <span class="n">severity</span><span class="o">=</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthorizationError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;User lacks required permission: </span><span class="si">{</span><span class="n">permission</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.require_mfa_verification">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.require_mfa_verification">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">require_mfa_verification</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check if user has completed MFA verification for sensitive operations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user: The authenticated user</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if MFA is verified or not required</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AuthenticationError: If MFA verification is required but not completed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+                <span class="s2">&quot;Multi-factor authentication verification required&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check if MFA is required for this user&#39;s role</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">user</span><span class="o">.</span><span class="n">role</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">require_mfa_for_roles</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span>
+                <span class="s2">&quot;Multi-factor authentication is required for this role&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.setup_mfa">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.setup_mfa">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">setup_mfa</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up MFA for a user.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_id: The user ID</span>
+<span class="sd">            method: The MFA method to set up</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict with setup information (e.g., QR code for TOTP)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">MFAMethod</span><span class="o">.</span><span class="n">TOTP</span><span class="p">:</span>
+            <span class="c1"># Get username from database</span>
+            <span class="n">username</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>  <span class="c1"># Default fallback</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_id</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+                        <span class="n">username</span> <span class="o">=</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get username for MFA setup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">secret</span><span class="p">,</span> <span class="n">qr_code</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mfa_service</span><span class="o">.</span><span class="n">generate_totp_secret</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="n">username</span><span class="p">)</span>
+
+            <span class="c1"># Store encrypted secret (in production, encrypt before storing)</span>
+            <span class="n">mfa_secret</span> <span class="o">=</span> <span class="n">MFASecret</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">secret</span><span class="o">=</span><span class="n">secret</span><span class="p">,</span>  <span class="c1"># TODO: Encrypt this</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mfa_secret</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;secret&quot;</span><span class="p">:</span> <span class="n">secret</span><span class="p">,</span>
+                <span class="s2">&quot;qr_code&quot;</span><span class="p">:</span> <span class="n">qr_code</span><span class="p">,</span>
+                <span class="s2">&quot;backup_codes&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">generate_backup_codes</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+        <span class="k">raise</span> <span class="n">MFAError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported MFA method: </span><span class="si">{</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.is_mfa_enabled">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.is_mfa_enabled">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_mfa_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if MFA is enabled for a user.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="p">[</span><span class="n">user_id</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.is_account_locked">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.is_account_locked">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_account_locked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if account is locked due to failed login attempts.&quot;&quot;&quot;</span>
+        <span class="c1"># Check database first for persistent lockout status</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user</span> <span class="ow">and</span> <span class="n">user</span><span class="o">.</span><span class="n">locked_until</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">user</span><span class="o">.</span><span class="n">locked_until</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Lockout period expired, clear it</span>
+                        <span class="n">user</span><span class="o">.</span><span class="n">locked_until</span> <span class="o">=</span> <span class="kc">None</span>
+                        <span class="n">user</span><span class="o">.</span><span class="n">failed_login_attempts</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">update_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to check account lockout status in database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Fallback to in-memory tracking</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">attempts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span>
+        <span class="n">recent_attempts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">attempt</span>
+            <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="n">attempts</span>
+            <span class="k">if</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">attempt</span>
+            <span class="o">&lt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">lockout_duration_minutes</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_attempts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">max_login_attempts</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.record_failed_login">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.record_failed_login">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_failed_login</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a failed login attempt.&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">now</span><span class="p">)</span>
+
+        <span class="c1"># Update failed login attempts in database</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+                    <span class="n">user</span><span class="o">.</span><span class="n">failed_login_attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="c1"># Lock account if max attempts reached</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">user</span><span class="o">.</span><span class="n">failed_login_attempts</span>
+                        <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">max_login_attempts</span>
+                    <span class="p">):</span>
+                        <span class="n">user</span><span class="o">.</span><span class="n">locked_until</span> <span class="o">=</span> <span class="n">now</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span>
+                            <span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">lockout_duration_minutes</span>
+                        <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">update_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to update failed login attempts in database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Clean up old attempts</span>
+        <span class="n">cutoff</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span>
+            <span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">lockout_duration_minutes</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">attempt</span>
+            <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;</span> <span class="n">cutoff</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.clear_failed_login_attempts">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.clear_failed_login_attempts">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_failed_login_attempts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear failed login attempts for a user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">username</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed_login_attempts</span><span class="p">[</span><span class="n">username</span><span class="p">]</span>
+
+        <span class="c1"># Clear failed login attempts in database</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">get_user_by_username</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+                    <span class="n">user</span><span class="o">.</span><span class="n">failed_login_attempts</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="n">user</span><span class="o">.</span><span class="n">locked_until</span> <span class="o">=</span> <span class="kc">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">user_repository</span><span class="o">.</span><span class="n">update_user</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to clear failed login attempts in database: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.log_security_event">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.log_security_event">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">log_security_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">SecurityEvent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log a security event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">security_events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="c1"># In production, this would write to a secure audit log</span>
+        <span class="c1"># For now, we&#39;ll just keep them in memory</span>
+
+        <span class="c1"># Keep only recent events to prevent memory issues</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">security_events</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">security_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">security_events</span><span class="p">[</span><span class="o">-</span><span class="mi">5000</span><span class="p">:]</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.cleanup_expired_sessions">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.cleanup_expired_sessions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup_expired_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove expired sessions.&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">security_settings</span><span class="o">.</span><span class="n">session_timeout_minutes</span><span class="p">)</span>
+
+        <span class="n">expired_sessions</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">session_id</span>
+            <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="n">session</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">&gt;</span> <span class="n">timeout</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="n">expired_sessions</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.revoke_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.revoke_session">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">revoke_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Revoke a specific session.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="EnhancedAuthService.revoke_all_user_sessions">
+<a class="viewcode-back" href="../../../../api/src.player_experience.services.auth_service.html#src.player_experience.services.EnhancedAuthService.revoke_all_user_sessions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">revoke_all_user_sessions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Revoke all sessions for a specific user.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">:</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

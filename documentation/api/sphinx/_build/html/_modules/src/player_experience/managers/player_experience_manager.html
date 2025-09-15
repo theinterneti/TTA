@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.player_experience_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.player_experience_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.player_experience_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Central orchestrator for all player experience functionality (Task 10).</span>
+
+<span class="sd">Responsibilities:</span>
+<span class="sd">- Player dashboard aggregation (characters, sessions, progress, recommendations)</span>
+<span class="sd">- Recommendation system integration (via PersonalizationServiceManager and ProgressTrackingService)</span>
+<span class="sd">- Adaptive experience management with feedback processing and crisis integration</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.character_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.session_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlayerDashboard</span><span class="p">,</span> <span class="n">Recommendation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.personalization_service_manager</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PersonalizationServiceManager</span><span class="p">,</span>
+    <span class="n">PlayerFeedback</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.progress_tracking_service</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressTrackingService</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.session_integration_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionIntegrationManager</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Central orchestrator for all player experience functionality.</span>
+
+<span class="sd">This module will be implemented in Task 10.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerExperienceManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Central orchestrator for all player experience functionality.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_repository</span><span class="p">:</span> <span class="n">SessionRepository</span><span class="p">,</span>
+        <span class="n">character_repository</span><span class="p">:</span> <span class="n">CharacterRepository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">personalization_manager</span><span class="p">:</span> <span class="n">PersonalizationServiceManager</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_service</span><span class="p">:</span> <span class="n">ProgressTrackingService</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">interactive_narrative_engine</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span> <span class="o">=</span> <span class="n">session_repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span> <span class="o">=</span> <span class="n">character_repository</span> <span class="ow">or</span> <span class="n">CharacterRepository</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">personalization_manager</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">personalization_manager</span> <span class="ow">or</span> <span class="n">PersonalizationServiceManager</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_service</span> <span class="o">=</span> <span class="n">progress_service</span> <span class="ow">or</span> <span class="n">ProgressTrackingService</span><span class="p">(</span>
+            <span class="n">session_repository</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span> <span class="o">=</span> <span class="n">SessionIntegrationManager</span><span class="p">(</span>
+            <span class="n">session_repository</span><span class="p">,</span> <span class="n">interactive_narrative_engine</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PlayerExperienceManager initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PlayerExperienceManager.get_player_dashboard">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.get_player_dashboard">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_player_dashboard</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">recent_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerDashboard</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Aggregate data to build the player dashboard.&quot;&quot;&quot;</span>
+        <span class="c1"># Characters</span>
+        <span class="n">characters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_characters_by_player</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+        <span class="n">active_char_summaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="s2">&quot;last_active&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">last_active</span><span class="p">,</span>
+                <span class="s2">&quot;session_count&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">session_count</span><span class="p">,</span>
+                <span class="s2">&quot;total_session_time&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">total_session_time</span><span class="p">,</span>
+                <span class="s2">&quot;readiness&quot;</span><span class="p">:</span> <span class="n">c</span><span class="o">.</span><span class="n">get_therapeutic_readiness</span><span class="p">(),</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">characters</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Recent sessions and quick stats</span>
+        <span class="n">recent_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session_summaries</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">recent_limit</span>
+        <span class="p">)</span>
+        <span class="n">total_today</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">duration_minutes</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">recent_sessions</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">==</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Progress summary/highlights</span>
+        <span class="n">progress_summary</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_service</span><span class="o">.</span><span class="n">compute_progress_summary</span><span class="p">(</span>
+            <span class="n">player_id</span>
+        <span class="p">)</span>
+        <span class="n">highlights</span> <span class="o">=</span> <span class="p">[</span><span class="n">h</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="p">(</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">recent_highlights</span> <span class="ow">or</span> <span class="p">[])]</span>
+
+        <span class="c1"># Recommendations</span>
+        <span class="n">recs</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_recommendations</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="n">dashboard</span> <span class="o">=</span> <span class="n">PlayerDashboard</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">active_characters</span><span class="o">=</span><span class="n">active_char_summaries</span><span class="p">,</span>
+            <span class="n">recent_sessions</span><span class="o">=</span><span class="n">recent_sessions</span><span class="p">,</span>
+            <span class="n">progress_highlights</span><span class="o">=</span><span class="n">highlights</span><span class="p">,</span>
+            <span class="n">recommendations</span><span class="o">=</span><span class="n">recs</span><span class="p">,</span>
+            <span class="n">therapeutic_momentum</span><span class="o">=</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">dashboard</span><span class="o">.</span><span class="n">total_session_time_today</span> <span class="o">=</span> <span class="n">total_today</span>
+        <span class="n">dashboard</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">progress_summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span>
+        <span class="p">)</span>
+        <span class="n">dashboard</span><span class="o">.</span><span class="n">most_effective_approach</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="kc">None</span>  <span class="c1"># placeholder until analytics available</span>
+        <span class="p">)</span>
+        <span class="n">dashboard</span><span class="o">.</span><span class="n">next_recommended_session</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dashboard</span></div>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager.get_recommendations">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.get_recommendations">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine progress-driven and personalization-driven recommendations.&quot;&quot;&quot;</span>
+        <span class="c1"># Progress insights</span>
+        <span class="n">progress_recs</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_service</span><span class="o">.</span><span class="n">generate_progress_insights</span><span class="p">(</span>
+            <span class="n">player_id</span>
+        <span class="p">)</span>
+        <span class="c1"># Personalization-based</span>
+        <span class="n">personal_recs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">personalization_manager</span><span class="o">.</span><span class="n">get_adaptive_recommendations</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+        <span class="p">)</span>
+
+        <span class="n">combined</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">progress_recs</span><span class="p">)</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">personal_recs</span><span class="p">)</span>
+        <span class="c1"># Deduplicate by title/type</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">unique</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">combined</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">r</span><span class="o">.</span><span class="n">recommendation_type</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">unique</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+        <span class="c1"># Sort by priority (ascending)</span>
+        <span class="n">unique</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">unique</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager.process_player_feedback">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.process_player_feedback">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_player_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process feedback and adapt experience using personalization manager.&quot;&quot;&quot;</span>
+        <span class="n">adaptation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">personalization_manager</span><span class="o">.</span><span class="n">process_feedback</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">feedback</span><span class="p">)</span>
+        <span class="c1"># Future: feed adaptation outcomes back into progress markers if needed</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;adaptation_id&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">adaptation_id</span><span class="p">,</span>
+            <span class="s2">&quot;changes_made&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">changes_made</span><span class="p">,</span>
+            <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">confidence_score</span><span class="p">,</span>
+            <span class="s2">&quot;requires_player_approval&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">requires_player_approval</span><span class="p">,</span>
+            <span class="s2">&quot;reasoning&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">reasoning</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager.detect_crisis_and_get_resources">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.detect_crisis_and_get_resources">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">detect_crisis_and_get_resources</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Proxy to personalization crisis detection and resources retrieval.&quot;&quot;&quot;</span>
+        <span class="n">crisis_detected</span><span class="p">,</span> <span class="n">crisis_types</span><span class="p">,</span> <span class="n">resources</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">personalization_manager</span><span class="o">.</span><span class="n">detect_crisis_situation</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">context</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;crisis_detected&quot;</span><span class="p">:</span> <span class="n">crisis_detected</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ct</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">crisis_types</span><span class="p">],</span>
+            <span class="s2">&quot;resources&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;resource_id&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">resource_id</span><span class="p">,</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;contact_method&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">contact_method</span><span class="p">,</span>
+                    <span class="s2">&quot;contact&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">contact_info</span><span class="p">,</span>
+                    <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span>
+                    <span class="s2">&quot;emergency&quot;</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">is_emergency</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">resources</span>
+            <span class="p">],</span>
+        <span class="p">}</span></div>
+
+
+    <span class="c1"># Convenience proxies to session manager (for integration in future tasks)</span>
+<div class="viewcode-block" id="PlayerExperienceManager.create_session">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.create_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager.add_progress_marker">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.add_progress_marker">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_progress_marker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">add_progress_marker</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PlayerExperienceManager.update_therapeutic_settings">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.player_experience_manager.html#src.player_experience.managers.PlayerExperienceManager.update_therapeutic_settings">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_therapeutic_settings</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_therapeutic_settings</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

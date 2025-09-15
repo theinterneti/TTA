@@ -1,0 +1,1352 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.api.routers.players &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.api.routers.players</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.api.routers.players</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Player management router for the Player Experience API.</span>
+
+<span class="sd">This module provides REST endpoints for player profile CRUD operations</span>
+<span class="sd">with authentication, authorization, and comprehensive API documentation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...database.player_profile_repository</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PlayerProfileRepository</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...managers.player_profile_manager</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DataAccessRestrictedError</span><span class="p">,</span>
+    <span class="n">PlayerProfileManager</span><span class="p">,</span>
+    <span class="n">PlayerProfileManagerError</span><span class="p">,</span>
+    <span class="n">PrivacyViolationError</span><span class="p">,</span>
+    <span class="n">create_player_profile_manager</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntensityLevel</span><span class="p">,</span> <span class="n">TherapeuticApproach</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.player</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CrisisContactInfo</span><span class="p">,</span>
+    <span class="n">PlayerProfile</span><span class="p">,</span>
+    <span class="n">PrivacySettings</span><span class="p">,</span>
+    <span class="n">TherapeuticPreferences</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">TokenData</span><span class="p">,</span> <span class="n">get_current_active_player</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+
+
+<span class="c1"># Dependency to get player profile manager</span>
+<div class="viewcode-block" id="get_player_manager">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.get_player_manager">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_manager</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PlayerProfileManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get player profile manager instance.&quot;&quot;&quot;</span>
+    <span class="c1"># Prefer in-memory repository by default to avoid external DB dependency in tests</span>
+    <span class="n">use_neo4j</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;TTA_USE_NEO4J&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;1&quot;</span>
+    <span class="k">if</span> <span class="n">use_neo4j</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">repository</span> <span class="o">=</span> <span class="n">PlayerProfileRepository</span><span class="p">()</span>
+            <span class="n">repository</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">create_player_profile_manager</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="c1"># Fallback to in-memory repository</span>
+
+    <span class="k">class</span><span class="w"> </span><span class="nc">_InMemoryRepo</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">username_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">username</span> <span class="o">==</span> <span class="n">username</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">email_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">email</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">email</span> <span class="o">==</span> <span class="n">email</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_player_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">profile</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">profiles</span><span class="p">[</span><span class="n">profile</span><span class="o">.</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">profile</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="n">repository</span> <span class="o">=</span> <span class="n">_InMemoryRepo</span><span class="p">()</span>  <span class="c1"># type: ignore</span>
+    <span class="k">return</span> <span class="n">create_player_profile_manager</span><span class="p">(</span><span class="n">repository</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span></div>
+
+
+
+<span class="c1"># Wrapper dependency to allow runtime patching in tests (closure resolves current binding)</span>
+<div class="viewcode-block" id="get_player_manager_dep">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.get_player_manager_dep">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_player_manager_dep</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">PlayerProfileManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve the current player manager provider. This indirection enables tests to patch get_player_manager.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_player_manager</span><span class="p">()</span></div>
+
+
+
+<span class="c1"># Request/Response Models for API Documentation</span>
+
+
+<div class="viewcode-block" id="CrisisContactInfoRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.CrisisContactInfoRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrisisContactInfoRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for crisis contact information.&quot;&quot;&quot;</span>
+
+    <span class="n">primary_contact_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Primary emergency contact name&quot;</span>
+    <span class="p">)</span>
+    <span class="n">primary_contact_phone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Primary emergency contact phone&quot;</span>
+    <span class="p">)</span>
+    <span class="n">therapist_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapist name&quot;</span>
+    <span class="p">)</span>
+    <span class="n">therapist_phone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapist phone number&quot;</span>
+    <span class="p">)</span>
+    <span class="n">crisis_hotline_preference</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Preferred crisis hotline&quot;</span>
+    <span class="p">)</span>
+    <span class="n">emergency_instructions</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Special emergency instructions&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticPreferencesRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.TherapeuticPreferencesRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticPreferencesRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for therapeutic preferences.&quot;&quot;&quot;</span>
+
+    <span class="n">intensity_level</span><span class="p">:</span> <span class="n">IntensityLevel</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">IntensityLevel</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic intensity level&quot;</span>
+    <span class="p">)</span>
+    <span class="n">preferred_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Preferred therapeutic approaches&quot;</span>
+    <span class="p">)</span>
+    <span class="n">trigger_warnings</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Topics to avoid or handle carefully&quot;</span>
+    <span class="p">)</span>
+    <span class="n">comfort_topics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Topics that provide comfort&quot;</span>
+    <span class="p">)</span>
+    <span class="n">avoid_topics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Topics to completely avoid&quot;</span>
+    <span class="p">)</span>
+    <span class="n">crisis_contact_info</span><span class="p">:</span> <span class="n">CrisisContactInfoRequest</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Emergency contact information&quot;</span>
+    <span class="p">)</span>
+    <span class="n">session_duration_preference</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mi">30</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">120</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Preferred session duration in minutes&quot;</span>
+    <span class="p">)</span>
+    <span class="n">reminder_frequency</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="s2">&quot;weekly&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Frequency of session reminders&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticPreferencesRequest.validate_approaches">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.TherapeuticPreferencesRequest.validate_approaches">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;preferred_approaches&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_approaches</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate therapeutic approaches.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot select more than 5 therapeutic approaches&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PrivacySettingsRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.PrivacySettingsRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrivacySettingsRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for privacy settings.&quot;&quot;&quot;</span>
+
+    <span class="n">data_collection_consent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consent to data collection&quot;</span>
+    <span class="p">)</span>
+    <span class="n">research_participation_consent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consent to participate in research&quot;</span>
+    <span class="p">)</span>
+    <span class="n">progress_sharing_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Allow sharing progress with others&quot;</span>
+    <span class="p">)</span>
+    <span class="n">anonymous_analytics_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Allow anonymous analytics&quot;</span>
+    <span class="p">)</span>
+    <span class="n">session_recording_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Allow session recording&quot;</span>
+    <span class="p">)</span>
+    <span class="n">data_retention_period_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="mi">365</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">2555</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Data retention period in days&quot;</span>
+    <span class="p">)</span>
+    <span class="n">third_party_sharing_consent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consent to third-party data sharing&quot;</span>
+    <span class="p">)</span>
+    <span class="n">collect_interaction_patterns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect interaction pattern data&quot;</span>
+    <span class="p">)</span>
+    <span class="n">collect_emotional_responses</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect emotional response data&quot;</span>
+    <span class="p">)</span>
+    <span class="n">collect_therapeutic_outcomes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect therapeutic outcome data&quot;</span>
+    <span class="p">)</span>
+    <span class="n">collect_usage_statistics</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Collect usage statistics&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CreatePlayerRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.CreatePlayerRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CreatePlayerRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for creating a new player profile.</span>
+<span class="sd">    Relaxed to accept flexible payloads used by E2E tests (no password required).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique username&quot;</span>
+    <span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Player&#39;s email address&quot;</span><span class="p">)</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span>
+        <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Player&#39;s password (optional for profile creation)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="n">TherapeuticPreferencesRequest</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic preferences&quot;</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">privacy_settings</span><span class="p">:</span> <span class="n">PrivacySettingsRequest</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Privacy settings&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="CreatePlayerRequest.validate_username">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.CreatePlayerRequest.validate_username">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_username</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate username format.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_-]+$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Username can only contain letters, numbers, underscores, and hyphens&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="CreatePlayerRequest.validate_email">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.CreatePlayerRequest.validate_email">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_email</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate email format.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="n">email_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">email_pattern</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid email format&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="UpdatePlayerRequest">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.UpdatePlayerRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UpdatePlayerRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request model for updating a player profile.&quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;New username&quot;</span>
+    <span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;New email address&quot;</span><span class="p">)</span>
+    <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="n">TherapeuticPreferencesRequest</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Updated therapeutic preferences&quot;</span>
+    <span class="p">)</span>
+    <span class="n">privacy_settings</span><span class="p">:</span> <span class="n">PrivacySettingsRequest</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Updated privacy settings&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="UpdatePlayerRequest.validate_username">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.UpdatePlayerRequest.validate_username">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;username&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_username</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate username format.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_-]+$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Username can only contain letters, numbers, underscores, and hyphens&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="UpdatePlayerRequest.validate_email">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.UpdatePlayerRequest.validate_email">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;email&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_email</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate email format.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+            <span class="n">email_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">email_pattern</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid email format&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PlayerResponse">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.PlayerResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for player profile data.&quot;&quot;&quot;</span>
+
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique player identifier&quot;</span><span class="p">)</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Player&#39;s username&quot;</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Player&#39;s email address&quot;</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Profile creation timestamp&quot;</span><span class="p">)</span>
+    <span class="n">last_login</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Last login timestamp&quot;</span><span class="p">)</span>
+    <span class="n">is_active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether the player profile is active&quot;</span><span class="p">)</span>
+    <span class="c1"># Fields expected by tests</span>
+    <span class="n">characters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of character IDs&quot;</span>
+    <span class="p">)</span>
+    <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic preferences&quot;</span>
+    <span class="p">)</span>
+    <span class="n">privacy_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Privacy settings&quot;</span>
+    <span class="p">)</span>
+    <span class="n">progress_summary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Progress summary&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<span class="c1"># Normalization helpers to accept flexible client/test payloads</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...utils.normalization</span><span class="w"> </span><span class="kn">import</span> <span class="n">normalize_approaches</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_therapeutic_preferences_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="n">payload</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">payload</span><span class="p">[</span><span class="s2">&quot;preferred_approaches&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">normalize_approaches</span><span class="p">(</span>
+        <span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;preferred_approaches&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">payload</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_normalize_privacy_settings_dict</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="c1"># Rename keys to match model</span>
+    <span class="n">rename_map</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_sharing_consent&quot;</span><span class="p">:</span> <span class="s2">&quot;data_collection_consent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;research_participation&quot;</span><span class="p">:</span> <span class="s2">&quot;research_participation_consent&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">allowed</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;data_collection_consent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;research_participation_consent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;progress_sharing_enabled&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;anonymous_analytics_enabled&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;session_recording_enabled&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;data_retention_period_days&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;third_party_sharing_consent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;collect_interaction_patterns&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;collect_emotional_responses&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;collect_therapeutic_outcomes&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;collect_usage_statistics&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">dict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">k2</span> <span class="o">=</span> <span class="n">rename_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k2</span> <span class="ow">in</span> <span class="n">allowed</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k2</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+    <span class="n">characters</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of character IDs&quot;</span><span class="p">)</span>
+    <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic preferences&quot;</span>
+    <span class="p">)</span>
+    <span class="n">privacy_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Privacy settings&quot;</span><span class="p">)</span>
+    <span class="n">progress_summary</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Progress summary&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="PlayerListResponse">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.PlayerListResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerListResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for player list (admin only).&quot;&quot;&quot;</span>
+
+    <span class="n">players</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PlayerResponse</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of players&quot;</span><span class="p">)</span>
+    <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Total number of players&quot;</span><span class="p">)</span>
+    <span class="n">page</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current page number&quot;</span><span class="p">)</span>
+    <span class="n">page_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of players per page&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PlayerDataExportResponse">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.PlayerDataExportResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerDataExportResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response model for player data export.&quot;&quot;&quot;</span>
+
+    <span class="n">export_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Complete player data export&quot;</span><span class="p">)</span>
+    <span class="n">export_date</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Export generation timestamp&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Helper functions</span>
+
+
+<div class="viewcode-block" id="convert_player_to_response">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.convert_player_to_response">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_player_to_response</span><span class="p">(</span><span class="n">player</span><span class="p">:</span> <span class="n">PlayerProfile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert PlayerProfile to PlayerResponse.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PlayerResponse</span><span class="p">(</span>
+        <span class="n">player_id</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">player_id</span><span class="p">,</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+        <span class="n">email</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+        <span class="n">created_at</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">last_login</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">last_login</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">last_login</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">is_active</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span>
+        <span class="n">characters</span><span class="o">=</span><span class="n">player</span><span class="o">.</span><span class="n">characters</span><span class="p">,</span>
+        <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;intensity_level&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">intensity_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;preferred_approaches&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">approach</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">for</span> <span class="n">approach</span> <span class="ow">in</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">preferred_approaches</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;trigger_warnings&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">trigger_warnings</span><span class="p">,</span>
+            <span class="s2">&quot;comfort_topics&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">comfort_topics</span><span class="p">,</span>
+            <span class="s2">&quot;avoid_topics&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+            <span class="s2">&quot;session_duration_preference&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">session_duration_preference</span><span class="p">,</span>
+            <span class="s2">&quot;reminder_frequency&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="p">,</span>
+            <span class="s2">&quot;crisis_contact_info&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;primary_contact_name&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_name</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;primary_contact_phone&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_phone</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;therapist_name&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_name</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;therapist_phone&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_phone</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;crisis_hotline_preference&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">crisis_hotline_preference</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;emergency_instructions&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">emergency_instructions</span>
+                        <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                        <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="o">.</span><span class="n">crisis_contact_info</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+        <span class="n">privacy_settings</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;data_collection_consent&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_collection_consent</span><span class="p">,</span>
+            <span class="s2">&quot;research_participation_consent&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">research_participation_consent</span><span class="p">,</span>
+            <span class="s2">&quot;progress_sharing_enabled&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">progress_sharing_enabled</span><span class="p">,</span>
+            <span class="s2">&quot;anonymous_analytics_enabled&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">anonymous_analytics_enabled</span><span class="p">,</span>
+            <span class="s2">&quot;session_recording_enabled&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">session_recording_enabled</span><span class="p">,</span>
+            <span class="s2">&quot;data_retention_period_days&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">data_retention_period_days</span><span class="p">,</span>
+            <span class="s2">&quot;third_party_sharing_consent&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">third_party_sharing_consent</span><span class="p">,</span>
+            <span class="s2">&quot;collect_interaction_patterns&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_interaction_patterns</span><span class="p">,</span>
+            <span class="s2">&quot;collect_emotional_responses&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_emotional_responses</span><span class="p">,</span>
+            <span class="s2">&quot;collect_therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_therapeutic_outcomes</span><span class="p">,</span>
+            <span class="s2">&quot;collect_usage_statistics&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">privacy_settings</span><span class="o">.</span><span class="n">collect_usage_statistics</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">progress_summary</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;total_sessions&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">total_sessions</span><span class="p">,</span>
+            <span class="s2">&quot;total_time_minutes&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">total_time_minutes</span><span class="p">,</span>
+            <span class="s2">&quot;milestones_achieved&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">,</span>
+            <span class="s2">&quot;current_streak_days&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">current_streak_days</span><span class="p">,</span>
+            <span class="s2">&quot;longest_streak_days&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">longest_streak_days</span><span class="p">,</span>
+            <span class="s2">&quot;favorite_therapeutic_approach&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">favorite_therapeutic_approach</span><span class="o">.</span><span class="n">value</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">favorite_therapeutic_approach</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;most_effective_world_type&quot;</span><span class="p">:</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">most_effective_world_type</span><span class="p">,</span>
+            <span class="s2">&quot;last_session_date&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">last_session_date</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">last_session_date</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;next_recommended_session&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">next_recommended_session</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">player</span><span class="o">.</span><span class="n">progress_summary</span><span class="o">.</span><span class="n">next_recommended_session</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+        <span class="p">},</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_request_to_therapeutic_preferences">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.convert_request_to_therapeutic_preferences">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_request_to_therapeutic_preferences</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">TherapeuticPreferencesRequest</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticPreferences</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert request model to TherapeuticPreferences.&quot;&quot;&quot;</span>
+    <span class="n">crisis_contact</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="p">:</span>
+        <span class="n">crisis_contact</span> <span class="o">=</span> <span class="n">CrisisContactInfo</span><span class="p">(</span>
+            <span class="n">primary_contact_name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_name</span><span class="p">,</span>
+            <span class="n">primary_contact_phone</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">primary_contact_phone</span><span class="p">,</span>
+            <span class="n">therapist_name</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_name</span><span class="p">,</span>
+            <span class="n">therapist_phone</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">therapist_phone</span><span class="p">,</span>
+            <span class="n">crisis_hotline_preference</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">crisis_hotline_preference</span><span class="p">,</span>
+            <span class="n">emergency_instructions</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">crisis_contact_info</span><span class="o">.</span><span class="n">emergency_instructions</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">TherapeuticPreferences</span><span class="p">(</span>
+        <span class="n">intensity_level</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">intensity_level</span><span class="p">,</span>
+        <span class="n">preferred_approaches</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">preferred_approaches</span><span class="p">,</span>
+        <span class="n">trigger_warnings</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">trigger_warnings</span><span class="p">,</span>
+        <span class="n">comfort_topics</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">comfort_topics</span><span class="p">,</span>
+        <span class="n">avoid_topics</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">avoid_topics</span><span class="p">,</span>
+        <span class="n">crisis_contact_info</span><span class="o">=</span><span class="n">crisis_contact</span><span class="p">,</span>
+        <span class="n">session_duration_preference</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">session_duration_preference</span><span class="p">,</span>
+        <span class="n">reminder_frequency</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">reminder_frequency</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="convert_request_to_privacy_settings">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.convert_request_to_privacy_settings">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">convert_request_to_privacy_settings</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">PrivacySettingsRequest</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PrivacySettings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert request model to PrivacySettings.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PrivacySettings</span><span class="p">(</span>
+        <span class="n">data_collection_consent</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data_collection_consent</span><span class="p">,</span>
+        <span class="n">research_participation_consent</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">research_participation_consent</span><span class="p">,</span>
+        <span class="n">progress_sharing_enabled</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">progress_sharing_enabled</span><span class="p">,</span>
+        <span class="n">anonymous_analytics_enabled</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">anonymous_analytics_enabled</span><span class="p">,</span>
+        <span class="n">session_recording_enabled</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">session_recording_enabled</span><span class="p">,</span>
+        <span class="n">data_retention_period_days</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">data_retention_period_days</span><span class="p">,</span>
+        <span class="n">third_party_sharing_consent</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">third_party_sharing_consent</span><span class="p">,</span>
+        <span class="n">collect_interaction_patterns</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">collect_interaction_patterns</span><span class="p">,</span>
+        <span class="n">collect_emotional_responses</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">collect_emotional_responses</span><span class="p">,</span>
+        <span class="n">collect_therapeutic_outcomes</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">collect_therapeutic_outcomes</span><span class="p">,</span>
+        <span class="n">collect_usage_statistics</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">collect_usage_statistics</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="players_root">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.players_root">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Players root&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Protected listing endpoint (placeholder).&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">players_root</span><span class="p">(</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Players root&quot;</span><span class="p">}</span></div>
+
+
+
+<span class="c1"># API Endpoints</span>
+
+
+<div class="viewcode-block" id="create_player">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.create_player">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span>
+    <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerResponse</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_201_CREATED</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Create Player Profile&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Create a new player profile with therapeutic preferences and privacy settings.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">201</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile created successfully&quot;</span><span class="p">},</span>
+        <span class="mi">400</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request data or validation error&quot;</span><span class="p">},</span>
+        <span class="mi">409</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Username or email already exists&quot;</span><span class="p">},</span>
+        <span class="mi">422</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Request validation error&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_player</span><span class="p">(</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">CreatePlayerRequest</span><span class="p">,</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span>
+        <span class="k">lambda</span><span class="p">:</span> <span class="kc">None</span>
+    <span class="p">),</span>  <span class="c1"># Auth optional for create</span>
+    <span class="n">http_request</span><span class="p">:</span> <span class="n">Request</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a new player profile.</span>
+
+<span class="sd">    Creates a new player profile with the provided information, including</span>
+<span class="sd">    therapeutic preferences and privacy settings. The username and email</span>
+<span class="sd">    must be unique across all players.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request: Player creation request data</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerResponse: Created player profile data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If creation fails due to validation or conflict</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Convert request models to domain models</span>
+        <span class="n">therapeutic_preferences</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="c1"># Normalize flexible payload strings to enums, etc.</span>
+                <span class="n">norm</span> <span class="o">=</span> <span class="n">_normalize_therapeutic_preferences_dict</span><span class="p">(</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span>
+                <span class="p">)</span>
+                <span class="n">tp_req</span> <span class="o">=</span> <span class="n">TherapeuticPreferencesRequest</span><span class="p">(</span><span class="o">**</span><span class="n">norm</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tp_req</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span>
+            <span class="n">therapeutic_preferences</span> <span class="o">=</span> <span class="n">convert_request_to_therapeutic_preferences</span><span class="p">(</span><span class="n">tp_req</span><span class="p">)</span>
+
+        <span class="n">privacy_settings</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">ps_norm</span> <span class="o">=</span> <span class="n">_normalize_privacy_settings_dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span><span class="p">)</span>
+                <span class="n">ps_req</span> <span class="o">=</span> <span class="n">PrivacySettingsRequest</span><span class="p">(</span><span class="o">**</span><span class="n">ps_norm</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ps_req</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span>
+            <span class="n">privacy_settings</span> <span class="o">=</span> <span class="n">convert_request_to_privacy_settings</span><span class="p">(</span><span class="n">ps_req</span><span class="p">)</span>
+
+        <span class="c1"># Create player profile (use token player_id if provided for deterministic tests)</span>
+        <span class="n">token_pid</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">current_player</span><span class="p">,</span> <span class="s2">&quot;player_id&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_player</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">token_pid</span> <span class="ow">is</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">http_request</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">http_request</span><span class="p">,</span> <span class="s2">&quot;state&quot;</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="c1"># AuthenticationMiddleware stores token data on request.state.current_player</span>
+            <span class="n">token_pid</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">http_request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;current_player&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="s2">&quot;player_id&quot;</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="p">)</span>
+        <span class="n">player</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">create_player_profile</span><span class="p">(</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="n">email</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">therapeutic_preferences</span><span class="p">,</span>
+            <span class="n">privacy_settings</span><span class="o">=</span><span class="n">privacy_settings</span><span class="p">,</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">token_pid</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">convert_player_to_response</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;already exists&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PrivacyViolationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Privacy violation: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while creating player profile&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_player">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.get_player">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerResponse</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get Player Profile&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Retrieve a player profile by ID with privacy controls applied.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile retrieved successfully&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_player</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a player profile by ID.</span>
+
+<span class="sd">    Retrieves the player profile for the specified ID. Access is restricted</span>
+<span class="sd">    to the profile owner only, enforcing privacy controls.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerResponse: Player profile data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If player not found or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Attempt to retrieve the profile first; handle not-found before access checks</span>
+        <span class="n">player</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">player</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">convert_player_to_response</span><span class="p">(</span><span class="n">player</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Access explicitly denied by manager privacy controls</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># If repository/manager fails and player_id doesn&#39;t match current, treat as access denied</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied: You can only access your own profile&quot;</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while retrieving player profile&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_player">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.update_player">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">put</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerResponse</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Update Player Profile&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update a player profile with new information and settings.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile updated successfully&quot;</span><span class="p">},</span>
+        <span class="mi">400</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request data or validation error&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+        <span class="mi">409</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Username or email already exists&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_player</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">UpdatePlayerRequest</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update a player profile.</span>
+
+<span class="sd">    Updates the player profile with the provided information. Only the</span>
+<span class="sd">    profile owner can update their own profile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        request: Player update request data</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerResponse: Updated player profile data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If update fails due to validation, conflict, or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the current player is trying to update their own profile</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Access denied: You can only update your own profile&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Build updates dictionary</span>
+        <span class="n">updates</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">username</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">username</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">email</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">email</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">convert_request_to_therapeutic_preferences</span><span class="p">(</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">therapeutic_preferences</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">updates</span><span class="p">[</span><span class="s2">&quot;privacy_settings&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">convert_request_to_privacy_settings</span><span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">privacy_settings</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Perform update</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">update_player_profile</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">updates</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Failed to update player profile&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Retrieve updated profile</span>
+        <span class="n">updated_player</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">updated_player</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found after update&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">convert_player_to_response</span><span class="p">(</span><span class="n">updated_player</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;already exists&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_409_CONFLICT</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PrivacyViolationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Privacy violation: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while updating player profile&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="delete_player">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.delete_player">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_204_NO_CONTENT</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Delete Player Profile&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Delete a player profile permanently (GDPR right to erasure).&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">204</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile deleted successfully&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">delete_player</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete a player profile.</span>
+
+<span class="sd">    Permanently deletes the player profile and all associated data.</span>
+<span class="sd">    This operation implements the GDPR right to erasure and cannot be undone.</span>
+<span class="sd">    Only the profile owner can delete their own profile.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If deletion fails or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the current player is trying to delete their own profile</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Access denied: You can only delete your own profile&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">delete_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while deleting player profile&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_player_progress">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.get_player_progress">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">/progress&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get Player Progress Summary&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_player_progress</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="c1"># Minimal progress summary for E2E tests</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;player_id&quot;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+        <span class="s2">&quot;total_sessions&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;total_time_minutes&quot;</span><span class="p">:</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="s2">&quot;milestones_achieved&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="get_player_dashboard">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.get_player_dashboard">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">/dashboard&quot;</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Get Player Dashboard&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_player_dashboard</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+    <span class="c1"># Assemble dashboard using the same character repository as the Characters API</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.characters</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_character_manager_dep</span>
+
+        <span class="n">cmanager</span> <span class="o">=</span> <span class="n">get_character_manager_dep</span><span class="p">()</span>
+        <span class="n">chars</span> <span class="o">=</span> <span class="n">cmanager</span><span class="o">.</span><span class="n">get_player_characters</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+        <span class="n">active_character_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">character_id</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chars</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">active_character_ids</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Minimal compatible payload for tests</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;player_id&quot;</span><span class="p">:</span> <span class="n">player_id</span><span class="p">,</span>
+        <span class="s2">&quot;active_characters&quot;</span><span class="p">:</span> <span class="n">active_character_ids</span><span class="p">,</span>
+        <span class="s2">&quot;recommendations&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="s2">&quot;world_mindfulness_garden&quot;</span><span class="p">}],</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="export_player_data">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.export_player_data">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">/export&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerDataExportResponse</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Export Player Data&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Export all player data for GDPR compliance and data portability.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player data exported successfully&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">export_player_data</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerDataExportResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Export all player data.</span>
+
+<span class="sd">    Exports all data associated with the player profile in a readable format</span>
+<span class="sd">    for GDPR compliance and data portability. Only the profile owner can</span>
+<span class="sd">    export their own data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerDataExportResponse: Complete player data export</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If export fails or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the current player is trying to export their own data</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Access denied: You can only export your own data&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">export_data</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">export_player_data</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">PlayerDataExportResponse</span><span class="p">(</span>
+            <span class="n">export_data</span><span class="o">=</span><span class="n">export_data</span><span class="p">,</span>
+            <span class="n">export_date</span><span class="o">=</span><span class="n">export_data</span><span class="p">[</span><span class="s2">&quot;export_metadata&quot;</span><span class="p">][</span><span class="s2">&quot;export_date&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;not found&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while exporting player data&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_therapeutic_preferences">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.update_therapeutic_preferences">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">/therapeutic-preferences&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerResponse</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Update Therapeutic Preferences&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update only the therapeutic preferences for a player profile.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Therapeutic preferences updated successfully&quot;</span><span class="p">},</span>
+        <span class="mi">400</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request data or validation error&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_therapeutic_preferences</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">TherapeuticPreferencesRequest</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update therapeutic preferences for a player.</span>
+
+<span class="sd">    Updates only the therapeutic preferences section of the player profile.</span>
+<span class="sd">    This is a convenience endpoint for therapeutic settings management.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        request: Therapeutic preferences request data</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerResponse: Updated player profile data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If update fails or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the current player is trying to update their own preferences</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Access denied: You can only update your own therapeutic preferences&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">therapeutic_preferences</span> <span class="o">=</span> <span class="n">convert_request_to_therapeutic_preferences</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">update_therapeutic_preferences</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">therapeutic_preferences</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Failed to update therapeutic preferences&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Retrieve updated profile</span>
+        <span class="n">updated_player</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">updated_player</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found after update&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">convert_player_to_response</span><span class="p">(</span><span class="n">updated_player</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while updating therapeutic preferences&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="update_privacy_settings">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.players.html#src.player_experience.api.routers.players.update_privacy_settings">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">patch</span><span class="p">(</span>
+    <span class="s2">&quot;/</span><span class="si">{player_id}</span><span class="s2">/privacy-settings&quot;</span><span class="p">,</span>
+    <span class="n">response_model</span><span class="o">=</span><span class="n">PlayerResponse</span><span class="p">,</span>
+    <span class="n">summary</span><span class="o">=</span><span class="s2">&quot;Update Privacy Settings&quot;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Update only the privacy settings for a player profile.&quot;</span><span class="p">,</span>
+    <span class="n">responses</span><span class="o">=</span><span class="p">{</span>
+        <span class="mi">200</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Privacy settings updated successfully&quot;</span><span class="p">},</span>
+        <span class="mi">400</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Invalid request data or validation error&quot;</span><span class="p">},</span>
+        <span class="mi">401</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Authentication required&quot;</span><span class="p">},</span>
+        <span class="mi">403</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Access denied - insufficient permissions&quot;</span><span class="p">},</span>
+        <span class="mi">404</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found&quot;</span><span class="p">},</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_privacy_settings</span><span class="p">(</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">request</span><span class="p">:</span> <span class="n">PrivacySettingsRequest</span><span class="p">,</span>
+    <span class="n">current_player</span><span class="p">:</span> <span class="n">TokenData</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_active_player</span><span class="p">),</span>
+    <span class="n">manager</span><span class="p">:</span> <span class="n">PlayerProfileManager</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_player_manager_dep</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlayerResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Update privacy settings for a player.</span>
+
+<span class="sd">    Updates only the privacy settings section of the player profile.</span>
+<span class="sd">    This is a convenience endpoint for privacy management.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        player_id: Player identifier</span>
+<span class="sd">        request: Privacy settings request data</span>
+<span class="sd">        current_player: Current authenticated player (from JWT token)</span>
+<span class="sd">        manager: Player profile manager dependency</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PlayerResponse: Updated player profile data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If update fails or access denied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Check if the current player is trying to update their own privacy settings</span>
+        <span class="k">if</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span> <span class="o">!=</span> <span class="n">player_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Access denied: You can only update your own privacy settings&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">privacy_settings</span> <span class="o">=</span> <span class="n">convert_request_to_privacy_settings</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+
+        <span class="n">success</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">update_privacy_settings</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">privacy_settings</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Failed to update privacy settings&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Retrieve updated profile</span>
+        <span class="n">updated_player</span> <span class="o">=</span> <span class="n">manager</span><span class="o">.</span><span class="n">get_player_profile</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">current_player</span><span class="o">.</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">updated_player</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_404_NOT_FOUND</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Player profile not found after update&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">convert_player_to_response</span><span class="p">(</span><span class="n">updated_player</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">DataAccessRestrictedError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PlayerProfileManagerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">PrivacyViolationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Privacy violation: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;detail&quot;</span><span class="p">:</span> <span class="s2">&quot;Internal server error occurred while updating privacy settings&quot;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

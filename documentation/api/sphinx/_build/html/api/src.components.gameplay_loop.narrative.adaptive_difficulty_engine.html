@@ -1,0 +1,708 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.adaptive_difficulty_engine module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.narrative.character_development_system module" href="src.components.gameplay_loop.narrative.character_development_system.html" />
+    <link rel="prev" title="src.components.gameplay_loop.narrative package" href="src.components.gameplay_loop.narrative.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.narrative.html">src.components.gameplay_loop.narrative package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.adaptive_difficulty_engine module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.narrative.adaptive_difficulty_engine.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.narrative.adaptive_difficulty_engine">
+<span id="src-components-gameplay-loop-narrative-adaptive-difficulty-engine-module"></span><h1>src.components.gameplay_loop.narrative.adaptive_difficulty_engine module<a class="headerlink" href="#module-src.components.gameplay_loop.narrative.adaptive_difficulty_engine" title="Link to this heading"></a></h1>
+<p>Adaptive Difficulty Engine for Therapeutic Narrative Engine</p>
+<p>This module provides intelligent difficulty calibration, performance monitoring,
+and adaptive challenge adjustment for therapeutic text adventures.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">AdaptationStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Strategies for difficulty adaptation.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.ALTERNATIVE_PATH">
+<span class="sig-name descname"><span class="pre">ALTERNATIVE_PATH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alternative_path'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.ALTERNATIVE_PATH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.CONTEXTUAL_SUPPORT">
+<span class="sig-name descname"><span class="pre">CONTEXTUAL_SUPPORT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'contextual_support'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.CONTEXTUAL_SUPPORT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.GRADUAL_DECREASE">
+<span class="sig-name descname"><span class="pre">GRADUAL_DECREASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gradual_decrease'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.GRADUAL_DECREASE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.GRADUAL_INCREASE">
+<span class="sig-name descname"><span class="pre">GRADUAL_INCREASE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gradual_increase'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.GRADUAL_INCREASE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.IMMEDIATE_ADJUSTMENT">
+<span class="sig-name descname"><span class="pre">IMMEDIATE_ADJUSTMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'immediate_adjustment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.IMMEDIATE_ADJUSTMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.SKILL_BUILDING">
+<span class="sig-name descname"><span class="pre">SKILL_BUILDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_building'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy.SKILL_BUILDING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">AdaptiveDifficultyEngine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_bus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Main engine for adaptive difficulty calibration and adjustment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event_bus</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.narrative.events.html#src.components.gameplay_loop.narrative.events.EventBus" title="src.components.gameplay_loop.narrative.events.EventBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventBus</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_adjustment_history">
+<span class="sig-name descname"><span class="pre">get_adjustment_history</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">24</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.get_adjustment_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_adjustment_history" title="Link to this definition"></a></dt>
+<dd><p>Get difficulty adjustment history for a user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>hours</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_current_difficulty_info">
+<span class="sig-name descname"><span class="pre">get_current_difficulty_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.get_current_difficulty_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_current_difficulty_info" title="Link to this definition"></a></dt>
+<dd><p>Get current difficulty information and parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_metrics">
+<span class="sig-name descname"><span class="pre">get_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.get_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get adaptive difficulty engine metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_performance_summary">
+<span class="sig-name descname"><span class="pre">get_performance_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hours</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.get_performance_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.get_performance_summary" title="Link to this definition"></a></dt>
+<dd><p>Get performance summary for a user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>hours</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.health_check">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">health_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.health_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.health_check" title="Link to this definition"></a></dt>
+<dd><p>Perform health check of adaptive difficulty engine.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.monitor_performance">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">monitor_performance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.monitor_performance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.monitor_performance" title="Link to this definition"></a></dt>
+<dd><p>Monitor user performance and create performance snapshot.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>interaction_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot"><code class="xref py py-class docutils literal notranslate"><span class="pre">PerformanceSnapshot</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.request_difficulty_adjustment">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">request_difficulty_adjustment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requested_difficulty</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.request_difficulty_adjustment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.request_difficulty_adjustment" title="Link to this definition"></a></dt>
+<dd><p>Request manual difficulty adjustment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>requested_difficulty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptationStrategy</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.update_user_preferences">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">update_user_preferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preferences</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdaptiveDifficultyEngine.update_user_preferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptiveDifficultyEngine.update_user_preferences" title="Link to this definition"></a></dt>
+<dd><p>Update user preferences for difficulty adaptation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>preferences</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">AdjustmentTrigger</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#AdjustmentTrigger"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Triggers for difficulty adjustment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.EMOTIONAL_DISTRESS">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_DISTRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_distress'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.EMOTIONAL_DISTRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.EXCELLENT_PERFORMANCE">
+<span class="sig-name descname"><span class="pre">EXCELLENT_PERFORMANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'excellent_performance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.EXCELLENT_PERFORMANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.PATTERN_RECOGNITION">
+<span class="sig-name descname"><span class="pre">PATTERN_RECOGNITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pattern_recognition'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.PATTERN_RECOGNITION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.POOR_PERFORMANCE">
+<span class="sig-name descname"><span class="pre">POOR_PERFORMANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'poor_performance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.POOR_PERFORMANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.THERAPEUTIC_GOAL_CHANGE">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_GOAL_CHANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_goal_change'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.THERAPEUTIC_GOAL_CHANGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.USER_REQUEST">
+<span class="sig-name descname"><span class="pre">USER_REQUEST</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_request'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger.USER_REQUEST" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">DifficultyAdjustment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">adjustment_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">from_difficulty=DifficultyLevel.MODERATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_difficulty=DifficultyLevel.MODERATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger=AdjustmentTrigger.POOR_PERFORMANCE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy=AdaptationStrategy.GRADUAL_INCREASE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">performance_indicators=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adjustment_reason=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expected_impact=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_explanation=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support_provided=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effectiveness_score=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#DifficultyAdjustment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Record of a difficulty adjustment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>adjustment_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>from_difficulty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></span>)</p></li>
+<li><p><strong>to_difficulty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></span>)</p></li>
+<li><p><strong>trigger</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdjustmentTrigger</span></code></a></span>)</p></li>
+<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptationStrategy</span></code></a></span>)</p></li>
+<li><p><strong>performance_indicators</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>adjustment_reason</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>expected_impact</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>story_explanation</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>support_provided</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>created_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>effectiveness_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.adjustment_id">
+<span class="sig-name descname"><span class="pre">adjustment_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.adjustment_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.adjustment_reason">
+<span class="sig-name descname"><span class="pre">adjustment_reason</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.adjustment_reason" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.effectiveness_score">
+<span class="sig-name descname"><span class="pre">effectiveness_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.effectiveness_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.expected_impact">
+<span class="sig-name descname"><span class="pre">expected_impact</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.expected_impact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.from_difficulty">
+<span class="sig-name descname"><span class="pre">from_difficulty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.from_difficulty" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.performance_indicators">
+<span class="sig-name descname"><span class="pre">performance_indicators</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.performance_indicators" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.story_explanation">
+<span class="sig-name descname"><span class="pre">story_explanation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.story_explanation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdaptationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdaptationStrategy</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gradual_increase'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.strategy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.support_provided">
+<span class="sig-name descname"><span class="pre">support_provided</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.support_provided" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.to_difficulty">
+<span class="sig-name descname"><span class="pre">to_difficulty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.to_difficulty" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.trigger">
+<span class="sig-name descname"><span class="pre">trigger</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.AdjustmentTrigger"><code class="xref py py-class docutils literal notranslate"><span class="pre">AdjustmentTrigger</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'poor_performance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.trigger" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyAdjustment.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">DifficultyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#DifficultyLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>Difficulty levels for adaptive calibration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.CHALLENGING">
+<span class="sig-name descname"><span class="pre">CHALLENGING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.CHALLENGING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.EASY">
+<span class="sig-name descname"><span class="pre">EASY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.EASY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.HARD">
+<span class="sig-name descname"><span class="pre">HARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.HARD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.MODERATE">
+<span class="sig-name descname"><span class="pre">MODERATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.MODERATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.VERY_EASY">
+<span class="sig-name descname"><span class="pre">VERY_EASY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.VERY_EASY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.VERY_HARD">
+<span class="sig-name descname"><span class="pre">VERY_HARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">6</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel.VERY_HARD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">PerformanceMetric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#PerformanceMetric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Performance metrics for difficulty assessment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.CHOICE_SUCCESS_RATE">
+<span class="sig-name descname"><span class="pre">CHOICE_SUCCESS_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_success_rate'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.CHOICE_SUCCESS_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.COMPLETION_RATE">
+<span class="sig-name descname"><span class="pre">COMPLETION_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'completion_rate'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.COMPLETION_RATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.EMOTIONAL_STABILITY">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_STABILITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_stability'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.EMOTIONAL_STABILITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.ENGAGEMENT_LEVEL">
+<span class="sig-name descname"><span class="pre">ENGAGEMENT_LEVEL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'engagement_level'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.ENGAGEMENT_LEVEL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.HELP_SEEKING_FREQUENCY">
+<span class="sig-name descname"><span class="pre">HELP_SEEKING_FREQUENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'help_seeking_frequency'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.HELP_SEEKING_FREQUENCY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.THERAPEUTIC_PROGRESS">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_progress'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.THERAPEUTIC_PROGRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.TIME_TO_DECISION">
+<span class="sig-name descname"><span class="pre">TIME_TO_DECISION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'time_to_decision'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceMetric.TIME_TO_DECISION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">PerformanceSnapshot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">snapshot_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">success_rate=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_progress=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emotional_stability=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engagement_level=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completion_rate=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">average_decision_time=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">help_requests=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_difficulty=DifficultyLevel.MODERATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recent_choices=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_goals=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#PerformanceSnapshot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Snapshot of user performance at a point in time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>snapshot_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>success_rate</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_progress</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>emotional_stability</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>engagement_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>completion_rate</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>average_decision_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>help_requests</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>current_difficulty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></span>)</p></li>
+<li><p><strong>recent_choices</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_goals</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>created_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>confidence</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.average_decision_time">
+<span class="sig-name descname"><span class="pre">average_decision_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.average_decision_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.completion_rate">
+<span class="sig-name descname"><span class="pre">completion_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.completion_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.confidence">
+<span class="sig-name descname"><span class="pre">confidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.confidence" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.current_difficulty">
+<span class="sig-name descname"><span class="pre">current_difficulty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.current_difficulty" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.emotional_stability">
+<span class="sig-name descname"><span class="pre">emotional_stability</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.emotional_stability" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.engagement_level">
+<span class="sig-name descname"><span class="pre">engagement_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.engagement_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.help_requests">
+<span class="sig-name descname"><span class="pre">help_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.help_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.recent_choices">
+<span class="sig-name descname"><span class="pre">recent_choices</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.recent_choices" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.snapshot_id">
+<span class="sig-name descname"><span class="pre">snapshot_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.snapshot_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.success_rate">
+<span class="sig-name descname"><span class="pre">success_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.success_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.therapeutic_goals">
+<span class="sig-name descname"><span class="pre">therapeutic_goals</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.therapeutic_goals" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.therapeutic_progress">
+<span class="sig-name descname"><span class="pre">therapeutic_progress</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.therapeutic_progress" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.PerformanceSnapshot.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.adaptive_difficulty_engine.</span></span><span class="sig-name descname"><span class="pre">UserPreferences</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preferred_difficulty=DifficultyLevel.MODERATE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">challenge_tolerance=0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptation_speed=0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wants_hints=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wants_explanations=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wants_encouragement=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wants_alternative_paths=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_focus=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_style='balanced'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/adaptive_difficulty_engine.html#UserPreferences"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>User preferences for difficulty and challenge.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>preferred_difficulty</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></span>)</p></li>
+<li><p><strong>challenge_tolerance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>adaptation_speed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>wants_hints</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>wants_explanations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>wants_encouragement</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>wants_alternative_paths</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_focus</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>learning_style</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>last_updated</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.adaptation_speed">
+<span class="sig-name descname"><span class="pre">adaptation_speed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.adaptation_speed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.challenge_tolerance">
+<span class="sig-name descname"><span class="pre">challenge_tolerance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.5</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.challenge_tolerance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.last_updated">
+<span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.last_updated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.learning_style">
+<span class="sig-name descname"><span class="pre">learning_style</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'balanced'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.learning_style" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.preferred_difficulty">
+<span class="sig-name descname"><span class="pre">preferred_difficulty</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel" title="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.DifficultyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">DifficultyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.preferred_difficulty" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.therapeutic_focus">
+<span class="sig-name descname"><span class="pre">therapeutic_focus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.therapeutic_focus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_alternative_paths">
+<span class="sig-name descname"><span class="pre">wants_alternative_paths</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_alternative_paths" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_encouragement">
+<span class="sig-name descname"><span class="pre">wants_encouragement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_encouragement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_explanations">
+<span class="sig-name descname"><span class="pre">wants_explanations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_explanations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_hints">
+<span class="sig-name descname"><span class="pre">wants_hints</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.adaptive_difficulty_engine.UserPreferences.wants_hints" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.narrative.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.narrative package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.narrative.character_development_system.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.narrative.character_development_system module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

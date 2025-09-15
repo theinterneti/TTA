@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>agent_orchestration.resource_exhaustion_detector &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">agent_orchestration.resource_exhaustion_detector</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for agent_orchestration.resource_exhaustion_detector</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Resource exhaustion detection with configurable thresholds.</span>
+
+<span class="sd">Provides comprehensive resource monitoring and exhaustion detection</span>
+<span class="sd">that integrates with workflow error handling and circuit breaker systems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Awaitable</span><span class="p">,</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ResourceThresholds">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceThresholds">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourceThresholds</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configurable resource thresholds for exhaustion detection.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Memory thresholds (percentage)</span>
+    <span class="n">memory_warning_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span>
+    <span class="n">memory_critical_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">80.0</span>
+    <span class="n">memory_exhaustion_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span>
+
+    <span class="c1"># CPU thresholds (percentage)</span>
+    <span class="n">cpu_warning_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span>
+    <span class="n">cpu_critical_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span>
+    <span class="n">cpu_exhaustion_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">95.0</span>
+
+    <span class="c1"># Disk thresholds (percentage used)</span>
+    <span class="n">disk_warning_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span>
+    <span class="n">disk_critical_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">85.0</span>
+    <span class="n">disk_exhaustion_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">90.0</span>
+
+    <span class="c1"># Early warning threshold (percentage of critical threshold)</span>
+    <span class="n">early_warning_percent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">75.0</span>
+
+    <span class="c1"># Sustained threshold duration (seconds)</span>
+    <span class="n">sustained_duration_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">30.0</span>
+
+<div class="viewcode-block" id="ResourceThresholds.validate">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceThresholds.validate">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate threshold configuration.&quot;&quot;&quot;</span>
+        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check memory thresholds</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="mi">0</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_warning_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_critical_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">memory_exhaustion_percent</span>
+            <span class="o">&lt;=</span> <span class="mi">100</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Memory thresholds must be: 0 &lt; warning &lt; critical &lt; exhaustion &lt;= 100&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check CPU thresholds</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="mi">0</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_warning_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_critical_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cpu_exhaustion_percent</span>
+            <span class="o">&lt;=</span> <span class="mi">100</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;CPU thresholds must be: 0 &lt; warning &lt; critical &lt; exhaustion &lt;= 100&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check disk thresholds</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+            <span class="mi">0</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">disk_warning_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">disk_critical_percent</span>
+            <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">disk_exhaustion_percent</span>
+            <span class="o">&lt;=</span> <span class="mi">100</span>
+        <span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Disk thresholds must be: 0 &lt; warning &lt; critical &lt; exhaustion &lt;= 100&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check early warning percentage</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">early_warning_percent</span> <span class="o">&lt;</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Early warning percent must be between 0 and 100&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check sustained duration</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sustained_duration_seconds</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Sustained duration must be positive&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">errors</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ResourceExhaustionEvent">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionEvent">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourceExhaustionEvent</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a resource exhaustion event.&quot;&quot;&quot;</span>
+
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">resource_type</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &#39;memory&#39;, &#39;cpu&#39;, &#39;disk&#39;</span>
+    <span class="n">current_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">threshold_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &#39;warning&#39;, &#39;critical&#39;, &#39;exhaustion&#39;</span>
+    <span class="n">sustained_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">additional_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ResourceExhaustionDetector">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResourceExhaustionDetector</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Detects resource exhaustion with configurable thresholds and sustained monitoring.</span>
+
+<span class="sd">    Provides early warning, critical, and exhaustion level detection with</span>
+<span class="sd">    integration for workflow error handling and circuit breaker systems.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">thresholds</span><span class="p">:</span> <span class="n">ResourceThresholds</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">check_interval_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
+        <span class="n">circuit_breaker_registry</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span> <span class="o">=</span> <span class="n">thresholds</span> <span class="ow">or</span> <span class="n">ResourceThresholds</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">check_interval_seconds</span> <span class="o">=</span> <span class="n">check_interval_seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_circuit_breaker_registry</span> <span class="o">=</span> <span class="n">circuit_breaker_registry</span>
+
+        <span class="c1"># Validation</span>
+        <span class="n">validation_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">validation_errors</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resource threshold validation failed: </span><span class="si">{</span><span class="n">validation_errors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid resource thresholds: </span><span class="si">{</span><span class="n">validation_errors</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># State tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resource_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_breach_times</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_exhaustion_events</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ResourceExhaustionEvent</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Callbacks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_callbacks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warning_callbacks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_checks</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warning_events</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_critical_events</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_events</span> <span class="o">=</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.start_monitoring">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.start_monitoring">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_monitoring</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start continuous resource monitoring.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Resource exhaustion monitoring already running&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_loop</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Started resource exhaustion monitoring&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.stop_monitoring">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.stop_monitoring">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop_monitoring</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop continuous resource monitoring.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Stopped resource exhaustion monitoring&quot;</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_monitoring_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Main monitoring loop.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">check_resource_exhaustion</span><span class="p">()</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_interval_seconds</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Resource exhaustion monitoring error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">check_interval_seconds</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.check_resource_exhaustion">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.check_resource_exhaustion">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">check_resource_exhaustion</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ResourceExhaustionEvent</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check for resource exhaustion and return any detected events.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_checks</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get current resource usage</span>
+            <span class="n">memory_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">percent</span>
+            <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">disk_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">percent</span>
+
+            <span class="c1"># Check each resource type</span>
+            <span class="n">events</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_resource_type</span><span class="p">(</span>
+                    <span class="s2">&quot;memory&quot;</span><span class="p">,</span>
+                    <span class="n">memory_percent</span><span class="p">,</span>
+                    <span class="n">current_time</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_warning_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_critical_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">events</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_resource_type</span><span class="p">(</span>
+                    <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+                    <span class="n">cpu_percent</span><span class="p">,</span>
+                    <span class="n">current_time</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_warning_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_critical_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">events</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_resource_type</span><span class="p">(</span>
+                    <span class="s2">&quot;disk&quot;</span><span class="p">,</span>
+                    <span class="n">disk_percent</span><span class="p">,</span>
+                    <span class="n">current_time</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_warning_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_critical_percent</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to check resource exhaustion: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">events</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_resource_type</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">resource_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">current_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">current_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">warning_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">critical_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">exhaustion_threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ResourceExhaustionEvent</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check exhaustion for a specific resource type.&quot;&quot;&quot;</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Update history</span>
+        <span class="n">history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_resource_history</span><span class="p">[</span><span class="n">resource_type</span><span class="p">]</span>
+        <span class="n">history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_value</span><span class="p">)</span>
+        <span class="c1"># Keep only last 100 readings</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">history</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="c1"># Determine severity level</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">threshold_value</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">if</span> <span class="n">current_value</span> <span class="o">&gt;=</span> <span class="n">exhaustion_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;exhaustion&quot;</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">exhaustion_threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_events</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">current_value</span> <span class="o">&gt;=</span> <span class="n">critical_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">critical_threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_critical_events</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">current_value</span> <span class="o">&gt;=</span> <span class="n">warning_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="s2">&quot;warning&quot;</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">warning_threshold</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warning_events</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">severity</span><span class="p">:</span>
+            <span class="c1"># Check for sustained threshold breach</span>
+            <span class="n">breach_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_breach_times</span><span class="p">[</span><span class="n">resource_type</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">breach_time</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># First time breaching threshold</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_breach_times</span><span class="p">[</span><span class="n">resource_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
+                <span class="n">sustained_duration</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sustained_duration</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="n">breach_time</span>
+
+            <span class="c1"># Create event</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">ResourceExhaustionEvent</span><span class="p">(</span>
+                <span class="n">timestamp</span><span class="o">=</span><span class="n">current_time</span><span class="p">,</span>
+                <span class="n">resource_type</span><span class="o">=</span><span class="n">resource_type</span><span class="p">,</span>
+                <span class="n">current_value</span><span class="o">=</span><span class="n">current_value</span><span class="p">,</span>
+                <span class="n">threshold_value</span><span class="o">=</span><span class="n">threshold_value</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+                <span class="n">sustained_duration</span><span class="o">=</span><span class="n">sustained_duration</span><span class="p">,</span>
+                <span class="n">additional_info</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;history_avg&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="k">if</span> <span class="n">history</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="s2">&quot;history_max&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="k">if</span> <span class="n">history</span> <span class="k">else</span> <span class="mf">0.0</span><span class="p">,</span>
+                    <span class="s2">&quot;trend&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_trend</span><span class="p">(</span><span class="n">history</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_exhaustion_events</span><span class="p">[</span><span class="n">resource_type</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span>
+
+            <span class="c1"># Log event</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+                    <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;exhaustion&quot;</span>
+                    <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span>
+                    <span class="k">if</span> <span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span>
+                    <span class="k">else</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+                <span class="p">),</span>
+                <span class="sa">f</span><span class="s2">&quot;Resource </span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">resource_type</span><span class="si">}</span><span class="s2"> at </span><span class="si">{</span><span class="n">current_value</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% (threshold: </span><span class="si">{</span><span class="n">threshold_value</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%)&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;resource_type&quot;</span><span class="p">:</span> <span class="n">resource_type</span><span class="p">,</span>
+                    <span class="s2">&quot;current_value&quot;</span><span class="p">:</span> <span class="n">current_value</span><span class="p">,</span>
+                    <span class="s2">&quot;threshold_value&quot;</span><span class="p">:</span> <span class="n">threshold_value</span><span class="p">,</span>
+                    <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">severity</span><span class="p">,</span>
+                    <span class="s2">&quot;sustained_duration&quot;</span><span class="p">:</span> <span class="n">sustained_duration</span><span class="p">,</span>
+                    <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;resource_</span><span class="si">{</span><span class="n">severity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Trigger callbacks and circuit breakers for sustained exhaustion</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;exhaustion&quot;</span>
+                <span class="ow">and</span> <span class="n">sustained_duration</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">sustained_duration_seconds</span>
+            <span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_sustained_exhaustion</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">severity</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;critical&quot;</span><span class="p">]:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_resource_warning</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Reset breach time if no longer breaching</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_threshold_breach_times</span><span class="p">[</span><span class="n">resource_type</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">events</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_trend</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate resource usage trend from history.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">history</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+
+        <span class="n">recent</span> <span class="o">=</span> <span class="n">history</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">:]</span>
+        <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">recent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">recent</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent</span><span class="p">))):</span>
+            <span class="k">return</span> <span class="s2">&quot;increasing&quot;</span>
+        <span class="k">elif</span> <span class="nb">all</span><span class="p">(</span><span class="n">recent</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">recent</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent</span><span class="p">))):</span>
+            <span class="k">return</span> <span class="s2">&quot;decreasing&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_sustained_exhaustion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">ResourceExhaustionEvent</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle sustained resource exhaustion.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Sustained resource exhaustion detected: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">resource_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;event&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span>
+                <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="s2">&quot;sustained_resource_exhaustion&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Trigger exhaustion callbacks</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">callback</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exhaustion callback failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Trigger circuit breakers if registry is available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circuit_breaker_registry</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_circuit_breakers_for_exhaustion</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_resource_warning</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">ResourceExhaustionEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle resource warning events.&quot;&quot;&quot;</span>
+        <span class="c1"># Trigger warning callbacks</span>
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warning_callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">callback</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Warning callback failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_trigger_circuit_breakers_for_exhaustion</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">ResourceExhaustionEvent</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger circuit breakers when sustained exhaustion is detected.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get all workflow circuit breakers</span>
+            <span class="n">all_metrics</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circuit_breaker_registry</span><span class="o">.</span><span class="n">get_all_metrics</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">cb_name</span> <span class="ow">in</span> <span class="n">all_metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">cb_name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;workflow:&quot;</span><span class="p">):</span>
+                    <span class="n">circuit_breaker</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_circuit_breaker_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">cb_name</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">circuit_breaker</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="n">circuit_breaker</span><span class="o">.</span><span class="n">_transition_to_open</span><span class="p">()</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Opened circuit breaker </span><span class="si">{</span><span class="n">cb_name</span><span class="si">}</span><span class="s2"> due to sustained </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">resource_type</span><span class="si">}</span><span class="s2"> exhaustion&quot;</span>
+                        <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to trigger circuit breakers for exhaustion: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># ---- Callback management ----</span>
+<div class="viewcode-block" id="ResourceExhaustionDetector.register_exhaustion_callback">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.register_exhaustion_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_exhaustion_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register callback for exhaustion events.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.register_warning_callback">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.register_warning_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_warning_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register callback for warning events.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_warning_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.unregister_exhaustion_callback">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.unregister_exhaustion_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister_exhaustion_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unregister exhaustion callback.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="ResourceExhaustionDetector.unregister_warning_callback">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.unregister_warning_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unregister_warning_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ResourceExhaustionEvent</span><span class="p">],</span> <span class="n">Awaitable</span><span class="p">[</span><span class="kc">None</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Unregister warning callback.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_warning_callbacks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># ---- Status and metrics ----</span>
+<div class="viewcode-block" id="ResourceExhaustionDetector.get_current_status">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.ResourceExhaustionDetector.get_current_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_current_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current resource exhaustion detector status.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">memory_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">percent</span>
+            <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">disk_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">percent</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">memory_percent</span> <span class="o">=</span> <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">disk_percent</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;monitoring_active&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="o">.</span><span class="n">done</span><span class="p">(),</span>
+            <span class="s2">&quot;current_usage&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;memory_percent&quot;</span><span class="p">:</span> <span class="n">memory_percent</span><span class="p">,</span>
+                <span class="s2">&quot;cpu_percent&quot;</span><span class="p">:</span> <span class="n">cpu_percent</span><span class="p">,</span>
+                <span class="s2">&quot;disk_percent&quot;</span><span class="p">:</span> <span class="n">disk_percent</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;thresholds&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;memory&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_warning_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;critical&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_critical_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;exhaustion&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">memory_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;cpu&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_warning_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;critical&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_critical_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;exhaustion&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">cpu_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;disk&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_warning_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;critical&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_critical_percent</span><span class="p">,</span>
+                    <span class="s2">&quot;exhaustion&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="o">.</span><span class="n">disk_exhaustion_percent</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;statistics&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;total_checks&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_checks</span><span class="p">,</span>
+                <span class="s2">&quot;warning_events&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_warning_events</span><span class="p">,</span>
+                <span class="s2">&quot;critical_events&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_critical_events</span><span class="p">,</span>
+                <span class="s2">&quot;exhaustion_events&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exhaustion_events</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;last_events&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">resource</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="vm">__dict__</span> <span class="k">if</span> <span class="n">event</span> <span class="k">else</span> <span class="kc">None</span>
+                <span class="k">for</span> <span class="n">resource</span><span class="p">,</span> <span class="n">event</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_exhaustion_events</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

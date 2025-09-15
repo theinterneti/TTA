@@ -1,0 +1,616 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.database.schema module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.integration package" href="src.components.gameplay_loop.integration.html" />
+    <link rel="prev" title="src.components.gameplay_loop.database.queries module" href="src.components.gameplay_loop.database.queries.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.database.html">src.components.gameplay_loop.database package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.database.schema module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.database.schema.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.database.schema">
+<span id="src-components-gameplay-loop-database-schema-module"></span><h1>src.components.gameplay_loop.database.schema module<a class="headerlink" href="#module-src.components.gameplay_loop.database.schema" title="Link to this heading"></a></h1>
+<p>Neo4j Graph Database Schema</p>
+<p>This module defines the comprehensive graph database schema for the therapeutic
+gameplay loop, including node types, relationships, constraints, and indexes.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphConstraints">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">GraphConstraints</span></span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphConstraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphConstraints" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Additional graph constraints and validation rules.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphConstraints.get_business_logic_constraints">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_business_logic_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphConstraints.get_business_logic_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphConstraints.get_business_logic_constraints" title="Link to this definition"></a></dt>
+<dd><p>Get business logic constraints for the therapeutic gameplay graph.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphIndexes">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">GraphIndexes</span></span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphIndexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphIndexes" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Performance optimization indexes for common query patterns.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphIndexes.get_performance_indexes">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_performance_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphIndexes.get_performance_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphIndexes.get_performance_indexes" title="Link to this definition"></a></dt>
+<dd><p>Get performance optimization indexes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">GraphSchema</span></span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphSchema"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Comprehensive graph schema definition for therapeutic gameplay.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.NODE_PROPERTIES">
+<span class="sig-name descname"><span class="pre">NODE_PROPERTIES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.components.gameplay_loop.database.schema.NodeType" title="src.components.gameplay_loop.database.schema.NodeType"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeType</span></code></a><span class="pre">,</span> <a class="reference internal" href="#src.components.gameplay_loop.database.schema.NodeProperties" title="src.components.gameplay_loop.database.schema.NodeProperties"><code class="xref py py-class docutils literal notranslate"><span class="pre">NodeProperties</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{NodeType.CHOICE:</span> <span class="pre">NodeProperties(required={'scene_id',</span> <span class="pre">'choice_text',</span> <span class="pre">'choice_id',</span> <span class="pre">'choice_type'},</span> <span class="pre">optional={'therapeutic_relevance',</span> <span class="pre">'prerequisites',</span> <span class="pre">'emotional_weight',</span> <span class="pre">'metadata',</span> <span class="pre">'difficulty_level'},</span> <span class="pre">indexed={'scene_id',</span> <span class="pre">'choice_type',</span> <span class="pre">'choice_id'},</span> <span class="pre">unique={'choice_id'}),</span> <span class="pre">NodeType.MILESTONE:</span> <span class="pre">NodeProperties(required={'milestone_id',</span> <span class="pre">'milestone_type',</span> <span class="pre">'title',</span> <span class="pre">'achieved_at'},</span> <span class="pre">optional={'therapeutic_significance',</span> <span class="pre">'celebration_content',</span> <span class="pre">'achievement_criteria',</span> <span class="pre">'related_skills',</span> <span class="pre">'description'},</span> <span class="pre">indexed={'milestone_id',</span> <span class="pre">'milestone_type',</span> <span class="pre">'achieved_at'},</span> <span class="pre">unique={'milestone_id'}),</span> <span class="pre">NodeType.PROGRESS_METRIC:</span> <span class="pre">NodeProperties(required={'progress_type',</span> <span class="pre">'metric_id',</span> <span class="pre">'current_value',</span> <span class="pre">'metric_name'},</span> <span class="pre">optional={'baseline_value',</span> <span class="pre">'confidence_level',</span> <span class="pre">'target_value',</span> <span class="pre">'last_updated',</span> <span class="pre">'measurement_method'},</span> <span class="pre">indexed={'progress_type',</span> <span class="pre">'metric_id',</span> <span class="pre">'metric_name'},</span> <span class="pre">unique={'metric_id'}),</span> <span class="pre">NodeType.SAFETY_CHECK:</span> <span class="pre">NodeProperties(required={'check_id',</span> <span class="pre">'content_id',</span> <span class="pre">'safety_score',</span> <span class="pre">'checked_at',</span> <span class="pre">'safety_level'},</span> <span class="pre">optional={'requires_human_review',</span> <span class="pre">'crisis_indicators',</span> <span class="pre">'risk_factors',</span> <span class="pre">'intervention_recommendations',</span> <span class="pre">'protective_factors'},</span> <span class="pre">indexed={'safety_level',</span> <span class="pre">'checked_at',</span> <span class="pre">'check_id',</span> <span class="pre">'content_id'},</span> <span class="pre">unique={'check_id'}),</span> <span class="pre">NodeType.SCENE:</span> <span class="pre">NodeProperties(required={'session_id',</span> <span class="pre">'created_at',</span> <span class="pre">'scene_type',</span> <span class="pre">'scene_id',</span> <span class="pre">'title'},</span> <span class="pre">optional={'therapeutic_focus',</span> <span class="pre">'narrative_content',</span> <span class="pre">'completed_at',</span> <span class="pre">'emotional_tone',</span> <span class="pre">'completion_criteria',</span> <span class="pre">'description'},</span> <span class="pre">indexed={'scene_type',</span> <span class="pre">'scene_id',</span> <span class="pre">'created_at',</span> <span class="pre">'session_id'},</span> <span class="pre">unique={'scene_id'}),</span> <span class="pre">NodeType.SESSION:</span> <span class="pre">NodeProperties(required={'session_id',</span> <span class="pre">'created_at',</span> <span class="pre">'user_id',</span> <span class="pre">'session_state'},</span> <span class="pre">optional={'world_id',</span> <span class="pre">'last_activity',</span> <span class="pre">'session_metrics',</span> <span class="pre">'completed_at',</span> <span class="pre">'therapeutic_goals',</span> <span class="pre">'character_id',</span> <span class="pre">'safety_level'},</span> <span class="pre">indexed={'session_id',</span> <span class="pre">'created_at',</span> <span class="pre">'user_id',</span> <span class="pre">'session_state'},</span> <span class="pre">unique={'session_id'}),</span> <span class="pre">NodeType.SKILL:</span> <span class="pre">NodeProperties(required={'skill_name',</span> <span class="pre">'skill_id',</span> <span class="pre">'skill_category'},</span> <span class="pre">optional={'practice_opportunities',</span> <span class="pre">'learning_objectives',</span> <span class="pre">'mastery_indicators',</span> <span class="pre">'description'},</span> <span class="pre">indexed={'skill_name',</span> <span class="pre">'skill_id',</span> <span class="pre">'skill_category'},</span> <span class="pre">unique={'skill_id'}),</span> <span class="pre">NodeType.THERAPEUTIC_GOAL:</span> <span class="pre">NodeProperties(required={'goal_type',</span> <span class="pre">'goal_name',</span> <span class="pre">'goal_id'},</span> <span class="pre">optional={'target_metrics',</span> <span class="pre">'priority',</span> <span class="pre">'completion_criteria',</span> <span class="pre">'description'},</span> <span class="pre">indexed={'goal_type',</span> <span class="pre">'goal_name',</span> <span class="pre">'goal_id'},</span> <span class="pre">unique={'goal_id'}),</span> <span class="pre">NodeType.USER:</span> <span class="pre">NodeProperties(required={'created_at',</span> <span class="pre">'user_id'},</span> <span class="pre">optional={'safety_settings',</span> <span class="pre">'progress_summary',</span> <span class="pre">'therapeutic_preferences'},</span> <span class="pre">indexed={'created_at',</span> <span class="pre">'user_id'},</span> <span class="pre">unique={'user_id'})}</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.NODE_PROPERTIES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.RELATIONSHIP_PROPERTIES">
+<span class="sig-name descname"><span class="pre">RELATIONSHIP_PROPERTIES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.components.gameplay_loop.database.schema.RelationshipType" title="src.components.gameplay_loop.database.schema.RelationshipType"><code class="xref py py-class docutils literal notranslate"><span class="pre">RelationshipType</span></code></a><span class="pre">,</span> <a class="reference internal" href="#src.components.gameplay_loop.database.schema.RelationshipProperties" title="src.components.gameplay_loop.database.schema.RelationshipProperties"><code class="xref py py-class docutils literal notranslate"><span class="pre">RelationshipProperties</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{RelationshipType.LEADS_TO:</span> <span class="pre">RelationshipProperties(required={'created_at'},</span> <span class="pre">optional={'conditions',</span> <span class="pre">'probability',</span> <span class="pre">'narrative_weight'},</span> <span class="pre">indexed={'created_at'}),</span> <span class="pre">RelationshipType.MADE_CHOICE:</span> <span class="pre">RelationshipProperties(required={'timestamp',</span> <span class="pre">'choice_id'},</span> <span class="pre">optional={'context',</span> <span class="pre">'confidence_level',</span> <span class="pre">'processing_time'},</span> <span class="pre">indexed={'timestamp',</span> <span class="pre">'choice_id'}),</span> <span class="pre">RelationshipType.PRACTICES_SKILL:</span> <span class="pre">RelationshipProperties(required={'skill_id',</span> <span class="pre">'practice_timestamp'},</span> <span class="pre">optional={'context',</span> <span class="pre">'success_level',</span> <span class="pre">'proficiency_demonstrated'},</span> <span class="pre">indexed={'skill_id',</span> <span class="pre">'practice_timestamp'}),</span> <span class="pre">RelationshipType.TRACKS_PROGRESS:</span> <span class="pre">RelationshipProperties(required={'measurement_timestamp',</span> <span class="pre">'metric_value'},</span> <span class="pre">optional={'confidence_level',</span> <span class="pre">'measurement_method',</span> <span class="pre">'notes'},</span> <span class="pre">indexed={'measurement_timestamp'}),</span> <span class="pre">RelationshipType.VALIDATES:</span> <span class="pre">RelationshipProperties(required={'validation_result',</span> <span class="pre">'validation_timestamp'},</span> <span class="pre">optional={'validation_notes',</span> <span class="pre">'validator_id',</span> <span class="pre">'validation_score'},</span> <span class="pre">indexed={'validation_timestamp'})}</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.RELATIONSHIP_PROPERTIES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.get_all_schema_statements">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_all_schema_statements</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphSchema.get_all_schema_statements"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.get_all_schema_statements" title="Link to this definition"></a></dt>
+<dd><p>Get all schema creation statements in proper order.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.get_node_constraints">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_node_constraints</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphSchema.get_node_constraints"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.get_node_constraints" title="Link to this definition"></a></dt>
+<dd><p>Generate Neo4j constraint statements for all node types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.get_node_indexes">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_node_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphSchema.get_node_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.get_node_indexes" title="Link to this definition"></a></dt>
+<dd><p>Generate Neo4j index statements for all node types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.GraphSchema.get_relationship_indexes">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_relationship_indexes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#GraphSchema.get_relationship_indexes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.GraphSchema.get_relationship_indexes" title="Link to this definition"></a></dt>
+<dd><p>Generate Neo4j relationship index statements.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeProperties">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">NodeProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexed</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#NodeProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeProperties" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Standard properties for different node types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>required</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>optional</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>indexed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>unique</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeProperties.indexed">
+<span class="sig-name descname"><span class="pre">indexed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeProperties.indexed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeProperties.optional">
+<span class="sig-name descname"><span class="pre">optional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeProperties.optional" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeProperties.required">
+<span class="sig-name descname"><span class="pre">required</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeProperties.required" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeProperties.unique">
+<span class="sig-name descname"><span class="pre">unique</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeProperties.unique" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">NodeType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#NodeType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Node types in the therapeutic gameplay graph.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.BEHAVIOR">
+<span class="sig-name descname"><span class="pre">BEHAVIOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Behavior'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.BEHAVIOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.BEHAVIORAL_CHANGE">
+<span class="sig-name descname"><span class="pre">BEHAVIORAL_CHANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BehavioralChange'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.BEHAVIORAL_CHANGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.CHARACTER">
+<span class="sig-name descname"><span class="pre">CHARACTER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Character'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.CHARACTER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.CHOICE">
+<span class="sig-name descname"><span class="pre">CHOICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Choice'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.CHOICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.CONSEQUENCE">
+<span class="sig-name descname"><span class="pre">CONSEQUENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Consequence'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.CONSEQUENCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.EMOTION">
+<span class="sig-name descname"><span class="pre">EMOTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Emotion'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.EMOTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.EMOTIONAL_GROWTH">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_GROWTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'EmotionalGrowth'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.EMOTIONAL_GROWTH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.MILESTONE">
+<span class="sig-name descname"><span class="pre">MILESTONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Milestone'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.MILESTONE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.NARRATIVE_ARC">
+<span class="sig-name descname"><span class="pre">NARRATIVE_ARC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'NarrativeArc'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.NARRATIVE_ARC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.PROGRESS_METRIC">
+<span class="sig-name descname"><span class="pre">PROGRESS_METRIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ProgressMetric'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.PROGRESS_METRIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.SAFETY_CHECK">
+<span class="sig-name descname"><span class="pre">SAFETY_CHECK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SafetyCheck'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.SAFETY_CHECK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.SCENE">
+<span class="sig-name descname"><span class="pre">SCENE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Scene'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.SCENE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.SESSION">
+<span class="sig-name descname"><span class="pre">SESSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Session'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.SESSION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.SKILL">
+<span class="sig-name descname"><span class="pre">SKILL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Skill'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.SKILL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.SKILL_DEVELOPMENT">
+<span class="sig-name descname"><span class="pre">SKILL_DEVELOPMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SkillDevelopment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.SKILL_DEVELOPMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.STORY_BEAT">
+<span class="sig-name descname"><span class="pre">STORY_BEAT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'StoryBeat'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.STORY_BEAT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.THEME">
+<span class="sig-name descname"><span class="pre">THEME</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Theme'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.THEME" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.THERAPEUTIC_ALIGNMENT">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_ALIGNMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TherapeuticAlignment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.THERAPEUTIC_ALIGNMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.THERAPEUTIC_GOAL">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_GOAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TherapeuticGoal'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.THERAPEUTIC_GOAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.USER">
+<span class="sig-name descname"><span class="pre">USER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'User'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.USER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.VALIDATION_RULE">
+<span class="sig-name descname"><span class="pre">VALIDATION_RULE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ValidationRule'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.VALIDATION_RULE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.NodeType.WORLD">
+<span class="sig-name descname"><span class="pre">WORLD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'World'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.NodeType.WORLD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipProperties">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">RelationshipProperties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">required</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optional</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indexed</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#RelationshipProperties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipProperties" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Standard properties for different relationship types.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>required</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>optional</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>indexed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipProperties.indexed">
+<span class="sig-name descname"><span class="pre">indexed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipProperties.indexed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipProperties.optional">
+<span class="sig-name descname"><span class="pre">optional</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipProperties.optional" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipProperties.required">
+<span class="sig-name descname"><span class="pre">required</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">set</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipProperties.required" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.database.schema.</span></span><span class="sig-name descname"><span class="pre">RelationshipType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/database/schema.html#RelationshipType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Relationship types in the therapeutic gameplay graph.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.ACHIEVES_MILESTONE">
+<span class="sig-name descname"><span class="pre">ACHIEVES_MILESTONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ACHIEVES_MILESTONE'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.ACHIEVES_MILESTONE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.ADDRESSES_GOAL">
+<span class="sig-name descname"><span class="pre">ADDRESSES_GOAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ADDRESSES_GOAL'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.ADDRESSES_GOAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.ALIGNS_WITH">
+<span class="sig-name descname"><span class="pre">ALIGNS_WITH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ALIGNS_WITH'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.ALIGNS_WITH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.BELONGS_TO">
+<span class="sig-name descname"><span class="pre">BELONGS_TO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BELONGS_TO'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.BELONGS_TO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.BRANCHES_TO">
+<span class="sig-name descname"><span class="pre">BRANCHES_TO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'BRANCHES_TO'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.BRANCHES_TO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.CHANGES_BEHAVIOR">
+<span class="sig-name descname"><span class="pre">CHANGES_BEHAVIOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CHANGES_BEHAVIOR'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.CHANGES_BEHAVIOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.COMPLETED_SCENE">
+<span class="sig-name descname"><span class="pre">COMPLETED_SCENE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'COMPLETED_SCENE'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.COMPLETED_SCENE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.CONCURRENT_WITH">
+<span class="sig-name descname"><span class="pre">CONCURRENT_WITH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CONCURRENT_WITH'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.CONCURRENT_WITH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.CONTAINS">
+<span class="sig-name descname"><span class="pre">CONTAINS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CONTAINS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.CONTAINS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.CORRELATES_WITH">
+<span class="sig-name descname"><span class="pre">CORRELATES_WITH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CORRELATES_WITH'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.CORRELATES_WITH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.CURRENT_SCENE">
+<span class="sig-name descname"><span class="pre">CURRENT_SCENE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CURRENT_SCENE'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.CURRENT_SCENE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.DEVELOPS_SKILL">
+<span class="sig-name descname"><span class="pre">DEVELOPS_SKILL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DEVELOPS_SKILL'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.DEVELOPS_SKILL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.FAILS_CHECK">
+<span class="sig-name descname"><span class="pre">FAILS_CHECK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FAILS_CHECK'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.FAILS_CHECK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.FOLLOWS">
+<span class="sig-name descname"><span class="pre">FOLLOWS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'FOLLOWS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.FOLLOWS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.HAS_CHOICE">
+<span class="sig-name descname"><span class="pre">HAS_CHOICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'HAS_CHOICE'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.HAS_CHOICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.HAS_SESSION">
+<span class="sig-name descname"><span class="pre">HAS_SESSION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'HAS_SESSION'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.HAS_SESSION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.IMPROVES">
+<span class="sig-name descname"><span class="pre">IMPROVES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'IMPROVES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.IMPROVES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.INFLUENCES">
+<span class="sig-name descname"><span class="pre">INFLUENCES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'INFLUENCES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.INFLUENCES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.INTERACTS_WITH">
+<span class="sig-name descname"><span class="pre">INTERACTS_WITH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'INTERACTS_WITH'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.INTERACTS_WITH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.LEADS_TO">
+<span class="sig-name descname"><span class="pre">LEADS_TO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LEADS_TO'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.LEADS_TO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.LOCATED_IN">
+<span class="sig-name descname"><span class="pre">LOCATED_IN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'LOCATED_IN'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.LOCATED_IN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.MADE_CHOICE">
+<span class="sig-name descname"><span class="pre">MADE_CHOICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MADE_CHOICE'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.MADE_CHOICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.MEASURES">
+<span class="sig-name descname"><span class="pre">MEASURES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MEASURES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.MEASURES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.PART_OF">
+<span class="sig-name descname"><span class="pre">PART_OF</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PART_OF'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.PART_OF" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.PASSES_CHECK">
+<span class="sig-name descname"><span class="pre">PASSES_CHECK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PASSES_CHECK'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.PASSES_CHECK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.PLAYS_AS">
+<span class="sig-name descname"><span class="pre">PLAYS_AS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PLAYS_AS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.PLAYS_AS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.PRACTICES_SKILL">
+<span class="sig-name descname"><span class="pre">PRACTICES_SKILL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PRACTICES_SKILL'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.PRACTICES_SKILL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.PRECEDES">
+<span class="sig-name descname"><span class="pre">PRECEDES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PRECEDES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.PRECEDES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.REGULATES_EMOTION">
+<span class="sig-name descname"><span class="pre">REGULATES_EMOTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'REGULATES_EMOTION'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.REGULATES_EMOTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.REQUIRES">
+<span class="sig-name descname"><span class="pre">REQUIRES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'REQUIRES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.REQUIRES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.RESULTS_IN">
+<span class="sig-name descname"><span class="pre">RESULTS_IN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'RESULTS_IN'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.RESULTS_IN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.RETURNS_TO">
+<span class="sig-name descname"><span class="pre">RETURNS_TO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'RETURNS_TO'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.RETURNS_TO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.SIMILAR_TO">
+<span class="sig-name descname"><span class="pre">SIMILAR_TO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SIMILAR_TO'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.SIMILAR_TO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.TRACKS_PROGRESS">
+<span class="sig-name descname"><span class="pre">TRACKS_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TRACKS_PROGRESS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.TRACKS_PROGRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.TRIGGERS">
+<span class="sig-name descname"><span class="pre">TRIGGERS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TRIGGERS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.TRIGGERS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.UNLOCKS">
+<span class="sig-name descname"><span class="pre">UNLOCKS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'UNLOCKS'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.UNLOCKS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.database.schema.RelationshipType.VALIDATES">
+<span class="sig-name descname"><span class="pre">VALIDATES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'VALIDATES'</span></em><a class="headerlink" href="#src.components.gameplay_loop.database.schema.RelationshipType.VALIDATES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.database.queries.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.database.queries module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.integration.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.integration package" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

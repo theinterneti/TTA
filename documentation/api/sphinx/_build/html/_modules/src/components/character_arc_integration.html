@@ -1,0 +1,1021 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.character_arc_integration &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.character_arc_integration</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.character_arc_integration</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Character Arc Integration Module</span>
+
+<span class="sd">This module provides integration between the new CharacterArcManager component</span>
+<span class="sd">and the existing tta.prototype Character Development System. It handles data</span>
+<span class="sd">synchronization, character arc data mapping, and relationship dynamics management</span>
+<span class="sd">across both systems.</span>
+
+<span class="sd">Classes:</span>
+<span class="sd">    CharacterArcIntegration: Main integration class</span>
+<span class="sd">    CharacterDataSynchronizer: Handles data sync between systems</span>
+<span class="sd">    RelationshipDynamicsManager: Manages relationship evolution across systems</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="c1"># Add tta.prototype path for imports</span>
+<span class="n">prototype_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;tta.prototype&quot;</span>
+<span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">prototype_path</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">prototype_path</span><span class="p">))</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">core.character_development_system</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">CharacterDevelopmentSystem</span><span class="p">,</span>
+        <span class="n">Interaction</span><span class="p">,</span>
+        <span class="n">PersonalityTrait</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">models.data_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterState</span><span class="p">,</span> <span class="n">DialogueStyle</span><span class="p">,</span> <span class="n">MemoryFragment</span>
+<span class="k">except</span> <span class="ne">ImportError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not import tta.prototype modules: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create mock classes for development</span>
+<div class="viewcode-block" id="CharacterDevelopmentSystem">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDevelopmentSystem">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">CharacterDevelopmentSystem</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="CharacterDevelopmentSystem.get_character_state">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDevelopmentSystem.get_character_state">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_character_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="CharacterDevelopmentSystem.update_character_from_interaction">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDevelopmentSystem.update_character_from_interaction">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">update_character_from_interaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">interaction</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CharacterDevelopmentSystem.create_character">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDevelopmentSystem.create_character">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">create_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+</div>
+
+
+<div class="viewcode-block" id="CharacterState">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterState">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">CharacterState</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Interaction">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.Interaction">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Interaction</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span></div>
+
+
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.character_arc_manager</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CharacterArc</span><span class="p">,</span>
+    <span class="n">CharacterArcManagerComponent</span><span class="p">,</span>
+    <span class="n">InteractionContext</span><span class="p">,</span>
+    <span class="n">PlayerInteraction</span><span class="p">,</span>
+    <span class="n">RelationshipState</span><span class="p">,</span>
+    <span class="n">RelationshipType</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CharacterDataSynchronizer">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDataSynchronizer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterDataSynchronizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles data synchronization between CharacterArcManager and Character Development System.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_development_system</span><span class="p">:</span> <span class="n">CharacterDevelopmentSystem</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span> <span class="o">=</span> <span class="n">character_development_system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync_mapping</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_sync_mapping</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_sync_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create mapping between CharacterArc and CharacterState fields.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="c1"># Personality trait mappings</span>
+            <span class="s2">&quot;openness&quot;</span><span class="p">:</span> <span class="s2">&quot;openness&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;conscientiousness&quot;</span><span class="p">:</span> <span class="s2">&quot;conscientiousness&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;extraversion&quot;</span><span class="p">:</span> <span class="s2">&quot;extraversion&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;agreeableness&quot;</span><span class="p">:</span> <span class="s2">&quot;agreeableness&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;neuroticism&quot;</span><span class="p">:</span> <span class="s2">&quot;neuroticism&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;empathy&quot;</span><span class="p">:</span> <span class="s2">&quot;empathy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;patience&quot;</span><span class="p">:</span> <span class="s2">&quot;patience&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;wisdom&quot;</span><span class="p">:</span> <span class="s2">&quot;wisdom&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;humor&quot;</span><span class="p">:</span> <span class="s2">&quot;humor&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;supportiveness&quot;</span><span class="p">:</span> <span class="s2">&quot;supportiveness&quot;</span><span class="p">,</span>
+            <span class="c1"># Relationship mappings</span>
+            <span class="s2">&quot;trust_level&quot;</span><span class="p">:</span> <span class="s2">&quot;trust_level&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;affection_level&quot;</span><span class="p">:</span> <span class="s2">&quot;affection_level&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;respect_level&quot;</span><span class="p">:</span> <span class="s2">&quot;respect_level&quot;</span><span class="p">,</span>
+            <span class="c1"># Other mappings</span>
+            <span class="s2">&quot;current_mood&quot;</span><span class="p">:</span> <span class="s2">&quot;current_mood&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_role&quot;</span><span class="p">:</span> <span class="s2">&quot;therapeutic_role&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="CharacterDataSynchronizer.sync_character_to_development_system">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDataSynchronizer.sync_character_to_development_system">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sync_character_to_development_system</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync CharacterArc data to Character Development System.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Syncing character arc </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> to development system&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get existing character state or create new one</span>
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">character_state</span><span class="p">:</span>
+                <span class="c1"># Create new character in development system</span>
+                <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">create_character</span><span class="p">(</span>
+                    <span class="n">character_id</span><span class="o">=</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_name</span><span class="p">,</span>
+                    <span class="n">personality_traits</span><span class="o">=</span><span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                    <span class="n">therapeutic_role</span><span class="o">=</span><span class="n">character_arc</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s2">&quot;therapeutic_role&quot;</span><span class="p">,</span> <span class="s2">&quot;companion&quot;</span>
+                    <span class="p">),</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">character_state</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to create character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> in development system&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Sync personality traits</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sync_personality_traits</span><span class="p">(</span><span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">)</span>
+
+            <span class="c1"># Sync relationship data</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sync_relationship_data</span><span class="p">(</span><span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">)</span>
+
+            <span class="c1"># Sync memory data</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sync_memory_data</span><span class="p">(</span><span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">)</span>
+
+            <span class="c1"># Update last interaction timestamp</span>
+            <span class="n">character_state</span><span class="o">.</span><span class="n">last_interaction</span> <span class="o">=</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">last_updated</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully synced character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CharacterDataSynchronizer.sync_character_from_development_system">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterDataSynchronizer.sync_character_from_development_system">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sync_character_from_development_system</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync data from Character Development System to CharacterArc.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Syncing character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> from development system&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">character_state</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> not found in development system&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Sync personality traits back</span>
+            <span class="k">for</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">character_state</span><span class="o">.</span><span class="n">personality_traits</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">trait_name</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="p">:</span>
+                    <span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="p">[</span><span class="n">trait_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+            <span class="c1"># Sync relationship scores back</span>
+            <span class="n">player_relationship</span> <span class="o">=</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">player_relationship</span> <span class="ow">and</span> <span class="s2">&quot;player&quot;</span> <span class="ow">in</span> <span class="n">character_state</span><span class="o">.</span><span class="n">relationship_scores</span><span class="p">:</span>
+                <span class="c1"># Map development system relationship score to our relationship metrics</span>
+                <span class="n">dev_score</span> <span class="o">=</span> <span class="n">character_state</span><span class="o">.</span><span class="n">relationship_scores</span><span class="p">[</span><span class="s2">&quot;player&quot;</span><span class="p">]</span>
+                <span class="n">player_relationship</span><span class="o">.</span><span class="n">trust_level</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="n">dev_score</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">player_relationship</span><span class="o">.</span><span class="n">affection_level</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="p">(</span><span class="n">dev_score</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Update last sync timestamp</span>
+            <span class="n">character_arc</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Successfully synced character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> from development system&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing character from development system: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_sync_personality_traits</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">:</span> <span class="n">CharacterState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync personality traits between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">trait_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_mapping</span><span class="p">:</span>
+                    <span class="n">mapped_trait</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_mapping</span><span class="p">[</span><span class="n">trait_name</span><span class="p">]</span>
+                    <span class="n">character_state</span><span class="o">.</span><span class="n">personality_traits</span><span class="p">[</span><span class="n">mapped_trait</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Synced </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="p">)</span><span class="si">}</span><span class="s2"> personality traits&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing personality traits: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_sync_relationship_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">:</span> <span class="n">CharacterState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync relationship data between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Convert our relationship states to development system relationship scores</span>
+            <span class="k">for</span> <span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span>
+                <span class="n">relationship_state</span><span class="p">,</span>
+            <span class="p">)</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Calculate overall relationship score from our detailed metrics</span>
+                <span class="n">overall_score</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">relationship_state</span><span class="o">.</span><span class="n">trust_level</span> <span class="o">*</span> <span class="mf">0.4</span>
+                    <span class="o">+</span> <span class="n">relationship_state</span><span class="o">.</span><span class="n">affection_level</span> <span class="o">*</span> <span class="mf">0.3</span>
+                    <span class="o">+</span> <span class="n">relationship_state</span><span class="o">.</span><span class="n">respect_level</span> <span class="o">*</span> <span class="mf">0.3</span>
+                <span class="p">)</span> <span class="o">*</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="mf">1.0</span>  <span class="c1"># Convert from 0-1 to -1 to 1 range</span>
+
+                <span class="n">character_state</span><span class="o">.</span><span class="n">relationship_scores</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">overall_score</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Synced </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="p">)</span><span class="si">}</span><span class="s2"> relationships&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing relationship data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_sync_memory_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">character_state</span><span class="p">:</span> <span class="n">CharacterState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sync memory data between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Convert character history to memory fragments</span>
+            <span class="k">for</span> <span class="n">history_entry</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">character_history</span><span class="p">[</span>
+                <span class="o">-</span><span class="mi">10</span><span class="p">:</span>
+            <span class="p">]:</span>  <span class="c1"># Last 10 interactions</span>
+                <span class="n">memory_content</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Interaction: </span><span class="si">{</span><span class="n">history_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;player_choice&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Unknown choice&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">emotional_weight</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                    <span class="n">history_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_impact&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">history_entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_impact&quot;</span><span class="p">,</span> <span class="p">{})))</span>
+
+                <span class="c1"># Check if this memory already exists</span>
+                <span class="n">existing_memory</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="n">memory_content</span> <span class="ow">in</span> <span class="n">memory</span><span class="o">.</span><span class="n">content</span>
+                    <span class="k">for</span> <span class="n">memory</span> <span class="ow">in</span> <span class="n">character_state</span><span class="o">.</span><span class="n">memory_fragments</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">existing_memory</span><span class="p">:</span>
+                    <span class="n">character_state</span><span class="o">.</span><span class="n">add_memory</span><span class="p">(</span>
+                        <span class="n">content</span><span class="o">=</span><span class="n">memory_content</span><span class="p">,</span>
+                        <span class="n">emotional_weight</span><span class="o">=</span><span class="n">emotional_weight</span><span class="p">,</span>
+                        <span class="n">tags</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;interaction&quot;</span><span class="p">,</span> <span class="s2">&quot;player&quot;</span><span class="p">],</span>
+                    <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Synced memory data for character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing memory data: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="RelationshipDynamicsManager">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.RelationshipDynamicsManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RelationshipDynamicsManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages relationship evolution across both character systems.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_development_system</span><span class="p">:</span> <span class="n">CharacterDevelopmentSystem</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span> <span class="o">=</span> <span class="n">character_development_system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relationship_evolution_rate</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+<div class="viewcode-block" id="RelationshipDynamicsManager.evolve_relationships_across_scales">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.RelationshipDynamicsManager.evolve_relationships_across_scales">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">evolve_relationships_across_scales</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span>
+        <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PlayerInteraction</span><span class="p">],</span>
+        <span class="n">time_period</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evolve relationships across both systems based on interactions.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">time_period</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">time_period</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">relationship_changes</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="c1"># Convert PlayerInteractions to development system Interactions</span>
+            <span class="n">dev_interactions</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">player_interaction</span> <span class="ow">in</span> <span class="n">interactions</span><span class="p">:</span>
+                <span class="n">dev_interaction</span> <span class="o">=</span> <span class="n">Interaction</span><span class="p">(</span>
+                    <span class="n">participants</span><span class="o">=</span><span class="p">[</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span> <span class="s2">&quot;player&quot;</span><span class="p">],</span>
+                    <span class="n">interaction_type</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">interaction_type</span><span class="p">,</span>
+                    <span class="n">content</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">player_choice</span><span class="p">,</span>
+                    <span class="n">emotional_impact</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">emotional_impact</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                    <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">emotional_impact</span><span class="p">)),</span>
+                    <span class="n">therapeutic_value</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">therapeutic_relevance</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">dev_interactions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dev_interaction</span><span class="p">)</span>
+
+            <span class="c1"># Update development system</span>
+            <span class="k">for</span> <span class="n">interaction</span> <span class="ow">in</span> <span class="n">dev_interactions</span><span class="p">:</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">update_character_from_interaction</span><span class="p">(</span>
+                        <span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span> <span class="n">interaction</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to update character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> in development system&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Update our relationship dynamics based on interactions</span>
+            <span class="k">for</span> <span class="n">interaction</span> <span class="ow">in</span> <span class="n">interactions</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_arc_relationships</span><span class="p">(</span><span class="n">character_arc</span><span class="p">,</span> <span class="n">interaction</span><span class="p">)</span>
+
+                <span class="c1"># Track changes</span>
+                <span class="k">for</span> <span class="n">character_id</span><span class="p">,</span> <span class="n">changes</span> <span class="ow">in</span> <span class="n">interaction</span><span class="o">.</span><span class="n">relationship_changes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">character_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">relationship_changes</span><span class="p">:</span>
+                        <span class="n">relationship_changes</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="n">relationship_changes</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+                        <span class="nb">sum</span><span class="p">(</span><span class="n">changes</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">changes</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">changes</span>
+                    <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Evolved relationships for character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">relationship_changes</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error evolving relationships: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_update_arc_relationships</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">interaction</span><span class="p">:</span> <span class="n">PlayerInteraction</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update character arc relationships based on interaction.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">player_id</span> <span class="o">=</span> <span class="s2">&quot;player&quot;</span>
+
+            <span class="c1"># Get or create player relationship</span>
+            <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="p">:</span>
+                <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">RelationshipState</span><span class="p">(</span>
+                    <span class="n">character_id</span><span class="o">=</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="p">,</span>
+                    <span class="n">relationship_type</span><span class="o">=</span><span class="n">RelationshipType</span><span class="o">.</span><span class="n">STRANGER</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">relationship</span> <span class="o">=</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span>
+
+            <span class="c1"># Update relationship metrics based on interaction</span>
+            <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">interaction</span><span class="o">.</span><span class="n">relationship_changes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">relationship</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
+                    <span class="n">current_value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">relationship</span><span class="p">,</span> <span class="n">metric</span><span class="p">)</span>
+                    <span class="n">new_value</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                        <span class="mf">0.0</span><span class="p">,</span>
+                        <span class="nb">min</span><span class="p">(</span>
+                            <span class="mf">1.0</span><span class="p">,</span>
+                            <span class="n">current_value</span> <span class="o">+</span> <span class="n">change</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship_evolution_rate</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+                    <span class="nb">setattr</span><span class="p">(</span><span class="n">relationship</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">new_value</span><span class="p">)</span>
+
+            <span class="c1"># Update relationship type based on trust level</span>
+            <span class="k">if</span> <span class="n">relationship</span><span class="o">.</span><span class="n">trust_level</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                <span class="n">relationship</span><span class="o">.</span><span class="n">relationship_type</span> <span class="o">=</span> <span class="n">RelationshipType</span><span class="o">.</span><span class="n">CLOSE_FRIEND</span>
+            <span class="k">elif</span> <span class="n">relationship</span><span class="o">.</span><span class="n">trust_level</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+                <span class="n">relationship</span><span class="o">.</span><span class="n">relationship_type</span> <span class="o">=</span> <span class="n">RelationshipType</span><span class="o">.</span><span class="n">FRIEND</span>
+            <span class="k">elif</span> <span class="n">relationship</span><span class="o">.</span><span class="n">trust_level</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>
+                <span class="n">relationship</span><span class="o">.</span><span class="n">relationship_type</span> <span class="o">=</span> <span class="n">RelationshipType</span><span class="o">.</span><span class="n">ACQUAINTANCE</span>
+
+            <span class="c1"># Update interaction tracking</span>
+            <span class="n">relationship</span><span class="o">.</span><span class="n">last_interaction</span> <span class="o">=</span> <span class="n">interaction</span><span class="o">.</span><span class="n">timestamp</span>
+            <span class="n">relationship</span><span class="o">.</span><span class="n">interaction_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">relationship</span><span class="o">.</span><span class="n">shared_experiences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interaction</span><span class="o">.</span><span class="n">interaction_id</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Updated relationship for character </span><span class="si">{</span><span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error updating arc relationships: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RelationshipDynamicsManager.calculate_relationship_compatibility">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.RelationshipDynamicsManager.calculate_relationship_compatibility">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">calculate_relationship_compatibility</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">other_character_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate relationship compatibility between characters.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get character states from development system</span>
+            <span class="n">char1_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_arc</span><span class="o">.</span><span class="n">character_id</span>
+            <span class="p">)</span>
+            <span class="n">char2_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">other_character_id</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">char1_state</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">char2_state</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">0.5</span>  <span class="c1"># Neutral compatibility if data unavailable</span>
+
+            <span class="c1"># Use development system&#39;s compatibility calculation</span>
+            <span class="n">compatibility</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">personality_manager</span><span class="o">.</span><span class="n">calculate_personality_compatibility</span><span class="p">(</span>
+                <span class="n">char1_state</span><span class="o">.</span><span class="n">personality_traits</span><span class="p">,</span> <span class="n">char2_state</span><span class="o">.</span><span class="n">personality_traits</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">compatibility</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error calculating relationship compatibility: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.5</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CharacterArcIntegration">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterArcIntegration</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main integration class between CharacterArcManager and Character Development System.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_arc_manager</span><span class="p">:</span> <span class="n">CharacterArcManagerComponent</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span> <span class="o">=</span> <span class="n">character_arc_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span> <span class="o">=</span> <span class="n">CharacterDevelopmentSystem</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_synchronizer</span> <span class="o">=</span> <span class="n">CharacterDataSynchronizer</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relationship_manager</span> <span class="o">=</span> <span class="n">RelationshipDynamicsManager</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Integration settings</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sync_interval</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>  <span class="c1"># Sync every 5 minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_sync_times</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Character Arc Integration initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CharacterArcIntegration.initialize_character_integration">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.initialize_character_integration">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialize_character_integration</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_personality</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">CharacterArc</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a character in both systems with integration.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Initializing integrated character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Create character in arc manager</span>
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">initialize_character_arc</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span> <span class="n">base_personality</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create character in development system</span>
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">create_character</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">base_personality</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Character_</span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">),</span>
+                <span class="n">personality_traits</span><span class="o">=</span><span class="n">base_personality</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+                <span class="n">therapeutic_role</span><span class="o">=</span><span class="n">base_personality</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_role&quot;</span><span class="p">,</span> <span class="s2">&quot;companion&quot;</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Initial sync</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_synchronizer</span><span class="o">.</span><span class="n">sync_character_to_development_system</span><span class="p">(</span>
+                <span class="n">character_arc</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Record sync time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_sync_times</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully initialized integrated character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error initializing integrated character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="CharacterArcIntegration.process_integrated_interaction">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.process_integrated_interaction">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_integrated_interaction</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">player_interaction</span><span class="p">:</span> <span class="n">PlayerInteraction</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process an interaction through both systems with synchronization.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Processing integrated interaction for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update character arc manager</span>
+            <span class="n">arc_success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">update_character_development</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span> <span class="n">player_interaction</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Convert to development system interaction</span>
+            <span class="n">dev_interaction</span> <span class="o">=</span> <span class="n">Interaction</span><span class="p">(</span>
+                <span class="n">participants</span><span class="o">=</span><span class="p">[</span><span class="n">character_id</span><span class="p">,</span> <span class="s2">&quot;player&quot;</span><span class="p">],</span>
+                <span class="n">interaction_type</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">interaction_type</span><span class="p">,</span>
+                <span class="n">content</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">player_choice</span><span class="p">,</span>
+                <span class="n">emotional_impact</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">emotional_impact</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">emotional_impact</span><span class="p">)),</span>
+                <span class="n">therapeutic_value</span><span class="o">=</span><span class="n">player_interaction</span><span class="o">.</span><span class="n">therapeutic_relevance</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update development system</span>
+            <span class="n">dev_success</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">update_character_from_interaction</span><span class="p">(</span>
+                    <span class="n">character_id</span><span class="p">,</span> <span class="n">dev_interaction</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sync data between systems</span>
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">get_character_arc</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">character_arc</span><span class="p">:</span>
+                <span class="n">sync_success</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_synchronizer</span><span class="o">.</span><span class="n">sync_character_to_development_system</span><span class="p">(</span>
+                        <span class="n">character_arc</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sync_success</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">success</span> <span class="o">=</span> <span class="n">arc_success</span> <span class="ow">and</span> <span class="n">dev_success</span> <span class="ow">and</span> <span class="n">sync_success</span>
+
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Successfully processed integrated interaction for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Partial failure processing interaction for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">success</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error processing integrated interaction for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CharacterArcIntegration.generate_integrated_character_response">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.generate_integrated_character_response">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_integrated_character_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">InteractionContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate character response using both systems for enhanced consistency.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating integrated response for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get response from arc manager</span>
+            <span class="n">arc_response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">generate_character_response</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span> <span class="n">context</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get dialogue context from development system</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">models.data_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">DialogueContext</span>
+
+            <span class="n">dialogue_context</span> <span class="o">=</span> <span class="n">DialogueContext</span><span class="p">(</span>
+                <span class="n">participants</span><span class="o">=</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">+</span> <span class="n">context</span><span class="o">.</span><span class="n">participants</span><span class="p">,</span>
+                <span class="n">current_topic</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;topic&quot;</span><span class="p">,</span> <span class="s2">&quot;general&quot;</span><span class="p">),</span>
+                <span class="n">emotional_context</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">mood</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">dev_context</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">generate_character_dialogue_context</span><span class="p">(</span>
+                    <span class="n">character_id</span><span class="p">,</span> <span class="n">dialogue_context</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Validate consistency between systems</span>
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_id</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">character_state</span><span class="p">:</span>
+                <span class="n">is_consistent</span><span class="p">,</span> <span class="n">consistency_message</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">validate_character_consistency</span><span class="p">(</span>
+                        <span class="n">character_id</span><span class="p">,</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">response_text</span><span class="p">,</span> <span class="n">dev_context</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">is_consistent</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Consistency issue for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">consistency_message</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Could implement response adjustment here</span>
+
+            <span class="c1"># Combine information from both systems</span>
+            <span class="n">integrated_response</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;response_text&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">response_text</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_tone&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">emotional_tone</span><span class="p">,</span>
+                <span class="s2">&quot;personality_consistency_score&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">personality_consistency_score</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_modeling&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">therapeutic_modeling</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_impact&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">relationship_impact</span><span class="p">,</span>
+                <span class="s2">&quot;arc_progression&quot;</span><span class="p">:</span> <span class="n">arc_response</span><span class="o">.</span><span class="n">arc_progression</span><span class="p">,</span>
+                <span class="s2">&quot;development_system_context&quot;</span><span class="p">:</span> <span class="n">dev_context</span><span class="p">,</span>
+                <span class="s2">&quot;consistency_validated&quot;</span><span class="p">:</span> <span class="n">is_consistent</span> <span class="k">if</span> <span class="n">character_state</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="o">**</span><span class="n">arc_response</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+                    <span class="s2">&quot;integration_timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+                    <span class="s2">&quot;systems_synced&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated integrated response for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">integrated_response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error generating integrated response for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;response_text&quot;</span><span class="p">:</span> <span class="s2">&quot;I&#39;m having trouble responding right now.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_tone&quot;</span><span class="p">:</span> <span class="s2">&quot;neutral&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+            <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="CharacterArcIntegration.sync_character_data">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.sync_character_data">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sync_character_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">force_sync</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Synchronize character data between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check if sync is needed</span>
+            <span class="n">last_sync</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_sync_times</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="ow">not</span> <span class="n">force_sync</span>
+                <span class="ow">and</span> <span class="n">last_sync</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_sync</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_interval</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># No sync needed</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Syncing character data for </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">get_character_arc</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">character_arc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Character arc not found for </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Sync to development system</span>
+            <span class="n">sync_to_success</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_synchronizer</span><span class="o">.</span><span class="n">sync_character_to_development_system</span><span class="p">(</span>
+                    <span class="n">character_arc</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sync from development system (to get any updates)</span>
+            <span class="n">sync_from_success</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_synchronizer</span><span class="o">.</span><span class="n">sync_character_from_development_system</span><span class="p">(</span>
+                    <span class="n">character_arc</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sync_to_success</span> <span class="ow">and</span> <span class="n">sync_from_success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">last_sync_times</span><span class="p">[</span><span class="n">character_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully synced character data for </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Partial sync failure for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error syncing character data for </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="CharacterArcIntegration.evolve_integrated_relationships">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.evolve_integrated_relationships">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">evolve_integrated_relationships</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PlayerInteraction</span><span class="p">],</span>
+        <span class="n">time_period</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evolve relationships across both systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Evolving integrated relationships for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">get_character_arc</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">character_arc</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Character arc not found for </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">{}</span>
+
+            <span class="c1"># Evolve relationships using relationship manager</span>
+            <span class="n">relationship_changes</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">relationship_manager</span><span class="o">.</span><span class="n">evolve_relationships_across_scales</span><span class="p">(</span>
+                    <span class="n">character_arc</span><span class="p">,</span> <span class="n">interactions</span><span class="p">,</span> <span class="n">time_period</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sync data after evolution</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">sync_character_data</span><span class="p">(</span><span class="n">character_id</span><span class="p">,</span> <span class="n">force_sync</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Get updated relationship summary</span>
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_id</span>
+            <span class="p">)</span>
+            <span class="n">relationship_summary</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">if</span> <span class="n">character_state</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">other_char_id</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">character_state</span><span class="o">.</span><span class="n">relationship_scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">relationship_summary</span><span class="p">[</span><span class="n">other_char_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">,</span>
+                        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">relationship_tracker</span><span class="o">.</span><span class="n">get_relationship_description</span><span class="p">(</span>
+                            <span class="n">score</span>
+                        <span class="p">),</span>
+                        <span class="s2">&quot;change&quot;</span><span class="p">:</span> <span class="n">relationship_changes</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">other_char_id</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>
+                    <span class="p">}</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_changes&quot;</span><span class="p">:</span> <span class="n">relationship_changes</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_summary&quot;</span><span class="p">:</span> <span class="n">relationship_summary</span><span class="p">,</span>
+                <span class="s2">&quot;evolution_timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Successfully evolved relationships for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error evolving integrated relationships for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="CharacterArcIntegration.get_integrated_character_summary">
+<a class="viewcode-back" href="../../../api/src.components.character_arc_integration.html#src.components.character_arc_integration.CharacterArcIntegration.get_integrated_character_summary">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_integrated_character_summary</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get comprehensive character summary from both systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting integrated summary for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get arc manager data</span>
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">get_character_arc</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+
+            <span class="c1"># Get development system data</span>
+            <span class="n">dev_summary</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_development_summary</span><span class="p">(</span>
+                    <span class="n">character_id</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Combine data</span>
+            <span class="n">integrated_summary</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span>
+                <span class="s2">&quot;arc_manager_data&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;current_stage&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">character_arc</span><span class="o">.</span><span class="n">current_stage</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">character_arc</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;completed_milestones&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">completed_milestones</span><span class="p">)</span> <span class="k">if</span> <span class="n">character_arc</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;active_goals&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">current_goals</span><span class="p">)</span> <span class="k">if</span> <span class="n">character_arc</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;therapeutic_modeling&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">therapeutic_modeling</span><span class="p">)</span> <span class="k">if</span> <span class="n">character_arc</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;relationship_count&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="p">)</span> <span class="k">if</span> <span class="n">character_arc</span> <span class="k">else</span> <span class="mi">0</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;development_system_data&quot;</span><span class="p">:</span> <span class="n">dev_summary</span><span class="p">,</span>
+                <span class="s2">&quot;integration_status&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;last_sync&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_sync_times</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">character_id</span><span class="p">),</span>
+                    <span class="s2">&quot;systems_connected&quot;</span><span class="p">:</span> <span class="n">character_arc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="nb">bool</span><span class="p">(</span><span class="n">dev_summary</span><span class="p">),</span>
+                    <span class="s2">&quot;data_consistency&quot;</span><span class="p">:</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_data_consistency</span><span class="p">(</span>
+                        <span class="n">character_id</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;summary_timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated integrated summary for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">integrated_summary</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error getting integrated summary for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_data_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check data consistency between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">character_arc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_arc_manager</span><span class="o">.</span><span class="n">get_character_arc</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+            <span class="n">character_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">get_character_state</span><span class="p">(</span>
+                <span class="n">character_id</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">character_arc</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">character_state</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;overall&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="s2">&quot;Missing character data&quot;</span><span class="p">}</span>
+
+            <span class="n">consistency_checks</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;personality_traits&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_personality_consistency</span><span class="p">(</span>
+                    <span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;relationships&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_relationship_consistency</span><span class="p">(</span>
+                    <span class="n">character_arc</span><span class="p">,</span> <span class="n">character_state</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;basic_info&quot;</span><span class="p">:</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">character_name</span> <span class="o">==</span> <span class="n">character_state</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">consistency_checks</span><span class="p">[</span><span class="s2">&quot;overall&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">all</span><span class="p">(</span><span class="n">consistency_checks</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">consistency_checks</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error checking data consistency: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;overall&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_personality_consistency</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">character_state</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check personality trait consistency between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">trait_name</span><span class="p">,</span> <span class="n">arc_value</span> <span class="ow">in</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">personality_evolution</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">trait_name</span> <span class="ow">in</span> <span class="n">character_state</span><span class="o">.</span><span class="n">personality_traits</span><span class="p">:</span>
+                    <span class="n">dev_value</span> <span class="o">=</span> <span class="n">character_state</span><span class="o">.</span><span class="n">personality_traits</span><span class="p">[</span><span class="n">trait_name</span><span class="p">]</span>
+                    <span class="c1"># Allow small differences due to different update mechanisms</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">arc_value</span> <span class="o">-</span> <span class="n">dev_value</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_relationship_consistency</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_arc</span><span class="p">:</span> <span class="n">CharacterArc</span><span class="p">,</span> <span class="n">character_state</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check relationship consistency between systems.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check if player relationship exists in both systems</span>
+            <span class="n">player_relationship</span> <span class="o">=</span> <span class="n">character_arc</span><span class="o">.</span><span class="n">relationship_dynamics</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">)</span>
+            <span class="n">player_score</span> <span class="o">=</span> <span class="n">character_state</span><span class="o">.</span><span class="n">relationship_scores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">player_relationship</span> <span class="ow">and</span> <span class="n">player_score</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Convert our detailed metrics to overall score</span>
+                <span class="n">arc_overall</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">player_relationship</span><span class="o">.</span><span class="n">trust_level</span>
+                    <span class="o">+</span> <span class="n">player_relationship</span><span class="o">.</span><span class="n">affection_level</span>
+                <span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+                <span class="n">dev_overall</span> <span class="o">=</span> <span class="p">(</span><span class="n">player_score</span> <span class="o">+</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>  <span class="c1"># Convert -1,1 to 0,1</span>
+
+                <span class="c1"># Allow reasonable difference</span>
+                <span class="k">return</span> <span class="nb">abs</span><span class="p">(</span><span class="n">arc_overall</span> <span class="o">-</span> <span class="n">dev_overall</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.3</span>
+
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># If no relationships to compare, consider consistent</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

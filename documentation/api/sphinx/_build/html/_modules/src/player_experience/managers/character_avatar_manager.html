@@ -1,0 +1,661 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.character_avatar_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.character_avatar_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.character_avatar_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Character creation, customization, and lifecycle management.</span>
+
+<span class="sd">This module provides the CharacterAvatarManager service that handles character CRUD operations,</span>
+<span class="sd">enforces character limits, and integrates with the existing CharacterDevelopmentSystem for</span>
+<span class="sd">therapeutic profiles.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.character_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharacterRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.character</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Character</span><span class="p">,</span>
+    <span class="n">CharacterCreationData</span><span class="p">,</span>
+    <span class="n">CharacterUpdates</span><span class="p">,</span>
+    <span class="n">TherapeuticProfile</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">IntensityLevel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.therapeutic_profile_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">TherapeuticProfileIntegrationService</span>
+
+
+<span class="c1"># Mock implementations for TTA components (will be replaced with actual imports when available)</span>
+<div class="viewcode-block" id="CharacterDevelopmentSystem">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterDevelopmentSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterDevelopmentSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock CharacterDevelopmentSystem for testing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="CharacterDevelopmentSystem.initialize_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterDevelopmentSystem.initialize_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">initialize_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mock: Initialized character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> in development system&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span> <span class="s2">&quot;initialized&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PersonalizationEngine">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.PersonalizationEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PersonalizationEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mock PersonalizationEngine for testing.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="PersonalizationEngine.create_personalization_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.PersonalizationEngine.create_personalization_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_personalization_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Mock: Created personalization profile for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span> <span class="s2">&quot;profile_created&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="PersonalizationEngine.update_personalization_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.PersonalizationEngine.update_personalization_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_personalization_profile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Mock: Updated personalization profile for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span> <span class="s2">&quot;profile_updated&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span></div>
+</div>
+
+
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CharacterLimitExceededError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterLimitExceededError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterLimitExceededError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when player tries to create more than the allowed number of characters.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="CharacterNotFoundError">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterNotFoundError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterNotFoundError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a requested character is not found.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span></div>
+
+
+
+<div class="viewcode-block" id="CharacterAvatarManager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CharacterAvatarManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages character creation, customization, and lifecycle.&quot;&quot;&quot;</span>
+
+    <span class="n">MAX_CHARACTERS_PER_PLAYER</span> <span class="o">=</span> <span class="mi">5</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_repository</span><span class="p">:</span> <span class="n">CharacterRepository</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Character Avatar Manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span> <span class="o">=</span> <span class="n">character_repository</span> <span class="ow">or</span> <span class="n">CharacterRepository</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span> <span class="o">=</span> <span class="n">CharacterDevelopmentSystem</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">personalization_engine</span> <span class="o">=</span> <span class="n">PersonalizationEngine</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span> <span class="o">=</span> <span class="n">TherapeuticProfileIntegrationService</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;CharacterAvatarManager initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CharacterAvatarManager.create_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.create_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">create_character</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">character_data</span><span class="p">:</span> <span class="n">CharacterCreationData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new character for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The ID of the player creating the character</span>
+<span class="sd">            character_data: The character creation data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The created Character object</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CharacterLimitExceededError: If player already has maximum characters</span>
+<span class="sd">            ValueError: If character data is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check character limit</span>
+        <span class="n">existing_characters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_player_characters</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">existing_characters</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">MAX_CHARACTERS_PER_PLAYER</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharacterLimitExceededError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2"> already has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">existing_characters</span><span class="p">)</span><span class="si">}</span><span class="s2"> characters. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Maximum allowed is </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">MAX_CHARACTERS_PER_PLAYER</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Validate character data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validate_character_creation_data</span><span class="p">(</span><span class="n">character_data</span><span class="p">)</span>
+
+        <span class="c1"># Generate unique character ID</span>
+        <span class="n">character_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+        <span class="c1"># Create character object with enhanced therapeutic profile</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="n">Character</span><span class="p">(</span>
+            <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span><span class="p">,</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">appearance</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">appearance</span><span class="p">,</span>
+            <span class="n">background</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+            <span class="n">therapeutic_profile</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="p">,</span>
+            <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+            <span class="n">last_active</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Enhance therapeutic profile based on character data</span>
+        <span class="n">enhanced_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span><span class="o">.</span><span class="n">create_therapeutic_profile_from_character</span><span class="p">(</span>
+            <span class="n">character</span>
+        <span class="p">)</span>
+        <span class="n">character</span><span class="o">.</span><span class="n">therapeutic_profile</span> <span class="o">=</span> <span class="n">enhanced_profile</span>
+
+        <span class="c1"># Initialize character in the development system</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">character_development_system</span><span class="o">.</span><span class="n">initialize_character</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span>
+                <span class="n">personality_traits</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_extract_personality_traits</span><span class="p">(</span><span class="n">character_data</span><span class="p">),</span>
+                <span class="n">therapeutic_goals</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">therapeutic_goals</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initialize character in development system: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create personalization profile and context</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">personalization_engine</span><span class="o">.</span><span class="n">create_personalization_profile</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span>
+                <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">enhanced_profile</span><span class="p">,</span>
+                <span class="n">background_info</span><span class="o">=</span><span class="n">character_data</span><span class="o">.</span><span class="n">background</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create personalization context for therapeutic integration</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span><span class="o">.</span><span class="n">create_personalization_context</span><span class="p">(</span>
+                <span class="n">character</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Generate personalization recommendations</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span><span class="o">.</span><span class="n">generate_personalization_recommendations</span><span class="p">(</span>
+                <span class="n">character</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create personalization profile and context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Save character to repository</span>
+        <span class="n">saved_character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">create_character</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">saved_character</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.get_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.get_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a character by ID.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The Character object if found, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.get_player_characters">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.get_player_characters">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_player_characters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Character</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get all characters for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of Character objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_characters_by_player</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.update_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.update_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_character</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">updates</span><span class="p">:</span> <span class="n">CharacterUpdates</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Character</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update an existing character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+<span class="sd">            updates: The character updates</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The updated Character object</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            CharacterNotFoundError: If character is not found</span>
+<span class="sd">            ValueError: If update data is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Get existing character</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CharacterNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2"> not found&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Apply updates</span>
+        <span class="k">if</span> <span class="n">updates</span><span class="o">.</span><span class="n">appearance</span><span class="p">:</span>
+            <span class="n">character</span><span class="o">.</span><span class="n">appearance</span> <span class="o">=</span> <span class="n">updates</span><span class="o">.</span><span class="n">appearance</span>
+
+        <span class="k">if</span> <span class="n">updates</span><span class="o">.</span><span class="n">background</span><span class="p">:</span>
+            <span class="c1"># Validate name consistency</span>
+            <span class="k">if</span> <span class="n">updates</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">character</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">character</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">updates</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">character</span><span class="o">.</span><span class="n">background</span> <span class="o">=</span> <span class="n">updates</span><span class="o">.</span><span class="n">background</span>
+
+        <span class="k">if</span> <span class="n">updates</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="p">:</span>
+            <span class="n">character</span><span class="o">.</span><span class="n">therapeutic_profile</span> <span class="o">=</span> <span class="n">updates</span><span class="o">.</span><span class="n">therapeutic_profile</span>
+
+            <span class="c1"># Update personalization profile</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">personalization_engine</span><span class="o">.</span><span class="n">update_personalization_profile</span><span class="p">(</span>
+                    <span class="n">character_id</span><span class="p">,</span> <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">updates</span><span class="o">.</span><span class="n">therapeutic_profile</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update personalization profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update last active timestamp</span>
+        <span class="n">character</span><span class="o">.</span><span class="n">last_active</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Save updated character</span>
+        <span class="n">updated_character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">update_character</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">updated_character</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.delete_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.delete_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">delete_character</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete a character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if character was deleted, False if not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Mark character as inactive instead of hard delete for data integrity</span>
+        <span class="n">character</span><span class="o">.</span><span class="n">is_active</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">character</span><span class="o">.</span><span class="n">last_active</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">update_character</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Deleted character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.get_character_therapeutic_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.get_character_therapeutic_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_character_therapeutic_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticProfile</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the therapeutic profile for a character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            The TherapeuticProfile if character exists, None otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">character</span><span class="o">.</span><span class="n">therapeutic_profile</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.update_character_therapeutic_profile">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.update_character_therapeutic_profile">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_character_therapeutic_profile</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">therapeutic_profile</span><span class="p">:</span> <span class="n">TherapeuticProfile</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update a character&#39;s therapeutic profile.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+<span class="sd">            therapeutic_profile: The new therapeutic profile</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            True if updated successfully, False if character not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">character</span><span class="o">.</span><span class="n">therapeutic_profile</span> <span class="o">=</span> <span class="n">therapeutic_profile</span>
+        <span class="n">character</span><span class="o">.</span><span class="n">last_active</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Update personalization profile</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">personalization_engine</span><span class="o">.</span><span class="n">update_personalization_profile</span><span class="p">(</span>
+                <span class="n">character_id</span><span class="p">,</span> <span class="n">therapeutic_preferences</span><span class="o">=</span><span class="n">therapeutic_profile</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to update personalization profile: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">update_character</span><span class="p">(</span><span class="n">character</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated therapeutic profile for character </span><span class="si">{</span><span class="n">character_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.get_character_statistics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.get_character_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_character_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get statistics for a character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with character statistics, None if character not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;character_id&quot;</span><span class="p">:</span> <span class="n">character_id</span><span class="p">,</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+            <span class="s2">&quot;last_active&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">last_active</span><span class="p">,</span>
+            <span class="s2">&quot;total_session_time&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">total_session_time</span><span class="p">,</span>
+            <span class="s2">&quot;session_count&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">session_count</span><span class="p">,</span>
+            <span class="s2">&quot;active_worlds&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">character</span><span class="o">.</span><span class="n">active_worlds</span><span class="p">),</span>
+            <span class="s2">&quot;therapeutic_readiness&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">get_therapeutic_readiness</span><span class="p">(),</span>
+            <span class="s2">&quot;active_therapeutic_goals&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">character</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">get_active_goals</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;is_active&quot;</span><span class="p">:</span> <span class="n">character</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validate_character_creation_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_data</span><span class="p">:</span> <span class="n">CharacterCreationData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate character creation data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_data: The character creation data to validate</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If data is invalid</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character_data</span><span class="o">.</span><span class="n">name</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">character_data</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Character name must be at least 2 characters long&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">character_data</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">50</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Character name cannot exceed 50 characters&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Background name is validated by CharacterBackground. No need to enforce equality to display name here.</span>
+
+        <span class="c1"># Validate therapeutic profile</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">readiness_level</span> <span class="o">&lt;</span> <span class="mf">0.0</span>
+            <span class="ow">or</span> <span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">readiness_level</span> <span class="o">&gt;</span> <span class="mf">1.0</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Therapeutic readiness level must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_personality_traits</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_data</span><span class="p">:</span> <span class="n">CharacterCreationData</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract personality traits from character data for the development system.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_data: The character creation data</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary of personality traits</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Map character background traits to personality system traits</span>
+        <span class="n">traits</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Extract from personality traits</span>
+        <span class="k">for</span> <span class="n">trait</span> <span class="ow">in</span> <span class="n">character_data</span><span class="o">.</span><span class="n">background</span><span class="o">.</span><span class="n">personality_traits</span><span class="p">:</span>
+            <span class="n">trait_lower</span> <span class="o">=</span> <span class="n">trait</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;empathetic&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span> <span class="ow">or</span> <span class="s2">&quot;caring&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;empathy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+            <span class="k">elif</span> <span class="s2">&quot;patient&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;patience&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+            <span class="k">elif</span> <span class="s2">&quot;organized&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;conscientiousness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span>
+            <span class="k">elif</span> <span class="s2">&quot;outgoing&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span> <span class="ow">or</span> <span class="s2">&quot;social&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;extraversion&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span>
+            <span class="k">elif</span> <span class="s2">&quot;anxious&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span> <span class="ow">or</span> <span class="s2">&quot;worried&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;neuroticism&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span>
+            <span class="k">elif</span> <span class="s2">&quot;supportive&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span> <span class="ow">or</span> <span class="s2">&quot;helpful&quot;</span> <span class="ow">in</span> <span class="n">trait_lower</span><span class="p">:</span>
+                <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;supportiveness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+
+        <span class="c1"># Extract from therapeutic profile</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">preferred_intensity</span>
+            <span class="o">==</span> <span class="n">IntensityLevel</span><span class="o">.</span><span class="n">HIGH</span>
+        <span class="p">):</span>
+            <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;openness&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;openness&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.3</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">character_data</span><span class="o">.</span><span class="n">therapeutic_profile</span><span class="o">.</span><span class="n">preferred_intensity</span> <span class="o">==</span> <span class="n">IntensityLevel</span><span class="o">.</span><span class="n">LOW</span>
+        <span class="p">):</span>
+            <span class="n">traits</span><span class="p">[</span><span class="s2">&quot;neuroticism&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">traits</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;neuroticism&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.2</span>
+
+        <span class="c1"># Ensure all values are in valid range</span>
+        <span class="k">for</span> <span class="n">trait_name</span> <span class="ow">in</span> <span class="n">traits</span><span class="p">:</span>
+            <span class="n">traits</span><span class="p">[</span><span class="n">trait_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">traits</span><span class="p">[</span><span class="n">trait_name</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">traits</span>
+
+<div class="viewcode-block" id="CharacterAvatarManager.get_character_personalization_recommendations">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.get_character_personalization_recommendations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_character_personalization_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get personalization recommendations for a character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of personalization recommendations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span><span class="o">.</span><span class="n">get_character_recommendations</span><span class="p">(</span>
+                <span class="n">character_id</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Convert to dictionaries for easier API consumption</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;recommendation_id&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">recommendation_id</span><span class="p">,</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">recommendation_type</span><span class="p">,</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                <span class="s2">&quot;rationale&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">rationale</span><span class="p">,</span>
+                <span class="s2">&quot;priority&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span>
+                <span class="s2">&quot;confidence_score&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">confidence_score</span><span class="p">,</span>
+                <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">rec</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">rec</span> <span class="ow">in</span> <span class="n">recommendations</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="CharacterAvatarManager.adapt_therapeutic_content_for_character">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.character_avatar_manager.html#src.player_experience.managers.CharacterAvatarManager.adapt_therapeutic_content_for_character">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">adapt_therapeutic_content_for_character</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;general&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Adapt therapeutic content for a specific character.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            character_id: The character ID</span>
+<span class="sd">            content: The content to adapt</span>
+<span class="sd">            content_type: Type of content</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dictionary with adaptation details, None if character not found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">character</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">character_repository</span><span class="o">.</span><span class="n">get_character</span><span class="p">(</span><span class="n">character_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">character</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">adaptation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integration_service</span><span class="o">.</span><span class="n">adapt_therapeutic_content</span><span class="p">(</span>
+            <span class="n">character</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">content_type</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;adaptation_id&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">adaptation_id</span><span class="p">,</span>
+            <span class="s2">&quot;original_content&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">original_content</span><span class="p">,</span>
+            <span class="s2">&quot;adapted_content&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">adapted_content</span><span class="p">,</span>
+            <span class="s2">&quot;adaptation_type&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">adaptation_type</span><span class="p">,</span>
+            <span class="s2">&quot;reasoning&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">reasoning</span><span class="p">,</span>
+            <span class="s2">&quot;effectiveness_score&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">effectiveness_score</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">adaptation</span><span class="o">.</span><span class="n">created_at</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

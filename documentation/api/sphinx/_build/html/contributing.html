@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contributing to TTA &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css?v=c5250a58" />
+
+
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=30646c52"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Deployment Documentation" href="deployment/index.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing to TTA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#getting-started">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#ways-to-contribute">Ways to Contribute</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-contributions">Code Contributions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation">Documentation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#quality-assurance">Quality Assurance</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#development-workflow">Development Workflow</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fork-and-clone">1. Fork and Clone</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-branch">2. Create a Branch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#make-changes">3. Make Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-your-changes">4. Test Your Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#commit-your-changes">5. Commit Your Changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#push-and-create-pull-request">6. Push and Create Pull Request</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#coding-standards">Coding Standards</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-style">Code Style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation-standards">Documentation Standards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#testing-standards">Testing Standards</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pull-request-guidelines">Pull Request Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#before-submitting">Before Submitting</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#pull-request-description">Pull Request Description</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#review-process">Review Process</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#issue-reporting">Issue Reporting</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#bug-reports">Bug Reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#feature-requests">Feature Requests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#security-issues">Security Issues</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#community-guidelines">Community Guidelines</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#code-of-conduct">Code of Conduct</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#communication">Communication</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#getting-help">Getting Help</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Contributing to TTA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="contributing-to-tta">
+<h1>Contributing to TTA<a class="headerlink" href="#contributing-to-tta" title="Link to this heading"></a></h1>
+<p>We welcome contributions to the Therapeutic Text Adventure (TTA) platform! This guide will help you get started with contributing to the project.</p>
+<section id="getting-started">
+<h2>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading"></a></h2>
+<p>Before you begin contributing, please:</p>
+<ol class="arabic simple">
+<li><p><strong>Read the Documentation</strong>: Familiarize yourself with the project by reading the <a class="reference internal" href="overview.html"><span class="doc">Platform Overview</span></a> and <a class="reference internal" href="getting-started.html"><span class="doc">Getting Started</span></a> guides.</p></li>
+<li><p><strong>Set Up Development Environment</strong>: Follow the setup instructions in <a class="reference internal" href="getting-started.html"><span class="doc">Getting Started</span></a>.</p></li>
+<li><p><strong>Join the Community</strong>: Participate in <a class="reference external" href="https://github.com/theinterneti/TTA/discussions">GitHub Discussions</a> to connect with other contributors.</p></li>
+</ol>
+</section>
+<section id="ways-to-contribute">
+<h2>Ways to Contribute<a class="headerlink" href="#ways-to-contribute" title="Link to this heading"></a></h2>
+<section id="code-contributions">
+<h3>Code Contributions<a class="headerlink" href="#code-contributions" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Bug Fixes</strong>: Help fix reported issues</p></li>
+<li><p><strong>Feature Development</strong>: Implement new features</p></li>
+<li><p><strong>Performance Improvements</strong>: Optimize existing code</p></li>
+<li><p><strong>Test Coverage</strong>: Add tests for untested code</p></li>
+</ul>
+</section>
+<section id="documentation">
+<h3>Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>API Documentation</strong>: Improve docstrings and API docs</p></li>
+<li><p><strong>User Guides</strong>: Write tutorials and how-to guides</p></li>
+<li><p><strong>Developer Documentation</strong>: Enhance development guides</p></li>
+<li><p><strong>Examples</strong>: Create example applications and use cases</p></li>
+</ul>
+</section>
+<section id="quality-assurance">
+<h3>Quality Assurance<a class="headerlink" href="#quality-assurance" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Bug Reports</strong>: Report issues you encounter</p></li>
+<li><p><strong>Testing</strong>: Help test new features and releases</p></li>
+<li><p><strong>Code Review</strong>: Review pull requests from other contributors</p></li>
+<li><p><strong>Security Audits</strong>: Help identify security vulnerabilities</p></li>
+</ul>
+</section>
+</section>
+<section id="development-workflow">
+<h2>Development Workflow<a class="headerlink" href="#development-workflow" title="Link to this heading"></a></h2>
+<section id="fork-and-clone">
+<h3>1. Fork and Clone<a class="headerlink" href="#fork-and-clone" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Fork the repository on GitHub, then clone your fork</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/YOUR_USERNAME/TTA.git
+<span class="nb">cd</span><span class="w"> </span>TTA
+
+<span class="c1"># Add upstream remote</span>
+git<span class="w"> </span>remote<span class="w"> </span>add<span class="w"> </span>upstream<span class="w"> </span>https://github.com/theinterneti/TTA.git
+</pre></div>
+</div>
+</section>
+<section id="create-a-branch">
+<h3>2. Create a Branch<a class="headerlink" href="#create-a-branch" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Create a new branch for your feature</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>feature/your-feature-name
+
+<span class="c1"># Or for bug fixes</span>
+git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>fix/issue-description
+</pre></div>
+</div>
+</section>
+<section id="make-changes">
+<h3>3. Make Changes<a class="headerlink" href="#make-changes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Write clean, well-documented code</p></li>
+<li><p>Follow the project’s coding standards</p></li>
+<li><p>Add tests for new functionality</p></li>
+<li><p>Update documentation as needed</p></li>
+</ul>
+</section>
+<section id="test-your-changes">
+<h3>4. Test Your Changes<a class="headerlink" href="#test-your-changes" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run the full test suite</span>
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/
+
+<span class="c1"># Run code quality checks</span>
+uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>run<span class="w"> </span>--all-files
+
+<span class="c1"># Test with coverage</span>
+uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/<span class="w"> </span>--cov<span class="o">=</span>src<span class="w"> </span>--cov-report<span class="o">=</span>html
+</pre></div>
+</div>
+</section>
+<section id="commit-your-changes">
+<h3>5. Commit Your Changes<a class="headerlink" href="#commit-your-changes" title="Link to this heading"></a></h3>
+<p>We use conventional commits for clear commit messages:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Examples of good commit messages</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;feat: add user authentication system&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;fix: resolve database connection timeout&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;docs: update API documentation&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;test: add integration tests for user service&quot;</span>
+</pre></div>
+</div>
+</section>
+<section id="push-and-create-pull-request">
+<h3>6. Push and Create Pull Request<a class="headerlink" href="#push-and-create-pull-request" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Push your branch</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>feature/your-feature-name
+
+<span class="c1"># Create a pull request on GitHub</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="coding-standards">
+<h2>Coding Standards<a class="headerlink" href="#coding-standards" title="Link to this heading"></a></h2>
+<section id="code-style">
+<h3>Code Style<a class="headerlink" href="#code-style" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Formatting</strong>: Use Black for code formatting</p></li>
+<li><p><strong>Import Sorting</strong>: Use isort for import organization</p></li>
+<li><p><strong>Linting</strong>: Use Ruff for linting</p></li>
+<li><p><strong>Type Hints</strong>: Use type hints for all functions and methods</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Good example</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_risk_score</span><span class="p">(</span>
+    <span class="n">anxiety_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">depression_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">history</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate therapeutic risk score.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        anxiety_level: Anxiety level (0-10)</span>
+<span class="sd">        depression_level: Depression level (0-10)</span>
+<span class="sd">        history: Optional list of historical factors</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Risk score as a float between 0.0 and 1.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Implementation here</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="documentation-standards">
+<h3>Documentation Standards<a class="headerlink" href="#documentation-standards" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Docstrings</strong>: Use Google-style docstrings</p></li>
+<li><p><strong>Type Information</strong>: Include parameter and return types</p></li>
+<li><p><strong>Examples</strong>: Provide usage examples where helpful</p></li>
+<li><p><strong>Error Handling</strong>: Document exceptions that may be raised</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">process_user_input</span><span class="p">(</span><span class="n">input_text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProcessedInput</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process and validate user input.</span>
+
+<span class="sd">    This function sanitizes user input and extracts relevant</span>
+<span class="sd">    therapeutic information for further processing.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        input_text: Raw user input text</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ProcessedInput object containing sanitized and structured data</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidationError: If input contains invalid or harmful content</span>
+<span class="sd">        ProcessingError: If input cannot be processed</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; processed = process_user_input(&quot;I&#39;m feeling anxious today&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; print(processed.sentiment)</span>
+<span class="sd">        &#39;negative&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+<section id="testing-standards">
+<h3>Testing Standards<a class="headerlink" href="#testing-standards" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>Test Coverage</strong>: Aim for 80%+ coverage on new code</p></li>
+<li><p><strong>Test Types</strong>: Write unit, integration, and end-to-end tests as appropriate</p></li>
+<li><p><strong>Test Naming</strong>: Use descriptive test names that explain what is being tested</p></li>
+<li><p><strong>Test Organization</strong>: Group related tests in classes</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">TestUserAuthentication</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tests for user authentication functionality.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_valid_credentials_returns_jwt_token</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that valid credentials return a JWT token.&quot;&quot;&quot;</span>
+        <span class="c1"># Test implementation</span>
+        <span class="k">pass</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">test_invalid_credentials_raises_authentication_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Test that invalid credentials raise AuthenticationError.&quot;&quot;&quot;</span>
+        <span class="c1"># Test implementation</span>
+        <span class="k">pass</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pull-request-guidelines">
+<h2>Pull Request Guidelines<a class="headerlink" href="#pull-request-guidelines" title="Link to this heading"></a></h2>
+<section id="before-submitting">
+<h3>Before Submitting<a class="headerlink" href="#before-submitting" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>[ ] Code follows project style guidelines</p></li>
+<li><p>[ ] Tests pass locally</p></li>
+<li><p>[ ] New code has appropriate test coverage</p></li>
+<li><p>[ ] Documentation is updated if needed</p></li>
+<li><p>[ ] Commit messages follow conventional commit format</p></li>
+</ul>
+</section>
+<section id="pull-request-description">
+<h3>Pull Request Description<a class="headerlink" href="#pull-request-description" title="Link to this heading"></a></h3>
+<p>Please include in your PR description:</p>
+<ol class="arabic simple">
+<li><p><strong>Summary</strong>: Brief description of changes</p></li>
+<li><p><strong>Motivation</strong>: Why this change is needed</p></li>
+<li><p><strong>Changes</strong>: Detailed list of modifications</p></li>
+<li><p><strong>Testing</strong>: How the changes were tested</p></li>
+<li><p><strong>Screenshots</strong>: If UI changes are involved</p></li>
+</ol>
+<p>Example PR template:</p>
+<div class="highlight-markdown notranslate"><div class="highlight"><pre><span></span><span class="gu">## Summary</span>
+Add user authentication system with JWT tokens
+
+<span class="gu">## Motivation</span>
+Users need to be able to securely authenticate to access therapeutic sessions
+
+<span class="gu">## Changes</span>
+<span class="k">-</span><span class="w"> </span>Add JWT authentication middleware
+<span class="k">-</span><span class="w"> </span>Create user login/logout endpoints
+<span class="k">-</span><span class="w"> </span>Add password hashing utilities
+<span class="k">-</span><span class="w"> </span>Update database schema for user accounts
+
+<span class="gu">## Testing</span>
+<span class="k">-</span><span class="w"> </span>Added unit tests for authentication functions
+<span class="k">-</span><span class="w"> </span>Added integration tests for login/logout flow
+<span class="k">-</span><span class="w"> </span>Tested manually with Postman
+
+<span class="gu">## Checklist</span>
+<span class="k">- [x]</span> Tests pass
+<span class="k">- [x]</span> Documentation updated
+<span class="k">- [x]</span> Code follows style guidelines
+</pre></div>
+</div>
+</section>
+<section id="review-process">
+<h3>Review Process<a class="headerlink" href="#review-process" title="Link to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p><strong>Automated Checks</strong>: CI/CD pipeline runs automatically</p></li>
+<li><p><strong>Code Review</strong>: Maintainers review code for quality and correctness</p></li>
+<li><p><strong>Testing</strong>: Changes are tested in staging environment</p></li>
+<li><p><strong>Approval</strong>: At least one maintainer approval required</p></li>
+<li><p><strong>Merge</strong>: Changes are merged into main branch</p></li>
+</ol>
+</section>
+</section>
+<section id="issue-reporting">
+<h2>Issue Reporting<a class="headerlink" href="#issue-reporting" title="Link to this heading"></a></h2>
+<section id="bug-reports">
+<h3>Bug Reports<a class="headerlink" href="#bug-reports" title="Link to this heading"></a></h3>
+<p>When reporting bugs, please include:</p>
+<ul class="simple">
+<li><p><strong>Environment</strong>: OS, Python version, dependency versions</p></li>
+<li><p><strong>Steps to Reproduce</strong>: Clear steps to reproduce the issue</p></li>
+<li><p><strong>Expected Behavior</strong>: What you expected to happen</p></li>
+<li><p><strong>Actual Behavior</strong>: What actually happened</p></li>
+<li><p><strong>Error Messages</strong>: Full error messages and stack traces</p></li>
+<li><p><strong>Additional Context</strong>: Any other relevant information</p></li>
+</ul>
+</section>
+<section id="feature-requests">
+<h3>Feature Requests<a class="headerlink" href="#feature-requests" title="Link to this heading"></a></h3>
+<p>When requesting features, please include:</p>
+<ul class="simple">
+<li><p><strong>Problem Statement</strong>: What problem does this solve?</p></li>
+<li><p><strong>Proposed Solution</strong>: How should this be implemented?</p></li>
+<li><p><strong>Alternatives</strong>: What alternatives have you considered?</p></li>
+<li><p><strong>Use Cases</strong>: How would this feature be used?</p></li>
+<li><p><strong>Priority</strong>: How important is this feature?</p></li>
+</ul>
+</section>
+<section id="security-issues">
+<h3>Security Issues<a class="headerlink" href="#security-issues" title="Link to this heading"></a></h3>
+<p><strong>Do not report security vulnerabilities in public issues.</strong></p>
+<p>Instead, please email security concerns to: <a class="reference external" href="mailto:security&#37;&#52;&#48;tta-platform&#46;org">security<span>&#64;</span>tta-platform<span>&#46;</span>org</a></p>
+</section>
+</section>
+<section id="community-guidelines">
+<h2>Community Guidelines<a class="headerlink" href="#community-guidelines" title="Link to this heading"></a></h2>
+<section id="code-of-conduct">
+<h3>Code of Conduct<a class="headerlink" href="#code-of-conduct" title="Link to this heading"></a></h3>
+<p>We are committed to providing a welcoming and inclusive environment for all contributors. Please:</p>
+<ul class="simple">
+<li><p><strong>Be Respectful</strong>: Treat all community members with respect</p></li>
+<li><p><strong>Be Inclusive</strong>: Welcome newcomers and help them get started</p></li>
+<li><p><strong>Be Constructive</strong>: Provide helpful feedback and suggestions</p></li>
+<li><p><strong>Be Patient</strong>: Remember that everyone is learning</p></li>
+</ul>
+</section>
+<section id="communication">
+<h3>Communication<a class="headerlink" href="#communication" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>GitHub Issues</strong>: For bug reports and feature requests</p></li>
+<li><p><strong>GitHub Discussions</strong>: For questions and general discussion</p></li>
+<li><p><strong>Pull Requests</strong>: For code review and technical discussion</p></li>
+<li><p><strong>Email</strong>: For security issues and private matters</p></li>
+</ul>
+</section>
+</section>
+<section id="recognition">
+<h2>Recognition<a class="headerlink" href="#recognition" title="Link to this heading"></a></h2>
+<p>Contributors are recognized in several ways:</p>
+<ul class="simple">
+<li><p><strong>Contributors File</strong>: Listed in CONTRIBUTORS.md</p></li>
+<li><p><strong>Release Notes</strong>: Mentioned in release announcements</p></li>
+<li><p><strong>GitHub</strong>: Contributor statistics and badges</p></li>
+<li><p><strong>Community</strong>: Recognition in community discussions</p></li>
+</ul>
+</section>
+<section id="getting-help">
+<h2>Getting Help<a class="headerlink" href="#getting-help" title="Link to this heading"></a></h2>
+<p>If you need help with contributing:</p>
+<ul class="simple">
+<li><p><strong>Documentation</strong>: Check this guide and other documentation</p></li>
+<li><p><strong>Discussions</strong>: Ask questions in GitHub Discussions</p></li>
+<li><p><strong>Issues</strong>: Look for issues labeled “good first issue”</p></li>
+<li><p><strong>Mentorship</strong>: Experienced contributors are happy to help newcomers</p></li>
+</ul>
+<p>Thank you for contributing to TTA! Your contributions help make therapeutic support more accessible and effective for everyone.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="deployment/index.html" class="btn btn-neutral float-left" title="Deployment Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

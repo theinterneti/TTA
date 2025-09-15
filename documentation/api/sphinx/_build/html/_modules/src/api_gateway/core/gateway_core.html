@@ -1,0 +1,857 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.core.gateway_core &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.core.gateway_core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.core.gateway_core</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core gateway request processing engine for the API Gateway.</span>
+
+<span class="sd">This module provides the main GatewayCore class that handles async request processing,</span>
+<span class="sd">routing logic with service discovery integration, and request/response transformation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">aiohttp</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">Response</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.responses</span><span class="w"> </span><span class="kn">import</span> <span class="n">JSONResponse</span><span class="p">,</span> <span class="n">StreamingResponse</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthContext</span><span class="p">,</span>
+    <span class="n">GatewayRequest</span><span class="p">,</span>
+    <span class="n">GatewayResponse</span><span class="p">,</span>
+    <span class="n">RequestMethod</span><span class="p">,</span>
+    <span class="n">RouteRule</span><span class="p">,</span>
+    <span class="n">RouteType</span><span class="p">,</span>
+    <span class="n">RoutingConfig</span><span class="p">,</span>
+    <span class="n">ServiceInfo</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..monitoring.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">metrics_collector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..services</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceDiscoveryManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.service_router</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceRouter</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="GatewayCore">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GatewayCore</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Core gateway request processing engine.</span>
+
+<span class="sd">    Handles async request processing, routing logic with service discovery integration,</span>
+<span class="sd">    and request/response transformation capabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">discovery_manager</span><span class="p">:</span> <span class="n">ServiceDiscoveryManager</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the gateway core.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            discovery_manager: Service discovery manager instance</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">discovery_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span> <span class="o">=</span> <span class="n">RoutingConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_http_session</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_requests</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GatewayRequest</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Initialize service router with load balancing and circuit breakers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_router</span> <span class="o">=</span> <span class="n">ServiceRouter</span><span class="p">(</span><span class="n">discovery_manager</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GatewayCore.initialize">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.initialize">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the gateway core.&quot;&quot;&quot;</span>
+        <span class="c1"># Create HTTP session for backend requests</span>
+        <span class="n">timeout</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientTimeout</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">health_check_timeout</span><span class="p">)</span>
+        <span class="n">connector</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">TCPConnector</span><span class="p">(</span>
+            <span class="n">limit</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>  <span class="c1"># Connection pool limit</span>
+            <span class="n">limit_per_host</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">keepalive_timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+            <span class="n">enable_cleanup_closed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_http_session</span> <span class="o">=</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientSession</span><span class="p">(</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+            <span class="n">connector</span><span class="o">=</span><span class="n">connector</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="s2">&quot;TTA-API-Gateway/1.0.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;X-Gateway-Version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Gateway core initialized&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.close">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.close">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the gateway core and cleanup resources.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http_session</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http_session</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Gateway core closed&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.process_request">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.process_request">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process an incoming request through the gateway.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: The incoming FastAPI request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: The processed response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">correlation_id</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;correlation_id&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Convert FastAPI request to gateway request</span>
+            <span class="n">gateway_request</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gateway_request</span><span class="p">(</span>
+                <span class="n">request</span><span class="p">,</span> <span class="n">correlation_id</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store active request for monitoring</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_requests</span><span class="p">[</span><span class="n">correlation_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span>
+
+            <span class="c1"># Find matching route</span>
+            <span class="n">route_rule</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_matching_route</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">route_rule</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_error_response</span><span class="p">(</span>
+                    <span class="mi">404</span><span class="p">,</span> <span class="s2">&quot;Route not found&quot;</span><span class="p">,</span> <span class="n">correlation_id</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Get target service</span>
+            <span class="n">target_service</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_target_service</span><span class="p">(</span><span class="n">route_rule</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">target_service</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_error_response</span><span class="p">(</span>
+                    <span class="mi">503</span><span class="p">,</span> <span class="s2">&quot;Service unavailable&quot;</span><span class="p">,</span> <span class="n">correlation_id</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Process the request</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_route_request</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="p">,</span> <span class="n">route_rule</span><span class="p">,</span> <span class="n">target_service</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Record metrics</span>
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">metrics_collector</span><span class="o">.</span><span class="n">record_request</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">,</span>
+                <span class="n">processing_time</span><span class="p">,</span>
+                <span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update service metrics through service router</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_router</span><span class="o">.</span><span class="n">update_service_metrics</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">target_service</span><span class="o">.</span><span class="n">id</span><span class="p">),</span>
+                <span class="n">processing_time</span><span class="p">,</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">400</span><span class="p">,</span>
+                <span class="n">therapeutic</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">,</span>
+                <span class="n">crisis</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error processing request </span><span class="si">{</span><span class="n">correlation_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">correlation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+                    <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="p">},</span>
+                <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">metrics_collector</span><span class="o">.</span><span class="n">record_request</span><span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="mi">500</span><span class="p">,</span> <span class="n">processing_time</span><span class="p">,</span> <span class="s2">&quot;gateway&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_error_response</span><span class="p">(</span>
+                <span class="mi">500</span><span class="p">,</span> <span class="s2">&quot;Internal gateway error&quot;</span><span class="p">,</span> <span class="n">correlation_id</span>
+            <span class="p">)</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="c1"># Remove from active requests</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_requests</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">correlation_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_gateway_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">correlation_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert FastAPI request to gateway request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request: FastAPI request</span>
+<span class="sd">            correlation_id: Request correlation ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GatewayRequest: Gateway request object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Read request body</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="s2">&quot;PUT&quot;</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">body</span> <span class="o">=</span> <span class="k">await</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to read request body: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Extract authentication context</span>
+        <span class="n">auth_context</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;auth_context&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">auth_context_dict</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">auth_context</span><span class="p">:</span>
+            <span class="n">auth_context_dict</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">auth_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">),</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_context&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">is_therapeutic_context</span><span class="p">(),</span>
+                <span class="s2">&quot;crisis_mode&quot;</span><span class="p">:</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="c1"># Get client IP</span>
+        <span class="n">client_ip</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span> <span class="k">else</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="n">forwarded_for</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;x-forwarded-for&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">forwarded_for</span><span class="p">:</span>
+            <span class="n">client_ip</span> <span class="o">=</span> <span class="n">forwarded_for</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">GatewayRequest</span><span class="p">(</span>
+            <span class="n">correlation_id</span><span class="o">=</span><span class="n">correlation_id</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">RequestMethod</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">method</span><span class="p">),</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
+            <span class="n">query_params</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">query_params</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="p">),</span>
+            <span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">,</span>
+            <span class="n">client_ip</span><span class="o">=</span><span class="n">client_ip</span><span class="p">,</span>
+            <span class="n">user_agent</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user-agent&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+            <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context_dict</span><span class="p">,</span>
+            <span class="n">therapeutic_session_id</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span>
+                <span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;therapeutic_session_id&quot;</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="n">is_therapeutic</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;is_therapeutic_context&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="n">crisis_mode</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="s2">&quot;crisis_mode&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_find_matching_route</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RouteRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Find matching route rule for the request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[RouteRule]: Matching route rule if found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">matching_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">get_matching_rules</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">matching_rules</span><span class="p">:</span>
+            <span class="c1"># Try to create dynamic route based on path</span>
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_dynamic_route</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">)</span>
+
+        <span class="c1"># Return the highest priority rule</span>
+        <span class="k">return</span> <span class="n">matching_rules</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_dynamic_route</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RouteRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create dynamic route based on request path and available services.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[RouteRule]: Dynamic route rule if service found</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path_parts</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Try to match path to service name</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">path_parts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">path_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;api&quot;</span><span class="p">:</span>
+            <span class="n">service_name</span> <span class="o">=</span> <span class="n">path_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="c1"># Map common service names</span>
+            <span class="n">service_mapping</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;auth&quot;</span><span class="p">:</span> <span class="s2">&quot;authentication-service&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;players&quot;</span><span class="p">:</span> <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;worlds&quot;</span><span class="p">:</span> <span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;gameplay&quot;</span><span class="p">:</span> <span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agents&quot;</span><span class="p">:</span> <span class="s2">&quot;agent-orchestration&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">target_service_name</span> <span class="o">=</span> <span class="n">service_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="n">service_name</span><span class="p">)</span>
+
+            <span class="c1"># Check if service exists</span>
+            <span class="n">services</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">get_all_healthy_services</span><span class="p">()</span>
+            <span class="n">target_service</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">services</span> <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">target_service_name</span><span class="p">),</span> <span class="kc">None</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">target_service</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RouteRule</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;dynamic-</span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Dynamic route for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">path_pattern</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;/api/</span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">/*&quot;</span><span class="p">,</span>
+                    <span class="n">methods</span><span class="o">=</span><span class="p">[</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="p">],</span>
+                    <span class="n">target_service</span><span class="o">=</span><span class="n">target_service_name</span><span class="p">,</span>
+                    <span class="n">therapeutic_priority</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>  <span class="c1"># Lower priority than configured routes</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_target_service</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">route_rule</span><span class="p">:</span> <span class="n">RouteRule</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ServiceInfo</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get target service for the route using service router with load balancing.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            route_rule: Route rule</span>
+<span class="sd">            gateway_request: Gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[ServiceInfo]: Target service if available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use service router for intelligent service selection with load balancing</span>
+        <span class="n">service</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_router</span><span class="o">.</span><span class="n">select_service</span><span class="p">(</span>
+            <span class="n">service_name</span><span class="o">=</span><span class="n">route_rule</span><span class="o">.</span><span class="n">target_service</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">=</span><span class="n">gateway_request</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">service</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_route_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span>
+        <span class="n">route_rule</span><span class="p">:</span> <span class="n">RouteRule</span><span class="p">,</span>
+        <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Route request to target service with failover and circuit breaker protection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Gateway request</span>
+<span class="sd">            route_rule: Route rule</span>
+<span class="sd">            target_service: Target service</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: Service response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Use service router for request routing with failover</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_router</span><span class="o">.</span><span class="n">route_request_with_failover</span><span class="p">(</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="n">route_rule</span><span class="o">.</span><span class="n">target_service</span><span class="p">,</span>
+                <span class="n">gateway_request</span><span class="o">=</span><span class="n">gateway_request</span><span class="p">,</span>
+                <span class="n">request_func</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_http_request</span><span class="p">,</span>
+                <span class="n">route_rule</span><span class="o">=</span><span class="n">route_rule</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to route request after all retries: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">route_rule</span><span class="o">.</span><span class="n">target_service</span><span class="p">,</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_error_response</span><span class="p">(</span>
+                <span class="mi">503</span><span class="p">,</span> <span class="s2">&quot;Service unavailable after retries&quot;</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_make_http_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span><span class="p">,</span>
+        <span class="n">route_rule</span><span class="p">:</span> <span class="n">RouteRule</span><span class="p">,</span>
+        <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Make HTTP request to target service.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            target_service: Target service</span>
+<span class="sd">            route_rule: Route rule</span>
+<span class="sd">            gateway_request: Gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: Service response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Transform request path if needed</span>
+            <span class="n">target_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_request_path</span><span class="p">(</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">route_rule</span><span class="p">)</span>
+
+            <span class="c1"># Build target URL</span>
+            <span class="n">target_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">target_service</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span><span class="si">}{</span><span class="n">target_path</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># Prepare headers</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_request_headers</span><span class="p">(</span><span class="n">gateway_request</span><span class="p">,</span> <span class="n">target_service</span><span class="p">)</span>
+
+            <span class="c1"># Make request to target service</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_http_session</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">url</span><span class="o">=</span><span class="n">target_url</span><span class="p">,</span>
+                <span class="n">params</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">query_params</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">body</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientTimeout</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">route_rule</span><span class="o">.</span><span class="n">timeout</span><span class="p">),</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">response</span><span class="p">:</span>
+
+                <span class="c1"># Read response</span>
+                <span class="n">response_body</span> <span class="o">=</span> <span class="k">await</span> <span class="n">response</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+                <span class="c1"># Transform response</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_response</span><span class="p">(</span>
+                    <span class="n">response</span><span class="p">,</span> <span class="n">response_body</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">,</span> <span class="n">target_service</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Request timeout to service </span><span class="si">{</span><span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;timeout&quot;</span><span class="p">:</span> <span class="n">route_rule</span><span class="o">.</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service timeout: </span><span class="si">{</span><span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Client error routing to service </span><span class="si">{</span><span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service connection error: </span><span class="si">{</span><span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_request_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">route_rule</span><span class="p">:</span> <span class="n">RouteRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform request path based on route rule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            original_path: Original request path</span>
+<span class="sd">            route_rule: Route rule</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: Transformed path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">route_rule</span><span class="o">.</span><span class="n">path_rewrite</span><span class="p">:</span>
+            <span class="c1"># Apply path rewrite pattern</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+            <span class="n">pattern</span> <span class="o">=</span> <span class="n">route_rule</span><span class="o">.</span><span class="n">path_pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;(.*)&quot;</span><span class="p">)</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">original_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="c1"># Replace placeholders in rewrite pattern</span>
+                <span class="n">transformed_path</span> <span class="o">=</span> <span class="n">route_rule</span><span class="o">.</span><span class="n">path_rewrite</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">group</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">groups</span><span class="p">()):</span>
+                    <span class="n">transformed_path</span> <span class="o">=</span> <span class="n">transformed_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">group</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">transformed_path</span>
+
+        <span class="k">return</span> <span class="n">original_path</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_request_headers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare headers for the target service request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Gateway request</span>
+<span class="sd">            target_service: Target service</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: Prepared headers</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Remove hop-by-hop headers</span>
+        <span class="n">hop_by_hop_headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;connection&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;keep-alive&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;proxy-authenticate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;proxy-authorization&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;te&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trailers&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;transfer-encoding&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;upgrade&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="n">hop_by_hop_headers</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">header</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="c1"># Add gateway headers</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Forwarded-For&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">client_ip</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Forwarded-Proto&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;https&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings</span><span class="o">.</span><span class="n">is_production</span> <span class="k">else</span> <span class="s2">&quot;http&quot;</span>
+        <span class="p">)</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Forwarded-Host&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Gateway-Request-ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span>
+        <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Gateway-Service&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># Add authentication context if available</span>
+        <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">auth_context</span><span class="p">:</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-User-ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-User-Role&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Therapeutic-Context&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_context&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Add therapeutic headers</span>
+        <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">:</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Therapeutic-Session&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+            <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">therapeutic_session_id</span><span class="p">:</span>
+                <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Therapeutic-Session-ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                    <span class="n">gateway_request</span><span class="o">.</span><span class="n">therapeutic_session_id</span>
+                <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">:</span>
+            <span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-Crisis-Mode&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+
+        <span class="k">return</span> <span class="n">headers</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_transform_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">aiohttp_response</span><span class="p">:</span> <span class="n">aiohttp</span><span class="o">.</span><span class="n">ClientResponse</span><span class="p">,</span>
+        <span class="n">response_body</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span>
+        <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span>
+        <span class="n">target_service</span><span class="p">:</span> <span class="n">ServiceInfo</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Response</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform service response for the client.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            aiohttp_response: aiohttp response from service</span>
+<span class="sd">            response_body: Response body bytes</span>
+<span class="sd">            gateway_request: Original gateway request</span>
+<span class="sd">            target_service: Target service info</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response: Transformed response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Prepare response headers</span>
+        <span class="n">response_headers</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Copy safe headers from service response</span>
+        <span class="n">safe_headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;content-type&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content-length&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cache-control&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;expires&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last-modified&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;etag&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;vary&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content-encoding&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;content-language&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">header_name</span><span class="p">,</span> <span class="n">header_value</span> <span class="ow">in</span> <span class="n">aiohttp_response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">header_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">safe_headers</span><span class="p">:</span>
+                <span class="n">response_headers</span><span class="p">[</span><span class="n">header_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_value</span>
+
+        <span class="c1"># Add gateway headers</span>
+        <span class="n">response_headers</span><span class="p">[</span><span class="s2">&quot;X-Gateway-Service&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">response_headers</span><span class="p">[</span><span class="s2">&quot;X-Gateway-Request-ID&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span>
+        <span class="n">response_headers</span><span class="p">[</span><span class="s2">&quot;X-Gateway-Version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>
+
+        <span class="c1"># Add therapeutic safety headers if applicable</span>
+        <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">:</span>
+            <span class="n">response_headers</span><span class="p">[</span><span class="s2">&quot;X-Therapeutic-Response&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;true&quot;</span>
+            <span class="n">response_headers</span><span class="p">[</span><span class="s2">&quot;X-Therapeutic-Safety&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;validated&quot;</span>
+
+        <span class="c1"># Handle different content types</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">aiohttp_response</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+            <span class="c1"># Handle JSON responses</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+                <span class="n">response_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+                <span class="c1"># Add gateway metadata to JSON responses</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">response_data</span><span class="p">[</span><span class="s2">&quot;_gateway&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="n">target_service</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                        <span class="s2">&quot;request_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+                <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+                    <span class="n">content</span><span class="o">=</span><span class="n">response_data</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">aiohttp_response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                    <span class="n">headers</span><span class="o">=</span><span class="n">response_headers</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">UnicodeDecodeError</span><span class="p">):</span>
+                <span class="c1"># Fallback to raw response if JSON parsing fails</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Handle streaming responses</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="s2">&quot;text/event-stream&quot;</span> <span class="ow">in</span> <span class="n">content_type</span>
+            <span class="ow">or</span> <span class="s2">&quot;application/octet-stream&quot;</span> <span class="ow">in</span> <span class="n">content_type</span>
+        <span class="p">):</span>
+
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stream_response</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">response_body</span>
+
+            <span class="k">return</span> <span class="n">StreamingResponse</span><span class="p">(</span>
+                <span class="n">stream_response</span><span class="p">(),</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">aiohttp_response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="n">response_headers</span><span class="p">,</span>
+                <span class="n">media_type</span><span class="o">=</span><span class="n">content_type</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Default response handling</span>
+        <span class="k">return</span> <span class="n">Response</span><span class="p">(</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">response_body</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">aiohttp_response</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">response_headers</span><span class="p">,</span>
+            <span class="n">media_type</span><span class="o">=</span><span class="n">content_type</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;;&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="n">content_type</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_error_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">correlation_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">JSONResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create standardized error response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            status_code: HTTP status code</span>
+<span class="sd">            message: Error message</span>
+<span class="sd">            correlation_id: Request correlation ID</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            JSONResponse: Error response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">error_response</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="n">status_code</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">&quot;request_id&quot;</span><span class="p">:</span> <span class="n">correlation_id</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                <span class="s2">&quot;gateway_version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">JSONResponse</span><span class="p">(</span>
+            <span class="n">content</span><span class="o">=</span><span class="n">error_response</span><span class="p">,</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;X-Gateway-Request-ID&quot;</span><span class="p">:</span> <span class="n">correlation_id</span><span class="p">,</span>
+                <span class="s2">&quot;X-Gateway-Version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Content-Type&quot;</span><span class="p">:</span> <span class="s2">&quot;application/json&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="GatewayCore.get_active_requests">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.get_active_requests">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_active_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GatewayRequest</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get currently active requests.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, GatewayRequest]: Active requests by correlation ID</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_requests</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.get_routing_config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.get_routing_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_routing_config</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RoutingConfig</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current routing configuration.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RoutingConfig: Current routing configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.update_routing_config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.update_routing_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_routing_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RoutingConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update routing configuration.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: New routing configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Routing configuration updated&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.add_route_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.add_route_rule">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_route_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">RouteRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add a new route rule.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rule: Route rule to add</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="c1"># Sort rules by priority</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added route rule: </span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GatewayCore.remove_route_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.gateway_core.html#src.api_gateway.core.GatewayCore.remove_route_rule">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">remove_route_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Remove a route rule by name.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rule_name: Name of the rule to remove</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if rule was removed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">original_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">rule</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span> <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">rule_name</span>
+        <span class="p">]</span>
+
+        <span class="n">removed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">routing_config</span><span class="o">.</span><span class="n">rules</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">original_count</span>
+        <span class="k">if</span> <span class="n">removed</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed route rule: </span><span class="si">{</span><span class="n">rule_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">removed</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

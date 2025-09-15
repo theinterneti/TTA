@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.config_schema &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.config_schema</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.config_schema</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Configuration schema validation for Agent Orchestration.</span>
+
+<span class="sd">This module provides Pydantic models for validating agent orchestration</span>
+<span class="sd">configuration, including discovery and auto-registration settings.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">validator</span>
+
+
+<div class="viewcode-block" id="CapabilityMatchingAlgorithm">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.CapabilityMatchingAlgorithm">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityMatchingAlgorithm</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Available capability matching algorithms.&quot;&quot;&quot;</span>
+
+    <span class="n">WEIGHTED_SCORE</span> <span class="o">=</span> <span class="s2">&quot;weighted_score&quot;</span>
+    <span class="n">EXACT_MATCH</span> <span class="o">=</span> <span class="s2">&quot;exact_match&quot;</span>
+    <span class="n">FUZZY_MATCH</span> <span class="o">=</span> <span class="s2">&quot;fuzzy_match&quot;</span>
+    <span class="n">PRIORITY_BASED</span> <span class="o">=</span> <span class="s2">&quot;priority_based&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="DiscoveryConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.DiscoveryConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DiscoveryConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for agent discovery system.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable agent discovery system&quot;</span><span class="p">)</span>
+    <span class="n">cache_ttl</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Discovery cache TTL in seconds&quot;</span>
+    <span class="p">)</span>
+    <span class="n">max_search_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum results for capability searches&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">capability_matching</span><span class="p">:</span> <span class="n">CapabilityMatchingConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">CapabilityMatchingConfig</span><span class="p">(),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Capability matching configuration&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityMatchingConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.CapabilityMatchingConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityMatchingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for capability matching algorithms.&quot;&quot;&quot;</span>
+
+    <span class="n">algorithm</span><span class="p">:</span> <span class="n">CapabilityMatchingAlgorithm</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">CapabilityMatchingAlgorithm</span><span class="o">.</span><span class="n">WEIGHTED_SCORE</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Capability matching algorithm&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">score_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Minimum match score threshold&quot;</span>
+    <span class="p">)</span>
+    <span class="n">prefer_exact_version</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Prefer exact version matches&quot;</span>
+    <span class="p">)</span>
+    <span class="n">include_deprecated</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Include deprecated capabilities in search results&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AgentCapabilityConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentCapabilityConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentCapabilityConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for agent capability advertisement.&quot;&quot;&quot;</span>
+
+    <span class="n">advertise</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Advertise capabilities for discovery&quot;</span>
+    <span class="p">)</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Capability set version&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AgentCapabilityConfig.validate_version">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentCapabilityConfig.validate_version">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate semantic version format.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Version must follow semantic versioning (e.g., &quot;1.0.0&quot; or &quot;1.0.0-beta.1&quot;)&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for individual agent types.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable this agent type&quot;</span><span class="p">)</span>
+    <span class="n">max_instances</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum number of instances&quot;</span>
+    <span class="p">)</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent timeout in seconds&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Auto-registration settings</span>
+    <span class="n">auto_register_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable auto-registration for this agent type&quot;</span>
+    <span class="p">)</span>
+    <span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Explicit instance name (null = auto-generate)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Capability settings</span>
+    <span class="n">capabilities</span><span class="p">:</span> <span class="n">AgentCapabilityConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">AgentCapabilityConfig</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Capability configuration&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="AgentConfig.validate_instance_name">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentConfig.validate_instance_name">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;instance&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_instance_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate instance name format if provided.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-zA-Z0-9_-]+$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Instance name must contain only alphanumeric characters, underscores, and hyphens&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentsConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentsConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentsConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for all agent orchestration settings.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Global settings</span>
+    <span class="n">auto_register</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Global flag for automatic agent registration (default: false for security)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">heartbeat_ttl</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">30.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">300.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent heartbeat TTL in seconds&quot;</span>
+    <span class="p">)</span>
+    <span class="n">heartbeat_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Heartbeat interval (null = auto-calculate as ttl/3)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Discovery system</span>
+    <span class="n">discovery</span><span class="p">:</span> <span class="n">DiscoveryConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">DiscoveryConfig</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Discovery system configuration&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Per-agent configurations</span>
+    <span class="n">input_processor</span><span class="p">:</span> <span class="n">AgentConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AgentConfig</span><span class="p">(</span><span class="n">max_instances</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input Processor Agent configuration&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">world_builder</span><span class="p">:</span> <span class="n">AgentConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AgentConfig</span><span class="p">(</span><span class="n">max_instances</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;World Builder Agent configuration&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">narrative_generator</span><span class="p">:</span> <span class="n">AgentConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">AgentConfig</span><span class="p">(</span><span class="n">max_instances</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">20</span><span class="p">),</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Narrative Generator Agent configuration&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="AgentsConfig.validate_heartbeat_interval">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentsConfig.validate_heartbeat_interval">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;heartbeat_interval&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_heartbeat_interval</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate heartbeat interval against TTL.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ttl</span> <span class="o">=</span> <span class="n">values</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;heartbeat_ttl&quot;</span><span class="p">,</span> <span class="mf">30.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="n">ttl</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Heartbeat interval must be positive and less than heartbeat_ttl&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="AgentsConfig.get_effective_heartbeat_interval">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentsConfig.get_effective_heartbeat_interval">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_effective_heartbeat_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the effective heartbeat interval (calculated if not set).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">heartbeat_interval</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">heartbeat_interval</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">heartbeat_ttl</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AgentsConfig.is_auto_registration_enabled">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentsConfig.is_auto_registration_enabled">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_auto_registration_enabled</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if auto-registration is enabled for a specific agent type.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">auto_register</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">agent_config</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">agent_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">agent_config</span><span class="o">.</span><span class="n">auto_register_enabled</span></div>
+
+
+<div class="viewcode-block" id="AgentsConfig.get_agent_config">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentsConfig.get_agent_config">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_agent_config</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentConfig</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get configuration for a specific agent type.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_type</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentOrchestrationConfig">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.AgentOrchestrationConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentOrchestrationConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete agent orchestration configuration schema.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable agent orchestration&quot;</span><span class="p">)</span>
+    <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">8503</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">65535</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Service port&quot;</span><span class="p">)</span>
+    <span class="n">max_concurrent_workflows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum concurrent workflows&quot;</span>
+    <span class="p">)</span>
+    <span class="n">workflow_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default workflow timeout in seconds&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Agent configuration</span>
+    <span class="n">agents</span><span class="p">:</span> <span class="n">AgentsConfig</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">AgentsConfig</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent configuration&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Other existing configurations (simplified for now)</span>
+    <span class="n">resources</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Resource management settings&quot;</span>
+    <span class="p">)</span>
+    <span class="n">messaging</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Message coordination settings&quot;</span>
+    <span class="p">)</span>
+    <span class="n">monitoring</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Performance monitoring settings&quot;</span>
+    <span class="p">)</span>
+    <span class="n">diagnostics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Diagnostics settings&quot;</span>
+    <span class="p">)</span>
+    <span class="n">realtime</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Real-time interaction settings&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="validate_agent_orchestration_config">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.validate_agent_orchestration_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_agent_orchestration_config</span><span class="p">(</span>
+    <span class="n">config_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentOrchestrationConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate agent orchestration configuration from a dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config_dict: Configuration dictionary</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Validated configuration object</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidationError: If configuration is invalid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">AgentOrchestrationConfig</span><span class="p">(</span><span class="o">**</span><span class="n">config_dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_default_agent_orchestration_config">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.config_schema.html#src.agent_orchestration.config_schema.get_default_agent_orchestration_config">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_default_agent_orchestration_config</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get default agent orchestration configuration as a dictionary.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">AgentOrchestrationConfig</span><span class="p">()</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
