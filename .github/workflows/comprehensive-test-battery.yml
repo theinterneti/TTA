@@ -1,0 +1,322 @@
+name: TTA Comprehensive Test Battery
+
+on:
+  push:
+    branches: [ main, develop, integration/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run comprehensive tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_categories:
+        description: 'Test categories to run (comma-separated: standard,adversarial,load_stress,data_pipeline,dashboard)'
+        required: false
+        default: 'standard,adversarial'
+      force_mock_mode:
+        description: 'Force mock mode even if real services are available'
+        required: false
+        default: 'false'
+        type: boolean
+      detailed_report:
+        description: 'Generate detailed HTML and CSV reports'
+        required: false
+        default: 'true'
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '18'
+
+jobs:
+  # Quick validation for PRs
+  pr-validation:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+        
+    - name: Install test battery dependencies
+      run: |
+        pip install psutil pydantic cryptography websockets aiohttp
+        
+    - name: Run PR validation tests
+      run: |
+        python tests/comprehensive_battery/run_comprehensive_tests.py \
+          --categories standard adversarial \
+          --max-concurrent 3 \
+          --timeout 300 \
+          --log-level INFO \
+          --output-dir ./test-results/pr-validation
+      env:
+        REDIS_URL: redis://localhost:6379
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: pr-validation-results
+        path: ./test-results/pr-validation/
+        retention-days: 7
+
+  # Comprehensive testing for main branch and scheduled runs
+  comprehensive-testing:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/integration/')) || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    
+    strategy:
+      matrix:
+        test-suite:
+          - name: "Core Tests"
+            categories: "standard,adversarial"
+            timeout: 600
+          - name: "Performance Tests"
+            categories: "load_stress"
+            timeout: 900
+          - name: "Integration Tests"
+            categories: "data_pipeline,dashboard"
+            timeout: 1200
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      neo4j:
+        image: neo4j:5-community
+        ports:
+          - 7687:7687
+          - 7474:7474
+        env:
+          NEO4J_AUTH: neo4j/testpassword
+          NEO4J_PLUGINS: '["apoc"]'
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+        
+    - name: Install test battery dependencies
+      run: |
+        pip install psutil pydantic cryptography websockets aiohttp
+        
+    - name: Wait for services
+      run: |
+        # Wait for Redis
+        timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
+        
+        # Wait for Neo4j (optional - will fall back to mock if unavailable)
+        timeout 60 bash -c 'until cypher-shell -a bolt://localhost:7687 -u neo4j -p testpassword "RETURN 1" 2>/dev/null; do sleep 2; done' || echo "Neo4j not available, will use mock"
+        
+    - name: Run comprehensive test battery
+      run: |
+        python tests/comprehensive_battery/run_comprehensive_tests.py \
+          --categories ${{ matrix.test-suite.categories }} \
+          --max-concurrent 5 \
+          --timeout ${{ matrix.test-suite.timeout }} \
+          --detailed-report \
+          --metrics \
+          --log-level INFO \
+          --output-dir ./test-results/${{ matrix.test-suite.name }} \
+          --neo4j-uri bolt://localhost:7687 \
+          --redis-url redis://localhost:6379
+      env:
+        NEO4J_AUTH: neo4j/testpassword
+        FORCE_MOCK_MODE: ${{ github.event.inputs.force_mock_mode || 'false' }}
+        
+    - name: Generate test summary
+      if: always()
+      run: |
+        echo "## Test Results Summary - ${{ matrix.test-suite.name }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ -f "./test-results/${{ matrix.test-suite.name }}/test_summary.json" ]; then
+          python -c "
+          import json
+          with open('./test-results/${{ matrix.test-suite.name }}/test_summary.json', 'r') as f:
+              data = json.load(f)
+          
+          print(f'**Total Tests:** {data.get(\"total_tests\", 0)}')
+          print(f'**Passed:** {data.get(\"passed_tests\", 0)}')
+          print(f'**Failed:** {data.get(\"failed_tests\", 0)}')
+          print(f'**Success Rate:** {data.get(\"success_rate\", 0):.1f}%')
+          print(f'**Duration:** {data.get(\"duration_seconds\", 0):.1f}s')
+          print(f'**Mock Mode:** {\"Yes\" if data.get(\"mock_mode\", False) else \"No\"}')
+          
+          if data.get('failed_tests', 0) > 0:
+              print('\n**Failed Tests:**')
+              for test in data.get('failed_test_details', []):
+                  print(f'- {test.get(\"name\", \"Unknown\")}: {test.get(\"error\", \"No details\")}')
+          " >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Test results not found" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: comprehensive-test-results-${{ matrix.test-suite.name }}
+        path: ./test-results/${{ matrix.test-suite.name }}/
+        retention-days: 30
+        
+    - name: Upload test logs
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-logs-${{ matrix.test-suite.name }}
+        path: |
+          ./testing/logs/
+          ./test-results/${{ matrix.test-suite.name }}/*.log
+        retention-days: 14
+
+  # Manual workflow dispatch with custom parameters
+  manual-testing:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      
+      neo4j:
+        image: neo4j:5-community
+        ports:
+          - 7687:7687
+          - 7474:7474
+        env:
+          NEO4J_AUTH: neo4j/testpassword
+          NEO4J_PLUGINS: '["apoc"]'
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p testpassword 'RETURN 1'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-asyncio pytest-cov
+        pip install psutil pydantic cryptography websockets aiohttp
+        
+    - name: Wait for services
+      run: |
+        timeout 30 bash -c 'until redis-cli -h localhost -p 6379 ping; do sleep 1; done'
+        timeout 60 bash -c 'until cypher-shell -a bolt://localhost:7687 -u neo4j -p testpassword "RETURN 1" 2>/dev/null; do sleep 2; done' || echo "Neo4j not available, will use mock"
+        
+    - name: Run custom test battery
+      run: |
+        CATEGORIES="${{ github.event.inputs.test_categories || 'standard,adversarial' }}"
+        DETAILED_FLAG=""
+        if [ "${{ github.event.inputs.detailed_report }}" = "true" ]; then
+          DETAILED_FLAG="--detailed-report --metrics"
+        fi
+        
+        FORCE_MOCK_FLAG=""
+        if [ "${{ github.event.inputs.force_mock_mode }}" = "true" ]; then
+          FORCE_MOCK_FLAG="--force-mock"
+        fi
+        
+        python tests/comprehensive_battery/run_comprehensive_tests.py \
+          --categories ${CATEGORIES} \
+          --max-concurrent 5 \
+          --timeout 1800 \
+          ${DETAILED_FLAG} \
+          ${FORCE_MOCK_FLAG} \
+          --log-level INFO \
+          --output-dir ./test-results/manual-run \
+          --neo4j-uri bolt://localhost:7687 \
+          --redis-url redis://localhost:6379
+      env:
+        NEO4J_AUTH: neo4j/testpassword
+        
+    - name: Upload manual test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: manual-test-results
+        path: ./test-results/manual-run/
+        retention-days: 30
+
+  # Notification job
+  notify-results:
+    if: always() && (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'schedule')
+    needs: [comprehensive-testing]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Notify on failure
+      if: needs.comprehensive-testing.result == 'failure'
+      run: |
+        echo "🚨 Comprehensive test battery failed on main branch"
+        echo "Please check the test results and fix any issues"
+        # Add notification logic here (Slack, email, etc.)
