@@ -1,0 +1,929 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.therapeutic_integration_system module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.narrative.therapeutic_integrator module" href="src.components.gameplay_loop.narrative.therapeutic_integrator.html" />
+    <link rel="prev" title="src.components.gameplay_loop.narrative.scene_manager module" href="src.components.gameplay_loop.narrative.scene_manager.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.narrative.html">src.components.gameplay_loop.narrative package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.therapeutic_integration_system module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.narrative.therapeutic_integration_system.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.narrative.therapeutic_integration_system">
+<span id="src-components-gameplay-loop-narrative-therapeutic-integration-system-module"></span><h1>src.components.gameplay_loop.narrative.therapeutic_integration_system module<a class="headerlink" href="#module-src.components.gameplay_loop.narrative.therapeutic_integration_system" title="Link to this heading"></a></h1>
+<p>Therapeutic Integration System for Core Gameplay Loop</p>
+<p>This module provides natural therapeutic concept embedding, progress tracking,
+and adaptive therapeutic approaches for meaningful therapeutic adventures.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">IntegrationStrategy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#IntegrationStrategy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Strategies for therapeutic concept integration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.COLLABORATIVE_EXPLORATION">
+<span class="sig-name descname"><span class="pre">COLLABORATIVE_EXPLORATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'collaborative_exploration'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.COLLABORATIVE_EXPLORATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.DIRECT_TEACHING">
+<span class="sig-name descname"><span class="pre">DIRECT_TEACHING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'direct_teaching'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.DIRECT_TEACHING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.EXPERIENTIAL_LEARNING">
+<span class="sig-name descname"><span class="pre">EXPERIENTIAL_LEARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'experiential_learning'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.EXPERIENTIAL_LEARNING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.GRADUAL_EXPOSURE">
+<span class="sig-name descname"><span class="pre">GRADUAL_EXPOSURE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gradual_exposure'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.GRADUAL_EXPOSURE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.METAPHORICAL_EMBEDDING">
+<span class="sig-name descname"><span class="pre">METAPHORICAL_EMBEDDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'metaphorical_embedding'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.METAPHORICAL_EMBEDDING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.MODELING_DEMONSTRATION">
+<span class="sig-name descname"><span class="pre">MODELING_DEMONSTRATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'modeling_demonstration'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.MODELING_DEMONSTRATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.REFLECTION_PROMPTING">
+<span class="sig-name descname"><span class="pre">REFLECTION_PROMPTING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reflection_prompting'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.REFLECTION_PROMPTING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.SKILL_PRACTICE">
+<span class="sig-name descname"><span class="pre">SKILL_PRACTICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_practice'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy.SKILL_PRACTICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">ProgressMilestone</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#ProgressMilestone"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of therapeutic progress milestones.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.BEHAVIORAL_CHANGE">
+<span class="sig-name descname"><span class="pre">BEHAVIORAL_CHANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'behavioral_change'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.BEHAVIORAL_CHANGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.EMOTIONAL_REGULATION">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_REGULATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_regulation'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.EMOTIONAL_REGULATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.GOAL_ACHIEVEMENT">
+<span class="sig-name descname"><span class="pre">GOAL_ACHIEVEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'goal_achievement'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.GOAL_ACHIEVEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.INSIGHT_DEVELOPMENT">
+<span class="sig-name descname"><span class="pre">INSIGHT_DEVELOPMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'insight_development'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.INSIGHT_DEVELOPMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.RELATIONSHIP_IMPROVEMENT">
+<span class="sig-name descname"><span class="pre">RELATIONSHIP_IMPROVEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'relationship_improvement'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.RELATIONSHIP_IMPROVEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.RESILIENCE_BUILDING">
+<span class="sig-name descname"><span class="pre">RESILIENCE_BUILDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'resilience_building'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.RESILIENCE_BUILDING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.SELF_AWARENESS_GROWTH">
+<span class="sig-name descname"><span class="pre">SELF_AWARENESS_GROWTH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'self_awareness_growth'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.SELF_AWARENESS_GROWTH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.SKILL_ACQUISITION">
+<span class="sig-name descname"><span class="pre">SKILL_ACQUISITION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_acquisition'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone.SKILL_ACQUISITION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">ResistancePattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pattern_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resistance_type=ResistanceType.COGNITIVE_RESISTANCE</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_areas=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">triggers=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manifestations=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">frequency=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">duration_pattern=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful_interventions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alternative_approaches=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bypass_strategies=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">first_observed=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_observed=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution_status='active'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#ResistancePattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Tracks patterns of therapeutic resistance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pattern_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>resistance_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResistanceType</span></code></a></span>)</p></li>
+<li><p><strong>concept_areas</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>triggers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>manifestations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>frequency</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>intensity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>duration_pattern</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>successful_interventions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>alternative_approaches</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a>]</span>)</p></li>
+<li><p><strong>bypass_strategies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>first_observed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>last_observed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>resolution_status</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.alternative_approaches">
+<span class="sig-name descname"><span class="pre">alternative_approaches</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.alternative_approaches" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.bypass_strategies">
+<span class="sig-name descname"><span class="pre">bypass_strategies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.bypass_strategies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.concept_areas">
+<span class="sig-name descname"><span class="pre">concept_areas</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.concept_areas" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.duration_pattern">
+<span class="sig-name descname"><span class="pre">duration_pattern</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.duration_pattern" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.first_observed">
+<span class="sig-name descname"><span class="pre">first_observed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.first_observed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.frequency">
+<span class="sig-name descname"><span class="pre">frequency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.frequency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.intensity">
+<span class="sig-name descname"><span class="pre">intensity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.intensity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.last_observed">
+<span class="sig-name descname"><span class="pre">last_observed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.last_observed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.manifestations">
+<span class="sig-name descname"><span class="pre">manifestations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.manifestations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.pattern_id">
+<span class="sig-name descname"><span class="pre">pattern_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.pattern_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.resistance_type">
+<span class="sig-name descname"><span class="pre">resistance_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResistanceType</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_resistance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.resistance_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.resolution_status">
+<span class="sig-name descname"><span class="pre">resolution_status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'active'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.resolution_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.successful_interventions">
+<span class="sig-name descname"><span class="pre">successful_interventions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.successful_interventions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.triggers">
+<span class="sig-name descname"><span class="pre">triggers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.triggers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">ResistanceType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#ResistanceType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of therapeutic resistance.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.BEHAVIORAL_RELUCTANCE">
+<span class="sig-name descname"><span class="pre">BEHAVIORAL_RELUCTANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'behavioral_reluctance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.BEHAVIORAL_RELUCTANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.COGNITIVE_RESISTANCE">
+<span class="sig-name descname"><span class="pre">COGNITIVE_RESISTANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_resistance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.COGNITIVE_RESISTANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.EMOTIONAL_AVOIDANCE">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_AVOIDANCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_avoidance'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.EMOTIONAL_AVOIDANCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.LEARNED_HELPLESSNESS">
+<span class="sig-name descname"><span class="pre">LEARNED_HELPLESSNESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'learned_helplessness'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.LEARNED_HELPLESSNESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.MOTIVATIONAL_AMBIVALENCE">
+<span class="sig-name descname"><span class="pre">MOTIVATIONAL_AMBIVALENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'motivational_ambivalence'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.MOTIVATIONAL_AMBIVALENCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.OVERWHELM_RESPONSE">
+<span class="sig-name descname"><span class="pre">OVERWHELM_RESPONSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'overwhelm_response'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.OVERWHELM_RESPONSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.PERFECTIONISM">
+<span class="sig-name descname"><span class="pre">PERFECTIONISM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'perfectionism'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.PERFECTIONISM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.TRUST_ISSUES">
+<span class="sig-name descname"><span class="pre">TRUST_ISSUES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'trust_issues'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType.TRUST_ISSUES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">TherapeuticApproach</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticApproach"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Therapeutic approaches for concept integration.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.ACCEPTANCE_COMMITMENT">
+<span class="sig-name descname"><span class="pre">ACCEPTANCE_COMMITMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'acceptance_commitment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.ACCEPTANCE_COMMITMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.COGNITIVE_BEHAVIORAL">
+<span class="sig-name descname"><span class="pre">COGNITIVE_BEHAVIORAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_behavioral'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.COGNITIVE_BEHAVIORAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.DIALECTICAL_BEHAVIORAL">
+<span class="sig-name descname"><span class="pre">DIALECTICAL_BEHAVIORAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dialectical_behavioral'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.DIALECTICAL_BEHAVIORAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.HUMANISTIC">
+<span class="sig-name descname"><span class="pre">HUMANISTIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'humanistic'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.HUMANISTIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.MINDFULNESS_BASED">
+<span class="sig-name descname"><span class="pre">MINDFULNESS_BASED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mindfulness_based'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.MINDFULNESS_BASED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.NARRATIVE_THERAPY">
+<span class="sig-name descname"><span class="pre">NARRATIVE_THERAPY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_therapy'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.NARRATIVE_THERAPY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.PSYCHODYNAMIC">
+<span class="sig-name descname"><span class="pre">PSYCHODYNAMIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'psychodynamic'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.PSYCHODYNAMIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.SOLUTION_FOCUSED">
+<span class="sig-name descname"><span class="pre">SOLUTION_FOCUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'solution_focused'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach.SOLUTION_FOCUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">TherapeuticConcept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">concept_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approach=TherapeuticApproach.COGNITIVE_BEHAVIORAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">core_principles=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">learning_objectives=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">integration_strategies=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_metaphors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">practice_scenarios=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prerequisite_concepts=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">difficulty_level=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_sessions=1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mastery_indicators=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_markers=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_practiced=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mastery_level=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticConcept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a therapeutic concept to be integrated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>approach</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a></span>)</p></li>
+<li><p><strong>core_principles</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>learning_objectives</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>integration_strategies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegrationStrategy</span></code></a>]</span>)</p></li>
+<li><p><strong>story_metaphors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>practice_scenarios</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>prerequisite_concepts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>difficulty_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>estimated_sessions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>mastery_indicators</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>progress_markers</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>created_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>last_practiced</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>mastery_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.approach">
+<span class="sig-name descname"><span class="pre">approach</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_behavioral'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.approach" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.concept_id">
+<span class="sig-name descname"><span class="pre">concept_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.concept_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.core_principles">
+<span class="sig-name descname"><span class="pre">core_principles</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.core_principles" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.difficulty_level">
+<span class="sig-name descname"><span class="pre">difficulty_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.difficulty_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.estimated_sessions">
+<span class="sig-name descname"><span class="pre">estimated_sessions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.estimated_sessions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.integration_strategies">
+<span class="sig-name descname"><span class="pre">integration_strategies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegrationStrategy</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.integration_strategies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.last_practiced">
+<span class="sig-name descname"><span class="pre">last_practiced</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.last_practiced" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.learning_objectives">
+<span class="sig-name descname"><span class="pre">learning_objectives</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.learning_objectives" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.mastery_indicators">
+<span class="sig-name descname"><span class="pre">mastery_indicators</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.mastery_indicators" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.mastery_level">
+<span class="sig-name descname"><span class="pre">mastery_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.mastery_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.practice_scenarios">
+<span class="sig-name descname"><span class="pre">practice_scenarios</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.practice_scenarios" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.prerequisite_concepts">
+<span class="sig-name descname"><span class="pre">prerequisite_concepts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.prerequisite_concepts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.progress_markers">
+<span class="sig-name descname"><span class="pre">progress_markers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.progress_markers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.story_metaphors">
+<span class="sig-name descname"><span class="pre">story_metaphors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept.story_metaphors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">TherapeuticIntegration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">integration_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy=IntegrationStrategy.EXPERIENTIAL_LEARNING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_context=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">narrative_embedding=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_involvement=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">practice_opportunities=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">immediate_feedback=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_outcomes=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_reactions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_engagement=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_understanding=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skill_demonstration=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emotional_response=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effectiveness_score=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a specific therapeutic integration in a story context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>integration_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegrationStrategy</span></code></a></span>)</p></li>
+<li><p><strong>story_context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>narrative_embedding</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>character_involvement</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>practice_opportunities</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>immediate_feedback</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>story_outcomes</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>character_reactions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>user_engagement</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>concept_understanding</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>skill_demonstration</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>emotional_response</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>created_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>effectiveness_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.character_involvement">
+<span class="sig-name descname"><span class="pre">character_involvement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.character_involvement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.character_reactions">
+<span class="sig-name descname"><span class="pre">character_reactions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.character_reactions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.concept_id">
+<span class="sig-name descname"><span class="pre">concept_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.concept_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.concept_understanding">
+<span class="sig-name descname"><span class="pre">concept_understanding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.concept_understanding" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.effectiveness_score">
+<span class="sig-name descname"><span class="pre">effectiveness_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.effectiveness_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.emotional_response">
+<span class="sig-name descname"><span class="pre">emotional_response</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.emotional_response" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.immediate_feedback">
+<span class="sig-name descname"><span class="pre">immediate_feedback</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.immediate_feedback" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.integration_id">
+<span class="sig-name descname"><span class="pre">integration_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.integration_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.narrative_embedding">
+<span class="sig-name descname"><span class="pre">narrative_embedding</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.narrative_embedding" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.practice_opportunities">
+<span class="sig-name descname"><span class="pre">practice_opportunities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.practice_opportunities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.skill_demonstration">
+<span class="sig-name descname"><span class="pre">skill_demonstration</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.skill_demonstration" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.story_context">
+<span class="sig-name descname"><span class="pre">story_context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.story_context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.story_outcomes">
+<span class="sig-name descname"><span class="pre">story_outcomes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.story_outcomes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegrationStrategy</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'experiential_learning'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.strategy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.user_engagement">
+<span class="sig-name descname"><span class="pre">user_engagement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.user_engagement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">TherapeuticIntegrationSystem</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_bus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Main system for therapeutic concept integration and progress tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event_bus</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.narrative.events.html#src.components.gameplay_loop.narrative.events.EventBus" title="src.components.gameplay_loop.narrative.events.EventBus"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventBus</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.detect_therapeutic_resistance">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">detect_therapeutic_resistance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">interaction_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.detect_therapeutic_resistance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.detect_therapeutic_resistance" title="Link to this definition"></a></dt>
+<dd><p>Detect patterns of therapeutic resistance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>interaction_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern"><code class="xref py py-class docutils literal notranslate"><span class="pre">ResistancePattern</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_metrics">
+<span class="sig-name descname"><span class="pre">get_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.get_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get therapeutic integration system metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_therapeutic_progress_summary">
+<span class="sig-name descname"><span class="pre">get_therapeutic_progress_summary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.get_therapeutic_progress_summary"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_therapeutic_progress_summary" title="Link to this definition"></a></dt>
+<dd><p>Get comprehensive therapeutic progress summary for a user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.health_check">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">health_check</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.health_check"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.health_check" title="Link to this definition"></a></dt>
+<dd><p>Perform health check of therapeutic integration system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.integrate_therapeutic_concept">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">integrate_therapeutic_concept</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">IntegrationStrategy.EXPERIENTIAL_LEARNING</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.integrate_therapeutic_concept"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.integrate_therapeutic_concept" title="Link to this definition"></a></dt>
+<dd><p>Integrate a therapeutic concept into the current story context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>story_context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntegrationStrategy</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticIntegration</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.provide_alternative_pathway">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">provide_alternative_pathway</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_approach</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.provide_alternative_pathway"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.provide_alternative_pathway" title="Link to this definition"></a></dt>
+<dd><p>Provide alternative therapeutic pathway for resistant concepts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>current_approach</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.track_therapeutic_progress">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">track_therapeutic_progress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticIntegrationSystem.track_therapeutic_progress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.track_therapeutic_progress" title="Link to this definition"></a></dt>
+<dd><p>Track therapeutic progress for a specific concept.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>progress_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticProgress</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.therapeutic_integration_system.</span></span><span class="sig-name descname"><span class="pre">TherapeuticProgress</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">progress_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">concept_name=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">approach=TherapeuticApproach.COGNITIVE_BEHAVIORAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_level=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">current_level=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_level=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_rate=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">practice_sessions=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">successful_applications=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_attempts=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milestones_achieved=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">milestone_dates=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">story_contexts=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_developments=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">narrative_celebrations=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">started_at=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">estimated_completion=None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/therapeutic_integration_system.html#TherapeuticProgress"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Tracks therapeutic progress for a user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>progress_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>concept_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>concept_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>approach</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a></span>)</p></li>
+<li><p><strong>initial_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>current_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>target_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>progress_rate</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>practice_sessions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>successful_applications</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>total_attempts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>milestones_achieved</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressMilestone</span></code></a>]</span>)</p></li>
+<li><p><strong>milestone_dates</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>]</span>)</p></li>
+<li><p><strong>story_contexts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>character_developments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>narrative_celebrations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>started_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>last_updated</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>estimated_completion</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.approach">
+<span class="sig-name descname"><span class="pre">approach</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach"><code class="xref py py-class docutils literal notranslate"><span class="pre">TherapeuticApproach</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_behavioral'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.approach" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.character_developments">
+<span class="sig-name descname"><span class="pre">character_developments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.character_developments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.concept_id">
+<span class="sig-name descname"><span class="pre">concept_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.concept_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.concept_name">
+<span class="sig-name descname"><span class="pre">concept_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.concept_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.current_level">
+<span class="sig-name descname"><span class="pre">current_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.current_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.estimated_completion">
+<span class="sig-name descname"><span class="pre">estimated_completion</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.estimated_completion" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.initial_level">
+<span class="sig-name descname"><span class="pre">initial_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.initial_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.last_updated">
+<span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.last_updated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.milestone_dates">
+<span class="sig-name descname"><span class="pre">milestone_dates</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.milestone_dates" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.milestones_achieved">
+<span class="sig-name descname"><span class="pre">milestones_achieved</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference internal" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone" title="src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressMilestone</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.milestones_achieved" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.narrative_celebrations">
+<span class="sig-name descname"><span class="pre">narrative_celebrations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.narrative_celebrations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.practice_sessions">
+<span class="sig-name descname"><span class="pre">practice_sessions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.practice_sessions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.progress_id">
+<span class="sig-name descname"><span class="pre">progress_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.progress_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.progress_rate">
+<span class="sig-name descname"><span class="pre">progress_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.progress_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.started_at">
+<span class="sig-name descname"><span class="pre">started_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.started_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.story_contexts">
+<span class="sig-name descname"><span class="pre">story_contexts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.story_contexts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.successful_applications">
+<span class="sig-name descname"><span class="pre">successful_applications</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.successful_applications" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.target_level">
+<span class="sig-name descname"><span class="pre">target_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.target_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.total_attempts">
+<span class="sig-name descname"><span class="pre">total_attempts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.total_attempts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.narrative.scene_manager.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.narrative.scene_manager module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.narrative.therapeutic_integrator.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.narrative.therapeutic_integrator module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

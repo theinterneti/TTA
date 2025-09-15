@@ -1,0 +1,487 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.models.gateway &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.models.gateway</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.models.gateway</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core gateway data models for the API Gateway.</span>
+
+<span class="sd">This module contains models for request/response handling,</span>
+<span class="sd">routing, and gateway operations.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span><span class="p">,</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+
+<div class="viewcode-block" id="RequestMethod">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RequestMethod">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestMethod</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;HTTP request method enumeration.&quot;&quot;&quot;</span>
+
+    <span class="n">GET</span> <span class="o">=</span> <span class="s2">&quot;GET&quot;</span>
+    <span class="n">POST</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span>
+    <span class="n">PUT</span> <span class="o">=</span> <span class="s2">&quot;PUT&quot;</span>
+    <span class="n">DELETE</span> <span class="o">=</span> <span class="s2">&quot;DELETE&quot;</span>
+    <span class="n">PATCH</span> <span class="o">=</span> <span class="s2">&quot;PATCH&quot;</span>
+    <span class="n">HEAD</span> <span class="o">=</span> <span class="s2">&quot;HEAD&quot;</span>
+    <span class="n">OPTIONS</span> <span class="o">=</span> <span class="s2">&quot;OPTIONS&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RouteType">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RouteType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RouteType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Route type enumeration.&quot;&quot;&quot;</span>
+
+    <span class="n">HTTP</span> <span class="o">=</span> <span class="s2">&quot;http&quot;</span>
+    <span class="n">WEBSOCKET</span> <span class="o">=</span> <span class="s2">&quot;websocket&quot;</span>
+    <span class="n">PROXY</span> <span class="o">=</span> <span class="s2">&quot;proxy&quot;</span>
+    <span class="n">REDIRECT</span> <span class="o">=</span> <span class="s2">&quot;redirect&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="GatewayRequest">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GatewayRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gateway request model.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Request identification</span>
+    <span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique request identifier&quot;</span>
+    <span class="p">)</span>
+    <span class="n">correlation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request correlation ID&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Request details</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">RequestMethod</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;HTTP method&quot;</span><span class="p">)</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request path&quot;</span><span class="p">)</span>
+    <span class="n">query_params</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Query parameters&quot;</span>
+    <span class="p">)</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request headers&quot;</span><span class="p">)</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request body&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Client information</span>
+    <span class="n">client_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client IP address&quot;</span><span class="p">)</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client user agent&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Routing information</span>
+    <span class="n">target_service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target service name&quot;</span><span class="p">)</span>
+    <span class="n">route_type</span><span class="p">:</span> <span class="n">RouteType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">RouteType</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Route type&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Authentication context</span>
+    <span class="n">auth_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Authentication context&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">received_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request received timestamp&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Therapeutic context</span>
+    <span class="n">therapeutic_session_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic session ID&quot;</span>
+    <span class="p">)</span>
+    <span class="n">is_therapeutic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic request flag&quot;</span><span class="p">)</span>
+    <span class="n">crisis_mode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Crisis mode flag&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GatewayRequest.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayRequest.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">use_enum_values</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">UUID</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="GatewayRequest.get_header">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayRequest.get_header">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get header value by name (case-insensitive).&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">return</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">default</span></div>
+
+
+<div class="viewcode-block" id="GatewayRequest.is_websocket">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayRequest.is_websocket">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_websocket</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if request is a WebSocket upgrade.&quot;&quot;&quot;</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s2">&quot;connection&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">upgrade</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="s2">&quot;upgrade&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">return</span> <span class="s2">&quot;upgrade&quot;</span> <span class="ow">in</span> <span class="n">connection</span> <span class="ow">and</span> <span class="n">upgrade</span> <span class="o">==</span> <span class="s2">&quot;websocket&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GatewayResponse">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GatewayResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Gateway response model.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Response identification</span>
+    <span class="n">request_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Associated request ID&quot;</span><span class="p">)</span>
+    <span class="n">correlation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request correlation ID&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Response details</span>
+    <span class="n">status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;HTTP status code&quot;</span><span class="p">)</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Response headers&quot;</span>
+    <span class="p">)</span>
+    <span class="n">body</span><span class="p">:</span> <span class="nb">bytes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Response body&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Processing information</span>
+    <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Service that handled the request&quot;</span>
+    <span class="p">)</span>
+    <span class="n">processing_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Processing time in seconds&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">completed_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Response completion timestamp&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Error information</span>
+    <span class="n">error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Error message if any&quot;</span><span class="p">)</span>
+    <span class="n">error_code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Error code if any&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GatewayResponse.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayResponse.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">UUID</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="GatewayResponse.is_success">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayResponse.is_success">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if response indicates success.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="mi">200</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&lt;</span> <span class="mi">300</span></div>
+
+
+<div class="viewcode-block" id="GatewayResponse.is_error">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.GatewayResponse.is_error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_error</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if response indicates an error.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">status_code</span> <span class="o">&gt;=</span> <span class="mi">400</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RouteRule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RouteRule">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RouteRule</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Route rule for request routing.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Rule identification</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule name&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule description&quot;</span><span class="p">)</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule enabled status&quot;</span><span class="p">)</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule priority (lower = higher priority)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Matching criteria</span>
+    <span class="n">path_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path pattern to match&quot;</span><span class="p">)</span>
+    <span class="n">methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RequestMethod</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;HTTP methods to match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Headers to match&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Routing configuration</span>
+    <span class="n">target_service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target service name&quot;</span><span class="p">)</span>
+    <span class="n">route_type</span><span class="p">:</span> <span class="n">RouteType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">RouteType</span><span class="o">.</span><span class="n">HTTP</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Route type&quot;</span><span class="p">)</span>
+    <span class="n">path_rewrite</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path rewrite pattern&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Load balancing</span>
+    <span class="n">load_balancing_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable load balancing&quot;</span>
+    <span class="p">)</span>
+    <span class="n">sticky_sessions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable sticky sessions&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Timeouts and retries</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Request timeout in seconds&quot;</span><span class="p">)</span>
+    <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of retries&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Therapeutic configuration</span>
+    <span class="n">therapeutic_priority</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic priority routing&quot;</span>
+    <span class="p">)</span>
+    <span class="n">crisis_bypass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Bypass normal routing for crisis&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule creation timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule update timestamp&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RouteRule.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RouteRule.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">use_enum_values</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="RouteRule.matches_request">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RouteRule.matches_request">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matches_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if rule matches a request.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+
+        <span class="c1"># Check path pattern</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_pattern</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check methods</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="ow">and</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check headers</span>
+        <span class="k">for</span> <span class="n">header_name</span><span class="p">,</span> <span class="n">header_value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">request_header</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">get_header</span><span class="p">(</span><span class="n">header_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">request_header</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">request_header</span><span class="p">,</span> <span class="n">header_value</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RoutingConfig">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RoutingConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RoutingConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete routing configuration.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Global configuration</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Routing enabled&quot;</span><span class="p">)</span>
+    <span class="n">default_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default request timeout&quot;</span><span class="p">)</span>
+    <span class="n">default_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default retry count&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Rules</span>
+    <span class="n">rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RouteRule</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Routing rules&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Load balancing</span>
+    <span class="n">default_load_balancing</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;round_robin&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default load balancing algorithm&quot;</span>
+    <span class="p">)</span>
+    <span class="n">health_check_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable health checks for routing&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Circuit breaker</span>
+    <span class="n">circuit_breaker_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enable circuit breaker&quot;</span>
+    <span class="p">)</span>
+    <span class="n">failure_threshold</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Circuit breaker failure threshold&quot;</span>
+    <span class="p">)</span>
+    <span class="n">recovery_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Circuit breaker recovery timeout&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RoutingConfig.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RoutingConfig.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="RoutingConfig.get_matching_rules">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.RoutingConfig.get_matching_rules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_matching_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RouteRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get matching rules for a request, sorted by priority.&quot;&quot;&quot;</span>
+        <span class="n">matching_rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">rule</span>
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rules</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span> <span class="ow">and</span> <span class="n">rule</span><span class="o">.</span><span class="n">matches_request</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">matching_rules</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WebSocketConnection">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.WebSocketConnection">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WebSocketConnection</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;WebSocket connection information.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Connection identification</span>
+    <span class="n">connection_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">uuid4</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique connection identifier&quot;</span>
+    <span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Associated user ID&quot;</span><span class="p">)</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Session identifier&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Connection details</span>
+    <span class="n">client_ip</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client IP address&quot;</span><span class="p">)</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;unknown&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client user agent&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Routing information</span>
+    <span class="n">target_service</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target service for WebSocket&quot;</span><span class="p">)</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;WebSocket path&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Status</span>
+    <span class="n">connected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Connection status&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">connected_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Connection timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">last_activity</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Last activity timestamp&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Therapeutic context</span>
+    <span class="n">therapeutic_session_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic session ID&quot;</span>
+    <span class="p">)</span>
+    <span class="n">is_therapeutic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic connection flag&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="WebSocketConnection.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.WebSocketConnection.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">UUID</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="WebSocketConnection.update_activity">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.gateway.html#src.api_gateway.models.WebSocketConnection.update_activity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update last activity timestamp.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

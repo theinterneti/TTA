@@ -1,0 +1,978 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.consequence_system &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.consequence_system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.narrative.consequence_system</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Consequence System for Therapeutic Narrative Engine</span>
+
+<span class="sd">This module provides comprehensive consequence generation, learning opportunity framing,</span>
+<span class="sd">and causality explanation for therapeutic text adventures.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.models.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ConsequenceSet</span><span class="p">,</span>
+    <span class="n">ConsequenceType</span><span class="p">,</span>
+    <span class="n">TherapeuticOutcome</span><span class="p">,</span>
+    <span class="n">UserChoice</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.services.session_state</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionState</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventBus</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">create_consequence_event</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ConsequenceFraming">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceFraming">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsequenceFraming</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;How consequences are framed for therapeutic learning.&quot;&quot;&quot;</span>
+
+    <span class="n">LEARNING_OPPORTUNITY</span> <span class="o">=</span> <span class="s2">&quot;learning_opportunity&quot;</span>
+    <span class="n">NATURAL_OUTCOME</span> <span class="o">=</span> <span class="s2">&quot;natural_outcome&quot;</span>
+    <span class="n">SKILL_PRACTICE</span> <span class="o">=</span> <span class="s2">&quot;skill_practice&quot;</span>
+    <span class="n">GROWTH_MOMENT</span> <span class="o">=</span> <span class="s2">&quot;growth_moment&quot;</span>
+    <span class="n">REFLECTION_PROMPT</span> <span class="o">=</span> <span class="s2">&quot;reflection_prompt&quot;</span>
+    <span class="n">POSITIVE_REINFORCEMENT</span> <span class="o">=</span> <span class="s2">&quot;positive_reinforcement&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConsequenceSeverity">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSeverity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsequenceSeverity</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Severity levels for consequences.&quot;&quot;&quot;</span>
+
+    <span class="n">MINIMAL</span> <span class="o">=</span> <span class="s2">&quot;minimal&quot;</span>
+    <span class="n">MILD</span> <span class="o">=</span> <span class="s2">&quot;mild&quot;</span>
+    <span class="n">MODERATE</span> <span class="o">=</span> <span class="s2">&quot;moderate&quot;</span>
+    <span class="n">SIGNIFICANT</span> <span class="o">=</span> <span class="s2">&quot;significant&quot;</span>
+    <span class="n">MAJOR</span> <span class="o">=</span> <span class="s2">&quot;major&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LearningOpportunityType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.LearningOpportunityType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LearningOpportunityType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of learning opportunities from consequences.&quot;&quot;&quot;</span>
+
+    <span class="n">EMOTIONAL_REGULATION</span> <span class="o">=</span> <span class="s2">&quot;emotional_regulation&quot;</span>
+    <span class="n">COMMUNICATION_SKILLS</span> <span class="o">=</span> <span class="s2">&quot;communication_skills&quot;</span>
+    <span class="n">PROBLEM_SOLVING</span> <span class="o">=</span> <span class="s2">&quot;problem_solving&quot;</span>
+    <span class="n">SELF_AWARENESS</span> <span class="o">=</span> <span class="s2">&quot;self_awareness&quot;</span>
+    <span class="n">RELATIONSHIP_BUILDING</span> <span class="o">=</span> <span class="s2">&quot;relationship_building&quot;</span>
+    <span class="n">COPING_STRATEGIES</span> <span class="o">=</span> <span class="s2">&quot;coping_strategies&quot;</span>
+    <span class="n">BOUNDARY_SETTING</span> <span class="o">=</span> <span class="s2">&quot;boundary_setting&quot;</span>
+    <span class="n">CONFLICT_RESOLUTION</span> <span class="o">=</span> <span class="s2">&quot;conflict_resolution&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ConsequencePattern">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequencePattern">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsequencePattern</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pattern of consequences from repeated choice types.&quot;&quot;&quot;</span>
+
+    <span class="n">pattern_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">choice_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">consequence_theme</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">therapeutic_significance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">learning_opportunities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">LearningOpportunityType</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recommended_interventions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CausalityExplanation">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.CausalityExplanation">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CausalityExplanation</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Explanation of causal relationships between choices and outcomes.&quot;&quot;&quot;</span>
+
+    <span class="n">explanation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">choice_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">consequence_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">causal_chain</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_insight</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">learning_points</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span></div>
+
+
+
+<div class="viewcode-block" id="ConsequenceGenerationContext">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceGenerationContext">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsequenceGenerationContext</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context for generating consequences.&quot;&quot;&quot;</span>
+
+    <span class="n">choice</span><span class="p">:</span> <span class="n">UserChoice</span>
+    <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span>
+    <span class="n">previous_consequences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConsequenceSet</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_goals</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">user_progress</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">narrative_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">safety_constraints</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ConsequenceSystem">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ConsequenceSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main system for generating and managing consequences.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_bus</span><span class="p">:</span> <span class="n">EventBus</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span> <span class="o">=</span> <span class="n">event_bus</span>
+
+        <span class="c1"># Consequence generation rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_consequence_templates</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">learning_frameworks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_learning_frameworks</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_mappings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_therapeutic_mappings</span><span class="p">()</span>
+
+        <span class="c1"># Pattern tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ConsequencePattern</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">causality_explanations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CausalityExplanation</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;consequences_generated&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;learning_opportunities_created&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;positive_reinforcements&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;pattern_recognitions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;causality_explanations&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_consequence_templates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load consequence generation templates.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="c1"># Positive choice consequences</span>
+            <span class="s2">&quot;positive_communication&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;The person responds warmly to your honest communication&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;You feel a sense of relief after expressing yourself clearly&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;The conversation flows more naturally after your openness&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;communication&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;self_expression&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">},</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_opportunities&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">COMMUNICATION_SKILLS</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;healthy_boundary&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;You feel empowered after setting a clear boundary&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Others respect your decision and give you space&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;The situation becomes less stressful once you&#39;ve established limits&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;boundary_setting&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;self_advocacy&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">},</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_opportunities&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">BOUNDARY_SETTING</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;emotional_regulation&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Taking a moment to breathe helps you feel more centered&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;You notice your emotions without being overwhelmed by them&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;The pause gives you clarity about what you really need&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;emotional_regulation&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.12</span><span class="p">},</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;mindfulness&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">},</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_opportunities&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">EMOTIONAL_REGULATION</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+            <span class="c1"># Challenging choice consequences (framed as learning)</span>
+            <span class="s2">&quot;avoidance_behavior&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;The immediate relief of avoiding the situation feels good&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;However, you notice a lingering sense of unfinished business&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;The problem remains, and you realize it might grow if left unaddressed&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_framing&quot;</span><span class="p">:</span> <span class="s2">&quot;This is a common response - avoidance can provide temporary relief but often prevents us from building confidence and problem-solving skills.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;avoidance_awareness&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">}</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_opportunities&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">PROBLEM_SOLVING</span><span class="p">,</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">SELF_AWARENESS</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;reactive_response&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;immediate&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Your quick reaction feels justified in the moment&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;You notice the other person&#39;s surprise at your intensity&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Afterward, you wonder if there might have been another way to respond&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_framing&quot;</span><span class="p">:</span> <span class="s2">&quot;Strong emotions can lead to quick reactions. This is natural, and recognizing it is the first step toward developing more intentional responses.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;skill&quot;</span><span class="p">:</span> <span class="s2">&quot;emotional_awareness&quot;</span><span class="p">,</span> <span class="s2">&quot;improvement&quot;</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">}</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;learning_opportunities&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">EMOTIONAL_REGULATION</span><span class="p">,</span>
+                    <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">SELF_AWARENESS</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_learning_frameworks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load therapeutic learning frameworks.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;cognitive_behavioral&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;focus&quot;</span><span class="p">:</span> <span class="s2">&quot;thoughts_feelings_behaviors&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;consequence_framing&quot;</span><span class="p">:</span> <span class="s2">&quot;Notice how your thoughts influenced your feelings and actions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;learning_prompts&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;What thoughts went through your mind before making this choice?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;How did those thoughts affect how you felt?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;What would you think differently next time?&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;dialectical_behavioral&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;focus&quot;</span><span class="p">:</span> <span class="s2">&quot;distress_tolerance_emotion_regulation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;consequence_framing&quot;</span><span class="p">:</span> <span class="s2">&quot;This situation offered a chance to practice emotional skills&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;learning_prompts&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;What emotions did you notice in this situation?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;How did you cope with those emotions?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;What skills could help you navigate similar situations?&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;mindfulness_based&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;focus&quot;</span><span class="p">:</span> <span class="s2">&quot;present_moment_awareness&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;consequence_framing&quot;</span><span class="p">:</span> <span class="s2">&quot;Each moment offers an opportunity for awareness and choice&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;learning_prompts&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;What did you notice about your experience in this moment?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;How present were you with your feelings and sensations?&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;What would mindful awareness look like in this situation?&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_therapeutic_mappings</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load mappings between choice types and therapeutic goals.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;communication_choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;improve_communication_skills&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;build_relationships&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;increase_self_expression&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;emotional_choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;emotional_regulation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;stress_management&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;anxiety_reduction&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;behavioral_choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;behavior_change&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;habit_formation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;goal_achievement&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;social_choices&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;social_skills&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;relationship_building&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;conflict_resolution&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ConsequenceSystem.generate_consequences">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem.generate_consequences">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_consequences</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConsequenceSet</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate consequences for a user choice.&quot;&quot;&quot;</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Analyze choice for consequence generation</span>
+            <span class="n">choice_analysis</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_choice</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+            <span class="c1"># Generate immediate consequences</span>
+            <span class="n">immediate_consequences</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_immediate_consequences</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">,</span> <span class="n">choice_analysis</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Generate therapeutic outcomes</span>
+            <span class="n">therapeutic_outcomes</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_therapeutic_outcomes</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">,</span> <span class="n">choice_analysis</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create learning opportunities</span>
+            <span class="n">learning_opportunities</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_learning_opportunities</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">,</span> <span class="n">choice_analysis</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Frame consequences therapeutically</span>
+            <span class="n">framed_consequences</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_frame_consequences_therapeutically</span><span class="p">(</span>
+                <span class="n">immediate_consequences</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">choice_analysis</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create consequence set</span>
+            <span class="n">consequence_set</span> <span class="o">=</span> <span class="n">ConsequenceSet</span><span class="p">(</span>
+                <span class="n">choice_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_id</span><span class="p">,</span>
+                <span class="n">consequences</span><span class="o">=</span><span class="n">framed_consequences</span><span class="p">,</span>
+                <span class="n">consequence_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_determine_consequence_type</span><span class="p">(</span><span class="n">choice_analysis</span><span class="p">),</span>
+                <span class="n">therapeutic_outcomes</span><span class="o">=</span><span class="n">therapeutic_outcomes</span><span class="p">,</span>
+                <span class="n">learning_opportunities</span><span class="o">=</span><span class="n">learning_opportunities</span><span class="p">,</span>
+                <span class="n">narrative_impact</span><span class="o">=</span><span class="n">choice_analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;narrative_impact&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">character_changes</span><span class="o">=</span><span class="n">choice_analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;character_changes&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">emotional_impact</span><span class="o">=</span><span class="n">choice_analysis</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_impact&quot;</span><span class="p">,</span> <span class="p">{}),</span>
+                <span class="n">created_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update patterns and metrics</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_choice_patterns</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">consequence_set</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;consequences_generated&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;learning_opportunities_created&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">learning_opportunities</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Publish consequence event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_publish_consequence_event</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">consequence_set</span><span class="p">)</span>
+
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Generated consequences for choice </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_id</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">processing_time</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">consequence_set</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to generate consequences for choice </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Return minimal consequence set</span>
+            <span class="k">return</span> <span class="n">ConsequenceSet</span><span class="p">(</span>
+                <span class="n">choice_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_id</span><span class="p">,</span>
+                <span class="n">consequences</span><span class="o">=</span><span class="p">[</span>
+                    <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Unable to generate consequences&quot;</span><span class="p">}</span>
+                <span class="p">],</span>
+                <span class="n">consequence_type</span><span class="o">=</span><span class="n">ConsequenceType</span><span class="o">.</span><span class="n">IMMEDIATE</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_choice</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze choice for consequence generation.&quot;&quot;&quot;</span>
+        <span class="n">choice</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span>
+
+        <span class="n">analysis</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;choice_type&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">choice_type</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">therapeutic_relevance</span><span class="p">,</span>
+            <span class="s2">&quot;emotional_weight&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">emotional_weight</span><span class="p">,</span>
+            <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">difficulty_level</span><span class="p">,</span>
+            <span class="s2">&quot;alignment_with_goals&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;pattern_match&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="s2">&quot;consequence_severity&quot;</span><span class="p">:</span> <span class="n">ConsequenceSeverity</span><span class="o">.</span><span class="n">MILD</span><span class="p">,</span>
+            <span class="s2">&quot;framing_approach&quot;</span><span class="p">:</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">NATURAL_OUTCOME</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Analyze alignment with therapeutic goals</span>
+        <span class="k">if</span> <span class="n">context</span><span class="o">.</span><span class="n">therapeutic_goals</span><span class="p">:</span>
+            <span class="n">alignment_scores</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">goal</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">therapeutic_goals</span><span class="p">:</span>
+                <span class="c1"># Simple keyword matching - could be enhanced with NLP</span>
+                <span class="n">choice_text</span> <span class="o">=</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                    <span class="n">keyword</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_goal_keywords</span><span class="p">(</span><span class="n">goal</span><span class="p">)</span>
+                <span class="p">):</span>
+                    <span class="n">alignment_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.8</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">alignment_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.2</span><span class="p">)</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;alignment_with_goals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">alignment_scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">alignment_scores</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Determine consequence severity</span>
+        <span class="k">if</span> <span class="n">choice</span><span class="o">.</span><span class="n">emotional_weight</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;consequence_severity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceSeverity</span><span class="o">.</span><span class="n">SIGNIFICANT</span>
+        <span class="k">elif</span> <span class="n">choice</span><span class="o">.</span><span class="n">emotional_weight</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;consequence_severity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceSeverity</span><span class="o">.</span><span class="n">MODERATE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;consequence_severity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceSeverity</span><span class="o">.</span><span class="n">MILD</span>
+
+        <span class="c1"># Determine framing approach</span>
+        <span class="k">if</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;alignment_with_goals&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;framing_approach&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">POSITIVE_REINFORCEMENT</span>
+        <span class="k">elif</span> <span class="n">choice</span><span class="o">.</span><span class="n">therapeutic_relevance</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;framing_approach&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">LEARNING_OPPORTUNITY</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;framing_approach&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">NATURAL_OUTCOME</span>
+
+        <span class="k">return</span> <span class="n">analysis</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_goal_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">goal</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get keywords associated with therapeutic goals.&quot;&quot;&quot;</span>
+        <span class="n">goal_keywords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;anxiety_management&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;calm&quot;</span><span class="p">,</span> <span class="s2">&quot;breathe&quot;</span><span class="p">,</span> <span class="s2">&quot;relax&quot;</span><span class="p">,</span> <span class="s2">&quot;worry&quot;</span><span class="p">,</span> <span class="s2">&quot;anxiety&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;depression_support&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mood&quot;</span><span class="p">,</span> <span class="s2">&quot;energy&quot;</span><span class="p">,</span> <span class="s2">&quot;hope&quot;</span><span class="p">,</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;motivation&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;communication_skills&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;talk&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;express&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;listen&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;communicate&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;share&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;emotional_regulation&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;feel&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="s2">&quot;control&quot;</span><span class="p">,</span> <span class="s2">&quot;manage&quot;</span><span class="p">,</span> <span class="s2">&quot;cope&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;relationship_building&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;friend&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;connect&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;relationship&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;trust&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;self_esteem&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;confident&quot;</span><span class="p">,</span> <span class="s2">&quot;worth&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="s2">&quot;proud&quot;</span><span class="p">,</span> <span class="s2">&quot;capable&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;stress_management&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;stress&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pressure&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;overwhelm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;manage&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;balance&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">goal_keywords</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">goal</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_generate_immediate_consequences</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate immediate consequences based on choice analysis.&quot;&quot;&quot;</span>
+        <span class="n">consequences</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get template based on choice characteristics</span>
+        <span class="n">template_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_consequence_template</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="p">,</span> <span class="n">analysis</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">template_key</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">and</span> <span class="s2">&quot;immediate&quot;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
+            <span class="c1"># Select appropriate immediate consequences</span>
+            <span class="n">immediate_options</span> <span class="o">=</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;immediate&quot;</span><span class="p">]</span>
+            <span class="n">selected</span> <span class="o">=</span> <span class="n">immediate_options</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>  <span class="c1"># Take first 2 for now</span>
+
+            <span class="k">for</span> <span class="n">consequence_text</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">:</span>
+                <span class="n">consequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;immediate&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">consequence_text</span><span class="p">,</span>
+                        <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;consequence_severity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">:</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;alignment_with_goals&quot;</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Generate generic consequence</span>
+            <span class="n">consequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;immediate&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Your choice to </span><span class="si">{</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> has immediate effects on the situation.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;consequence_severity&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">:</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;alignment_with_goals&quot;</span><span class="p">],</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">consequences</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_select_consequence_template</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">:</span> <span class="n">UserChoice</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select appropriate consequence template based on choice.&quot;&quot;&quot;</span>
+        <span class="n">choice_text</span> <span class="o">=</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># Simple keyword-based template selection</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">word</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;communicate&quot;</span><span class="p">,</span> <span class="s2">&quot;talk&quot;</span><span class="p">,</span> <span class="s2">&quot;express&quot;</span><span class="p">,</span> <span class="s2">&quot;share&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;positive_communication&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">word</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;boundary&quot;</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;stop&quot;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="s2">&quot;healthy_boundary&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">word</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;breathe&quot;</span><span class="p">,</span> <span class="s2">&quot;calm&quot;</span><span class="p">,</span> <span class="s2">&quot;pause&quot;</span><span class="p">,</span> <span class="s2">&quot;mindful&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;emotional_regulation&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="n">word</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;avoid&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="s2">&quot;skip&quot;</span><span class="p">,</span> <span class="s2">&quot;later&quot;</span><span class="p">]):</span>
+            <span class="k">return</span> <span class="s2">&quot;avoidance_behavior&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">word</span> <span class="ow">in</span> <span class="n">choice_text</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;angry&quot;</span><span class="p">,</span> <span class="s2">&quot;frustrated&quot;</span><span class="p">,</span> <span class="s2">&quot;react&quot;</span><span class="p">,</span> <span class="s2">&quot;snap&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;reactive_response&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;positive_communication&quot;</span>  <span class="c1"># Default template</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_generate_therapeutic_outcomes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticOutcome</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate therapeutic outcomes from consequences.&quot;&quot;&quot;</span>
+        <span class="n">outcomes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get template-based outcomes</span>
+        <span class="n">template_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_consequence_template</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="p">,</span> <span class="n">analysis</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">template_key</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">and</span> <span class="s2">&quot;therapeutic_outcomes&quot;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">outcome_data</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;therapeutic_outcomes&quot;</span><span class="p">]:</span>
+                <span class="n">outcome</span> <span class="o">=</span> <span class="n">TherapeuticOutcome</span><span class="p">(</span>
+                    <span class="n">outcome_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()),</span>
+                    <span class="n">outcome_type</span><span class="o">=</span><span class="n">outcome_data</span><span class="p">[</span><span class="s2">&quot;skill&quot;</span><span class="p">],</span>
+                    <span class="n">therapeutic_value</span><span class="o">=</span><span class="n">outcome_data</span><span class="p">[</span><span class="s2">&quot;improvement&quot;</span><span class="p">],</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Improved </span><span class="si">{</span><span class="n">outcome_data</span><span class="p">[</span><span class="s1">&#39;skill&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> through choice experience&quot;</span><span class="p">,</span>
+                    <span class="n">measurement_criteria</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Skill practice in </span><span class="si">{</span><span class="n">outcome_data</span><span class="p">[</span><span class="s1">&#39;skill&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">achieved_at</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">(),</span>
+                <span class="p">)</span>
+                <span class="n">outcomes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">outcomes</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_learning_opportunities</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create learning opportunities from consequences.&quot;&quot;&quot;</span>
+        <span class="n">opportunities</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Get template-based learning opportunities</span>
+        <span class="n">template_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_consequence_template</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="p">,</span> <span class="n">analysis</span><span class="p">)</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">template_key</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">and</span> <span class="s2">&quot;learning_opportunities&quot;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opportunity_type</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;learning_opportunities&quot;</span><span class="p">]:</span>
+                <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_format_learning_opportunity</span><span class="p">(</span><span class="n">opportunity_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Add framework-specific learning prompts</span>
+        <span class="n">framework</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_therapeutic_framework</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">framework</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_frameworks</span><span class="p">:</span>
+            <span class="n">framework_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">learning_frameworks</span><span class="p">[</span><span class="n">framework</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;learning_prompts&quot;</span> <span class="ow">in</span> <span class="n">framework_data</span><span class="p">:</span>
+                <span class="n">opportunities</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="n">framework_data</span><span class="p">[</span><span class="s2">&quot;learning_prompts&quot;</span><span class="p">][:</span><span class="mi">2</span><span class="p">]</span>
+                <span class="p">)</span>  <span class="c1"># Add 2 prompts</span>
+
+        <span class="k">return</span> <span class="n">opportunities</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_format_learning_opportunity</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">opportunity_type</span><span class="p">:</span> <span class="n">LearningOpportunityType</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Format learning opportunity as user-friendly text.&quot;&quot;&quot;</span>
+        <span class="n">opportunity_formats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">EMOTIONAL_REGULATION</span><span class="p">:</span> <span class="s2">&quot;This situation offers a chance to practice recognizing and managing emotions.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">COMMUNICATION_SKILLS</span><span class="p">:</span> <span class="s2">&quot;This is an opportunity to practice expressing yourself clearly and listening actively.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">PROBLEM_SOLVING</span><span class="p">:</span> <span class="s2">&quot;This challenge can help you develop problem-solving strategies.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">SELF_AWARENESS</span><span class="p">:</span> <span class="s2">&quot;This moment offers insight into your patterns and reactions.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">RELATIONSHIP_BUILDING</span><span class="p">:</span> <span class="s2">&quot;This interaction can strengthen your connection with others.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">COPING_STRATEGIES</span><span class="p">:</span> <span class="s2">&quot;This situation allows you to practice healthy coping techniques.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">BOUNDARY_SETTING</span><span class="p">:</span> <span class="s2">&quot;This is a chance to practice setting healthy boundaries.&quot;</span><span class="p">,</span>
+            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">CONFLICT_RESOLUTION</span><span class="p">:</span> <span class="s2">&quot;This conflict offers an opportunity to practice resolution skills.&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">opportunity_formats</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="n">opportunity_type</span><span class="p">,</span> <span class="s2">&quot;This situation offers a learning opportunity.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_select_therapeutic_framework</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Select appropriate therapeutic framework for the user.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple selection based on therapeutic goals</span>
+        <span class="n">goals</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">therapeutic_goals</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;anxiety&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="ow">or</span> <span class="s2">&quot;stress&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="k">for</span> <span class="n">goal</span> <span class="ow">in</span> <span class="n">goals</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;cognitive_behavioral&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;emotion&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="ow">or</span> <span class="s2">&quot;regulation&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="k">for</span> <span class="n">goal</span> <span class="ow">in</span> <span class="n">goals</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;dialectical_behavioral&quot;</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span><span class="s2">&quot;mindfulness&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="ow">or</span> <span class="s2">&quot;awareness&quot;</span> <span class="ow">in</span> <span class="n">goal</span> <span class="k">for</span> <span class="n">goal</span> <span class="ow">in</span> <span class="n">goals</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;mindfulness_based&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;cognitive_behavioral&quot;</span>  <span class="c1"># Default</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_frame_consequences_therapeutically</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">consequences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span>
+        <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Frame consequences in a therapeutically beneficial way.&quot;&quot;&quot;</span>
+        <span class="n">framed_consequences</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">framing_approach</span> <span class="o">=</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;framing_approach&quot;</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">consequence</span> <span class="ow">in</span> <span class="n">consequences</span><span class="p">:</span>
+            <span class="n">framed_consequence</span> <span class="o">=</span> <span class="n">consequence</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="c1"># Add therapeutic framing</span>
+            <span class="k">if</span> <span class="n">framing_approach</span> <span class="o">==</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">LEARNING_OPPORTUNITY</span><span class="p">:</span>
+                <span class="n">framed_consequence</span><span class="p">[</span><span class="s2">&quot;therapeutic_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_learning_frame</span><span class="p">(</span>
+                    <span class="n">consequence</span><span class="p">,</span> <span class="n">context</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">framing_approach</span> <span class="o">==</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">POSITIVE_REINFORCEMENT</span><span class="p">:</span>
+                <span class="n">framed_consequence</span><span class="p">[</span><span class="s2">&quot;therapeutic_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_create_reinforcement_frame</span><span class="p">(</span><span class="n">consequence</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">framing_approach</span> <span class="o">==</span> <span class="n">ConsequenceFraming</span><span class="o">.</span><span class="n">GROWTH_MOMENT</span><span class="p">:</span>
+                <span class="n">framed_consequence</span><span class="p">[</span><span class="s2">&quot;therapeutic_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_growth_frame</span><span class="p">(</span>
+                    <span class="n">consequence</span><span class="p">,</span> <span class="n">context</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">framed_consequence</span><span class="p">[</span><span class="s2">&quot;therapeutic_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;This outcome reflects the natural result of your choice.&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Add reflection prompts</span>
+            <span class="n">framed_consequence</span><span class="p">[</span><span class="s2">&quot;reflection_prompts&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_generate_reflection_prompts</span><span class="p">(</span><span class="n">consequence</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="n">framed_consequences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">framed_consequence</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">framed_consequences</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_learning_frame</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">consequence</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create learning-focused therapeutic frame.&quot;&quot;&quot;</span>
+        <span class="n">template_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_select_consequence_template</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">template_key</span><span class="p">,</span> <span class="p">{})</span>
+
+        <span class="k">if</span> <span class="n">template</span> <span class="ow">and</span> <span class="s2">&quot;learning_framing&quot;</span> <span class="ow">in</span> <span class="n">template</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;learning_framing&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;Every choice is an opportunity to learn something new about yourself and develop your skills.&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_reinforcement_frame</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">consequence</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create positive reinforcement frame.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;This positive outcome shows your growing skills and healthy choices. Well done!&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_growth_frame</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">consequence</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create growth-focused frame.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;This experience contributes to your personal growth and understanding.&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_reflection_prompts</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">consequence</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate reflection prompts for the consequence.&quot;&quot;&quot;</span>
+        <span class="n">prompts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;How do you feel about this outcome?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What did you learn from this experience?&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;What might you do differently next time?&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Add choice-specific prompts</span>
+        <span class="k">if</span> <span class="s2">&quot;communication&quot;</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">prompts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;How did your communication style affect the outcome?&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;emotional&quot;</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">prompts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;What emotions did you notice during this choice?&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">prompts</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># Return max 3 prompts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_consequence_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ConsequenceType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the type of consequence based on analysis.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConsequenceType</span><span class="o">.</span><span class="n">THERAPEUTIC</span>
+        <span class="k">elif</span> <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;emotional_weight&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConsequenceType</span><span class="o">.</span><span class="n">SHORT_TERM</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ConsequenceType</span><span class="o">.</span><span class="n">IMMEDIATE</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_update_choice_patterns</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span> <span class="n">consequence_set</span><span class="p">:</span> <span class="n">ConsequenceSet</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update choice patterns for pattern recognition.&quot;&quot;&quot;</span>
+        <span class="n">user_id</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+        <span class="n">choice_type</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_type</span><span class="o">.</span><span class="n">value</span>
+
+        <span class="n">pattern_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">choice_type</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">if</span> <span class="n">pattern_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">[</span><span class="n">pattern_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConsequencePattern</span><span class="p">(</span>
+                <span class="n">choice_pattern</span><span class="o">=</span><span class="n">choice_type</span><span class="p">,</span> <span class="n">consequence_theme</span><span class="o">=</span><span class="s2">&quot;developing&quot;</span><span class="p">,</span> <span class="n">frequency</span><span class="o">=</span><span class="mi">0</span>
+            <span class="p">)</span>
+
+        <span class="n">pattern</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">[</span><span class="n">pattern_key</span><span class="p">]</span>
+        <span class="n">pattern</span><span class="o">.</span><span class="n">frequency</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Update therapeutic significance</span>
+        <span class="k">if</span> <span class="n">consequence_set</span><span class="o">.</span><span class="n">therapeutic_outcomes</span><span class="p">:</span>
+            <span class="n">avg_therapeutic_value</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="n">outcome</span><span class="o">.</span><span class="n">therapeutic_value</span>
+                <span class="k">for</span> <span class="n">outcome</span> <span class="ow">in</span> <span class="n">consequence_set</span><span class="o">.</span><span class="n">therapeutic_outcomes</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">consequence_set</span><span class="o">.</span><span class="n">therapeutic_outcomes</span><span class="p">)</span>
+            <span class="n">pattern</span><span class="o">.</span><span class="n">therapeutic_significance</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pattern</span><span class="o">.</span><span class="n">therapeutic_significance</span> <span class="o">*</span> <span class="mf">0.8</span> <span class="o">+</span> <span class="n">avg_therapeutic_value</span> <span class="o">*</span> <span class="mf">0.2</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Update learning opportunities</span>
+        <span class="k">if</span> <span class="n">consequence_set</span><span class="o">.</span><span class="n">learning_opportunities</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">opportunity</span> <span class="ow">in</span> <span class="n">consequence_set</span><span class="o">.</span><span class="n">learning_opportunities</span><span class="p">:</span>
+                <span class="c1"># Extract learning type from opportunity text (simplified)</span>
+                <span class="k">if</span> <span class="s2">&quot;emotional&quot;</span> <span class="ow">in</span> <span class="n">opportunity</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">EMOTIONAL_REGULATION</span>
+                        <span class="ow">not</span> <span class="ow">in</span> <span class="n">pattern</span><span class="o">.</span><span class="n">learning_opportunities</span>
+                    <span class="p">):</span>
+                        <span class="n">pattern</span><span class="o">.</span><span class="n">learning_opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">EMOTIONAL_REGULATION</span>
+                        <span class="p">)</span>
+                <span class="k">elif</span> <span class="s2">&quot;communication&quot;</span> <span class="ow">in</span> <span class="n">opportunity</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">COMMUNICATION_SKILLS</span>
+                        <span class="ow">not</span> <span class="ow">in</span> <span class="n">pattern</span><span class="o">.</span><span class="n">learning_opportunities</span>
+                    <span class="p">):</span>
+                        <span class="n">pattern</span><span class="o">.</span><span class="n">learning_opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">LearningOpportunityType</span><span class="o">.</span><span class="n">COMMUNICATION_SKILLS</span>
+                        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;pattern_recognitions&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_publish_consequence_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span><span class="p">,</span> <span class="n">consequence_set</span><span class="p">:</span> <span class="n">ConsequenceSet</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish consequence generation event.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">create_consequence_event</span><span class="p">(</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">CONSEQUENCE_APPLIED</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">.</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">consequence_set</span><span class="o">.</span><span class="n">consequence_id</span><span class="p">,</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;choice_id&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span><span class="o">.</span><span class="n">choice_id</span><span class="p">,</span>
+                <span class="s2">&quot;consequence_type&quot;</span><span class="p">:</span> <span class="n">consequence_set</span><span class="o">.</span><span class="n">consequence_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_outcomes_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">consequence_set</span><span class="o">.</span><span class="n">therapeutic_outcomes</span><span class="p">),</span>
+                <span class="s2">&quot;learning_opportunities_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="n">consequence_set</span><span class="o">.</span><span class="n">learning_opportunities</span>
+                <span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ConsequenceSystem.explain_causality">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem.explain_causality">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">explain_causality</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">choice_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">consequence_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CausalityExplanation</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate explanation of causal relationship between choice and consequence.&quot;&quot;&quot;</span>
+        <span class="n">explanation</span> <span class="o">=</span> <span class="n">CausalityExplanation</span><span class="p">(</span>
+            <span class="n">choice_id</span><span class="o">=</span><span class="n">choice_id</span><span class="p">,</span> <span class="n">consequence_id</span><span class="o">=</span><span class="n">consequence_id</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Build causal chain</span>
+        <span class="n">choice</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">choice</span>
+        <span class="n">causal_chain</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">&quot;You chose to: </span><span class="si">{</span><span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;This choice reflected your values and current emotional state&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;The choice led to specific reactions from others and the environment&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;These reactions created the consequences you experienced&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Add therapeutic insight</span>
+        <span class="n">therapeutic_insight</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_therapeutic_insight</span><span class="p">(</span><span class="n">choice</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+        <span class="c1"># Generate learning points</span>
+        <span class="n">learning_points</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;Choices reflect our internal state and values&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Every choice has natural consequences in relationships and situations&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Understanding these connections helps us make more intentional choices&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Each experience builds our wisdom for future decisions&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">explanation</span><span class="o">.</span><span class="n">causal_chain</span> <span class="o">=</span> <span class="n">causal_chain</span>
+        <span class="n">explanation</span><span class="o">.</span><span class="n">therapeutic_insight</span> <span class="o">=</span> <span class="n">therapeutic_insight</span>
+        <span class="n">explanation</span><span class="o">.</span><span class="n">learning_points</span> <span class="o">=</span> <span class="n">learning_points</span>
+        <span class="n">explanation</span><span class="o">.</span><span class="n">confidence</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># High confidence for rule-based explanations</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;causality_explanations&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">explanation</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_therapeutic_insight</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">choice</span><span class="p">:</span> <span class="n">UserChoice</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">ConsequenceGenerationContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate therapeutic insight from choice-consequence relationship.&quot;&quot;&quot;</span>
+        <span class="n">insights</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;This experience shows how our choices shape our relationships and environment.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Notice how your internal state influenced your choice and its outcomes.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;This pattern of choice and consequence is common in similar situations.&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Your growing awareness of these connections is a sign of personal growth.&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Select insight based on choice characteristics</span>
+        <span class="k">if</span> <span class="n">choice</span><span class="o">.</span><span class="n">therapeutic_relevance</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">insights</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># Growth-focused</span>
+        <span class="k">elif</span> <span class="n">choice</span><span class="o">.</span><span class="n">emotional_weight</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">insights</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># Emotion-focused</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">insights</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># General relationship-focused</span>
+
+<div class="viewcode-block" id="ConsequenceSystem.recognize_patterns">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem.recognize_patterns">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recognize_patterns</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConsequencePattern</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recognize patterns in user&#39;s choice-consequence history.&quot;&quot;&quot;</span>
+        <span class="n">user_patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pattern</span>
+            <span class="k">for</span> <span class="n">pattern_key</span><span class="p">,</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">pattern_key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">user_id</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Filter patterns with sufficient frequency</span>
+        <span class="n">significant_patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">pattern</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">user_patterns</span>
+            <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">frequency</span> <span class="o">&gt;=</span> <span class="mi">3</span>  <span class="c1"># At least 3 occurrences</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Sort by therapeutic significance</span>
+        <span class="n">significant_patterns</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">therapeutic_significance</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">significant_patterns</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># Return top 5 patterns</span></div>
+
+
+<div class="viewcode-block" id="ConsequenceSystem.get_metrics">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get consequence system metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;active_patterns&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">),</span>
+            <span class="s2">&quot;causality_explanations_stored&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">causality_explanations</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ConsequenceSystem.health_check">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.consequence_system.html#src.components.gameplay_loop.narrative.consequence_system.ConsequenceSystem.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform health check of consequence system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;templates_loaded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">consequence_templates</span><span class="p">),</span>
+            <span class="s2">&quot;frameworks_loaded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">learning_frameworks</span><span class="p">),</span>
+            <span class="s2">&quot;patterns_tracked&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">choice_patterns</span><span class="p">),</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

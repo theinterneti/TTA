@@ -1,0 +1,601 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.core.request_transformer &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.core.request_transformer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.core.request_transformer</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Request and response transformation service for the API Gateway.</span>
+
+<span class="sd">This module provides comprehensive request/response transformation capabilities</span>
+<span class="sd">including validation, sanitization, and therapeutic safety processing.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ValidationError</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayRequest</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TransformationRule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.TransformationRule">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransformationRule</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rule for request/response transformation.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">path_pattern</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Request transformations</span>
+    <span class="n">request_headers_add</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">request_headers_remove</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">request_body_transform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># JSONPath or regex pattern</span>
+
+    <span class="c1"># Response transformations</span>
+    <span class="n">response_headers_add</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">response_headers_remove</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">response_body_transform</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Validation rules</span>
+    <span class="n">request_validation_schema</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">response_validation_schema</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Therapeutic safety</span>
+    <span class="n">therapeutic_content_scan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">crisis_detection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">sensitive_data_mask</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="RequestTransformer">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestTransformer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request and response transformation service.</span>
+
+<span class="sd">    Provides comprehensive transformation capabilities including:</span>
+<span class="sd">    - Header manipulation</span>
+<span class="sd">    - Body transformation and validation</span>
+<span class="sd">    - Therapeutic content safety processing</span>
+<span class="sd">    - Sensitive data masking</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the request transformer.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TransformationRule</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sensitive_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sensitive_patterns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_crisis_keywords</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_crisis_keywords</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_sensitive_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load patterns for sensitive data detection.&quot;&quot;&quot;</span>
+        <span class="n">patterns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># Social Security Numbers</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{3}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{4}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{9}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="c1"># Credit Card Numbers</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="c1"># Phone Numbers</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{3}</span><span class="s2">[-.]?\d</span><span class="si">{3}</span><span class="s2">[-.]?\d</span><span class="si">{4}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="c1"># Email Addresses (partial masking)</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b&quot;</span><span class="p">),</span>
+            <span class="c1"># Medical Record Numbers</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\bMRN[-:\s]?\d+\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+            <span class="c1"># Therapeutic Session IDs (if they follow a pattern)</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\bSESSION[-_]?\d+\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">patterns</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_crisis_keywords</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load keywords for crisis detection.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Self-harm indicators</span>
+            <span class="s2">&quot;suicide&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;kill myself&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;end it all&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hurt myself&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;self-harm&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cutting&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overdose&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;jump off&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hang myself&quot;</span><span class="p">,</span>
+            <span class="c1"># Crisis emotional states</span>
+            <span class="s2">&quot;hopeless&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;worthless&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;can&#39;t go on&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;no point&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;give up&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;desperate&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trapped&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;unbearable pain&quot;</span><span class="p">,</span>
+            <span class="c1"># Immediate danger</span>
+            <span class="s2">&quot;right now&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;tonight&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;today&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;this moment&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;immediately&quot;</span><span class="p">,</span>
+            <span class="c1"># Substance abuse crisis</span>
+            <span class="s2">&quot;overdosed&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;too many pills&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;drinking too much&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;can&#39;t stop using&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="RequestTransformer.transform_request">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer.transform_request">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">transform_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform incoming request based on configured rules.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Original gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GatewayRequest: Transformed request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find applicable transformation rules</span>
+            <span class="n">applicable_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_applicable_rules</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Apply transformations</span>
+            <span class="n">transformed_request</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">applicable_rules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Transform headers</span>
+                <span class="n">transformed_request</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_request_headers</span><span class="p">(</span>
+                    <span class="n">transformed_request</span><span class="p">,</span> <span class="n">rule</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Transform body</span>
+                <span class="n">transformed_request</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_request_body</span><span class="p">(</span>
+                    <span class="n">transformed_request</span><span class="p">,</span> <span class="n">rule</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Validate request</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_validation_schema</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_request</span><span class="p">(</span><span class="n">transformed_request</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+                <span class="c1"># Therapeutic safety processing</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">therapeutic_content_scan</span> <span class="ow">or</span> <span class="n">rule</span><span class="o">.</span><span class="n">crisis_detection</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_therapeutic_safety</span><span class="p">(</span><span class="n">transformed_request</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">transformed_request</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request transformation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Return original request if transformation fails</span>
+            <span class="k">return</span> <span class="n">gateway_request</span></div>
+
+
+<div class="viewcode-block" id="RequestTransformer.transform_response">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer.transform_response">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">transform_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">response_data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transform service response based on configured rules.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            response_data: Original response data</span>
+<span class="sd">            content_type: Response content type</span>
+<span class="sd">            gateway_request: Original gateway request</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bytes: Transformed response data</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find applicable transformation rules</span>
+            <span class="n">applicable_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_applicable_rules</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="n">transformed_data</span> <span class="o">=</span> <span class="n">response_data</span>
+
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">applicable_rules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="c1"># Transform response body</span>
+                <span class="n">transformed_data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transform_response_body</span><span class="p">(</span>
+                    <span class="n">transformed_data</span><span class="p">,</span> <span class="n">content_type</span><span class="p">,</span> <span class="n">rule</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Mask sensitive data if required</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">sensitive_data_mask</span><span class="p">:</span>
+                    <span class="n">transformed_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_sensitive_data</span><span class="p">(</span>
+                        <span class="n">transformed_data</span><span class="p">,</span> <span class="n">content_type</span>
+                    <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">transformed_data</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response transformation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Return original response if transformation fails</span>
+            <span class="k">return</span> <span class="n">response_data</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_applicable_rules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TransformationRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find transformation rules applicable to the request.&quot;&quot;&quot;</span>
+        <span class="n">applicable_rules</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="p">:</span>
+            <span class="c1"># Check path pattern</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">path_pattern</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Check method</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span> <span class="ow">and</span> <span class="s2">&quot;*&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span> <span class="ow">and</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">applicable_rules</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_transform_request_headers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform request headers based on rule.&quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="c1"># Add headers</span>
+        <span class="k">for</span> <span class="n">header_name</span><span class="p">,</span> <span class="n">header_value</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_headers_add</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">headers</span><span class="p">[</span><span class="n">header_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">header_value</span>
+
+        <span class="c1"># Remove headers</span>
+        <span class="k">for</span> <span class="n">header_name</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_headers_remove</span><span class="p">:</span>
+            <span class="n">headers</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">header_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">request</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">headers</span>
+        <span class="k">return</span> <span class="n">request</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_transform_request_body</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform request body based on rule.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_body_transform</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">request</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse JSON body if applicable</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+                <span class="c1"># Apply transformation (simplified - could be extended with JSONPath)</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_body_transform</span> <span class="o">==</span> <span class="s2">&quot;add_timestamp&quot;</span><span class="p">:</span>
+                    <span class="n">body_data</span><span class="p">[</span><span class="s2">&quot;_gateway_timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+                <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_body_transform</span> <span class="o">==</span> <span class="s2">&quot;add_user_context&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="p">:</span>
+                        <span class="n">body_data</span><span class="p">[</span><span class="s2">&quot;_user_context&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">),</span>
+                            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">),</span>
+                            <span class="s2">&quot;therapeutic&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                                <span class="s2">&quot;therapeutic_context&quot;</span><span class="p">,</span> <span class="kc">False</span>
+                            <span class="p">),</span>
+                        <span class="p">}</span>
+
+                <span class="n">request</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">body_data</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request body transformation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">request</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_transform_response_body</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">response_data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transform response body based on rule.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">response_data</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">response_body_transform</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response_data</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">response_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">response_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+                <span class="c1"># Apply transformation</span>
+                <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">response_body_transform</span> <span class="o">==</span> <span class="s2">&quot;add_gateway_metadata&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">response_json</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">response_json</span><span class="p">[</span><span class="s2">&quot;_gateway&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s2">&quot;transformed&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                            <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span>
+                        <span class="p">}</span>
+
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">response_json</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response body transformation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">response_data</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_validate_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate request against schema.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_validation_schema</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+                <span class="c1"># Simple validation (could be extended with jsonschema)</span>
+                <span class="n">required_fields</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">request_validation_schema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;required&quot;</span><span class="p">,</span> <span class="p">[])</span>
+                <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">required_fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">body_data</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ValidationError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Required field &#39;</span><span class="si">{</span><span class="n">field</span><span class="si">}</span><span class="s2">&#39; missing&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_therapeutic_safety</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process therapeutic safety checks.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Convert body to text for analysis</span>
+            <span class="n">body_text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">content_type</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;content-type&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                <span class="n">body_text</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">body_text</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Crisis detection</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">crisis_detection</span><span class="p">:</span>
+                <span class="n">crisis_detected</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_crisis_content</span><span class="p">(</span><span class="n">body_text</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">crisis_detected</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Crisis content detected in request </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">correlation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                            <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="p">(</span>
+                                <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">auth_context</span>
+                                <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;crisis_detected&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                            <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="s2">&quot;crisis_detection&quot;</span><span class="p">,</span>
+                        <span class="p">},</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Set crisis mode flag</span>
+                    <span class="n">request</span><span class="o">.</span><span class="n">crisis_mode</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Therapeutic safety processing failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_detect_crisis_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect crisis-related content in text.&quot;&quot;&quot;</span>
+        <span class="n">text_lower</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># Check for crisis keywords</span>
+        <span class="n">crisis_score</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_crisis_keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">text_lower</span><span class="p">:</span>
+                <span class="n">crisis_score</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Threshold for crisis detection (configurable)</span>
+        <span class="k">return</span> <span class="n">crisis_score</span> <span class="o">&gt;=</span> <span class="mi">2</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_sensitive_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">content_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask sensitive data in response.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;application/json&quot;</span> <span class="ow">in</span> <span class="n">content_type</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">response_json</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+                <span class="n">masked_json</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_json_sensitive_data</span><span class="p">(</span><span class="n">response_json</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">masked_json</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Mask in plain text</span>
+                <span class="n">text</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+                <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_text_sensitive_data</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">masked_text</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Sensitive data masking failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_json_sensitive_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively mask sensitive data in JSON.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">masked_data</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span>
+                    <span class="s2">&quot;ssn&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;social_security&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;credit_card&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;password&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;token&quot;</span><span class="p">,</span>
+                <span class="p">]:</span>
+                    <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;***MASKED***&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_json_sensitive_data</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">masked_data</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_mask_json_sensitive_data</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_text_sensitive_data</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_text_sensitive_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask sensitive data in text using regex patterns.&quot;&quot;&quot;</span>
+        <span class="n">masked_text</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sensitive_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;***MASKED***&quot;</span><span class="p">,</span> <span class="n">masked_text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">masked_text</span>
+
+<div class="viewcode-block" id="RequestTransformer.add_transformation_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer.add_transformation_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_transformation_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">TransformationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a new transformation rule.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added transformation rule: </span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestTransformer.remove_transformation_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer.remove_transformation_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_transformation_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a transformation rule by name.&quot;&quot;&quot;</span>
+        <span class="n">original_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">rule</span> <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span> <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">rule_name</span>
+        <span class="p">]</span>
+
+        <span class="n">removed</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">original_count</span>
+        <span class="k">if</span> <span class="n">removed</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removed transformation rule: </span><span class="si">{</span><span class="n">rule_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">removed</span></div>
+
+
+<div class="viewcode-block" id="RequestTransformer.get_transformation_rules">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.request_transformer.html#src.api_gateway.core.RequestTransformer.get_transformation_rules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_transformation_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">TransformationRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all transformation rules.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformation_rules</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

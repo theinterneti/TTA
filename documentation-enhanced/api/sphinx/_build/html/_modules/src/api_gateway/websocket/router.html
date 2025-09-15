@@ -1,0 +1,438 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.websocket.router &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.websocket.router</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.websocket.router</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">WebSocket router for the API Gateway.</span>
+
+<span class="sd">This module provides FastAPI WebSocket routing with authentication integration,</span>
+<span class="sd">service discovery, and therapeutic session management.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">APIRouter</span><span class="p">,</span>
+    <span class="n">Depends</span><span class="p">,</span>
+    <span class="n">HTTPException</span><span class="p">,</span>
+    <span class="n">WebSocket</span><span class="p">,</span>
+    <span class="n">status</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..core.service_router</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceRouter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AuthContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..services</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceDiscoveryManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..utils.auth_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_websocket_auth_context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.connection_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">ConnectionType</span><span class="p">,</span> <span class="n">WebSocketConnectionManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.proxy</span><span class="w"> </span><span class="kn">import</span> <span class="n">WebSocketProxy</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="WebSocketRouter">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.router.html#src.api_gateway.websocket.WebSocketRouter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WebSocketRouter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    WebSocket router for the API Gateway.</span>
+
+<span class="sd">    Provides FastAPI WebSocket endpoints with authentication, service discovery,</span>
+<span class="sd">    and therapeutic session management integration.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">connection_manager</span><span class="p">:</span> <span class="n">WebSocketConnectionManager</span><span class="p">,</span>
+        <span class="n">service_router</span><span class="p">:</span> <span class="n">ServiceRouter</span><span class="p">,</span>
+        <span class="n">discovery_manager</span><span class="p">:</span> <span class="n">ServiceDiscoveryManager</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize WebSocket router.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            connection_manager: WebSocket connection manager</span>
+<span class="sd">            service_router: Service router for backend selection</span>
+<span class="sd">            discovery_manager: Service discovery manager</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span> <span class="o">=</span> <span class="n">connection_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_router</span> <span class="o">=</span> <span class="n">service_router</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">discovery_manager</span>
+
+        <span class="c1"># Initialize WebSocket proxy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span> <span class="o">=</span> <span class="n">WebSocketProxy</span><span class="p">(</span>
+            <span class="n">connection_manager</span><span class="p">,</span> <span class="n">service_router</span><span class="p">,</span> <span class="n">discovery_manager</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create FastAPI router</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_setup_routes</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_routes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup WebSocket routes.&quot;&quot;&quot;</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/chat&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">chat_websocket</span><span class="p">(</span><span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Chat WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">CHAT</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/narrative&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">narrative_websocket</span><span class="p">(</span><span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Narrative WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">NARRATIVE</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;player-experience-interface&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/therapeutic/</span><span class="si">{session_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">therapeutic_websocket</span><span class="p">(</span>
+            <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Therapeutic session WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Verify therapeutic access</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">is_therapeutic_context</span><span class="p">():</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1008</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Therapeutic access required&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">THERAPEUTIC_SESSION</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+                <span class="n">therapeutic_session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/crisis&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">crisis_websocket</span><span class="p">(</span><span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Crisis support WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Mark as crisis mode</span>
+            <span class="k">if</span> <span class="n">auth_context</span><span class="p">:</span>
+                <span class="n">auth_context</span><span class="o">.</span><span class="n">crisis_mode</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">CRISIS_SUPPORT</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;core-gameplay-loop&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/admin&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">admin_websocket</span><span class="p">(</span><span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Admin WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Verify admin access</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">():</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1008</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Admin access required&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;agent-orchestration&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">websocket</span><span class="p">(</span><span class="s2">&quot;/ws/monitoring&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">monitoring_websocket</span><span class="p">(</span><span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Monitoring WebSocket endpoint.&quot;&quot;&quot;</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_auth_context</span><span class="p">(</span><span class="n">websocket</span><span class="p">,</span> <span class="n">token</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Verify monitoring access</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span> <span class="ow">or</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">()</span>
+                <span class="ow">or</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_therapist</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1008</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Monitoring access required&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">handle_connection</span><span class="p">(</span>
+                <span class="n">websocket</span><span class="o">=</span><span class="n">websocket</span><span class="p">,</span>
+                <span class="n">connection_type</span><span class="o">=</span><span class="n">ConnectionType</span><span class="o">.</span><span class="n">MONITORING</span><span class="p">,</span>
+                <span class="n">service_name</span><span class="o">=</span><span class="s2">&quot;agent-orchestration&quot;</span><span class="p">,</span>
+                <span class="n">auth_context</span><span class="o">=</span><span class="n">auth_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># HTTP endpoints for WebSocket management</span>
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/ws/stats&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">websocket_stats</span><span class="p">(</span>
+            <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_websocket_auth_context</span><span class="p">),</span>
+        <span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Get WebSocket connection statistics.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Admin access required&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">connection_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">get_connection_stats</span><span class="p">()</span>
+            <span class="n">proxy_stats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">proxy</span><span class="o">.</span><span class="n">get_proxy_stats</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;connections&quot;</span><span class="p">:</span> <span class="n">connection_stats</span><span class="p">,</span>
+                <span class="s2">&quot;proxy&quot;</span><span class="p">:</span> <span class="n">proxy_stats</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/ws/broadcast/user/</span><span class="si">{user_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_to_user</span><span class="p">(</span>
+            <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+            <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_websocket_auth_context</span><span class="p">),</span>
+        <span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Broadcast message to all connections of a user.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Admin access required&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">sent_count</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">broadcast_to_user</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="p">,</span> <span class="n">message</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;sent_to_connections&quot;</span><span class="p">:</span> <span class="n">sent_count</span><span class="p">}</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/ws/broadcast/session/</span><span class="si">{session_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_to_session</span><span class="p">(</span>
+            <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+            <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_websocket_auth_context</span><span class="p">),</span>
+        <span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Broadcast message to all connections in a therapeutic session.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
+                <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">()</span>
+                <span class="ow">or</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_therapist</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Admin or therapist access required&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="n">sent_count</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">broadcast_to_session</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="p">,</span> <span class="n">message</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;sent_to_connections&quot;</span><span class="p">:</span> <span class="n">sent_count</span><span class="p">}</span>
+
+        <span class="nd">@self</span><span class="o">.</span><span class="n">router</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;/ws/connection/</span><span class="si">{connection_id}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">disconnect_connection</span><span class="p">(</span>
+            <span class="n">connection_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+            <span class="n">auth_context</span><span class="p">:</span> <span class="n">AuthContext</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_websocket_auth_context</span><span class="p">),</span>
+        <span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Disconnect a specific WebSocket connection.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span><span class="o">.</span><span class="n">permissions</span><span class="o">.</span><span class="n">is_admin</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span>
+                    <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Admin access required&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="n">connection_id</span><span class="p">,</span> <span class="s2">&quot;admin_disconnect&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;disconnected&quot;</span><span class="p">,</span> <span class="s2">&quot;connection_id&quot;</span><span class="p">:</span> <span class="n">connection_id</span><span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_auth_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">websocket</span><span class="p">:</span> <span class="n">WebSocket</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthContext</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get authentication context for WebSocket connection.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            websocket: WebSocket connection</span>
+<span class="sd">            token: Authentication token</span>
+<span class="sd">            required: Whether authentication is required</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Authentication context or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try to get token from query parameter if not provided</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">websocket</span><span class="o">.</span><span class="n">query_params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;token&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Try to get token from headers</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+                <span class="n">auth_header</span> <span class="o">=</span> <span class="n">websocket</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;authorization&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">auth_header</span> <span class="ow">and</span> <span class="n">auth_header</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Bearer &quot;</span><span class="p">):</span>
+                    <span class="n">token</span> <span class="o">=</span> <span class="n">auth_header</span><span class="p">[</span><span class="mi">7</span><span class="p">:]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1008</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Authentication required&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Validate token and get auth context</span>
+            <span class="c1"># This would integrate with your authentication service</span>
+            <span class="n">auth_context</span> <span class="o">=</span> <span class="k">await</span> <span class="n">get_websocket_auth_context</span><span class="p">(</span><span class="n">token</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_context</span> <span class="ow">and</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1008</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Invalid authentication&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">return</span> <span class="n">auth_context</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting auth context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">required</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">websocket</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="mi">1011</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;Authentication error&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="WebSocketRouter.get_router">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.router.html#src.api_gateway.websocket.WebSocketRouter.get_router">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_router</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIRouter</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the FastAPI router.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">router</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="create_websocket_router">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.websocket.router.html#src.api_gateway.websocket.create_websocket_router">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_websocket_router</span><span class="p">(</span>
+    <span class="n">connection_manager</span><span class="p">:</span> <span class="n">WebSocketConnectionManager</span><span class="p">,</span>
+    <span class="n">service_router</span><span class="p">:</span> <span class="n">ServiceRouter</span><span class="p">,</span>
+    <span class="n">discovery_manager</span><span class="p">:</span> <span class="n">ServiceDiscoveryManager</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">APIRouter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create WebSocket router with all dependencies.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        connection_manager: WebSocket connection manager</span>
+<span class="sd">        service_router: Service router</span>
+<span class="sd">        discovery_manager: Service discovery manager</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Configured FastAPI router</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">websocket_router</span> <span class="o">=</span> <span class="n">WebSocketRouter</span><span class="p">(</span>
+        <span class="n">connection_manager</span><span class="p">,</span> <span class="n">service_router</span><span class="p">,</span> <span class="n">discovery_manager</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">websocket_router</span><span class="o">.</span><span class="n">get_router</span><span class="p">()</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,943 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>agent_orchestration.proxies &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">agent_orchestration.proxies</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for agent_orchestration.proxies</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">IPAAdapter</span><span class="p">,</span> <span class="n">NGAAdapter</span><span class="p">,</span> <span class="n">RetryConfig</span><span class="p">,</span> <span class="n">WBAAdapter</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">Agent</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageCoordinator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">AgentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.realtime.agent_event_integration</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_agent_event_integrator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.realtime.event_publisher</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventPublisher</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.therapeutic_safety</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafetyLevel</span><span class="p">,</span> <span class="n">get_global_safety_service</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="InputProcessorAgentProxy">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.InputProcessorAgentProxy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">InputProcessorAgentProxy</span><span class="p">(</span><span class="n">Agent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps Input Processor Agent functionality with validation and retry logic.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">coordinator</span><span class="p">:</span> <span class="n">MessageCoordinator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">8.0</span><span class="p">,</span>
+        <span class="n">enable_real_agent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fallback_to_mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">agent_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">EventPublisher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">AgentId</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;ipa:</span><span class="si">{</span><span class="n">instance</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">coordinator</span><span class="o">=</span><span class="n">coordinator</span><span class="p">,</span>
+            <span class="n">default_timeout_s</span><span class="o">=</span><span class="n">default_timeout_s</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Real agent communication setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="o">=</span> <span class="n">enable_real_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span> <span class="o">=</span> <span class="n">fallback_to_mock</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span> <span class="o">=</span> <span class="n">agent_registry</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span><span class="p">:</span>
+            <span class="n">retry_config</span> <span class="o">=</span> <span class="n">RetryConfig</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">base_delay</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span> <span class="o">=</span> <span class="n">IPAAdapter</span><span class="p">(</span>
+                <span class="n">fallback_to_mock</span><span class="o">=</span><span class="n">fallback_to_mock</span><span class="p">,</span> <span class="n">retry_config</span><span class="o">=</span><span class="n">retry_config</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Real-time event integration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_integrator</span> <span class="o">=</span> <span class="n">get_agent_event_integrator</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">),</span>
+            <span class="n">event_publisher</span><span class="o">=</span><span class="n">event_publisher</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="n">event_publisher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Register with agent registry if provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Registered IPA proxy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with agent registry&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register with agent registry: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InputProcessorAgentProxy.process">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.InputProcessorAgentProxy.process">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># Validate user input</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_payload</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;InputProcessorAgentProxy requires non-empty &#39;text&#39;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Track operation with real-time events</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_integrator</span><span class="o">.</span><span class="n">track_operation</span><span class="p">(</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="s2">&quot;input_processing&quot;</span><span class="p">,</span>
+            <span class="n">operation_data</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;text_length&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">),</span>
+                <span class="s2">&quot;has_context&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">input_payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)),</span>
+            <span class="p">},</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">operation</span><span class="p">:</span>
+            <span class="c1"># Safety validation (annotate only; never block)</span>
+            <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span><span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;Performing safety validation&quot;</span><span class="p">)</span>
+            <span class="n">safety</span> <span class="o">=</span> <span class="n">get_global_safety_service</span><span class="p">()</span>
+            <span class="n">validation_meta</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">safety</span><span class="o">.</span><span class="n">validate_text</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+                <span class="n">validation_meta</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="c1"># Fail-open: do not block or raise</span>
+                <span class="n">validation_meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;safety_validation_failed&quot;</span><span class="p">}</span>
+
+            <span class="c1"># Process through real IPA if available</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span><span class="mf">0.3</span><span class="p">,</span> <span class="s2">&quot;Processing with real IPA&quot;</span><span class="p">)</span>
+                    <span class="n">ipa_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="o">.</span><span class="n">process_input</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+                    <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span>
+                        <span class="mf">0.8</span><span class="p">,</span> <span class="s2">&quot;Merging results with safety validation&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Merge real IPA results with safety validation</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;normalized_text&quot;</span><span class="p">:</span> <span class="n">ipa_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;normalized_text&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">),</span>
+                        <span class="s2">&quot;routing&quot;</span><span class="p">:</span> <span class="n">ipa_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;routing&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;intent&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">}),</span>
+                        <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+                        <span class="s2">&quot;raw_intent&quot;</span><span class="p">:</span> <span class="n">ipa_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw_intent&quot;</span><span class="p">),</span>
+                        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">ipa_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;real_ipa&quot;</span><span class="p">),</span>
+                    <span class="p">}</span>
+
+                    <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span>
+                        <span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;Input processing completed&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;IPA processed input with intent: </span><span class="si">{</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;routing&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intent&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="n">result</span>
+
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real IPA processing failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                        <span class="k">raise</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Falling back to mock implementation&quot;</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span>
+                        <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;Falling back to mock implementation&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Fallback to mock implementation</span>
+            <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span><span class="mf">0.7</span><span class="p">,</span> <span class="s2">&quot;Using mock implementation&quot;</span><span class="p">)</span>
+            <span class="n">routing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;intent&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">}</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;normalized_text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                <span class="s2">&quot;routing&quot;</span><span class="p">:</span> <span class="n">routing</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_fallback&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">await</span> <span class="n">operation</span><span class="p">[</span><span class="s2">&quot;publish_progress&quot;</span><span class="p">](</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;Mock processing completed&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="InputProcessorAgentProxy.handle_with_retry">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.InputProcessorAgentProxy.handle_with_retry">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_with_retry</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">backoff_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_with_timeout</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;</span> <span class="n">retries</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff_s</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;</span> <span class="n">retries</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">backoff_s</span> <span class="o">*</span> <span class="n">attempt</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InputProcessorAgentProxy.discover_ipa_instances">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.InputProcessorAgentProxy.discover_ipa_instances">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">discover_ipa_instances</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Discover available IPA instances through the agent registry.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of available IPA instances with their metadata</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get all registered agents</span>
+            <span class="n">registered_agents</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="o">.</span><span class="n">list_registered</span><span class="p">()</span>
+
+            <span class="c1"># Filter for IPA instances</span>
+            <span class="n">ipa_instances</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">agent</span>
+                <span class="k">for</span> <span class="n">agent</span> <span class="ow">in</span> <span class="n">registered_agents</span>
+                <span class="k">if</span> <span class="n">agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_id&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="o">.</span><span class="n">value</span>
+                <span class="ow">and</span> <span class="n">agent</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alive&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Discovered </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ipa_instances</span><span class="p">)</span><span class="si">}</span><span class="s2"> live IPA instances&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ipa_instances</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to discover IPA instances: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="InputProcessorAgentProxy.select_best_ipa_instance">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.InputProcessorAgentProxy.select_best_ipa_instance">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">select_best_ipa_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select the best available IPA instance based on load and health.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Best IPA instance metadata or None if none available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">instances</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discover_ipa_instances</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">instances</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Simple selection: prefer instances with lower load</span>
+        <span class="c1"># In a real implementation, this could consider more factors</span>
+        <span class="n">best_instance</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="n">instances</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;load&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Selected IPA instance: </span><span class="si">{</span><span class="n">best_instance</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">best_instance</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="WorldBuilderAgentProxy">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.WorldBuilderAgentProxy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">WorldBuilderAgentProxy</span><span class="p">(</span><span class="n">Agent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps World Builder Agent functionality with world state caching.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">coordinator</span><span class="p">:</span> <span class="n">MessageCoordinator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">12.0</span><span class="p">,</span>
+        <span class="n">enable_real_agent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fallback_to_mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">neo4j_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">agent_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">EventPublisher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">AgentId</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;wba:</span><span class="si">{</span><span class="n">instance</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">coordinator</span><span class="o">=</span><span class="n">coordinator</span><span class="p">,</span>
+            <span class="n">default_timeout_s</span><span class="o">=</span><span class="n">default_timeout_s</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Legacy cache for fallback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_ttl_s</span> <span class="o">=</span> <span class="mf">30.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_times</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Real agent communication setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="o">=</span> <span class="n">enable_real_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span> <span class="o">=</span> <span class="n">fallback_to_mock</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neo4j_manager</span> <span class="o">=</span> <span class="n">neo4j_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="n">tools</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span> <span class="o">=</span> <span class="n">agent_registry</span>
+
+        <span class="c1"># Real-time event integration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_integrator</span> <span class="o">=</span> <span class="n">get_agent_event_integrator</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">),</span>
+            <span class="n">event_publisher</span><span class="o">=</span><span class="n">event_publisher</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="n">event_publisher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span><span class="p">:</span>
+            <span class="n">retry_config</span> <span class="o">=</span> <span class="n">RetryConfig</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">base_delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span> <span class="o">=</span> <span class="n">WBAAdapter</span><span class="p">(</span>
+                <span class="n">neo4j_manager</span><span class="o">=</span><span class="n">neo4j_manager</span><span class="p">,</span>
+                <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
+                <span class="n">fallback_to_mock</span><span class="o">=</span><span class="n">fallback_to_mock</span><span class="p">,</span>
+                <span class="n">retry_config</span><span class="o">=</span><span class="n">retry_config</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Register with agent registry if provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Registered WBA proxy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with agent registry&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register with agent registry: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cache_get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_times</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">ts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_ttl_s</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache_times</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_cache_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_times</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<div class="viewcode-block" id="WorldBuilderAgentProxy.process">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.WorldBuilderAgentProxy.process">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># Expected payload: {&quot;world_id&quot;: str, &quot;updates&quot;: {...} or None}</span>
+        <span class="n">world_id</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_payload</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">world_id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;WorldBuilderAgentProxy requires &#39;world_id&#39;&quot;</span><span class="p">)</span>
+        <span class="n">updates</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_payload</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;updates&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Process through real WBA if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">wba_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span>
+                    <span class="n">world_id</span><span class="p">,</span> <span class="n">updates</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Cache the result for performance</span>
+                <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;world:</span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="n">wba_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_state&quot;</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_cache_set</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">wba_result</span><span class="p">[</span><span class="s2">&quot;world_state&quot;</span><span class="p">])</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;WBA processed world </span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2"> with source: </span><span class="si">{</span><span class="n">wba_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="n">wba_result</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real WBA processing failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Falling back to mock implementation&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Fallback to mock implementation</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;world:</span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="n">updates</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cached</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_get</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cached</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+                    <span class="s2">&quot;world_state&quot;</span><span class="p">:</span> <span class="n">cached</span><span class="p">,</span>
+                    <span class="s2">&quot;cached&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_fallback&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="c1"># Simulate fetch world state (placeholder)</span>
+            <span class="n">world_state</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span> <span class="s2">&quot;regions&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;entities&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cache_set</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">world_state</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+                <span class="s2">&quot;world_state&quot;</span><span class="p">:</span> <span class="n">world_state</span><span class="p">,</span>
+                <span class="s2">&quot;cached&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_fallback&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="c1"># Apply updates (placeholder logic)</span>
+        <span class="n">current</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_get</span><span class="p">(</span><span class="n">cache_key</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{</span>
+            <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;regions&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;entities&quot;</span><span class="p">:</span> <span class="p">[],</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">updates</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">current</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">updates</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_set</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span>
+            <span class="s2">&quot;world_state&quot;</span><span class="p">:</span> <span class="n">current</span><span class="p">,</span>
+            <span class="s2">&quot;updated&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_fallback&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="WorldBuilderAgentProxy.handle_concurrent_update">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.WorldBuilderAgentProxy.handle_concurrent_update">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_concurrent_update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">updates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Handle concurrent world state updates with conflict resolution.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            world_id: ID of the world to update</span>
+<span class="sd">            updates: Updates to apply</span>
+<span class="sd">            version: Optional version for optimistic locking</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Result of the update operation with conflict resolution info</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Real WBA should handle conflict resolution internally</span>
+                <span class="c1"># For now, we pass through the version info in the updates</span>
+                <span class="n">enhanced_updates</span> <span class="o">=</span> <span class="n">updates</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">version</span><span class="p">:</span>
+                    <span class="n">enhanced_updates</span><span class="p">[</span><span class="s2">&quot;_version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">version</span>
+
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span>
+                    <span class="n">world_id</span><span class="p">,</span> <span class="n">enhanced_updates</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Check if conflict was detected and resolved</span>
+                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;conflict_resolved&quot;</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Conflict resolved for world </span><span class="si">{</span><span class="n">world_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">result</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Concurrent update handling failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                    <span class="k">raise</span>
+
+        <span class="c1"># Fallback: simple last-write-wins strategy</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Using simple last-write-wins conflict resolution&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">({</span><span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span> <span class="s2">&quot;updates&quot;</span><span class="p">:</span> <span class="n">updates</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="WorldBuilderAgentProxy.get_world_version">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.WorldBuilderAgentProxy.get_world_version">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_world_version</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the current version of a world state for optimistic locking.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            world_id: ID of the world</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Current version string or None if not available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span><span class="n">world_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_state&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_version&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get world version: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Fallback: use timestamp as version</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">))</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NarrativeGeneratorAgentProxy">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.NarrativeGeneratorAgentProxy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NarrativeGeneratorAgentProxy</span><span class="p">(</span><span class="n">Agent</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wraps Narrative Generator Agent functionality with content filtering.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">coordinator</span><span class="p">:</span> <span class="n">MessageCoordinator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">15.0</span><span class="p">,</span>
+        <span class="n">enable_real_agent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fallback_to_mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">agent_registry</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">EventPublisher</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="n">AgentId</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">instance</span><span class="p">),</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;nga:</span><span class="si">{</span><span class="n">instance</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">coordinator</span><span class="o">=</span><span class="n">coordinator</span><span class="p">,</span>
+            <span class="n">default_timeout_s</span><span class="o">=</span><span class="n">default_timeout_s</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Real agent communication setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="o">=</span> <span class="n">enable_real_agent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span> <span class="o">=</span> <span class="n">fallback_to_mock</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span> <span class="o">=</span> <span class="n">agent_registry</span>
+
+        <span class="c1"># Narrative state tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span><span class="p">:</span>
+            <span class="n">retry_config</span> <span class="o">=</span> <span class="n">RetryConfig</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">base_delay</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span> <span class="o">=</span> <span class="n">NGAAdapter</span><span class="p">(</span>
+                <span class="n">fallback_to_mock</span><span class="o">=</span><span class="n">fallback_to_mock</span><span class="p">,</span> <span class="n">retry_config</span><span class="o">=</span><span class="n">retry_config</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Real-time event integration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_integrator</span> <span class="o">=</span> <span class="n">get_agent_event_integrator</span><span class="p">(</span>
+            <span class="n">agent_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">agent_id</span><span class="p">),</span>
+            <span class="n">event_publisher</span><span class="o">=</span><span class="n">event_publisher</span><span class="p">,</span>
+            <span class="n">enabled</span><span class="o">=</span><span class="n">event_publisher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Register with agent registry if provided</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Registered NGA proxy </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with agent registry&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register with agent registry: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Very basic content filtering placeholder; real implementation would use safety policies</span>
+        <span class="n">banned</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;violence&quot;</span><span class="p">,</span> <span class="s2">&quot;hate&quot;</span><span class="p">]</span>
+        <span class="n">lowered</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">banned</span><span class="p">:</span>
+            <span class="n">lowered</span> <span class="o">=</span> <span class="n">lowered</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="s2">&quot;[redacted]&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">lowered</span>
+
+<div class="viewcode-block" id="NarrativeGeneratorAgentProxy.process">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.NarrativeGeneratorAgentProxy.process">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="c1"># Expected payload: {&quot;prompt&quot;: str, &quot;context&quot;: {...}}</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_payload</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">prompt</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;NarrativeGeneratorAgentProxy requires non-empty &#39;prompt&#39;&quot;</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_payload</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="c1"># Update narrative context</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_narrative_context</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+        <span class="c1"># Process through real NGA if available</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agent</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Enhance context with narrative history</span>
+                <span class="n">enhanced_context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">enhanced_context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;narrative_context&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                            <span class="n">session_id</span><span class="p">,</span> <span class="p">{}</span>
+                        <span class="p">),</span>
+                        <span class="s2">&quot;narrative_history&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recent_narrative_history</span><span class="p">(</span>
+                            <span class="n">session_id</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">5</span>
+                        <span class="p">),</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+
+                <span class="n">nga_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span><span class="o">.</span><span class="n">generate_narrative</span><span class="p">(</span>
+                    <span class="n">prompt</span><span class="p">,</span> <span class="n">enhanced_context</span>
+                <span class="p">)</span>
+                <span class="n">story</span> <span class="o">=</span> <span class="n">nga_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;story&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Track narrative state</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_track_narrative_state</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">prompt</span><span class="p">,</span> <span class="n">story</span><span class="p">,</span> <span class="n">enhanced_context</span><span class="p">)</span>
+
+                <span class="c1"># Safety validation for real NGA result</span>
+                <span class="n">safety</span> <span class="o">=</span> <span class="n">get_global_safety_service</span><span class="p">()</span>
+                <span class="n">validation_meta</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">safety</span><span class="o">.</span><span class="n">validate_text</span><span class="p">(</span><span class="n">story</span><span class="p">)</span>
+                    <span class="n">validation_meta</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">BLOCKED</span><span class="p">:</span>
+                        <span class="c1"># Replace content with alternative suggestion; ensure supportive language</span>
+                        <span class="n">alt</span> <span class="o">=</span> <span class="n">safety</span><span class="o">.</span><span class="n">suggest_alternative</span><span class="p">(</span><span class="n">SafetyLevel</span><span class="o">.</span><span class="n">BLOCKED</span><span class="p">,</span> <span class="n">story</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="s2">&quot;support&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">alt</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                            <span class="n">alt</span> <span class="o">=</span> <span class="s2">&quot;I&#39;m here to support you. &quot;</span> <span class="o">+</span> <span class="n">alt</span>
+                        <span class="k">return</span> <span class="p">{</span>
+                            <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">alt</span><span class="p">,</span>
+                            <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+                            <span class="s2">&quot;context_used&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">enhanced_context</span><span class="p">),</span>
+                            <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+                            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">nga_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;real_nga&quot;</span><span class="p">),</span>
+                        <span class="p">}</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="n">validation_meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;safety_validation_failed&quot;</span><span class="p">}</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;NGA generated narrative with source: </span><span class="si">{</span><span class="n">nga_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;source&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;unknown&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+                    <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">nga_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;raw&quot;</span><span class="p">,</span> <span class="n">story</span><span class="p">),</span>
+                    <span class="s2">&quot;context_used&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">enhanced_context</span><span class="p">),</span>
+                    <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+                    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="n">nga_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;real_nga&quot;</span><span class="p">),</span>
+                <span class="p">}</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real NGA processing failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                    <span class="k">raise</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Falling back to mock implementation&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Fallback to mock implementation</span>
+        <span class="n">story</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Story: </span><span class="si">{</span><span class="n">prompt</span><span class="p">[:</span><span class="mi">64</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span>
+        <span class="n">safety</span> <span class="o">=</span> <span class="n">get_global_safety_service</span><span class="p">()</span>
+        <span class="n">validation_meta</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="n">safety</span><span class="o">.</span><span class="n">validate_text</span><span class="p">(</span><span class="n">story</span><span class="p">)</span>
+            <span class="n">validation_meta</span> <span class="o">=</span> <span class="n">res</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">res</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">BLOCKED</span><span class="p">:</span>
+                <span class="c1"># Replace content with alternative suggestion; ensure supportive language</span>
+                <span class="n">alt</span> <span class="o">=</span> <span class="n">safety</span><span class="o">.</span><span class="n">suggest_alternative</span><span class="p">(</span><span class="n">SafetyLevel</span><span class="o">.</span><span class="n">BLOCKED</span><span class="p">,</span> <span class="n">story</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s2">&quot;support&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">alt</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">alt</span> <span class="o">=</span> <span class="s2">&quot;I’m here to support you. &quot;</span> <span class="o">+</span> <span class="n">alt</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">alt</span><span class="p">,</span>
+                    <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+                    <span class="s2">&quot;context_used&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">context</span><span class="p">),</span>
+                    <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="c1"># WARNING -&gt; annotate only; SAFE -&gt; proceed</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">validation_meta</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;safety_validation_failed&quot;</span><span class="p">}</span>
+        <span class="n">filtered</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content</span><span class="p">(</span><span class="n">story</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">filtered</span><span class="p">,</span>
+            <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+            <span class="s2">&quot;context_used&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">(</span><span class="n">context</span><span class="p">),</span>
+            <span class="s2">&quot;therapeutic_validation&quot;</span><span class="p">:</span> <span class="n">validation_meta</span><span class="p">,</span>
+            <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;mock_fallback&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_narrative_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update narrative context for a session.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;session_start&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                <span class="s2">&quot;total_interactions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;themes&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">&quot;characters&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">&quot;locations&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="p">}</span>
+
+        <span class="n">session_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+        <span class="n">session_context</span><span class="p">[</span><span class="s2">&quot;total_interactions&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">session_context</span><span class="p">[</span><span class="s2">&quot;last_prompt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">prompt</span>
+        <span class="n">session_context</span><span class="p">[</span><span class="s2">&quot;last_update&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Extract themes, characters, locations from context</span>
+        <span class="k">if</span> <span class="s2">&quot;world_state&quot;</span> <span class="ow">in</span> <span class="n">context</span><span class="p">:</span>
+            <span class="n">world_state</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;world_state&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">world_state</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">session_context</span><span class="p">[</span><span class="s2">&quot;locations&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">world_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;regions&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                <span class="n">session_context</span><span class="p">[</span><span class="s2">&quot;characters&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">world_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entities&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_recent_narrative_history</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get recent narrative history for a session.&quot;&quot;&quot;</span>
+        <span class="n">session_history</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">entry</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_history</span>
+            <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">session_id</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">session_history</span><span class="p">[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span> <span class="k">if</span> <span class="n">session_history</span> <span class="k">else</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_track_narrative_state</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">story</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Track narrative state for continuity.&quot;&quot;&quot;</span>
+        <span class="n">narrative_entry</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span>
+            <span class="s2">&quot;story&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+            <span class="s2">&quot;context_snapshot&quot;</span><span class="p">:</span> <span class="n">context</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;story_length&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">story</span><span class="p">),</span>
+            <span class="s2">&quot;themes_detected&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_themes</span><span class="p">(</span><span class="n">story</span><span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">narrative_entry</span><span class="p">)</span>
+
+        <span class="c1"># Keep only recent history (last 100 entries per session)</span>
+        <span class="n">session_entries</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_history</span> <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">session_id</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">session_entries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="c1"># Remove oldest entries for this session</span>
+            <span class="n">entries_to_remove</span> <span class="o">=</span> <span class="n">session_entries</span><span class="p">[:</span><span class="o">-</span><span class="mi">100</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries_to_remove</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_history</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_themes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">story</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract themes from generated story (simple keyword-based approach).&quot;&quot;&quot;</span>
+        <span class="n">themes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">story_lower</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="n">theme_keywords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;adventure&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;adventure&quot;</span><span class="p">,</span> <span class="s2">&quot;journey&quot;</span><span class="p">,</span> <span class="s2">&quot;quest&quot;</span><span class="p">,</span> <span class="s2">&quot;explore&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;friendship&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;friend&quot;</span><span class="p">,</span> <span class="s2">&quot;companion&quot;</span><span class="p">,</span> <span class="s2">&quot;ally&quot;</span><span class="p">,</span> <span class="s2">&quot;together&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;mystery&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mystery&quot;</span><span class="p">,</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span> <span class="s2">&quot;hidden&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;growth&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;learn&quot;</span><span class="p">,</span> <span class="s2">&quot;grow&quot;</span><span class="p">,</span> <span class="s2">&quot;develop&quot;</span><span class="p">,</span> <span class="s2">&quot;change&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;courage&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;brave&quot;</span><span class="p">,</span> <span class="s2">&quot;courage&quot;</span><span class="p">,</span> <span class="s2">&quot;fear&quot;</span><span class="p">,</span> <span class="s2">&quot;overcome&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">theme</span><span class="p">,</span> <span class="n">keywords</span> <span class="ow">in</span> <span class="n">theme_keywords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">story_lower</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">):</span>
+                <span class="n">themes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">theme</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">themes</span>
+
+<div class="viewcode-block" id="NarrativeGeneratorAgentProxy.get_narrative_continuity_context">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.NarrativeGeneratorAgentProxy.get_narrative_continuity_context">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_narrative_continuity_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get narrative continuity context for a session.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_id: Session identifier</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict containing narrative continuity information</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">session_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_narrative_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">recent_history</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recent_narrative_history</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+        <span class="c1"># Analyze narrative patterns</span>
+        <span class="n">themes_frequency</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">characters_mentioned</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">locations_visited</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">recent_history</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">theme</span> <span class="ow">in</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;themes_detected&quot;</span><span class="p">,</span> <span class="p">[]):</span>
+                <span class="n">themes_frequency</span><span class="p">[</span><span class="n">theme</span><span class="p">]</span> <span class="o">=</span> <span class="n">themes_frequency</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">theme</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+            <span class="c1"># Extract characters and locations from context</span>
+            <span class="n">context_snapshot</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context_snapshot&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="s2">&quot;world_state&quot;</span> <span class="ow">in</span> <span class="n">context_snapshot</span><span class="p">:</span>
+                <span class="n">world_state</span> <span class="o">=</span> <span class="n">context_snapshot</span><span class="p">[</span><span class="s2">&quot;world_state&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">world_state</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">characters_mentioned</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">world_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;entities&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+                    <span class="n">locations_visited</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">world_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;regions&quot;</span><span class="p">,</span> <span class="p">[]))</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;session_context&quot;</span><span class="p">:</span> <span class="n">session_context</span><span class="p">,</span>
+            <span class="s2">&quot;recent_themes&quot;</span><span class="p">:</span> <span class="n">themes_frequency</span><span class="p">,</span>
+            <span class="s2">&quot;characters_mentioned&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">characters_mentioned</span><span class="p">),</span>
+            <span class="s2">&quot;locations_visited&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">locations_visited</span><span class="p">),</span>
+            <span class="s2">&quot;narrative_arc_length&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_history</span><span class="p">),</span>
+            <span class="s2">&quot;session_duration&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="o">-</span> <span class="n">session_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_start&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="NarrativeGeneratorAgentProxy.format_narrative_output">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.NarrativeGeneratorAgentProxy.format_narrative_output">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">format_narrative_output</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">story</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Format narrative output with enhanced metadata and structure.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            story: Generated story text</span>
+<span class="sd">            context: Generation context</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Formatted narrative output</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Basic formatting</span>
+        <span class="n">formatted_story</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+        <span class="c1"># Add paragraph breaks for better readability</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">formatted_story</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="c1"># Simple paragraph detection based on sentence endings</span>
+            <span class="n">sentences</span> <span class="o">=</span> <span class="n">formatted_story</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;. &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">mid_point</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="n">formatted_story</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">[:</span><span class="n">mid_point</span><span class="p">])</span>
+                    <span class="o">+</span> <span class="s2">&quot;.</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                    <span class="o">+</span> <span class="s2">&quot;. &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sentences</span><span class="p">[</span><span class="n">mid_point</span><span class="p">:])</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Extract narrative elements</span>
+        <span class="n">narrative_elements</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;word_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">formatted_story</span><span class="o">.</span><span class="n">split</span><span class="p">()),</span>
+            <span class="s2">&quot;estimated_reading_time&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">formatted_story</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+            <span class="o">/</span> <span class="mi">200</span><span class="p">,</span>  <span class="c1"># ~200 words per minute</span>
+            <span class="s2">&quot;narrative_tone&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_narrative_tone</span><span class="p">(</span><span class="n">formatted_story</span><span class="p">),</span>
+            <span class="s2">&quot;therapeutic_elements&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identify_therapeutic_elements</span><span class="p">(</span>
+                <span class="n">formatted_story</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;formatted_story&quot;</span><span class="p">:</span> <span class="n">formatted_story</span><span class="p">,</span>
+            <span class="s2">&quot;original_story&quot;</span><span class="p">:</span> <span class="n">story</span><span class="p">,</span>
+            <span class="s2">&quot;narrative_elements&quot;</span><span class="p">:</span> <span class="n">narrative_elements</span><span class="p">,</span>
+            <span class="s2">&quot;generation_context&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span>
+            <span class="s2">&quot;formatting_applied&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_narrative_tone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">story</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze the tone of the narrative (simple keyword-based approach).&quot;&quot;&quot;</span>
+        <span class="n">story_lower</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="n">tone_indicators</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;hopeful&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;hope&quot;</span><span class="p">,</span> <span class="s2">&quot;bright&quot;</span><span class="p">,</span> <span class="s2">&quot;positive&quot;</span><span class="p">,</span> <span class="s2">&quot;optimistic&quot;</span><span class="p">,</span> <span class="s2">&quot;better&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;contemplative&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;think&quot;</span><span class="p">,</span> <span class="s2">&quot;reflect&quot;</span><span class="p">,</span> <span class="s2">&quot;consider&quot;</span><span class="p">,</span> <span class="s2">&quot;ponder&quot;</span><span class="p">,</span> <span class="s2">&quot;wonder&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;adventurous&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;exciting&quot;</span><span class="p">,</span> <span class="s2">&quot;thrilling&quot;</span><span class="p">,</span> <span class="s2">&quot;adventure&quot;</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="s2">&quot;daring&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;peaceful&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;calm&quot;</span><span class="p">,</span> <span class="s2">&quot;serene&quot;</span><span class="p">,</span> <span class="s2">&quot;peaceful&quot;</span><span class="p">,</span> <span class="s2">&quot;quiet&quot;</span><span class="p">,</span> <span class="s2">&quot;gentle&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;mysterious&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;mysterious&quot;</span><span class="p">,</span> <span class="s2">&quot;strange&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;hidden&quot;</span><span class="p">,</span> <span class="s2">&quot;secret&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="n">tone_scores</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">tone</span><span class="p">,</span> <span class="n">keywords</span> <span class="ow">in</span> <span class="n">tone_indicators</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span> <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">story_lower</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">tone_scores</span><span class="p">[</span><span class="n">tone</span><span class="p">]</span> <span class="o">=</span> <span class="n">score</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">tone_scores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">tone_scores</span><span class="o">.</span><span class="n">get</span><span class="p">)</span> <span class="k">if</span> <span class="n">tone_scores</span> <span class="k">else</span> <span class="s2">&quot;neutral&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_identify_therapeutic_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">story</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify therapeutic elements in the narrative.&quot;&quot;&quot;</span>
+        <span class="n">story_lower</span> <span class="o">=</span> <span class="n">story</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">elements</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">therapeutic_patterns</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;emotional_validation&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;understand&quot;</span><span class="p">,</span> <span class="s2">&quot;feel&quot;</span><span class="p">,</span> <span class="s2">&quot;emotion&quot;</span><span class="p">,</span> <span class="s2">&quot;valid&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;problem_solving&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;solution&quot;</span><span class="p">,</span> <span class="s2">&quot;solve&quot;</span><span class="p">,</span> <span class="s2">&quot;overcome&quot;</span><span class="p">,</span> <span class="s2">&quot;handle&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;self_reflection&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;realize&quot;</span><span class="p">,</span> <span class="s2">&quot;understand&quot;</span><span class="p">,</span> <span class="s2">&quot;learn&quot;</span><span class="p">,</span> <span class="s2">&quot;discover&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;social_connection&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;friend&quot;</span><span class="p">,</span> <span class="s2">&quot;support&quot;</span><span class="p">,</span> <span class="s2">&quot;together&quot;</span><span class="p">,</span> <span class="s2">&quot;help&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;resilience&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;strong&quot;</span><span class="p">,</span> <span class="s2">&quot;persevere&quot;</span><span class="p">,</span> <span class="s2">&quot;continue&quot;</span><span class="p">,</span> <span class="s2">&quot;endure&quot;</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">element</span><span class="p">,</span> <span class="n">keywords</span> <span class="ow">in</span> <span class="n">therapeutic_patterns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">story_lower</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span><span class="p">):</span>
+                <span class="n">elements</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">elements</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

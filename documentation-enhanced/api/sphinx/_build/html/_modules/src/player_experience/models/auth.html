@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.models.auth &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.models.auth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.models.auth</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Authentication and authorization models for the Player Experience system.</span>
+
+<span class="sd">This module defines user roles, permissions, and multi-factor authentication</span>
+<span class="sd">models for enhanced security.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
+
+
+<div class="viewcode-block" id="UserRole">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.UserRole">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserRole</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User roles for role-based access control.&quot;&quot;&quot;</span>
+
+    <span class="n">PLAYER</span> <span class="o">=</span> <span class="s2">&quot;player&quot;</span>
+    <span class="n">THERAPIST</span> <span class="o">=</span> <span class="s2">&quot;therapist&quot;</span>
+    <span class="n">ADMIN</span> <span class="o">=</span> <span class="s2">&quot;admin&quot;</span>
+    <span class="n">RESEARCHER</span> <span class="o">=</span> <span class="s2">&quot;researcher&quot;</span>
+    <span class="n">MODERATOR</span> <span class="o">=</span> <span class="s2">&quot;moderator&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Permission">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.Permission">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Permission</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;System permissions for fine-grained access control.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Player permissions</span>
+    <span class="n">CREATE_CHARACTER</span> <span class="o">=</span> <span class="s2">&quot;create_character&quot;</span>
+    <span class="n">MANAGE_OWN_CHARACTERS</span> <span class="o">=</span> <span class="s2">&quot;manage_own_characters&quot;</span>
+    <span class="n">ACCESS_THERAPEUTIC_CONTENT</span> <span class="o">=</span> <span class="s2">&quot;access_therapeutic_content&quot;</span>
+    <span class="n">MANAGE_OWN_PROFILE</span> <span class="o">=</span> <span class="s2">&quot;manage_own_profile&quot;</span>
+    <span class="n">EXPORT_OWN_DATA</span> <span class="o">=</span> <span class="s2">&quot;export_own_data&quot;</span>
+    <span class="n">DELETE_OWN_DATA</span> <span class="o">=</span> <span class="s2">&quot;delete_own_data&quot;</span>
+
+    <span class="c1"># Therapist permissions</span>
+    <span class="n">VIEW_PATIENT_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;view_patient_progress&quot;</span>
+    <span class="n">MANAGE_THERAPEUTIC_CONTENT</span> <span class="o">=</span> <span class="s2">&quot;manage_therapeutic_content&quot;</span>
+    <span class="n">ACCESS_CRISIS_PROTOCOLS</span> <span class="o">=</span> <span class="s2">&quot;access_crisis_protocols&quot;</span>
+    <span class="n">VIEW_ANONYMIZED_DATA</span> <span class="o">=</span> <span class="s2">&quot;view_anonymized_data&quot;</span>
+
+    <span class="c1"># Admin permissions</span>
+    <span class="n">MANAGE_USERS</span> <span class="o">=</span> <span class="s2">&quot;manage_users&quot;</span>
+    <span class="n">MANAGE_SYSTEM_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;manage_system_config&quot;</span>
+    <span class="n">ACCESS_AUDIT_LOGS</span> <span class="o">=</span> <span class="s2">&quot;access_audit_logs&quot;</span>
+    <span class="n">MANAGE_ROLES</span> <span class="o">=</span> <span class="s2">&quot;manage_roles&quot;</span>
+    <span class="n">SYSTEM_MAINTENANCE</span> <span class="o">=</span> <span class="s2">&quot;system_maintenance&quot;</span>
+
+    <span class="c1"># Researcher permissions</span>
+    <span class="n">ACCESS_RESEARCH_DATA</span> <span class="o">=</span> <span class="s2">&quot;access_research_data&quot;</span>
+    <span class="n">EXPORT_ANONYMIZED_DATA</span> <span class="o">=</span> <span class="s2">&quot;export_anonymized_data&quot;</span>
+    <span class="n">MANAGE_RESEARCH_STUDIES</span> <span class="o">=</span> <span class="s2">&quot;manage_research_studies&quot;</span>
+
+    <span class="c1"># Moderator permissions</span>
+    <span class="n">MODERATE_CONTENT</span> <span class="o">=</span> <span class="s2">&quot;moderate_content&quot;</span>
+    <span class="n">HANDLE_REPORTS</span> <span class="o">=</span> <span class="s2">&quot;handle_reports&quot;</span>
+    <span class="n">TEMPORARY_USER_ACTIONS</span> <span class="o">=</span> <span class="s2">&quot;temporary_user_actions&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MFAMethod">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.MFAMethod">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAMethod</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multi-factor authentication methods.&quot;&quot;&quot;</span>
+
+    <span class="n">TOTP</span> <span class="o">=</span> <span class="s2">&quot;totp&quot;</span>  <span class="c1"># Time-based One-Time Password (Google Authenticator, etc.)</span>
+    <span class="n">SMS</span> <span class="o">=</span> <span class="s2">&quot;sms&quot;</span>  <span class="c1"># SMS-based verification</span>
+    <span class="n">EMAIL</span> <span class="o">=</span> <span class="s2">&quot;email&quot;</span>  <span class="c1"># Email-based verification</span>
+    <span class="n">BACKUP_CODES</span> <span class="o">=</span> <span class="s2">&quot;backup_codes&quot;</span>  <span class="c1"># Recovery backup codes</span></div>
+
+
+
+<div class="viewcode-block" id="RolePermissions">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.RolePermissions">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RolePermissions</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Defines permissions for each role.&quot;&quot;&quot;</span>
+
+    <span class="n">role</span><span class="p">:</span> <span class="n">UserRole</span>
+    <span class="n">permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Permission</span><span class="p">]</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span></div>
+
+
+
+<span class="c1"># Default role permissions mapping</span>
+<span class="n">DEFAULT_ROLE_PERMISSIONS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">UserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">:</span> <span class="n">RolePermissions</span><span class="p">(</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">PLAYER</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">CREATE_CHARACTER</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_OWN_CHARACTERS</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">ACCESS_THERAPEUTIC_CONTENT</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_OWN_PROFILE</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">EXPORT_OWN_DATA</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">DELETE_OWN_DATA</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Standard player with access to therapeutic content and character management&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">:</span> <span class="n">RolePermissions</span><span class="p">(</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">VIEW_PATIENT_PROGRESS</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_THERAPEUTIC_CONTENT</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">ACCESS_CRISIS_PROTOCOLS</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">VIEW_ANONYMIZED_DATA</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_OWN_PROFILE</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">EXPORT_OWN_DATA</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Licensed therapist with access to patient data and therapeutic tools&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">UserRole</span><span class="o">.</span><span class="n">RESEARCHER</span><span class="p">:</span> <span class="n">RolePermissions</span><span class="p">(</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">RESEARCHER</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">ACCESS_RESEARCH_DATA</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">EXPORT_ANONYMIZED_DATA</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_RESEARCH_STUDIES</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">VIEW_ANONYMIZED_DATA</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_OWN_PROFILE</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Researcher with access to anonymized data for studies&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">UserRole</span><span class="o">.</span><span class="n">MODERATOR</span><span class="p">:</span> <span class="n">RolePermissions</span><span class="p">(</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">MODERATOR</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="o">=</span><span class="p">[</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MODERATE_CONTENT</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">HANDLE_REPORTS</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">TEMPORARY_USER_ACTIONS</span><span class="p">,</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_OWN_PROFILE</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Content moderator with limited administrative capabilities&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">:</span> <span class="n">RolePermissions</span><span class="p">(</span>
+        <span class="n">role</span><span class="o">=</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span>
+        <span class="n">permissions</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">Permission</span><span class="p">),</span>  <span class="c1"># All permissions</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;System administrator with full access&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="MFAConfig">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.MFAConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Multi-factor authentication configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">required_methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MFAMethod</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">backup_codes_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">totp_issuer</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;TTA Therapeutic Platform&quot;</span>
+    <span class="n">sms_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">email_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">recovery_codes_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="MFASecret">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.MFASecret">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFASecret</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MFA secret information for a user.&quot;&quot;&quot;</span>
+
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span>
+    <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># Encrypted secret</span>
+    <span class="n">backup_codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>  <span class="c1"># Encrypted backup codes</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_used</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">is_verified</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="MFAChallenge">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.MFAChallenge">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAChallenge</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MFA challenge request model.&quot;&quot;&quot;</span>
+
+    <span class="n">challenge_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span>
+    <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">attempts_remaining</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span></div>
+
+
+
+<div class="viewcode-block" id="MFAVerification">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.MFAVerification">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFAVerification</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MFA verification request model.&quot;&quot;&quot;</span>
+
+    <span class="n">challenge_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">code</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span></div>
+
+
+
+<div class="viewcode-block" id="UserCredentials">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.UserCredentials">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserCredentials</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User credentials for authentication.&quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">phone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="UserRegistration">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.UserRegistration">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">UserRegistration</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;User registration request model.&quot;&quot;&quot;</span>
+
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[^@]+@[^@]+\.[^@]+$&quot;</span><span class="p">)</span>
+    <span class="n">password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+    <span class="n">phone</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">role</span><span class="p">:</span> <span class="n">UserRole</span> <span class="o">=</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">PLAYER</span>
+    <span class="n">therapeutic_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">privacy_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="PasswordResetRequest">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.PasswordResetRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PasswordResetRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Password reset request model.&quot;&quot;&quot;</span>
+
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="sa">r</span><span class="s2">&quot;^[^@]+@[^@]+\.[^@]+$&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="PasswordReset">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.PasswordReset">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PasswordReset</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Password reset confirmation model.&quot;&quot;&quot;</span>
+
+    <span class="n">token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">new_password</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="SecurityEvent">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.SecurityEvent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecurityEvent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Security event for audit logging.&quot;&quot;&quot;</span>
+
+    <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">details</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;info&quot;</span>  <span class="c1"># info, warning, error, critical</span></div>
+
+
+
+<div class="viewcode-block" id="AuthenticatedUser">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AuthenticatedUser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Authenticated user with role and permissions.&quot;&quot;&quot;</span>
+
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">username</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">email</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">role</span><span class="p">:</span> <span class="n">UserRole</span>
+    <span class="n">permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Permission</span><span class="p">]</span>
+    <span class="n">mfa_enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mfa_verified</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">last_login</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="AuthenticatedUser.has_permission">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.has_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user has a specific permission.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">permission</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permissions</span></div>
+
+
+<div class="viewcode-block" id="AuthenticatedUser.has_any_permission">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.has_any_permission">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_any_permission</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Permission</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user has any of the specified permissions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permissions</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permissions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AuthenticatedUser.has_all_permissions">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.has_all_permissions">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_all_permissions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">permissions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Permission</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user has all of the specified permissions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">perm</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">permissions</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">permissions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AuthenticatedUser.is_admin">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.is_admin">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_admin</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user is an admin.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span></div>
+
+
+<div class="viewcode-block" id="AuthenticatedUser.is_therapist">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.is_therapist">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_therapist</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user is a therapist.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span></div>
+
+
+<div class="viewcode-block" id="AuthenticatedUser.can_access_user_data">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.AuthenticatedUser.can_access_user_data">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">can_access_user_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if user can access another user&#39;s data.&quot;&quot;&quot;</span>
+        <span class="c1"># Users can always access their own data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">target_user_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Admins can access any user&#39;s data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_admin</span><span class="p">():</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="c1"># Therapists can access their patients&#39; data (would need additional logic)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_therapist</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_permission</span><span class="p">(</span>
+            <span class="n">Permission</span><span class="o">.</span><span class="n">VIEW_PATIENT_PROGRESS</span>
+        <span class="p">):</span>
+            <span class="c1"># TODO: Implement therapist-patient relationship checking</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SessionInfo">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.SessionInfo">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionInfo</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Session information model.&quot;&quot;&quot;</span>
+
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">last_activity</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">is_active</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">mfa_verified</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="SecuritySettings">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.auth.html#src.player_experience.models.auth.SecuritySettings">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecuritySettings</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Security settings for the authentication system.&quot;&quot;&quot;</span>
+
+    <span class="n">password_min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span>
+    <span class="n">password_require_uppercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">password_require_lowercase</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">password_require_numbers</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">password_require_special</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">password_max_age_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">90</span>
+    <span class="n">max_login_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">lockout_duration_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="n">session_timeout_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">480</span>  <span class="c1"># 8 hours</span>
+    <span class="n">mfa_required_for_sensitive_ops</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">require_mfa_for_roles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">UserRole</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="n">UserRole</span><span class="o">.</span><span class="n">ADMIN</span><span class="p">,</span> <span class="n">UserRole</span><span class="o">.</span><span class="n">THERAPIST</span><span class="p">]</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

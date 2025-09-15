@@ -1,0 +1,572 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.middleware.sanitization_middleware module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.api_gateway.middleware.security module" href="src.api_gateway.middleware.security.html" />
+    <link rel="prev" title="src.api_gateway.middleware.safety_middleware module" href="src.api_gateway.middleware.safety_middleware.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.api_gateway.html">src.api_gateway package</a></li>
+          <li class="breadcrumb-item"><a href="src.api_gateway.middleware.html">src.api_gateway.middleware package</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.middleware.sanitization_middleware module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.api_gateway.middleware.sanitization_middleware.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.api_gateway.middleware.sanitization_middleware">
+<span id="src-api-gateway-middleware-sanitization-middleware-module"></span><h1>src.api_gateway.middleware.sanitization_middleware module<a class="headerlink" href="#module-src.api_gateway.middleware.sanitization_middleware" title="Link to this heading"></a></h1>
+<p>Sanitization middleware for the API Gateway.</p>
+<p>This module provides comprehensive data sanitization, PII masking,
+content filtering, and data privacy protection.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.middleware.sanitization_middleware.</span></span><span class="sig-name descname"><span class="pre">PrivacyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#PrivacyLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Privacy protection levels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.BASIC">
+<span class="sig-name descname"><span class="pre">BASIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'basic'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.BASIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'high'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.HIGH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.MAXIMUM">
+<span class="sig-name descname"><span class="pre">MAXIMUM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'maximum'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.MAXIMUM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'none'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.NONE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.STANDARD">
+<span class="sig-name descname"><span class="pre">STANDARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'standard'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel.STANDARD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.middleware.sanitization_middleware.</span></span><span class="sig-name descname"><span class="pre">SanitizationConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">enabled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preserve_data_structure</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_sanitization_actions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_privacy_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrivacyLevel.STANDARD</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_privacy_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PrivacyLevel.HIGH</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_pii_detection</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pii_confidence_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_content_filtering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">profanity_filtering</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hipaa_compliance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gdpr_compliance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coppa_compliance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Configuration for sanitization middleware.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>enabled</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>preserve_data_structure</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>log_sanitization_actions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>default_privacy_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_privacy_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></span>)</p></li>
+<li><p><strong>enable_pii_detection</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>pii_confidence_threshold</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>enable_content_filtering</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>profanity_filtering</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>hipaa_compliance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>gdpr_compliance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>coppa_compliance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.coppa_compliance">
+<span class="sig-name descname"><span class="pre">coppa_compliance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.coppa_compliance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.default_privacy_level">
+<span class="sig-name descname"><span class="pre">default_privacy_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'standard'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.default_privacy_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enable_content_filtering">
+<span class="sig-name descname"><span class="pre">enable_content_filtering</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enable_content_filtering" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enable_pii_detection">
+<span class="sig-name descname"><span class="pre">enable_pii_detection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enable_pii_detection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enabled">
+<span class="sig-name descname"><span class="pre">enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.enabled" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.gdpr_compliance">
+<span class="sig-name descname"><span class="pre">gdpr_compliance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.gdpr_compliance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.hipaa_compliance">
+<span class="sig-name descname"><span class="pre">hipaa_compliance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.hipaa_compliance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.log_sanitization_actions">
+<span class="sig-name descname"><span class="pre">log_sanitization_actions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.log_sanitization_actions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.pii_confidence_threshold">
+<span class="sig-name descname"><span class="pre">pii_confidence_threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.8</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.pii_confidence_threshold" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.preserve_data_structure">
+<span class="sig-name descname"><span class="pre">preserve_data_structure</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.preserve_data_structure" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.profanity_filtering">
+<span class="sig-name descname"><span class="pre">profanity_filtering</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.profanity_filtering" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.therapeutic_privacy_level">
+<span class="sig-name descname"><span class="pre">therapeutic_privacy_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'high'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig.therapeutic_privacy_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.middleware.sanitization_middleware.</span></span><span class="sig-name descname"><span class="pre">SanitizationMiddleware</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Sanitization middleware for comprehensive data privacy protection.</p>
+<p>Provides PII masking, content filtering, data redaction,
+and therapeutic privacy protection.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig" title="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SanitizationConfig</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p>
+</dd>
+</dl>
+<p>Initialize sanitization middleware.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationConfig" title="src.api_gateway.middleware.sanitization_middleware.SanitizationConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">SanitizationConfig</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – Sanitization configuration</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.add_sanitization_rule">
+<span class="sig-name descname"><span class="pre">add_sanitization_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.add_sanitization_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.add_sanitization_rule" title="Link to this definition"></a></dt>
+<dd><p>Add a custom sanitization rule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rule</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule" title="src.api_gateway.middleware.sanitization_middleware.SanitizationRule"><code class="xref py py-class docutils literal notranslate"><span class="pre">SanitizationRule</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.get_sanitization_stats">
+<span class="sig-name descname"><span class="pre">get_sanitization_stats</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.get_sanitization_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.get_sanitization_stats" title="Link to this definition"></a></dt>
+<dd><p>Get sanitization statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.register_custom_sanitizer">
+<span class="sig-name descname"><span class="pre">register_custom_sanitizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.register_custom_sanitizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.register_custom_sanitizer" title="Link to this definition"></a></dt>
+<dd><p>Register a custom sanitization function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>function</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.remove_sanitization_rule">
+<span class="sig-name descname"><span class="pre">remove_sanitization_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.remove_sanitization_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.remove_sanitization_rule" title="Link to this definition"></a></dt>
+<dd><p>Remove a sanitization rule by name.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rule_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.sanitize_request">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sanitize_request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gateway_request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.sanitize_request"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.sanitize_request" title="Link to this definition"></a></dt>
+<dd><p>Sanitize incoming request data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gateway_request</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.gateway.html#src.api_gateway.models.gateway.GatewayRequest" title="src.api_gateway.models.gateway.GatewayRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">GatewayRequest</span></code></a></span>) – Request to sanitize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sanitized request</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.GatewayRequest" title="src.api_gateway.models.GatewayRequest">GatewayRequest</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.sanitize_response">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sanitize_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gateway_response</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gateway_request</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationMiddleware.sanitize_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationMiddleware.sanitize_response" title="Link to this definition"></a></dt>
+<dd><p>Sanitize outgoing response data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>gateway_response</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.gateway.html#src.api_gateway.models.gateway.GatewayResponse" title="src.api_gateway.models.gateway.GatewayResponse"><code class="xref py py-class docutils literal notranslate"><span class="pre">GatewayResponse</span></code></a></span>) – Response to sanitize</p></li>
+<li><p><strong>gateway_request</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.api_gateway.models.gateway.html#src.api_gateway.models.gateway.GatewayRequest" title="src.api_gateway.models.gateway.GatewayRequest"><code class="xref py py-class docutils literal notranslate"><span class="pre">GatewayRequest</span></code></a></span>) – Original request for context</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Sanitized response</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="src.api_gateway.models.html#src.api_gateway.models.GatewayResponse" title="src.api_gateway.models.GatewayResponse">GatewayResponse</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.middleware.sanitization_middleware.</span></span><span class="sig-name descname"><span class="pre">SanitizationRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitization_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path_patterns=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">methods=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_email=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_phone=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_ssn=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_credit_card=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_medical_id=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_custom_patterns=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_profanity=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filter_sensitive_terms=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocked_terms=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replacement_text='[FILTERED]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redact_fields=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redact_patterns=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">redaction_replacement='[REDACTED]'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_whitespace=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_case=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize_unicode=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_content_masking=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_data_protection=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">privacy_level=PrivacyLevel.STANDARD</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Individual sanitization rule configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>sanitization_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType" title="src.api_gateway.middleware.sanitization_middleware.SanitizationType"><code class="xref py py-class docutils literal notranslate"><span class="pre">SanitizationType</span></code></a></span>)</p></li>
+<li><p><strong>enabled</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>path_patterns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>methods</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>mask_email</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>mask_phone</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>mask_ssn</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>mask_credit_card</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>mask_medical_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>mask_custom_patterns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>filter_profanity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>filter_sensitive_terms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>blocked_terms</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>replacement_text</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>redact_fields</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>redact_patterns</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>redaction_replacement</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>normalize_whitespace</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>normalize_case</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>normalize_unicode</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_content_masking</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>session_data_protection</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>privacy_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.blocked_terms">
+<span class="sig-name descname"><span class="pre">blocked_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.blocked_terms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.enabled">
+<span class="sig-name descname"><span class="pre">enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.enabled" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.filter_profanity">
+<span class="sig-name descname"><span class="pre">filter_profanity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.filter_profanity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.filter_sensitive_terms">
+<span class="sig-name descname"><span class="pre">filter_sensitive_terms</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.filter_sensitive_terms" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_credit_card">
+<span class="sig-name descname"><span class="pre">mask_credit_card</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_credit_card" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_custom_patterns">
+<span class="sig-name descname"><span class="pre">mask_custom_patterns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_custom_patterns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_email">
+<span class="sig-name descname"><span class="pre">mask_email</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_email" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_medical_id">
+<span class="sig-name descname"><span class="pre">mask_medical_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_medical_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_phone">
+<span class="sig-name descname"><span class="pre">mask_phone</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_phone" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_ssn">
+<span class="sig-name descname"><span class="pre">mask_ssn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.mask_ssn" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.methods">
+<span class="sig-name descname"><span class="pre">methods</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.methods" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_case">
+<span class="sig-name descname"><span class="pre">normalize_case</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_case" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_unicode">
+<span class="sig-name descname"><span class="pre">normalize_unicode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_unicode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_whitespace">
+<span class="sig-name descname"><span class="pre">normalize_whitespace</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.normalize_whitespace" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.path_patterns">
+<span class="sig-name descname"><span class="pre">path_patterns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.path_patterns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.priority" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.privacy_level">
+<span class="sig-name descname"><span class="pre">privacy_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.PrivacyLevel" title="src.api_gateway.middleware.sanitization_middleware.PrivacyLevel"><code class="xref py py-class docutils literal notranslate"><span class="pre">PrivacyLevel</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'standard'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.privacy_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redact_fields">
+<span class="sig-name descname"><span class="pre">redact_fields</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redact_fields" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redact_patterns">
+<span class="sig-name descname"><span class="pre">redact_patterns</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redact_patterns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redaction_replacement">
+<span class="sig-name descname"><span class="pre">redaction_replacement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'[REDACTED]'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.redaction_replacement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.replacement_text">
+<span class="sig-name descname"><span class="pre">replacement_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'[FILTERED]'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.replacement_text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.sanitization_type">
+<span class="sig-name descname"><span class="pre">sanitization_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType" title="src.api_gateway.middleware.sanitization_middleware.SanitizationType"><code class="xref py py-class docutils literal notranslate"><span class="pre">SanitizationType</span></code></a></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.sanitization_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.session_data_protection">
+<span class="sig-name descname"><span class="pre">session_data_protection</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.session_data_protection" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationRule.therapeutic_content_masking">
+<span class="sig-name descname"><span class="pre">therapeutic_content_masking</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationRule.therapeutic_content_masking" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.api_gateway.middleware.sanitization_middleware.</span></span><span class="sig-name descname"><span class="pre">SanitizationType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/api_gateway/middleware/sanitization_middleware.html#SanitizationType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of sanitization to perform.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType.CONTENT_FILTERING">
+<span class="sig-name descname"><span class="pre">CONTENT_FILTERING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'content_filtering'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType.CONTENT_FILTERING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType.DATA_REDACTION">
+<span class="sig-name descname"><span class="pre">DATA_REDACTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'data_redaction'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType.DATA_REDACTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType.FORMAT_NORMALIZATION">
+<span class="sig-name descname"><span class="pre">FORMAT_NORMALIZATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'format_normalization'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType.FORMAT_NORMALIZATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType.PII_MASKING">
+<span class="sig-name descname"><span class="pre">PII_MASKING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pii_masking'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType.PII_MASKING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.api_gateway.middleware.sanitization_middleware.SanitizationType.THERAPEUTIC_PRIVACY">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_PRIVACY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_privacy'</span></em><a class="headerlink" href="#src.api_gateway.middleware.sanitization_middleware.SanitizationType.THERAPEUTIC_PRIVACY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.api_gateway.middleware.safety_middleware.html" class="btn btn-neutral float-left" title="src.api_gateway.middleware.safety_middleware module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.api_gateway.middleware.security.html" class="btn btn-neutral float-right" title="src.api_gateway.middleware.security module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

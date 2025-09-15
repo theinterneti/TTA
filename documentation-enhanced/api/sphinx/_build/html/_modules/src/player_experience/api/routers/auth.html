@@ -1,0 +1,939 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.api.routers.auth &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.api.routers.auth</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.api.routers.auth</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Enhanced authentication router for the Player Experience API.</span>
+
+<span class="sd">This module provides endpoints for user authentication, registration,</span>
+<span class="sd">token management, multi-factor authentication, and role-based access control.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">APIRouter</span><span class="p">,</span> <span class="n">Depends</span><span class="p">,</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">Request</span><span class="p">,</span> <span class="n">status</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi.security</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPAuthorizationCredentials</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">...database.user_auth_schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserAuthSchemaManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...database.user_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">UserRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthenticatedUser</span><span class="p">,</span>
+    <span class="n">MFAChallenge</span><span class="p">,</span>
+    <span class="n">MFAConfig</span><span class="p">,</span>
+    <span class="n">MFAMethod</span><span class="p">,</span>
+    <span class="n">MFAVerification</span><span class="p">,</span>
+    <span class="n">PasswordReset</span><span class="p">,</span>
+    <span class="n">PasswordResetRequest</span><span class="p">,</span>
+    <span class="n">Permission</span><span class="p">,</span>
+    <span class="n">SecuritySettings</span><span class="p">,</span>
+    <span class="n">UserRegistration</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...services.auth_service</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthenticationError</span><span class="p">,</span>
+    <span class="n">AuthorizationError</span><span class="p">,</span>
+    <span class="n">EnhancedAuthService</span><span class="p">,</span>
+    <span class="n">MFAError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..auth</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AuthService</span><span class="p">,</span>
+    <span class="n">LoginRequest</span><span class="p">,</span>
+    <span class="n">RefreshTokenRequest</span><span class="p">,</span>
+    <span class="n">Token</span><span class="p">,</span>
+    <span class="n">security</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">router</span> <span class="o">=</span> <span class="n">APIRouter</span><span class="p">()</span>
+
+<span class="c1"># Initialize enhanced auth service (in production, this would be dependency injected)</span>
+<span class="c1"># Use the same JWT_SECRET_KEY as the rest of the authentication system for consistency</span>
+<span class="n">_AUTH_SECRET</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span>
+    <span class="s2">&quot;JWT_SECRET_KEY&quot;</span><span class="p">,</span> <span class="s2">&quot;TTA_JWT_Secret_Key_Change_In_Production_2024!&quot;</span>
+<span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">_AUTH_SECRET</span> <span class="ow">or</span> <span class="n">_AUTH_SECRET</span> <span class="o">==</span> <span class="s2">&quot;your-secret-key-change-in-production&quot;</span><span class="p">:</span>
+    <span class="c1"># Secure default behavior: use the same default as the main auth system</span>
+    <span class="n">_AUTH_SECRET</span> <span class="o">=</span> <span class="s2">&quot;TTA_JWT_Secret_Key_Change_In_Production_2024!&quot;</span>
+
+<span class="c1"># Initialize user repository and schema (with fallback for testing)</span>
+<span class="n">user_repository</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># Try to initialize database components</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...api.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_settings</span>
+
+    <span class="n">settings</span> <span class="o">=</span> <span class="n">get_settings</span><span class="p">()</span>
+
+    <span class="c1"># Setup user authentication schema</span>
+    <span class="n">schema_manager</span> <span class="o">=</span> <span class="n">UserAuthSchemaManager</span><span class="p">(</span>
+        <span class="n">uri</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_url</span><span class="p">,</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_username</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_password</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">schema_manager</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+    <span class="n">schema_manager</span><span class="o">.</span><span class="n">setup_user_auth_schema</span><span class="p">()</span>
+    <span class="n">schema_manager</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="c1"># Initialize user repository</span>
+    <span class="n">user_repository</span> <span class="o">=</span> <span class="n">UserRepository</span><span class="p">(</span>
+        <span class="n">uri</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_url</span><span class="p">,</span>
+        <span class="n">username</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_username</span><span class="p">,</span>
+        <span class="n">password</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">neo4j_password</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">user_repository</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># In development/testing, continue without database</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initialize user database components: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="n">auth_service</span> <span class="o">=</span> <span class="n">EnhancedAuthService</span><span class="p">(</span>
+    <span class="n">secret_key</span><span class="o">=</span><span class="n">_AUTH_SECRET</span><span class="p">,</span>
+    <span class="n">user_repository</span><span class="o">=</span><span class="n">user_repository</span><span class="p">,</span>
+    <span class="n">security_settings</span><span class="o">=</span><span class="n">SecuritySettings</span><span class="p">(),</span>
+    <span class="n">mfa_config</span><span class="o">=</span><span class="n">MFAConfig</span><span class="p">(</span><span class="n">enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">email_enabled</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+<span class="p">)</span>
+
+
+<div class="viewcode-block" id="LoginResponse">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.LoginResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LoginResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced login response with MFA support.&quot;&quot;&quot;</span>
+
+    <span class="n">access_token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">refresh_token</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">token_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bearer&quot;</span>
+    <span class="n">expires_in</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">mfa_required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mfa_challenge</span><span class="p">:</span> <span class="n">MFAChallenge</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="MFASetupResponse">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.MFASetupResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MFASetupResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;MFA setup response model.&quot;&quot;&quot;</span>
+
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">secret</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">qr_code</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">backup_codes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="get_client_ip">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_client_ip">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_client_ip</span><span class="p">(</span><span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Extract client IP address from request.&quot;&quot;&quot;</span>
+    <span class="n">forwarded</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;X-Forwarded-For&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">forwarded</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">forwarded</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">host</span> <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">client</span> <span class="k">else</span> <span class="s2">&quot;unknown&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="get_current_authenticated_user">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_current_authenticated_user">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_current_authenticated_user</span><span class="p">(</span>
+    <span class="n">credentials</span><span class="p">:</span> <span class="n">HTTPAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">security</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthenticatedUser</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get current authenticated user with enhanced validation.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">verify_access_token</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">credentials</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="require_permission">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.require_permission">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">require_permission</span><span class="p">(</span><span class="n">permission</span><span class="p">:</span> <span class="n">Permission</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dependency factory for permission-based access control.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_permission</span><span class="p">(</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthenticatedUser</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">auth_service</span><span class="o">.</span><span class="n">require_permission</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">permission</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">user</span>
+        <span class="k">except</span> <span class="n">AuthorizationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_403_FORBIDDEN</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">check_permission</span></div>
+
+
+
+<div class="viewcode-block" id="require_mfa_verification">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.require_mfa_verification">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">require_mfa_verification</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Dependency for requiring MFA verification.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_mfa</span><span class="p">(</span>
+        <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AuthenticatedUser</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">auth_service</span><span class="o">.</span><span class="n">require_mfa_verification</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">user</span>
+        <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">check_mfa</span></div>
+
+
+
+<div class="viewcode-block" id="register">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.register">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/register&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">register</span><span class="p">(</span><span class="n">registration</span><span class="p">:</span> <span class="n">UserRegistration</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Register a new user account.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        registration: User registration data</span>
+<span class="sd">        request: HTTP request for IP tracking</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict with registration result</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If registration fails</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">register_user</span><span class="p">(</span><span class="n">registration</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Registration failed&quot;</span><span class="p">,</span> <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">errors</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;User registered successfully&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">registration</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Re-raise explicit HTTP errors without converting to 500</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Registration failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="login">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.login">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/login&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">LoginResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">login</span><span class="p">(</span><span class="n">credentials</span><span class="p">:</span> <span class="n">LoginRequest</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LoginResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Authenticate a user and return access tokens with MFA support.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        credentials: User login credentials</span>
+<span class="sd">        request: HTTP request for IP tracking</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        LoginResponse: Access tokens and MFA challenge if required</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If authentication fails</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client_ip</span> <span class="o">=</span> <span class="n">get_client_ip</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">user_agent</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Authenticate user</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">authenticate_user</span><span class="p">(</span><span class="n">credentials</span><span class="p">,</span> <span class="n">client_ip</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Invalid username or password&quot;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create session</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">client_ip</span><span class="p">,</span> <span class="n">user_agent</span><span class="p">)</span>
+
+        <span class="c1"># Check if MFA is required</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">:</span>
+            <span class="c1"># Create MFA challenge</span>
+            <span class="n">challenge</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">mfa_service</span><span class="o">.</span><span class="n">create_mfa_challenge</span><span class="p">(</span>
+                <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">MFAMethod</span><span class="o">.</span><span class="n">TOTP</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">LoginResponse</span><span class="p">(</span>
+                <span class="n">access_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># No token until MFA is completed</span>
+                <span class="n">refresh_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="n">expires_in</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">mfa_required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">mfa_challenge</span><span class="o">=</span><span class="n">challenge</span><span class="p">,</span>
+                <span class="n">user_info</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                    <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                    <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create access token</span>
+        <span class="n">access_token</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">create_access_token</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">session_id</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">LoginResponse</span><span class="p">(</span>
+            <span class="n">access_token</span><span class="o">=</span><span class="n">access_token</span><span class="p">,</span>
+            <span class="n">refresh_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># TODO: Implement refresh token</span>
+            <span class="n">token_type</span><span class="o">=</span><span class="s2">&quot;bearer&quot;</span><span class="p">,</span>
+            <span class="n">expires_in</span><span class="o">=</span><span class="n">auth_service</span><span class="o">.</span><span class="n">access_token_expire_minutes</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
+            <span class="n">mfa_required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">user_info</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+                <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+                <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Preserve explicitly raised HTTP errors</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Login failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="verify_mfa">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.verify_mfa">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/mfa/verify&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">LoginResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">verify_mfa</span><span class="p">(</span><span class="n">verification</span><span class="p">:</span> <span class="n">MFAVerification</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LoginResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify MFA challenge and complete authentication.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        verification: MFA verification data</span>
+<span class="sd">        request: HTTP request for IP tracking</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        LoginResponse: Access tokens after successful MFA verification</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If MFA verification fails</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># TODO: Get user&#39;s MFA secret from database</span>
+        <span class="c1"># For now, we&#39;ll use a placeholder</span>
+        <span class="n">user_secrets</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">mfa_secrets</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user_secrets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;MFA not set up for this user&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">secret</span> <span class="o">=</span> <span class="n">user_secrets</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">secret</span>  <span class="c1"># Get TOTP secret</span>
+
+        <span class="c1"># Verify MFA challenge</span>
+        <span class="n">is_valid</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">mfa_service</span><span class="o">.</span><span class="n">verify_mfa_challenge</span><span class="p">(</span><span class="n">verification</span><span class="p">,</span> <span class="n">secret</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Invalid MFA code&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># TODO: Get user from database and create authenticated user</span>
+        <span class="c1"># For now, return a placeholder response</span>
+        <span class="k">return</span> <span class="n">LoginResponse</span><span class="p">(</span>
+            <span class="n">access_token</span><span class="o">=</span><span class="s2">&quot;mfa_verified_token&quot;</span><span class="p">,</span>
+            <span class="n">refresh_token</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">token_type</span><span class="o">=</span><span class="s2">&quot;bearer&quot;</span><span class="p">,</span>
+            <span class="n">expires_in</span><span class="o">=</span><span class="mi">1800</span><span class="p">,</span>
+            <span class="n">mfa_required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">user_info</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;MFA verification successful&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">MFAError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;MFA verification failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="setup_mfa">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.setup_mfa">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/mfa/setup&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">MFASetupResponse</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">setup_mfa</span><span class="p">(</span>
+    <span class="n">method</span><span class="p">:</span> <span class="n">MFAMethod</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">)</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MFASetupResponse</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up multi-factor authentication for the current user.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        method: MFA method to set up</span>
+<span class="sd">        user: Current authenticated user</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        MFASetupResponse: Setup information including QR code for TOTP</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If MFA setup fails</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">setup_info</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">setup_mfa</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">MFASetupResponse</span><span class="p">(</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">secret</span><span class="o">=</span><span class="n">setup_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;secret&quot;</span><span class="p">),</span>
+            <span class="n">qr_code</span><span class="o">=</span><span class="n">setup_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;qr_code&quot;</span><span class="p">),</span>
+            <span class="n">backup_codes</span><span class="o">=</span><span class="n">setup_info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;backup_codes&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">MFAError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span><span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;MFA setup failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="refresh_token">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.refresh_token">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/refresh&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="n">Token</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">refresh_token</span><span class="p">(</span><span class="n">refresh_request</span><span class="p">:</span> <span class="n">RefreshTokenRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Token</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Refresh an access token using a refresh token.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        refresh_request: The refresh token request</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Token: New access and refresh tokens</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If refresh token is invalid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">AuthService</span><span class="o">.</span><span class="n">refresh_access_token</span><span class="p">(</span><span class="n">refresh_request</span><span class="o">.</span><span class="n">refresh_token</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="logout">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.logout">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/logout&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logout</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logout the current user and revoke their session.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: The current authenticated user</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Success message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Revoke the user&#39;s session</span>
+        <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">session_id</span><span class="p">:</span>
+            <span class="n">auth_service</span><span class="o">.</span><span class="n">revoke_session</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">session_id</span><span class="p">)</span>
+
+        <span class="c1"># Log security event</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityEvent</span>
+
+        <span class="n">auth_service</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+            <span class="n">SecurityEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;user_logout&quot;</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Successfully logged out&quot;</span><span class="p">}</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Logout failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="logout_all_sessions">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.logout_all_sessions">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/logout-all&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logout_all_sessions</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Logout from all sessions for the current user.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: The current authenticated user</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Success message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Revoke all user sessions</span>
+        <span class="n">auth_service</span><span class="o">.</span><span class="n">revoke_all_user_sessions</span><span class="p">(</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">)</span>
+
+        <span class="c1"># Log security event</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityEvent</span>
+
+        <span class="n">auth_service</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+            <span class="n">SecurityEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;user_logout_all&quot;</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Successfully logged out from all sessions&quot;</span><span class="p">}</span>
+
+    <span class="k">except</span> <span class="n">HTTPException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">e</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_500_INTERNAL_SERVER_ERROR</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Logout all failed: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_current_user_info">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_current_user_info">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/me&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_current_user_info</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get information about the current authenticated user.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: The current authenticated user</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict: Current user information including role and permissions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+        <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+        <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">email</span><span class="p">,</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+        <span class="s2">&quot;mfa_enabled&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_enabled</span><span class="p">,</span>
+        <span class="s2">&quot;mfa_verified&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">,</span>
+        <span class="s2">&quot;last_login&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">last_login</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="k">if</span> <span class="n">user</span><span class="o">.</span><span class="n">last_login</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="verify_token_endpoint">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.verify_token_endpoint">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/verify-token&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">verify_token_endpoint</span><span class="p">(</span>
+    <span class="n">credentials</span><span class="p">:</span> <span class="n">HTTPAuthorizationCredentials</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">security</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Verify if a token is valid and return user information.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        credentials: The HTTP authorization credentials</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Token validity status and user information</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        HTTPException: If token is invalid</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">user</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">verify_access_token</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">credentials</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;valid&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+            <span class="s2">&quot;mfa_verified&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">,</span>
+        <span class="p">}</span>
+    <span class="k">except</span> <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_401_UNAUTHORIZED</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Invalid token: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;WWW-Authenticate&quot;</span><span class="p">:</span> <span class="s2">&quot;Bearer&quot;</span><span class="p">},</span>
+        <span class="p">)</span></div>
+
+
+
+<span class="c1"># Role-based access control endpoints</span>
+<div class="viewcode-block" id="get_user_permissions">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_user_permissions">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/permissions&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_user_permissions</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">get_current_authenticated_user</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get current user&#39;s permissions.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: Current authenticated user</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict: User permissions and role information</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">user</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+        <span class="s2">&quot;is_admin&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">is_admin</span><span class="p">(),</span>
+        <span class="s2">&quot;is_therapist&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">is_therapist</span><span class="p">(),</span>
+    <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="get_available_roles">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_available_roles">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/roles&quot;</span><span class="p">,</span> <span class="n">response_model</span><span class="o">=</span><span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_available_roles</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">require_permission</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_ROLES</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get all available roles and their permissions (admin only).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: Current authenticated user (must have MANAGE_ROLES permission)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of roles with their permissions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">DEFAULT_ROLE_PERMISSIONS</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="n">role_perm</span><span class="o">.</span><span class="n">role</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">role_perm</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="s2">&quot;permissions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">perm</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">perm</span> <span class="ow">in</span> <span class="n">role_perm</span><span class="o">.</span><span class="n">permissions</span><span class="p">],</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">role_perm</span> <span class="ow">in</span> <span class="n">DEFAULT_ROLE_PERMISSIONS</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">]</span></div>
+
+
+
+<span class="c1"># Security and audit endpoints</span>
+<div class="viewcode-block" id="get_security_events">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_security_events">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/security/events&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_security_events</span><span class="p">(</span>
+    <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">require_permission</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">ACCESS_AUDIT_LOGS</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get security events for audit purposes (admin only).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        limit: Maximum number of events to return</span>
+<span class="sd">        user: Current authenticated user (must have ACCESS_AUDIT_LOGS permission)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of security events</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">security_events</span><span class="p">[</span><span class="o">-</span><span class="n">limit</span><span class="p">:]</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;event_type&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">event_type</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;ip_address&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">ip_address</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">timestamp</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;details&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">details</span><span class="p">,</span>
+            <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">event</span><span class="o">.</span><span class="n">severity</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">events</span>
+    <span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="get_active_sessions">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.get_active_sessions">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/security/sessions&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_active_sessions</span><span class="p">(</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">require_permission</span><span class="p">(</span><span class="n">Permission</span><span class="o">.</span><span class="n">MANAGE_USERS</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get active sessions (admin only).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        user: Current authenticated user (must have MANAGE_USERS permission)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of active sessions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;created_at&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">created_at</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;last_activity&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">last_activity</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;ip_address&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">ip_address</span><span class="p">,</span>
+            <span class="s2">&quot;is_active&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">is_active</span><span class="p">,</span>
+            <span class="s2">&quot;mfa_verified&quot;</span><span class="p">:</span> <span class="n">session</span><span class="o">.</span><span class="n">mfa_verified</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">is_active</span>
+    <span class="p">]</span></div>
+
+
+
+<span class="c1"># Password management endpoints</span>
+<div class="viewcode-block" id="request_password_reset">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.request_password_reset">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/password/reset-request&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request_password_reset</span><span class="p">(</span><span class="n">request_data</span><span class="p">:</span> <span class="n">PasswordResetRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Request a password reset for a user.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        request_data: Password reset request data</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict: Success message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Implement password reset email sending</span>
+    <span class="c1"># For now, just return a success message</span>
+
+    <span class="c1"># Log security event</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityEvent</span>
+
+    <span class="n">auth_service</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+        <span class="n">SecurityEvent</span><span class="p">(</span>
+            <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;password_reset_requested&quot;</span><span class="p">,</span> <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">request_data</span><span class="o">.</span><span class="n">email</span><span class="p">}</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Password reset email sent if account exists&quot;</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="reset_password">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.reset_password">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/password/reset&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">reset_password</span><span class="p">(</span><span class="n">reset_data</span><span class="p">:</span> <span class="n">PasswordReset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reset user password with token.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        reset_data: Password reset data with token</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict: Success message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO: Implement password reset token verification and password update</span>
+    <span class="c1"># For now, just validate password strength</span>
+
+    <span class="n">is_valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">validate_password_strength</span><span class="p">(</span>
+        <span class="n">reset_data</span><span class="o">.</span><span class="n">new_password</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Password does not meet requirements&quot;</span><span class="p">,</span> <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">errors</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Password reset successfully&quot;</span><span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="change_password">
+<a class="viewcode-back" href="../../../../../api/src.player_experience.api.routers.auth.html#src.player_experience.api.routers.auth.change_password">[docs]</a>
+<span class="nd">@router</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/password/change&quot;</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">change_password</span><span class="p">(</span>
+    <span class="n">current_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">new_password</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">user</span><span class="p">:</span> <span class="n">AuthenticatedUser</span> <span class="o">=</span> <span class="n">Depends</span><span class="p">(</span><span class="n">require_mfa_verification</span><span class="p">()),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Change user password (requires MFA verification for sensitive operation).</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        current_password: Current password</span>
+<span class="sd">        new_password: New password</span>
+<span class="sd">        user: Current authenticated user (must have MFA verified)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict: Success message</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Validate new password strength</span>
+    <span class="n">is_valid</span><span class="p">,</span> <span class="n">errors</span> <span class="o">=</span> <span class="n">auth_service</span><span class="o">.</span><span class="n">security_service</span><span class="o">.</span><span class="n">validate_password_strength</span><span class="p">(</span>
+        <span class="n">new_password</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+            <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_400_BAD_REQUEST</span><span class="p">,</span>
+            <span class="n">detail</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Password does not meet requirements&quot;</span><span class="p">,</span> <span class="s2">&quot;errors&quot;</span><span class="p">:</span> <span class="n">errors</span><span class="p">},</span>
+        <span class="p">)</span>
+
+    <span class="c1"># TODO: Verify current password and update to new password in database</span>
+
+    <span class="c1"># Log security event</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">...models.auth</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecurityEvent</span>
+
+    <span class="n">auth_service</span><span class="o">.</span><span class="n">log_security_event</span><span class="p">(</span>
+        <span class="n">SecurityEvent</span><span class="p">(</span>
+            <span class="n">event_type</span><span class="o">=</span><span class="s2">&quot;password_changed&quot;</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">details</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;username&quot;</span><span class="p">:</span> <span class="n">user</span><span class="o">.</span><span class="n">username</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Password changed successfully&quot;</span><span class="p">}</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

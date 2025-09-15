@@ -1,0 +1,692 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.services.session_state &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.services.session_state</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.services.session_state</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Session State Management</span>
+
+<span class="sd">This module defines session state structures, transitions, and validation</span>
+<span class="sd">for the therapeutic gameplay loop system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+
+
+<div class="viewcode-block" id="SessionStateType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionStateType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionStateType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of session states.&quot;&quot;&quot;</span>
+
+    <span class="n">INITIALIZING</span> <span class="o">=</span> <span class="s2">&quot;initializing&quot;</span>
+    <span class="n">ACTIVE</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>
+    <span class="n">PAUSED</span> <span class="o">=</span> <span class="s2">&quot;paused&quot;</span>
+    <span class="n">TRANSITIONING</span> <span class="o">=</span> <span class="s2">&quot;transitioning&quot;</span>
+    <span class="n">COMPLETED</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">EXPIRED</span> <span class="o">=</span> <span class="s2">&quot;expired&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="TransitionType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.TransitionType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransitionType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of state transitions.&quot;&quot;&quot;</span>
+
+    <span class="n">START</span> <span class="o">=</span> <span class="s2">&quot;start&quot;</span>
+    <span class="n">PAUSE</span> <span class="o">=</span> <span class="s2">&quot;pause&quot;</span>
+    <span class="n">RESUME</span> <span class="o">=</span> <span class="s2">&quot;resume&quot;</span>
+    <span class="n">COMPLETE</span> <span class="o">=</span> <span class="s2">&quot;complete&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">EXPIRE</span> <span class="o">=</span> <span class="s2">&quot;expire&quot;</span>
+    <span class="n">RESET</span> <span class="o">=</span> <span class="s2">&quot;reset&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="StateTransition">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.StateTransition">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateTransition</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a state transition with validation rules.&quot;&quot;&quot;</span>
+
+    <span class="n">from_state</span><span class="p">:</span> <span class="n">SessionStateType</span>
+    <span class="n">to_state</span><span class="p">:</span> <span class="n">SessionStateType</span>
+    <span class="n">transition_type</span><span class="p">:</span> <span class="n">TransitionType</span>
+    <span class="n">conditions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">side_effects</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StateTransition.is_valid">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.StateTransition.is_valid">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if transition is valid given current context.&quot;&quot;&quot;</span>
+        <span class="c1"># Basic state transition validation</span>
+        <span class="n">valid_transitions</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">TRANSITIONING</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">TRANSITIONING</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span> <span class="p">[],</span>  <span class="c1"># Terminal state</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">:</span> <span class="p">[</span><span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">],</span>  <span class="c1"># Can restart</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_transitions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">from_state</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check custom conditions</span>
+        <span class="k">for</span> <span class="n">condition</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conditions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate_condition</span><span class="p">(</span><span class="n">condition</span><span class="p">,</span> <span class="n">current_context</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_evaluate_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">condition</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate a transition condition.&quot;&quot;&quot;</span>
+        <span class="c1"># Simple condition evaluation - can be extended</span>
+        <span class="k">if</span> <span class="n">condition</span> <span class="o">==</span> <span class="s2">&quot;has_active_scene&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;current_scene_id&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="n">condition</span> <span class="o">==</span> <span class="s2">&quot;no_safety_concerns&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;safety_level&quot;</span><span class="p">,</span> <span class="s2">&quot;standard&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;crisis&quot;</span>
+        <span class="k">elif</span> <span class="n">condition</span> <span class="o">==</span> <span class="s2">&quot;session_not_expired&quot;</span><span class="p">:</span>
+            <span class="n">last_activity</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;last_activity&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">last_activity</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">last_activity</span> <span class="o">&lt;</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># Default to true for unknown conditions</span></div>
+
+
+
+<div class="viewcode-block" id="SessionState">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionState</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive session state representation.&quot;&quot;&quot;</span>
+
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique session identifier&quot;</span><span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;User identifier&quot;</span><span class="p">)</span>
+    <span class="n">state_type</span><span class="p">:</span> <span class="n">SessionStateType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">)</span>
+
+    <span class="c1"># Core session data</span>
+    <span class="n">current_scene_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current active scene&quot;</span><span class="p">)</span>
+    <span class="n">scene_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scene ID history&quot;</span>
+    <span class="p">)</span>
+    <span class="n">choice_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Choice ID history&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Therapeutic context</span>
+    <span class="n">therapeutic_goals</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">safety_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;standard&quot;</span><span class="p">)</span>
+    <span class="n">therapeutic_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># User preferences and settings</span>
+    <span class="n">user_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">accessibility_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Progress and metrics</span>
+    <span class="n">session_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">progress_snapshots</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Narrative context</span>
+    <span class="n">narrative_variables</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">character_relationships</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">world_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Interaction context</span>
+    <span class="n">recent_interactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>  <span class="c1"># Interaction IDs</span>
+    <span class="n">emotional_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">engagement_metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Timing and lifecycle</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_activity</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Session expiration time&quot;</span><span class="p">)</span>
+    <span class="n">completed_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Session completion time&quot;</span><span class="p">)</span>
+
+    <span class="c1"># State management</span>
+    <span class="n">state_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">transition_locks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Cache metadata</span>
+    <span class="n">cache_version</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Cache version for invalidation&quot;</span><span class="p">)</span>
+    <span class="n">last_persisted</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Last persistence timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">dirty_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Fields needing persistence&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="SessionState.validate_emotional_state">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.validate_emotional_state">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;emotional_state&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_emotional_state</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">emotion</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">intensity</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Emotional intensity for </span><span class="si">{</span><span class="n">emotion</span><span class="si">}</span><span class="s2"> must be between 0.0 and 1.0&quot;</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SessionState.update_activity">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.update_activity">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_activity</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update last activity timestamp.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;last_activity&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;last_activity&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.add_scene">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.add_scene">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scene_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a scene to the session history.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">scene_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_history</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scene_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_scene_id</span> <span class="o">=</span> <span class="n">scene_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;scene_history&quot;</span><span class="p">,</span> <span class="s2">&quot;current_scene_id&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">field</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">field</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.add_choice">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.add_choice">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">choice_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a choice to the session history.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">choice_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_history</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choice_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">choice_id</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;choice_history&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;choice_history&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.update_emotional_state">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.update_emotional_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_emotional_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emotion</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">intensity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update emotional state for a specific emotion.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">intensity</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Emotional intensity must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">emotional_state</span><span class="p">[</span><span class="n">emotion</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;emotional_state&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;emotional_state&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.set_narrative_variable">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.set_narrative_variable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">set_narrative_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set a narrative variable.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">narrative_variables</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;narrative_variables&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;narrative_variables&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.get_narrative_variable">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.get_narrative_variable">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_narrative_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a narrative variable.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">narrative_variables</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">default</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.add_progress_snapshot">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.add_progress_snapshot">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_progress_snapshot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">snapshot</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a progress snapshot.&quot;&quot;&quot;</span>
+        <span class="n">snapshot</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_snapshots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">snapshot</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s2">&quot;progress_snapshots&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;progress_snapshots&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.is_expired">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.is_expired">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_expired</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if session is expired.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SessionState.is_active">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.is_active">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if session is in an active state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">state_type</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">TRANSITIONING</span><span class="p">,</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="SessionState.get_session_duration">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.get_session_duration">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_session_duration</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">timedelta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get total session duration.&quot;&quot;&quot;</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed_at</span> <span class="ow">or</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">end_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">created_at</span></div>
+
+
+<div class="viewcode-block" id="SessionState.get_idle_time">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.get_idle_time">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_idle_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">timedelta</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get time since last activity.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_activity</span></div>
+
+
+<div class="viewcode-block" id="SessionState.record_state_change">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.record_state_change">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">record_state_change</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">from_state</span><span class="p">:</span> <span class="n">SessionStateType</span><span class="p">,</span> <span class="n">to_state</span><span class="p">:</span> <span class="n">SessionStateType</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a state change in history.&quot;&quot;&quot;</span>
+        <span class="n">state_change</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;from_state&quot;</span><span class="p">:</span> <span class="n">from_state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;to_state&quot;</span><span class="p">:</span> <span class="n">to_state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="n">reason</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state_change</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;state_history&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;state_history&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionState.clear_dirty_fields">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.clear_dirty_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_dirty_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clear dirty fields after successful persistence.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_persisted</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="SessionState.has_dirty_fields">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionState.has_dirty_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_dirty_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if there are unsaved changes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dirty_fields</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StateValidator">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.StateValidator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StateValidator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Validates session state transitions and consistency.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transition_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_define_transition_rules</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_define_transition_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">StateTransition</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Define all valid state transitions.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Initialization transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">START</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;no_safety_concerns&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;set_start_time&quot;</span><span class="p">,</span> <span class="s2">&quot;initialize_metrics&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="c1"># Active state transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">PAUSE</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;has_active_scene&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;save_current_state&quot;</span><span class="p">,</span> <span class="s2">&quot;set_pause_time&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">TRANSITIONING</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">START</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;scene_transition_requested&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;prepare_scene_transition&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;completion_criteria_met&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;finalize_session&quot;</span><span class="p">,</span> <span class="s2">&quot;save_final_state&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="c1"># Paused state transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">RESUME</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;session_not_expired&quot;</span><span class="p">,</span> <span class="s2">&quot;no_safety_concerns&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;restore_session_state&quot;</span><span class="p">,</span> <span class="s2">&quot;update_activity&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="c1"># Transitioning state transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">TRANSITIONING</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">COMPLETE</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;transition_completed&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;activate_new_scene&quot;</span><span class="p">,</span> <span class="s2">&quot;update_narrative_state&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="c1"># Error recovery transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">RESET</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;error_resolved&quot;</span><span class="p">,</span> <span class="s2">&quot;no_safety_concerns&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;clear_error_state&quot;</span><span class="p">,</span> <span class="s2">&quot;restore_last_good_state&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="c1"># Expiration transitions</span>
+            <span class="n">StateTransition</span><span class="p">(</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">EXPIRE</span><span class="p">,</span>
+                <span class="n">conditions</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;session_expired&quot;</span><span class="p">],</span>
+                <span class="n">side_effects</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;cleanup_session_data&quot;</span><span class="p">,</span> <span class="s2">&quot;notify_expiration&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="StateValidator.validate_transition">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.StateValidator.validate_transition">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_transition</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">current_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">new_state_type</span><span class="p">:</span> <span class="n">SessionStateType</span><span class="p">,</span>
+        <span class="n">transition_type</span><span class="p">:</span> <span class="n">TransitionType</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate a state transition.&quot;&quot;&quot;</span>
+        <span class="c1"># Find applicable transition rule</span>
+        <span class="n">applicable_rule</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_rules</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">rule</span><span class="o">.</span><span class="n">from_state</span> <span class="o">==</span> <span class="n">current_state</span><span class="o">.</span><span class="n">state_type</span>
+                <span class="ow">and</span> <span class="n">rule</span><span class="o">.</span><span class="n">to_state</span> <span class="o">==</span> <span class="n">new_state_type</span>
+                <span class="ow">and</span> <span class="n">rule</span><span class="o">.</span><span class="n">transition_type</span> <span class="o">==</span> <span class="n">transition_type</span>
+            <span class="p">):</span>
+                <span class="n">applicable_rule</span> <span class="o">=</span> <span class="n">rule</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">applicable_rule</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;No transition rule found for </span><span class="si">{</span><span class="n">current_state</span><span class="o">.</span><span class="n">state_type</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">new_state_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check if transition is valid</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;current_scene_id&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="o">.</span><span class="n">current_scene_id</span><span class="p">,</span>
+            <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="o">.</span><span class="n">safety_level</span><span class="p">,</span>
+            <span class="s2">&quot;last_activity&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="o">.</span><span class="n">last_activity</span><span class="p">,</span>
+            <span class="s2">&quot;session_duration&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="o">.</span><span class="n">get_session_duration</span><span class="p">(),</span>
+            <span class="s2">&quot;idle_time&quot;</span><span class="p">:</span> <span class="n">current_state</span><span class="o">.</span><span class="n">get_idle_time</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">applicable_rule</span><span class="o">.</span><span class="n">is_valid</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="kc">False</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Transition conditions not met for </span><span class="si">{</span><span class="n">current_state</span><span class="o">.</span><span class="n">state_type</span><span class="si">}</span><span class="s2"> -&gt; </span><span class="si">{</span><span class="n">new_state_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Transition valid&quot;</span></div>
+
+
+<div class="viewcode-block" id="StateValidator.validate_state_consistency">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.StateValidator.validate_state_consistency">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_state_consistency</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate internal state consistency.&quot;&quot;&quot;</span>
+        <span class="n">issues</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check basic consistency</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">completed_at</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">state_type</span> <span class="o">!=</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Session has completion time but is not in completed state&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">state_type</span> <span class="o">==</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">completed_at</span><span class="p">:</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Session is completed but has no completion time&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">is_expired</span><span class="p">()</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">state_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">,</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Session is expired but not in expired or completed state&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check scene consistency</span>
+        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">current_scene_id</span> <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">current_scene_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">scene_history</span><span class="p">:</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Current scene is not in scene history&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check safety level consistency</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">state</span><span class="o">.</span><span class="n">safety_level</span> <span class="o">==</span> <span class="s2">&quot;crisis&quot;</span>
+            <span class="ow">and</span> <span class="n">state</span><span class="o">.</span><span class="n">state_type</span> <span class="o">==</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span>
+        <span class="p">):</span>
+            <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Session is active but has crisis safety level&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Check emotional state values</span>
+        <span class="k">for</span> <span class="n">emotion</span><span class="p">,</span> <span class="n">intensity</span> <span class="ow">in</span> <span class="n">state</span><span class="o">.</span><span class="n">emotional_state</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">intensity</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">issues</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid emotional intensity for </span><span class="si">{</span><span class="n">emotion</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">intensity</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">issues</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">issues</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SessionStateManager">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionStateManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionStateManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages session state transitions and validation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">validator</span> <span class="o">=</span> <span class="n">StateValidator</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SessionStateManager.transition_state">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionStateManager.transition_state">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">transition_state</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">new_state_type</span><span class="p">:</span> <span class="n">SessionStateType</span><span class="p">,</span>
+        <span class="n">transition_type</span><span class="p">:</span> <span class="n">TransitionType</span><span class="p">,</span>
+        <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transition session to new state.&quot;&quot;&quot;</span>
+        <span class="c1"># Validate transition</span>
+        <span class="n">is_valid</span><span class="p">,</span> <span class="n">message</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate_transition</span><span class="p">(</span>
+            <span class="n">session_state</span><span class="p">,</span> <span class="n">new_state_type</span><span class="p">,</span> <span class="n">transition_type</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">message</span>
+
+        <span class="c1"># Record state change</span>
+        <span class="n">old_state</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">state_type</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">record_state_change</span><span class="p">(</span><span class="n">old_state</span><span class="p">,</span> <span class="n">new_state_type</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+
+        <span class="c1"># Update state</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">state_type</span> <span class="o">=</span> <span class="n">new_state_type</span>
+        <span class="n">session_state</span><span class="o">.</span><span class="n">update_activity</span><span class="p">()</span>
+
+        <span class="c1"># Handle special state transitions</span>
+        <span class="k">if</span> <span class="n">new_state_type</span> <span class="o">==</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">:</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">completed_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">new_state_type</span> <span class="o">==</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">:</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">expires_at</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="kc">True</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Successfully transitioned from </span><span class="si">{</span><span class="n">old_state</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_state_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionStateManager.validate_session">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionStateManager.validate_session">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate session state consistency.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">validator</span><span class="o">.</span><span class="n">validate_state_consistency</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SessionStateManager.auto_expire_check">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.SessionStateManager.auto_expire_check">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auto_expire_check</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">max_idle_time</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if session should be auto-expired.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">session_state</span><span class="o">.</span><span class="n">state_type</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span>
+            <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="n">session_state</span><span class="o">.</span><span class="n">get_idle_time</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">max_idle_time</span><span class="p">:</span>
+            <span class="n">success</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transition_state</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="p">,</span>
+                <span class="n">SessionStateType</span><span class="o">.</span><span class="n">EXPIRED</span><span class="p">,</span>
+                <span class="n">TransitionType</span><span class="o">.</span><span class="n">EXPIRE</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;Auto-expired after </span><span class="si">{</span><span class="n">max_idle_time</span><span class="si">}</span><span class="s2"> idle time&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">success</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

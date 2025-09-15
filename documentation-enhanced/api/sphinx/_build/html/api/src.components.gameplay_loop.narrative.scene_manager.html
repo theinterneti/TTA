@@ -1,0 +1,524 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.scene_manager module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.narrative.therapeutic_integration_system module" href="src.components.gameplay_loop.narrative.therapeutic_integration_system.html" />
+    <link rel="prev" title="src.components.gameplay_loop.narrative.replayability_system module" href="src.components.gameplay_loop.narrative.replayability_system.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.narrative.html">src.components.gameplay_loop.narrative package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.scene_manager module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.narrative.scene_manager.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.narrative.scene_manager">
+<span id="src-components-gameplay-loop-narrative-scene-manager-module"></span><h1>src.components.gameplay_loop.narrative.scene_manager module<a class="headerlink" href="#module-src.components.gameplay_loop.narrative.scene_manager" title="Link to this heading"></a></h1>
+<p>Scene Manager for Narrative Engine</p>
+<p>This module handles individual scene logic, transitions, and state management
+for therapeutic narrative experiences.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.scene_manager.</span></span><span class="sig-name descname"><span class="pre">SceneContext</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_time=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status=SceneStatus.LOADING</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">variables=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choices_presented=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_interactions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_moments=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emotional_responses=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skill_practice_opportunities=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">time_spent=datetime.timedelta(0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">engagement_score=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completion_rate=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneContext"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Context for scene processing.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.models.core.html#src.components.gameplay_loop.models.core.NarrativeScene" title="src.components.gameplay_loop.models.core.NarrativeScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeScene</span></code></a></span>)</p></li>
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>entry_time</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>status</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus" title="src.components.gameplay_loop.narrative.scene_manager.SceneStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneStatus</span></code></a></span>)</p></li>
+<li><p><strong>variables</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>choices_presented</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>user_interactions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span>)</p></li>
+<li><p><strong>therapeutic_moments</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]]</span>)</p></li>
+<li><p><strong>emotional_responses</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]</span>)</p></li>
+<li><p><strong>skill_practice_opportunities</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>time_spent</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></a></span>)</p></li>
+<li><p><strong>engagement_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>completion_rate</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.add_interaction">
+<span class="sig-name descname"><span class="pre">add_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">interaction_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneContext.add_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.add_interaction" title="Link to this definition"></a></dt>
+<dd><p>Add user interaction to scene context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>interaction_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.choices_presented">
+<span class="sig-name descname"><span class="pre">choices_presented</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.choices_presented" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.completion_rate">
+<span class="sig-name descname"><span class="pre">completion_rate</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.completion_rate" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.emotional_responses">
+<span class="sig-name descname"><span class="pre">emotional_responses</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.emotional_responses" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.engagement_score">
+<span class="sig-name descname"><span class="pre">engagement_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.engagement_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.entry_time">
+<span class="sig-name descname"><span class="pre">entry_time</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.entry_time" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.record_therapeutic_moment">
+<span class="sig-name descname"><span class="pre">record_therapeutic_moment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">moment_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relevance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneContext.record_therapeutic_moment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.record_therapeutic_moment" title="Link to this definition"></a></dt>
+<dd><p>Record a therapeutic moment in the scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>moment_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>relevance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.scene">
+<span class="sig-name descname"><span class="pre">scene</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.gameplay_loop.models.core.html#src.components.gameplay_loop.models.core.NarrativeScene" title="src.components.gameplay_loop.models.core.NarrativeScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeScene</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.scene" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.session_state">
+<span class="sig-name descname"><span class="pre">session_state</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.session_state" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.skill_practice_opportunities">
+<span class="sig-name descname"><span class="pre">skill_practice_opportunities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.skill_practice_opportunities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.status">
+<span class="sig-name descname"><span class="pre">status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus" title="src.components.gameplay_loop.narrative.scene_manager.SceneStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneStatus</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'loading'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.therapeutic_moments">
+<span class="sig-name descname"><span class="pre">therapeutic_moments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.therapeutic_moments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.time_spent">
+<span class="sig-name descname"><span class="pre">time_spent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.timedelta" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">timedelta</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">datetime.timedelta(0)</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.time_spent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.update_emotional_response">
+<span class="sig-name descname"><span class="pre">update_emotional_response</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emotion</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneContext.update_emotional_response"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.update_emotional_response" title="Link to this definition"></a></dt>
+<dd><p>Update emotional response tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>emotion</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>intensity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.update_time_spent">
+<span class="sig-name descname"><span class="pre">update_time_spent</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneContext.update_time_spent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.update_time_spent" title="Link to this definition"></a></dt>
+<dd><p>Update time spent in scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.user_interactions">
+<span class="sig-name descname"><span class="pre">user_interactions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.user_interactions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneContext.variables">
+<span class="sig-name descname"><span class="pre">variables</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext.variables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.scene_manager.</span></span><span class="sig-name descname"><span class="pre">SceneManager</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">narrative_engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Manages scene processing and transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.enter_scene">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">enter_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.enter_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.enter_scene" title="Link to this definition"></a></dt>
+<dd><p>Enter a scene in the narrative.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.models.core.html#src.components.gameplay_loop.models.core.NarrativeScene" title="src.components.gameplay_loop.models.core.NarrativeScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeScene</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.exit_scene">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exit_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">completion_status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SceneStatus.COMPLETED</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.exit_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.exit_scene" title="Link to this definition"></a></dt>
+<dd><p>Exit a scene.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+<li><p><strong>scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>completion_status</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus" title="src.components.gameplay_loop.narrative.scene_manager.SceneStatus"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneStatus</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.get_metrics">
+<span class="sig-name descname"><span class="pre">get_metrics</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.get_metrics"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.get_metrics" title="Link to this definition"></a></dt>
+<dd><p>Get scene manager metrics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.get_scene_context">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">get_scene_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.get_scene_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.get_scene_context" title="Link to this definition"></a></dt>
+<dd><p>Get scene context.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.scene_manager.SceneContext" title="src.components.gameplay_loop.narrative.scene_manager.SceneContext"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneContext</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.initialize">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">initialize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.initialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.initialize" title="Link to this definition"></a></dt>
+<dd><p>Initialize the scene manager.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneManager.load_scene">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">load_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneManager.load_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneManager.load_scene" title="Link to this definition"></a></dt>
+<dd><p>Load a scene by ID.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.models.core.html#src.components.gameplay_loop.models.core.NarrativeScene" title="src.components.gameplay_loop.models.core.NarrativeScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeScene</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.scene_manager.</span></span><span class="sig-name descname"><span class="pre">SceneStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Scene processing status.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus.ACTIVE">
+<span class="sig-name descname"><span class="pre">ACTIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'active'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus.ACTIVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus.COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus.FAILED">
+<span class="sig-name descname"><span class="pre">FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'failed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus.FAILED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus.LOADING">
+<span class="sig-name descname"><span class="pre">LOADING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'loading'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus.LOADING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneStatus.SKIPPED">
+<span class="sig-name descname"><span class="pre">SKIPPED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skipped'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneStatus.SKIPPED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.scene_manager.</span></span><span class="sig-name descname"><span class="pre">SceneTransition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">from_scene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_scene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trigger_data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conditions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_impact=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneTransition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Represents a transition between scenes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>from_scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>to_scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>trigger_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>trigger_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>conditions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_impact</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.conditions">
+<span class="sig-name descname"><span class="pre">conditions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.conditions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.from_scene_id">
+<span class="sig-name descname"><span class="pre">from_scene_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.from_scene_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneTransition.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.is_valid" title="Link to this definition"></a></dt>
+<dd><p>Check if transition is valid given current session state.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.therapeutic_impact">
+<span class="sig-name descname"><span class="pre">therapeutic_impact</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.therapeutic_impact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.to_scene_id">
+<span class="sig-name descname"><span class="pre">to_scene_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.to_scene_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.trigger_data">
+<span class="sig-name descname"><span class="pre">trigger_data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.trigger_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneTransition.trigger_type">
+<span class="sig-name descname"><span class="pre">trigger_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition.trigger_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneValidator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.scene_manager.</span></span><span class="sig-name descname"><span class="pre">SceneValidator</span></span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneValidator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Validates scene content and transitions.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneValidator.validate_scene">
+<span class="sig-name descname"><span class="pre">validate_scene</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scene</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneValidator.validate_scene"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneValidator.validate_scene" title="Link to this definition"></a></dt>
+<dd><p>Validate scene content.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>scene</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.models.core.html#src.components.gameplay_loop.models.core.NarrativeScene" title="src.components.gameplay_loop.models.core.NarrativeScene"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeScene</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.scene_manager.SceneValidator.validate_transition">
+<span class="sig-name descname"><span class="pre">validate_transition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transition</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/scene_manager.html#SceneValidator.validate_transition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.scene_manager.SceneValidator.validate_transition" title="Link to this definition"></a></dt>
+<dd><p>Validate scene transition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transition</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.scene_manager.SceneTransition" title="src.components.gameplay_loop.narrative.scene_manager.SceneTransition"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneTransition</span></code></a></span>)</p></li>
+<li><p><strong>session_state</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.gameplay_loop.services.session_state.html#src.components.gameplay_loop.services.session_state.SessionState" title="src.components.gameplay_loop.services.session_state.SessionState"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionState</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.narrative.replayability_system.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.narrative.replayability_system module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.narrative.therapeutic_integration_system.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.narrative.therapeutic_integration_system module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

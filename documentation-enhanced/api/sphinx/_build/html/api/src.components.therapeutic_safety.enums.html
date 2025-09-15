@@ -1,0 +1,905 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.therapeutic_safety.enums module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.therapeutic_safety.events module" href="src.components.therapeutic_safety.events.html" />
+    <link rel="prev" title="src.components.therapeutic_safety.cache module" href="src.components.therapeutic_safety.cache.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.therapeutic_safety.html">src.components.therapeutic_safety package</a></li>
+      <li class="breadcrumb-item active">src.components.therapeutic_safety.enums module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.therapeutic_safety.enums.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.therapeutic_safety.enums">
+<span id="src-components-therapeutic-safety-enums-module"></span><h1>src.components.therapeutic_safety.enums module<a class="headerlink" href="#module-src.components.therapeutic_safety.enums" title="Link to this heading"></a></h1>
+<p>Enums for Therapeutic Safety Content Validation</p>
+<p>This module defines all enumeration types used throughout the therapeutic
+safety validation system.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">AgeGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#AgeGroup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Age groups for content appropriateness.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup.ADULT">
+<span class="sig-name descname"><span class="pre">ADULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'adult'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup.ADULT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup.CHILD">
+<span class="sig-name descname"><span class="pre">CHILD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'child'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup.CHILD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup.SENIOR">
+<span class="sig-name descname"><span class="pre">SENIOR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'senior'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup.SENIOR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup.TEEN">
+<span class="sig-name descname"><span class="pre">TEEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'teen'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup.TEEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.AgeGroup.YOUNG_ADULT">
+<span class="sig-name descname"><span class="pre">YOUNG_ADULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'young_adult'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.AgeGroup.YOUNG_ADULT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">BiasType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#BiasType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of bias that can be detected in content.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.AGE">
+<span class="sig-name descname"><span class="pre">AGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'age'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.AGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.CULTURAL">
+<span class="sig-name descname"><span class="pre">CULTURAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cultural'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.CULTURAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.DISABILITY">
+<span class="sig-name descname"><span class="pre">DISABILITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'disability'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.DISABILITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.GENDER">
+<span class="sig-name descname"><span class="pre">GENDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'gender'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.GENDER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.POLITICAL">
+<span class="sig-name descname"><span class="pre">POLITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'political'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.POLITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.RACIAL">
+<span class="sig-name descname"><span class="pre">RACIAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'racial'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.RACIAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.RELIGIOUS">
+<span class="sig-name descname"><span class="pre">RELIGIOUS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'religious'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.RELIGIOUS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.SEXUAL_ORIENTATION">
+<span class="sig-name descname"><span class="pre">SEXUAL_ORIENTATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'sexual_orientation'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.SEXUAL_ORIENTATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.SOCIOECONOMIC">
+<span class="sig-name descname"><span class="pre">SOCIOECONOMIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'socioeconomic'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.SOCIOECONOMIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.BiasType.THERAPEUTIC">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.BiasType.THERAPEUTIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ContentSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ContentSource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Source of content being validated.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.AI_GENERATED">
+<span class="sig-name descname"><span class="pre">AI_GENERATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ai_generated'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.AI_GENERATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.CURATED">
+<span class="sig-name descname"><span class="pre">CURATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'curated'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.CURATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.EXTERNAL_API">
+<span class="sig-name descname"><span class="pre">EXTERNAL_API</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'external_api'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.EXTERNAL_API" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.SYSTEM_GENERATED">
+<span class="sig-name descname"><span class="pre">SYSTEM_GENERATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_generated'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.SYSTEM_GENERATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.TEMPLATE_BASED">
+<span class="sig-name descname"><span class="pre">TEMPLATE_BASED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'template_based'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.TEMPLATE_BASED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentSource.USER_GENERATED">
+<span class="sig-name descname"><span class="pre">USER_GENERATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_generated'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentSource.USER_GENERATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ContentType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ContentType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of content that can be validated.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.CONSEQUENCE">
+<span class="sig-name descname"><span class="pre">CONSEQUENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'consequence'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.CONSEQUENCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.EDUCATIONAL_CONTENT">
+<span class="sig-name descname"><span class="pre">EDUCATIONAL_CONTENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'educational_content'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.EDUCATIONAL_CONTENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.GENERATED_CONTENT">
+<span class="sig-name descname"><span class="pre">GENERATED_CONTENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'generated_content'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.GENERATED_CONTENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.NARRATIVE_SCENE">
+<span class="sig-name descname"><span class="pre">NARRATIVE_SCENE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_scene'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.NARRATIVE_SCENE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.SYSTEM_MESSAGE">
+<span class="sig-name descname"><span class="pre">SYSTEM_MESSAGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_message'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.SYSTEM_MESSAGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.THERAPEUTIC_INTERVENTION">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_INTERVENTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_intervention'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.THERAPEUTIC_INTERVENTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.USER_CHOICE">
+<span class="sig-name descname"><span class="pre">USER_CHOICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_choice'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.USER_CHOICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ContentType.USER_INPUT">
+<span class="sig-name descname"><span class="pre">USER_INPUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_input'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ContentType.USER_INPUT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">CrisisLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#CrisisLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>Crisis severity levels for content assessment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.HIGH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.LOW">
+<span class="sig-name descname"><span class="pre">LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.LOW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.MODERATE">
+<span class="sig-name descname"><span class="pre">MODERATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.MODERATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.NONE">
+<span class="sig-name descname"><span class="pre">NONE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.NONE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.CrisisLevel.SEVERE">
+<span class="sig-name descname"><span class="pre">SEVERE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.CrisisLevel.SEVERE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">InterventionType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#InterventionType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of therapeutic interventions.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.CORRECTIVE">
+<span class="sig-name descname"><span class="pre">CORRECTIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'corrective'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.CORRECTIVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.CRISIS">
+<span class="sig-name descname"><span class="pre">CRISIS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crisis'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.CRISIS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.EDUCATIONAL">
+<span class="sig-name descname"><span class="pre">EDUCATIONAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'educational'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.EDUCATIONAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.IMMEDIATE">
+<span class="sig-name descname"><span class="pre">IMMEDIATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'immediate'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.IMMEDIATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.PREVENTIVE">
+<span class="sig-name descname"><span class="pre">PREVENTIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'preventive'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.PREVENTIVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.SCHEDULED">
+<span class="sig-name descname"><span class="pre">SCHEDULED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scheduled'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.SCHEDULED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.InterventionType.SUPPORTIVE">
+<span class="sig-name descname"><span class="pre">SUPPORTIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'supportive'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.InterventionType.SUPPORTIVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">MaturityLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#MaturityLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>Content maturity levels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel.ADULT">
+<span class="sig-name descname"><span class="pre">ADULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel.ADULT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel.ALL_AGES">
+<span class="sig-name descname"><span class="pre">ALL_AGES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel.ALL_AGES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel.MATURE_ADULT">
+<span class="sig-name descname"><span class="pre">MATURE_ADULT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel.MATURE_ADULT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel.MATURE_TEEN">
+<span class="sig-name descname"><span class="pre">MATURE_TEEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel.MATURE_TEEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.MaturityLevel.TEEN">
+<span class="sig-name descname"><span class="pre">TEEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.MaturityLevel.TEEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ProtectiveFactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ProtectiveFactor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Protective factors that can mitigate risks.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.COPING_SKILLS">
+<span class="sig-name descname"><span class="pre">COPING_SKILLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'coping_skills'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.COPING_SKILLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.CRISIS_RESOURCES">
+<span class="sig-name descname"><span class="pre">CRISIS_RESOURCES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crisis_resources'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.CRISIS_RESOURCES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.GROUNDING_TECHNIQUES">
+<span class="sig-name descname"><span class="pre">GROUNDING_TECHNIQUES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'grounding_techniques'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.GROUNDING_TECHNIQUES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.MEANING_PURPOSE">
+<span class="sig-name descname"><span class="pre">MEANING_PURPOSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'meaning_purpose'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.MEANING_PURPOSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.MINDFULNESS_PRACTICE">
+<span class="sig-name descname"><span class="pre">MINDFULNESS_PRACTICE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mindfulness_practice'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.MINDFULNESS_PRACTICE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.POSITIVE_ACTIVITIES">
+<span class="sig-name descname"><span class="pre">POSITIVE_ACTIVITIES</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'positive_activities'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.POSITIVE_ACTIVITIES" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.PROFESSIONAL_HELP">
+<span class="sig-name descname"><span class="pre">PROFESSIONAL_HELP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'professional_help'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.PROFESSIONAL_HELP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.SAFETY_PLAN">
+<span class="sig-name descname"><span class="pre">SAFETY_PLAN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_plan'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.SAFETY_PLAN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.SOCIAL_SUPPORT">
+<span class="sig-name descname"><span class="pre">SOCIAL_SUPPORT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'social_support'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.SOCIAL_SUPPORT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ProtectiveFactor.THERAPEUTIC_RELATIONSHIP">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_RELATIONSHIP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_relationship'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ProtectiveFactor.THERAPEUTIC_RELATIONSHIP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">RiskCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#RiskCategory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Categories of risk in therapeutic content.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.ANXIETY_TRIGGER">
+<span class="sig-name descname"><span class="pre">ANXIETY_TRIGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anxiety_trigger'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.ANXIETY_TRIGGER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.DEPRESSION_TRIGGER">
+<span class="sig-name descname"><span class="pre">DEPRESSION_TRIGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'depression_trigger'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.DEPRESSION_TRIGGER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.EATING_DISORDER">
+<span class="sig-name descname"><span class="pre">EATING_DISORDER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'eating_disorder'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.EATING_DISORDER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.INAPPROPRIATE_CONTENT">
+<span class="sig-name descname"><span class="pre">INAPPROPRIATE_CONTENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'inappropriate_content'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.INAPPROPRIATE_CONTENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.PANIC_TRIGGER">
+<span class="sig-name descname"><span class="pre">PANIC_TRIGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'panic_trigger'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.PANIC_TRIGGER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.SELF_HARM">
+<span class="sig-name descname"><span class="pre">SELF_HARM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'self_harm'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.SELF_HARM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.SUBSTANCE_ABUSE">
+<span class="sig-name descname"><span class="pre">SUBSTANCE_ABUSE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'substance_abuse'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.SUBSTANCE_ABUSE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.SUICIDE">
+<span class="sig-name descname"><span class="pre">SUICIDE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'suicide'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.SUICIDE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.TRAUMA_TRIGGER">
+<span class="sig-name descname"><span class="pre">TRAUMA_TRIGGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'trauma_trigger'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.TRAUMA_TRIGGER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.RiskCategory.VIOLENCE">
+<span class="sig-name descname"><span class="pre">VIOLENCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'violence'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.RiskCategory.VIOLENCE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">SafetyLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#SafetyLevel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Overall safety levels for content and users.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel.CAUTION">
+<span class="sig-name descname"><span class="pre">CAUTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'caution'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel.CAUTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'critical'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel.DANGER">
+<span class="sig-name descname"><span class="pre">DANGER</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'danger'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel.DANGER" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel.SAFE">
+<span class="sig-name descname"><span class="pre">SAFE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safe'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel.SAFE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.SafetyLevel.WARNING">
+<span class="sig-name descname"><span class="pre">WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'warning'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.SafetyLevel.WARNING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">TherapeuticFramework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#TherapeuticFramework"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Therapeutic frameworks for content alignment.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.ACT">
+<span class="sig-name descname"><span class="pre">ACT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'acceptance_commitment_therapy'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.ACT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.CBT">
+<span class="sig-name descname"><span class="pre">CBT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_behavioral_therapy'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.CBT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.DBT">
+<span class="sig-name descname"><span class="pre">DBT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'dialectical_behavior_therapy'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.DBT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.FAMILY_SYSTEMS">
+<span class="sig-name descname"><span class="pre">FAMILY_SYSTEMS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'family_systems'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.FAMILY_SYSTEMS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.HUMANISTIC">
+<span class="sig-name descname"><span class="pre">HUMANISTIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'humanistic'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.HUMANISTIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.MINDFULNESS">
+<span class="sig-name descname"><span class="pre">MINDFULNESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mindfulness_based'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.MINDFULNESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.NARRATIVE_THERAPY">
+<span class="sig-name descname"><span class="pre">NARRATIVE_THERAPY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_therapy'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.NARRATIVE_THERAPY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.PSYCHODYNAMIC">
+<span class="sig-name descname"><span class="pre">PSYCHODYNAMIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'psychodynamic'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.PSYCHODYNAMIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.SOLUTION_FOCUSED">
+<span class="sig-name descname"><span class="pre">SOLUTION_FOCUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'solution_focused'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.SOLUTION_FOCUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticFramework.TRAUMA_INFORMED">
+<span class="sig-name descname"><span class="pre">TRAUMA_INFORMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'trauma_informed'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticFramework.TRAUMA_INFORMED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">TherapeuticGoalCategory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#TherapeuticGoalCategory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Categories of therapeutic goals.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ADDICTION_RECOVERY">
+<span class="sig-name descname"><span class="pre">ADDICTION_RECOVERY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'addiction_recovery'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ADDICTION_RECOVERY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ANGER_MANAGEMENT">
+<span class="sig-name descname"><span class="pre">ANGER_MANAGEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anger_management'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ANGER_MANAGEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ANXIETY_MANAGEMENT">
+<span class="sig-name descname"><span class="pre">ANXIETY_MANAGEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'anxiety_management'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.ANXIETY_MANAGEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.BEHAVIORAL_CHANGE">
+<span class="sig-name descname"><span class="pre">BEHAVIORAL_CHANGE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'behavioral_change'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.BEHAVIORAL_CHANGE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.COGNITIVE_RESTRUCTURING">
+<span class="sig-name descname"><span class="pre">COGNITIVE_RESTRUCTURING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cognitive_restructuring'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.COGNITIVE_RESTRUCTURING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.COMMUNICATION_SKILLS">
+<span class="sig-name descname"><span class="pre">COMMUNICATION_SKILLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'communication_skills'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.COMMUNICATION_SKILLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.DEPRESSION_SUPPORT">
+<span class="sig-name descname"><span class="pre">DEPRESSION_SUPPORT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'depression_support'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.DEPRESSION_SUPPORT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.EMOTIONAL_REGULATION">
+<span class="sig-name descname"><span class="pre">EMOTIONAL_REGULATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'emotional_regulation'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.EMOTIONAL_REGULATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.GRIEF_PROCESSING">
+<span class="sig-name descname"><span class="pre">GRIEF_PROCESSING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'grief_processing'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.GRIEF_PROCESSING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.MINDFULNESS">
+<span class="sig-name descname"><span class="pre">MINDFULNESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'mindfulness'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.MINDFULNESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.RELATIONSHIP_SKILLS">
+<span class="sig-name descname"><span class="pre">RELATIONSHIP_SKILLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'relationship_skills'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.RELATIONSHIP_SKILLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.SELF_ESTEEM">
+<span class="sig-name descname"><span class="pre">SELF_ESTEEM</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'self_esteem'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.SELF_ESTEEM" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.SOCIAL_SKILLS">
+<span class="sig-name descname"><span class="pre">SOCIAL_SKILLS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'social_skills'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.SOCIAL_SKILLS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.STRESS_MANAGEMENT">
+<span class="sig-name descname"><span class="pre">STRESS_MANAGEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'stress_management'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.STRESS_MANAGEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.TherapeuticGoalCategory.TRAUMA_RECOVERY">
+<span class="sig-name descname"><span class="pre">TRAUMA_RECOVERY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'trauma_recovery'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.TherapeuticGoalCategory.TRAUMA_RECOVERY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ValidationAction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ValidationAction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Actions that can be taken based on validation results.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.APPROVE">
+<span class="sig-name descname"><span class="pre">APPROVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'approve'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.APPROVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.BLOCK">
+<span class="sig-name descname"><span class="pre">BLOCK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'block'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.BLOCK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.ESCALATE">
+<span class="sig-name descname"><span class="pre">ESCALATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'escalate'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.ESCALATE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.FLAG_FOR_REVIEW">
+<span class="sig-name descname"><span class="pre">FLAG_FOR_REVIEW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'flag_for_review'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.FLAG_FOR_REVIEW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.MODIFY">
+<span class="sig-name descname"><span class="pre">MODIFY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'modify'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.MODIFY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.REJECT">
+<span class="sig-name descname"><span class="pre">REJECT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reject'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.REJECT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.REQUIRE_CONFIRMATION">
+<span class="sig-name descname"><span class="pre">REQUIRE_CONFIRMATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'require_confirmation'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.REQUIRE_CONFIRMATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationAction.WARN">
+<span class="sig-name descname"><span class="pre">WARN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'warn'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationAction.WARN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ValidationComponent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ValidationComponent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Components involved in validation pipeline.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.AGE_APPROPRIATENESS">
+<span class="sig-name descname"><span class="pre">AGE_APPROPRIATENESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'age_appropriateness'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.AGE_APPROPRIATENESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.BIAS_DETECTION">
+<span class="sig-name descname"><span class="pre">BIAS_DETECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'bias_detection'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.BIAS_DETECTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.CONTENT_SAFETY">
+<span class="sig-name descname"><span class="pre">CONTENT_SAFETY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'content_safety'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.CONTENT_SAFETY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.CRISIS_DETECTION">
+<span class="sig-name descname"><span class="pre">CRISIS_DETECTION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crisis_detection'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.CRISIS_DETECTION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.CULTURAL_SENSITIVITY">
+<span class="sig-name descname"><span class="pre">CULTURAL_SENSITIVITY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cultural_sensitivity'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.CULTURAL_SENSITIVITY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.EVIDENCE_BASED">
+<span class="sig-name descname"><span class="pre">EVIDENCE_BASED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'evidence_based'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.EVIDENCE_BASED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationComponent.THERAPEUTIC_ALIGNMENT">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_ALIGNMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_alignment'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationComponent.THERAPEUTIC_ALIGNMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ValidationPriority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ValidationPriority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.IntEnum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">IntEnum</span></code></a></p>
+<p>Priority levels for validation processing.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">5</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">3</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority.HIGH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority.LOW">
+<span class="sig-name descname"><span class="pre">LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority.LOW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority.NORMAL">
+<span class="sig-name descname"><span class="pre">NORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">2</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority.NORMAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationPriority.URGENT">
+<span class="sig-name descname"><span class="pre">URGENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">4</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationPriority.URGENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ValidationScope</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ValidationScope"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Scope of validation to be performed.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope.BASIC">
+<span class="sig-name descname"><span class="pre">BASIC</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'basic'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope.BASIC" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope.COMPREHENSIVE">
+<span class="sig-name descname"><span class="pre">COMPREHENSIVE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'comprehensive'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope.COMPREHENSIVE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope.CRISIS_FOCUSED">
+<span class="sig-name descname"><span class="pre">CRISIS_FOCUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crisis_focused'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope.CRISIS_FOCUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope.STANDARD">
+<span class="sig-name descname"><span class="pre">STANDARD</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'standard'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope.STANDARD" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationScope.THERAPEUTIC_FOCUSED">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_FOCUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_focused'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationScope.THERAPEUTIC_FOCUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.therapeutic_safety.enums.</span></span><span class="sig-name descname"><span class="pre">ValidationStatus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/therapeutic_safety/enums.html#ValidationStatus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Status of validation process.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.CANCELLED">
+<span class="sig-name descname"><span class="pre">CANCELLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'cancelled'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.CANCELLED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.COMPLETED">
+<span class="sig-name descname"><span class="pre">COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'completed'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.FAILED">
+<span class="sig-name descname"><span class="pre">FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'failed'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.FAILED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.IN_PROGRESS">
+<span class="sig-name descname"><span class="pre">IN_PROGRESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'in_progress'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.IN_PROGRESS" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.PENDING">
+<span class="sig-name descname"><span class="pre">PENDING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pending'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.PENDING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.RETRY_NEEDED">
+<span class="sig-name descname"><span class="pre">RETRY_NEEDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'retry_needed'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.RETRY_NEEDED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.therapeutic_safety.enums.ValidationStatus.TIMEOUT">
+<span class="sig-name descname"><span class="pre">TIMEOUT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'timeout'</span></em><a class="headerlink" href="#src.components.therapeutic_safety.enums.ValidationStatus.TIMEOUT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.therapeutic_safety.cache.html" class="btn btn-neutral float-left" title="src.components.therapeutic_safety.cache module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.therapeutic_safety.events.html" class="btn btn-neutral float-right" title="src.components.therapeutic_safety.events module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

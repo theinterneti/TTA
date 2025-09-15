@@ -1,0 +1,458 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.models.progress &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.models.progress</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.models.progress</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Progress tracking and analytics data models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">TherapeuticApproach</span>
+
+
+<div class="viewcode-block" id="ProgressVizSeries">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressVizSeries">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressVizSeries</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Visualization-friendly time series for progress charts.&quot;&quot;&quot;</span>
+
+    <span class="n">time_buckets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">series</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">meta</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticMetric">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.TherapeuticMetric">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticMetric</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Individual therapeutic effectiveness metric.&quot;&quot;&quot;</span>
+
+    <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">unit</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">measured_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">confidence_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># 0.0 to 1.0</span>
+
+<div class="viewcode-block" id="TherapeuticMetric.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.TherapeuticMetric.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate therapeutic metric after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confidence_level</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Confidence level must be between 0.0 and 1.0&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProgressHighlight">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressHighlight">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressHighlight</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Significant progress achievement or insight.&quot;&quot;&quot;</span>
+
+    <span class="n">highlight_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">highlight_type</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># breakthrough, milestone, insight, skill_development</span>
+    <span class="n">achieved_at</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">related_character_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">related_world_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0 to 1.0</span>
+    <span class="n">celebration_shown</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="ProgressHighlight.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressHighlight.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate progress highlight after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_value</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Therapeutic value must be between 0.0 and 1.0&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Milestone">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.Milestone">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Milestone</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Therapeutic milestone with progress tracking.&quot;&quot;&quot;</span>
+
+    <span class="n">milestone_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">target_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">achieved_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">progress_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">required_actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">completed_actions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_approaches_involved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span>
+    <span class="p">)</span>
+    <span class="n">reward_description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">is_achieved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="Milestone.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.Milestone.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate milestone after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">&lt;=</span> <span class="mf">100.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Progress percentage must be between 0.0 and 100.0&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_achieved</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">achieved_date</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">achieved_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="Milestone.add_completed_action">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.Milestone.add_completed_action">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_completed_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mark an action as completed and update progress.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">action</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_actions</span> <span class="ow">and</span> <span class="n">action</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed_actions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completed_actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_update_progress</span><span class="p">()</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_update_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update progress percentage based on completed actions.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_actions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">completed_actions</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">required_actions</span><span class="p">)</span>
+            <span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">&gt;=</span> <span class="mf">100.0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_achieved</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">is_achieved</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">achieved_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="EngagementMetrics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.EngagementMetrics">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EngagementMetrics</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Player engagement and participation metrics.&quot;&quot;&quot;</span>
+
+    <span class="n">total_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_time_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">average_session_length</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">sessions_this_week</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">sessions_this_month</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">current_streak_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">longest_streak_days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_session_date</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">preferred_session_times</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>  <span class="c1"># hour ranges</span>
+    <span class="n">dropout_risk_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0 to 1.0, higher = more risk</span>
+
+<div class="viewcode-block" id="EngagementMetrics.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.EngagementMetrics.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate engagement metrics after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Dropout risk score must be between 0.0 and 1.0&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EngagementMetrics.update_session_stats">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.EngagementMetrics.update_session_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_session_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_duration_minutes</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update engagement metrics with new session data.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_sessions</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_time_minutes</span> <span class="o">+=</span> <span class="n">session_duration_minutes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_time_minutes</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_sessions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_session_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+
+        <span class="c1"># Update streak</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_session_date</span><span class="p">:</span>
+            <span class="n">days_since_last</span> <span class="o">=</span> <span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_session_date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span>
+            <span class="k">if</span> <span class="n">days_since_last</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">longest_streak_days</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">longest_streak_days</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_streak_days</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">=</span> <span class="mi">1</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TherapeuticEffectivenessReport">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.TherapeuticEffectivenessReport">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticEffectivenessReport</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Report on therapeutic effectiveness for a player.&quot;&quot;&quot;</span>
+
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">report_period_start</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">report_period_end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+    <span class="c1"># Effectiveness metrics</span>
+    <span class="n">overall_effectiveness_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0 to 1.0</span>
+    <span class="n">therapeutic_metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticMetric</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">most_effective_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">least_effective_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Progress indicators</span>
+    <span class="n">goals_achieved</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">goals_in_progress</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">milestones_reached</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">breakthrough_moments</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Behavioral changes</span>
+    <span class="n">emotional_regulation_improvement</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># -1.0 to 1.0</span>
+    <span class="n">coping_skills_development</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># -1.0 to 1.0</span>
+    <span class="n">self_awareness_growth</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># -1.0 to 1.0</span>
+
+    <span class="c1"># Recommendations</span>
+    <span class="n">recommended_adjustments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">suggested_next_steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="n">generated_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticEffectivenessReport.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.TherapeuticEffectivenessReport.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate therapeutic effectiveness report after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">overall_effectiveness_score</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Overall effectiveness score must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">improvement</span> <span class="ow">in</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">emotional_regulation_improvement</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">coping_skills_development</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">self_awareness_growth</span><span class="p">,</span>
+        <span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">&lt;=</span> <span class="n">improvement</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Improvement scores must be between -1.0 and 1.0&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProgressSummary">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressSummary</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive progress summary for a player.&quot;&quot;&quot;</span>
+
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span>
+
+    <span class="c1"># Basic statistics</span>
+    <span class="n">engagement_metrics</span><span class="p">:</span> <span class="n">EngagementMetrics</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">EngagementMetrics</span><span class="p">)</span>
+
+    <span class="c1"># Progress tracking</span>
+    <span class="n">milestones_achieved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">active_milestones</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recent_highlights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressHighlight</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Therapeutic insights</span>
+    <span class="n">favorite_therapeutic_approach</span><span class="p">:</span> <span class="n">TherapeuticApproach</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">most_effective_world_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_momentum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 0.0 to 1.0</span>
+    <span class="n">readiness_for_advancement</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c1"># 0.0 to 1.0</span>
+
+    <span class="c1"># Trends and patterns</span>
+    <span class="n">progress_trend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stable&quot;</span>  <span class="c1"># improving, stable, declining</span>
+    <span class="n">engagement_trend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;stable&quot;</span>  <span class="c1"># increasing, stable, decreasing</span>
+    <span class="n">challenge_areas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">strength_areas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Future planning</span>
+    <span class="n">next_recommended_goals</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">suggested_therapeutic_adjustments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressSummary.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate progress summary after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Therapeutic momentum must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">readiness_for_advancement</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Readiness for advancement must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+
+        <span class="n">valid_trends</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;improving&quot;</span><span class="p">,</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span> <span class="s2">&quot;declining&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_trend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_trends</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress trend must be one of: </span><span class="si">{</span><span class="n">valid_trends</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">valid_engagement_trends</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;increasing&quot;</span><span class="p">,</span> <span class="s2">&quot;stable&quot;</span><span class="p">,</span> <span class="s2">&quot;decreasing&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">engagement_trend</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_engagement_trends</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Engagement trend must be one of: </span><span class="si">{</span><span class="n">valid_engagement_trends</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressSummary.add_milestone">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary.add_milestone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">milestone</span><span class="p">:</span> <span class="n">Milestone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a milestone to tracking.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">milestone</span><span class="o">.</span><span class="n">is_achieved</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_milestones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressSummary.achieve_milestone">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary.achieve_milestone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">achieve_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">milestone_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Move a milestone from active to achieved.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">milestone</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_milestones</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">milestone</span><span class="o">.</span><span class="n">milestone_id</span> <span class="o">==</span> <span class="n">milestone_id</span><span class="p">:</span>
+                <span class="n">milestone</span><span class="o">.</span><span class="n">is_achieved</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">milestone</span><span class="o">.</span><span class="n">achieved_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+                <span class="n">achieved_milestone</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_milestones</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">achieved_milestone</span><span class="p">)</span>
+                <span class="k">break</span></div>
+
+
+<div class="viewcode-block" id="ProgressSummary.add_progress_highlight">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary.add_progress_highlight">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_progress_highlight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">highlight</span><span class="p">:</span> <span class="n">ProgressHighlight</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a progress highlight.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recent_highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">highlight</span><span class="p">)</span>
+
+        <span class="c1"># Keep only the most recent 10 highlights</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recent_highlights</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recent_highlights</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">h</span><span class="p">:</span> <span class="n">h</span><span class="o">.</span><span class="n">achieved_at</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)[:</span><span class="mi">10</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ProgressSummary.calculate_overall_progress_score">
+<a class="viewcode-back" href="../../../../api/src.player_experience.models.progress.html#src.player_experience.models.ProgressSummary.calculate_overall_progress_score">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_overall_progress_score</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate an overall progress score based on various factors.&quot;&quot;&quot;</span>
+        <span class="n">factors</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Milestone achievement rate</span>
+        <span class="n">total_milestones</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_milestones</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">total_milestones</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">milestone_score</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">)</span> <span class="o">/</span> <span class="n">total_milestones</span>
+            <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone_score</span> <span class="o">*</span> <span class="mf">0.4</span><span class="p">)</span>
+
+        <span class="c1"># Therapeutic momentum</span>
+        <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">*</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="c1"># Engagement consistency</span>
+        <span class="n">engagement_score</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">/</span> <span class="mf">30.0</span><span class="p">)</span>
+        <span class="n">factors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">engagement_score</span> <span class="o">*</span> <span class="mf">0.3</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span> <span class="k">if</span> <span class="n">factors</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

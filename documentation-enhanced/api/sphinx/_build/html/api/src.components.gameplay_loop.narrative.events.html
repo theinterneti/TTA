@@ -1,0 +1,1079 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.events module &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.gameplay_loop.narrative.flow_controller module" href="src.components.gameplay_loop.narrative.flow_controller.html" />
+    <link rel="prev" title="src.components.gameplay_loop.narrative.engine module" href="src.components.gameplay_loop.narrative.engine.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.html">src.components.gameplay_loop package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.gameplay_loop.narrative.html">src.components.gameplay_loop.narrative package</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.events module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.gameplay_loop.narrative.events.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.gameplay_loop.narrative.events">
+<span id="src-components-gameplay-loop-narrative-events-module"></span><h1>src.components.gameplay_loop.narrative.events module<a class="headerlink" href="#module-src.components.gameplay_loop.narrative.events" title="Link to this heading"></a></h1>
+<p>Narrative Engine Events</p>
+<p>This module defines the event system for the narrative engine, enabling
+decoupled communication between components and external integrations.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ChoiceEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">ChoiceEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type=EventType.NARRATIVE_STARTED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=EventPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_errors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_text=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_type=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_relevance=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#ChoiceEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></p>
+<p>Choice-specific event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>processed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>processing_errors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>retry_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>choice_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_text</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_relevance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_id">
+<span class="sig-name descname"><span class="pre">choice_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_text">
+<span class="sig-name descname"><span class="pre">choice_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_type">
+<span class="sig-name descname"><span class="pre">choice_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent.choice_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ChoiceEvent.therapeutic_relevance">
+<span class="sig-name descname"><span class="pre">therapeutic_relevance</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent.therapeutic_relevance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">EventBus</span></span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Event bus for managing narrative events.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus.clear_history">
+<span class="sig-name descname"><span class="pre">clear_history</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus.clear_history"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus.clear_history" title="Link to this definition"></a></dt>
+<dd><p>Clear event history.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus.get_events">
+<span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus.get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus.get_events" title="Link to this definition"></a></dt>
+<dd><p>Get events from history with optional filtering.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>limit</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus.publish">
+<em class="property"><span class="k"><span class="pre">async</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">publish</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus.publish"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus.publish" title="Link to this definition"></a></dt>
+<dd><p>Publish an event to all subscribers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>event</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus.subscribe">
+<span class="sig-name descname"><span class="pre">subscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus.subscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus.subscribe" title="Link to this definition"></a></dt>
+<dd><p>Subscribe to an event type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>handler</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">callable</span></code></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventBus.unsubscribe">
+<span class="sig-name descname"><span class="pre">unsubscribe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">handler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventBus.unsubscribe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventBus.unsubscribe" title="Link to this definition"></a></dt>
+<dd><p>Unsubscribe from an event type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>handler</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">callable</span></code></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventPriority">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">EventPriority</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventPriority"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Event priority levels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventPriority.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'critical'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventPriority.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventPriority.HIGH">
+<span class="sig-name descname"><span class="pre">HIGH</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'high'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventPriority.HIGH" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventPriority.LOW">
+<span class="sig-name descname"><span class="pre">LOW</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'low'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventPriority.LOW" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventPriority.NORMAL">
+<span class="sig-name descname"><span class="pre">NORMAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'normal'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventPriority.NORMAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">EventType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#EventType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Types of narrative events.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ADAPTATION_MADE">
+<span class="sig-name descname"><span class="pre">ADAPTATION_MADE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'adaptation_made'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ADAPTATION_MADE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ADAPTIVE_INTERVENTION_TRIGGERED">
+<span class="sig-name descname"><span class="pre">ADAPTIVE_INTERVENTION_TRIGGERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'adaptive_intervention_triggered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ADAPTIVE_INTERVENTION_TRIGGERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ALTERNATIVE_PATH_COMPLETED">
+<span class="sig-name descname"><span class="pre">ALTERNATIVE_PATH_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alternative_path_completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ALTERNATIVE_PATH_COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ALTERNATIVE_PATH_CREATED">
+<span class="sig-name descname"><span class="pre">ALTERNATIVE_PATH_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'alternative_path_created'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ALTERNATIVE_PATH_CREATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BACKUP_CREATED">
+<span class="sig-name descname"><span class="pre">BACKUP_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'backup_created'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BACKUP_CREATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BACKUP_RESTORED">
+<span class="sig-name descname"><span class="pre">BACKUP_RESTORED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'backup_restored'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BACKUP_RESTORED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BRANCH_TAKEN">
+<span class="sig-name descname"><span class="pre">BRANCH_TAKEN</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'branch_taken'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BRANCH_TAKEN" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_ACCEPTED">
+<span class="sig-name descname"><span class="pre">BREAK_POINT_ACCEPTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'break_point_accepted'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_ACCEPTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_DETECTED">
+<span class="sig-name descname"><span class="pre">BREAK_POINT_DETECTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'break_point_detected'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_DETECTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_OFFERED">
+<span class="sig-name descname"><span class="pre">BREAK_POINT_OFFERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'break_point_offered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.BREAK_POINT_OFFERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHARACTER_ABILITY_UNLOCKED">
+<span class="sig-name descname"><span class="pre">CHARACTER_ABILITY_UNLOCKED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_ability_unlocked'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHARACTER_ABILITY_UNLOCKED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHARACTER_DEVELOPED">
+<span class="sig-name descname"><span class="pre">CHARACTER_DEVELOPED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_developed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHARACTER_DEVELOPED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHARACTER_DEVELOPMENT_SYNCED">
+<span class="sig-name descname"><span class="pre">CHARACTER_DEVELOPMENT_SYNCED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_development_synced'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHARACTER_DEVELOPMENT_SYNCED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHARACTER_LEVEL_UP">
+<span class="sig-name descname"><span class="pre">CHARACTER_LEVEL_UP</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_level_up'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHARACTER_LEVEL_UP" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHARACTER_MILESTONE_ACHIEVED">
+<span class="sig-name descname"><span class="pre">CHARACTER_MILESTONE_ACHIEVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_milestone_achieved'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHARACTER_MILESTONE_ACHIEVED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHOICE_MADE">
+<span class="sig-name descname"><span class="pre">CHOICE_MADE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_made'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHOICE_MADE" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHOICE_PRESENTED">
+<span class="sig-name descname"><span class="pre">CHOICE_PRESENTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_presented'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHOICE_PRESENTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHOICE_PROCESSED">
+<span class="sig-name descname"><span class="pre">CHOICE_PROCESSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_processed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHOICE_PROCESSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CHOICE_VALIDATED">
+<span class="sig-name descname"><span class="pre">CHOICE_VALIDATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'choice_validated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CHOICE_VALIDATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_EVENT">
+<span class="sig-name descname"><span class="pre">COLLABORATIVE_EVENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'collaborative_event'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_EVENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_SESSION_CREATED">
+<span class="sig-name descname"><span class="pre">COLLABORATIVE_SESSION_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'collaborative_session_created'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_SESSION_CREATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_SESSION_STARTED">
+<span class="sig-name descname"><span class="pre">COLLABORATIVE_SESSION_STARTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'collaborative_session_started'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.COLLABORATIVE_SESSION_STARTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CONFLICT_REPORTED">
+<span class="sig-name descname"><span class="pre">CONFLICT_REPORTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'conflict_reported'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CONFLICT_REPORTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CONSEQUENCE_APPLIED">
+<span class="sig-name descname"><span class="pre">CONSEQUENCE_APPLIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'consequence_applied'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CONSEQUENCE_APPLIED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CONSEQUENCE_GENERATED">
+<span class="sig-name descname"><span class="pre">CONSEQUENCE_GENERATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'consequence_generated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CONSEQUENCE_GENERATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.CRISIS_INTERVENTION_NEEDED">
+<span class="sig-name descname"><span class="pre">CRISIS_INTERVENTION_NEEDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'crisis_intervention_needed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.CRISIS_INTERVENTION_NEEDED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.DIFFICULTY_ADJUSTED">
+<span class="sig-name descname"><span class="pre">DIFFICULTY_ADJUSTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'difficulty_adjusted'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.DIFFICULTY_ADJUSTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ERROR_ESCALATED">
+<span class="sig-name descname"><span class="pre">ERROR_ESCALATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'error_escalated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ERROR_ESCALATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ERROR_EVENT">
+<span class="sig-name descname"><span class="pre">ERROR_EVENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'error_event'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ERROR_EVENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.ERROR_HANDLED">
+<span class="sig-name descname"><span class="pre">ERROR_HANDLED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'error_handled'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.ERROR_HANDLED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.EXPLORATION_EVENT">
+<span class="sig-name descname"><span class="pre">EXPLORATION_EVENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exploration_event'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.EXPLORATION_EVENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.EXPLORATION_STARTED">
+<span class="sig-name descname"><span class="pre">EXPLORATION_STARTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'exploration_started'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.EXPLORATION_STARTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.GOAL_COMPLETED">
+<span class="sig-name descname"><span class="pre">GOAL_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'goal_completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.GOAL_COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.GROUP_CHOICE_DECIDED">
+<span class="sig-name descname"><span class="pre">GROUP_CHOICE_DECIDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'group_choice_decided'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.GROUP_CHOICE_DECIDED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.GROUP_CHOICE_PROPOSED">
+<span class="sig-name descname"><span class="pre">GROUP_CHOICE_PROPOSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'group_choice_proposed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.GROUP_CHOICE_PROPOSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.INTEGRATION_ERROR">
+<span class="sig-name descname"><span class="pre">INTEGRATION_ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'integration_error'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.INTEGRATION_ERROR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.INTEGRATION_HEALTH_CHECK">
+<span class="sig-name descname"><span class="pre">INTEGRATION_HEALTH_CHECK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'integration_health_check'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.INTEGRATION_HEALTH_CHECK" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.INTERVENTION_APPLIED">
+<span class="sig-name descname"><span class="pre">INTERVENTION_APPLIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'intervention_applied'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.INTERVENTION_APPLIED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.LEARNING_OPPORTUNITY_CREATED">
+<span class="sig-name descname"><span class="pre">LEARNING_OPPORTUNITY_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'learning_opportunity_created'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.LEARNING_OPPORTUNITY_CREATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.MILESTONE_ACHIEVED">
+<span class="sig-name descname"><span class="pre">MILESTONE_ACHIEVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'milestone_achieved'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.MILESTONE_ACHIEVED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.MODERATION_ACTION_APPLIED">
+<span class="sig-name descname"><span class="pre">MODERATION_ACTION_APPLIED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'moderation_action_applied'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.MODERATION_ACTION_APPLIED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_COMPLETED">
+<span class="sig-name descname"><span class="pre">NARRATIVE_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_PAUSED">
+<span class="sig-name descname"><span class="pre">NARRATIVE_PAUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_paused'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_PAUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_RESUMED">
+<span class="sig-name descname"><span class="pre">NARRATIVE_RESUMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_resumed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_RESUMED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_STARTED">
+<span class="sig-name descname"><span class="pre">NARRATIVE_STARTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_started'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.NARRATIVE_STARTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PARTICIPANT_JOINED">
+<span class="sig-name descname"><span class="pre">PARTICIPANT_JOINED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'participant_joined'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PARTICIPANT_JOINED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PARTICIPANT_LEFT">
+<span class="sig-name descname"><span class="pre">PARTICIPANT_LEFT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'participant_left'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PARTICIPANT_LEFT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PATH_COMPARISON_GENERATED">
+<span class="sig-name descname"><span class="pre">PATH_COMPARISON_GENERATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'path_comparison_generated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PATH_COMPARISON_GENERATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PATTERN_RECOGNIZED">
+<span class="sig-name descname"><span class="pre">PATTERN_RECOGNIZED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'pattern_recognized'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PATTERN_RECOGNIZED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PERFORMANCE_MONITORED">
+<span class="sig-name descname"><span class="pre">PERFORMANCE_MONITORED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'performance_monitored'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PERFORMANCE_MONITORED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PROGRESS_TRACKING_UPDATED">
+<span class="sig-name descname"><span class="pre">PROGRESS_TRACKING_UPDATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'progress_tracking_updated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PROGRESS_TRACKING_UPDATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.PROGRESS_UPDATED">
+<span class="sig-name descname"><span class="pre">PROGRESS_UPDATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'progress_updated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.PROGRESS_UPDATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.RECOVERY_ATTEMPTED">
+<span class="sig-name descname"><span class="pre">RECOVERY_ATTEMPTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'recovery_attempted'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.RECOVERY_ATTEMPTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.RECOVERY_FAILED">
+<span class="sig-name descname"><span class="pre">RECOVERY_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'recovery_failed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.RECOVERY_FAILED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.RECOVERY_SUCCESSFUL">
+<span class="sig-name descname"><span class="pre">RECOVERY_SUCCESSFUL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'recovery_successful'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.RECOVERY_SUCCESSFUL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.REFLECTION_TRIGGERED">
+<span class="sig-name descname"><span class="pre">REFLECTION_TRIGGERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reflection_triggered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.REFLECTION_TRIGGERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SAFETY_CHECK_TRIGGERED">
+<span class="sig-name descname"><span class="pre">SAFETY_CHECK_TRIGGERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_check_triggered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SAFETY_CHECK_TRIGGERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SAFETY_CLEARED">
+<span class="sig-name descname"><span class="pre">SAFETY_CLEARED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_cleared'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SAFETY_CLEARED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SAFETY_CONCERN_DETECTED">
+<span class="sig-name descname"><span class="pre">SAFETY_CONCERN_DETECTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_concern_detected'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SAFETY_CONCERN_DETECTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SAFETY_VALIDATION_COMPLETED">
+<span class="sig-name descname"><span class="pre">SAFETY_VALIDATION_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'safety_validation_completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SAFETY_VALIDATION_COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SCENE_COMPLETED">
+<span class="sig-name descname"><span class="pre">SCENE_COMPLETED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scene_completed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SCENE_COMPLETED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SCENE_ENTERED">
+<span class="sig-name descname"><span class="pre">SCENE_ENTERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scene_entered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SCENE_ENTERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SCENE_EXITED">
+<span class="sig-name descname"><span class="pre">SCENE_EXITED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scene_exited'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SCENE_EXITED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SCENE_FAILED">
+<span class="sig-name descname"><span class="pre">SCENE_FAILED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'scene_failed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SCENE_FAILED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SESSION_ENDED">
+<span class="sig-name descname"><span class="pre">SESSION_ENDED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'session_ended'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SESSION_ENDED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SESSION_MANAGEMENT">
+<span class="sig-name descname"><span class="pre">SESSION_MANAGEMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'session_management'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SESSION_MANAGEMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SESSION_PAUSED">
+<span class="sig-name descname"><span class="pre">SESSION_PAUSED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'session_paused'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SESSION_PAUSED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SESSION_RESUMED">
+<span class="sig-name descname"><span class="pre">SESSION_RESUMED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'session_resumed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SESSION_RESUMED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SESSION_STARTED">
+<span class="sig-name descname"><span class="pre">SESSION_STARTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'session_started'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SESSION_STARTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SKILL_DEVELOPED">
+<span class="sig-name descname"><span class="pre">SKILL_DEVELOPED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'skill_developed'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SKILL_DEVELOPED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SNAPSHOT_CREATED">
+<span class="sig-name descname"><span class="pre">SNAPSHOT_CREATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'snapshot_created'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SNAPSHOT_CREATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SNAPSHOT_RESTORED">
+<span class="sig-name descname"><span class="pre">SNAPSHOT_RESTORED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'snapshot_restored'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SNAPSHOT_RESTORED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SUPPORT_MESSAGE_SENT">
+<span class="sig-name descname"><span class="pre">SUPPORT_MESSAGE_SENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'support_message_sent'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SUPPORT_MESSAGE_SENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SYSTEM_DEGRADED">
+<span class="sig-name descname"><span class="pre">SYSTEM_DEGRADED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_degraded'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SYSTEM_DEGRADED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SYSTEM_INTEGRATION_CONNECTED">
+<span class="sig-name descname"><span class="pre">SYSTEM_INTEGRATION_CONNECTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_integration_connected'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SYSTEM_INTEGRATION_CONNECTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SYSTEM_INTEGRATION_DISCONNECTED">
+<span class="sig-name descname"><span class="pre">SYSTEM_INTEGRATION_DISCONNECTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_integration_disconnected'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SYSTEM_INTEGRATION_DISCONNECTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.SYSTEM_RECOVERED">
+<span class="sig-name descname"><span class="pre">SYSTEM_RECOVERED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'system_recovered'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.SYSTEM_RECOVERED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_CONCEPT_INTEGRATED">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_CONCEPT_INTEGRATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_concept_integrated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_CONCEPT_INTEGRATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_CONTENT_RETRIEVED">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_CONTENT_RETRIEVED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_content_retrieved'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_CONTENT_RETRIEVED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_MOMENT">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_MOMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_moment'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_MOMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_PROGRESS_UPDATED">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_PROGRESS_UPDATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_progress_updated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_PROGRESS_UPDATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_RESISTANCE_DETECTED">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_RESISTANCE_DETECTED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_resistance_detected'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.THERAPEUTIC_RESISTANCE_DETECTED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.EventType.USER_PREFERENCES_UPDATED">
+<span class="sig-name descname"><span class="pre">USER_PREFERENCES_UPDATED</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'user_preferences_updated'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.EventType.USER_PREFERENCES_UPDATED" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">NarrativeEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type=EventType.NARRATIVE_STARTED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=EventPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_errors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count=0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#NarrativeEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Base class for all narrative events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>processed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>processing_errors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>retry_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.context">
+<span class="sig-name descname"><span class="pre">context</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.context" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.data">
+<span class="sig-name descname"><span class="pre">data</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.event_id">
+<span class="sig-name descname"><span class="pre">event_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.event_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.event_type">
+<span class="sig-name descname"><span class="pre">event_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'narrative_started'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.event_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.from_dict">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#NarrativeEvent.from_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.from_dict" title="Link to this definition"></a></dt>
+<dd><p>Create event from dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.priority">
+<span class="sig-name descname"><span class="pre">priority</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'normal'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.priority" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.processed">
+<span class="sig-name descname"><span class="pre">processed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.processed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.processing_errors">
+<span class="sig-name descname"><span class="pre">processing_errors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.processing_errors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.retry_count">
+<span class="sig-name descname"><span class="pre">retry_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.retry_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.to_dict">
+<span class="sig-name descname"><span class="pre">to_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#NarrativeEvent.to_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.to_dict" title="Link to this definition"></a></dt>
+<dd><p>Convert event to dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.NarrativeEvent.user_id">
+<span class="sig-name descname"><span class="pre">user_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent.user_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">ProgressEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type=EventType.NARRATIVE_STARTED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=EventPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_errors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_type=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_name=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_value=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">improvement=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#ProgressEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></p>
+<p>Progress-specific event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>processed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>processing_errors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>retry_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>progress_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>metric_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>old_value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>new_value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>improvement</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent.improvement">
+<span class="sig-name descname"><span class="pre">improvement</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent.improvement" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent.metric_name">
+<span class="sig-name descname"><span class="pre">metric_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent.metric_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent.new_value">
+<span class="sig-name descname"><span class="pre">new_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent.new_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent.old_value">
+<span class="sig-name descname"><span class="pre">old_value</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent.old_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.ProgressEvent.progress_type">
+<span class="sig-name descname"><span class="pre">progress_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.ProgressEvent.progress_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SafetyEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">SafetyEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type=EventType.NARRATIVE_STARTED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=EventPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_errors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safety_level='standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_factors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protective_factors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intervention_needed=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#SafetyEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SafetyEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></p>
+<p>Safety-specific event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>processed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>processing_errors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>retry_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>safety_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>risk_factors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>protective_factors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>intervention_needed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SafetyEvent.intervention_needed">
+<span class="sig-name descname"><span class="pre">intervention_needed</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SafetyEvent.intervention_needed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SafetyEvent.protective_factors">
+<span class="sig-name descname"><span class="pre">protective_factors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SafetyEvent.protective_factors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SafetyEvent.risk_factors">
+<span class="sig-name descname"><span class="pre">risk_factors</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SafetyEvent.risk_factors" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SafetyEvent.safety_level">
+<span class="sig-name descname"><span class="pre">safety_level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'standard'</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SafetyEvent.safety_level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SceneEvent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">SceneEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type=EventType.NARRATIVE_STARTED</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">priority=EventPriority.NORMAL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processed=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">processing_errors=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_id=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_type=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_focus=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#SceneEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SceneEvent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></p>
+<p>Scene-specific event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>priority</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventPriority" title="src.components.gameplay_loop.narrative.events.EventPriority"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventPriority</span></code></a></span>)</p></li>
+<li><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>processed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>processing_errors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>retry_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>scene_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_focus</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SceneEvent.scene_id">
+<span class="sig-name descname"><span class="pre">scene_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SceneEvent.scene_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SceneEvent.scene_type">
+<span class="sig-name descname"><span class="pre">scene_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SceneEvent.scene_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.SceneEvent.therapeutic_focus">
+<span class="sig-name descname"><span class="pre">therapeutic_focus</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.SceneEvent.therapeutic_focus" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.create_choice_event">
+<span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">create_choice_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_relevance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#create_choice_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.create_choice_event" title="Link to this definition"></a></dt>
+<dd><p>Create a choice event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_text</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_relevance</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.ChoiceEvent" title="src.components.gameplay_loop.narrative.events.ChoiceEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ChoiceEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.create_consequence_event">
+<span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">create_consequence_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequence_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consequence_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#create_consequence_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.create_consequence_event" title="Link to this definition"></a></dt>
+<dd><p>Create a consequence event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>consequence_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>choice_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>consequence_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.NarrativeEvent" title="src.components.gameplay_loop.narrative.events.NarrativeEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">NarrativeEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.create_progress_event">
+<span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">create_progress_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">progress_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">old_value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">new_value</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#create_progress_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.create_progress_event" title="Link to this definition"></a></dt>
+<dd><p>Create a progress event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>progress_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>metric_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>old_value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>new_value</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.ProgressEvent" title="src.components.gameplay_loop.narrative.events.ProgressEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ProgressEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.create_safety_event">
+<span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">create_safety_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safety_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">protective_factors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intervention_needed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#create_safety_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.create_safety_event" title="Link to this definition"></a></dt>
+<dd><p>Create a safety event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>safety_level</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>risk_factors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>protective_factors</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>intervention_needed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.SafetyEvent" title="src.components.gameplay_loop.narrative.events.SafetyEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">SafetyEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="src.components.gameplay_loop.narrative.events.create_scene_event">
+<span class="sig-prename descclassname"><span class="pre">src.components.gameplay_loop.narrative.events.</span></span><span class="sig-name descname"><span class="pre">create_scene_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scene_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_focus</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/gameplay_loop/narrative/events.html#create_scene_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.gameplay_loop.narrative.events.create_scene_event" title="Link to this definition"></a></dt>
+<dd><p>Create a scene event.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.EventType" title="src.components.gameplay_loop.narrative.events.EventType"><code class="xref py py-class docutils literal notranslate"><span class="pre">EventType</span></code></a></span>)</p></li>
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>scene_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>scene_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_focus</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="#src.components.gameplay_loop.narrative.events.SceneEvent" title="src.components.gameplay_loop.narrative.events.SceneEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">SceneEvent</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.narrative.engine.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.narrative.engine module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.gameplay_loop.narrative.flow_controller.html" class="btn btn-neutral float-right" title="src.components.gameplay_loop.narrative.flow_controller module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

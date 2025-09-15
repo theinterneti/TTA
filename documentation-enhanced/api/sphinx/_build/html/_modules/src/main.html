@@ -1,0 +1,519 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.main &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.main</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.main</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">TTA Main Script</span>
+
+<span class="sd">This script provides a command-line interface for the TTA Orchestrator.</span>
+
+<span class="sd">Usage:</span>
+<span class="sd">    ```bash</span>
+<span class="sd">    # Start all components</span>
+<span class="sd">    python src/main.py start</span>
+
+<span class="sd">    # Start specific components</span>
+<span class="sd">    python src/main.py start neo4j llm</span>
+
+<span class="sd">    # Stop all components</span>
+<span class="sd">    python src/main.py stop</span>
+
+<span class="sd">    # Get status of all components</span>
+<span class="sd">    python src/main.py status</span>
+
+<span class="sd">    # Run Docker Compose command in both repositories</span>
+<span class="sd">    python src/main.py docker compose up -d</span>
+
+<span class="sd">    # Get configuration value</span>
+<span class="sd">    python src/main.py config get tta.dev.enabled</span>
+<span class="sd">    ```</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.console</span><span class="w"> </span><span class="kn">import</span> <span class="n">Console</span>
+
+<span class="c1"># Add the parent directory to the Python path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span><span class="p">))</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.orchestration</span><span class="w"> </span><span class="kn">import</span> <span class="n">TTAOrchestrator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.orchestration.decorators</span><span class="w"> </span><span class="kn">import</span> <span class="n">log_entry_exit</span><span class="p">,</span> <span class="n">timing_decorator</span>
+
+<span class="c1"># Configure logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+<span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Configure rich console</span>
+<span class="n">console</span> <span class="o">=</span> <span class="n">Console</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="parse_args">
+<a class="viewcode-back" href="../../api/src.main.html#src.main.parse_args">[docs]</a>
+<span class="nd">@log_entry_exit</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_args</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">argparse</span><span class="o">.</span><span class="n">Namespace</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse command-line arguments.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        argparse.Namespace: Parsed arguments</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">description</span><span class="o">=</span><span class="s2">&quot;TTA Orchestrator&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Main command</span>
+    <span class="n">subparsers</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">dest</span><span class="o">=</span><span class="s2">&quot;command&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Command to run&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Start command</span>
+    <span class="n">start_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Start components&quot;</span><span class="p">)</span>
+    <span class="n">start_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Components to start (default: all)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">start_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Stop command</span>
+    <span class="n">stop_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;stop&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Stop components&quot;</span><span class="p">)</span>
+    <span class="n">stop_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Components to stop (default: all)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">stop_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Restart command</span>
+    <span class="n">restart_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;restart&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Restart components&quot;</span><span class="p">)</span>
+    <span class="n">restart_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Components to restart (default: all)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">restart_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Status command</span>
+    <span class="n">status_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Get component status&quot;</span><span class="p">)</span>
+    <span class="n">status_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;components&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Components to get status for (default: all)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">status_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Docker command</span>
+    <span class="n">docker_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;docker&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Run Docker commands&quot;</span><span class="p">)</span>
+    <span class="n">docker_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;docker_command&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Docker command to run&quot;</span><span class="p">)</span>
+    <span class="n">docker_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;docker_args&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Arguments for the Docker command&quot;</span>
+    <span class="p">)</span>
+    <span class="n">docker_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--repository&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;tta.dev&quot;</span><span class="p">,</span> <span class="s2">&quot;tta.prototype&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">],</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Repository to run the command in (default: both)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">docker_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Config command</span>
+    <span class="n">config_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Manage configuration&quot;</span><span class="p">)</span>
+    <span class="n">config_subparsers</span> <span class="o">=</span> <span class="n">config_parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;config_command&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Configuration command&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Config get command</span>
+    <span class="n">config_get_parser</span> <span class="o">=</span> <span class="n">config_subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Get configuration value&quot;</span>
+    <span class="p">)</span>
+    <span class="n">config_get_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Configuration key (e.g., &quot;tta.dev.enabled&quot;)&#39;</span>
+    <span class="p">)</span>
+    <span class="n">config_get_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Config set command</span>
+    <span class="n">config_set_parser</span> <span class="o">=</span> <span class="n">config_subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;set&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Set configuration value&quot;</span>
+    <span class="p">)</span>
+    <span class="n">config_set_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Configuration key (e.g., &quot;tta.dev.enabled&quot;)&#39;</span>
+    <span class="p">)</span>
+    <span class="n">config_set_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Configuration value&quot;</span><span class="p">)</span>
+    <span class="n">config_set_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Config save command</span>
+    <span class="n">config_save_parser</span> <span class="o">=</span> <span class="n">config_subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;save&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Save configuration&quot;</span><span class="p">)</span>
+    <span class="n">config_save_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--path&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to save configuration to&quot;</span><span class="p">)</span>
+    <span class="n">config_save_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to configuration file&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Admin command</span>
+    <span class="n">admin_parser</span> <span class="o">=</span> <span class="n">subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;admin&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Administrative commands&quot;</span><span class="p">)</span>
+    <span class="n">admin_subparsers</span> <span class="o">=</span> <span class="n">admin_parser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;admin_command&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Admin subcommand&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Admin recover subcommand</span>
+    <span class="n">admin_recover</span> <span class="o">=</span> <span class="n">admin_subparsers</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;recover&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Recover expired message reservations and report per-agent stats&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">admin_recover</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;redis_url&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;redis://localhost:6379/0&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Redis URL (default: redis://localhost:6379/0)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">admin_recover</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--key-prefix&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;ao&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Redis key prefix (default: ao)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../api/src.main.html#src.main.main">[docs]</a>
+<span class="nd">@log_entry_exit</span>
+<span class="nd">@timing_decorator</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main function.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        int: Exit code (0 for success, non-zero for failure)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span><span class="p">:</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+            <span class="s2">&quot;[bold red]No command specified. Use --help for usage information.[/bold red]&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="c1"># Create the orchestrator</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">orchestrator</span> <span class="o">=</span> <span class="n">TTAOrchestrator</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">config</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error creating orchestrator: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold red]Error creating orchestrator: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="c1"># Handle commands</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;start&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="c1"># Start specific components</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;[bold blue]Starting component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">...[/bold blue]&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">start_component</span><span class="p">(</span><span class="n">component</span><span class="p">):</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;[bold red]Failed to start component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Start all components</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold blue]Starting all components...[/bold blue]&quot;</span><span class="p">)</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">start_all</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="s2">&quot;[bold green]All components started successfully![/bold green]&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold red]Failed to start all components[/bold red]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;stop&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="c1"># Stop specific components</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;[bold blue]Stopping component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">...[/bold blue]&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">stop_component</span><span class="p">(</span><span class="n">component</span><span class="p">):</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;[bold red]Failed to stop component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Stop all components</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold blue]Stopping all components...[/bold blue]&quot;</span><span class="p">)</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">stop_all</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="s2">&quot;[bold green]All components stopped successfully![/bold green]&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold red]Failed to stop all components[/bold red]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;restart&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="c1"># Restart specific components</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;[bold blue]Restarting component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">...[/bold blue]&quot;</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">stop_component</span><span class="p">(</span>
+                    <span class="n">component</span>
+                <span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">start_component</span><span class="p">(</span><span class="n">component</span><span class="p">):</span>
+                    <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;[bold red]Failed to restart component </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Restart all components</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold blue]Restarting all components...[/bold blue]&quot;</span><span class="p">)</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">stop_all</span><span class="p">()</span> <span class="ow">and</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">start_all</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="s2">&quot;[bold green]All components restarted successfully![/bold green]&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold red]Failed to restart all components[/bold red]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;status&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+            <span class="c1"># Get status of specific components</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">components</span><span class="p">:</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">get_component_status</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">status</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">: [bold green]</span><span class="si">{</span><span class="n">status</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">[/bold green]&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2">: [bold red]not found[/bold red]&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Get status of all components</span>
+            <span class="n">orchestrator</span><span class="o">.</span><span class="n">display_status</span><span class="p">()</span>
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;docker&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">docker_command</span> <span class="o">==</span> <span class="s2">&quot;compose&quot;</span><span class="p">:</span>
+            <span class="c1"># Run Docker Compose command</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;[bold blue]Running Docker Compose command in </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">repository</span><span class="si">}</span><span class="s2">...[/bold blue]&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run_docker_compose_command</span><span class="p">(</span>
+                    <span class="n">args</span><span class="o">.</span><span class="n">docker_args</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">repository</span>
+                <span class="p">)</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">for</span> <span class="n">repo</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold blue]=== </span><span class="si">{</span><span class="n">repo</span><span class="si">}</span><span class="s2"> ===[/bold blue]&quot;</span><span class="p">)</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+                        <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold yellow]</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">[/bold yellow]&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;[bold red]Error running Docker Compose command: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span>
+                <span class="p">)</span>
+                <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Run Docker command</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;[bold blue]Running Docker command: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">docker_command</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">docker_args</span><span class="p">)</span><span class="si">}</span><span class="s2">[/bold blue]&quot;</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">run_docker_command</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">docker_command</span><span class="p">]</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">docker_args</span>
+                <span class="p">)</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="p">:</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold yellow]</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">stderr</span><span class="si">}</span><span class="s2">[/bold yellow]&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">result</span><span class="o">.</span><span class="n">returncode</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold red]Error running Docker command: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">config_command</span><span class="p">:</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="s2">&quot;[bold red]No config command specified. Use --help for usage information.[/bold red]&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">config_command</span> <span class="o">==</span> <span class="s2">&quot;get&quot;</span><span class="p">:</span>
+            <span class="c1"># Get configuration value</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">: [bold green]</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">[/bold green]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">config_command</span> <span class="o">==</span> <span class="s2">&quot;set&quot;</span><span class="p">:</span>
+            <span class="c1"># Set configuration value</span>
+            <span class="c1"># Convert value to appropriate type</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">value</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">]:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;false&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">]:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+            <span class="n">orchestrator</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Set </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2"> to [bold green]</span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">[/bold green]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">config_command</span> <span class="o">==</span> <span class="s2">&quot;save&quot;</span><span class="p">:</span>
+            <span class="c1"># Save configuration</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="n">orchestrator</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                    <span class="s2">&quot;[bold green]Configuration saved successfully![/bold green]&quot;</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold red]Failed to save configuration[/bold red]&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="mi">1</span>
+    <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">command</span> <span class="o">==</span> <span class="s2">&quot;admin&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">admin_command</span><span class="p">:</span>
+            <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span>
+                <span class="s2">&quot;[bold red]No admin subcommand specified. Use --help for usage information.[/bold red]&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">admin_command</span> <span class="o">==</span> <span class="s2">&quot;recover&quot;</span><span class="p">:</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">src.agent_orchestration.admin.recover</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_recovery</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">per_agent</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="s2">&quot;asyncio&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                    <span class="n">run_recovery</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">redis_url</span><span class="p">,</span> <span class="n">key_prefix</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">key_prefix</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">per_agent</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;[bold blue]Recovered messages summary:[/bold blue]&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">per_agent</span><span class="p">:</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="s2">&quot;  No expired reservations found.&quot;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">agent</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">per_agent</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">agent</span><span class="si">}</span><span class="s2">: [bold green]</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">[/bold green]&quot;</span><span class="p">)</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Total recovered: [bold green]</span><span class="si">{</span><span class="n">total</span><span class="si">}</span><span class="s2">[/bold green]&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="mi">0</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">console</span><span class="o">.</span><span class="n">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[bold red]Admin recovery failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">[/bold red]&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="mi">0</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

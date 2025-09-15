@@ -1,0 +1,528 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.coordinators.redis_message_coordinator &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.coordinators.redis_message_coordinator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.coordinators.redis_message_coordinator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Redis-backed implementation of the MessageCoordinator with reliability (Task 4.1 + 4.2).</span>
+
+<span class="sd">Capabilities:</span>
+<span class="sd">- send_message: enqueue to a recipient-specific Redis list (legacy/audit) and ready scheduler (zset)</span>
+<span class="sd">- broadcast_message: looped send to multiple recipients</span>
+<span class="sd">- subscribe_to_messages: record subscriptions in Redis for observability (set)</span>
+<span class="sd">- receive/ack/nack: reservation semantics with visibility timeouts and exponential backoff retries</span>
+<span class="sd">- recover_pending: reclaim expired reservations back to ready queues</span>
+
+<span class="sd">Keys (per agent instance):</span>
+<span class="sd">- {pfx}:queue:{type}:{inst}                 - legacy/audit list of enqueued payloads</span>
+<span class="sd">- {pfx}:sched:{type}:{inst}:prio:{lvl}      - zset of ready/delayed items (score=available_at_us)</span>
+<span class="sd">- {pfx}:reserved:{type}:{inst}              - hash of token -&gt; payload JSON</span>
+<span class="sd">- {pfx}:reserved_deadlines:{type}:{inst}    - zset of token -&gt; deadline_us</span>
+<span class="sd">- {pfx}:dlq:{type}:{inst}                   - dead-letter queue list</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timezone</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">redis.asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redis</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageCoordinator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..messaging</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">FailureType</span><span class="p">,</span>
+    <span class="n">MessageResult</span><span class="p">,</span>
+    <span class="n">MessageSubscription</span><span class="p">,</span>
+    <span class="n">QueueMessage</span><span class="p">,</span>
+    <span class="n">ReceivedMessage</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">AgentMessage</span><span class="p">,</span> <span class="n">AgentType</span><span class="p">,</span> <span class="n">MessageType</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_now_us</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">*</span> <span class="mi">1_000_000</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_iso_now</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RedisMessageCoordinator</span><span class="p">(</span><span class="n">MessageCoordinator</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">redis</span><span class="p">:</span> <span class="n">Redis</span><span class="p">,</span> <span class="n">key_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ao&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Optional router attached by component for intelligent routing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_agent_router</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span> <span class="o">=</span> <span class="n">redis</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span> <span class="o">=</span> <span class="n">key_prefix</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="c1"># Defaults; configurable via configure()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue_size</span> <span class="o">=</span> <span class="mi">10000</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_retry_attempts</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="c1"># Metrics</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">..metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageMetrics</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="n">MessageMetrics</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_base</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_factor</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_max</span> <span class="o">=</span> <span class="mf">30.0</span>
+
+    <span class="c1"># ---- Key helpers ----</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_queue_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:queue:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_subs_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:subs:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sched_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">prio_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:sched:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">:prio:</span><span class="si">{</span><span class="n">prio_level</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reserved_hash</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:reserved:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_reserved_deadlines</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:reserved_deadlines:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_dlq_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:dlq:</span><span class="si">{</span><span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="c1"># ---- Public API ----</span>
+<div class="viewcode-block" id="RedisMessageCoordinator.send_message">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.send_message">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">recipient</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">AgentMessage</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MessageResult</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Queue backpressure (graceful overflow handling)</span>
+            <span class="n">qlen</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">llen</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">recipient</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">qlen</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">qlen</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue_size</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span>
+                    <span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">delivered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="s2">&quot;queue full&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Ensure timestamp exists and is ISO-8601</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">message</span><span class="o">.</span><span class="n">timestamp</span><span class="p">:</span>
+                <span class="n">message</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">_iso_now</span><span class="p">()</span>
+
+            <span class="n">qmsg</span> <span class="o">=</span> <span class="n">QueueMessage</span><span class="p">(</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span>
+                <span class="n">enqueued_at</span><span class="o">=</span><span class="n">_iso_now</span><span class="p">(),</span>
+                <span class="n">delivery_attempts</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">qmsg</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+            <span class="c1"># Legacy/audit list</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">recipient</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="c1"># Schedule into priority zset (available now)</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">_now_us</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sched_key</span><span class="p">(</span><span class="n">recipient</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">priority</span><span class="p">)),</span> <span class="p">{</span><span class="n">payload</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="c1"># Metrics: mark successful delivery</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">inc_delivered_ok</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span><span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">delivered</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">inc_delivered_error</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span>
+                <span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">delivered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.broadcast_message">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.broadcast_message">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">broadcast_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">,</span> <span class="n">recipients</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentId</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">MessageResult</span><span class="p">]:</span>
+        <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MessageResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">recipients</span><span class="p">:</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">sender</span><span class="o">=</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="o">=</span><span class="n">r</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">)</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.subscribe_to_messages">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.subscribe_to_messages">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">subscribe_to_messages</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">message_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">MessageType</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MessageSubscription</span><span class="p">:</span>
+        <span class="c1"># Fire-and-forget recording; unit tests can assert stored values</span>
+        <span class="n">sub_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;sub_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_store</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">message_types</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">sadd</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_subs_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="o">*</span><span class="p">[</span><span class="n">mt</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">mt</span> <span class="ow">in</span> <span class="n">message_types</span><span class="p">]</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">asyncio</span><span class="o">.</span><span class="n">get_running_loop</span><span class="p">()</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="n">_store</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">MessageSubscription</span><span class="p">(</span>
+            <span class="n">subscription_id</span><span class="o">=</span><span class="n">sub_id</span><span class="p">,</span> <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">message_types</span><span class="o">=</span><span class="n">message_types</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.receive">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.receive">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">receive</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">visibility_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReceivedMessage</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reserve the next message by priority (HIGH-&gt;NORMAL-&gt;LOW) and FIFO within each.&quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">_now_us</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">prio</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">skey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sched_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="n">prio</span><span class="p">)</span>
+            <span class="c1"># Find one due item (score &lt;= now)</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrangebyscore</span><span class="p">(</span>
+                <span class="n">skey</span><span class="p">,</span> <span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">now</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">members</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">member</span> <span class="o">=</span> <span class="n">members</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Remove it from sched set</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrem</span><span class="p">(</span><span class="n">skey</span><span class="p">,</span> <span class="n">member</span><span class="p">)</span>
+            <span class="n">payload</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">member</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="n">member</span>
+            <span class="p">)</span>
+            <span class="c1"># Create reservation</span>
+            <span class="n">token</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;res_</span><span class="si">{</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">16</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">deadline</span> <span class="o">=</span> <span class="n">now</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">visibility_timeout</span> <span class="o">*</span> <span class="mi">1_000_000</span><span class="p">)</span>
+            <span class="c1"># Store reservation</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_deadlines</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="p">{</span><span class="n">token</span><span class="p">:</span> <span class="n">deadline</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="c1"># Return wrapper</span>
+            <span class="n">qmsg_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">rm</span> <span class="o">=</span> <span class="n">ReceivedMessage</span><span class="p">(</span>
+                <span class="n">token</span><span class="o">=</span><span class="n">token</span><span class="p">,</span>
+                <span class="n">queue_message</span><span class="o">=</span><span class="n">QueueMessage</span><span class="p">(</span><span class="o">**</span><span class="n">qmsg_dict</span><span class="p">),</span>
+                <span class="n">visibility_deadline</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+                    <span class="n">deadline</span> <span class="o">/</span> <span class="mi">1_000_000</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">rm</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.ack">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.ack">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ack</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># Remove reservation and underlying audit list entry</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hdel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_deadlines</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">payload</span><span class="p">:</span>
+            <span class="c1"># Remove one occurrence from audit list</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">lrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.nack">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.nack">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">nack</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span>
+        <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">failure</span><span class="p">:</span> <span class="n">FailureType</span> <span class="o">=</span> <span class="n">FailureType</span><span class="o">.</span><span class="n">TRANSIENT</span><span class="p">,</span>
+        <span class="n">error</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hdel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_deadlines</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">payload</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">qm</span> <span class="o">=</span> <span class="n">QueueMessage</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+            <span class="c1"># Update attempts and error</span>
+            <span class="n">qm</span><span class="o">.</span><span class="n">delivery_attempts</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">delivery_attempts</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">qm</span><span class="o">.</span><span class="n">last_error</span> <span class="o">=</span> <span class="n">error</span>
+            <span class="n">updated</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+            <span class="c1"># Also ensure audit list has a canonical payload form for LREM cleanup later</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">lrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">updated</span><span class="p">)</span>
+
+            <span class="c1"># DLQ on permanent failure or when attempts exceed allowed retries</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">failure</span> <span class="o">==</span> <span class="n">FailureType</span><span class="o">.</span><span class="n">PERMANENT</span>
+                <span class="ow">or</span> <span class="n">qm</span><span class="o">.</span><span class="n">delivery_attempts</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_attempts</span>
+            <span class="p">):</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dlq_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">updated</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">inc_permanent</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># Alert/notify: administrator visibility for persistent failures</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="s2">&quot;DLQ enqueue for </span><span class="si">%s</span><span class="s2">:</span><span class="si">%s</span><span class="s2"> message_id=</span><span class="si">%s</span><span class="s2"> attempts=</span><span class="si">%s</span><span class="s2"> error=</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">agent_id</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="n">agent_id</span><span class="o">.</span><span class="n">instance</span> <span class="ow">or</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+                        <span class="n">qm</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span>
+                        <span class="n">qm</span><span class="o">.</span><span class="n">delivery_attempts</span><span class="p">,</span>
+                        <span class="n">error</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="c1"># Also remove the latest audit copy to avoid duplication</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">lrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_queue_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">updated</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">True</span>
+
+            <span class="c1"># Schedule retry with exponential backoff</span>
+            <span class="n">delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_base</span>
+                <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backoff_factor</span> <span class="o">**</span> <span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">delivery_attempts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_max</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">score</span> <span class="o">=</span> <span class="n">_now_us</span><span class="p">()</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">delay</span> <span class="o">*</span> <span class="mi">1_000_000</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_sched_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">priority</span><span class="p">)),</span> <span class="p">{</span><span class="n">updated</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">inc_retries_scheduled</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">last_backoff_seconds</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">inc_nacks</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="c1"># If we cannot parse, dead-letter to avoid poison-pill loops</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dlq_key</span><span class="p">(</span><span class="n">agent_id</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.recover_pending">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.recover_pending">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">recover_pending</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reclaim expired reservations back to ready queues.</span>
+<span class="sd">        If agent_id is None, perform a best-effort scan across known agent instances.</span>
+<span class="sd">        Returns number of messages recovered. Logs per-agent counts for observability.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">recovered_total</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">per_agent_counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">agent_ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentId</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">agent_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Discover known agent queues by pattern (best-effort, cheap approach)</span>
+            <span class="n">seen</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">agent_ids</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">at</span> <span class="ow">in</span> <span class="p">(</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">):</span>
+                <span class="c1"># Prefer deadlines keys</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:reserved_deadlines:</span><span class="si">{</span><span class="n">at</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:*&quot;</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pfx</span><span class="si">}</span><span class="s2">:reserved:</span><span class="si">{</span><span class="n">at</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:*&quot;</span><span class="p">,</span>
+                <span class="p">):</span>
+                    <span class="k">async</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">scan_iter</span><span class="p">(</span><span class="n">match</span><span class="o">=</span><span class="n">pattern</span><span class="p">):</span>
+                        <span class="n">parts</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">key</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="n">key</span>
+                        <span class="p">)</span>
+                        <span class="n">inst</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="n">sig</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">at</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">inst</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="k">if</span> <span class="n">sig</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sig</span><span class="p">)</span>
+                        <span class="n">agent_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">AgentId</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">at</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">inst</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">agent_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">agent_id</span><span class="p">]</span>
+
+        <span class="n">now</span> <span class="o">=</span> <span class="n">_now_us</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">aid</span> <span class="ow">in</span> <span class="n">agent_ids</span><span class="p">:</span>
+            <span class="n">recovered_for_agent</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">dkey</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reserved_deadlines</span><span class="p">(</span><span class="n">aid</span><span class="p">)</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrangebyscore</span><span class="p">(</span><span class="n">dkey</span><span class="p">,</span> <span class="nb">min</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="n">now</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+                <span class="n">token</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="nb">bytearray</span><span class="p">))</span> <span class="k">else</span> <span class="n">t</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">aid</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">payload</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">pdata</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">payload</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">payload</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                        <span class="p">)</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">pdata</span><span class="p">)</span>
+                        <span class="n">qm</span> <span class="o">=</span> <span class="n">QueueMessage</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
+                        <span class="n">score</span> <span class="o">=</span> <span class="n">_now_us</span><span class="p">()</span>
+                        <span class="c1"># Re-schedule using the original payload to preserve audit list matching</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_sched_key</span><span class="p">(</span><span class="n">aid</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">qm</span><span class="o">.</span><span class="n">priority</span><span class="p">)),</span> <span class="p">{</span><span class="n">payload</span><span class="p">:</span> <span class="n">score</span><span class="p">}</span>
+                        <span class="p">)</span>
+                        <span class="n">recovered_total</span> <span class="o">+=</span> <span class="mi">1</span>
+                        <span class="n">recovered_for_agent</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">rpush</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dlq_key</span><span class="p">(</span><span class="n">aid</span><span class="p">),</span> <span class="n">payload</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">hdel</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_hash</span><span class="p">(</span><span class="n">aid</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redis</span><span class="o">.</span><span class="n">zrem</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_reserved_deadlines</span><span class="p">(</span><span class="n">aid</span><span class="p">),</span> <span class="n">token</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">recovered_for_agent</span><span class="p">:</span>
+                <span class="n">agent_key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">aid</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">aid</span><span class="o">.</span><span class="n">instance</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;default&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">per_agent_counts</span><span class="p">[</span><span class="n">agent_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">recovered_for_agent</span>
+
+        <span class="k">if</span> <span class="n">per_agent_counts</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">agent_key</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">per_agent_counts</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Recovered </span><span class="si">%s</span><span class="s2"> messages for agent </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">count</span><span class="p">,</span> <span class="n">agent_key</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">recovered_total</span></div>
+
+
+<div class="viewcode-block" id="RedisMessageCoordinator.configure">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.coordinators.redis_message_coordinator.html#src.agent_orchestration.coordinators.RedisMessageCoordinator.configure">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">configure</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retry_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">backoff_base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">backoff_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">backoff_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">queue_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_queue_size</span> <span class="o">=</span> <span class="n">queue_size</span>
+        <span class="k">if</span> <span class="n">retry_attempts</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_retry_attempts</span> <span class="o">=</span> <span class="n">retry_attempts</span>
+        <span class="k">if</span> <span class="n">backoff_base</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_base</span> <span class="o">=</span> <span class="n">backoff_base</span>
+        <span class="k">if</span> <span class="n">backoff_factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_factor</span> <span class="o">=</span> <span class="n">backoff_factor</span>
+        <span class="k">if</span> <span class="n">backoff_max</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_backoff_max</span> <span class="o">=</span> <span class="n">backoff_max</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

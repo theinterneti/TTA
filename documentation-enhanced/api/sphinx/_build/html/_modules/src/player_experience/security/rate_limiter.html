@@ -1,0 +1,741 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.security.rate_limiter &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.security.rate_limiter</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.security.rate_limiter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Advanced rate limiting and DDoS protection system.</span>
+
+<span class="sd">This module provides multiple rate limiting algorithms and DDoS protection</span>
+<span class="sd">mechanisms to secure the Player Experience Interface from abuse.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">redis</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">redis</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redis</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..monitoring.logging_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">LogCategory</span><span class="p">,</span> <span class="n">LogContext</span><span class="p">,</span> <span class="n">get_logger</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="RateLimitStrategy">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rate limiting strategies.&quot;&quot;&quot;</span>
+
+    <span class="n">TOKEN_BUCKET</span> <span class="o">=</span> <span class="s2">&quot;token_bucket&quot;</span>
+    <span class="n">SLIDING_WINDOW</span> <span class="o">=</span> <span class="s2">&quot;sliding_window&quot;</span>
+    <span class="n">FIXED_WINDOW</span> <span class="o">=</span> <span class="s2">&quot;fixed_window&quot;</span>
+    <span class="n">LEAKY_BUCKET</span> <span class="o">=</span> <span class="s2">&quot;leaky_bucket&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitScope">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitScope">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitScope</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scope for rate limiting.&quot;&quot;&quot;</span>
+
+    <span class="n">GLOBAL</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span>
+    <span class="n">IP_ADDRESS</span> <span class="o">=</span> <span class="s2">&quot;ip_address&quot;</span>
+    <span class="n">USER</span> <span class="o">=</span> <span class="s2">&quot;user&quot;</span>
+    <span class="n">ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;endpoint&quot;</span>
+    <span class="n">API_KEY</span> <span class="o">=</span> <span class="s2">&quot;api_key&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitConfig">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for rate limiting.&quot;&quot;&quot;</span>
+
+    <span class="n">requests_per_minute</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">60</span>
+    <span class="n">requests_per_hour</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">requests_per_day</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span>
+    <span class="n">burst_capacity</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">RateLimitStrategy</span> <span class="o">=</span> <span class="n">RateLimitStrategy</span><span class="o">.</span><span class="n">TOKEN_BUCKET</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="n">RateLimitScope</span> <span class="o">=</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">IP_ADDRESS</span>
+    <span class="n">whitelist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">blacklist</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">enable_adaptive</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">adaptive_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># Trigger adaptive limiting at 80% capacity</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitExceeded">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitExceeded">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitExceeded</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception raised when rate limit is exceeded.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">retry_after</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">limit_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retry_after</span> <span class="o">=</span> <span class="n">retry_after</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">limit_type</span> <span class="o">=</span> <span class="n">limit_type</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitResult">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of rate limit check.&quot;&quot;&quot;</span>
+
+    <span class="n">allowed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="n">remaining</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">reset_time</span><span class="p">:</span> <span class="n">datetime</span>
+    <span class="n">retry_after</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">limit_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimiter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Abstract base class for rate limiters.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">RLock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="RateLimiter.check_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter.check_limit">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimitResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if request is within rate limit.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="RateLimiter.reset_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter.reset_limit">[docs]</a>
+    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset rate limit for identifier.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="RateLimiter.is_whitelisted">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter.is_whitelisted">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_whitelisted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if identifier is whitelisted.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">whitelist</span></div>
+
+
+<div class="viewcode-block" id="RateLimiter.is_blacklisted">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter.is_blacklisted">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_blacklisted</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if identifier is blacklisted.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">blacklist</span></div>
+
+
+<div class="viewcode-block" id="RateLimiter.get_identifier">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimiter.get_identifier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_identifier</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">api_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get rate limit identifier based on scope.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">GLOBAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;global&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">IP_ADDRESS</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ip_address</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">USER</span> <span class="ow">and</span> <span class="n">user_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;user:</span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">ENDPOINT</span> <span class="ow">and</span> <span class="n">endpoint</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;endpoint:</span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">ip_address</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scope</span> <span class="o">==</span> <span class="n">RateLimitScope</span><span class="o">.</span><span class="n">API_KEY</span> <span class="ow">and</span> <span class="n">api_key</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;api_key:</span><span class="si">{</span><span class="n">api_key</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ip_address</span>  <span class="c1"># Default to IP address</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TokenBucketRateLimiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.TokenBucketRateLimiter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TokenBucketRateLimiter</span><span class="p">(</span><span class="n">RateLimiter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Token bucket rate limiter implementation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buckets</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span>
+            <span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">burst_capacity</span><span class="p">,</span>
+                <span class="s2">&quot;last_refill&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                <span class="s2">&quot;requests&quot;</span><span class="p">:</span> <span class="n">deque</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="TokenBucketRateLimiter.check_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.TokenBucketRateLimiter.check_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimitResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check token bucket rate limit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_whitelisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">burst_capacity</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_blacklisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">retry_after</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;blacklisted&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">bucket</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buckets</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
+            <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="c1"># Refill tokens based on time elapsed</span>
+            <span class="n">time_elapsed</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;last_refill&quot;</span><span class="p">]</span>
+            <span class="n">tokens_to_add</span> <span class="o">=</span> <span class="n">time_elapsed</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span> <span class="o">/</span> <span class="mf">60.0</span><span class="p">)</span>
+            <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">burst_capacity</span><span class="p">,</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">tokens_to_add</span>
+            <span class="p">)</span>
+            <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;last_refill&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
+
+            <span class="c1"># Check if request can be allowed</span>
+            <span class="k">if</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span> <span class="o">-=</span> <span class="mi">1</span>
+                <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;requests&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
+                <span class="c1"># Clean old requests</span>
+                <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">3600</span>  <span class="c1"># Keep 1 hour of history</span>
+                <span class="k">while</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;requests&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;requests&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">cutoff_time</span><span class="p">:</span>
+                    <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;requests&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]),</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+                    <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Calculate retry after</span>
+                <span class="n">retry_after</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="mf">60.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">)</span>
+                <span class="p">)</span>
+
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">retry_after</span><span class="p">),</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="n">retry_after</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;rate_limit&quot;</span><span class="p">,</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TokenBucketRateLimiter.reset_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.TokenBucketRateLimiter.reset_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset token bucket for identifier.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">buckets</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buckets</span><span class="p">[</span><span class="n">identifier</span><span class="p">][</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">burst_capacity</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">buckets</span><span class="p">[</span><span class="n">identifier</span><span class="p">][</span><span class="s2">&quot;last_refill&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SlidingWindowRateLimiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.SlidingWindowRateLimiter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SlidingWindowRateLimiter</span><span class="p">(</span><span class="n">RateLimiter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Sliding window rate limiter implementation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">deque</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">deque</span><span class="p">())</span>
+
+<div class="viewcode-block" id="SlidingWindowRateLimiter.check_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.SlidingWindowRateLimiter.check_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimitResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check sliding window rate limit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_whitelisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_blacklisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">retry_after</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;blacklisted&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
+
+            <span class="c1"># Remove requests outside the window</span>
+            <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">60</span>  <span class="c1"># 1 minute window</span>
+            <span class="k">while</span> <span class="n">window</span> <span class="ow">and</span> <span class="n">window</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">cutoff_time</span><span class="p">:</span>
+                <span class="n">window</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+            <span class="c1"># Check limits for different time windows</span>
+            <span class="n">minute_requests</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+            <span class="n">hour_requests</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">window</span> <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">3600</span><span class="p">])</span>
+            <span class="n">day_requests</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">window</span> <span class="k">if</span> <span class="n">t</span> <span class="o">&gt;</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">86400</span><span class="p">])</span>
+
+            <span class="c1"># Check if any limit is exceeded</span>
+            <span class="k">if</span> <span class="n">minute_requests</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">),</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;per_minute&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">hour_requests</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_hour</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;per_hour&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">day_requests</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_day</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="mi">86400</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;per_day&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Allow request</span>
+            <span class="n">window</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current_time</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span> <span class="o">-</span> <span class="n">minute_requests</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SlidingWindowRateLimiter.reset_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.SlidingWindowRateLimiter.reset_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset sliding window for identifier.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">windows</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RedisRateLimiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RedisRateLimiter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RedisRateLimiter</span><span class="p">(</span><span class="n">RateLimiter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Redis-based distributed rate limiter.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">:</span> <span class="n">Redis</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">redis</span> <span class="o">=</span> <span class="n">redis_client</span>
+
+<div class="viewcode-block" id="RedisRateLimiter.check_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RedisRateLimiter.check_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimitResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check rate limit using Redis.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_whitelisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_blacklisted</span><span class="p">(</span><span class="n">identifier</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">retry_after</span><span class="o">=</span><span class="mi">3600</span><span class="p">,</span>
+                <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;blacklisted&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">current_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+        <span class="n">pipe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">pipeline</span><span class="p">()</span>
+
+        <span class="c1"># Sliding window implementation with Redis</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rate_limit:</span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">window_start</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="mi">60</span>  <span class="c1"># 1 minute window</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Remove old entries</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">zremrangebyscore</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">window_start</span><span class="p">)</span>
+
+            <span class="c1"># Count current requests</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">zcard</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+            <span class="c1"># Add current request</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">zadd</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="p">{</span><span class="nb">str</span><span class="p">(</span><span class="n">current_time</span><span class="p">):</span> <span class="n">current_time</span><span class="p">})</span>
+
+            <span class="c1"># Set expiration</span>
+            <span class="n">pipe</span><span class="o">.</span><span class="n">expire</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="mi">3600</span><span class="p">)</span>  <span class="c1"># Keep data for 1 hour</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">pipe</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+            <span class="n">current_requests</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">current_requests</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;per_minute&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span> <span class="o">-</span> <span class="n">current_requests</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">RedisError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Redis rate limiter error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">LogCategory</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+            <span class="c1"># Fail open - allow request if Redis is unavailable</span>
+            <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                <span class="n">allowed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">remaining</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">requests_per_minute</span><span class="p">,</span>
+                <span class="n">reset_time</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RedisRateLimiter.reset_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RedisRateLimiter.reset_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset rate limit in Redis.&quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;rate_limit:</span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">redis</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">redis</span><span class="o">.</span><span class="n">RedisError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Redis rate limiter reset error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">category</span><span class="o">=</span><span class="n">LogCategory</span><span class="o">.</span><span class="n">ERROR</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AdaptiveRateLimiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.AdaptiveRateLimiter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdaptiveRateLimiter</span><span class="p">(</span><span class="n">RateLimiter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Adaptive rate limiter that adjusts limits based on system load.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">,</span> <span class="n">base_limiter</span><span class="p">:</span> <span class="n">RateLimiter</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_limiter</span> <span class="o">=</span> <span class="n">base_limiter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_load</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_rate</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_adjustment</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AdaptiveRateLimiter.update_system_metrics">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.AdaptiveRateLimiter.update_system_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_system_metrics</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">cpu_usage</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">memory_usage</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">error_rate</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">response_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update system metrics for adaptive limiting.&quot;&quot;&quot;</span>
+        <span class="c1"># Calculate system load score (0.0 to 1.0)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_load</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cpu_usage</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">,</span> <span class="n">memory_usage</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_rate</span> <span class="o">=</span> <span class="n">error_rate</span> <span class="o">/</span> <span class="mf">100.0</span>
+
+        <span class="c1"># Adjust adaptive factor based on system health</span>
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_adjustment</span> <span class="o">&gt;</span> <span class="mi">60</span><span class="p">:</span>  <span class="c1"># Adjust every minute</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_load</span> <span class="o">&gt;</span> <span class="mf">0.8</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_rate</span> <span class="o">&gt;</span> <span class="mf">0.1</span> <span class="ow">or</span> <span class="n">response_time</span> <span class="o">&gt;</span> <span class="mf">2.0</span><span class="p">:</span>
+                <span class="c1"># System under stress - reduce limits</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">*</span> <span class="mf">0.8</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">system_load</span> <span class="o">&lt;</span> <span class="mf">0.5</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_rate</span> <span class="o">&lt;</span> <span class="mf">0.01</span>
+                <span class="ow">and</span> <span class="n">response_time</span> <span class="o">&lt;</span> <span class="mf">0.5</span>
+            <span class="p">):</span>
+                <span class="c1"># System healthy - increase limits</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">*</span> <span class="mf">1.1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_adjustment</span> <span class="o">=</span> <span class="n">current_time</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Adaptive rate limiter adjusted: factor=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;load=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">system_load</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">, error_rate=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">error_rate</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="n">LogCategory</span><span class="o">.</span><span class="n">PERFORMANCE</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveRateLimiter.check_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.AdaptiveRateLimiter.check_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimitResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check adaptive rate limit.&quot;&quot;&quot;</span>
+        <span class="c1"># Get base result</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_limiter</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="c1"># Apply adaptive factor</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="c1"># Reduce effective limit</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+            <span class="k">if</span> <span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptive_factor</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RateLimitResult</span><span class="p">(</span>
+                    <span class="n">allowed</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">remaining</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                    <span class="n">reset_time</span><span class="o">=</span><span class="n">result</span><span class="o">.</span><span class="n">reset_time</span><span class="p">,</span>
+                    <span class="n">retry_after</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                    <span class="n">limit_type</span><span class="o">=</span><span class="s2">&quot;adaptive_limit&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="AdaptiveRateLimiter.reset_limit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.AdaptiveRateLimiter.reset_limit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset adaptive rate limit.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_limiter</span><span class="o">.</span><span class="n">reset_limit</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RateLimitMiddleware">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Middleware for applying rate limiting to requests.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rate_limiter</span><span class="p">:</span> <span class="n">RateLimiter</span><span class="p">,</span> <span class="n">get_identifier_func</span><span class="p">:</span> <span class="nb">callable</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rate_limiter</span> <span class="o">=</span> <span class="n">rate_limiter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">get_identifier</span> <span class="o">=</span> <span class="n">get_identifier_func</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_default_get_identifier</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_default_get_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Default identifier extraction from request.&quot;&quot;&quot;</span>
+        <span class="c1"># This would be implemented based on your web framework</span>
+        <span class="c1"># For FastAPI, you might extract from request.client.host</span>
+        <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">client</span><span class="p">,</span> <span class="s2">&quot;host&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RateLimitMiddleware.__call__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.RateLimitMiddleware.__call__">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">call_next</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply rate limiting to request.&quot;&quot;&quot;</span>
+        <span class="n">identifier</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_identifier</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+        <span class="n">endpoint</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limiter</span><span class="o">.</span><span class="n">check_limit</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">allowed</span><span class="p">:</span>
+                <span class="c1"># Log rate limit violation</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Rate limit exceeded for </span><span class="si">{</span><span class="n">identifier</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">category</span><span class="o">=</span><span class="n">LogCategory</span><span class="o">.</span><span class="n">SECURITY</span><span class="p">,</span>
+                    <span class="n">context</span><span class="o">=</span><span class="n">LogContext</span><span class="p">(</span><span class="n">ip_address</span><span class="o">=</span><span class="n">identifier</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">=</span><span class="n">endpoint</span><span class="p">),</span>
+                    <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;limit_type&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">limit_type</span><span class="p">,</span>
+                        <span class="s2">&quot;retry_after&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">retry_after</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+                <span class="k">raise</span> <span class="n">RateLimitExceeded</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Rate limit exceeded. Try again in </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">retry_after</span><span class="si">}</span><span class="s2"> seconds.&quot;</span><span class="p">,</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">retry_after</span><span class="p">,</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">limit_type</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Add rate limit headers to response</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">call_next</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-RateLimit-Remaining&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">remaining</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">[</span><span class="s2">&quot;X-RateLimit-Reset&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">reset_time</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="n">RateLimitExceeded</span><span class="p">:</span>
+            <span class="c1"># Return rate limit error response</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPException</span><span class="p">,</span> <span class="n">status</span>
+
+            <span class="k">raise</span> <span class="n">HTTPException</span><span class="p">(</span>
+                <span class="n">status_code</span><span class="o">=</span><span class="n">status</span><span class="o">.</span><span class="n">HTTP_429_TOO_MANY_REQUESTS</span><span class="p">,</span>
+                <span class="n">detail</span><span class="o">=</span><span class="s2">&quot;Rate limit exceeded&quot;</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;Retry-After&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">retry_after</span><span class="p">),</span>
+                    <span class="s2">&quot;X-RateLimit-Remaining&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;X-RateLimit-Reset&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">reset_time</span><span class="o">.</span><span class="n">timestamp</span><span class="p">())),</span>
+                <span class="p">},</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="create_rate_limiter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.create_rate_limiter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_rate_limiter</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">RateLimitConfig</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">:</span> <span class="n">Redis</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimiter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory function to create appropriate rate limiter.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">redis_client</span><span class="p">:</span>
+        <span class="n">base_limiter</span> <span class="o">=</span> <span class="n">RedisRateLimiter</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">redis_client</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="n">RateLimitStrategy</span><span class="o">.</span><span class="n">TOKEN_BUCKET</span><span class="p">:</span>
+        <span class="n">base_limiter</span> <span class="o">=</span> <span class="n">TokenBucketRateLimiter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">strategy</span> <span class="o">==</span> <span class="n">RateLimitStrategy</span><span class="o">.</span><span class="n">SLIDING_WINDOW</span><span class="p">:</span>
+        <span class="n">base_limiter</span> <span class="o">=</span> <span class="n">SlidingWindowRateLimiter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">base_limiter</span> <span class="o">=</span> <span class="n">TokenBucketRateLimiter</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>  <span class="c1"># Default</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">enable_adaptive</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">AdaptiveRateLimiter</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">base_limiter</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">base_limiter</span></div>
+
+
+
+<span class="c1"># Backward-compat shim expected by middleware imports</span>
+<span class="c1"># Provides a simple getter that returns a default validator callable; adjust as needed.</span>
+<div class="viewcode-block" id="get_security_validator">
+<a class="viewcode-back" href="../../../../api/src.player_experience.security.rate_limiter.html#src.player_experience.security.get_security_validator">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_security_validator</span><span class="p">():</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_validator</span><span class="p">(</span><span class="n">_</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="n">_validator</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

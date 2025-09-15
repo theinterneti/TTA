@@ -1,0 +1,1036 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.personalization_service_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.personalization_service_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.personalization_service_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Therapeutic personalization and adaptation management.</span>
+
+<span class="sd">This module provides comprehensive therapeutic personalization services,</span>
+<span class="sd">extending the existing PersonalizationEngine with player-specific features,</span>
+<span class="sd">real-time adaptation, and crisis detection capabilities.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrisisType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Recommendation</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.therapeutic_settings</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EnhancedTherapeuticSettings</span><span class="p">,</span>
+    <span class="n">SettingsConflict</span><span class="p">,</span>
+    <span class="n">TherapeuticPreferencesValidator</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Import from TTA prototype (with fallback for testing)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+    <span class="n">prototype_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;..&quot;</span><span class="p">,</span> <span class="s2">&quot;tta.prototype&quot;</span><span class="p">,</span> <span class="s2">&quot;core&quot;</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">prototype_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">:</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">prototype_path</span><span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">personalization_engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">PersonalizationEngine</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">progress_based_therapeutic_adaptation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressBasedTherapeuticAdaptation</span>
+<span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">NameError</span><span class="p">,</span> <span class="ne">ModuleNotFoundError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="c1"># Fallback for testing - create mock classes</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;Could not import TTA prototype components: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. Using mock implementations.&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="PersonalizationEngine">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationEngine">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">PersonalizationEngine</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm_client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">llm_client</span> <span class="o">=</span> <span class="n">llm_client</span>
+
+<div class="viewcode-block" id="PersonalizationEngine.personalize_content">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationEngine.personalize_content">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">personalize_content</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">session_state</span><span class="p">,</span> <span class="n">profile</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">None</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;adapted_content&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span>
+                <span class="s2">&quot;recommendations&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                <span class="s2">&quot;adaptation_info&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;mock&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;rationale&quot;</span><span class="p">:</span> <span class="s2">&quot;Mock adaptation for testing&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">}</span></div>
+</div>
+
+
+<div class="viewcode-block" id="ProgressBasedTherapeuticAdaptation">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.ProgressBasedTherapeuticAdaptation">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">ProgressBasedTherapeuticAdaptation</span><span class="p">:</span>
+        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm_client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">llm_client</span> <span class="o">=</span> <span class="n">llm_client</span>
+
+<div class="viewcode-block" id="ProgressBasedTherapeuticAdaptation.adapt_therapeutic_content">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.ProgressBasedTherapeuticAdaptation.adapt_therapeutic_content">[docs]</a>
+        <span class="k">def</span><span class="w"> </span><span class="nf">adapt_therapeutic_content</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="n">progress_data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;adapted_content&quot;</span><span class="p">:</span> <span class="n">content</span><span class="p">,</span> <span class="s2">&quot;adaptations&quot;</span><span class="p">:</span> <span class="p">[]}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PlayerFeedback">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PlayerFeedback">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">PlayerFeedback</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents feedback from a player about their therapeutic experience.&quot;&quot;&quot;</span>
+
+    <span class="n">feedback_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">feedback_type</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;rating&quot;, &quot;text&quot;, &quot;preference_change&quot;, &quot;crisis_indicator&quot;</span>
+    <span class="n">content</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+    <span class="n">processed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="PlayerFeedback.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PlayerFeedback.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate feedback after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feedback_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AdaptationResult">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.AdaptationResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AdaptationResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of therapeutic adaptation based on player feedback.&quot;&quot;&quot;</span>
+
+    <span class="n">adaptation_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">changes_made</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">confidence_score</span><span class="p">:</span> <span class="nb">float</span>  <span class="c1"># 0.0 to 1.0</span>
+    <span class="n">reasoning</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">requires_player_approval</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AdaptationResult.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.AdaptationResult.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate adaptation result after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">confidence_score</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Confidence score must be between 0.0 and 1.0&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CrisisSupportResource">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.CrisisSupportResource">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrisisSupportResource</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a crisis support resource.&quot;&quot;&quot;</span>
+
+    <span class="n">resource_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">contact_method</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;phone&quot;, &quot;text&quot;, &quot;chat&quot;, &quot;website&quot;</span>
+    <span class="n">contact_info</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">availability</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># &quot;24/7&quot;, &quot;business_hours&quot;, &quot;specific_times&quot;</span>
+    <span class="n">crisis_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisType</span><span class="p">]</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># 1 (highest) to 5 (lowest)</span>
+    <span class="n">is_emergency</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="CrisisSupportResource.__post_init__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.CrisisSupportResource.__post_init__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate crisis support resource after initialization.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">priority</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Priority must be between 1 and 5&quot;</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CrisisDetectionSystem">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.CrisisDetectionSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CrisisDetectionSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Handles crisis detection and emergency response.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the crisis detection system.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_keywords</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">CrisisType</span><span class="o">.</span><span class="n">SUICIDAL_IDEATION</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;suicide&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;kill myself&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end it all&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;not worth living&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;better off dead&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;want to die&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end my life&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">CrisisType</span><span class="o">.</span><span class="n">SELF_HARM</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;hurt myself&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cut myself&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;self harm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;self-harm&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cutting&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;burning myself&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;punish myself&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">CrisisType</span><span class="o">.</span><span class="n">PANIC_ATTACK</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;can&#39;t breathe&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;heart racing&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;panic attack&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;losing control&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;going crazy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;chest pain&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dizzy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;hyperventilating&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">CrisisType</span><span class="o">.</span><span class="n">SEVERE_DEPRESSION</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;hopeless&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;worthless&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nothing matters&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;can&#39;t go on&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;empty inside&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;numb&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;no point&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;give up&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">CrisisType</span><span class="o">.</span><span class="n">TRAUMA_RESPONSE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;flashback&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;nightmare&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;triggered&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reliving&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;can&#39;t stop thinking&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;haunted&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;traumatized&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_crisis_resources</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_crisis_resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisSupportResource</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize default crisis support resources.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">CrisisSupportResource</span><span class="p">(</span>
+                <span class="n">resource_id</span><span class="o">=</span><span class="s2">&quot;988_lifeline&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;988 Suicide &amp; Crisis Lifeline&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Free and confidential emotional support 24/7&quot;</span><span class="p">,</span>
+                <span class="n">contact_method</span><span class="o">=</span><span class="s2">&quot;phone&quot;</span><span class="p">,</span>
+                <span class="n">contact_info</span><span class="o">=</span><span class="s2">&quot;988&quot;</span><span class="p">,</span>
+                <span class="n">availability</span><span class="o">=</span><span class="s2">&quot;24/7&quot;</span><span class="p">,</span>
+                <span class="n">crisis_types</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">SUICIDAL_IDEATION</span><span class="p">,</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">SEVERE_DEPRESSION</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">is_emergency</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">CrisisSupportResource</span><span class="p">(</span>
+                <span class="n">resource_id</span><span class="o">=</span><span class="s2">&quot;crisis_text_line&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Crisis Text Line&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Free, 24/7 support via text message&quot;</span><span class="p">,</span>
+                <span class="n">contact_method</span><span class="o">=</span><span class="s2">&quot;text&quot;</span><span class="p">,</span>
+                <span class="n">contact_info</span><span class="o">=</span><span class="s2">&quot;Text HOME to 741741&quot;</span><span class="p">,</span>
+                <span class="n">availability</span><span class="o">=</span><span class="s2">&quot;24/7&quot;</span><span class="p">,</span>
+                <span class="n">crisis_types</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">SUICIDAL_IDEATION</span><span class="p">,</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">SELF_HARM</span><span class="p">,</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">PANIC_ATTACK</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">is_emergency</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">CrisisSupportResource</span><span class="p">(</span>
+                <span class="n">resource_id</span><span class="o">=</span><span class="s2">&quot;emergency_services&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Emergency Services&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Immediate emergency response&quot;</span><span class="p">,</span>
+                <span class="n">contact_method</span><span class="o">=</span><span class="s2">&quot;phone&quot;</span><span class="p">,</span>
+                <span class="n">contact_info</span><span class="o">=</span><span class="s2">&quot;911&quot;</span><span class="p">,</span>
+                <span class="n">availability</span><span class="o">=</span><span class="s2">&quot;24/7&quot;</span><span class="p">,</span>
+                <span class="n">crisis_types</span><span class="o">=</span><span class="p">[</span><span class="n">CrisisType</span><span class="o">.</span><span class="n">SUICIDAL_IDEATION</span><span class="p">,</span> <span class="n">CrisisType</span><span class="o">.</span><span class="n">SELF_HARM</span><span class="p">],</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="n">is_emergency</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">CrisisSupportResource</span><span class="p">(</span>
+                <span class="n">resource_id</span><span class="o">=</span><span class="s2">&quot;nami_helpline&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;NAMI HelpLine&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Information, referrals and support for mental health&quot;</span><span class="p">,</span>
+                <span class="n">contact_method</span><span class="o">=</span><span class="s2">&quot;phone&quot;</span><span class="p">,</span>
+                <span class="n">contact_info</span><span class="o">=</span><span class="s2">&quot;1-800-950-NAMI (6264)&quot;</span><span class="p">,</span>
+                <span class="n">availability</span><span class="o">=</span><span class="s2">&quot;Monday-Friday 10am-10pm ET&quot;</span><span class="p">,</span>
+                <span class="n">crisis_types</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">SEVERE_DEPRESSION</span><span class="p">,</span>
+                    <span class="n">CrisisType</span><span class="o">.</span><span class="n">GENERAL_DISTRESS</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">CrisisSupportResource</span><span class="p">(</span>
+                <span class="n">resource_id</span><span class="o">=</span><span class="s2">&quot;samhsa_helpline&quot;</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SAMHSA National Helpline&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Treatment referral and information service&quot;</span><span class="p">,</span>
+                <span class="n">contact_method</span><span class="o">=</span><span class="s2">&quot;phone&quot;</span><span class="p">,</span>
+                <span class="n">contact_info</span><span class="o">=</span><span class="s2">&quot;1-800-662-HELP (4357)&quot;</span><span class="p">,</span>
+                <span class="n">availability</span><span class="o">=</span><span class="s2">&quot;24/7&quot;</span><span class="p">,</span>
+                <span class="n">crisis_types</span><span class="o">=</span><span class="p">[</span><span class="n">CrisisType</span><span class="o">.</span><span class="n">SUBSTANCE_ABUSE</span><span class="p">,</span> <span class="n">CrisisType</span><span class="o">.</span><span class="n">GENERAL_DISTRESS</span><span class="p">],</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="CrisisDetectionSystem.detect_crisis_indicators">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.CrisisDetectionSystem.detect_crisis_indicators">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_crisis_indicators</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisType</span><span class="p">],</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect crisis indicators in text and context.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (crisis_detected, crisis_types, confidence_score)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">text_lower</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">detected_types</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">confidence_scores</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Keyword-based detection</span>
+        <span class="k">for</span> <span class="n">crisis_type</span><span class="p">,</span> <span class="n">keywords</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_keywords</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">keywords</span> <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">text_lower</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">matches</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">detected_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">crisis_type</span><span class="p">)</span>
+                <span class="c1"># Calculate confidence based on number of matches and keyword specificity</span>
+                <span class="n">confidence</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">matches</span> <span class="o">*</span> <span class="mf">0.3</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">confidence_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">confidence</span><span class="p">)</span>
+
+        <span class="c1"># Context-based detection</span>
+        <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+            <span class="c1"># Check for emotional state indicators</span>
+            <span class="n">emotional_state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_state&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="k">if</span> <span class="n">emotional_state</span><span class="p">:</span>
+                <span class="n">distress_level</span> <span class="o">=</span> <span class="n">emotional_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;distress_level&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">distress_level</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                    <span class="n">detected_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CrisisType</span><span class="o">.</span><span class="n">GENERAL_DISTRESS</span><span class="p">)</span>
+                    <span class="n">confidence_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">distress_level</span><span class="p">)</span>
+
+            <span class="c1"># Check for behavioral indicators</span>
+            <span class="n">behavioral_indicators</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;behavioral_indicators&quot;</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">crisis_behaviors</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;withdrawal&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;agitation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sleep_disruption&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;appetite_changes&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">behavior</span> <span class="ow">in</span> <span class="n">behavioral_indicators</span> <span class="k">for</span> <span class="n">behavior</span> <span class="ow">in</span> <span class="n">crisis_behaviors</span><span class="p">):</span>
+                <span class="n">detected_types</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">CrisisType</span><span class="o">.</span><span class="n">SEVERE_DEPRESSION</span><span class="p">)</span>
+                <span class="n">confidence_scores</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+
+        <span class="c1"># Calculate overall confidence</span>
+        <span class="n">overall_confidence</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">)</span> <span class="k">if</span> <span class="n">confidence_scores</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">crisis_detected</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">detected_types</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">overall_confidence</span> <span class="o">&gt;</span> <span class="mf">0.3</span>
+
+        <span class="k">return</span> <span class="n">crisis_detected</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">detected_types</span><span class="p">)),</span> <span class="n">overall_confidence</span></div>
+
+
+<div class="viewcode-block" id="CrisisDetectionSystem.get_crisis_resources">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.CrisisDetectionSystem.get_crisis_resources">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_crisis_resources</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">crisis_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisType</span><span class="p">],</span> <span class="n">emergency_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisSupportResource</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get appropriate crisis support resources for given crisis types.&quot;&quot;&quot;</span>
+        <span class="n">relevant_resources</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">resource</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_resources</span><span class="p">:</span>
+            <span class="c1"># Filter by emergency status if requested</span>
+            <span class="k">if</span> <span class="n">emergency_only</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">resource</span><span class="o">.</span><span class="n">is_emergency</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Check if resource handles any of the crisis types</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">crisis_type</span> <span class="ow">in</span> <span class="n">resource</span><span class="o">.</span><span class="n">crisis_types</span> <span class="k">for</span> <span class="n">crisis_type</span> <span class="ow">in</span> <span class="n">crisis_types</span>
+            <span class="p">):</span>
+                <span class="n">relevant_resources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resource</span><span class="p">)</span>
+
+        <span class="c1"># Sort by priority (1 = highest priority)</span>
+        <span class="n">relevant_resources</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">relevant_resources</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PersonalizationServiceManager">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PersonalizationServiceManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Manages therapeutic personalization and adaptation.</span>
+
+<span class="sd">    Extends the existing PersonalizationEngine with player-specific features,</span>
+<span class="sd">    real-time adaptation based on feedback, and crisis detection capabilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">llm_client</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the Personalization Service Manager.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">personalization_engine</span> <span class="o">=</span> <span class="n">PersonalizationEngine</span><span class="p">(</span><span class="n">llm_client</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_adapter</span> <span class="o">=</span> <span class="n">ProgressBasedTherapeuticAdaptation</span><span class="p">(</span><span class="n">llm_client</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_validator</span> <span class="o">=</span> <span class="n">TherapeuticPreferencesValidator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_detector</span> <span class="o">=</span> <span class="n">CrisisDetectionSystem</span><span class="p">()</span>
+
+        <span class="c1"># Storage for adaptation history (in production, this would be database-backed)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">AdaptationResult</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">feedback_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">PlayerFeedback</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PersonalizationServiceManager initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PersonalizationServiceManager.update_therapeutic_settings">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager.update_therapeutic_settings">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_therapeutic_settings</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">settings</span><span class="p">:</span> <span class="n">EnhancedTherapeuticSettings</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">SettingsConflict</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update therapeutic settings for a player with validation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player&#39;s unique identifier</span>
+<span class="sd">            settings: The new therapeutic settings</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (success, conflicts_list)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Validate settings</span>
+            <span class="n">is_valid</span><span class="p">,</span> <span class="n">conflicts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">settings_validator</span><span class="o">.</span><span class="n">validate_settings</span><span class="p">(</span><span class="n">settings</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_valid</span><span class="p">:</span>
+                <span class="c1"># Try to auto-resolve all conflicts (including critical ones)</span>
+                <span class="n">resolved_settings</span> <span class="o">=</span> <span class="n">settings</span>
+                <span class="n">resolved_any</span> <span class="o">=</span> <span class="kc">False</span>
+
+                <span class="k">for</span> <span class="n">conflict</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">conflict</span><span class="o">.</span><span class="n">auto_resolvable</span> <span class="ow">and</span> <span class="n">conflict</span><span class="o">.</span><span class="n">resolution_options</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">resolved_settings</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">settings_validator</span><span class="o">.</span><span class="n">resolve_conflict</span><span class="p">(</span>
+                                    <span class="n">resolved_settings</span><span class="p">,</span>
+                                    <span class="n">conflict</span><span class="p">,</span>
+                                    <span class="n">conflict</span><span class="o">.</span><span class="n">resolution_options</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Auto-resolved conflict </span><span class="si">{</span><span class="n">conflict</span><span class="o">.</span><span class="n">conflict_id</span><span class="si">}</span><span class="s2"> for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="n">resolved_any</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Failed to auto-resolve conflict </span><span class="si">{</span><span class="n">conflict</span><span class="o">.</span><span class="n">conflict_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+                <span class="c1"># Re-validate after resolution</span>
+                <span class="k">if</span> <span class="n">resolved_any</span><span class="p">:</span>
+                    <span class="n">is_valid</span><span class="p">,</span> <span class="n">remaining_conflicts</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">settings_validator</span><span class="o">.</span><span class="n">validate_settings</span><span class="p">(</span><span class="n">resolved_settings</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">is_valid</span><span class="p">:</span>
+                        <span class="n">settings</span> <span class="o">=</span> <span class="n">resolved_settings</span>
+                        <span class="n">conflicts</span> <span class="o">=</span> <span class="n">remaining_conflicts</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Check if there are still critical unresolvable conflicts</span>
+                        <span class="n">critical_unresolvable</span> <span class="o">=</span> <span class="p">[</span>
+                            <span class="n">c</span>
+                            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">remaining_conflicts</span>
+                            <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">c</span><span class="o">.</span><span class="n">auto_resolvable</span>
+                        <span class="p">]</span>
+                        <span class="k">if</span> <span class="n">critical_unresolvable</span><span class="p">:</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Critical unresolvable conflicts found in settings for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+                            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">remaining_conflicts</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="c1"># Non-critical conflicts remaining, but settings are usable</span>
+                            <span class="n">settings</span> <span class="o">=</span> <span class="n">resolved_settings</span>
+                            <span class="n">conflicts</span> <span class="o">=</span> <span class="n">remaining_conflicts</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># No conflicts were resolvable, check if any are critical</span>
+                    <span class="n">critical_conflicts</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">conflicts</span> <span class="k">if</span> <span class="n">c</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span>
+                    <span class="p">]</span>
+                    <span class="k">if</span> <span class="n">critical_conflicts</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Critical conflicts found in settings for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="n">conflicts</span>
+
+            <span class="c1"># Store settings (in production, this would save to database)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Therapeutic settings updated for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span><span class="p">,</span> <span class="n">conflicts</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error updating therapeutic settings for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="PersonalizationServiceManager.get_adaptive_recommendations">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager.get_adaptive_recommendations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_adaptive_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate adaptive recommendations based on player behavior and progress.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player&#39;s unique identifier</span>
+<span class="sd">            context: Optional context information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of personalized recommendations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Get adaptation history for this player</span>
+            <span class="n">player_adaptations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="n">player_feedback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_history</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="p">[])</span>
+
+            <span class="c1"># Generate recommendations based on recent feedback</span>
+            <span class="k">if</span> <span class="n">player_feedback</span><span class="p">:</span>
+                <span class="n">recent_feedback</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">f</span>
+                    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">player_feedback</span>
+                    <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+                <span class="p">]</span>
+
+                <span class="c1"># Analyze feedback patterns</span>
+                <span class="k">if</span> <span class="n">recent_feedback</span><span class="p">:</span>
+                    <span class="n">recommendations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_feedback_based_recommendations</span><span class="p">(</span>
+                            <span class="n">player_id</span><span class="p">,</span> <span class="n">recent_feedback</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Generate recommendations based on adaptation patterns</span>
+            <span class="k">if</span> <span class="n">player_adaptations</span><span class="p">:</span>
+                <span class="n">recent_adaptations</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">a</span>
+                    <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">player_adaptations</span>
+                    <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+                <span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">recent_adaptations</span><span class="p">:</span>
+                    <span class="n">recommendations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_generate_adaptation_based_recommendations</span><span class="p">(</span>
+                            <span class="n">player_id</span><span class="p">,</span> <span class="n">recent_adaptations</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+            <span class="c1"># Generate contextual recommendations</span>
+            <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_generate_contextual_recommendations</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Sort by priority and limit results</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">recommendations</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span>  <span class="c1"># Return top 5 recommendations</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error generating adaptive recommendations for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="PersonalizationServiceManager.process_feedback">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager.process_feedback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">process_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AdaptationResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process player feedback and adapt therapeutic experience accordingly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player&#39;s unique identifier</span>
+<span class="sd">            feedback: The feedback to process</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Result of the adaptation process</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Store feedback</span>
+            <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feedback_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">feedback_history</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feedback_history</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+
+            <span class="c1"># Process different types of feedback</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.5</span>
+            <span class="n">reasoning</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">requires_approval</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="k">if</span> <span class="n">feedback</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;rating&quot;</span><span class="p">:</span>
+                <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_process_rating_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">feedback</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">:</span>
+                <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_text_feedback</span><span class="p">(</span>
+                    <span class="n">feedback</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">feedback</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;preference_change&quot;</span><span class="p">:</span>
+                <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_process_preference_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">requires_approval</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">elif</span> <span class="n">feedback</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;crisis_indicator&quot;</span><span class="p">:</span>
+                <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_process_crisis_feedback</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">requires_approval</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Crisis adaptations are automatic</span>
+
+            <span class="c1"># Create adaptation result</span>
+            <span class="n">adaptation_result</span> <span class="o">=</span> <span class="n">AdaptationResult</span><span class="p">(</span>
+                <span class="n">adaptation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="n">changes_made</span><span class="o">=</span><span class="n">changes_made</span><span class="p">,</span>
+                <span class="n">confidence_score</span><span class="o">=</span><span class="n">confidence_score</span><span class="p">,</span>
+                <span class="n">reasoning</span><span class="o">=</span><span class="n">reasoning</span><span class="p">,</span>
+                <span class="n">requires_player_approval</span><span class="o">=</span><span class="n">requires_approval</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store adaptation result</span>
+            <span class="k">if</span> <span class="n">player_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_history</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_history</span><span class="p">[</span><span class="n">player_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">adaptation_result</span><span class="p">)</span>
+
+            <span class="c1"># Mark feedback as processed</span>
+            <span class="n">feedback</span><span class="o">.</span><span class="n">processed</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Processed feedback </span><span class="si">{</span><span class="n">feedback</span><span class="o">.</span><span class="n">feedback_id</span><span class="si">}</span><span class="s2"> for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">adaptation_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing feedback for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">AdaptationResult</span><span class="p">(</span>
+                <span class="n">adaptation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+                <span class="n">changes_made</span><span class="o">=</span><span class="p">[],</span>
+                <span class="n">confidence_score</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+                <span class="n">reasoning</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Error processing feedback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">requires_player_approval</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PersonalizationServiceManager.get_crisis_support_resources">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager.get_crisis_support_resources">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_crisis_support_resources</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">crisis_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisType</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">emergency_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisSupportResource</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get crisis support resources for a player.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player&#39;s unique identifier</span>
+<span class="sd">            crisis_types: Specific crisis types to get resources for</span>
+<span class="sd">            emergency_only: Whether to return only emergency resources</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of relevant crisis support resources</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">crisis_types</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># If no specific crisis types, return general resources</span>
+                <span class="n">crisis_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">CrisisType</span><span class="o">.</span><span class="n">GENERAL_DISTRESS</span><span class="p">]</span>
+
+            <span class="n">resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_detector</span><span class="o">.</span><span class="n">get_crisis_resources</span><span class="p">(</span>
+                <span class="n">crisis_types</span><span class="p">,</span> <span class="n">emergency_only</span>
+            <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Retrieved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">resources</span><span class="p">)</span><span class="si">}</span><span class="s2"> crisis support resources for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">resources</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error getting crisis support resources for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="PersonalizationServiceManager.detect_crisis_situation">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.personalization_service_manager.html#src.player_experience.managers.PersonalizationServiceManager.detect_crisis_situation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">detect_crisis_situation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisType</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">CrisisSupportResource</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect crisis situation and provide immediate resources.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            player_id: The player&#39;s unique identifier</span>
+<span class="sd">            text: Text to analyze for crisis indicators</span>
+<span class="sd">            context: Optional context information</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Tuple of (crisis_detected, crisis_types, emergency_resources)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Detect crisis indicators</span>
+            <span class="n">crisis_detected</span><span class="p">,</span> <span class="n">crisis_types</span><span class="p">,</span> <span class="n">confidence</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">crisis_detector</span><span class="o">.</span><span class="n">detect_crisis_indicators</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">context</span> <span class="ow">or</span> <span class="p">{})</span>
+            <span class="p">)</span>
+
+            <span class="n">emergency_resources</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="n">crisis_detected</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Crisis detected for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">crisis_types</span><span class="si">}</span><span class="s2"> (confidence: </span><span class="si">{</span><span class="n">confidence</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Get emergency resources</span>
+                <span class="n">emergency_resources</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_detector</span><span class="o">.</span><span class="n">get_crisis_resources</span><span class="p">(</span>
+                    <span class="n">crisis_types</span><span class="p">,</span> <span class="n">emergency_only</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Create crisis feedback for adaptation</span>
+                <span class="n">crisis_feedback</span> <span class="o">=</span> <span class="n">PlayerFeedback</span><span class="p">(</span>
+                    <span class="n">feedback_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                    <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+                    <span class="n">session_id</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>  <span class="c1"># May not have session context</span>
+                    <span class="n">feedback_type</span><span class="o">=</span><span class="s2">&quot;crisis_indicator&quot;</span><span class="p">,</span>
+                    <span class="n">content</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;crisis_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ct</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">crisis_types</span><span class="p">],</span>
+                        <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">,</span>
+                        <span class="s2">&quot;text_analyzed&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span>
+                        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Process crisis feedback for immediate adaptation</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process_feedback</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">crisis_feedback</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">crisis_detected</span><span class="p">,</span> <span class="n">crisis_types</span><span class="p">,</span> <span class="n">emergency_resources</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error detecting crisis situation for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_feedback_based_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">feedback_list</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">PlayerFeedback</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate recommendations based on recent feedback patterns.&quot;&quot;&quot;</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Analyze feedback patterns</span>
+        <span class="n">rating_feedback</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">feedback_list</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;rating&quot;</span><span class="p">]</span>
+        <span class="n">text_feedback</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">feedback_list</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">feedback_type</span> <span class="o">==</span> <span class="s2">&quot;text&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Low ratings suggest need for adjustment</span>
+        <span class="k">if</span> <span class="n">rating_feedback</span><span class="p">:</span>
+            <span class="n">avg_rating</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">rating_feedback</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">rating_feedback</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">avg_rating</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Recommendation</span><span class="p">(</span>
+                        <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Adjust Therapeutic Intensity&quot;</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Recent ratings suggest the current approach may be too intense. Consider reducing intensity or trying a gentler approach.&quot;</span><span class="p">,</span>
+                        <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;therapeutic_adjustment&quot;</span><span class="p">,</span>
+                        <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;Low average rating in recent sessions&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Analyze text feedback for common themes</span>
+        <span class="k">if</span> <span class="n">text_feedback</span><span class="p">:</span>
+            <span class="c1"># Simple keyword analysis (in production, this would use NLP)</span>
+            <span class="n">all_text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">text_feedback</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;too fast&quot;</span> <span class="ow">in</span> <span class="n">all_text</span> <span class="ow">or</span> <span class="s2">&quot;overwhelming&quot;</span> <span class="ow">in</span> <span class="n">all_text</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Recommendation</span><span class="p">(</span>
+                        <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Slow Down Pacing&quot;</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Feedback indicates the pacing may be too fast. Consider extending session duration or reducing content density.&quot;</span><span class="p">,</span>
+                        <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;pacing_adjustment&quot;</span><span class="p">,</span>
+                        <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;Player feedback indicates pacing issues&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;boring&quot;</span> <span class="ow">in</span> <span class="n">all_text</span> <span class="ow">or</span> <span class="s2">&quot;not engaging&quot;</span> <span class="ow">in</span> <span class="n">all_text</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Recommendation</span><span class="p">(</span>
+                        <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Increase Engagement&quot;</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consider adding more interactive elements or trying different therapeutic approaches to increase engagement.&quot;</span><span class="p">,</span>
+                        <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;engagement_improvement&quot;</span><span class="p">,</span>
+                        <span class="n">priority</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                        <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;Player feedback indicates low engagement&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recommendations</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_adaptation_based_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">adaptations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AdaptationResult</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate recommendations based on adaptation patterns.&quot;&quot;&quot;</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Look for patterns in adaptations</span>
+        <span class="n">successful_adaptations</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">adaptations</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">confidence_score</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">]</span>
+        <span class="n">failed_adaptations</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">adaptations</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">confidence_score</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">failed_adaptations</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">successful_adaptations</span><span class="p">):</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Review Therapeutic Approach&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Recent adaptations have had mixed results. Consider consulting with a therapeutic professional to review the current approach.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;professional_consultation&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;Pattern of low-confidence adaptations detected&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recommendations</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_contextual_recommendations</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate recommendations based on current context.&quot;&quot;&quot;</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Check for time-based recommendations</span>
+        <span class="n">current_hour</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">hour</span>
+        <span class="k">if</span> <span class="n">current_hour</span> <span class="o">&lt;</span> <span class="mi">6</span> <span class="ow">or</span> <span class="n">current_hour</span> <span class="o">&gt;</span> <span class="mi">22</span><span class="p">:</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Consider Session Timing&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Late night or early morning sessions may affect therapeutic effectiveness. Consider scheduling during regular hours.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;scheduling_suggestion&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+                    <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;Session occurring outside optimal hours&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check for emotional state recommendations</span>
+        <span class="n">emotional_state</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_state&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="k">if</span> <span class="n">emotional_state</span><span class="p">:</span>
+            <span class="n">stress_level</span> <span class="o">=</span> <span class="n">emotional_state</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;stress_level&quot;</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">stress_level</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+                <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">Recommendation</span><span class="p">(</span>
+                        <span class="n">recommendation_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()),</span>
+                        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Stress Management Focus&quot;</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;High stress levels detected. Consider focusing on stress reduction techniques in upcoming sessions.&quot;</span><span class="p">,</span>
+                        <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">,</span>
+                        <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                        <span class="n">reasoning</span><span class="o">=</span><span class="s2">&quot;High stress level detected in current context&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">recommendations</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_rating_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process rating-based feedback.&quot;&quot;&quot;</span>
+        <span class="n">rating</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.6</span>
+        <span class="n">reasoning</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Based on rating of </span><span class="si">{</span><span class="n">rating</span><span class="si">}</span><span class="s2">/5&quot;</span>
+
+        <span class="k">if</span> <span class="n">rating</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;reduce_intensity&quot;</span><span class="p">,</span> <span class="s2">&quot;increase_support&quot;</span><span class="p">]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.8</span>
+            <span class="n">reasoning</span> <span class="o">+=</span> <span class="s2">&quot; - Low rating suggests need for gentler approach&quot;</span>
+        <span class="k">elif</span> <span class="n">rating</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maintain_current_approach&quot;</span><span class="p">]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.9</span>
+            <span class="n">reasoning</span> <span class="o">+=</span> <span class="s2">&quot; - High rating suggests current approach is effective&quot;</span>
+
+        <span class="k">return</span> <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_text_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process text-based feedback.&quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.5</span>
+        <span class="n">reasoning</span> <span class="o">=</span> <span class="s2">&quot;Based on text feedback analysis&quot;</span>
+
+        <span class="c1"># Simple keyword-based analysis</span>
+        <span class="k">if</span> <span class="s2">&quot;helpful&quot;</span> <span class="ow">in</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;good&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maintain_current_approach&quot;</span><span class="p">]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="k">elif</span> <span class="s2">&quot;difficult&quot;</span> <span class="ow">in</span> <span class="n">text</span> <span class="ow">or</span> <span class="s2">&quot;hard&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;reduce_difficulty&quot;</span><span class="p">,</span> <span class="s2">&quot;increase_support&quot;</span><span class="p">]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.6</span>
+        <span class="k">elif</span> <span class="s2">&quot;boring&quot;</span> <span class="ow">in</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;increase_engagement&quot;</span><span class="p">,</span> <span class="s2">&quot;vary_approaches&quot;</span><span class="p">]</span>
+            <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.7</span>
+
+        <span class="k">return</span> <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_preference_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process preference change feedback.&quot;&quot;&quot;</span>
+        <span class="n">changes</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;preference_changes&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;update_</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">changes</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">0.9</span>  <span class="c1"># High confidence for explicit preference changes</span>
+        <span class="n">reasoning</span> <span class="o">=</span> <span class="s2">&quot;Direct preference change request from player&quot;</span>
+
+        <span class="k">return</span> <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_crisis_feedback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">feedback</span><span class="p">:</span> <span class="n">PlayerFeedback</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process crisis indicator feedback.&quot;&quot;&quot;</span>
+        <span class="n">crisis_types</span> <span class="o">=</span> <span class="n">feedback</span><span class="o">.</span><span class="n">content</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;crisis_types&quot;</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">changes_made</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;enable_crisis_monitoring&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;reduce_intensity&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;provide_support_resources&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="n">confidence_score</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># Maximum confidence for crisis situations</span>
+        <span class="n">reasoning</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Crisis indicators detected: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">crisis_types</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="n">changes_made</span><span class="p">,</span> <span class="n">confidence_score</span><span class="p">,</span> <span class="n">reasoning</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
