@@ -1,6 +1,27 @@
 import os
 import pytest
+import logging
+import sys
+from pathlib import Path
 from unittest.mock import Mock
+
+# Add project root to path for comprehensive test battery integration
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+# Configure logging for tests
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# Import comprehensive test battery components
+try:
+    from tests.comprehensive_battery.mocks.mock_services import MockServiceManager
+    from tests.comprehensive_battery.comprehensive_test_battery import TestBatteryConfig
+    COMPREHENSIVE_TEST_AVAILABLE = True
+except ImportError:
+    COMPREHENSIVE_TEST_AVAILABLE = False
 
 
 def has_neo4j():
@@ -276,4 +297,103 @@ def redis_client_sync(redis_container):
             client.close()
         except Exception:
             pass
+
+
+# Comprehensive Test Battery Integration
+@pytest.fixture(scope="session")
+async def comprehensive_test_config():
+    """Provide comprehensive test battery configuration."""
+    if not COMPREHENSIVE_TEST_AVAILABLE:
+        pytest.skip("Comprehensive test battery not available")
+
+    config = TestBatteryConfig()
+
+    # Override with test-specific settings
+    config.neo4j_uri = os.getenv('NEO4J_URI', 'bolt://localhost:7687')
+    config.neo4j_user = os.getenv('NEO4J_USER', 'neo4j')
+    config.neo4j_password = os.getenv('NEO4J_PASSWORD', 'testpassword')
+    config.redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+
+    # Test-specific overrides
+    config.max_concurrent_tests = 2
+    config.test_timeout_seconds = 300
+    config.cleanup_between_tests = True
+
+    return config
+
+
+@pytest.fixture(scope="session")
+async def mock_service_manager():
+    """Provide mock service manager for comprehensive testing."""
+    if not COMPREHENSIVE_TEST_AVAILABLE:
+        pytest.skip("Comprehensive test battery not available")
+
+    manager = MockServiceManager()
+    yield manager
+    await manager.cleanup()
+
+
+# Pytest configuration for comprehensive test battery
+def pytest_configure(config):
+    """Configure pytest with comprehensive test battery markers."""
+    config.addinivalue_line(
+        "markers", "comprehensive: mark test as part of comprehensive test battery"
+    )
+    config.addinivalue_line(
+        "markers", "integration: mark test as integration test"
+    )
+    config.addinivalue_line(
+        "markers", "slow: mark test as slow running"
+    )
+    config.addinivalue_line(
+        "markers", "mock_only: mark test to run only in mock mode"
+    )
+    config.addinivalue_line(
+        "markers", "real_services: mark test to require real services"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Modify test collection based on environment and comprehensive test battery settings."""
+    # Skip real service tests in CI if services aren't available
+    if os.getenv('CI') == 'true' and os.getenv('SKIP_REAL_SERVICE_TESTS') == 'true':
+        skip_real = pytest.mark.skip(reason="Real services not available in CI")
+        for item in items:
+            if "real_services" in item.keywords:
+                item.add_marker(skip_real)
+
+    # Add slow marker to integration tests
+    for item in items:
+        if "integration" in item.keywords or "comprehensive" in item.keywords:
+            item.add_marker(pytest.mark.slow)
+
+    # Skip comprehensive tests if not available
+    if not COMPREHENSIVE_TEST_AVAILABLE:
+        skip_comprehensive = pytest.mark.skip(reason="Comprehensive test battery not available")
+        for item in items:
+            if "comprehensive" in item.keywords:
+                item.add_marker(skip_comprehensive)
+
+
+# Test environment setup
+@pytest.fixture(autouse=True)
+def test_environment_setup():
+    """Set up test environment variables for comprehensive test battery integration."""
+    # Ensure we're in test mode
+    os.environ['TESTING'] = 'true'
+    os.environ['LOG_LEVEL'] = os.getenv('LOG_LEVEL', 'INFO')
+
+    # Mock mode settings for CI environments
+    if os.getenv('CI') == 'true':
+        os.environ['FORCE_MOCK_MODE'] = os.getenv('FORCE_MOCK_MODE', 'true')
+
+    # Comprehensive test mode flag
+    if os.getenv('COMPREHENSIVE_TEST_MODE') == 'true':
+        os.environ['COMPREHENSIVE_TEST_ACTIVE'] = 'true'
+
+    yield
+
+    # Cleanup
+    os.environ.pop('TESTING', None)
+    os.environ.pop('COMPREHENSIVE_TEST_ACTIVE', None)
 

