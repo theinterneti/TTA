@@ -81,10 +81,55 @@ The repository includes several scripts to help organize the codebase:
 
 ## Testing
 
-To run the tests for the TTA project, use the following command:
+The TTA project includes comprehensive testing infrastructure with multiple layers of validation:
+
+### Comprehensive Test Battery 🧪
+
+The TTA Comprehensive Test Battery provides robust, multi-dimensional testing with automatic mock fallback:
 
 ```bash
+# Quick validation (standard tests)
+python tests/comprehensive_battery/run_comprehensive_tests.py --categories standard
+
+# Full test battery (all categories)
+python tests/comprehensive_battery/run_comprehensive_tests.py --all --detailed-report
+
+# Force mock mode (no external dependencies)
+python tests/comprehensive_battery/run_comprehensive_tests.py --all --force-mock
+
+# Using Makefile shortcuts
+make test-all
+make test-standard
+make test-adversarial
+```
+
+**Test Categories:**
+- **Standard Tests**: Normal user interactions and story generation flows
+- **Adversarial Tests**: Security vulnerabilities and edge cases
+- **Load/Stress Tests**: Performance under concurrent load
+- **Data Pipeline Tests**: End-to-end data flow validation
+- **Dashboard Tests**: Real-time monitoring functionality
+
+**Key Features:**
+- ✅ **Mock/Real Service Support**: Automatic fallback when services unavailable
+- ✅ **CI/CD Integration**: GitHub Actions workflows included
+- ✅ **Developer Dashboard**: Real-time monitoring and results visualization
+- ✅ **Flexible Execution**: Run individual categories or full battery
+- ✅ **Comprehensive Reporting**: JSON, HTML, CSV, and TXT formats
+
+See [Comprehensive Test Battery Documentation](docs/testing/comprehensive-test-battery.md) for detailed usage.
+
+### Traditional Testing
+
+```bash
+# Run traditional unit tests
 python -m unittest discover tests
+
+# Run with pytest (if available)
+pytest
+
+# Integration with comprehensive test battery
+COMPREHENSIVE_TEST_MODE=true pytest tests/test_comprehensive_integration.py
 ```
 
 ## Agent Orchestration Diagnostics (Local)
