@@ -1,0 +1,296 @@
+#!/bin/bash
+
+# TTA Documentation Build Script
+# This script builds the Sphinx documentation for the TTA project
+
+set -e  # Exit on any error
+
+# Colors for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Logging functions
+log_info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Configuration
+DOCS_DIR="docs/sphinx"
+BUILD_DIR="docs/sphinx/_build"
+HTML_DIR="docs/sphinx/_build/html"
+
+# Function to clean previous builds
+clean_build() {
+    log_info "Cleaning previous documentation builds..."
+    
+    if [ -d "$BUILD_DIR" ]; then
+        rm -rf "$BUILD_DIR"
+        log_success "Previous build directory cleaned"
+    fi
+    
+    # Clean auto-generated API files
+    if [ -d "$DOCS_DIR/api" ]; then
+        rm -rf "$DOCS_DIR/api"
+        log_success "Auto-generated API files cleaned"
+    fi
+}
+
+# Function to build HTML documentation
+build_html() {
+    log_info "Building HTML documentation..."
+    
+    cd "$DOCS_DIR"
+    
+    # Build with Sphinx
+    if uv run sphinx-build -b html . _build/html -W --keep-going; then
+        log_success "HTML documentation built successfully"
+        return 0
+    else
+        log_warning "HTML documentation built with warnings"
+        return 1
+    fi
+}
+
+# Function to build PDF documentation (if LaTeX is available)
+build_pdf() {
+    log_info "Checking if LaTeX is available for PDF generation..."
+    
+    if command -v pdflatex &> /dev/null; then
+        log_info "Building PDF documentation..."
+        
+        cd "$DOCS_DIR"
+        
+        if uv run sphinx-build -b latex . _build/latex; then
+            cd _build/latex
+            if make; then
+                log_success "PDF documentation built successfully"
+                return 0
+            else
+                log_warning "PDF build failed during LaTeX compilation"
+                return 1
+            fi
+        else
+            log_warning "PDF build failed during Sphinx LaTeX generation"
+            return 1
+        fi
+    else
+        log_warning "LaTeX not available, skipping PDF generation"
+        return 1
+    fi
+}
+
+# Function to validate the build
+validate_build() {
+    log_info "Validating documentation build..."
+    
+    # Check if HTML files were generated
+    if [ ! -f "$HTML_DIR/index.html" ]; then
+        log_error "Main index.html not found"
+        return 1
+    fi
+    
+    # Check if API documentation was generated
+    if [ ! -d "$HTML_DIR/api" ]; then
+        log_warning "API documentation directory not found"
+    fi
+    
+    # Check if static files were copied
+    if [ ! -d "$HTML_DIR/_static" ]; then
+        log_warning "Static files directory not found"
+    fi
+    
+    # Count HTML files
+    HTML_COUNT=$(find "$HTML_DIR" -name "*.html" | wc -l)
+    log_info "Generated $HTML_COUNT HTML files"
+    
+    if [ "$HTML_COUNT" -lt 10 ]; then
+        log_warning "Fewer HTML files than expected were generated"
+        return 1
+    fi
+    
+    log_success "Documentation build validation passed"
+    return 0
+}
+
+# Function to generate build report
+generate_report() {
+    log_info "Generating build report..."
+    
+    REPORT_FILE="docs_build_report.md"
+    
+    cat > "$REPORT_FILE" << EOF
+# TTA Documentation Build Report
+
+**Date:** $(date)
+**Build Script:** build_docs.sh
+
+## Build Summary
+
+- **Status:** $([ $BUILD_SUCCESS -eq 0 ] && echo "✅ Success" || echo "❌ Failed")
+- **HTML Build:** $([ $HTML_SUCCESS -eq 0 ] && echo "✅ Success" || echo "❌ Failed")
+- **PDF Build:** $([ $PDF_SUCCESS -eq 0 ] && echo "✅ Success" || echo "⚠️ Skipped/Failed")
+- **Validation:** $([ $VALIDATION_SUCCESS -eq 0 ] && echo "✅ Passed" || echo "❌ Failed")
+
+## Generated Files
+
+- **HTML Documentation:** \`$HTML_DIR/index.html\`
+- **API Documentation:** \`$HTML_DIR/api/modules.html\`
+- **Search Index:** \`$HTML_DIR/search.html\`
+
+## Statistics
+
+- **HTML Files Generated:** $(find "$HTML_DIR" -name "*.html" 2>/dev/null | wc -l)
+- **API Modules Documented:** $(find "$HTML_DIR/api" -name "*.html" 2>/dev/null | wc -l)
+- **Build Warnings:** Check build output for details
+
+## Access Documentation
+
+### Local Development
+\`\`\`bash
+# Open in browser
+open $HTML_DIR/index.html
+
+# Or serve with Python
+cd $HTML_DIR
+python -m http.server 8000
+# Then visit http://localhost:8000
+\`\`\`
+
+### Production Deployment
+The documentation can be deployed to:
+- GitHub Pages
+- Netlify
+- Vercel
+- Any static hosting service
+
+## Next Steps
+
+1. **Review Documentation:** Check generated documentation for completeness
+2. **Fix Warnings:** Address any Sphinx warnings in the build output
+3. **Deploy:** Set up automated deployment for documentation updates
+4. **Maintain:** Keep documentation updated with code changes
+
+---
+
+*Generated by TTA documentation build script*
+EOF
+    
+    log_success "Build report generated: $REPORT_FILE"
+}
+
+# Function to open documentation in browser (optional)
+open_docs() {
+    if [ "$1" = "--open" ]; then
+        log_info "Opening documentation in browser..."
+        
+        if command -v open &> /dev/null; then
+            # macOS
+            open "$HTML_DIR/index.html"
+        elif command -v xdg-open &> /dev/null; then
+            # Linux
+            xdg-open "$HTML_DIR/index.html"
+        elif command -v start &> /dev/null; then
+            # Windows
+            start "$HTML_DIR/index.html"
+        else
+            log_info "Cannot automatically open browser. Please open: $HTML_DIR/index.html"
+        fi
+    fi
+}
+
+# Main execution
+main() {
+    echo "=========================================="
+    echo "TTA Documentation Build"
+    echo "=========================================="
+    echo
+    
+    # Initialize success flags
+    BUILD_SUCCESS=1
+    HTML_SUCCESS=1
+    PDF_SUCCESS=1
+    VALIDATION_SUCCESS=1
+    
+    # Change to project root
+    cd "$(dirname "$0")/.."
+    
+    # Clean previous builds
+    clean_build
+    
+    # Build HTML documentation
+    if build_html; then
+        HTML_SUCCESS=0
+    fi
+    
+    # Build PDF documentation (optional)
+    if build_pdf; then
+        PDF_SUCCESS=0
+    fi
+    
+    # Validate the build
+    if validate_build; then
+        VALIDATION_SUCCESS=0
+    fi
+    
+    # Overall success if HTML build and validation passed
+    if [ $HTML_SUCCESS -eq 0 ] && [ $VALIDATION_SUCCESS -eq 0 ]; then
+        BUILD_SUCCESS=0
+    fi
+    
+    # Generate build report
+    generate_report
+    
+    # Open documentation if requested
+    open_docs "$1"
+    
+    # Final status
+    echo
+    echo "=========================================="
+    echo "Build Summary"
+    echo "=========================================="
+    
+    if [ $BUILD_SUCCESS -eq 0 ]; then
+        log_success "Documentation build completed successfully!"
+        log_info "HTML documentation: $HTML_DIR/index.html"
+        log_info "Build report: docs_build_report.md"
+        exit 0
+    else
+        log_error "Documentation build failed. Check the output above for details."
+        exit 1
+    fi
+}
+
+# Show usage if help requested
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "TTA Documentation Build Script"
+    echo
+    echo "Usage: $0 [OPTIONS]"
+    echo
+    echo "Options:"
+    echo "  --open    Open documentation in browser after build"
+    echo "  --help    Show this help message"
+    echo
+    echo "Examples:"
+    echo "  $0                # Build documentation"
+    echo "  $0 --open        # Build and open in browser"
+    echo
+    exit 0
+fi
+
+# Run main function
+main "$@"

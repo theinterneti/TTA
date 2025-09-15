@@ -1,0 +1,353 @@
+version: "3.8"
+
+services:
+  # Enhanced Neo4j Database Service with Production Configuration
+  neo4j:
+    image: neo4j:5.15-enterprise
+    container_name: tta-neo4j-prod
+    restart: unless-stopped
+    ports:
+      - "7474:7474" # HTTP
+      - "7687:7687" # Bolt
+    environment:
+      # Authentication
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:-TTA_Neo4j_Prod_2024!}
+
+      # Memory Configuration (Production Optimized)
+      NEO4J_server_memory_heap_initial__size: 2G
+      NEO4J_server_memory_heap_max__size: 4G
+      NEO4J_server_memory_pagecache_size: 2G
+
+      # Security Configuration
+      NEO4J_dbms_security_procedures_unrestricted: apoc.*,algo.*
+      NEO4J_dbms_security_procedures_allowlist: apoc.*,algo.*
+
+      # Performance Configuration
+      NEO4J_dbms_transaction_timeout: 60s
+      NEO4J_dbms_lock_acquisition_timeout: 60s
+      NEO4J_dbms_checkpoint_interval_time: 15m
+
+      # Backup Configuration
+      NEO4J_dbms_backup_enabled: true
+      NEO4J_dbms_backup_address: 0.0.0.0:6362
+
+      # Monitoring
+      NEO4J_metrics_enabled: true
+      NEO4J_metrics_jmx_enabled: true
+      NEO4J_metrics_graphite_enabled: true
+      NEO4J_metrics_graphite_server: graphite:2003
+
+    volumes:
+      - neo4j_data_prod:/data
+      - neo4j_logs_prod:/logs
+      - neo4j_import_prod:/var/lib/neo4j/import
+      - neo4j_plugins_prod:/plugins
+      - neo4j_backups:/backups
+      - ./database/neo4j/init:/docker-entrypoint-initdb.d
+      - ./monitoring/neo4j:/var/lib/neo4j/conf
+    networks:
+      - tta-network-prod
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-TTA_Neo4j_Prod_2024!} 'RETURN 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    deploy:
+      resources:
+        limits:
+          memory: 6G
+          cpus: '2.0'
+        reservations:
+          memory: 4G
+          cpus: '1.0'
+
+  # Enhanced Redis Cache Service with Production Configuration
+  redis:
+    image: redis:7.2-alpine
+    container_name: tta-redis-prod
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server /usr/local/etc/redis/redis.conf
+      --requirepass ${REDIS_PASSWORD:-TTA_Redis_Prod_2024!}
+      --maxmemory 2gb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+      --appendonly yes
+      --appendfsync everysec
+      --auto-aof-rewrite-percentage 100
+      --auto-aof-rewrite-min-size 128mb
+      --tcp-keepalive 300
+      --timeout 0
+      --tcp-backlog 511
+      --databases 16
+      --maxclients 10000
+    volumes:
+      - redis_data_prod:/data
+      - redis_backups:/backups
+      - ./database/redis/redis-prod.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - tta-network-prod
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-TTA_Redis_Prod_2024!}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 3G
+          cpus: '1.0'
+        reservations:
+          memory: 2G
+          cpus: '0.5'
+
+  # TTA API Gateway with Production Configuration
+  tta-api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.prod
+    container_name: tta-api-prod
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ENV=production
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-TTA_Neo4j_Prod_2024!}
+      - REDIS_URL=redis://redis:6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-TTA_Redis_Prod_2024!}
+      - JWT_SECRET=${JWT_SECRET}
+      - CRISIS_RESPONSE_TIMEOUT=1000
+      - HIPAA_AUDIT_ENABLED=true
+      - LOG_LEVEL=info
+    volumes:
+      - api_logs:/app/logs
+      - api_uploads:/app/uploads
+      - ./monitoring/api:/app/monitoring
+    networks:
+      - tta-network-prod
+    depends_on:
+      neo4j:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 1G
+          cpus: '0.5'
+
+  # Nginx Reverse Proxy with SSL and Load Balancing
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: tta-nginx-prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx-prod.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
+      - nginx_cache:/var/cache/nginx
+    networks:
+      - tta-network-prod
+    depends_on:
+      - tta-api
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # Prometheus Monitoring
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: tta-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.enable-lifecycle'
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    networks:
+      - tta-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+
+  # Grafana Dashboard
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: tta-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - tta-network-prod
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+  # Backup Service
+  backup-service:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    container_name: tta-backup-service
+    restart: unless-stopped
+    environment:
+      - BACKUP_SCHEDULE=0 2 * * *  # Daily at 2 AM
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-TTA_Neo4j_Prod_2024!}
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-TTA_Redis_Prod_2024!}
+      - S3_BUCKET=${BACKUP_S3_BUCKET}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+    volumes:
+      - neo4j_backups:/neo4j-backups
+      - redis_backups:/redis-backups
+      - backup_logs:/app/logs
+    networks:
+      - tta-network-prod
+    depends_on:
+      - neo4j
+      - redis
+
+  # Log Aggregation with ELK Stack
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: tta-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - tta-network-prod
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: tta-logstash
+    restart: unless-stopped
+    volumes:
+      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./monitoring/logstash/config:/usr/share/logstash/config:ro
+      - api_logs:/logs/api:ro
+      - nginx_logs:/logs/nginx:ro
+    networks:
+      - tta-network-prod
+    depends_on:
+      - elasticsearch
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: tta-kibana
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    networks:
+      - tta-network-prod
+    depends_on:
+      - elasticsearch
+
+volumes:
+  # Production Neo4j Volumes
+  neo4j_data_prod:
+    driver: local
+  neo4j_logs_prod:
+    driver: local
+  neo4j_import_prod:
+    driver: local
+  neo4j_plugins_prod:
+    driver: local
+  neo4j_backups:
+    driver: local
+
+  # Production Redis Volumes
+  redis_data_prod:
+    driver: local
+  redis_backups:
+    driver: local
+
+  # Application Volumes
+  api_logs:
+    driver: local
+  api_uploads:
+    driver: local
+  nginx_cache:
+    driver: local
+  nginx_logs:
+    driver: local
+
+  # Monitoring Volumes
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+
+  # Backup Volumes
+  backup_logs:
+    driver: local
+
+networks:
+  tta-network-prod:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
