@@ -1,0 +1,178 @@
+{
+  "dashboard": {
+    "id": null,
+    "title": "TTA Franchise World System",
+    "tags": ["tta", "franchise", "therapeutic"],
+    "style": "dark",
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "System Overview",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "up{job=\"tta-franchise-api\"}",
+            "legendFormat": "API Status"
+          },
+          {
+            "expr": "up{job=\"tta-franchise-bridge\"}",
+            "legendFormat": "Bridge Status"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "thresholds": {
+              "steps": [
+                {"color": "red", "value": 0},
+                {"color": "green", "value": 1}
+              ]
+            }
+          }
+        },
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "id": 2,
+        "title": "API Response Time",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{job=\"tta-franchise-api\"}[5m]))",
+            "legendFormat": "95th percentile"
+          },
+          {
+            "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{job=\"tta-franchise-api\"}[5m]))",
+            "legendFormat": "50th percentile"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Response Time (seconds)",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "id": 3,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"tta-franchise-api\"}[5m])",
+            "legendFormat": "{{method}} {{endpoint}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests per second",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "id": 4,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "rate(http_requests_total{job=\"tta-franchise-api\",status=~\"4..|5..\"}[5m])",
+            "legendFormat": "{{status}} errors"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Errors per second",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "id": 5,
+        "title": "Active Sessions",
+        "type": "stat",
+        "targets": [
+          {
+            "expr": "tta_active_sessions_total",
+            "legendFormat": "Active Sessions"
+          }
+        ],
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            }
+          }
+        },
+        "gridPos": {"h": 4, "w": 6, "x": 0, "y": 16}
+      },
+      {
+        "id": 6,
+        "title": "World Usage",
+        "type": "piechart",
+        "targets": [
+          {
+            "expr": "tta_world_usage_total",
+            "legendFormat": "{{world_name}}"
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 6, "y": 16}
+      },
+      {
+        "id": 7,
+        "title": "Database Connections",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "redis_connected_clients",
+            "legendFormat": "Redis Connections"
+          },
+          {
+            "expr": "neo4j_database_pool_total_used",
+            "legendFormat": "Neo4j Connections"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Connections",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "id": 8,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes{job=\"tta-franchise-api\"}",
+            "legendFormat": "API Memory"
+          },
+          {
+            "expr": "process_resident_memory_bytes{job=\"tta-franchise-bridge\"}",
+            "legendFormat": "Bridge Memory"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Memory (bytes)",
+            "min": 0
+          }
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "30s"
+  }
+}
