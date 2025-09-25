@@ -1,0 +1,48 @@
+# TTA Franchise World System - Backup Service Dockerfile
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    cron \
+    docker.io \
+    awscli \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Copy backup scripts and requirements
+COPY deployment/backup-requirements.txt .
+RUN pip install --no-cache-dir -r backup-requirements.txt
+
+# Copy backup scripts
+COPY deployment/backup.sh .
+COPY deployment/backup.py .
+
+# Make scripts executable
+RUN chmod +x backup.sh
+
+# Create backup directory
+RUN mkdir -p /app/backups
+
+# Create non-root user for security
+RUN groupadd -r backup && useradd -r -g backup backup
+RUN chown -R backup:backup /app
+
+# Set up cron job
+RUN echo "0 2 * * * /app/backup.sh" | crontab -u backup -
+
+# Switch to backup user
+USER backup
+
+# Environment variables
+ENV BACKUP_SCHEDULE="0 2 * * *"
+ENV BACKUP_RETENTION_DAYS=30
+
+# Health check
+HEALTHCHECK --interval=60s --timeout=30s --start-period=10s --retries=3 \
+    CMD python -c "import os; exit(0 if os.path.exists('/app/backups') else 1)"
+
+# Start cron daemon
+CMD ["cron", "-f"]

@@ -1,0 +1,39 @@
+# Node.js Bridge Service Dockerfile
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache curl
+
+# Copy package files
+COPY scripts/package*.json ./
+RUN npm ci --only=production
+
+# Copy bridge service code
+COPY deployment/bridge-service.js ./
+COPY scripts/ ./scripts/
+
+# Create necessary directories
+RUN mkdir -p /app/logs
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S tta && \
+    adduser -S tta -u 1001 -G tta
+RUN chown -R tta:tta /app
+USER tta
+
+# Expose port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Environment variables
+ENV NODE_ENV=production
+ENV BRIDGE_PORT=3001
+
+# Start command
+CMD ["node", "bridge-service.js"]
