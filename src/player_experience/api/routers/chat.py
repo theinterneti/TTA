@@ -23,7 +23,23 @@ from ...managers.personalization_service_manager import (
 from ...models.session import ProgressMarker
 from ...models.enums import ProgressMarkerType
 
+# Initialize logger first
 logger = logging.getLogger(__name__)
+
+# Import agent orchestration system
+try:
+    from src.agent_orchestration.realtime.agent_event_integration import get_agent_event_integrator
+    from src.agent_orchestration.therapeutic_safety import (
+        get_global_safety_service,
+        SafetyLevel,
+        CrisisManager
+    )
+    AGENT_ORCHESTRATION_AVAILABLE = True
+    THERAPEUTIC_SAFETY_AVAILABLE = True
+except ImportError:
+    logger.warning("Agent orchestration system not available, using fallback responses")
+    AGENT_ORCHESTRATION_AVAILABLE = False
+    THERAPEUTIC_SAFETY_AVAILABLE = False
 
 # In-memory metrics (testing/observability aid)
 METRICS: Dict[str, int] = {
@@ -232,9 +248,15 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
             if mtype == "user_message":
                 text = content.get("text", "")
 
-                # Optional typing indicator
+                # Progressive feedback: Start typing indicator
                 if typing_flag:
                     await manager.send_json(websocket, _event_message("typing", {"status": "start"}, session_id))
+
+                # Progressive feedback: Analyzing input
+                await manager.send_json(websocket, _event_message("progress", {
+                    "stage": "analyzing",
+                    "message": "Understanding your message..."
+                }, session_id))
 
                 # Detect crisis via PSM
                 crisis_detected, crisis_types, crisis_resources = psm.detect_crisis_situation(
@@ -243,12 +265,129 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 if crisis_detected:
                     METRICS["crisis_detected"] += 1
 
-                adapted = psm.personalization_engine.personalize_content(
-                    user_id=player_id,
-                    content=text,
-                    session_state={},
-                    profile={},
-                )
+                # Generate AI response using agent orchestration system
+                ai_response_text = text  # Fallback to echo
+                safety_validation_result = None
+                crisis_intervention = None
+
+                if AGENT_ORCHESTRATION_AVAILABLE:
+                    try:
+                        # Progressive feedback: Processing with AI
+                        await manager.send_json(websocket, _event_message("progress", {
+                            "stage": "processing",
+                            "message": "Processing your input..."
+                        }, session_id))
+
+                        # Get agent event integrator
+                        agent_integrator = get_agent_event_integrator()
+
+                        # Progressive feedback: Building world context
+                        await manager.send_json(websocket, _event_message("progress", {
+                            "stage": "world_building",
+                            "message": "Building narrative context..."
+                        }, session_id))
+
+                        # Execute complete IPA → WBA → NGA workflow
+                        workflow_result = await agent_integrator.execute_complete_workflow(
+                            user_input=text,
+                            session_id=session_id or "default",
+                            world_id=metadata.get("world_id"),
+                            workflow_id=f"chat_{player_id}_{int(datetime.utcnow().timestamp() * 1000)}"
+                        )
+
+                        # Progressive feedback: Generating response
+                        await manager.send_json(websocket, _event_message("progress", {
+                            "stage": "generating",
+                            "message": "Crafting therapeutic response..."
+                        }, session_id))
+
+                        # Extract narrative response from NGA
+                        ai_response_text = workflow_result.get("nga_result", {}).get("story", text)
+
+                        # Therapeutic Safety Validation: Validate AI-generated response
+                        if THERAPEUTIC_SAFETY_AVAILABLE:
+                            try:
+                                safety_service = get_global_safety_service()
+                                safety_validation_result = await safety_service.validate_text(ai_response_text)
+
+                                # If response is blocked, use alternative content
+                                if safety_validation_result.level == SafetyLevel.BLOCKED:
+                                    logger.warning(f"AI response blocked by safety validation for session {session_id}")
+                                    ai_response_text = safety_validation_result.alternative_content or safety_service.suggest_alternative(
+                                        SafetyLevel.BLOCKED, ai_response_text
+                                    )
+                                    metadata["safety_override"] = True
+
+                                # If crisis detected in AI response, initiate intervention
+                                if safety_validation_result.crisis_detected:
+                                    crisis_manager = CrisisManager()
+                                    crisis_assessment = crisis_manager.assess_crisis(
+                                        safety_validation_result,
+                                        {"session_id": session_id, "player_id": player_id}
+                                    )
+                                    crisis_intervention = crisis_manager.initiate_intervention(
+                                        crisis_assessment,
+                                        session_id or "default",
+                                        player_id
+                                    )
+                                    logger.critical(f"Crisis intervention initiated: {crisis_intervention.intervention_id}")
+                                    metadata["crisis_intervention_id"] = crisis_intervention.intervention_id
+
+                                # Add safety metadata
+                                metadata["safety_validation"] = {
+                                    "level": safety_validation_result.level.value,
+                                    "score": safety_validation_result.score,
+                                    "crisis_detected": safety_validation_result.crisis_detected,
+                                    "escalation_recommended": safety_validation_result.escalation_recommended
+                                }
+
+                            except Exception as safety_error:
+                                logger.error(f"Therapeutic safety validation failed: {safety_error}")
+
+                        # Add workflow metadata
+                        metadata["workflow_id"] = workflow_result.get("workflow_id")
+                        metadata["ipa_intent"] = workflow_result.get("ipa_result", {}).get("routing", {}).get("intent")
+
+                        logger.info(f"AI response generated via agent orchestration for session {session_id}")
+
+                    except Exception as e:
+                        logger.error(f"Agent orchestration failed, using fallback: {e}")
+                        # Progressive feedback: Using fallback
+                        await manager.send_json(websocket, _event_message("progress", {
+                            "stage": "fallback",
+                            "message": "Generating response..."
+                        }, session_id))
+
+                        # Fall back to personalization engine
+                        adapted = psm.personalization_engine.personalize_content(
+                            user_id=player_id,
+                            content=text,
+                            session_state={},
+                            profile={},
+                        )
+                        ai_response_text = adapted.get("adapted_content", text)
+                else:
+                    # Progressive feedback: Using personalization
+                    await manager.send_json(websocket, _event_message("progress", {
+                        "stage": "personalizing",
+                        "message": "Personalizing response..."
+                    }, session_id))
+
+                    # Use personalization engine as fallback
+                    adapted = psm.personalization_engine.personalize_content(
+                        user_id=player_id,
+                        content=text,
+                        session_state={},
+                        profile={},
+                    )
+                    ai_response_text = adapted.get("adapted_content", text)
+
+                # Progressive feedback: Complete
+                await manager.send_json(websocket, _event_message("progress", {
+                    "stage": "complete",
+                    "message": "Response ready"
+                }, session_id))
+
                 # Recommendations
                 recs = psm.get_adaptive_recommendations(player_id, context={"session_id": session_id})
                 # Build assistant response with optional safety block and interactive resources
@@ -267,7 +406,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                     "recommendations": safe_recs,
                     "safety": {"crisis": bool(crisis_detected), "types": [ct.value for ct in crisis_types] if crisis_detected else []},
                 }
-                reply_content: Dict[str, Any] = {"text": adapted.get("adapted_content", text)}
+                reply_content: Dict[str, Any] = {"text": ai_response_text}
                 elements: List[Dict[str, Any]] = []
                 if crisis_detected and crisis_resources:
                     elements.extend([
