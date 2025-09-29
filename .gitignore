@@ -103,10 +103,27 @@ dump.rdb
 # -------------------------------------------------
 # 8) Environment & secrets (do NOT commit secrets)
 # -------------------------------------------------
+# Environment files with actual secrets (NEVER commit these)
 .env
+.env.local
+.env.development
+.env.staging
+.env.production
+.env.test.local
+
+# Legacy environment files (keep ignoring)
 .env.*
 *.env
 *.env.*
+
+# Exception: Allow .example files to be committed (they're templates)
+!.env.example
+!.env.local.example
+!.env.production.example
+!.env.staging.example
+!src/player_experience/frontend/.env.example
+
+# Secrets and certificates
 .secrets/
 *.pem
 *.key
