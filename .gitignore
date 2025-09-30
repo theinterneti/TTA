@@ -53,6 +53,9 @@ htmlcov/
 coverage.xml
 junit*.xml
 .tox/
+# Test result files that may contain sensitive data (JWT tokens, etc.)
+*_test_results_*.json
+phase*_integration_test_results_*.json
 
 # -------------------------------------------------
 # 5) Tool caches (linters/type checkers/etc.)
