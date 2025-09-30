@@ -16,7 +16,8 @@ from src.components.model_management import (
     TaskType,
     ModelRequirements,
     GenerationRequest,
-    ProviderType
+    ProviderType,
+    ModelInfo
 )
 from src.components.model_management.models import ModelManagementConfig
 from src.components.model_management.providers import OpenRouterProvider
@@ -170,8 +171,15 @@ class TestOpenRouterProvider:
     @pytest.mark.asyncio
     async def test_get_available_models(self, provider):
         """Test getting available models from OpenRouter."""
-        # Mock the HTTP client
-        with patch.object(provider, '_client') as mock_client:
+        # Initialize provider first
+        config = {
+            "api_key": "test-key",
+            "base_url": "https://openrouter.ai/api/v1",
+            "free_models_only": True
+        }
+
+        # Mock the HTTP client for both initialization and model fetching
+        with patch('httpx.AsyncClient') as mock_client_class:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
@@ -186,11 +194,14 @@ class TestOpenRouterProvider:
                 ]
             }
             # AsyncClient.get() is async, so we need AsyncMock
-            mock_client.get = AsyncMock(return_value=mock_response)
+            mock_client_instance = Mock()
+            mock_client_instance.get = AsyncMock(return_value=mock_response)
+            mock_client_class.return_value = mock_client_instance
 
-            provider._client = mock_client
-            await provider._refresh_available_models()
+            # Initialize provider
+            await provider.initialize(config)
 
+            # Get available models
             models = await provider.get_available_models()
             assert len(models) > 0
             assert models[0].model_id == "test-model"
@@ -214,24 +225,30 @@ class TestModelSelector:
             max_latency_ms=5000,
             min_quality_score=6.0
         )
-        
-        # Mock available models
-        with patch.object(selector, '_get_compatible_models') as mock_get_models:
-            mock_get_models.return_value = [
-                Mock(
-                    model_id="test-model-1",
-                    performance_score=8.0,
-                    cost_per_token=0.0,
-                    therapeutic_safety_score=7.0
-                ),
-                Mock(
-                    model_id="test-model-2", 
-                    performance_score=7.0,
-                    cost_per_token=0.001,
-                    therapeutic_safety_score=8.0
-                )
-            ]
-            
+
+        # Mock the method that gets all available models
+        test_models = [
+            ModelInfo(
+                model_id="test-model-1",
+                name="Test Model 1",
+                provider_type=ProviderType.OPENROUTER,
+                performance_score=8.0,
+                cost_per_token=0.0,
+                therapeutic_safety_score=7.0,
+                capabilities=["chat", "general"]
+            ),
+            ModelInfo(
+                model_id="test-model-2",
+                name="Test Model 2",
+                provider_type=ProviderType.OPENROUTER,
+                performance_score=7.0,
+                cost_per_token=0.001,
+                therapeutic_safety_score=8.0,
+                capabilities=["chat", "general"]
+            )
+        ]
+
+        with patch.object(selector, '_get_all_available_models', return_value=test_models):
             selected = await selector.select_model(requirements)
             assert selected is not None
             assert selected.model_id in ["test-model-1", "test-model-2"]
