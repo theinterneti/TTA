@@ -12,20 +12,20 @@ from unittest.mock import Mock, AsyncMock
 
 def test_integration_test_structure():
     """Test that integration test modules can be imported and have proper structure."""
-    
-    # Test imports
+
+    # Test imports - use absolute imports instead of relative
     try:
-        from . import test_multi_agent_workflow_integration
-        from . import test_end_to_end_workflows
-        from . import test_error_handling_recovery
-        from . import test_state_persistence_aggregation
+        import tests.agent_orchestration.test_multi_agent_workflow_integration
+        import tests.agent_orchestration.test_end_to_end_workflows
+        import tests.agent_orchestration.test_error_handling_recovery
+        import tests.agent_orchestration.test_state_persistence_aggregation
         print("✓ All integration test modules imported successfully")
     except ImportError as e:
         pytest.fail(f"Failed to import integration test modules: {e}")
-    
+
     # Test fixture availability
     try:
-        from .test_multi_agent_workflow_integration import (
+        from tests.agent_orchestration.test_multi_agent_workflow_integration import (
             WorkflowStateVerifier, PerformanceMetrics, IntegrationTestHelper
         )
         print("✓ Test utilities imported successfully")
@@ -78,8 +78,8 @@ def test_mock_workflow_execution():
 
 def test_test_data_fixtures():
     """Test that test data fixtures are properly structured."""
-    
-    from .test_multi_agent_workflow_integration import (
+
+    from tests.agent_orchestration.test_multi_agent_workflow_integration import (
         sample_player_inputs, sample_world_contexts, sample_character_data,
         expected_narrative_outputs, complex_therapeutic_scenarios
     )
@@ -113,7 +113,7 @@ def test_test_data_fixtures():
 def test_performance_metrics_utility():
     """Test the performance metrics utility class."""
     
-    from .test_multi_agent_workflow_integration import PerformanceMetrics
+    from tests.agent_orchestration.test_multi_agent_workflow_integration import PerformanceMetrics
     
     # Create metrics instance
     metrics = PerformanceMetrics()
@@ -163,7 +163,7 @@ def test_performance_metrics_utility():
 def test_workflow_state_verifier():
     """Test the workflow state verifier utility."""
     
-    from .test_multi_agent_workflow_integration import WorkflowStateVerifier
+    from tests.agent_orchestration.test_multi_agent_workflow_integration import WorkflowStateVerifier
     from src.agent_orchestration import AgentMessage, AgentId, AgentType, MessageType, MessagePriority
     
     verifier = WorkflowStateVerifier()

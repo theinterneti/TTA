@@ -156,21 +156,21 @@ class AgentEventIntegrator:
         """Publish progress update for an operation."""
         if operation_id not in self.active_operations:
             return False
-        
+
         operation = self.active_operations[operation_id]
-        progress_event = ProgressiveFeedbackEvent(
-            agent_id=self.agent_id,
+        # Use create_progressive_feedback_event helper function
+        progress_event = create_progressive_feedback_event(
             operation_id=operation_id,
-            progress=progress,
+            operation_type=operation["type"],
+            stage="processing",
             message=message or f"Progress: {progress:.1%}",
+            progress_percentage=progress * 100,  # Convert to percentage
             intermediate_result=None,
-            metadata={
-                "operation_type": operation["type"],
-                "workflow_id": workflow_id
-            },
+            estimated_remaining=None,
+            user_id=None,
             source=f"agent_{self.agent_id}"
         )
-        
+
         return await self._publish_event(progress_event)
     
     async def _publish_feedback(
@@ -182,22 +182,21 @@ class AgentEventIntegrator:
         """Publish progressive feedback for an operation."""
         if operation_id not in self.active_operations:
             return False
-        
+
         operation = self.active_operations[operation_id]
-        feedback_event = ProgressiveFeedbackEvent(
-            agent_id=self.agent_id,
+        # Use create_progressive_feedback_event helper function
+        feedback_event = create_progressive_feedback_event(
             operation_id=operation_id,
-            progress=feedback_data.get("progress", 0.0),
+            operation_type=operation["type"],
+            stage=feedback_data.get("stage", "processing"),
             message=feedback_data.get("message", "Processing..."),
+            progress_percentage=feedback_data.get("progress", 0.0) * 100,  # Convert to percentage
             intermediate_result=feedback_data.get("intermediate_result"),
-            metadata={
-                "operation_type": operation["type"],
-                "workflow_id": workflow_id,
-                **feedback_data.get("metadata", {})
-            },
+            estimated_remaining=feedback_data.get("estimated_remaining"),
+            user_id=feedback_data.get("user_id"),
             source=f"agent_{self.agent_id}"
         )
-        
+
         return await self._publish_event(feedback_event)
     
     async def publish_status_change(

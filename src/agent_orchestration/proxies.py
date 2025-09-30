@@ -245,15 +245,25 @@ class WorldBuilderAgentProxy(Agent):
             raise ValueError("WorldBuilderAgentProxy requires 'world_id'")
         updates = (input_payload or {}).get("updates")
 
+        cache_key = f"world:{world_id}"
+
+        # Check cache first for read operations (no updates)
+        if updates is None:
+            cached = self._cache_get(cache_key)
+            if cached is not None:
+                return {"world_id": world_id, "world_state": cached, "cached": True, "source": "cache"}
+
         # Process through real WBA if available
         if self.enable_real_agent and self.wba_adapter:
             try:
                 wba_result = await self.wba_adapter.process_world_request(world_id, updates)
 
                 # Cache the result for performance
-                cache_key = f"world:{world_id}"
                 if wba_result.get("world_state"):
                     self._cache_set(cache_key, wba_result["world_state"])
+
+                # Add cached flag for consistency
+                wba_result["cached"] = False
 
                 logger.info(f"WBA processed world {world_id} with source: {wba_result.get('source', 'unknown')}")
                 return wba_result
@@ -265,11 +275,7 @@ class WorldBuilderAgentProxy(Agent):
                 logger.warning("Falling back to mock implementation")
 
         # Fallback to mock implementation
-        cache_key = f"world:{world_id}"
         if updates is None:
-            cached = self._cache_get(cache_key)
-            if cached is not None:
-                return {"world_id": world_id, "world_state": cached, "cached": True, "source": "mock_fallback"}
             # Simulate fetch world state (placeholder)
             world_state = {"id": world_id, "regions": [], "entities": []}
             self._cache_set(cache_key, world_state)
@@ -431,9 +437,12 @@ class NarrativeGeneratorAgentProxy(Agent):
                 except Exception:
                     validation_meta = {"error": "safety_validation_failed"}
 
+                # Apply content filtering to the story
+                filtered_story = self._filter_content(story)
+
                 logger.info(f"NGA generated narrative with source: {nga_result.get('source', 'unknown')}")
                 return {
-                    "story": story,
+                    "story": filtered_story,
                     "raw": nga_result.get("raw", story),
                     "context_used": bool(enhanced_context),
                     "therapeutic_validation": validation_meta,
