@@ -77,14 +77,17 @@ class AgentEventIntegrator:
         }
         
         # Send start event
+        # Extract agent_type from agent_id (format: "type:instance")
+        agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
         start_event = create_agent_status_event(
             agent_id=self.agent_id,
-            status=AgentStatus.PROCESSING,
-            message=f"Started {operation_type}",
+            agent_type=agent_type,
+            status=AgentStatus.BUSY,
             metadata={
                 "operation_id": operation_id,
                 "operation_type": operation_type,
                 "workflow_id": workflow_id,
+                "message": f"Started {operation_type}",
                 **self.active_operations[operation_id]["data"]
             }
         )
@@ -104,32 +107,36 @@ class AgentEventIntegrator:
             
             # Send completion event
             duration = time.time() - start_time
+            agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
             completion_event = create_agent_status_event(
                 agent_id=self.agent_id,
-                status=AgentStatus.COMPLETED,
-                message=f"Completed {operation_type}",
+                agent_type=agent_type,
+                status=AgentStatus.IDLE,  # Use IDLE instead of non-existent COMPLETED
                 metadata={
                     "operation_id": operation_id,
                     "operation_type": operation_type,
                     "duration": duration,
-                    "workflow_id": workflow_id
+                    "workflow_id": workflow_id,
+                    "message": f"Completed {operation_type}"
                 }
             )
             await self._publish_event(completion_event)
-            
+
         except Exception as e:
             # Send error event
             duration = time.time() - start_time
+            agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
             error_event = create_agent_status_event(
                 agent_id=self.agent_id,
+                agent_type=agent_type,
                 status=AgentStatus.ERROR,
-                message=f"Error in {operation_type}: {str(e)}",
                 metadata={
                     "operation_id": operation_id,
                     "operation_type": operation_type,
                     "duration": duration,
                     "error": str(e),
-                    "workflow_id": workflow_id
+                    "workflow_id": workflow_id,
+                    "message": f"Error in {operation_type}: {str(e)}"
                 }
             )
             await self._publish_event(error_event)
@@ -200,11 +207,15 @@ class AgentEventIntegrator:
         metadata: Optional[Dict[str, Any]] = None
     ) -> bool:
         """Publish agent status change event."""
+        agent_type = self.agent_id.split(":")[0] if ":" in self.agent_id else "unknown"
+        event_metadata = metadata or {}
+        if message:
+            event_metadata["message"] = message
         event = create_agent_status_event(
             agent_id=self.agent_id,
+            agent_type=agent_type,
             status=status,
-            message=message,
-            metadata=metadata or {}
+            metadata=event_metadata
         )
         return await self._publish_event(event)
     

@@ -214,12 +214,12 @@ class MonitoringEventIntegrator:
         
         # Check for slow response times
         if response_time > 30.0:  # 30 seconds
-            return AgentStatus.DEGRADED
-        
+            return AgentStatus.BUSY  # Use BUSY instead of non-existent DEGRADED
+
         # Check if actively processing
         if last_activity > time.time() - 60:  # Active in last minute
-            return AgentStatus.PROCESSING
-        
+            return AgentStatus.BUSY  # Use BUSY instead of non-existent PROCESSING
+
         return AgentStatus.IDLE
     
     async def _handle_alert(self, alert: Dict[str, Any]) -> None:

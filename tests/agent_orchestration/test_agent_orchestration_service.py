@@ -226,16 +226,17 @@ async def test_process_user_input_not_initialized(orchestration_service, sample_
 async def test_process_user_input_therapeutic_safety_error(orchestration_service, sample_session_context):
     """Test process_user_input handles therapeutic safety errors."""
     await orchestration_service.initialize()
-    
-    # Mock therapeutic validator to return unsafe content
+
+    # Mock therapeutic validator to return unsafe content with "blocked" level
     orchestration_service.therapeutic_validator.validate_text = AsyncMock(return_value=Mock(
         safe=False,
-        level="high_risk",
+        level="blocked",
         reason="Contains harmful content"
     ))
-    
-    with patch.object(orchestration_service, '_call_therapeutic_validator', 
-                     return_value={"safe": False, "level": "high_risk", "reason": "Test error"}):
+
+    # Mock _call_therapeutic_validator to return blocked content (async method)
+    with patch.object(orchestration_service, '_call_therapeutic_validator',
+                     new=AsyncMock(return_value={"safe": False, "level": "blocked", "reason": "Test error", "crisis_detected": False})):
         with pytest.raises(TherapeuticSafetyError, match="Content blocked due to safety concerns"):
             await orchestration_service.process_user_input(
                 user_input="I want to hurt myself",
