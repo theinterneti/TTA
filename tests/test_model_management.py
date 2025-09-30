@@ -120,11 +120,11 @@ class TestHardwareDetector:
         """Test system resource detection."""
         with patch('psutil.virtual_memory') as mock_memory:
             with patch('psutil.cpu_count') as mock_cpu:
-                mock_memory.return_value = Mock(total=16 * 1024**3)  # 16GB
+                mock_memory.return_value = Mock(total=16 * 1024**3, available=8 * 1024**3)  # 16GB total, 8GB available
                 mock_cpu.return_value = 8
-                
+
                 resources = await detector.detect_system_resources()
-                
+
                 assert "total_ram_gb" in resources
                 assert "cpu_cores" in resources
                 assert resources["total_ram_gb"] == 16
