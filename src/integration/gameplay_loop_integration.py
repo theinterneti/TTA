@@ -63,18 +63,19 @@ class GameplayLoopIntegration:
                 user_id = user_info.get("user_id") or user_info.get("username")
 
                 if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
+                    return {"success": False, "error": "Invalid user information", "code": "AUTH_ERROR"}
 
             except AuthenticationError as e:
-                return {"error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
+                return {"success": False, "error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
             
             # Validate therapeutic context if safety service is available
             if self.safety_service and therapeutic_context:
                 context_text = str(therapeutic_context)
                 validation_result = await self.safety_service.validate_text(context_text)
-                
+
                 if validation_result.level.value >= 8:  # High risk level
                     return {
+                        "success": False,
                         "error": "Therapeutic context contains unsafe content",
                         "code": "SAFETY_ERROR",
                         "safety_level": validation_result.level.value
@@ -85,9 +86,9 @@ class GameplayLoopIntegration:
                 user_id=user_id,
                 therapeutic_context=therapeutic_context
             )
-            
+
             if not session_id:
-                return {"error": "Failed to create gameplay session", "code": "SESSION_ERROR"}
+                return {"success": False, "error": "Failed to create gameplay session", "code": "SESSION_ERROR"}
             
             # Get initial session state
             session_status = await self.gameplay_component.get_session_status(session_id)
@@ -102,7 +103,7 @@ class GameplayLoopIntegration:
             
         except Exception as e:
             logger.error(f"Failed to create authenticated session: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+            return {"success": False, "error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
     
     async def process_validated_choice(self,
                                      session_id: str,
@@ -126,24 +127,24 @@ class GameplayLoopIntegration:
                 user_id = user_info.get("user_id") or user_info.get("username")
 
                 if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
+                    return {"success": False, "error": "Invalid user information", "code": "AUTH_ERROR"}
 
             except AuthenticationError as e:
-                return {"error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
+                return {"success": False, "error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
 
             # Verify session ownership
             session_status = await self.gameplay_component.get_session_status(session_id)
             if not session_status:
-                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
-            
+                return {"success": False, "error": "Session not found", "code": "SESSION_NOT_FOUND"}
+
             if session_status.get("user_id") != user_id:
-                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
+                return {"success": False, "error": "Session access denied", "code": "ACCESS_DENIED"}
             
             # Process the choice
             choice_result = await self.gameplay_component.process_user_choice(session_id, choice_id)
-            
+
             if not choice_result or "error" in choice_result:
-                return {"error": choice_result.get("error", "Choice processing failed"), "code": "CHOICE_ERROR"}
+                return {"success": False, "error": choice_result.get("error", "Choice processing failed"), "code": "CHOICE_ERROR"}
             
             # Validate generated content if safety service is available
             if self.safety_service and choice_result.get("next_scene"):
@@ -177,7 +178,7 @@ class GameplayLoopIntegration:
             
         except Exception as e:
             logger.error(f"Failed to process validated choice: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+            return {"success": False, "error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
     
     async def get_session_with_auth(self,
                                   session_id: str,
@@ -199,19 +200,19 @@ class GameplayLoopIntegration:
                 user_id = user_info.get("user_id") or user_info.get("username")
 
                 if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
+                    return {"success": False, "error": "Invalid user information", "code": "AUTH_ERROR"}
 
             except AuthenticationError as e:
-                return {"error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
+                return {"success": False, "error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
 
             # Get session status
             session_status = await self.gameplay_component.get_session_status(session_id)
             if not session_status:
-                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
-            
+                return {"success": False, "error": "Session not found", "code": "SESSION_NOT_FOUND"}
+
             # Verify session ownership
             if session_status.get("user_id") != user_id:
-                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
+                return {"success": False, "error": "Session access denied", "code": "ACCESS_DENIED"}
             
             return {
                 "success": True,
@@ -221,7 +222,7 @@ class GameplayLoopIntegration:
             
         except Exception as e:
             logger.error(f"Failed to get session with auth: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+            return {"success": False, "error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
     
     async def end_session_with_auth(self,
                                   session_id: str,
@@ -243,24 +244,24 @@ class GameplayLoopIntegration:
                 user_id = user_info.get("user_id") or user_info.get("username")
 
                 if not user_id:
-                    return {"error": "Invalid user information", "code": "AUTH_ERROR"}
+                    return {"success": False, "error": "Invalid user information", "code": "AUTH_ERROR"}
 
             except AuthenticationError as e:
-                return {"error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
+                return {"success": False, "error": f"Authentication failed: {str(e)}", "code": "AUTH_ERROR"}
 
             # Verify session ownership
             session_status = await self.gameplay_component.get_session_status(session_id)
             if not session_status:
-                return {"error": "Session not found", "code": "SESSION_NOT_FOUND"}
-            
+                return {"success": False, "error": "Session not found", "code": "SESSION_NOT_FOUND"}
+
             if session_status.get("user_id") != user_id:
-                return {"error": "Session access denied", "code": "ACCESS_DENIED"}
+                return {"success": False, "error": "Session access denied", "code": "ACCESS_DENIED"}
             
             # End the session
             success = await self.gameplay_component.end_session(session_id)
-            
+
             if not success:
-                return {"error": "Failed to end session", "code": "SESSION_ERROR"}
+                return {"success": False, "error": "Failed to end session", "code": "SESSION_ERROR"}
             
             return {
                 "success": True,
@@ -270,7 +271,7 @@ class GameplayLoopIntegration:
             
         except Exception as e:
             logger.error(f"Failed to end session with auth: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+            return {"success": False, "error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
     
     async def get_user_sessions(self, auth_token: str) -> Dict[str, Any]:
         """
@@ -306,7 +307,7 @@ class GameplayLoopIntegration:
             
         except Exception as e:
             logger.error(f"Failed to get user sessions: {e}")
-            return {"error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
+            return {"success": False, "error": f"Internal error: {str(e)}", "code": "INTERNAL_ERROR"}
     
     def get_integration_status(self) -> Dict[str, Any]:
         """
