@@ -133,8 +133,9 @@ class TestHardwareDetector:
     @pytest.mark.asyncio
     async def test_recommend_models(self, detector):
         """Test model recommendations."""
-        recommendations = await detector.recommend_models(TaskType.THERAPEUTIC_NARRATIVE)
-        
+        # Use THERAPEUTIC_RESPONSE instead of THERAPEUTIC_NARRATIVE (which doesn't exist in TaskType enum)
+        recommendations = await detector.recommend_models(TaskType.THERAPEUTIC_RESPONSE)
+
         assert isinstance(recommendations, list)
         assert len(recommendations) > 0
 
@@ -155,13 +156,14 @@ class TestOpenRouterProvider:
             "base_url": "https://openrouter.ai/api/v1",
             "free_models_only": True
         }
-        
+
         with patch('httpx.AsyncClient') as mock_client:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {"data": []}
-            mock_client.return_value.get.return_value = mock_response
-            
+            # AsyncClient.get() is async, so we need AsyncMock
+            mock_client.return_value.get = AsyncMock(return_value=mock_response)
+
             success = await provider.initialize(config)
             assert success
     
@@ -183,11 +185,12 @@ class TestOpenRouterProvider:
                     }
                 ]
             }
-            mock_client.get.return_value = mock_response
-            
+            # AsyncClient.get() is async, so we need AsyncMock
+            mock_client.get = AsyncMock(return_value=mock_response)
+
             provider._client = mock_client
             await provider._refresh_available_models()
-            
+
             models = await provider.get_available_models()
             assert len(models) > 0
             assert models[0].model_id == "test-model"
