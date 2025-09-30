@@ -694,3 +694,7 @@ class TherapeuticCharacterDevelopmentSystem:
             "milestone_types_available": len(MilestoneType),
             "framework_mappings_configured": len(self.framework_attribute_mappings),
         }
+
+
+# Alias for backward compatibility
+CharacterDevelopmentSystem = TherapeuticCharacterDevelopmentSystem

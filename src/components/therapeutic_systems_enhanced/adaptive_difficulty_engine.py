@@ -649,3 +649,7 @@ class TherapeuticAdaptiveDifficultyEngine:
             "difficulty_levels_available": len(DifficultyLevel),
             "adaptation_strategies_available": len(self.adaptation_strategies),
         }
+
+
+# Alias for backward compatibility
+AdaptiveDifficultyEngine = TherapeuticAdaptiveDifficultyEngine

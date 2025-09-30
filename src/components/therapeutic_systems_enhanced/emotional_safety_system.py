@@ -750,3 +750,7 @@ class TherapeuticEmotionalSafetySystem:
                 rt < 1.0 for rt in self.metrics["response_times"]
             ),
         }
+
+
+# Alias for backward compatibility
+EmotionalSafetySystem = TherapeuticEmotionalSafetySystem
