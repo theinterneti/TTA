@@ -363,7 +363,10 @@ class TestBatteryDashboard:
             </div>
             
             <script>
-                const ws = new WebSocket(`ws://${window.location.host}/dashboard/test-battery/ws`);
+                // Use secure WebSocket (wss://) in production, ws:// only for local development
+                // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+                const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'; // nosemgrep
+                const ws = new WebSocket(`${protocol}//${window.location.host}/dashboard/test-battery/ws`);
                 const log = document.getElementById('log');
                 
                 function addLog(message) {

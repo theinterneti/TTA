@@ -35,8 +35,14 @@ class DeploymentValidator:
         self.host = host
         self.port = port
         self.environment = environment
-        self.base_url = f"http://{host}:{port}"
-        self.ws_url = f"ws://{host}:{port}"
+        # Use secure protocols in production environments
+        if environment in ['production', 'staging']:
+            self.base_url = f"https://{host}:{port}"
+            self.ws_url = f"wss://{host}:{port}"
+        else:
+            self.base_url = f"http://{host}:{port}"
+            # nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
+            self.ws_url = f"ws://{host}:{port}"
         self.session = requests.Session()
         self.test_results: List[Dict[str, Any]] = []
         
