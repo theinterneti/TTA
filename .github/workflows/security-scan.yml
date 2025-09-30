@@ -33,6 +33,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+          cache-dependency-path: 'src/player_experience/frontend/package-lock.json'
 
       - name: Install dependencies
         run: |
