@@ -44,12 +44,61 @@ def neo4j_available():
 @pytest.fixture()
 def mock_neo4j_driver():
     """Provide a simple mock Neo4j driver/session for unit tests."""
+    from unittest.mock import AsyncMock
     mock_driver = Mock()
     mock_session_ctx = Mock()
     mock_driver.session.return_value = mock_session_ctx
-    mock_session_ctx.__enter__.return_value = Mock(run=Mock(return_value=Mock(single=Mock(return_value=None))))
+
+    # Mock session methods
+    mock_session = Mock()
+    mock_session.run = Mock(return_value=Mock(single=Mock(return_value=None)))
+    mock_session.close = AsyncMock()
+    mock_session_ctx.__enter__.return_value = mock_session
     mock_session_ctx.__exit__.return_value = None
+    mock_session_ctx.__aenter__ = AsyncMock(return_value=mock_session)
+    mock_session_ctx.__aexit__ = AsyncMock(return_value=None)
+
+    # Mock driver methods
+    mock_driver.close = Mock()
+    mock_driver.verify_connectivity = Mock()
+
     return mock_driver
+
+
+@pytest.fixture()
+def mock_redis_client():
+    """Provide a simple mock Redis client for unit tests."""
+    from unittest.mock import AsyncMock
+    mock_client = Mock()
+
+    # Mock common Redis methods
+    mock_client.get = AsyncMock(return_value=None)
+    mock_client.set = AsyncMock(return_value=True)
+    mock_client.delete = AsyncMock(return_value=1)
+    mock_client.exists = AsyncMock(return_value=0)
+    mock_client.ping = AsyncMock(return_value=True)
+    mock_client.close = AsyncMock()
+    mock_client.aclose = AsyncMock()
+
+    # Mock hash operations
+    mock_client.hget = AsyncMock(return_value=None)
+    mock_client.hset = AsyncMock(return_value=1)
+    mock_client.hgetall = AsyncMock(return_value={})
+    mock_client.hdel = AsyncMock(return_value=1)
+
+    # Mock list operations
+    mock_client.lpush = AsyncMock(return_value=1)
+    mock_client.rpush = AsyncMock(return_value=1)
+    mock_client.lpop = AsyncMock(return_value=None)
+    mock_client.rpop = AsyncMock(return_value=None)
+    mock_client.lrange = AsyncMock(return_value=[])
+
+    # Mock set operations
+    mock_client.sadd = AsyncMock(return_value=1)
+    mock_client.smembers = AsyncMock(return_value=set())
+    mock_client.srem = AsyncMock(return_value=1)
+
+    return mock_client
 
 
 # --- Testcontainers: Neo4j & Redis fixtures ---
