@@ -35,7 +35,7 @@ jobs:
 
       - name: Install dependencies
         working-directory: src/player_experience/frontend
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Run npm audit
         working-directory: src/player_experience/frontend
