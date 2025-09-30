@@ -19,7 +19,7 @@ from src.components.model_management import (
     ProviderType,
     ModelInfo
 )
-from src.components.model_management.models import ModelManagementConfig
+from src.components.model_management.models import ModelManagementConfig, ModelSelectionCriteria
 from src.components.model_management.providers import OpenRouterProvider
 from src.components.model_management.services import HardwareDetector, ModelSelector
 
@@ -215,7 +215,8 @@ class TestModelSelector:
         """Create a ModelSelector instance for testing."""
         mock_providers = {}
         mock_hardware_detector = Mock()
-        return ModelSelector(mock_providers, mock_hardware_detector, "performance_based")
+        selection_criteria = ModelSelectionCriteria()
+        return ModelSelector(mock_providers, mock_hardware_detector, selection_criteria)
     
     @pytest.mark.asyncio
     async def test_select_model(self, selector):
@@ -318,7 +319,7 @@ class TestIntegration:
                         with patch.object(full_system, 'load_model', return_value=mock_instance):
                             response = await full_system.generate_text(
                                 "Tell me a story about courage",
-                                task_type=TaskType.THERAPEUTIC_NARRATIVE
+                                task_type=TaskType.THERAPEUTIC_RESPONSE
                             )
                             
                             assert response is not None
@@ -358,28 +359,28 @@ class TestErrorHandling:
                         await component._start_impl()
                         
                         # Mock fallback handler
-                        component.fallback_handler = AsyncMock()
-                        component.fallback_handler.get_fallback_model.return_value = Mock(
+                        component.fallback_handler = Mock()
+                        component.fallback_handler.get_fallback_model = AsyncMock(return_value=Mock(
                             model_id="fallback-model",
                             provider_type=ProviderType.OLLAMA
-                        )
-                        
-                        # Mock model selector to return None (simulating failure)
-                        component.model_selector = AsyncMock()
-                        component.model_selector.select_model.return_value = None
-                        
+                        ))
+
+                        # Mock model selector to raise exception (simulating failure)
+                        component.model_selector = Mock()
+                        component.model_selector.select_model = AsyncMock(side_effect=Exception("Model selection failed"))
+
                         # Mock load_model for fallback
-                        mock_fallback_instance = AsyncMock()
+                        mock_fallback_instance = Mock()
                         mock_fallback_instance.model_id = "fallback-model"
-                        mock_fallback_instance.generate.return_value = Mock(
+                        mock_fallback_instance.generate = AsyncMock(return_value=Mock(
                             text="Fallback response",
                             model_id="fallback-model",
                             latency_ms=300,
                             usage={"total_tokens": 30},
                             metadata={"provider": "ollama"}
-                        )
-                        
-                        with patch.object(component, 'load_model', return_value=mock_fallback_instance):
+                        ))
+
+                        with patch.object(component, 'load_model', new=AsyncMock(return_value=mock_fallback_instance)):
                             response = await component.generate_text("Test prompt")
                             
                             # Should get fallback response
