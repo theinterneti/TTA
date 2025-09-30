@@ -36,18 +36,13 @@ jobs:
           cache-dependency-path: 'src/player_experience/frontend/package-lock.json'
 
       - name: Install dependencies
-        run: |
-          npm ci
-          cd src/player_experience/frontend
-          npm ci
+        working-directory: src/player_experience/frontend
+        run: npm ci
 
       - name: Run npm audit
+        working-directory: src/player_experience/frontend
         run: |
-          echo "Running npm audit for root dependencies..."
-          npm audit --audit-level=moderate --json > npm-audit-root.json || true
-          
           echo "Running npm audit for frontend dependencies..."
-          cd src/player_experience/frontend
           npm audit --audit-level=moderate --json > ../../../npm-audit-frontend.json || true
 
       - name: Run Semgrep security scan
