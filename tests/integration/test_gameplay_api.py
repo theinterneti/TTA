@@ -143,12 +143,12 @@ class TestGameplayAPI:
     
     def test_process_choice_session_not_found(self, client, mock_gameplay_service, mock_auth):
         """Test choice processing with session not found."""
-        # Mock session not found
-        mock_gameplay_service.process_validated_choice.return_value = {
+        # Mock session not found - must use AsyncMock for async methods
+        mock_gameplay_service.process_validated_choice = AsyncMock(return_value={
             "success": False,
             "error": "Session not found",
             "code": "SESSION_NOT_FOUND"
-        }
+        })
 
         response = client.post(
             "/api/v1/gameplay/sessions/nonexistent-session/choices",
@@ -157,7 +157,8 @@ class TestGameplayAPI:
         )
 
         assert response.status_code == 404
-        assert "Session not found" in response.json()["detail"]
+        # Global exception handler transforms HTTPException to {"error": "...", "message": "...", "status_code": ...}
+        assert "Session not found" in response.json()["message"]
     
     def test_get_session_status_success(self, client, mock_gameplay_service, mock_auth):
         """Test successful session status retrieval."""
@@ -173,12 +174,12 @@ class TestGameplayAPI:
     
     def test_get_session_status_access_denied(self, client, mock_gameplay_service, mock_auth):
         """Test session status retrieval with access denied."""
-        # Mock access denied
-        mock_gameplay_service.get_session_with_auth.return_value = {
+        # Mock access denied - must use AsyncMock for async methods
+        mock_gameplay_service.get_session_with_auth = AsyncMock(return_value={
             "success": False,
             "error": "Session access denied",
             "code": "ACCESS_DENIED"
-        }
+        })
 
         response = client.get(
             "/api/v1/gameplay/sessions/test-session-123",
@@ -186,7 +187,8 @@ class TestGameplayAPI:
         )
 
         assert response.status_code == 403
-        assert "Session access denied" in response.json()["detail"]
+        # Global exception handler transforms HTTPException to {"error": "...", "message": "...", "status_code": ...}
+        assert "Session access denied" in response.json()["message"]
     
     def test_end_session_success(self, client, mock_gameplay_service, mock_auth):
         """Test successful session termination."""
@@ -245,8 +247,8 @@ class TestGameplayAPI:
     
     def test_internal_server_error_handling(self, client, mock_gameplay_service, mock_auth):
         """Test handling of internal server errors."""
-        # Mock service to raise an exception
-        mock_gameplay_service.create_authenticated_session.side_effect = Exception("Internal error")
+        # Mock service to raise an exception - must use AsyncMock for async methods
+        mock_gameplay_service.create_authenticated_session = AsyncMock(side_effect=Exception("Internal error"))
 
         response = client.post(
             "/api/v1/gameplay/sessions",
@@ -255,7 +257,8 @@ class TestGameplayAPI:
         )
 
         assert response.status_code == 500
-        assert "Internal server error" in response.json()["detail"]
+        # Global exception handler transforms HTTPException to {"error": "...", "message": "...", "status_code": ...}
+        assert "Internal server error" in response.json()["message"]
 
 
 class TestGameplayAPIDocumentation:
