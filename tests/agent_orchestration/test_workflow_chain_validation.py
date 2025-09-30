@@ -20,7 +20,7 @@ from src.agent_orchestration.realtime.event_publisher import EventPublisher
 from src.agent_orchestration.performance.response_time_monitor import (
     ResponseTimeMonitor, OperationType
 )
-from src.agent_orchestration.therapeutic_safety.validator import TherapeuticValidator
+from src.agent_orchestration.therapeutic_safety import TherapeuticValidator
 
 
 @pytest.mark.integration

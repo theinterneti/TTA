@@ -12,6 +12,11 @@ from .response_time_monitor import (
 from .analytics import PerformanceAnalytics
 from .optimization import IntelligentAgentCoordinator
 from .alerting import PerformanceAlerting
+from .step_aggregator import (
+    get_step_aggregator,
+    StepTimingAggregator,
+    StepStats,
+)
 
 __all__ = [
     "get_response_time_monitor",
@@ -19,5 +24,8 @@ __all__ = [
     "PerformanceAnalytics",
     "IntelligentAgentCoordinator",
     "PerformanceAlerting",
+    "get_step_aggregator",
+    "StepTimingAggregator",
+    "StepStats",
 ]
 

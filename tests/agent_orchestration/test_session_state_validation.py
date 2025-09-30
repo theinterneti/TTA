@@ -16,8 +16,7 @@ from src.agent_orchestration.service import AgentOrchestrationService
 from src.agent_orchestration.proxies import (
     InputProcessorAgentProxy, WorldBuilderAgentProxy, NarrativeGeneratorAgentProxy
 )
-from src.agent_orchestration.therapeutic_safety.validator import TherapeuticValidator
-from src.agent_orchestration.therapeutic_safety.crisis_intervention import CrisisInterventionManager
+from src.agent_orchestration.therapeutic_safety import TherapeuticValidator, CrisisInterventionManager
 
 
 @pytest.mark.integration

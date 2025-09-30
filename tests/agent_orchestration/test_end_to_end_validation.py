@@ -22,8 +22,7 @@ from src.agent_orchestration.performance.response_time_monitor import (
     ResponseTimeMonitor, get_response_time_monitor
 )
 from src.agent_orchestration.performance.optimization import IntelligentAgentCoordinator
-from src.agent_orchestration.therapeutic_safety.validator import TherapeuticValidator
-from src.agent_orchestration.therapeutic_safety.crisis_intervention import CrisisInterventionManager
+from src.agent_orchestration.therapeutic_safety import TherapeuticValidator, CrisisInterventionManager
 from src.agent_orchestration.models import AgentType
 
 
