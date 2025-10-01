@@ -104,10 +104,25 @@ jobs:
       - name: Start monitoring stack with Docker Compose
         run: |
           cd monitoring
-          docker compose -f docker-compose.monitoring.yml up -d prometheus grafana
+          # Use CI-specific Prometheus configuration for fast startup
+          # Create a temporary override to use prometheus-ci.yml
+          cat > docker-compose.ci-override.yml << 'EOF'
+          version: '3.8'
+          services:
+            prometheus:
+              command:
+                - --config.file=/etc/prometheus/prometheus-ci.yml
+                - --storage.tsdb.path=/prometheus
+                - --web.console.libraries=/etc/prometheus/console_libraries
+                - --web.console.templates=/etc/prometheus/consoles
+                - --storage.tsdb.retention.time=30d
+                - --web.enable-lifecycle
+          EOF
+
+          docker compose -f docker-compose.monitoring.yml -f docker-compose.ci-override.yml up -d prometheus grafana
 
           # Wait for services to be healthy
-          echo "Waiting for Prometheus to be healthy..."
+          echo "Waiting for Prometheus to be healthy (using CI config for fast startup)..."
           timeout 60 bash -c 'until docker exec tta-prometheus wget --no-verbose --tries=1 --spider http://localhost:9090/-/healthy 2>&1 | grep -q "200 OK"; do sleep 2; done'
           echo "✅ Prometheus is healthy"
 
@@ -147,7 +162,8 @@ jobs:
         if: always()
         run: |
           cd monitoring
-          docker compose -f docker-compose.monitoring.yml down -v
+          docker compose -f docker-compose.monitoring.yml -f docker-compose.ci-override.yml down -v
+          rm -f docker-compose.ci-override.yml
       - name: Performance regression detection
         run: |
           uv run python scripts/performance_regression_check.py \

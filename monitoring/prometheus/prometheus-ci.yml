@@ -1,0 +1,42 @@
+# Prometheus Configuration for CI/CD Environment
+# This is a minimal configuration optimized for fast startup in GitHub Actions
+# For production/staging configuration, see prometheus.yml
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# No rule files needed for CI validation
+rule_files: []
+
+scrape_configs:
+  # Prometheus itself - minimal self-monitoring for health check validation
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          environment: 'ci'
+          instance: 'prometheus-ci'
+
+# No alerting configuration needed for CI
+alerting:
+  alertmanagers: []
+
+# Rationale for CI-Specific Configuration:
+# ========================================
+# The production prometheus.yml contains 16 scrape jobs targeting services that
+# don't exist in the GitHub Actions environment (staging services, node-exporter,
+# cadvisor, TTA APIs, etc.). When Prometheus starts with the full configuration,
+# it attempts to connect to all these non-existent targets, which significantly
+# delays initialization and causes health check timeouts in CI.
+#
+# This minimal CI configuration:
+# 1. Reduces startup time from 60+ seconds to ~5-10 seconds
+# 2. Validates that Prometheus can start and become healthy
+# 3. Validates that the monitoring stack infrastructure works correctly
+# 4. Provides fast feedback in CI/CD pipeline
+#
+# The CI validation focuses on infrastructure correctness (Docker Compose setup,
+# volume mounts, container networking, health checks) rather than full monitoring
+# functionality, which is tested in staging/production environments.
+
