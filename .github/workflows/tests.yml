@@ -104,7 +104,7 @@ jobs:
       - name: Start monitoring stack with Docker Compose
         run: |
           cd monitoring
-          docker-compose -f docker-compose.monitoring.yml up -d prometheus grafana
+          docker compose -f docker-compose.monitoring.yml up -d prometheus grafana
 
           # Wait for services to be healthy
           echo "Waiting for Prometheus to be healthy..."
@@ -147,7 +147,7 @@ jobs:
         if: always()
         run: |
           cd monitoring
-          docker-compose -f docker-compose.monitoring.yml down -v
+          docker compose -f docker-compose.monitoring.yml down -v
       - name: Performance regression detection
         run: |
           uv run python scripts/performance_regression_check.py \
