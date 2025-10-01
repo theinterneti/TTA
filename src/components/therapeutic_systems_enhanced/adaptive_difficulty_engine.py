@@ -17,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class DifficultyLevel(IntEnum):
     """Difficulty levels for therapeutic scenarios (1-6 scale)."""
+
     VERY_EASY = 1
     EASY = 2
     MODERATE = 3
@@ -27,6 +28,7 @@ class DifficultyLevel(IntEnum):
 
 class AdaptationStrategy(Enum):
     """Strategies for adapting difficulty based on user performance."""
+
     IMMEDIATE_ADJUSTMENT = "immediate_adjustment"
     GRADUAL_INCREASE = "gradual_increase"
     GRADUAL_DECREASE = "gradual_decrease"
@@ -37,6 +39,7 @@ class AdaptationStrategy(Enum):
 
 class AdjustmentTrigger(Enum):
     """Triggers that cause difficulty adjustments."""
+
     POOR_PERFORMANCE = "poor_performance"
     EXCELLENT_PERFORMANCE = "excellent_performance"
     EMOTIONAL_DISTRESS = "emotional_distress"
@@ -76,42 +79,48 @@ class TherapeuticAdaptiveDifficultyEngine:
         self.user_preferences = {}
 
         # Configuration parameters
-        self.performance_window_minutes = self.config.get("performance_window_minutes", 10)
+        self.performance_window_minutes = self.config.get(
+            "performance_window_minutes", 10
+        )
         self.adjustment_threshold = self.config.get("adjustment_threshold", 0.3)
-        self.min_samples_for_adjustment = self.config.get("min_samples_for_adjustment", 3)
-        self.max_adjustments_per_session = self.config.get("max_adjustments_per_session", 5)
+        self.min_samples_for_adjustment = self.config.get(
+            "min_samples_for_adjustment", 3
+        )
+        self.max_adjustments_per_session = self.config.get(
+            "max_adjustments_per_session", 5
+        )
 
         # Adaptation strategy configurations
         self.adaptation_strategies = {
             AdaptationStrategy.IMMEDIATE_ADJUSTMENT: {
                 "adjustment_rate": 1.0,
                 "therapeutic_focus": "crisis_management",
-                "description": "Immediate difficulty change for crisis situations"
+                "description": "Immediate difficulty change for crisis situations",
             },
             AdaptationStrategy.GRADUAL_INCREASE: {
                 "adjustment_rate": 0.5,
                 "therapeutic_focus": "skill_building",
-                "description": "Gradual increase to build confidence"
+                "description": "Gradual increase to build confidence",
             },
             AdaptationStrategy.GRADUAL_DECREASE: {
                 "adjustment_rate": -0.5,
                 "therapeutic_focus": "stress_reduction",
-                "description": "Gradual decrease to reduce overwhelm"
+                "description": "Gradual decrease to reduce overwhelm",
             },
             AdaptationStrategy.CONTEXTUAL_SUPPORT: {
                 "adjustment_rate": 0.0,
                 "therapeutic_focus": "emotional_support",
-                "description": "Provide support without changing difficulty"
+                "description": "Provide support without changing difficulty",
             },
             AdaptationStrategy.SKILL_BUILDING: {
                 "adjustment_rate": 0.0,
                 "therapeutic_focus": "competency_development",
-                "description": "Focus on skill development at current level"
+                "description": "Focus on skill development at current level",
             },
             AdaptationStrategy.ALTERNATIVE_PATH: {
                 "adjustment_rate": "variable",
                 "therapeutic_focus": "personalization",
-                "description": "Offer alternative approaches to same goals"
+                "description": "Offer alternative approaches to same goals",
             },
         }
 
@@ -309,7 +318,10 @@ class TherapeuticAdaptiveDifficultyEngine:
             }
 
     def _calculate_baseline_capability(
-        self, user_id: str, performance_history: list[Any], user_history: dict[str, Any] | None
+        self,
+        user_id: str,
+        performance_history: list[Any],
+        user_history: dict[str, Any] | None,
     ) -> float:
         """Calculate baseline capability score for the user."""
         if not performance_history and not user_history:
@@ -318,7 +330,9 @@ class TherapeuticAdaptiveDifficultyEngine:
         # Use performance history if available
         if performance_history:
             recent_performance = performance_history[-5:]  # Last 5 sessions
-            success_rates = [p.success_rate for p in recent_performance if hasattr(p, 'success_rate')]
+            success_rates = [
+                p.success_rate for p in recent_performance if hasattr(p, "success_rate")
+            ]
             if success_rates:
                 return sum(success_rates) / len(success_rates)
 
@@ -346,8 +360,10 @@ class TherapeuticAdaptiveDifficultyEngine:
             return DifficultyLevel.VERY_EASY
 
     def _generate_assessment_reasoning(
-        self, capability_score: float, difficulty_level: DifficultyLevel,
-        therapeutic_goals: list[str] | None
+        self,
+        capability_score: float,
+        difficulty_level: DifficultyLevel,
+        therapeutic_goals: list[str] | None,
     ) -> str:
         """Generate human-readable reasoning for the assessment."""
         base_reasoning = f"Based on capability score of {capability_score:.2f}, "
@@ -361,7 +377,9 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         if therapeutic_goals:
             primary_goal = therapeutic_goals[0].replace("_", " ")
-            base_reasoning += f" Difficulty calibrated for {primary_goal} therapeutic focus."
+            base_reasoning += (
+                f" Difficulty calibrated for {primary_goal} therapeutic focus."
+            )
 
         return base_reasoning
 
@@ -380,9 +398,13 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         return strategies
 
-    def _create_performance_metrics(self, user_id: str, performance_data: dict[str, Any]) -> PerformanceMetrics:
+    def _create_performance_metrics(
+        self, user_id: str, performance_data: dict[str, Any]
+    ) -> PerformanceMetrics:
         """Create performance metrics object from performance data."""
-        metrics = PerformanceMetrics(user_id, performance_data.get("session_id", "unknown"))
+        metrics = PerformanceMetrics(
+            user_id, performance_data.get("session_id", "unknown")
+        )
 
         metrics.success_rate = performance_data.get("success_rate", 0.5)
         metrics.response_time = performance_data.get("response_time", 30.0)
@@ -393,7 +415,9 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         return metrics
 
-    def _analyze_performance_trend(self, user_id: str, current_metrics: PerformanceMetrics) -> str:
+    def _analyze_performance_trend(
+        self, user_id: str, current_metrics: PerformanceMetrics
+    ) -> str:
         """Analyze performance trend over recent sessions."""
         history = self.user_performance_history.get(user_id, [])
 
@@ -405,9 +429,15 @@ class TherapeuticAdaptiveDifficultyEngine:
         success_rates = [session.success_rate for session in recent_sessions]
 
         if len(success_rates) >= 2:
-            if all(success_rates[i] < success_rates[i+1] for i in range(len(success_rates)-1)):
+            if all(
+                success_rates[i] < success_rates[i + 1]
+                for i in range(len(success_rates) - 1)
+            ):
                 return "improving"
-            elif all(success_rates[i] > success_rates[i+1] for i in range(len(success_rates)-1)):
+            elif all(
+                success_rates[i] > success_rates[i + 1]
+                for i in range(len(success_rates) - 1)
+            ):
                 return "declining"
             else:
                 return "stable"
@@ -415,7 +445,10 @@ class TherapeuticAdaptiveDifficultyEngine:
         return "stable"
 
     def _determine_adjustment_trigger(
-        self, metrics: PerformanceMetrics, trend: str, emotional_state: dict[str, Any] | None
+        self,
+        metrics: PerformanceMetrics,
+        trend: str,
+        emotional_state: dict[str, Any] | None,
     ) -> AdjustmentTrigger | None:
         """Determine if difficulty adjustment is needed and why."""
         # Check emotional distress first (highest priority)
@@ -441,8 +474,10 @@ class TherapeuticAdaptiveDifficultyEngine:
         return None  # No adjustment needed
 
     def _select_adaptation_strategy(
-        self, metrics: PerformanceMetrics, trigger: AdjustmentTrigger,
-        emotional_state: dict[str, Any] | None
+        self,
+        metrics: PerformanceMetrics,
+        trigger: AdjustmentTrigger,
+        emotional_state: dict[str, Any] | None,
     ) -> AdaptationStrategy:
         """Select appropriate adaptation strategy based on trigger and context."""
         if trigger == AdjustmentTrigger.EMOTIONAL_DISTRESS:
@@ -471,8 +506,10 @@ class TherapeuticAdaptiveDifficultyEngine:
         return DifficultyLevel.MODERATE  # Default
 
     def _calculate_new_difficulty(
-        self, current_difficulty: DifficultyLevel, strategy: AdaptationStrategy,
-        metrics: PerformanceMetrics
+        self,
+        current_difficulty: DifficultyLevel,
+        strategy: AdaptationStrategy,
+        metrics: PerformanceMetrics,
     ) -> DifficultyLevel:
         """Calculate new difficulty level based on strategy."""
         strategy_config = self.adaptation_strategies[strategy]
@@ -483,9 +520,15 @@ class TherapeuticAdaptiveDifficultyEngine:
         elif adjustment_rate == "variable":
             # Alternative path - choose based on performance
             if metrics.success_rate < 0.5:
-                return max(DifficultyLevel.VERY_EASY, DifficultyLevel(current_difficulty.value - 1))
+                return max(
+                    DifficultyLevel.VERY_EASY,
+                    DifficultyLevel(current_difficulty.value - 1),
+                )
             else:
-                return min(DifficultyLevel.VERY_HARD, DifficultyLevel(current_difficulty.value + 1))
+                return min(
+                    DifficultyLevel.VERY_HARD,
+                    DifficultyLevel(current_difficulty.value + 1),
+                )
         else:
             # Calculate adjustment
             adjustment = int(adjustment_rate * 2)  # Scale to difficulty range
@@ -494,7 +537,10 @@ class TherapeuticAdaptiveDifficultyEngine:
             return DifficultyLevel(new_value)
 
     def _apply_difficulty_adjustment(
-        self, user_id: str, new_difficulty: DifficultyLevel, strategy: AdaptationStrategy
+        self,
+        user_id: str,
+        new_difficulty: DifficultyLevel,
+        strategy: AdaptationStrategy,
     ):
         """Apply the difficulty adjustment for the user."""
         if user_id not in self.difficulty_adjustments:
@@ -505,7 +551,9 @@ class TherapeuticAdaptiveDifficultyEngine:
 
         adjustment_record = {
             "timestamp": datetime.utcnow(),
-            "previous_difficulty": self.difficulty_adjustments[user_id]["current_difficulty"],
+            "previous_difficulty": self.difficulty_adjustments[user_id][
+                "current_difficulty"
+            ],
             "new_difficulty": new_difficulty,
             "strategy": strategy,
             "adjustment_id": str(uuid4()),
@@ -517,13 +565,17 @@ class TherapeuticAdaptiveDifficultyEngine:
         # Keep only recent adjustments (last 24 hours)
         cutoff_time = datetime.utcnow() - timedelta(hours=24)
         self.difficulty_adjustments[user_id]["adjustments"] = [
-            adj for adj in self.difficulty_adjustments[user_id]["adjustments"]
+            adj
+            for adj in self.difficulty_adjustments[user_id]["adjustments"]
             if adj["timestamp"] > cutoff_time
         ]
 
     def _generate_adaptation_reasoning(
-        self, trigger: AdjustmentTrigger, strategy: AdaptationStrategy,
-        old_difficulty: DifficultyLevel, new_difficulty: DifficultyLevel
+        self,
+        trigger: AdjustmentTrigger,
+        strategy: AdaptationStrategy,
+        old_difficulty: DifficultyLevel,
+        new_difficulty: DifficultyLevel,
     ) -> str:
         """Generate human-readable reasoning for the adaptation."""
         trigger_descriptions = {
@@ -567,7 +619,9 @@ class TherapeuticAdaptiveDifficultyEngine:
         """
         try:
             current_difficulty = self._get_current_difficulty(user_id)
-            adjustment_history = self.difficulty_adjustments.get(user_id, {}).get("adjustments", [])
+            adjustment_history = self.difficulty_adjustments.get(user_id, {}).get(
+                "adjustments", []
+            )
 
             # Calculate calibration confidence
             calibration_confidence = self._calculate_calibration_confidence(user_id)
@@ -577,12 +631,18 @@ class TherapeuticAdaptiveDifficultyEngine:
                 "current_difficulty": current_difficulty.name,
                 "calibration_confidence": calibration_confidence,
                 "recent_adjustments": len(adjustment_history),
-                "last_adjustment": adjustment_history[-1]["timestamp"].isoformat() if adjustment_history else None,
+                "last_adjustment": (
+                    adjustment_history[-1]["timestamp"].isoformat()
+                    if adjustment_history
+                    else None
+                ),
                 "calibration_id": str(uuid4()),
             }
 
         except Exception as e:
-            logger.error(f"Error getting difficulty calibration for user {user_id}: {e}")
+            logger.error(
+                f"Error getting difficulty calibration for user {user_id}: {e}"
+            )
             return {
                 "difficulty_calibrated": False,
                 "error": str(e),
@@ -591,7 +651,9 @@ class TherapeuticAdaptiveDifficultyEngine:
     def _calculate_calibration_confidence(self, user_id: str) -> float:
         """Calculate confidence in current difficulty calibration."""
         history = self.user_performance_history.get(user_id, [])
-        adjustments = self.difficulty_adjustments.get(user_id, {}).get("adjustments", [])
+        adjustments = self.difficulty_adjustments.get(user_id, {}).get(
+            "adjustments", []
+        )
 
         if not history:
             return 0.5  # Default confidence
@@ -599,9 +661,13 @@ class TherapeuticAdaptiveDifficultyEngine:
         # Higher confidence with more stable performance
         recent_performance = history[-5:] if len(history) >= 5 else history
         if recent_performance:
-            success_rates = [p.success_rate for p in recent_performance if hasattr(p, 'success_rate')]
+            success_rates = [
+                p.success_rate for p in recent_performance if hasattr(p, "success_rate")
+            ]
             if success_rates:
-                variance = sum((sr - 0.6) ** 2 for sr in success_rates) / len(success_rates)
+                variance = sum((sr - 0.6) ** 2 for sr in success_rates) / len(
+                    success_rates
+                )
                 stability_score = max(0.0, 1.0 - variance)
 
                 # Reduce confidence if too many recent adjustments

@@ -14,8 +14,8 @@ import logging
 import shlex
 import subprocess
 import time
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import List, Optional, Mapping
 
 logger = logging.getLogger(__name__)
 
@@ -27,32 +27,38 @@ class RunResult:
     Mirrors key attributes of subprocess.CompletedProcess for convenience,
     but adds duration and command string for logging.
     """
-    args: List[str]
+
+    args: list[str]
     returncode: int
     stdout: str
     stderr: str
     duration_s: float
 
     def to_completed_process(self) -> subprocess.CompletedProcess:
-        return subprocess.CompletedProcess(args=self.args, returncode=self.returncode, stdout=self.stdout, stderr=self.stderr)
+        return subprocess.CompletedProcess(
+            args=self.args,
+            returncode=self.returncode,
+            stdout=self.stdout,
+            stderr=self.stderr,
+        )
 
 
 class ProcessError(subprocess.SubprocessError):
-    def __init__(self, message: str, *, result: Optional[RunResult] = None):
+    def __init__(self, message: str, *, result: RunResult | None = None):
         super().__init__(message)
         self.result = result
 
 
-def _format_cmd(cmd: List[str]) -> str:
+def _format_cmd(cmd: list[str]) -> str:
     return " ".join(shlex.quote(c) for c in cmd)
 
 
 def run(
-    cmd: List[str],
+    cmd: list[str],
     *,
     timeout: int = 60,
-    cwd: Optional[str] = None,
-    env: Optional[Mapping[str, str]] = None,
+    cwd: str | None = None,
+    env: Mapping[str, str] | None = None,
     check: bool = False,
     text: bool = True,
     capture_output: bool = True,
@@ -91,18 +97,29 @@ def run(
         raise ProcessError(f"Command timed out after {duration:.2f}s: {cmd_str}") from e
     except Exception as e:
         duration = time.perf_counter() - start
-        logger.error(f"Command failed to start after {duration:.2f}s: {cmd_str} | err={e}")
+        logger.error(
+            f"Command failed to start after {duration:.2f}s: {cmd_str} | err={e}"
+        )
         raise
 
     duration = time.perf_counter() - start
-    rr = RunResult(args=full_cmd, returncode=result.returncode, stdout=result.stdout or "", stderr=result.stderr or "", duration_s=duration)
+    rr = RunResult(
+        args=full_cmd,
+        returncode=result.returncode,
+        stdout=result.stdout or "",
+        stderr=result.stderr or "",
+        duration_s=duration,
+    )
 
     if rr.returncode != 0:
-        logger.error(f"Command failed (rc={rr.returncode}) in {duration:.2f}s: {cmd_str}\nSTDERR: {rr.stderr.strip()}")
+        logger.error(
+            f"Command failed (rc={rr.returncode}) in {duration:.2f}s: {cmd_str}\nSTDERR: {rr.stderr.strip()}"
+        )
         if check:
-            raise ProcessError(f"Command failed (rc={rr.returncode}): {cmd_str}", result=rr)
+            raise ProcessError(
+                f"Command failed (rc={rr.returncode}): {cmd_str}", result=rr
+            )
     else:
         logger.info(f"Command succeeded (rc=0) in {duration:.2f}s: {cmd_str}")
 
     return rr.to_completed_process()
-

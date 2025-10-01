@@ -25,14 +25,14 @@ Example:
     ```python
     from src.components.model_management import ModelManagementComponent
     from src.orchestration import TTAConfig
-    
+
     # Initialize model management
     config = TTAConfig()
     model_manager = ModelManagementComponent(config)
-    
+
     # Start the service
     await model_manager.start()
-    
+
     # Select optimal model for task
     model = await model_manager.select_model(
         task_type="narrative_generation",
@@ -41,22 +41,17 @@ Example:
     ```
 """
 
-from .model_management_component import ModelManagementComponent
 from .interfaces import (
-    IModelProvider,
+    GenerationRequest,
     IModelInstance,
-    TaskType,
-    ModelRequirements,
+    IModelProvider,
     ModelInfo,
+    ModelRequirements,
     ProviderType,
-    GenerationRequest
+    TaskType,
 )
-from .models import (
-    ModelConfiguration,
-    PerformanceMetrics,
-    SystemResources,
-    ModelStatus
-)
+from .model_management_component import ModelManagementComponent
+from .models import ModelConfiguration, ModelStatus, PerformanceMetrics, SystemResources
 
 __all__ = [
     "ModelManagementComponent",
@@ -70,5 +65,5 @@ __all__ = [
     "ModelConfiguration",
     "PerformanceMetrics",
     "SystemResources",
-    "ModelStatus"
+    "ModelStatus",
 ]

@@ -5,7 +5,7 @@ import json
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Any, Dict, Optional, List
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -14,19 +14,19 @@ logger = logging.getLogger(__name__)
 class RunStep:
     name: str
     started_at: float
-    ended_at: Optional[float] = None
-    error: Optional[str] = None
+    ended_at: float | None = None
+    error: str | None = None
     warned: bool = False
 
 
 @dataclass
 class RunRecord:
     run_id: str
-    workflow: Optional[str] = None
+    workflow: str | None = None
     status: str = "running"  # running|completed|failed|timed_out
     started_at: float = field(default_factory=lambda: time.time())
-    ended_at: Optional[float] = None
-    steps: List[RunStep] = field(default_factory=list)
+    ended_at: float | None = None
+    steps: list[RunStep] = field(default_factory=list)
     total_timeout_s: float = 300.0
     step_timeout_s: float = 60.0
 
@@ -42,16 +42,21 @@ class WorkflowMonitor:
       - {pfx}:wf:metrics -> hash of counters
     """
 
-    def __init__(self, redis, key_prefix: str = "ao", *,
-                 default_total_timeout_s: float = 300.0,
-                 default_step_timeout_s: float = 60.0,
-                 audit_retention_days: int = 30) -> None:
+    def __init__(
+        self,
+        redis,
+        key_prefix: str = "ao",
+        *,
+        default_total_timeout_s: float = 300.0,
+        default_step_timeout_s: float = 60.0,
+        audit_retention_days: int = 30,
+    ) -> None:
         self._redis = redis
         self._pfx = key_prefix.rstrip(":")
         self._def_total = float(default_total_timeout_s)
         self._def_step = float(default_step_timeout_s)
         self._audit_ttl_s = int(max(1, audit_retention_days) * 86400)
-        self._bg_task: Optional[asyncio.Task] = None
+        self._bg_task: asyncio.Task | None = None
 
     # ---- Redis key helpers ----
     def _run_key(self, run_id: str) -> str:
@@ -64,9 +69,14 @@ class WorkflowMonitor:
         return f"{self._pfx}:wf:metrics"
 
     # ---- Public API ----
-    async def start_run(self, run_id: str, *, workflow: Optional[str] = None,
-                        total_timeout_s: Optional[float] = None,
-                        step_timeout_s: Optional[float] = None) -> None:
+    async def start_run(
+        self,
+        run_id: str,
+        *,
+        workflow: str | None = None,
+        total_timeout_s: float | None = None,
+        step_timeout_s: float | None = None,
+    ) -> None:
         now = time.time()
         rr = RunRecord(
             run_id=run_id,
@@ -84,7 +94,7 @@ class WorkflowMonitor:
         rr.steps.append(RunStep(name=step_name, started_at=time.time()))
         await self._persist(rr)
 
-    async def end_step(self, run_id: str, *, error: Optional[str] = None) -> None:
+    async def end_step(self, run_id: str, *, error: str | None = None) -> None:
         rr = await self._load(run_id)
         if not rr:
             return
@@ -117,11 +127,11 @@ class WorkflowMonitor:
         await self._persist(rr)
         await self._incr_metric("workflow_failures_total", 1)
 
-    async def get_run(self, run_id: str) -> Optional[Dict[str, Any]]:
+    async def get_run(self, run_id: str) -> dict[str, Any] | None:
         rr = await self._load(run_id)
         return self._dump(rr) if rr else None
 
-    async def record_rollback_audit(self, run_id: str, entry: Dict[str, Any]) -> None:
+    async def record_rollback_audit(self, run_id: str, entry: dict[str, Any]) -> None:
         try:
             await self._redis.rpush(self._audit_key(run_id), json.dumps(entry))
             await self._redis.expire(self._audit_key(run_id), self._audit_ttl_s)
@@ -129,10 +139,10 @@ class WorkflowMonitor:
         except Exception:
             logger.debug("Failed to record rollback audit", exc_info=True)
 
-    async def get_rollback_history(self, run_id: str) -> List[Dict[str, Any]]:
+    async def get_rollback_history(self, run_id: str) -> list[dict[str, Any]]:
         try:
             raw = await self._redis.lrange(self._audit_key(run_id), 0, -1)
-            out: List[Dict[str, Any]] = []
+            out: list[dict[str, Any]] = []
             for b in raw or []:
                 try:
                     out.append(json.loads(b if isinstance(b, str) else b.decode()))
@@ -155,7 +165,9 @@ class WorkflowMonitor:
                 if not data:
                     continue
                 try:
-                    rr = self._from_dump(json.loads(data if isinstance(data, str) else data.decode()))
+                    rr = self._from_dump(
+                        json.loads(data if isinstance(data, str) else data.decode())
+                    )
                 except Exception:
                     continue
                 if rr.status not in ("running",):
@@ -171,9 +183,16 @@ class WorkflowMonitor:
                         elapsed = now - s.started_at
                         if elapsed >= 0.75 * rr.step_timeout_s and not s.warned:
                             s.warned = True
-                            await self._audit(rr.run_id, {
-                                "ts": now, "event": "early_warning", "type": "step", "name": s.name, "elapsed": elapsed,
-                            })
+                            await self._audit(
+                                rr.run_id,
+                                {
+                                    "ts": now,
+                                    "event": "early_warning",
+                                    "type": "step",
+                                    "name": s.name,
+                                    "elapsed": elapsed,
+                                },
+                            )
                             await self._persist(rr)
                         if elapsed >= rr.step_timeout_s:
                             rr.status = "timed_out"
@@ -215,22 +234,26 @@ class WorkflowMonitor:
     # ---- Helpers ----
     async def _maybe_warn(self, rr: RunRecord, kind: str) -> None:
         try:
-            await self._audit(rr.run_id, {"ts": time.time(), "event": "early_warning", "type": kind})
+            await self._audit(
+                rr.run_id, {"ts": time.time(), "event": "early_warning", "type": kind}
+            )
         except Exception:
             pass
 
-    async def _audit(self, run_id: str, entry: Dict[str, Any]) -> None:
+    async def _audit(self, run_id: str, entry: dict[str, Any]) -> None:
         await self.record_rollback_audit(run_id, entry)
 
     async def _persist(self, rr: RunRecord) -> None:
         await self._redis.set(self._run_key(rr.run_id), json.dumps(self._dump(rr)))
 
-    async def _load(self, run_id: str) -> Optional[RunRecord]:
+    async def _load(self, run_id: str) -> RunRecord | None:
         raw = await self._redis.get(self._run_key(run_id))
         if not raw:
             return None
         try:
-            return self._from_dump(json.loads(raw if isinstance(raw, str) else raw.decode()))
+            return self._from_dump(
+                json.loads(raw if isinstance(raw, str) else raw.decode())
+            )
         except Exception:
             return None
 
@@ -240,10 +263,10 @@ class WorkflowMonitor:
         except Exception:
             pass
 
-    async def metrics_snapshot(self) -> Dict[str, int]:
+    async def metrics_snapshot(self) -> dict[str, int]:
         try:
             data = await self._redis.hgetall(self._metrics_key())
-            out: Dict[str, int] = {}
+            out: dict[str, int] = {}
             for k, v in (data or {}).items():
                 key = k if isinstance(k, str) else k.decode()
                 try:
@@ -255,7 +278,7 @@ class WorkflowMonitor:
             return {}
 
     # ---- serialization helpers ----
-    def _dump(self, rr: RunRecord) -> Dict[str, Any]:
+    def _dump(self, rr: RunRecord) -> dict[str, Any]:
         return {
             "run_id": rr.run_id,
             "workflow": rr.workflow,
@@ -276,7 +299,7 @@ class WorkflowMonitor:
             ],
         }
 
-    def _from_dump(self, d: Dict[str, Any]) -> RunRecord:
+    def _from_dump(self, d: dict[str, Any]) -> RunRecord:
         rr = RunRecord(
             run_id=d.get("run_id"),
             workflow=d.get("workflow"),
@@ -287,12 +310,13 @@ class WorkflowMonitor:
             step_timeout_s=float(d.get("step_timeout_s") or self._def_step),
         )
         for s in d.get("steps", []) or []:
-            rr.steps.append(RunStep(
-                name=s.get("name"),
-                started_at=float(s.get("started_at") or time.time()),
-                ended_at=s.get("ended_at"),
-                error=s.get("error"),
-                warned=bool(s.get("warned", False)),
-            ))
+            rr.steps.append(
+                RunStep(
+                    name=s.get("name"),
+                    started_at=float(s.get("started_at") or time.time()),
+                    ended_at=s.get("ended_at"),
+                    error=s.get("error"),
+                    warned=bool(s.get("warned", False)),
+                )
+            )
         return rr
-

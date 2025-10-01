@@ -48,7 +48,9 @@ const CharacterManagement: React.FC = () => {
   }, [dispatch, profile?.player_id]);
 
   const handleCreateCharacter = () => {
+    console.log('handleCreateCharacter called - setting showCreateForm to true');
     setShowCreateForm(true);
+    console.log('showCreateForm state should now be true');
   };
 
   const handleEditCharacter = (character: Character) => {
@@ -191,6 +193,7 @@ const CharacterManagement: React.FC = () => {
       )}
 
       {/* Character Creation Form */}
+      {console.log('Rendering CharacterManagement, showCreateForm:', showCreateForm)}
       {showCreateForm && (
         <CharacterCreationForm
           onClose={() => setShowCreateForm(false)}

@@ -1,15 +1,15 @@
 """
 Time/date utility helpers to centralize timezone-agnostic date calculations.
 """
+
 from __future__ import annotations
 
-from datetime import datetime, timedelta, date
-from typing import Iterable, List
+from collections.abc import Iterable
+from datetime import date, datetime, timedelta
 
 
 def utc_today() -> date:
-    """Return today's date in UTC.
-    """
+    """Return today's date in UTC."""
     return datetime.utcnow().date()
 
 
@@ -34,7 +34,9 @@ def pick_reference_today(candidates: Iterable[date]) -> date:
     return max(cset) if cset else utc
 
 
-def consecutive_streak_ending_today(dates: Iterable[date], ref_today: date | None = None) -> int:
+def consecutive_streak_ending_today(
+    dates: Iterable[date], ref_today: date | None = None
+) -> int:
     """Compute a consecutive-day streak ending at ref_today.
     Dates are treated as calendar dates (no times). Duplicates are ignored.
     """
@@ -49,4 +51,3 @@ def consecutive_streak_ending_today(dates: Iterable[date], ref_today: date | Non
         else:
             break
     return streak
-

@@ -4,12 +4,11 @@ Policy configuration for tool execution governance.
 - Supports file-based YAML/JSON or environment variables
 - Backward compatible with TTA_ALLOWED_CALLABLES
 """
+
 from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
-from typing import List, Optional
 
 try:
     import yaml  # type: ignore
@@ -34,16 +33,15 @@ def _redact(obj: dict) -> dict:
         return obj
 
 
-
 class ToolPolicyConfig(BaseModel):
-    callable_allowlist: List[str] = Field(default_factory=list)
+    callable_allowlist: list[str] = Field(default_factory=list)
     allow_network_tools: bool = True
     allow_filesystem_tools: bool = True
     allow_process_tools: bool = True
-    default_timeout_ms: Optional[int] = None
-    max_concurrency: Optional[int] = None
-    cpu_limit_percent: Optional[int] = None
-    memory_limit_mb: Optional[int] = None
+    default_timeout_ms: int | None = None
+    max_concurrency: int | None = None
+    cpu_limit_percent: int | None = None
+    memory_limit_mb: int | None = None
 
 
 _ENV_BOOL_KEYS = {
@@ -67,7 +65,7 @@ def _parse_bool(val: str | None, default: bool) -> bool:
     return v in ("1", "true", "yes", "y", "on")
 
 
-def _parse_int(val: str | None) -> Optional[int]:
+def _parse_int(val: str | None) -> int | None:
     if not val:
         return None
     try:
@@ -77,10 +75,10 @@ def _parse_int(val: str | None) -> Optional[int]:
 
 
 def _load_from_file(path: str) -> dict:
-    with open(path, "r", encoding="utf-8") as f:
+    with open(path, encoding="utf-8") as f:
         content = f.read()
     # detect by extension
-    if path.endswith(('.yaml', '.yml')):
+    if path.endswith((".yaml", ".yml")):
         if yaml is None:
             raise RuntimeError("PyYAML not installed but YAML config provided")
         data = yaml.safe_load(content) or {}
@@ -120,7 +118,9 @@ def load_tool_policy_config() -> ToolPolicyConfig:
     # 2b) Env boolean flags
     for env_key, field_name in _ENV_BOOL_KEYS.items():
         if env_key in os.environ:
-            base[field_name] = _parse_bool(os.environ.get(env_key), base.get(field_name, True))
+            base[field_name] = _parse_bool(
+                os.environ.get(env_key), base.get(field_name, True)
+            )
 
     # 2c) Env integer options
     for env_key, field_name in _ENV_INT_KEYS.items():
@@ -147,7 +147,7 @@ def load_tool_policy_config_from(path: str) -> ToolPolicyConfig:
         return ToolPolicyConfig()
 
 
-def validate_tool_policy_config(data: dict) -> tuple[bool, Optional[str]]:
+def validate_tool_policy_config(data: dict) -> tuple[bool, str | None]:
     """Validate a dict as ToolPolicyConfig. Returns (ok, error_message)."""
     try:
         ToolPolicyConfig(**data)
@@ -159,4 +159,3 @@ def validate_tool_policy_config(data: dict) -> tuple[bool, Optional[str]]:
 def redact_policy_config_dict(data: dict) -> dict:
     """Return a redacted shallow copy of a tool policy dict."""
     return _redact(dict(data or {}))
-

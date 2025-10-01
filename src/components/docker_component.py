@@ -25,28 +25,32 @@ Example:
     ```
 """
 
-import os
 import logging
-import subprocess
-from src.common.process_utils import run as safe_run
+import os
 import shutil
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any
+
+from src.common.process_utils import run as safe_run
 
 # Try to import codecarbon for carbon tracking
 try:
     from codecarbon import track_emissions
+
     CODECARBON_AVAILABLE = True
 except ImportError:
     CODECARBON_AVAILABLE = False
+
     # Define a no-op decorator
     def track_emissions(*args, **kwargs):
         def decorator(func):
             return func
+
         return decorator if args and callable(args[0]) else decorator
 
-from src.orchestration.component import Component, ComponentStatus
-from src.orchestration.decorators import log_entry_exit, timing_decorator, retry
+
+from src.orchestration.component import Component
+from src.orchestration.decorators import log_entry_exit, timing_decorator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -186,7 +190,9 @@ class DockerComponent(Component):
                 self._ensure_consistent_services("tta.prototype")
                 logger.info("tta.prototype repository processed successfully")
             else:
-                logger.error(f"tta.prototype repository not found at {self.tta_prototype_path}")
+                logger.error(
+                    f"tta.prototype repository not found at {self.tta_prototype_path}"
+                )
                 return False
 
             logger.info("Docker consistency ensured across repositories")
@@ -208,22 +214,36 @@ class DockerComponent(Component):
         logger.info(f"Checking Docker files for {repo_name}...")
 
         # Check Dockerfile
-        if not (repo_path / "Dockerfile").exists() and (template_path / "Dockerfile").exists():
+        if (
+            not (repo_path / "Dockerfile").exists()
+            and (template_path / "Dockerfile").exists()
+        ):
             logger.info(f"Copying Dockerfile template to {repo_name}...")
             shutil.copy(template_path / "Dockerfile", repo_path / "Dockerfile")
             logger.info(f"Copied Dockerfile template to {repo_name}")
 
         # Check docker-compose.yml
-        if not (repo_path / "docker-compose.yml").exists() and (template_path / "docker-compose.yml").exists():
+        if (
+            not (repo_path / "docker-compose.yml").exists()
+            and (template_path / "docker-compose.yml").exists()
+        ):
             logger.info(f"Copying docker-compose.yml template to {repo_name}...")
-            shutil.copy(template_path / "docker-compose.yml", repo_path / "docker-compose.yml")
+            shutil.copy(
+                template_path / "docker-compose.yml", repo_path / "docker-compose.yml"
+            )
             logger.info(f"Copied docker-compose.yml template to {repo_name}")
 
         # Check devcontainer.json
-        if not (repo_path / ".devcontainer" / "devcontainer.json").exists() and (template_path / ".devcontainer" / "devcontainer.json").exists():
+        if (
+            not (repo_path / ".devcontainer" / "devcontainer.json").exists()
+            and (template_path / ".devcontainer" / "devcontainer.json").exists()
+        ):
             logger.info(f"Copying devcontainer.json template to {repo_name}...")
             os.makedirs(repo_path / ".devcontainer", exist_ok=True)
-            shutil.copy(template_path / ".devcontainer" / "devcontainer.json", repo_path / ".devcontainer" / "devcontainer.json")
+            shutil.copy(
+                template_path / ".devcontainer" / "devcontainer.json",
+                repo_path / ".devcontainer" / "devcontainer.json",
+            )
             logger.info(f"Copied devcontainer.json template to {repo_name}")
 
         logger.info(f"Docker files for {repo_name} are in place")
@@ -242,15 +262,17 @@ class DockerComponent(Component):
 
         if docker_compose_path.exists():
             # Read the docker-compose.yml file
-            with open(docker_compose_path, 'r') as f:
+            with open(docker_compose_path) as f:
                 content = f.read()
 
             # Replace container names
             repo_prefix = repo_name.replace("tta.", "")
-            updated_content = content.replace("container_name: tta-", f"container_name: tta-{repo_prefix}-")
+            updated_content = content.replace(
+                "container_name: tta-", f"container_name: tta-{repo_prefix}-"
+            )
 
             # Write the updated content back to the file
-            with open(docker_compose_path, 'w') as f:
+            with open(docker_compose_path, "w") as f:
                 f.write(updated_content)
 
             logger.info(f"Standardized container names in {repo_name}")
@@ -269,7 +291,7 @@ class DockerComponent(Component):
 
         if devcontainer_path.exists():
             # Read the devcontainer.json file
-            with open(devcontainer_path, 'r') as f:
+            with open(devcontainer_path) as f:
                 content = f.read()
 
             # Check for essential extensions
@@ -280,7 +302,7 @@ class DockerComponent(Component):
                 "ms-python.flake8",
                 "ms-azuretools.vscode-docker",
                 "ms-vscode-remote.remote-containers",
-                "neo4j-extensions.neo4j-for-vscode"
+                "neo4j-extensions.neo4j-for-vscode",
             ]
 
             missing_extensions = []
@@ -289,7 +311,9 @@ class DockerComponent(Component):
                     missing_extensions.append(ext)
 
             if missing_extensions:
-                logger.warning(f"Missing extensions in {repo_name}: {', '.join(missing_extensions)}")
+                logger.warning(
+                    f"Missing extensions in {repo_name}: {', '.join(missing_extensions)}"
+                )
                 logger.warning(f"Please add these extensions to {devcontainer_path}")
             else:
                 logger.info(f"All essential extensions are present in {repo_name}")
@@ -314,7 +338,7 @@ class DockerComponent(Component):
             if template_env_path.exists():
                 shutil.copy(template_env_path, env_example_path)
             else:
-                with open(env_example_path, 'w') as f:
+                with open(env_example_path, "w") as f:
                     f.write("# TTA Environment Variables\n")
                     f.write("NEO4J_PASSWORD=password\n")
                     f.write("NEO4J_URI=bolt://neo4j:7687\n")
@@ -325,7 +349,7 @@ class DockerComponent(Component):
             logger.info(f"Created .env.example in {repo_name}")
         else:
             # Ensure essential environment variables are included
-            with open(env_example_path, 'r') as f:
+            with open(env_example_path) as f:
                 content = f.read()
 
             essential_vars = [
@@ -333,7 +357,7 @@ class DockerComponent(Component):
                 "NEO4J_URI",
                 "NEO4J_USERNAME",
                 "MODEL_CACHE_DIR",
-                "CODECARBON_OUTPUT_DIR"
+                "CODECARBON_OUTPUT_DIR",
             ]
 
             missing_vars = []
@@ -344,7 +368,7 @@ class DockerComponent(Component):
             if missing_vars:
                 logger.info(f"Adding missing environment variables to {repo_name}...")
 
-                with open(env_example_path, 'a') as f:
+                with open(env_example_path, "a") as f:
                     for var in missing_vars:
                         if var == "NEO4J_PASSWORD":
                             f.write(f"{var}=password\n")
@@ -361,7 +385,9 @@ class DockerComponent(Component):
 
                 logger.info(f"Added missing environment variables to {repo_name}")
             else:
-                logger.info(f"All essential environment variables are present in {repo_name}")
+                logger.info(
+                    f"All essential environment variables are present in {repo_name}"
+                )
 
     def _ensure_consistent_services(self, repo_name: str) -> None:
         """
@@ -377,7 +403,7 @@ class DockerComponent(Component):
 
         if docker_compose_path.exists():
             # Read the docker-compose.yml file
-            with open(docker_compose_path, 'r') as f:
+            with open(docker_compose_path) as f:
                 content = f.read()
 
             # Check for essential services
@@ -389,7 +415,9 @@ class DockerComponent(Component):
                     missing_services.append(service.replace(":", ""))
 
             if missing_services:
-                logger.warning(f"Missing services in {repo_name}: {', '.join(missing_services)}")
+                logger.warning(
+                    f"Missing services in {repo_name}: {', '.join(missing_services)}"
+                )
                 logger.warning(f"Please add these services to {docker_compose_path}")
             else:
                 logger.info(f"All essential services are present in {repo_name}")

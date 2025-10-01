@@ -2,17 +2,15 @@
 ContradictionDetector extracted from narrative_coherence_engine.
 Implements contradiction detection across direct, implicit, temporal, and causal dimensions.
 """
+
 from __future__ import annotations
 
 import logging
-import uuid
-from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from .models import (
-    NarrativeContent,
     Contradiction,
-    ValidationSeverity,
+    NarrativeContent,
 )
 
 logger = logging.getLogger(__name__)
@@ -27,12 +25,12 @@ class ContradictionDetector:
     and temporal inconsistencies.
     """
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         """Initialize the contradiction detector."""
         self.config = config
-        self.contradiction_patterns: Dict[str, List[str]] = {}
-        self.temporal_markers: List[str] = []
-        self.causal_indicators: List[str] = []
+        self.contradiction_patterns: dict[str, list[str]] = {}
+        self.temporal_markers: list[str] = []
+        self.causal_indicators: list[str] = []
 
         # Load detection patterns
         self._load_contradiction_patterns()
@@ -41,7 +39,9 @@ class ContradictionDetector:
 
         logger.info("ContradictionDetector initialized")
 
-    async def detect_contradictions(self, content_history: List[NarrativeContent]) -> List[Contradiction]:
+    async def detect_contradictions(
+        self, content_history: list[NarrativeContent]
+    ) -> list[Contradiction]:
         """
         Detect contradictions across a history of narrative content.
 
@@ -52,24 +52,34 @@ class ContradictionDetector:
             List of detected contradictions
         """
         try:
-            logger.debug(f"Detecting contradictions across {len(content_history)} content pieces")
+            logger.debug(
+                f"Detecting contradictions across {len(content_history)} content pieces"
+            )
 
-            contradictions: List[Contradiction] = []
+            contradictions: list[Contradiction] = []
 
             # Detect direct contradictions
-            direct_contradictions = await self._detect_direct_contradictions(content_history)
+            direct_contradictions = await self._detect_direct_contradictions(
+                content_history
+            )
             contradictions.extend(direct_contradictions)
 
             # Detect implicit contradictions
-            implicit_contradictions = await self._detect_implicit_contradictions(content_history)
+            implicit_contradictions = await self._detect_implicit_contradictions(
+                content_history
+            )
             contradictions.extend(implicit_contradictions)
 
             # Detect temporal contradictions
-            temporal_contradictions = await self._detect_temporal_contradictions(content_history)
+            temporal_contradictions = await self._detect_temporal_contradictions(
+                content_history
+            )
             contradictions.extend(temporal_contradictions)
 
             # Detect causal contradictions
-            causal_contradictions = await self._detect_causal_contradictions(content_history)
+            causal_contradictions = await self._detect_causal_contradictions(
+                content_history
+            )
             contradictions.extend(causal_contradictions)
 
             logger.info(f"Detected {len(contradictions)} contradictions")
@@ -82,10 +92,42 @@ class ContradictionDetector:
     def _load_contradiction_patterns(self):
         """Load patterns for detecting contradictions."""
         self.contradiction_patterns = {
-            "negation": ["not", "never", "no", "none", "neither", "cannot", "won't", "doesn't"],
-            "affirmation": ["yes", "always", "definitely", "certainly", "absolutely", "indeed"],
-            "temporal_conflict": ["before", "after", "during", "while", "when", "then", "now", "previously"],
-            "state_change": ["became", "turned into", "transformed", "changed", "evolved", "grew"],
+            "negation": [
+                "not",
+                "never",
+                "no",
+                "none",
+                "neither",
+                "cannot",
+                "won't",
+                "doesn't",
+            ],
+            "affirmation": [
+                "yes",
+                "always",
+                "definitely",
+                "certainly",
+                "absolutely",
+                "indeed",
+            ],
+            "temporal_conflict": [
+                "before",
+                "after",
+                "during",
+                "while",
+                "when",
+                "then",
+                "now",
+                "previously",
+            ],
+            "state_change": [
+                "became",
+                "turned into",
+                "transformed",
+                "changed",
+                "evolved",
+                "grew",
+            ],
             "existence": ["exists", "is", "was", "are", "were", "has", "have", "had"],
         }
 
@@ -131,55 +173,69 @@ class ContradictionDetector:
             "resulted in",
         ]
 
-    async def _detect_direct_contradictions(self, content_history: List[NarrativeContent]) -> List[Contradiction]:
+    async def _detect_direct_contradictions(
+        self, content_history: list[NarrativeContent]
+    ) -> list[Contradiction]:
         """Detect direct contradictions between content pieces."""
-        contradictions: List[Contradiction] = []
+        contradictions: list[Contradiction] = []
         try:
             for i in range(len(content_history)):
                 for j in range(i + 1, len(content_history)):
                     content1 = content_history[i]
                     content2 = content_history[j]
-                    direct_conflicts = await self._find_direct_conflicts(content1, content2)
+                    direct_conflicts = await self._find_direct_conflicts(
+                        content1, content2
+                    )
                     contradictions.extend(direct_conflicts)
             return contradictions
         except Exception as e:
             logger.error(f"Error detecting direct contradictions: {e}")
             return []
 
-    async def _detect_implicit_contradictions(self, content_history: List[NarrativeContent]) -> List[Contradiction]:
+    async def _detect_implicit_contradictions(
+        self, content_history: list[NarrativeContent]
+    ) -> list[Contradiction]:
         """Detect implicit contradictions that require inference."""
-        contradictions: List[Contradiction] = []
+        contradictions: list[Contradiction] = []
         try:
             for i in range(len(content_history)):
                 for j in range(i + 1, len(content_history)):
                     content1 = content_history[i]
                     content2 = content_history[j]
-                    implicit_conflicts = await self._find_implicit_conflicts(content1, content2)
+                    implicit_conflicts = await self._find_implicit_conflicts(
+                        content1, content2
+                    )
                     contradictions.extend(implicit_conflicts)
             return contradictions
         except Exception as e:
             logger.error(f"Error detecting implicit contradictions: {e}")
             return []
 
-    async def _detect_temporal_contradictions(self, content_history: List[NarrativeContent]) -> List[Contradiction]:
+    async def _detect_temporal_contradictions(
+        self, content_history: list[NarrativeContent]
+    ) -> list[Contradiction]:
         """Detect temporal contradictions in the narrative timeline."""
-        contradictions: List[Contradiction] = []
+        contradictions: list[Contradiction] = []
         try:
             temporal_events = await self._extract_temporal_events(content_history)
             for i in range(len(temporal_events)):
                 for j in range(i + 1, len(temporal_events)):
                     event1 = temporal_events[i]
                     event2 = temporal_events[j]
-                    temporal_conflicts = await self._find_temporal_conflicts(event1, event2)
+                    temporal_conflicts = await self._find_temporal_conflicts(
+                        event1, event2
+                    )
                     contradictions.extend(temporal_conflicts)
             return contradictions
         except Exception as e:
             logger.error(f"Error detecting temporal contradictions: {e}")
             return []
 
-    async def _detect_causal_contradictions(self, content_history: List[NarrativeContent]) -> List[Contradiction]:
+    async def _detect_causal_contradictions(
+        self, content_history: list[NarrativeContent]
+    ) -> list[Contradiction]:
         """Detect causal contradictions in cause-effect relationships."""
-        contradictions: List[Contradiction] = []
+        contradictions: list[Contradiction] = []
         try:
             causal_chains = await self._extract_causal_chains(content_history)
             for chain in causal_chains:
@@ -191,24 +247,35 @@ class ContradictionDetector:
             return []
 
     # Placeholder detailed methods
-    async def _find_direct_conflicts(self, content1: NarrativeContent, content2: NarrativeContent) -> List[Contradiction]:
+    async def _find_direct_conflicts(
+        self, content1: NarrativeContent, content2: NarrativeContent
+    ) -> list[Contradiction]:
         return []
 
-    async def _find_implicit_conflicts(self, content1: NarrativeContent, content2: NarrativeContent) -> List[Contradiction]:
+    async def _find_implicit_conflicts(
+        self, content1: NarrativeContent, content2: NarrativeContent
+    ) -> list[Contradiction]:
         return []
 
-    async def _extract_temporal_events(self, content_history: List[NarrativeContent]) -> List[Dict[str, Any]]:
+    async def _extract_temporal_events(
+        self, content_history: list[NarrativeContent]
+    ) -> list[dict[str, Any]]:
         return []
 
-    async def _find_temporal_conflicts(self, event1: Dict[str, Any], event2: Dict[str, Any]) -> List[Contradiction]:
+    async def _find_temporal_conflicts(
+        self, event1: dict[str, Any], event2: dict[str, Any]
+    ) -> list[Contradiction]:
         return []
 
-    async def _extract_causal_chains(self, content_history: List[NarrativeContent]) -> List[List[Dict[str, Any]]]:
+    async def _extract_causal_chains(
+        self, content_history: list[NarrativeContent]
+    ) -> list[list[dict[str, Any]]]:
         return []
 
-    async def _find_causal_conflicts(self, causal_chain: List[Dict[str, Any]]) -> List[Contradiction]:
+    async def _find_causal_conflicts(
+        self, causal_chain: list[dict[str, Any]]
+    ) -> list[Contradiction]:
         return []
 
 
 __all__ = ["ContradictionDetector"]
-

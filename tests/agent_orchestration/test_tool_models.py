@@ -1,9 +1,13 @@
 import pytest
-from src.agent_orchestration.tools.models import ToolSpec, ToolParameter, ToolPolicy
+
+from src.agent_orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
 
 
 def test_tool_spec_semver_and_param_limits():
-    params = [ToolParameter(name=f"p{i}", required=True, schema={"type": "string"}) for i in range(3)]
+    params = [
+        ToolParameter(name=f"p{i}", required=True, schema={"type": "string"})
+        for i in range(3)
+    ]
     spec = ToolSpec(
         name="kg.query",
         version="1.2.3",
@@ -27,7 +31,9 @@ def test_tool_spec_semver_and_param_limits():
 
 
 def test_tool_policy_safety_flags():
-    policy = ToolPolicy(allow_network_tools=False, allow_filesystem_tools=False, max_schema_depth=3)
+    policy = ToolPolicy(
+        allow_network_tools=False, allow_filesystem_tools=False, max_schema_depth=3
+    )
     spec = ToolSpec(
         name="net.fetch",
         description="fetch network resource",
@@ -40,4 +46,3 @@ def test_tool_policy_safety_flags():
 
     policy2 = ToolPolicy(allow_network_tools=True)
     policy2.check_safety(spec)  # should not raise
-

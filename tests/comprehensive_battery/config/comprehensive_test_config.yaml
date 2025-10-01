@@ -9,6 +9,40 @@ mock_mode:
   mock_data_size: "medium"  # small, medium, large - affects amount of mock data generated
   preserve_mock_data: false  # Keep mock data between test runs
 
+# Container Integration Settings
+containers:
+  enabled: true  # Enable Docker container integration
+  auto_start: false  # Automatically start containers if they're stopped
+  health_check_timeout: 30  # Seconds to wait for container health checks
+  startup_wait_timeout: 120  # Seconds to wait for container startup
+  fallback_to_mock: true  # Fall back to mock if containers fail
+
+  # Container-specific settings
+  neo4j:
+    container_name: "tta-test-neo4j"
+    image: "neo4j:5-community"
+    ports:
+      bolt: 7687
+      http: 7474
+    auth:
+      username: "neo4j"
+      password: "tta_test_password_2024"
+    health_check:
+      method: "both"  # http, bolt, or both
+      endpoint: "http://localhost:7474/db/data/"
+      timeout: 15
+      retries: 8
+
+  redis:
+    container_name: "tta-test-redis"
+    image: "redis:7-alpine"
+    ports:
+      redis: 6379
+    health_check:
+      method: "ping"  # ping or connection
+      timeout: 5
+      retries: 3
+
 # Test Execution Settings
 execution:
   max_concurrent_tests: 5

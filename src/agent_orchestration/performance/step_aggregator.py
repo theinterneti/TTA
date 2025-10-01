@@ -8,16 +8,14 @@ enabling lightweight in-process performance tracking.
 from __future__ import annotations
 
 import threading
-import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional
 
 
 @dataclass
 class StepStats:
     """Statistics for a single step type."""
-    
-    durations_ms: List[float] = field(default_factory=list)
+
+    durations_ms: list[float] = field(default_factory=list)
     max_samples: int = 1000
     successes: int = 0
     errors: int = 0
@@ -33,7 +31,7 @@ class StepStats:
         else:
             self.errors += 1
 
-    def snapshot(self) -> Dict[str, float]:
+    def snapshot(self) -> dict[str, float]:
         """Get current statistics snapshot."""
         arr = list(self.durations_ms)
         if not arr:
@@ -59,7 +57,7 @@ class StepTimingAggregator:
 
     def __init__(self) -> None:
         self._lock = threading.RLock()
-        self._stats: Dict[str, StepStats] = {}
+        self._stats: dict[str, StepStats] = {}
 
     def record(self, agent_key: str, duration_ms: float, success: bool = True) -> None:
         """Record a step execution for an agent."""
@@ -70,10 +68,10 @@ class StepTimingAggregator:
                 self._stats[agent_key] = stats
             stats.record(duration_ms, success)
 
-    def snapshot(self) -> Dict[str, Dict[str, float]]:
+    def snapshot(self) -> dict[str, dict[str, float]]:
         """Get snapshot of all agent statistics."""
         with self._lock:
-            snap: Dict[str, Dict[str, float]] = {}
+            snap: dict[str, dict[str, float]] = {}
             for k, stats in self._stats.items():
                 s = stats.snapshot()
                 s["error_rate"] = stats.error_rate()
@@ -88,4 +86,3 @@ _AGGREGATOR = StepTimingAggregator()
 def get_step_aggregator() -> StepTimingAggregator:
     """Get the global step timing aggregator instance."""
     return _AGGREGATOR
-

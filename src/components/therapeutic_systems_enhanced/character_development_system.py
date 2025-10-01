@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class TherapeuticAttribute(Enum):
     """12 core therapeutic character attributes aligned with evidence-based frameworks."""
+
     COURAGE = "courage"
     WISDOM = "wisdom"
     COMPASSION = "compassion"
@@ -34,6 +35,7 @@ class TherapeuticAttribute(Enum):
 
 class MilestoneType(Enum):
     """Types of therapeutic milestones that can be achieved."""
+
     THERAPEUTIC_BREAKTHROUGH = "therapeutic_breakthrough"
     SKILL_MASTERY = "skill_mastery"
     EMOTIONAL_GROWTH = "emotional_growth"
@@ -47,6 +49,7 @@ class MilestoneType(Enum):
 @dataclass
 class CharacterAttributes:
     """Container for character attribute values and progression."""
+
     courage: float = 5.0
     wisdom: float = 5.0
     compassion: float = 5.0
@@ -90,6 +93,7 @@ class CharacterAttributes:
 @dataclass
 class TherapeuticMilestone:
     """Represents a therapeutic milestone achievement."""
+
     milestone_id: str
     milestone_type: MilestoneType
     title: str
@@ -103,6 +107,7 @@ class TherapeuticMilestone:
 @dataclass
 class CharacterProgressionEvent:
     """Represents a character progression event."""
+
     event_id: str
     character_id: str
     event_type: str
@@ -115,6 +120,7 @@ class CharacterProgressionEvent:
 @dataclass
 class TherapeuticCharacter:
     """Complete therapeutic character with attributes and progression."""
+
     character_id: str
     user_id: str
     name: str
@@ -150,14 +156,32 @@ class TherapeuticCharacterDevelopmentSystem:
         self.attribute_growth_rate = self.config.get("attribute_growth_rate", 0.1)
         self.milestone_threshold = self.config.get("milestone_threshold", 2.0)
         self.max_attribute_value = self.config.get("max_attribute_value", 10.0)
-        self.therapeutic_alignment_bonus = self.config.get("therapeutic_alignment_bonus", 0.2)
+        self.therapeutic_alignment_bonus = self.config.get(
+            "therapeutic_alignment_bonus", 0.2
+        )
 
         # Therapeutic framework mappings
         self.framework_attribute_mappings = {
-            "CBT": [TherapeuticAttribute.SELF_AWARENESS, TherapeuticAttribute.WISDOM, TherapeuticAttribute.RESILIENCE],
-            "DBT": [TherapeuticAttribute.EMOTIONAL_INTELLIGENCE, TherapeuticAttribute.MINDFULNESS, TherapeuticAttribute.ADAPTABILITY],
-            "MINDFULNESS": [TherapeuticAttribute.MINDFULNESS, TherapeuticAttribute.SELF_AWARENESS, TherapeuticAttribute.COMPASSION],
-            "ACT": [TherapeuticAttribute.COURAGE, TherapeuticAttribute.INTEGRITY, TherapeuticAttribute.ADAPTABILITY],
+            "CBT": [
+                TherapeuticAttribute.SELF_AWARENESS,
+                TherapeuticAttribute.WISDOM,
+                TherapeuticAttribute.RESILIENCE,
+            ],
+            "DBT": [
+                TherapeuticAttribute.EMOTIONAL_INTELLIGENCE,
+                TherapeuticAttribute.MINDFULNESS,
+                TherapeuticAttribute.ADAPTABILITY,
+            ],
+            "MINDFULNESS": [
+                TherapeuticAttribute.MINDFULNESS,
+                TherapeuticAttribute.SELF_AWARENESS,
+                TherapeuticAttribute.COMPASSION,
+            ],
+            "ACT": [
+                TherapeuticAttribute.COURAGE,
+                TherapeuticAttribute.INTEGRITY,
+                TherapeuticAttribute.ADAPTABILITY,
+            ],
         }
 
         # Performance metrics
@@ -296,7 +320,9 @@ class TherapeuticCharacterDevelopmentSystem:
         return goal_names.get(primary_goal, "Journey")
 
     def _initialize_character_attributes(
-        self, therapeutic_goals: list[str] | None, initial_attributes: dict[str, float] | None
+        self,
+        therapeutic_goals: list[str] | None,
+        initial_attributes: dict[str, float] | None,
     ) -> CharacterAttributes:
         """Initialize character attributes with therapeutic goal alignment."""
         # Start with base attributes
@@ -318,22 +344,56 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return attributes
 
-    def _calculate_therapeutic_goal_bonuses(self, therapeutic_goals: list[str]) -> dict[str, float]:
+    def _calculate_therapeutic_goal_bonuses(
+        self, therapeutic_goals: list[str]
+    ) -> dict[str, float]:
         """Calculate attribute bonuses based on therapeutic goals."""
         bonuses = {}
 
         # Goal-to-attribute mappings
         goal_mappings = {
-            "anxiety_management": {"mindfulness": 1.0, "resilience": 0.8, "self_awareness": 0.6},
-            "confidence_building": {"courage": 1.2, "confidence": 1.0, "resilience": 0.5},
-            "communication_skills": {"communication": 1.2, "empathy": 0.8, "emotional_intelligence": 0.6},
-            "emotional_regulation": {"emotional_intelligence": 1.0, "mindfulness": 0.8, "self_awareness": 0.7},
-            "mindfulness": {"mindfulness": 1.2, "self_awareness": 0.9, "compassion": 0.6},
+            "anxiety_management": {
+                "mindfulness": 1.0,
+                "resilience": 0.8,
+                "self_awareness": 0.6,
+            },
+            "confidence_building": {
+                "courage": 1.2,
+                "confidence": 1.0,
+                "resilience": 0.5,
+            },
+            "communication_skills": {
+                "communication": 1.2,
+                "empathy": 0.8,
+                "emotional_intelligence": 0.6,
+            },
+            "emotional_regulation": {
+                "emotional_intelligence": 1.0,
+                "mindfulness": 0.8,
+                "self_awareness": 0.7,
+            },
+            "mindfulness": {
+                "mindfulness": 1.2,
+                "self_awareness": 0.9,
+                "compassion": 0.6,
+            },
             "resilience": {"resilience": 1.2, "courage": 0.8, "adaptability": 0.7},
-            "self_awareness": {"self_awareness": 1.2, "wisdom": 0.8, "mindfulness": 0.6},
-            "empathy": {"empathy": 1.2, "compassion": 1.0, "emotional_intelligence": 0.7},
+            "self_awareness": {
+                "self_awareness": 1.2,
+                "wisdom": 0.8,
+                "mindfulness": 0.6,
+            },
+            "empathy": {
+                "empathy": 1.2,
+                "compassion": 1.0,
+                "emotional_intelligence": 0.7,
+            },
             "social_skills": {"communication": 1.0, "empathy": 0.9, "confidence": 0.7},
-            "stress_management": {"resilience": 1.0, "mindfulness": 0.9, "adaptability": 0.6},
+            "stress_management": {
+                "resilience": 1.0,
+                "mindfulness": 0.9,
+                "adaptability": 0.6,
+            },
         }
 
         # Accumulate bonuses from all goals
@@ -351,49 +411,73 @@ class TherapeuticCharacterDevelopmentSystem:
                 "title": "Therapeutic Breakthrough",
                 "description": "Achieved a significant breakthrough in therapeutic understanding",
                 "therapeutic_value": 3.0,
-                "attributes": [TherapeuticAttribute.SELF_AWARENESS, TherapeuticAttribute.WISDOM],
+                "attributes": [
+                    TherapeuticAttribute.SELF_AWARENESS,
+                    TherapeuticAttribute.WISDOM,
+                ],
             },
             MilestoneType.SKILL_MASTERY: {
                 "title": "Skill Mastery",
                 "description": "Mastered a key therapeutic skill or coping strategy",
                 "therapeutic_value": 2.5,
-                "attributes": [TherapeuticAttribute.CONFIDENCE, TherapeuticAttribute.RESILIENCE],
+                "attributes": [
+                    TherapeuticAttribute.CONFIDENCE,
+                    TherapeuticAttribute.RESILIENCE,
+                ],
             },
             MilestoneType.EMOTIONAL_GROWTH: {
                 "title": "Emotional Growth",
                 "description": "Demonstrated significant emotional intelligence development",
                 "therapeutic_value": 2.8,
-                "attributes": [TherapeuticAttribute.EMOTIONAL_INTELLIGENCE, TherapeuticAttribute.EMPATHY],
+                "attributes": [
+                    TherapeuticAttribute.EMOTIONAL_INTELLIGENCE,
+                    TherapeuticAttribute.EMPATHY,
+                ],
             },
             MilestoneType.RELATIONSHIP_IMPROVEMENT: {
                 "title": "Relationship Improvement",
                 "description": "Improved interpersonal relationships and communication",
                 "therapeutic_value": 2.6,
-                "attributes": [TherapeuticAttribute.COMMUNICATION, TherapeuticAttribute.EMPATHY],
+                "attributes": [
+                    TherapeuticAttribute.COMMUNICATION,
+                    TherapeuticAttribute.EMPATHY,
+                ],
             },
             MilestoneType.COPING_STRATEGY_DEVELOPMENT: {
                 "title": "Coping Strategy Development",
                 "description": "Developed effective coping strategies for challenges",
                 "therapeutic_value": 2.4,
-                "attributes": [TherapeuticAttribute.RESILIENCE, TherapeuticAttribute.ADAPTABILITY],
+                "attributes": [
+                    TherapeuticAttribute.RESILIENCE,
+                    TherapeuticAttribute.ADAPTABILITY,
+                ],
             },
             MilestoneType.CONFIDENCE_BUILDING: {
                 "title": "Confidence Building",
                 "description": "Built significant confidence and self-assurance",
                 "therapeutic_value": 2.7,
-                "attributes": [TherapeuticAttribute.CONFIDENCE, TherapeuticAttribute.COURAGE],
+                "attributes": [
+                    TherapeuticAttribute.CONFIDENCE,
+                    TherapeuticAttribute.COURAGE,
+                ],
             },
             MilestoneType.MINDFULNESS_ACHIEVEMENT: {
                 "title": "Mindfulness Achievement",
                 "description": "Achieved mindfulness and present-moment awareness",
                 "therapeutic_value": 2.5,
-                "attributes": [TherapeuticAttribute.MINDFULNESS, TherapeuticAttribute.SELF_AWARENESS],
+                "attributes": [
+                    TherapeuticAttribute.MINDFULNESS,
+                    TherapeuticAttribute.SELF_AWARENESS,
+                ],
             },
             MilestoneType.COMMUNICATION_MILESTONE: {
                 "title": "Communication Milestone",
                 "description": "Reached a significant communication and expression milestone",
                 "therapeutic_value": 2.3,
-                "attributes": [TherapeuticAttribute.COMMUNICATION, TherapeuticAttribute.CONFIDENCE],
+                "attributes": [
+                    TherapeuticAttribute.COMMUNICATION,
+                    TherapeuticAttribute.CONFIDENCE,
+                ],
             },
         }
 
@@ -422,7 +506,9 @@ class TherapeuticCharacterDevelopmentSystem:
 
             # Get user's character
             if user_id not in self.characters:
-                logger.warning(f"No character found for user {user_id}, creating default character")
+                logger.warning(
+                    f"No character found for user {user_id}, creating default character"
+                )
                 await self.create_character(user_id)
 
             character = self.characters[user_id]
@@ -438,18 +524,24 @@ class TherapeuticCharacterDevelopmentSystem:
                     current_value = getattr(character.attributes, attr_name)
 
                     # Apply therapeutic alignment bonus
-                    aligned_bonus = self._calculate_alignment_bonus(attr_name, character.therapeutic_goals)
+                    aligned_bonus = self._calculate_alignment_bonus(
+                        attr_name, character.therapeutic_goals
+                    )
                     adjusted_impact = impact * (1.0 + aligned_bonus)
 
                     # Calculate new value with growth rate
                     change = adjusted_impact * self.attribute_growth_rate
-                    new_value = max(0.0, min(self.max_attribute_value, current_value + change))
+                    new_value = max(
+                        0.0, min(self.max_attribute_value, current_value + change)
+                    )
 
                     setattr(character.attributes, attr_name, new_value)
                     attribute_changes[attr_name] = change
 
             # Check for milestone achievements
-            milestone_achieved = self._check_milestone_achievement(character, attribute_changes, therapeutic_value)
+            milestone_achieved = self._check_milestone_achievement(
+                character, attribute_changes, therapeutic_value
+            )
 
             # Create progression event
             progression_event = CharacterProgressionEvent(
@@ -461,7 +553,9 @@ class TherapeuticCharacterDevelopmentSystem:
                 therapeutic_context={
                     "session_context": session_context,
                     "therapeutic_value": therapeutic_value,
-                    "consequence_type": consequence_data.get("consequence_type", "unknown"),
+                    "consequence_type": consequence_data.get(
+                        "consequence_type", "unknown"
+                    ),
                 },
                 timestamp=start_time,
             )
@@ -488,20 +582,26 @@ class TherapeuticCharacterDevelopmentSystem:
             return {
                 "character_id": character.character_id,
                 "attribute_changes": attribute_changes,
-                "milestone_achieved": milestone_achieved.title if milestone_achieved else None,
+                "milestone_achieved": (
+                    milestone_achieved.title if milestone_achieved else None
+                ),
                 "total_therapeutic_value": character.total_therapeutic_value,
                 "processing_time": processing_time.total_seconds(),
             }
 
         except Exception as e:
-            logger.error(f"Error processing therapeutic consequence for user {user_id}: {e}")
+            logger.error(
+                f"Error processing therapeutic consequence for user {user_id}: {e}"
+            )
             return {
                 "error": str(e),
                 "character_id": None,
                 "attribute_changes": {},
             }
 
-    def _calculate_alignment_bonus(self, attribute_name: str, therapeutic_goals: list[str]) -> float:
+    def _calculate_alignment_bonus(
+        self, attribute_name: str, therapeutic_goals: list[str]
+    ) -> float:
         """Calculate therapeutic alignment bonus for attribute growth."""
         if not therapeutic_goals:
             return 0.0
@@ -511,12 +611,17 @@ class TherapeuticCharacterDevelopmentSystem:
         for goal in therapeutic_goals:
             goal_bonuses = self._calculate_therapeutic_goal_bonuses([goal])
             if attribute_name in goal_bonuses:
-                alignment_score += goal_bonuses[attribute_name] * self.therapeutic_alignment_bonus
+                alignment_score += (
+                    goal_bonuses[attribute_name] * self.therapeutic_alignment_bonus
+                )
 
         return min(0.5, alignment_score)  # Cap bonus at 50%
 
     def _check_milestone_achievement(
-        self, character: TherapeuticCharacter, attribute_changes: dict[str, float], therapeutic_value: float
+        self,
+        character: TherapeuticCharacter,
+        attribute_changes: dict[str, float],
+        therapeutic_value: float,
     ) -> TherapeuticMilestone | None:
         """Check if character has achieved a therapeutic milestone."""
         # Check if therapeutic value meets milestone threshold
@@ -524,7 +629,9 @@ class TherapeuticCharacterDevelopmentSystem:
             return None
 
         # Determine milestone type based on attribute changes and therapeutic value
-        milestone_type = self._determine_milestone_type(attribute_changes, therapeutic_value)
+        milestone_type = self._determine_milestone_type(
+            attribute_changes, therapeutic_value
+        )
         if not milestone_type:
             return None
 
@@ -546,7 +653,9 @@ class TherapeuticCharacterDevelopmentSystem:
 
         return milestone
 
-    def _determine_milestone_type(self, attribute_changes: dict[str, float], therapeutic_value: float) -> MilestoneType | None:
+    def _determine_milestone_type(
+        self, attribute_changes: dict[str, float], therapeutic_value: float
+    ) -> MilestoneType | None:
         """Determine the type of milestone based on attribute changes."""
         if not attribute_changes:
             return None
@@ -593,10 +702,14 @@ class TherapeuticCharacterDevelopmentSystem:
             average_level = total_level / len(attributes_dict)
 
             # Get top attributes
-            top_attributes = sorted(attributes_dict.items(), key=lambda x: x[1], reverse=True)[:3]
+            top_attributes = sorted(
+                attributes_dict.items(), key=lambda x: x[1], reverse=True
+            )[:3]
 
             # Get recent milestones
-            recent_milestones = sorted(character.milestones, key=lambda x: x.achievement_date, reverse=True)[:5]
+            recent_milestones = sorted(
+                character.milestones, key=lambda x: x.achievement_date, reverse=True
+            )[:5]
 
             # Calculate progression rate
             progression_rate = self._calculate_progression_rate(character)
@@ -608,7 +721,9 @@ class TherapeuticCharacterDevelopmentSystem:
                 "total_therapeutic_value": character.total_therapeutic_value,
                 "session_count": character.session_count,
                 "attributes": attributes_dict,
-                "top_attributes": [{"name": name, "value": value} for name, value in top_attributes],
+                "top_attributes": [
+                    {"name": name, "value": value} for name, value in top_attributes
+                ],
                 "milestone_count": len(character.milestones),
                 "recent_milestones": [
                     {
@@ -637,7 +752,8 @@ class TherapeuticCharacterDevelopmentSystem:
         # Look at events from the last 7 days
         cutoff_date = datetime.utcnow() - timedelta(days=7)
         recent_events = [
-            event for event in character.progression_events
+            event
+            for event in character.progression_events
             if event.timestamp > cutoff_date
         ]
 
@@ -658,8 +774,12 @@ class TherapeuticCharacterDevelopmentSystem:
             return {
                 "status": "healthy",
                 "characters_tracked": len(self.characters),
-                "total_milestones": sum(len(char.milestones) for char in self.characters.values()),
-                "total_progression_events": sum(len(char.progression_events) for char in self.characters.values()),
+                "total_milestones": sum(
+                    len(char.milestones) for char in self.characters.values()
+                ),
+                "total_progression_events": sum(
+                    len(char.progression_events) for char in self.characters.values()
+                ),
                 "therapeutic_attributes": len(TherapeuticAttribute),
                 "milestone_types": len(MilestoneType),
                 "framework_mappings": len(self.framework_attribute_mappings),
@@ -682,7 +802,9 @@ class TherapeuticCharacterDevelopmentSystem:
 
         average_therapeutic_value = 0.0
         if self.characters:
-            total_value = sum(char.total_therapeutic_value for char in self.characters.values())
+            total_value = sum(
+                char.total_therapeutic_value for char in self.characters.values()
+            )
             average_therapeutic_value = total_value / len(self.characters)
 
         return {

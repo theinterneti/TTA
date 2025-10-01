@@ -1,15 +1,17 @@
 """
 ToolInvocationService: Centralized entry point for dynamic tool executions.
 """
+
 from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Any, Awaitable, Callable, Dict, Optional
+from collections.abc import Callable
+from typing import Any
 
-from .models import ToolSpec, ToolPolicy
+from .coordinator import FactoryFn, ToolCoordinator
+from .models import ToolPolicy, ToolSpec
 from .redis_tool_registry import RedisToolRegistry
-from .coordinator import ToolCoordinator, FactoryFn
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +29,8 @@ class ToolInvocationService:
         coordinator: ToolCoordinator,
         policy: ToolPolicy,
         *,
-        callable_resolver: Optional[Callable[[ToolSpec], Callable[..., Any]]] = None,
-        on_error: Optional[Callable[[Exception, ToolSpec], Any]] = None,
+        callable_resolver: Callable[[ToolSpec], Callable[..., Any]] | None = None,
+        on_error: Callable[[Exception, ToolSpec], Any] | None = None,
     ) -> None:
         self._registry = registry
         self._coord = coordinator
@@ -36,7 +38,9 @@ class ToolInvocationService:
         self._resolve = callable_resolver
         self._on_error = on_error
 
-    async def invoke_tool(self, tool_name: str, version: Optional[str], arguments: Dict[str, Any]) -> Any:
+    async def invoke_tool(
+        self, tool_name: str, version: str | None, arguments: dict[str, Any]
+    ) -> Any:
         spec = await self._registry.get_tool(tool_name, version)
         if not spec:
             raise ValueError(f"Tool not found: {tool_name} {version or '(latest)'}")
@@ -61,7 +65,9 @@ class ToolInvocationService:
                 return self._on_error(e, spec)
             raise
 
-    async def invoke_tool_by_spec(self, spec: ToolSpec, callable_fn: Callable[..., Any], *args, **kwargs) -> Any:
+    async def invoke_tool_by_spec(
+        self, spec: ToolSpec, callable_fn: Callable[..., Any], *args, **kwargs
+    ) -> Any:
         # Policy checks: safety and allowlist
         try:
             if hasattr(self._policy, "validate_safety_flags"):
@@ -73,7 +79,9 @@ class ToolInvocationService:
         try:
             return await self._coord.run_tool(spec, callable_fn, *args, **kwargs)
         except Exception as e:
-            logger.exception("Tool invocation by spec failed: %s %s", spec.name, spec.version)
+            logger.exception(
+                "Tool invocation by spec failed: %s %s", spec.name, spec.version
+            )
             if self._on_error:
                 return self._on_error(e, spec)
             raise
@@ -98,25 +106,37 @@ class ToolInvocationService:
         try:
             return await self._coord.run_tool(spec, callable_fn, *args, **kwargs)
         except Exception as e:
-            logger.exception("Tool register+invoke failed: %s %s", spec.name, spec.version)
+            logger.exception(
+                "Tool register+invoke failed: %s %s", spec.name, spec.version
+            )
             if self._on_error:
                 return self._on_error(e, spec)
             raise
 
     # Synchronous wrappers
-    def invoke_tool_sync(self, tool_name: str, version: Optional[str], arguments: Dict[str, Any]) -> Any:
+    def invoke_tool_sync(
+        self, tool_name: str, version: str | None, arguments: dict[str, Any]
+    ) -> Any:
         try:
             loop = asyncio.get_running_loop()
-            raise RuntimeError("invoke_tool_sync cannot run inside an active event loop")
+            raise RuntimeError(
+                "invoke_tool_sync cannot run inside an active event loop"
+            )
         except RuntimeError:
             return asyncio.run(self.invoke_tool(tool_name, version, arguments))
 
-    def invoke_tool_by_spec_sync(self, spec: ToolSpec, callable_fn: Callable[..., Any], *args, **kwargs) -> Any:
+    def invoke_tool_by_spec_sync(
+        self, spec: ToolSpec, callable_fn: Callable[..., Any], *args, **kwargs
+    ) -> Any:
         try:
             loop = asyncio.get_running_loop()
-            raise RuntimeError("invoke_tool_by_spec_sync cannot run inside an active event loop")
+            raise RuntimeError(
+                "invoke_tool_by_spec_sync cannot run inside an active event loop"
+            )
         except RuntimeError:
-            return asyncio.run(self.invoke_tool_by_spec(spec, callable_fn, *args, **kwargs))
+            return asyncio.run(
+                self.invoke_tool_by_spec(spec, callable_fn, *args, **kwargs)
+            )
 
     def register_and_invoke_sync(
         self,
@@ -128,7 +148,12 @@ class ToolInvocationService:
     ) -> Any:
         try:
             loop = asyncio.get_running_loop()
-            raise RuntimeError("register_and_invoke_sync cannot run inside an active event loop")
+            raise RuntimeError(
+                "register_and_invoke_sync cannot run inside an active event loop"
+            )
         except RuntimeError:
-            return asyncio.run(self.register_and_invoke(factory_fn, signature, callable_fn, *args, **kwargs))
-
+            return asyncio.run(
+                self.register_and_invoke(
+                    factory_fn, signature, callable_fn, *args, **kwargs
+                )
+            )

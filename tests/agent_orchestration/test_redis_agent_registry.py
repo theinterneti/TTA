@@ -1,9 +1,8 @@
 import asyncio
 import json
-import time
+
 import pytest
 
-from src.agent_orchestration import AgentId, AgentType
 from src.agent_orchestration.proxies import InputProcessorAgentProxy
 from src.agent_orchestration.registries import RedisAgentRegistry
 
@@ -56,4 +55,3 @@ async def test_snapshot_async_combines_local_and_redis(redis_client):
     assert "local" in snap and "redis_index" in snap
     assert a.name in snap["local"]
     assert any((d.get("name") == a.name) for d in snap["redis_index"])
-

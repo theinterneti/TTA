@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 class ExplorationMode(Enum):
     """Modes of therapeutic exploration."""
+
     SANDBOX = "sandbox"  # Free exploration without guidance
     GUIDED = "guided"  # Guided exploration with therapeutic insights
     COMPARATIVE = "comparative"  # Compare different therapeutic approaches
@@ -28,6 +29,7 @@ class ExplorationMode(Enum):
 
 class PathType(Enum):
     """Types of alternative paths for exploration."""
+
     CHOICE_ALTERNATIVE = "choice_alternative"  # Different choice at decision point
     THERAPEUTIC_APPROACH = "therapeutic_approach"  # Different therapeutic framework
     CHARACTER_DEVELOPMENT = "character_development"  # Different character growth path
@@ -38,6 +40,7 @@ class PathType(Enum):
 
 class ComparisonMetric(Enum):
     """Metrics for comparing alternative paths."""
+
     THERAPEUTIC_VALUE = "therapeutic_value"
     CHARACTER_GROWTH = "character_growth"
     EMOTIONAL_WELLBEING = "emotional_wellbeing"
@@ -51,6 +54,7 @@ class ComparisonMetric(Enum):
 @dataclass
 class ExplorationSnapshot:
     """Snapshot of session state for safe exploration."""
+
     snapshot_id: str = field(default_factory=lambda: str(uuid4()))
     session_id: str = ""
     user_id: str = ""
@@ -76,6 +80,7 @@ class ExplorationSnapshot:
 @dataclass
 class AlternativePath:
     """Represents an alternative therapeutic path for exploration."""
+
     path_id: str = field(default_factory=lambda: str(uuid4()))
     exploration_id: str = ""
     snapshot_id: str = ""
@@ -105,6 +110,7 @@ class AlternativePath:
 @dataclass
 class PathComparison:
     """Comparison analysis between alternative therapeutic paths."""
+
     comparison_id: str = field(default_factory=lambda: str(uuid4()))
     exploration_id: str = ""
 
@@ -113,7 +119,9 @@ class PathComparison:
     comparison_metrics: list[ComparisonMetric] = field(default_factory=list)
 
     # Comparison results
-    metric_scores: dict[str, dict[str, float]] = field(default_factory=dict)  # metric -> path_id -> score
+    metric_scores: dict[str, dict[str, float]] = field(
+        default_factory=dict
+    )  # metric -> path_id -> score
     overall_rankings: dict[str, int] = field(default_factory=dict)  # path_id -> rank
 
     # Insights and recommendations
@@ -131,6 +139,7 @@ class PathComparison:
 @dataclass
 class ExplorationSession:
     """Manages a therapeutic exploration session."""
+
     exploration_id: str = field(default_factory=lambda: str(uuid4()))
     user_id: str = ""
     base_session_id: str = ""
@@ -188,7 +197,9 @@ class TherapeuticReplayabilitySystem:
         self.max_snapshots_per_user = self.config.get("max_snapshots_per_user", 10)
         self.max_paths_per_exploration = self.config.get("max_paths_per_exploration", 5)
         self.snapshot_retention_days = self.config.get("snapshot_retention_days", 30)
-        self.enable_predictive_analysis = self.config.get("enable_predictive_analysis", True)
+        self.enable_predictive_analysis = self.config.get(
+            "enable_predictive_analysis", True
+        )
 
         # Performance metrics
         self.metrics = {
@@ -260,9 +271,13 @@ class TherapeuticReplayabilitySystem:
                 session_phase=preserved_state.get("current_phase", "unknown"),
                 character_state=preserved_state.get("character_attributes", {}),
                 therapeutic_progress={
-                    "therapeutic_value": preserved_state.get("therapeutic_value_accumulated", 0.0),
+                    "therapeutic_value": preserved_state.get(
+                        "therapeutic_value_accumulated", 0.0
+                    ),
                     "choices_made": preserved_state.get("choices_made", 0),
-                    "milestones_achieved": preserved_state.get("milestones_achieved", 0),
+                    "milestones_achieved": preserved_state.get(
+                        "milestones_achieved", 0
+                    ),
                 },
                 choice_history=preserved_state.get("choice_history", []),
                 scenario_context=preserved_state.get("scenario_context", {}),
@@ -397,7 +412,9 @@ class TherapeuticReplayabilitySystem:
             snapshot = self.exploration_snapshots.get(snapshot_id)
 
             if not exploration or not snapshot:
-                raise ValueError(f"Invalid exploration {exploration_id} or snapshot {snapshot_id}")
+                raise ValueError(
+                    f"Invalid exploration {exploration_id} or snapshot {snapshot_id}"
+                )
 
             # Create alternative path
             path = AlternativePath(
@@ -411,11 +428,21 @@ class TherapeuticReplayabilitySystem:
 
             # Generate predicted outcomes if predictive analysis is enabled
             if self.enable_predictive_analysis:
-                path.predicted_outcomes = await self._predict_path_outcomes(path, snapshot)
-                path.therapeutic_value = path.predicted_outcomes.get("therapeutic_value", 0.0)
-                path.character_impact = path.predicted_outcomes.get("character_impact", {})
-                path.learning_opportunities = path.predicted_outcomes.get("learning_opportunities", [])
-                path.safety_considerations = path.predicted_outcomes.get("safety_considerations", [])
+                path.predicted_outcomes = await self._predict_path_outcomes(
+                    path, snapshot
+                )
+                path.therapeutic_value = path.predicted_outcomes.get(
+                    "therapeutic_value", 0.0
+                )
+                path.character_impact = path.predicted_outcomes.get(
+                    "character_impact", {}
+                )
+                path.learning_opportunities = path.predicted_outcomes.get(
+                    "learning_opportunities", []
+                )
+                path.safety_considerations = path.predicted_outcomes.get(
+                    "safety_considerations", []
+                )
 
             # Store alternative path
             self.alternative_paths[path.path_id] = path
@@ -441,7 +468,9 @@ class TherapeuticReplayabilitySystem:
             return path
 
         except Exception as e:
-            logger.error(f"Error creating alternative path for exploration {exploration_id}: {e}")
+            logger.error(
+                f"Error creating alternative path for exploration {exploration_id}: {e}"
+            )
 
             # Return minimal path
             return AlternativePath(
@@ -505,18 +534,32 @@ class TherapeuticReplayabilitySystem:
             )
 
             # Calculate metric scores for each path
-            comparison.metric_scores = await self._calculate_metric_scores(paths, comparison_metrics)
+            comparison.metric_scores = await self._calculate_metric_scores(
+                paths, comparison_metrics
+            )
 
             # Generate overall rankings
-            comparison.overall_rankings = await self._generate_path_rankings(paths, comparison.metric_scores)
+            comparison.overall_rankings = await self._generate_path_rankings(
+                paths, comparison.metric_scores
+            )
 
             # Generate insights and recommendations
             comparison.key_differences = await self._identify_key_differences(paths)
-            comparison.therapeutic_insights = await self._generate_therapeutic_insights(paths, comparison.metric_scores)
-            comparison.character_development_insights = await self._generate_character_insights(paths)
-            comparison.recommended_approach = await self._recommend_best_approach(paths, comparison.metric_scores)
-            comparison.recommendation_reasoning = await self._generate_recommendation_reasoning(paths, comparison)
-            comparison.learning_opportunities = await self._identify_learning_opportunities(paths, comparison)
+            comparison.therapeutic_insights = await self._generate_therapeutic_insights(
+                paths, comparison.metric_scores
+            )
+            comparison.character_development_insights = (
+                await self._generate_character_insights(paths)
+            )
+            comparison.recommended_approach = await self._recommend_best_approach(
+                paths, comparison.metric_scores
+            )
+            comparison.recommendation_reasoning = (
+                await self._generate_recommendation_reasoning(paths, comparison)
+            )
+            comparison.learning_opportunities = (
+                await self._identify_learning_opportunities(paths, comparison)
+            )
 
             # Store comparison
             self.path_comparisons[comparison.comparison_id] = comparison
@@ -576,9 +619,13 @@ class TherapeuticReplayabilitySystem:
                 "user_id": snapshot.user_id,
                 "current_phase": snapshot.session_phase,
                 "character_attributes": snapshot.character_state.copy(),
-                "therapeutic_value_accumulated": snapshot.therapeutic_progress.get("therapeutic_value", 0.0),
+                "therapeutic_value_accumulated": snapshot.therapeutic_progress.get(
+                    "therapeutic_value", 0.0
+                ),
                 "choices_made": snapshot.therapeutic_progress.get("choices_made", 0),
-                "milestones_achieved": snapshot.therapeutic_progress.get("milestones_achieved", 0),
+                "milestones_achieved": snapshot.therapeutic_progress.get(
+                    "milestones_achieved", 0
+                ),
                 "choice_history": snapshot.choice_history.copy(),
                 "scenario_context": snapshot.scenario_context.copy(),
                 "therapeutic_goals": snapshot.therapeutic_goals.copy(),
@@ -589,7 +636,9 @@ class TherapeuticReplayabilitySystem:
 
             # If we have a gameplay loop controller, restore through it
             if self.gameplay_loop_controller:
-                restoration_result = await self._restore_through_controller(restored_state, target_session_id)
+                restoration_result = await self._restore_through_controller(
+                    restored_state, target_session_id
+                )
             else:
                 restoration_result = {"restored": True, "method": "direct"}
 
@@ -604,7 +653,9 @@ class TherapeuticReplayabilitySystem:
                 "processing_time": processing_time.total_seconds(),
             }
 
-            logger.info(f"Restored session from snapshot {snapshot_id} in {response['processing_time']:.3f}s")
+            logger.info(
+                f"Restored session from snapshot {snapshot_id} in {response['processing_time']:.3f}s"
+            )
 
             return response
 
@@ -619,7 +670,9 @@ class TherapeuticReplayabilitySystem:
 
     # Helper methods for therapeutic system integration
 
-    async def _predict_path_outcomes(self, path: AlternativePath, snapshot: ExplorationSnapshot) -> dict[str, Any]:
+    async def _predict_path_outcomes(
+        self, path: AlternativePath, snapshot: ExplorationSnapshot
+    ) -> dict[str, Any]:
         """Predict outcomes for an alternative path using therapeutic systems."""
         try:
             predicted_outcomes = {
@@ -633,17 +686,24 @@ class TherapeuticReplayabilitySystem:
             if self.consequence_system and path.alternative_choices:
                 for choice in path.alternative_choices:
                     try:
-                        consequence = await self.consequence_system.process_choice_consequence(
-                            user_id=snapshot.user_id,
-                            choice=choice.get("text", ""),
-                            scenario_context=snapshot.scenario_context,
+                        consequence = (
+                            await self.consequence_system.process_choice_consequence(
+                                user_id=snapshot.user_id,
+                                choice=choice.get("text", ""),
+                                scenario_context=snapshot.scenario_context,
+                            )
                         )
-                        predicted_outcomes["therapeutic_value"] += consequence.get("therapeutic_value", 0.0)
+                        predicted_outcomes["therapeutic_value"] += consequence.get(
+                            "therapeutic_value", 0.0
+                        )
 
                         # Merge character impact
                         char_impact = consequence.get("character_impact", {})
                         for attr, value in char_impact.items():
-                            predicted_outcomes["character_impact"][attr] = predicted_outcomes["character_impact"].get(attr, 0.0) + value
+                            predicted_outcomes["character_impact"][attr] = (
+                                predicted_outcomes["character_impact"].get(attr, 0.0)
+                                + value
+                            )
                     except Exception as e:
                         logger.debug(f"Error predicting consequence: {e}")
 
@@ -657,7 +717,9 @@ class TherapeuticReplayabilitySystem:
                     )
 
                     for rec in recommendations[:3]:  # Top 3 recommendations
-                        predicted_outcomes["learning_opportunities"].append(f"Explore {rec.framework.value} approach")
+                        predicted_outcomes["learning_opportunities"].append(
+                            f"Explore {rec.framework.value} approach"
+                        )
                 except Exception as e:
                     logger.debug(f"Error predicting learning opportunities: {e}")
 
@@ -665,16 +727,25 @@ class TherapeuticReplayabilitySystem:
             if self.emotional_safety_system and path.alternative_choices:
                 for choice in path.alternative_choices:
                     try:
-                        safety_assessment = await self.emotional_safety_system.assess_crisis_risk(
-                            user_id=snapshot.user_id,
-                            user_input=choice.get("text", ""),
-                            session_context=snapshot.scenario_context,
+                        safety_assessment = (
+                            await self.emotional_safety_system.assess_crisis_risk(
+                                user_id=snapshot.user_id,
+                                user_input=choice.get("text", ""),
+                                session_context=snapshot.scenario_context,
+                            )
                         )
 
                         if safety_assessment.get("crisis_detected", False):
-                            predicted_outcomes["safety_considerations"].append("Crisis risk detected - proceed with caution")
-                        elif safety_assessment.get("safety_level", "standard") == "elevated":
-                            predicted_outcomes["safety_considerations"].append("Elevated emotional sensitivity - monitor closely")
+                            predicted_outcomes["safety_considerations"].append(
+                                "Crisis risk detected - proceed with caution"
+                            )
+                        elif (
+                            safety_assessment.get("safety_level", "standard")
+                            == "elevated"
+                        ):
+                            predicted_outcomes["safety_considerations"].append(
+                                "Elevated emotional sensitivity - monitor closely"
+                            )
                     except Exception as e:
                         logger.debug(f"Error assessing safety: {e}")
 
@@ -682,9 +753,16 @@ class TherapeuticReplayabilitySystem:
 
         except Exception as e:
             logger.error(f"Error predicting path outcomes: {e}")
-            return {"therapeutic_value": 0.0, "character_impact": {}, "learning_opportunities": [], "safety_considerations": []}
+            return {
+                "therapeutic_value": 0.0,
+                "character_impact": {},
+                "learning_opportunities": [],
+                "safety_considerations": [],
+            }
 
-    async def _calculate_metric_scores(self, paths: list[AlternativePath], metrics: list[ComparisonMetric]) -> dict[str, dict[str, float]]:
+    async def _calculate_metric_scores(
+        self, paths: list[AlternativePath], metrics: list[ComparisonMetric]
+    ) -> dict[str, dict[str, float]]:
         """Calculate metric scores for path comparison."""
         try:
             scores = {}
@@ -697,17 +775,23 @@ class TherapeuticReplayabilitySystem:
                         scores[metric.value][path.path_id] = path.therapeutic_value
                     elif metric == ComparisonMetric.CHARACTER_GROWTH:
                         # Sum of positive character impacts
-                        char_growth = sum(max(0, v) for v in path.character_impact.values())
+                        char_growth = sum(
+                            max(0, v) for v in path.character_impact.values()
+                        )
                         scores[metric.value][path.path_id] = char_growth
                     elif metric == ComparisonMetric.LEARNING_OUTCOMES:
-                        scores[metric.value][path.path_id] = len(path.learning_opportunities)
+                        scores[metric.value][path.path_id] = len(
+                            path.learning_opportunities
+                        )
                     elif metric == ComparisonMetric.SAFETY_SCORE:
                         # Inverse of safety considerations (fewer = better)
                         safety_score = max(0, 10 - len(path.safety_considerations))
                         scores[metric.value][path.path_id] = safety_score
                     else:
                         # Default scoring
-                        scores[metric.value][path.path_id] = path.therapeutic_value * 0.5
+                        scores[metric.value][path.path_id] = (
+                            path.therapeutic_value * 0.5
+                        )
 
             return scores
 
@@ -715,7 +799,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error calculating metric scores: {e}")
             return {}
 
-    async def _generate_path_rankings(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> dict[str, int]:
+    async def _generate_path_rankings(
+        self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]
+    ) -> dict[str, int]:
         """Generate overall rankings for paths based on metric scores."""
         try:
             # Calculate weighted average scores
@@ -745,7 +831,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating path rankings: {e}")
             return {}
 
-    async def _identify_key_differences(self, paths: list[AlternativePath]) -> list[str]:
+    async def _identify_key_differences(
+        self, paths: list[AlternativePath]
+    ) -> list[str]:
         """Identify key differences between alternative paths."""
         try:
             differences = []
@@ -753,7 +841,9 @@ class TherapeuticReplayabilitySystem:
             # Compare therapeutic values
             therapeutic_values = [path.therapeutic_value for path in paths]
             if max(therapeutic_values) - min(therapeutic_values) > 1.0:
-                differences.append(f"Therapeutic value varies significantly ({min(therapeutic_values):.1f} to {max(therapeutic_values):.1f})")
+                differences.append(
+                    f"Therapeutic value varies significantly ({min(therapeutic_values):.1f} to {max(therapeutic_values):.1f})"
+                )
 
             # Compare character impacts
             all_attributes = set()
@@ -763,7 +853,9 @@ class TherapeuticReplayabilitySystem:
             for attr in all_attributes:
                 attr_values = [path.character_impact.get(attr, 0.0) for path in paths]
                 if max(attr_values) - min(attr_values) > 0.5:
-                    differences.append(f"{attr.title()} development varies between paths")
+                    differences.append(
+                        f"{attr.title()} development varies between paths"
+                    )
 
             # Compare learning opportunities
             learning_counts = [len(path.learning_opportunities) for path in paths]
@@ -781,7 +873,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error identifying key differences: {e}")
             return ["Error analyzing path differences"]
 
-    async def _generate_therapeutic_insights(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> list[str]:
+    async def _generate_therapeutic_insights(
+        self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]
+    ) -> list[str]:
         """Generate therapeutic insights from path comparison."""
         try:
             insights = []
@@ -793,25 +887,35 @@ class TherapeuticReplayabilitySystem:
                 best_path = next((p for p in paths if p.path_id == best_path_id), None)
 
                 if best_path:
-                    insights.append(f"'{best_path.path_name}' shows highest therapeutic potential")
+                    insights.append(
+                        f"'{best_path.path_name}' shows highest therapeutic potential"
+                    )
 
                     if best_path.learning_opportunities:
-                        insights.append(f"This path offers: {', '.join(best_path.learning_opportunities[:2])}")
+                        insights.append(
+                            f"This path offers: {', '.join(best_path.learning_opportunities[:2])}"
+                        )
 
             # Analyze character development patterns
             char_insights = []
             for path in paths:
                 if path.character_impact:
-                    strongest_impact = max(path.character_impact.items(), key=lambda x: abs(x[1]))
+                    strongest_impact = max(
+                        path.character_impact.items(), key=lambda x: abs(x[1])
+                    )
                     if abs(strongest_impact[1]) > 0.5:
-                        char_insights.append(f"'{path.path_name}' significantly impacts {strongest_impact[0]}")
+                        char_insights.append(
+                            f"'{path.path_name}' significantly impacts {strongest_impact[0]}"
+                        )
 
             insights.extend(char_insights[:2])  # Limit character insights
 
             # Safety insights
             risky_paths = [p for p in paths if p.safety_considerations]
             if risky_paths:
-                insights.append(f"{len(risky_paths)} path(s) require additional safety monitoring")
+                insights.append(
+                    f"{len(risky_paths)} path(s) require additional safety monitoring"
+                )
 
             return insights[:5]  # Limit to top 5 insights
 
@@ -819,7 +923,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating therapeutic insights: {e}")
             return ["Error generating therapeutic insights"]
 
-    async def _generate_character_insights(self, paths: list[AlternativePath]) -> list[str]:
+    async def _generate_character_insights(
+        self, paths: list[AlternativePath]
+    ) -> list[str]:
         """Generate character development insights from path comparison."""
         try:
             insights = []
@@ -830,22 +936,31 @@ class TherapeuticReplayabilitySystem:
                 all_attributes.update(path.character_impact.keys())
 
             for attr in all_attributes:
-                attr_impacts = [(path.path_name, path.character_impact.get(attr, 0.0)) for path in paths]
+                attr_impacts = [
+                    (path.path_name, path.character_impact.get(attr, 0.0))
+                    for path in paths
+                ]
                 attr_impacts.sort(key=lambda x: abs(x[1]), reverse=True)
 
                 if attr_impacts and abs(attr_impacts[0][1]) > 0.3:
-                    insights.append(f"'{attr_impacts[0][0]}' has strongest impact on {attr} development")
+                    insights.append(
+                        f"'{attr_impacts[0][0]}' has strongest impact on {attr} development"
+                    )
 
             # Find paths with balanced character development
             balanced_paths = []
             for path in paths:
                 if len(path.character_impact) >= 3:
                     impact_values = list(path.character_impact.values())
-                    if max(impact_values) - min(impact_values) < 1.0:  # Relatively balanced
+                    if (
+                        max(impact_values) - min(impact_values) < 1.0
+                    ):  # Relatively balanced
                         balanced_paths.append(path.path_name)
 
             if balanced_paths:
-                insights.append(f"Balanced character development: {', '.join(balanced_paths[:2])}")
+                insights.append(
+                    f"Balanced character development: {', '.join(balanced_paths[:2])}"
+                )
 
             return insights[:3]  # Limit to top 3 insights
 
@@ -853,7 +968,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating character insights: {e}")
             return ["Error analyzing character development patterns"]
 
-    async def _recommend_best_approach(self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]) -> str | None:
+    async def _recommend_best_approach(
+        self, paths: list[AlternativePath], metric_scores: dict[str, dict[str, float]]
+    ) -> str | None:
         """Recommend the best therapeutic approach based on analysis."""
         try:
             if not paths or not metric_scores:
@@ -886,17 +1003,24 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error recommending best approach: {e}")
             return None
 
-    async def _generate_recommendation_reasoning(self, paths: list[AlternativePath], comparison: PathComparison) -> str:
+    async def _generate_recommendation_reasoning(
+        self, paths: list[AlternativePath], comparison: PathComparison
+    ) -> str:
         """Generate reasoning for the recommended approach."""
         try:
             if not comparison.recommended_approach:
                 return "No clear recommendation could be determined from the analysis."
 
-            recommended_path = next((p for p in paths if p.path_name == comparison.recommended_approach), None)
+            recommended_path = next(
+                (p for p in paths if p.path_name == comparison.recommended_approach),
+                None,
+            )
             if not recommended_path:
                 return "Recommended approach not found in analyzed paths."
 
-            reasoning_parts = [f"'{comparison.recommended_approach}' is recommended because it"]
+            reasoning_parts = [
+                f"'{comparison.recommended_approach}' is recommended because it"
+            ]
 
             # Add therapeutic value reasoning
             if recommended_path.therapeutic_value > 2.0:
@@ -904,9 +1028,13 @@ class TherapeuticReplayabilitySystem:
 
             # Add character development reasoning
             if recommended_path.character_impact:
-                strongest_impact = max(recommended_path.character_impact.items(), key=lambda x: abs(x[1]))
+                strongest_impact = max(
+                    recommended_path.character_impact.items(), key=lambda x: abs(x[1])
+                )
                 if abs(strongest_impact[1]) > 0.5:
-                    reasoning_parts.append(f"significantly develops {strongest_impact[0]}")
+                    reasoning_parts.append(
+                        f"significantly develops {strongest_impact[0]}"
+                    )
 
             # Add safety reasoning
             if len(recommended_path.safety_considerations) == 0:
@@ -917,7 +1045,9 @@ class TherapeuticReplayabilitySystem:
                 reasoning_parts.append("offers valuable learning opportunities")
 
             if len(reasoning_parts) == 1:
-                reasoning_parts.append("demonstrates overall balanced therapeutic benefits")
+                reasoning_parts.append(
+                    "demonstrates overall balanced therapeutic benefits"
+                )
 
             return " and ".join(reasoning_parts) + "."
 
@@ -925,19 +1055,25 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error generating recommendation reasoning: {e}")
             return "Unable to generate reasoning for recommendation."
 
-    async def _identify_learning_opportunities(self, paths: list[AlternativePath], comparison: PathComparison) -> list[str]:
+    async def _identify_learning_opportunities(
+        self, paths: list[AlternativePath], comparison: PathComparison
+    ) -> list[str]:
         """Identify learning opportunities from path comparison."""
         try:
             opportunities = []
 
             # Learning from differences
             if comparison.key_differences:
-                opportunities.append("Compare different therapeutic approaches and their outcomes")
+                opportunities.append(
+                    "Compare different therapeutic approaches and their outcomes"
+                )
 
             # Learning from character development
             char_paths = [p for p in paths if p.character_impact]
             if len(char_paths) > 1:
-                opportunities.append("Explore how different choices affect character development")
+                opportunities.append(
+                    "Explore how different choices affect character development"
+                )
 
             # Learning from therapeutic frameworks
             framework_variety = set()
@@ -948,19 +1084,25 @@ class TherapeuticReplayabilitySystem:
                             framework_variety.add(opp)
 
             if framework_variety:
-                opportunities.append("Experience different therapeutic frameworks in practice")
+                opportunities.append(
+                    "Experience different therapeutic frameworks in practice"
+                )
 
             # Learning from safety considerations
             risky_paths = [p for p in paths if p.safety_considerations]
             safe_paths = [p for p in paths if not p.safety_considerations]
 
             if risky_paths and safe_paths:
-                opportunities.append("Understand the safety implications of different choices")
+                opportunities.append(
+                    "Understand the safety implications of different choices"
+                )
 
             # Learning from outcome prediction
             executed_paths = [p for p in paths if p.is_executed]
             if executed_paths:
-                opportunities.append("Compare predicted vs actual outcomes for better decision-making")
+                opportunities.append(
+                    "Compare predicted vs actual outcomes for better decision-making"
+                )
 
             return opportunities[:5]  # Limit to top 5 opportunities
 
@@ -968,7 +1110,9 @@ class TherapeuticReplayabilitySystem:
             logger.error(f"Error identifying learning opportunities: {e}")
             return ["Explore alternative approaches to gain therapeutic insights"]
 
-    async def _restore_through_controller(self, restored_state: dict[str, Any], target_session_id: str) -> dict[str, Any]:
+    async def _restore_through_controller(
+        self, restored_state: dict[str, Any], target_session_id: str
+    ) -> dict[str, Any]:
         """Restore session state through gameplay loop controller."""
         try:
             # This would integrate with the gameplay loop controller to restore state
@@ -1011,7 +1155,9 @@ class TherapeuticReplayabilitySystem:
                     user_snapshots.remove(snapshot_id)
 
             # Remove snapshots older than retention period
-            cutoff_date = datetime.utcnow() - timedelta(days=self.snapshot_retention_days)
+            cutoff_date = datetime.utcnow() - timedelta(
+                days=self.snapshot_retention_days
+            )
             expired_snapshots = []
 
             for snapshot_id in user_snapshots:
@@ -1033,9 +1179,12 @@ class TherapeuticReplayabilitySystem:
             systems_status = {
                 "consequence_system": self.consequence_system is not None,
                 "emotional_safety_system": self.emotional_safety_system is not None,
-                "adaptive_difficulty_engine": self.adaptive_difficulty_engine is not None,
-                "character_development_system": self.character_development_system is not None,
-                "therapeutic_integration_system": self.therapeutic_integration_system is not None,
+                "adaptive_difficulty_engine": self.adaptive_difficulty_engine
+                is not None,
+                "character_development_system": self.character_development_system
+                is not None,
+                "therapeutic_integration_system": self.therapeutic_integration_system
+                is not None,
                 "gameplay_loop_controller": self.gameplay_loop_controller is not None,
             }
 
@@ -1065,7 +1214,9 @@ class TherapeuticReplayabilitySystem:
     def get_metrics(self) -> dict[str, Any]:
         """Get replayability system metrics."""
         # Calculate additional metrics
-        active_explorations = sum(1 for exp in self.exploration_sessions.values() if exp.is_active)
+        active_explorations = sum(
+            1 for exp in self.exploration_sessions.values() if exp.is_active
+        )
 
         return {
             **self.metrics,

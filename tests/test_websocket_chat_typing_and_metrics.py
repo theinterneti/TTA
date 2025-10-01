@@ -1,15 +1,17 @@
 """
 Tests for typing indicators and observability metrics in WebSocket chat.
 """
+
 from __future__ import annotations
 
 import json
+
 import pytest
 from fastapi.testclient import TestClient
 from jose import jwt
 
 from src.player_experience.api.app import create_app
-from src.player_experience.api.auth import SECRET_KEY, ALGORITHM
+from src.player_experience.api.auth import ALGORITHM, SECRET_KEY
 from src.player_experience.api.config import TestingSettings
 from src.player_experience.api.routers.chat import METRICS, reset_metrics
 
@@ -17,6 +19,7 @@ from src.player_experience.api.routers.chat import METRICS, reset_metrics
 @pytest.fixture
 def client() -> TestClient:
     import src.player_experience.api.config as config_module
+
     config_module.settings = TestingSettings()
     app = create_app()
     return TestClient(app)
@@ -55,7 +58,9 @@ def test_metrics_incremented(client: TestClient) -> None:
         ws.send_text(json.dumps({"type": "user_message", "content": {"text": "check"}}))
         json.loads(ws.receive_text())  # assistant
         after = dict(METRICS)
-        assert after["connections"] == before["connections"] + 0 or after["connections"] >= 1
+        assert (
+            after["connections"] == before["connections"] + 0
+            or after["connections"] >= 1
+        )
         assert after["messages_in"] == before["messages_in"] + 1
         assert after["messages_out"] >= before["messages_out"] + 1
-

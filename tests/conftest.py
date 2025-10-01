@@ -1,9 +1,10 @@
-import os
-import pytest
 import logging
+import os
 import sys
 from pathlib import Path
 from unittest.mock import Mock
+
+import pytest
 
 # Add project root to path for comprehensive test battery integration
 project_root = Path(__file__).parent.parent
@@ -11,14 +12,14 @@ sys.path.insert(0, str(project_root))
 
 # Configure logging for tests
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 
 # Import comprehensive test battery components
 try:
-    from tests.comprehensive_battery.mocks.mock_services import MockServiceManager
     from tests.comprehensive_battery.comprehensive_test_battery import TestBatteryConfig
+    from tests.comprehensive_battery.mocks.mock_services import MockServiceManager
+
     COMPREHENSIVE_TEST_AVAILABLE = True
 except ImportError:
     COMPREHENSIVE_TEST_AVAILABLE = False
@@ -27,6 +28,7 @@ except ImportError:
 def has_neo4j():
     try:
         import neo4j  # noqa: F401
+
         return True
     except Exception:
         return False
@@ -45,6 +47,7 @@ def neo4j_available():
 def mock_neo4j_driver():
     """Provide a simple mock Neo4j driver/session for unit tests."""
     from unittest.mock import AsyncMock
+
     mock_driver = Mock()
     mock_session_ctx = Mock()
     mock_driver.session.return_value = mock_session_ctx
@@ -69,6 +72,7 @@ def mock_neo4j_driver():
 def mock_redis_client():
     """Provide a simple mock Redis client for unit tests."""
     from unittest.mock import AsyncMock
+
     mock_client = Mock()
 
     # Mock common Redis methods
@@ -104,7 +108,10 @@ def mock_redis_client():
 # --- Testcontainers: Neo4j & Redis fixtures ---
 @pytest.fixture(scope="session")
 def neo4j_container(pytestconfig):
-    if not (pytestconfig.getoption("--neo4j") or os.environ.get("RUN_NEO4J_TESTS") in {"1","true","True"}):
+    if not (
+        pytestconfig.getoption("--neo4j")
+        or os.environ.get("RUN_NEO4J_TESTS") in {"1", "true", "True"}
+    ):
         pytest.skip("Neo4j not requested; use --neo4j or RUN_NEO4J_TESTS=1")
 
     # If CI provides a service, prefer it to avoid nested containers
@@ -118,6 +125,7 @@ def neo4j_container(pytestconfig):
         return
 
     from testcontainers.neo4j import Neo4jContainer
+
     with (
         Neo4jContainer("neo4j:5-community")
         .with_env("NEO4J_AUTH", "neo4j/testpassword")
@@ -126,13 +134,19 @@ def neo4j_container(pytestconfig):
         # Readiness probe: wait for auth subsystem to be fully initialized
         try:
             from neo4j import GraphDatabase
-            from neo4j.exceptions import AuthError, ServiceUnavailable as _ServiceUnavailable, ClientError as _ClientError
+            from neo4j.exceptions import (
+                AuthError,
+            )
+            from neo4j.exceptions import ClientError as _ClientError
+            from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
         except Exception:
             GraphDatabase = None  # type: ignore
             AuthError = Exception  # type: ignore
             _ServiceUnavailable = Exception  # type: ignore
             _ClientError = Exception  # type: ignore
-        import time as _t, logging as _logging
+        import logging as _logging
+        import time as _t
+
         _logger = _logging.getLogger(__name__)
         uri = neo4j.get_connection_url()
         username = "neo4j"
@@ -140,7 +154,9 @@ def neo4j_container(pytestconfig):
         if GraphDatabase is not None:
             # Small initial wait to avoid early unauthorized during server auth init
             try:
-                _logger.debug("Neo4j Testcontainer initial wait 10.0s before readiness probe")
+                _logger.debug(
+                    "Neo4j Testcontainer initial wait 10.0s before readiness probe"
+                )
                 _t.sleep(10.0)
             except Exception:
                 pass
@@ -152,34 +168,55 @@ def neo4j_container(pytestconfig):
                     try:
                         with d.session() as s:
                             s.run("RETURN 1")
-                        _logger.debug("Neo4j container ready after attempt %s", attempt + 1)
+                        _logger.debug(
+                            "Neo4j container ready after attempt %s", attempt + 1
+                        )
                         break
                     finally:
                         d.close()
                 except (AuthError, _ServiceUnavailable) as e:
-                    delay = min(base_delay * (2 ** attempt), 8.0)
-                    _logger.debug("Neo4j container not ready (%s); retry in %.1fs", type(e).__name__, delay)
+                    delay = min(base_delay * (2**attempt), 8.0)
+                    _logger.debug(
+                        "Neo4j container not ready (%s); retry in %.1fs",
+                        type(e).__name__,
+                        delay,
+                    )
                     if attempt < (attempts - 1):
                         _t.sleep(delay)
                     else:
-                        _logger.warning("Neo4j readiness probe exhausted attempts with %s; proceeding to yield credentials and let client retry", type(e).__name__)
+                        _logger.warning(
+                            "Neo4j readiness probe exhausted attempts with %s; proceeding to yield credentials and let client retry",
+                            type(e).__name__,
+                        )
                         break
                 except _ClientError as e:
                     emsg = str(e)
-                    if ("AuthenticationRateLimit" in emsg) or ("authentication details too many times" in emsg):
-                        delay = min(base_delay * (2 ** attempt), 8.0)
-                        _logger.debug("Neo4j container rate limited; retry in %.1fs", delay)
+                    if ("AuthenticationRateLimit" in emsg) or (
+                        "authentication details too many times" in emsg
+                    ):
+                        delay = min(base_delay * (2**attempt), 8.0)
+                        _logger.debug(
+                            "Neo4j container rate limited; retry in %.1fs", delay
+                        )
                         if attempt < (attempts - 1):
                             _t.sleep(delay)
                         else:
-                            _logger.warning("Neo4j readiness probe exhausted attempts on AuthenticationRateLimit; proceeding to yield credentials")
+                            _logger.warning(
+                                "Neo4j readiness probe exhausted attempts on AuthenticationRateLimit; proceeding to yield credentials"
+                            )
                             break
                     else:
-                        _logger.warning("Neo4j readiness probe got unexpected ClientError: %s; proceeding without blocking", emsg)
+                        _logger.warning(
+                            "Neo4j readiness probe got unexpected ClientError: %s; proceeding without blocking",
+                            emsg,
+                        )
                         break
                 except Exception as e:
                     # Do not fail the entire test session; proceed and let client retry
-                    _logger.warning("Neo4j readiness probe encountered unexpected error: %s; proceeding", e)
+                    _logger.warning(
+                        "Neo4j readiness probe encountered unexpected error: %s; proceeding",
+                        e,
+                    )
                     break
         yield {
             "uri": uri,
@@ -192,13 +229,20 @@ def neo4j_container(pytestconfig):
 def neo4j_driver(neo4j_container):
     # Hardened readiness: retry to avoid AuthenticationRateLimit/Unauthorized races
     from neo4j import GraphDatabase
+
     try:
-        from neo4j.exceptions import AuthError, ServiceUnavailable as _ServiceUnavailable, ClientError as _ClientError
+        from neo4j.exceptions import (
+            AuthError,
+        )
+        from neo4j.exceptions import ClientError as _ClientError
+        from neo4j.exceptions import ServiceUnavailable as _ServiceUnavailable
     except Exception:
         AuthError = Exception  # type: ignore
         _ServiceUnavailable = Exception  # type: ignore
         _ClientError = Exception  # type: ignore
-    import time as _t, logging as _logging
+    import logging as _logging
+    import time as _t
+
     _logger = _logging.getLogger(__name__)
 
     uri = neo4j_container["uri"]
@@ -225,8 +269,14 @@ def neo4j_driver(neo4j_container):
             return
         except (AuthError, _ServiceUnavailable) as e:
             last_exc = e
-            delay = min(base_delay * (2 ** attempt), 8.0)
-            _logger.debug("neo4j_driver readiness attempt %d/%d failed (%s); retry in %.1fs", attempt + 1, attempts, type(e).__name__, delay)
+            delay = min(base_delay * (2**attempt), 8.0)
+            _logger.debug(
+                "neo4j_driver readiness attempt %d/%d failed (%s); retry in %.1fs",
+                attempt + 1,
+                attempts,
+                type(e).__name__,
+                delay,
+            )
             try:
                 if d:
                     d.close()
@@ -239,9 +289,14 @@ def neo4j_driver(neo4j_container):
         except _ClientError as e:
             emsg = str(e)
             last_exc = e
-            if ("AuthenticationRateLimit" in emsg) or ("authentication details too many times" in emsg):
-                delay = min(base_delay * (2 ** attempt), 8.0)
-                _logger.debug("neo4j_driver readiness hit AuthenticationRateLimit; retry in %.1fs", delay)
+            if ("AuthenticationRateLimit" in emsg) or (
+                "authentication details too many times" in emsg
+            ):
+                delay = min(base_delay * (2**attempt), 8.0)
+                _logger.debug(
+                    "neo4j_driver readiness hit AuthenticationRateLimit; retry in %.1fs",
+                    delay,
+                )
                 try:
                     if d:
                         d.close()
@@ -275,7 +330,10 @@ def neo4j_driver(neo4j_container):
 
 @pytest.fixture(scope="session")
 def redis_container(pytestconfig):
-    if not (pytestconfig.getoption("--redis") or os.environ.get("RUN_REDIS_TESTS") in {"1","true","True"}):
+    if not (
+        pytestconfig.getoption("--redis")
+        or os.environ.get("RUN_REDIS_TESTS") in {"1", "true", "True"}
+    ):
         pytest.skip("Redis container not requested; use --redis or RUN_REDIS_TESTS=1")
 
     # Prefer CI-provided service if available
@@ -285,6 +343,7 @@ def redis_container(pytestconfig):
         return
 
     from testcontainers.redis import RedisContainer
+
     prev_env = os.environ.get("TEST_REDIS_URI")
     try:
         with RedisContainer("redis:7") as rc:
@@ -309,6 +368,7 @@ import pytest_asyncio
 def redis_client_sync(redis_container):
     # Synchronous client for sync tests
     import redis
+
     client = redis.Redis.from_url(redis_container)
     try:
         client.ping()
@@ -321,6 +381,7 @@ def redis_client_sync(redis_container):
 async def redis_client(redis_container):
     # Async client for async repository tests
     import redis.asyncio as aioredis
+
     client = aioredis.from_url(redis_container)
     try:
         await client.ping()
@@ -329,13 +390,13 @@ async def redis_client(redis_container):
         await client.aclose()
 
 
-
 @pytest.fixture()
 def redis_client_sync(redis_container):
     """Synchronous Redis client for simple integration tests.
     Returns redis.Redis so .get/.exists return concrete results, not coroutines.
     """
     import redis
+
     client = redis.from_url(redis_container)
     try:
         # Basic liveness check
@@ -358,10 +419,10 @@ async def comprehensive_test_config():
     config = TestBatteryConfig()
 
     # Override with test-specific settings
-    config.neo4j_uri = os.getenv('NEO4J_URI', 'bolt://localhost:7687')
-    config.neo4j_user = os.getenv('NEO4J_USER', 'neo4j')
-    config.neo4j_password = os.getenv('NEO4J_PASSWORD', 'testpassword')
-    config.redis_url = os.getenv('REDIS_URL', 'redis://localhost:6379')
+    config.neo4j_uri = os.getenv("NEO4J_URI", "bolt://localhost:7687")
+    config.neo4j_user = os.getenv("NEO4J_USER", "neo4j")
+    config.neo4j_password = os.getenv("NEO4J_PASSWORD", "testpassword")
+    config.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
 
     # Test-specific overrides
     config.max_concurrent_tests = 2
@@ -388,15 +449,9 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "comprehensive: mark test as part of comprehensive test battery"
     )
-    config.addinivalue_line(
-        "markers", "integration: mark test as integration test"
-    )
-    config.addinivalue_line(
-        "markers", "slow: mark test as slow running"
-    )
-    config.addinivalue_line(
-        "markers", "mock_only: mark test to run only in mock mode"
-    )
+    config.addinivalue_line("markers", "integration: mark test as integration test")
+    config.addinivalue_line("markers", "slow: mark test as slow running")
+    config.addinivalue_line("markers", "mock_only: mark test to run only in mock mode")
     config.addinivalue_line(
         "markers", "real_services: mark test to require real services"
     )
@@ -405,7 +460,7 @@ def pytest_configure(config):
 def pytest_collection_modifyitems(config, items):
     """Modify test collection based on environment and comprehensive test battery settings."""
     # Skip real service tests in CI if services aren't available
-    if os.getenv('CI') == 'true' and os.getenv('SKIP_REAL_SERVICE_TESTS') == 'true':
+    if os.getenv("CI") == "true" and os.getenv("SKIP_REAL_SERVICE_TESTS") == "true":
         skip_real = pytest.mark.skip(reason="Real services not available in CI")
         for item in items:
             if "real_services" in item.keywords:
@@ -418,7 +473,9 @@ def pytest_collection_modifyitems(config, items):
 
     # Skip comprehensive tests if not available
     if not COMPREHENSIVE_TEST_AVAILABLE:
-        skip_comprehensive = pytest.mark.skip(reason="Comprehensive test battery not available")
+        skip_comprehensive = pytest.mark.skip(
+            reason="Comprehensive test battery not available"
+        )
         for item in items:
             if "comprehensive" in item.keywords:
                 item.add_marker(skip_comprehensive)
@@ -429,20 +486,19 @@ def pytest_collection_modifyitems(config, items):
 def test_environment_setup():
     """Set up test environment variables for comprehensive test battery integration."""
     # Ensure we're in test mode
-    os.environ['TESTING'] = 'true'
-    os.environ['LOG_LEVEL'] = os.getenv('LOG_LEVEL', 'INFO')
+    os.environ["TESTING"] = "true"
+    os.environ["LOG_LEVEL"] = os.getenv("LOG_LEVEL", "INFO")
 
     # Mock mode settings for CI environments
-    if os.getenv('CI') == 'true':
-        os.environ['FORCE_MOCK_MODE'] = os.getenv('FORCE_MOCK_MODE', 'true')
+    if os.getenv("CI") == "true":
+        os.environ["FORCE_MOCK_MODE"] = os.getenv("FORCE_MOCK_MODE", "true")
 
     # Comprehensive test mode flag
-    if os.getenv('COMPREHENSIVE_TEST_MODE') == 'true':
-        os.environ['COMPREHENSIVE_TEST_ACTIVE'] = 'true'
+    if os.getenv("COMPREHENSIVE_TEST_MODE") == "true":
+        os.environ["COMPREHENSIVE_TEST_ACTIVE"] = "true"
 
     yield
 
     # Cleanup
-    os.environ.pop('TESTING', None)
-    os.environ.pop('COMPREHENSIVE_TEST_ACTIVE', None)
-
+    os.environ.pop("TESTING", None)
+    os.environ.pop("COMPREHENSIVE_TEST_ACTIVE", None)

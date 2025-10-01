@@ -6,30 +6,29 @@ workflow definitions. Adds optional LangGraph integration: build_graph and
 execute_graph delegate to LangGraph when available via LangGraphWorkflowBuilder
 and LangGraphExecutor; otherwise they return stub responses.
 """
+
 from __future__ import annotations
 
+import logging
+import time
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 from pydantic import BaseModel, Field, ValidationError
 
-from .workflow import (
-    WorkflowDefinition,
-    AgentStep,
-    WorkflowType,
-    ErrorHandlingStrategy,
-    OrchestrationResponse as WorkflowOrchestrationResponse,
-)
-from .state import AgentContext
-from .models import OrchestrationRequest
-from .langgraph_integration import LangGraphWorkflowBuilder, LangGraphExecutor
-from .performance import get_step_aggregator
 from .circuit_breaker import CircuitBreakerOpenError
 from .circuit_breaker_registry import CircuitBreakerRegistry
-import time
-import logging
+from .langgraph_integration import LangGraphExecutor, LangGraphWorkflowBuilder
+from .models import OrchestrationRequest
+from .performance import get_step_aggregator
+from .state import AgentContext
+from .workflow import (
+    AgentStep,
+    WorkflowDefinition,
+)
+from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
 
 logger = logging.getLogger(__name__)
 
@@ -49,9 +48,9 @@ class WorkflowRunStatus(str, Enum):
 class StepResult(BaseModel):
     step: AgentStep
     started_at: str = Field(default_factory=_utc_now)
-    ended_at: Optional[str] = None
-    result: Dict[str, Any] = Field(default_factory=dict)
-    error: Optional[str] = None
+    ended_at: str | None = None
+    result: dict[str, Any] = Field(default_factory=dict)
+    error: str | None = None
 
 
 class WorkflowRunState(BaseModel):
@@ -59,23 +58,25 @@ class WorkflowRunState(BaseModel):
     workflow_name: str
     status: WorkflowRunStatus = WorkflowRunStatus.PENDING
     current_step_index: int = 0
-    started_at: Optional[str] = None
-    ended_at: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    started_at: str | None = None
+    ended_at: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
     request: OrchestrationRequest
     context: AgentContext = Field(default_factory=AgentContext)
     definition: WorkflowDefinition
 
-    history: List[StepResult] = Field(default_factory=list)
+    history: list[StepResult] = Field(default_factory=list)
 
 
 class WorkflowManager:
     """Registers and executes workflows with basic validation and state tracking."""
 
-    def __init__(self, circuit_breaker_registry: Optional[CircuitBreakerRegistry] = None) -> None:
-        self._workflows: Dict[str, WorkflowDefinition] = {}
-        self._runs: Dict[str, WorkflowRunState] = {}
+    def __init__(
+        self, circuit_breaker_registry: CircuitBreakerRegistry | None = None
+    ) -> None:
+        self._workflows: dict[str, WorkflowDefinition] = {}
+        self._runs: dict[str, WorkflowRunState] = {}
         self._lg_builder = LangGraphWorkflowBuilder()
         self._lg_executor = LangGraphExecutor()
         # Performance aggregator
@@ -84,17 +85,19 @@ class WorkflowManager:
         self._circuit_breaker_registry = circuit_breaker_registry
 
     # ---- Registration ----
-    def register_workflow(self, name: str, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:
+    def register_workflow(
+        self, name: str, definition: WorkflowDefinition
+    ) -> tuple[bool, str | None]:
         ok, err = self._validate_workflow_definition(definition)
         if not ok:
             return False, err
         self._workflows[name] = definition
         return True, None
 
-    def get_workflow(self, name: str) -> Optional[WorkflowDefinition]:
+    def get_workflow(self, name: str) -> WorkflowDefinition | None:
         return self._workflows.get(name)
 
-    def list_workflows(self) -> List[str]:
+    def list_workflows(self) -> list[str]:
         return sorted(self._workflows.keys())
 
     # ---- Execution ----
@@ -102,9 +105,9 @@ class WorkflowManager:
         self,
         name: str,
         request: OrchestrationRequest,
-        context: Optional[AgentContext] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[Optional[WorkflowOrchestrationResponse], Optional[str], Optional[str]]:
+        context: AgentContext | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> tuple[WorkflowOrchestrationResponse | None, str | None, str | None]:
         """
         Execute a registered workflow in a minimal, synchronous manner.
 
@@ -149,7 +152,9 @@ class WorkflowManager:
 
             # Optionally build/execute a graph (no-op if not available)
             graph = self._lg_builder.build(definition)
-            graph_response = self._lg_executor.execute(graph, {"history": [h.step.agent.value for h in run_state.history]})
+            graph_response = self._lg_executor.execute(
+                graph, {"history": [h.step.agent.value for h in run_state.history]}
+            )
 
             # Mark complete
             run_state.status = WorkflowRunStatus.COMPLETED
@@ -157,14 +162,24 @@ class WorkflowManager:
 
             # Compose response using context, history, and graph metadata
             # Aggregate safety findings from step results (if present)
-            agg_safety: Dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
+            agg_safety: dict[str, Any] = {
+                "level": "safe",
+                "findings": [],
+                "by_step": [],
+            }
             try:
                 levels = {"safe": 0, "warning": 1, "blocked": 2}
                 max_level = 0
                 for h in run_state.history:
-                    tv = h.result.get("therapeutic_validation") if isinstance(h.result, dict) else None
+                    tv = (
+                        h.result.get("therapeutic_validation")
+                        if isinstance(h.result, dict)
+                        else None
+                    )
                     if tv and isinstance(tv, dict):
-                        agg_safety["by_step"].append({"agent": h.step.agent.value, "validation": tv})
+                        agg_safety["by_step"].append(
+                            {"agent": h.step.agent.value, "validation": tv}
+                        )
                         lvl = str(tv.get("level") or "safe").lower()
                         max_level = max(max_level, levels.get(lvl, 0))
                         f = tv.get("findings") or []
@@ -198,10 +213,10 @@ class WorkflowManager:
             return None, run_id, str(e)
 
     # ---- State introspection ----
-    def get_run_state(self, run_id: str) -> Optional[WorkflowRunState]:
+    def get_run_state(self, run_id: str) -> WorkflowRunState | None:
         return self._runs.get(run_id)
 
-    def update_run_metadata(self, run_id: str, metadata: Dict[str, Any]) -> bool:
+    def update_run_metadata(self, run_id: str, metadata: dict[str, Any]) -> bool:
         run = self._runs.get(run_id)
         if not run:
             return False
@@ -212,7 +227,9 @@ class WorkflowManager:
     def build_graph(self, definition: WorkflowDefinition) -> Any:
         return self._lg_builder.build(definition)
 
-    def execute_graph(self, graph: Any, initial_state: Dict[str, Any]) -> WorkflowOrchestrationResponse:
+    def execute_graph(
+        self, graph: Any, initial_state: dict[str, Any]
+    ) -> WorkflowOrchestrationResponse:
         return self._lg_executor.execute(graph, initial_state)
 
     # ---- Internal helpers ----
@@ -220,7 +237,7 @@ class WorkflowManager:
         # In future tasks, invoke AgentProxy implementations and update context
         result = StepResult(step=step)
         t0 = time.time()
-        error: Optional[str] = None
+        error: str | None = None
         try:
             # Placeholder processing logic
             result.result = {
@@ -235,17 +252,17 @@ class WorkflowManager:
             duration_ms = (t1 - t0) * 1000.0
             # Record performance per agent type key
             try:
-                self._aggregator.record(step.agent.value, duration_ms, success=(error is None))
+                self._aggregator.record(
+                    step.agent.value, duration_ms, success=(error is None)
+                )
             except Exception:
                 pass
             result.ended_at = _utc_now()
         return result
 
     async def _execute_workflow_steps(
-        self,
-        definition: WorkflowDefinition,
-        run_state: WorkflowRunState
-    ) -> Optional[WorkflowOrchestrationResponse]:
+        self, definition: WorkflowDefinition, run_state: WorkflowRunState
+    ) -> WorkflowOrchestrationResponse | None:
         """Execute workflow steps with error handling."""
         # Sequentially process agent_sequence only (parallel steps may be handled by graph executor)
         for idx, step in enumerate(definition.agent_sequence):
@@ -259,7 +276,9 @@ class WorkflowManager:
 
         # Optionally build/execute a graph (no-op if not available)
         graph = self._lg_builder.build(definition)
-        graph_response = self._lg_executor.execute(graph, {"history": [h.step.agent.value for h in run_state.history]})
+        graph_response = self._lg_executor.execute(
+            graph, {"history": [h.step.agent.value for h in run_state.history]}
+        )
 
         # Mark complete
         run_state.status = WorkflowRunStatus.COMPLETED
@@ -267,14 +286,16 @@ class WorkflowManager:
 
         # Compose response using context, history, and graph metadata
         # Aggregate safety findings from step results (if present)
-        agg_safety: Dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
+        agg_safety: dict[str, Any] = {"level": "safe", "findings": [], "by_step": []}
         try:
             for step_result in run_state.history:
                 if "safety" in step_result.result:
                     agg_safety["by_step"].append(step_result.result["safety"])
                     if step_result.result["safety"].get("level") == "warning":
                         agg_safety["level"] = "warning"
-                        agg_safety["findings"].extend(step_result.result["safety"].get("findings", []))
+                        agg_safety["findings"].extend(
+                            step_result.result["safety"].get("findings", [])
+                        )
         except Exception:
             pass
 
@@ -286,13 +307,18 @@ class WorkflowManager:
                 "workflow_name": run_state.workflow_name,
                 "steps_completed": len(run_state.history),
                 "total_duration": (
-                    (datetime.fromisoformat(run_state.ended_at.rstrip("Z")) -
-                     datetime.fromisoformat(run_state.started_at.rstrip("Z"))).total_seconds()
-                    if run_state.started_at and run_state.ended_at else None
+                    (
+                        datetime.fromisoformat(run_state.ended_at.rstrip("Z"))
+                        - datetime.fromisoformat(run_state.started_at.rstrip("Z"))
+                    ).total_seconds()
+                    if run_state.started_at and run_state.ended_at
+                    else None
                 ),
                 "graph_response": graph_response,
             },
-            performance_metrics=self._aggregator.get_metrics() if self._aggregator else {},
+            performance_metrics=(
+                self._aggregator.get_metrics() if self._aggregator else {}
+            ),
             therapeutic_validation=agg_safety,
         )
 
@@ -300,9 +326,9 @@ class WorkflowManager:
         self,
         name: str,
         request: OrchestrationRequest,
-        context: Optional[AgentContext] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[Optional[WorkflowOrchestrationResponse], Optional[str], Optional[str]]:
+        context: AgentContext | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> tuple[WorkflowOrchestrationResponse | None, str | None, str | None]:
         """Execute workflow in degraded mode when circuit breaker is open."""
         logger.info(f"Executing workflow {name} in degraded mode")
 
@@ -329,9 +355,9 @@ class WorkflowManager:
         self,
         name: str,
         request: OrchestrationRequest,
-        context: Optional[AgentContext] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Tuple[Optional[WorkflowOrchestrationResponse], Optional[str], Optional[str]]:
+        context: AgentContext | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> tuple[WorkflowOrchestrationResponse | None, str | None, str | None]:
         """
         Execute a registered workflow asynchronously with circuit breaker support.
 
@@ -351,8 +377,12 @@ class WorkflowManager:
                     f"workflow:{name}"
                 )
                 if not await circuit_breaker.is_call_permitted():
-                    logger.warning(f"Circuit breaker open for workflow {name}, attempting degraded execution")
-                    return self._execute_degraded_workflow(name, request, context, metadata)
+                    logger.warning(
+                        f"Circuit breaker open for workflow {name}, attempting degraded execution"
+                    )
+                    return self._execute_degraded_workflow(
+                        name, request, context, metadata
+                    )
             except Exception as e:
                 logger.warning(f"Circuit breaker check failed for workflow {name}: {e}")
                 # Continue with normal execution if circuit breaker check fails
@@ -388,8 +418,12 @@ class WorkflowManager:
                     if response:
                         return response, run_id, None
                 except CircuitBreakerOpenError:
-                    logger.warning(f"Circuit breaker opened during workflow {name} execution")
-                    return self._execute_degraded_workflow(name, request, context, metadata)
+                    logger.warning(
+                        f"Circuit breaker opened during workflow {name} execution"
+                    )
+                    return self._execute_degraded_workflow(
+                        name, request, context, metadata
+                    )
                 except Exception as e:
                     logger.error(f"Workflow {name} execution failed: {e}")
                     run_state.status = WorkflowRunStatus.FAILED
@@ -410,12 +444,16 @@ class WorkflowManager:
         return None, run_id, "Workflow execution completed without response"
 
     # ---- Circuit breaker management ----
-    async def get_circuit_breaker_status(self, workflow_name: str) -> Optional[Dict[str, Any]]:
+    async def get_circuit_breaker_status(
+        self, workflow_name: str
+    ) -> dict[str, Any] | None:
         """Get circuit breaker status for a workflow."""
         if not self._circuit_breaker_registry:
             return None
 
-        circuit_breaker = await self._circuit_breaker_registry.get(f"workflow:{workflow_name}")
+        circuit_breaker = await self._circuit_breaker_registry.get(
+            f"workflow:{workflow_name}"
+        )
         if circuit_breaker:
             return await circuit_breaker.get_metrics()
         return None
@@ -425,21 +463,25 @@ class WorkflowManager:
         if not self._circuit_breaker_registry:
             return False
 
-        circuit_breaker = await self._circuit_breaker_registry.get(f"workflow:{workflow_name}")
+        circuit_breaker = await self._circuit_breaker_registry.get(
+            f"workflow:{workflow_name}"
+        )
         if circuit_breaker:
             await circuit_breaker.reset()
             logger.info(f"Reset circuit breaker for workflow {workflow_name}")
             return True
         return False
 
-    async def get_all_circuit_breaker_status(self) -> Dict[str, Any]:
+    async def get_all_circuit_breaker_status(self) -> dict[str, Any]:
         """Get status of all workflow circuit breakers."""
         if not self._circuit_breaker_registry:
             return {}
 
         return await self._circuit_breaker_registry.get_all_metrics()
 
-    def _validate_workflow_definition(self, definition: WorkflowDefinition) -> Tuple[bool, Optional[str]]:
+    def _validate_workflow_definition(
+        self, definition: WorkflowDefinition
+    ) -> tuple[bool, str | None]:
         try:
             WorkflowDefinition(**definition.model_dump())
         except ValidationError as e:
@@ -457,7 +499,7 @@ class WorkflowManager:
 
     def _validate_request_against_workflow(
         self, request: OrchestrationRequest, definition: WorkflowDefinition
-    ) -> Tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         if definition.agent_sequence:
             first_agent = definition.agent_sequence[0].agent
             if request.entrypoint != first_agent:
@@ -466,4 +508,3 @@ class WorkflowManager:
                     f"{first_agent.value}"
                 )
         return True, None
-

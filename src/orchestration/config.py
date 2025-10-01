@@ -24,14 +24,15 @@ Example:
     ```
 """
 
-import os
 import json
-import yaml
 import logging
+import os
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any
 
-from .decorators import log_entry_exit, timing_decorator, singleton
+import yaml
+
+from .decorators import log_entry_exit, singleton, timing_decorator
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +53,7 @@ class TTAConfig:
         config: Configuration dictionary
     """
 
-    def __init__(self, config_path: Optional[Union[str, Path]] = None):
+    def __init__(self, config_path: str | Path | None = None):
         """
         Initialize the TTA Configuration.
 
@@ -68,7 +69,7 @@ class TTAConfig:
             config_path = Path(config_path)
 
         self.config_path = config_path
-        self.config: Dict[str, Any] = {}
+        self.config: dict[str, Any] = {}
 
         # Load configuration
         self._load_config()
@@ -87,31 +88,37 @@ class TTAConfig:
         or uses default configuration if the file is not found or invalid.
         """
         if not self.config_path.exists():
-            logger.warning(f"Config file not found at {self.config_path}. Using default configuration.")
+            logger.warning(
+                f"Config file not found at {self.config_path}. Using default configuration."
+            )
             self.config = self._get_default_config()
             return
 
         try:
             # Determine file format based on extension
-            if self.config_path.suffix.lower() in ['.yaml', '.yml']:
-                with open(self.config_path, 'r') as f:
+            if self.config_path.suffix.lower() in [".yaml", ".yml"]:
+                with open(self.config_path) as f:
                     self.config = yaml.safe_load(f) or {}
-            elif self.config_path.suffix.lower() == '.json':
-                with open(self.config_path, 'r') as f:
+            elif self.config_path.suffix.lower() == ".json":
+                with open(self.config_path) as f:
                     self.config = json.load(f)
             else:
-                logger.warning(f"Unsupported config file format: {self.config_path.suffix}")
+                logger.warning(
+                    f"Unsupported config file format: {self.config_path.suffix}"
+                )
                 self.config = self._get_default_config()
                 return
 
             logger.info(f"Loaded configuration from {self.config_path}")
             # Ensure agent_orchestration block exists for backward compatibility
-            self.config.setdefault("agent_orchestration", {"enabled": False, "port": 8503})
+            self.config.setdefault(
+                "agent_orchestration", {"enabled": False, "port": 8503}
+            )
         except Exception as e:
             logger.error(f"Error loading config file: {e}")
             self.config = self._get_default_config()
 
-    def _get_default_config(self) -> Dict[str, Any]:
+    def _get_default_config(self) -> dict[str, Any]:
         """
         Get the default configuration.
 
@@ -126,14 +133,14 @@ class TTAConfig:
                         "enabled": True,
                         "port": 7687,
                         "username": "neo4j",
-                        "password": "password"
+                        "password": "password",
                     },
                     "llm": {
                         "enabled": True,
                         "model": "qwen2.5-7b-instruct",
-                        "api_base": "http://localhost:1234/v1"
-                    }
-                }
+                        "api_base": "http://localhost:1234/v1",
+                    },
+                },
             },
             "tta.prototype": {
                 "enabled": True,
@@ -142,13 +149,10 @@ class TTAConfig:
                         "enabled": True,
                         "port": 7688,
                         "username": "neo4j",
-                        "password": "password"
+                        "password": "password",
                     },
-                    "app": {
-                        "enabled": True,
-                        "port": 8501
-                    }
-                }
+                    "app": {"enabled": True, "port": 8501},
+                },
             },
             "agent_orchestration": {
                 "enabled": False,
@@ -161,7 +165,7 @@ class TTAConfig:
                         "heartbeat_interval": 30.0,
                         "connection_timeout": 60.0,
                         "max_connections": 1000,
-                        "auth_required": True
+                        "auth_required": True,
                     },
                     "events": {
                         "enabled": False,
@@ -169,13 +173,13 @@ class TTAConfig:
                         "buffer_size": 1000,
                         "broadcast_agent_status": True,
                         "broadcast_workflow_progress": True,
-                        "broadcast_system_metrics": False
+                        "broadcast_system_metrics": False,
                     },
                     "progressive_feedback": {
                         "enabled": False,
                         "update_interval": 1.0,
                         "max_updates_per_workflow": 100,
-                        "stream_intermediate_results": True
+                        "stream_intermediate_results": True,
                     },
                     "optimization": {
                         "enabled": False,
@@ -184,9 +188,9 @@ class TTAConfig:
                         "auto_parameter_adjustment": False,
                         "speed_creativity_balance": 0.5,
                         "optimization_interval": 60.0,
-                        "min_data_points": 10
-                    }
-                }
+                        "min_data_points": 10,
+                    },
+                },
             },
             "docker": {
                 "enabled": True,
@@ -195,7 +199,7 @@ class TTAConfig:
                 "standardize_container_names": True,
                 "ensure_consistent_extensions": True,
                 "ensure_consistent_env_vars": True,
-                "ensure_consistent_services": True
+                "ensure_consistent_services": True,
             },
             "carbon": {
                 "enabled": True,
@@ -203,12 +207,9 @@ class TTAConfig:
                 "output_dir": "logs/codecarbon",
                 "log_level": "info",
                 "measurement_interval": 15,
-                "track_components": True
+                "track_components": True,
             },
-            "environment": {
-                "name": "development",
-                "log_level": "info"
-            }
+            "environment": {"name": "development", "log_level": "info"},
         }
 
     @log_entry_exit
@@ -242,7 +243,7 @@ class TTAConfig:
                 self._set_nested_config(parts, typed_value)
                 logger.debug(f"Loaded environment variable {key}={typed_value}")
 
-    def _set_nested_config(self, keys: List[str], value: Any) -> None:
+    def _set_nested_config(self, keys: list[str], value: Any) -> None:
         """
         Set a nested configuration value.
 
@@ -322,7 +323,7 @@ class TTAConfig:
         logger.debug(f"Set configuration {key}={value}")
 
     @timing_decorator
-    def save(self, path: Optional[Union[str, Path]] = None) -> bool:
+    def save(self, path: str | Path | None = None) -> bool:
         """
         Save the configuration to a file.
 
@@ -342,11 +343,11 @@ class TTAConfig:
             path.parent.mkdir(parents=True, exist_ok=True)
 
             # Determine file format based on extension
-            if path.suffix.lower() in ['.yaml', '.yml']:
-                with open(path, 'w') as f:
+            if path.suffix.lower() in [".yaml", ".yml"]:
+                with open(path, "w") as f:
                     yaml.dump(self.config, f, default_flow_style=False)
-            elif path.suffix.lower() == '.json':
-                with open(path, 'w') as f:
+            elif path.suffix.lower() == ".json":
+                with open(path, "w") as f:
                     json.dump(self.config, f, indent=2)
             else:
                 logger.error(f"Unsupported config file format: {path.suffix}")
@@ -376,7 +377,7 @@ class TTAConfig:
         """
         return self.__str__()
 
-    def validate(self, schema: Optional[Dict[str, Any]] = None) -> bool:
+    def validate(self, schema: dict[str, Any] | None = None) -> bool:
         """
         Validate the configuration against a schema.
 
@@ -397,7 +398,9 @@ class TTAConfig:
             logger.error(f"Configuration validation failed: {e}")
             return False
 
-    def _validate_dict(self, config: Dict[str, Any], schema: Dict[str, Any], path: str = "") -> None:
+    def _validate_dict(
+        self, config: dict[str, Any], schema: dict[str, Any], path: str = ""
+    ) -> None:
         """
         Validate a dictionary against a schema.
 
@@ -444,7 +447,7 @@ class TTAConfig:
             if enum_values is not None and value not in enum_values:
                 raise ValueError(f"Key '{path}.{key}' must be one of {enum_values}")
 
-    def _get_default_schema(self) -> Dict[str, Any]:
+    def _get_default_schema(self) -> dict[str, Any]:
         """
         Get the default schema for configuration validation.
 
@@ -457,16 +460,16 @@ class TTAConfig:
                 "required": True,
                 "schema": {
                     "enabled": {"type": "bool", "required": True},
-                    "components": {"type": "dict", "required": True}
-                }
+                    "components": {"type": "dict", "required": True},
+                },
             },
             "tta.prototype": {
                 "type": "dict",
                 "required": True,
                 "schema": {
                     "enabled": {"type": "bool", "required": True},
-                    "components": {"type": "dict", "required": True}
-                }
+                    "components": {"type": "dict", "required": True},
+                },
             },
             "agent_orchestration": {
                 "type": "dict",
@@ -485,50 +488,101 @@ class TTAConfig:
                                 "schema": {
                                     "enabled": {"type": "bool", "required": False},
                                     "path": {"type": "str", "required": False},
-                                    "heartbeat_interval": {"type": "float", "required": False},
-                                    "connection_timeout": {"type": "float", "required": False},
-                                    "max_connections": {"type": "int", "required": False},
-                                    "auth_required": {"type": "bool", "required": False}
-                                }
+                                    "heartbeat_interval": {
+                                        "type": "float",
+                                        "required": False,
+                                    },
+                                    "connection_timeout": {
+                                        "type": "float",
+                                        "required": False,
+                                    },
+                                    "max_connections": {
+                                        "type": "int",
+                                        "required": False,
+                                    },
+                                    "auth_required": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                },
                             },
                             "events": {
                                 "type": "dict",
                                 "required": False,
                                 "schema": {
                                     "enabled": {"type": "bool", "required": False},
-                                    "redis_channel_prefix": {"type": "str", "required": False},
+                                    "redis_channel_prefix": {
+                                        "type": "str",
+                                        "required": False,
+                                    },
                                     "buffer_size": {"type": "int", "required": False},
-                                    "broadcast_agent_status": {"type": "bool", "required": False},
-                                    "broadcast_workflow_progress": {"type": "bool", "required": False},
-                                    "broadcast_system_metrics": {"type": "bool", "required": False}
-                                }
+                                    "broadcast_agent_status": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                    "broadcast_workflow_progress": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                    "broadcast_system_metrics": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                },
                             },
                             "progressive_feedback": {
                                 "type": "dict",
                                 "required": False,
                                 "schema": {
                                     "enabled": {"type": "bool", "required": False},
-                                    "update_interval": {"type": "float", "required": False},
-                                    "max_updates_per_workflow": {"type": "int", "required": False},
-                                    "stream_intermediate_results": {"type": "bool", "required": False}
-                                }
+                                    "update_interval": {
+                                        "type": "float",
+                                        "required": False,
+                                    },
+                                    "max_updates_per_workflow": {
+                                        "type": "int",
+                                        "required": False,
+                                    },
+                                    "stream_intermediate_results": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                },
                             },
                             "optimization": {
                                 "type": "dict",
                                 "required": False,
                                 "schema": {
                                     "enabled": {"type": "bool", "required": False},
-                                    "response_time_monitoring": {"type": "bool", "required": False},
-                                    "statistical_analysis": {"type": "bool", "required": False},
-                                    "auto_parameter_adjustment": {"type": "bool", "required": False},
-                                    "speed_creativity_balance": {"type": "float", "required": False},
-                                    "optimization_interval": {"type": "float", "required": False},
-                                    "min_data_points": {"type": "int", "required": False}
-                                }
-                            }
-                        }
-                    }
-                }
+                                    "response_time_monitoring": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                    "statistical_analysis": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                    "auto_parameter_adjustment": {
+                                        "type": "bool",
+                                        "required": False,
+                                    },
+                                    "speed_creativity_balance": {
+                                        "type": "float",
+                                        "required": False,
+                                    },
+                                    "optimization_interval": {
+                                        "type": "float",
+                                        "required": False,
+                                    },
+                                    "min_data_points": {
+                                        "type": "int",
+                                        "required": False,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
             },
             "docker": {
                 "type": "dict",
@@ -540,8 +594,8 @@ class TTAConfig:
                     "standardize_container_names": {"type": "bool", "required": True},
                     "ensure_consistent_extensions": {"type": "bool", "required": True},
                     "ensure_consistent_env_vars": {"type": "bool", "required": True},
-                    "ensure_consistent_services": {"type": "bool", "required": True}
-                }
+                    "ensure_consistent_services": {"type": "bool", "required": True},
+                },
             },
             "carbon": {
                 "type": "dict",
@@ -550,17 +604,29 @@ class TTAConfig:
                     "enabled": {"type": "bool", "required": True},
                     "project_name": {"type": "str", "required": True},
                     "output_dir": {"type": "str", "required": True},
-                    "log_level": {"type": "str", "required": True, "enum": ["debug", "info", "warning", "error", "critical"]},
+                    "log_level": {
+                        "type": "str",
+                        "required": True,
+                        "enum": ["debug", "info", "warning", "error", "critical"],
+                    },
                     "measurement_interval": {"type": "int", "required": True},
-                    "track_components": {"type": "bool", "required": True}
-                }
+                    "track_components": {"type": "bool", "required": True},
+                },
             },
             "environment": {
                 "type": "dict",
                 "required": True,
                 "schema": {
-                    "name": {"type": "str", "required": True, "enum": ["development", "production", "testing"]},
-                    "log_level": {"type": "str", "required": True, "enum": ["debug", "info", "warning", "error", "critical"]}
-                }
-            }
+                    "name": {
+                        "type": "str",
+                        "required": True,
+                        "enum": ["development", "production", "testing"],
+                    },
+                    "log_level": {
+                        "type": "str",
+                        "required": True,
+                        "enum": ["debug", "info", "warning", "error", "critical"],
+                    },
+                },
+            },
         }

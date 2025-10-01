@@ -1,16 +1,15 @@
 import asyncio
 import json
 import uuid
-from typing import List
 
 import pytest
 
 from src.agent_orchestration import (
     AgentId,
-    AgentType,
     AgentMessage,
-    MessageType,
+    AgentType,
     MessagePriority,
+    MessageType,
 )
 from src.agent_orchestration.coordinators import RedisMessageCoordinator
 
@@ -46,7 +45,7 @@ async def test_send_message_enqueues(redis_client):
 async def test_broadcast_message(redis_client):
     coord = RedisMessageCoordinator(redis_client, key_prefix="testao")
     sender = AgentId(type=AgentType.IPA)
-    recipients: List[AgentId] = [
+    recipients: list[AgentId] = [
         AgentId(type=AgentType.WBA, instance="a"),
         AgentId(type=AgentType.NGA, instance="b"),
     ]
@@ -80,4 +79,3 @@ async def test_subscribe_records_types(redis_client):
     key = f"testao:subs:{agent.type.value}:{agent.instance}"
     members = await redis_client.smembers(key)
     assert {m.decode() for m in members} >= {"request", "event"}
-

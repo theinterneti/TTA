@@ -62,9 +62,30 @@ docker-compose up
 
 ## Documentation
 
+## Environment Setup
+
+The TTA project uses a secure, consolidated environment configuration structure. To get started:
+
+```bash
+# 1. Copy the environment template
+cp .env.example .env
+
+# 2. Get a free OpenRouter API key at https://openrouter.ai
+# 3. Edit .env and set your API key:
+OPENROUTER_API_KEY=your_actual_key_here
+
+# 4. Validate your setup
+python scripts/validate_environment.py
+```
+
+For detailed setup instructions, see: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
+
+## Documentation
+
 For more information, see the documentation in the `Documentation` directory:
 
-- [Environment Structure](Documentation/ENV_STRUCTURE.md)
+- [Environment Structure](Documentation/ENV_STRUCTURE.md) - **Updated with new consolidated structure**
+- [Environment Setup Guide](ENVIRONMENT_SETUP.md) - **Comprehensive setup instructions**
 - [GitHub Setup](Documentation/GITHUB_SETUP.md)
 - [Docker Setup Guide](Documentation/docker/docker_setup_guide.md)
 - [DevContainer Troubleshooting Guide](Documentation/docker/devcontainer_troubleshooting_guide.md)

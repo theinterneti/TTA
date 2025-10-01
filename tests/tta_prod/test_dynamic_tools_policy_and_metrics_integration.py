@@ -1,8 +1,8 @@
-import os
+
 import pytest
 
-from tta.prod.src.tools.dynamic_tools import DynamicTool
 from src.agent_orchestration.tools.metrics import get_tool_metrics
+from tta.prod.src.tools.dynamic_tools import DynamicTool
 
 
 @pytest.mark.redis
@@ -52,4 +52,3 @@ async def slow_action():
 
     snap = get_tool_metrics().snapshot()
     assert snap.get("slow:1.0.0", {}).get("failures", 0) >= 1
-

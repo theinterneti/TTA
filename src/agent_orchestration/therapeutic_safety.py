@@ -46,13 +46,14 @@ Enhanced config format supports multiple validation types:
   }
 }
 """
+
 from __future__ import annotations
 
 import json
 import re
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     import yaml  # type: ignore
@@ -68,6 +69,7 @@ class SafetyLevel(str, Enum):
 
 class ValidationType(str, Enum):
     """Types of validation algorithms available."""
+
     KEYWORD = "keyword"
     SENTIMENT = "sentiment"
     CONTEXT_AWARE = "context_aware"
@@ -77,6 +79,7 @@ class ValidationType(str, Enum):
 
 class CrisisType(str, Enum):
     """Types of crisis situations that can be detected."""
+
     SELF_HARM = "self_harm"
     SUICIDAL_IDEATION = "suicidal_ideation"
     SUBSTANCE_ABUSE = "substance_abuse"
@@ -88,6 +91,7 @@ class CrisisType(str, Enum):
 
 class TherapeuticContext(str, Enum):
     """Therapeutic contexts for content validation."""
+
     GENERAL_THERAPY = "general_therapy"
     CRISIS_INTERVENTION = "crisis_intervention"
     COGNITIVE_BEHAVIORAL = "cognitive_behavioral"
@@ -98,6 +102,7 @@ class TherapeuticContext(str, Enum):
 
 class CrisisLevel(str, Enum):
     """Crisis severity levels for intervention protocols."""
+
     LOW = "low"
     MODERATE = "moderate"
     HIGH = "high"
@@ -106,6 +111,7 @@ class CrisisLevel(str, Enum):
 
 class InterventionType(str, Enum):
     """Types of crisis interventions available."""
+
     AUTOMATED_RESPONSE = "automated_response"
     HUMAN_OVERSIGHT = "human_oversight"
     EMERGENCY_SERVICES = "emergency_services"
@@ -114,6 +120,7 @@ class InterventionType(str, Enum):
 
 class EscalationStatus(str, Enum):
     """Status of crisis escalation."""
+
     NONE = "none"
     PENDING = "pending"
     IN_PROGRESS = "in_progress"
@@ -127,35 +134,35 @@ class ValidationFinding:
     category: str
     level: SafetyLevel
     priority: int
-    span: Optional[Tuple[int, int]] = None
-    snippet: Optional[str] = None
-    message: Optional[str] = None
+    span: tuple[int, int] | None = None
+    snippet: str | None = None
+    message: str | None = None
     # Enhanced fields for comprehensive analysis
     validation_type: ValidationType = ValidationType.KEYWORD
     confidence: float = 1.0  # 0.0 to 1.0
-    crisis_type: Optional[CrisisType] = None
-    therapeutic_context: Optional[TherapeuticContext] = None
-    sentiment_score: Optional[float] = None  # -1.0 to 1.0
+    crisis_type: CrisisType | None = None
+    therapeutic_context: TherapeuticContext | None = None
+    sentiment_score: float | None = None  # -1.0 to 1.0
     escalation_required: bool = False
-    alternative_suggested: Optional[str] = None
+    alternative_suggested: str | None = None
 
 
 @dataclass
 class ValidationResult:
     level: SafetyLevel
-    findings: List[ValidationFinding] = field(default_factory=list)
+    findings: list[ValidationFinding] = field(default_factory=list)
     score: float = 1.0  # 1.0=safe, 0.0=max unsafe
-    audit: List[Dict[str, Any]] = field(default_factory=list)
+    audit: list[dict[str, Any]] = field(default_factory=list)
     # Enhanced fields for comprehensive analysis
     crisis_detected: bool = False
-    crisis_types: List[CrisisType] = field(default_factory=list)
-    overall_sentiment: Optional[float] = None  # -1.0 to 1.0
+    crisis_types: list[CrisisType] = field(default_factory=list)
+    overall_sentiment: float | None = None  # -1.0 to 1.0
     therapeutic_appropriateness: float = 1.0  # 0.0 to 1.0
     escalation_recommended: bool = False
-    alternative_content: Optional[str] = None
-    monitoring_flags: List[str] = field(default_factory=list)
+    alternative_content: str | None = None
+    monitoring_flags: list[str] = field(default_factory=list)
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "level": self.level.value,
             "score": self.score,
@@ -185,41 +192,44 @@ class ValidationResult:
 @dataclass
 class CrisisAssessment:
     """Assessment of a crisis situation."""
+
     crisis_level: CrisisLevel
-    crisis_types: List[CrisisType]
+    crisis_types: list[CrisisType]
     confidence: float  # 0.0 to 1.0
-    risk_factors: List[str]
-    protective_factors: List[str]
+    risk_factors: list[str]
+    protective_factors: list[str]
     immediate_risk: bool
     intervention_recommended: InterventionType
     escalation_required: bool
     assessment_timestamp: float
-    context: Optional[Dict[str, Any]] = None
+    context: dict[str, Any] | None = None
 
 
 @dataclass
 class InterventionAction:
     """A specific intervention action taken."""
+
     action_type: InterventionType
     description: str
     timestamp: float
     success: bool
     response_time_ms: float
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 @dataclass
 class CrisisIntervention:
     """Complete crisis intervention record."""
+
     intervention_id: str
     session_id: str
     user_id: str
     crisis_assessment: CrisisAssessment
-    actions_taken: List[InterventionAction] = field(default_factory=list)
+    actions_taken: list[InterventionAction] = field(default_factory=list)
     escalation_status: EscalationStatus = EscalationStatus.NONE
     resolution_status: str = "active"
     created_timestamp: float = 0.0
-    resolved_timestamp: Optional[float] = None
+    resolved_timestamp: float | None = None
     human_notified: bool = False
     emergency_contacted: bool = False
     follow_up_required: bool = True
@@ -231,18 +241,18 @@ class SafetyRule:
     category: str  # crisis_detection, boundary_maintenance, professional_ethics
     priority: int
     level: SafetyLevel
-    pattern: Optional[str] = None
-    flags: Optional[str] = None
+    pattern: str | None = None
+    flags: str | None = None
     # Enhanced fields for comprehensive validation
     validation_type: ValidationType = ValidationType.KEYWORD
     sensitivity: float = 0.5  # 0.0 to 1.0
     context_aware: bool = False
-    therapeutic_context: Optional[TherapeuticContext] = None
-    crisis_type: Optional[CrisisType] = None
+    therapeutic_context: TherapeuticContext | None = None
+    crisis_type: CrisisType | None = None
     escalation_threshold: float = 0.8  # 0.0 to 1.0
-    alternative_template: Optional[str] = None
+    alternative_template: str | None = None
 
-    def compile(self) -> Optional[re.Pattern]:
+    def compile(self) -> re.Pattern | None:
         if not self.pattern:
             return None
         fl = 0
@@ -253,17 +263,17 @@ class SafetyRule:
 
 
 class SafetyRuleEngine:
-    def __init__(self, rules: List[SafetyRule]):
+    def __init__(self, rules: list[SafetyRule]):
         # Sort rules by priority desc for deterministic evaluation
         self._rules = sorted(rules, key=lambda r: r.priority, reverse=True)
-        self._compiled: List[Tuple[SafetyRule, Optional[re.Pattern]]] = [
+        self._compiled: list[tuple[SafetyRule, re.Pattern | None]] = [
             (r, r.compile()) for r in self._rules
         ]
 
     @staticmethod
-    def from_config(config: Dict[str, Any]) -> "SafetyRuleEngine":
+    def from_config(config: dict[str, Any]) -> SafetyRuleEngine:
         rules_cfg = (config or {}).get("rules") or []
-        rules: List[SafetyRule] = []
+        rules: list[SafetyRule] = []
         for rc in rules_cfg:
             # Parse enhanced rule configuration
             validation_type = ValidationType(rc.get("validation_type", "keyword"))
@@ -294,29 +304,39 @@ class SafetyRuleEngine:
         return SafetyRuleEngine(rules)
 
     @staticmethod
-    def load_config(path: str) -> Dict[str, Any]:
+    def load_config(path: str) -> dict[str, Any]:
         if path.lower().endswith((".yaml", ".yml")) and yaml is not None:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 return yaml.safe_load(f)  # type: ignore
-        with open(path, "r", encoding="utf-8") as f:
+        with open(path, encoding="utf-8") as f:
             return json.load(f)
 
-    def evaluate(self, text: str, context: Optional[Dict[str, Any]] = None) -> List[ValidationFinding]:
+    def evaluate(
+        self, text: str, context: dict[str, Any] | None = None
+    ) -> list[ValidationFinding]:
         """Enhanced evaluation with multiple validation types and context awareness."""
-        findings: List[ValidationFinding] = []
+        findings: list[ValidationFinding] = []
 
         # Basic sentiment analysis for context
         sentiment_score = self._analyze_sentiment(text)
 
         for rule, rx in self._compiled:
             if rule.validation_type == ValidationType.KEYWORD:
-                findings.extend(self._evaluate_keyword_rule(rule, rx, text, sentiment_score))
+                findings.extend(
+                    self._evaluate_keyword_rule(rule, rx, text, sentiment_score)
+                )
             elif rule.validation_type == ValidationType.CRISIS_DETECTION:
-                findings.extend(self._evaluate_crisis_rule(rule, text, sentiment_score, context))
+                findings.extend(
+                    self._evaluate_crisis_rule(rule, text, sentiment_score, context)
+                )
             elif rule.validation_type == ValidationType.THERAPEUTIC_BOUNDARY:
-                findings.extend(self._evaluate_therapeutic_rule(rule, rx, text, context))
+                findings.extend(
+                    self._evaluate_therapeutic_rule(rule, rx, text, context)
+                )
             elif rule.validation_type == ValidationType.SENTIMENT:
-                findings.extend(self._evaluate_sentiment_rule(rule, text, sentiment_score))
+                findings.extend(
+                    self._evaluate_sentiment_rule(rule, text, sentiment_score)
+                )
             elif rule.validation_type == ValidationType.CONTEXT_AWARE:
                 findings.extend(self._evaluate_context_rule(rule, rx, text, context))
 
@@ -325,9 +345,41 @@ class SafetyRuleEngine:
     def _analyze_sentiment(self, text: str) -> float:
         """Basic sentiment analysis. Returns score from -1.0 (negative) to 1.0 (positive)."""
         # Simple keyword-based sentiment analysis
-        positive_words = ["happy", "good", "better", "hope", "grateful", "thankful", "positive", "joy", "love", "peace"]
-        negative_words = ["sad", "bad", "worse", "hopeless", "angry", "hate", "depressed", "anxious", "fear", "pain"]
-        crisis_words = ["suicide", "kill", "die", "death", "hurt", "harm", "end", "over", "done"]
+        positive_words = [
+            "happy",
+            "good",
+            "better",
+            "hope",
+            "grateful",
+            "thankful",
+            "positive",
+            "joy",
+            "love",
+            "peace",
+        ]
+        negative_words = [
+            "sad",
+            "bad",
+            "worse",
+            "hopeless",
+            "angry",
+            "hate",
+            "depressed",
+            "anxious",
+            "fear",
+            "pain",
+        ]
+        crisis_words = [
+            "suicide",
+            "kill",
+            "die",
+            "death",
+            "hurt",
+            "harm",
+            "end",
+            "over",
+            "done",
+        ]
 
         text_lower = text.lower()
         positive_count = sum(1 for word in positive_words if word in text_lower)
@@ -343,7 +395,9 @@ class SafetyRuleEngine:
         total_words = positive_count + total_negative
         return (positive_count - total_negative) / max(total_words, 1)
 
-    def _evaluate_keyword_rule(self, rule: SafetyRule, rx: Optional[re.Pattern], text: str, sentiment: float) -> List[ValidationFinding]:
+    def _evaluate_keyword_rule(
+        self, rule: SafetyRule, rx: re.Pattern | None, text: str, sentiment: float
+    ) -> list[ValidationFinding]:
         """Evaluate keyword-based rules with enhanced context."""
         findings = []
         if rx is None:
@@ -384,7 +438,13 @@ class SafetyRuleEngine:
             )
         return findings
 
-    def _evaluate_crisis_rule(self, rule: SafetyRule, text: str, sentiment: float, context: Optional[Dict[str, Any]]) -> List[ValidationFinding]:
+    def _evaluate_crisis_rule(
+        self,
+        rule: SafetyRule,
+        text: str,
+        sentiment: float,
+        context: dict[str, Any] | None,
+    ) -> list[ValidationFinding]:
         """Evaluate crisis detection rules with enhanced algorithms."""
         findings = []
 
@@ -396,20 +456,20 @@ class SafetyRuleEngine:
                 r"(life isn't worth|life is not worth|should just end|ending it all)",
                 r"(don't want to be here|want to be dead|rather be dead)",
                 r"(better off without me|everyone would be better|world would be better)",
-                r"(thinking about killing|thinking about suicide|thoughts of suicide)"
+                r"(thinking about killing|thinking about suicide|thoughts of suicide)",
             ],
             CrisisType.SELF_HARM: [
                 r"(cut myself|hurt myself|self harm|self-harm|cutting|burning myself)",
                 r"(punish myself|deserve pain|make it stop|deserve to feel pain|hurt when I feel)",
                 r"(hitting myself|burned myself|cutting helps|hurting myself)",
-                r"(I've been hitting|I've been cutting|I burned myself)"
+                r"(I've been hitting|I've been cutting|I burned myself)",
             ],
             CrisisType.SEVERE_DEPRESSION: [
                 r"(nothing matters|completely hopeless|can't feel anything|empty inside)",
                 r"(no one cares|worthless|failure|burden)",
                 r"(feel hopeless|feel completely|no point to|there's no point)",
-                r"(can't go on|I can't continue|everything is hopeless)"
-            ]
+                r"(can't go on|I can't continue|everything is hopeless)",
+            ],
         }
 
         text_lower = text.lower()
@@ -458,7 +518,13 @@ class SafetyRuleEngine:
 
         return findings
 
-    def _evaluate_therapeutic_rule(self, rule: SafetyRule, rx: Optional[re.Pattern], text: str, context: Optional[Dict[str, Any]]) -> List[ValidationFinding]:
+    def _evaluate_therapeutic_rule(
+        self,
+        rule: SafetyRule,
+        rx: re.Pattern | None,
+        text: str,
+        context: dict[str, Any] | None,
+    ) -> list[ValidationFinding]:
         """Evaluate therapeutic boundary rules."""
         findings = []
         if rx is None:
@@ -498,7 +564,9 @@ class SafetyRuleEngine:
 
         return findings
 
-    def _evaluate_sentiment_rule(self, rule: SafetyRule, text: str, sentiment: float) -> List[ValidationFinding]:
+    def _evaluate_sentiment_rule(
+        self, rule: SafetyRule, text: str, sentiment: float
+    ) -> list[ValidationFinding]:
         """Evaluate sentiment-based rules."""
         findings = []
 
@@ -534,7 +602,13 @@ class SafetyRuleEngine:
 
         return findings
 
-    def _evaluate_context_rule(self, rule: SafetyRule, rx: Optional[re.Pattern], text: str, context: Optional[Dict[str, Any]]) -> List[ValidationFinding]:
+    def _evaluate_context_rule(
+        self,
+        rule: SafetyRule,
+        rx: re.Pattern | None,
+        text: str,
+        context: dict[str, Any] | None,
+    ) -> list[ValidationFinding]:
         """Evaluate context-aware rules."""
         findings = []
         if rx is None or not context:
@@ -577,7 +651,9 @@ class SafetyRuleEngine:
 class TherapeuticValidator:
     """Enhanced TherapeuticValidator with comprehensive safety validation capabilities."""
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None, config_path: Optional[str] = None) -> None:
+    def __init__(
+        self, config: dict[str, Any] | None = None, config_path: str | None = None
+    ) -> None:
         if config_path and not config:
             cfg = SafetyRuleEngine.load_config(config_path)
         else:
@@ -586,22 +662,40 @@ class TherapeuticValidator:
         self._config = cfg
 
         # Enhanced configuration options
-        self._crisis_detection_enabled = cfg.get("crisis_detection", {}).get("enabled", True)
-        self._crisis_sensitivity = cfg.get("crisis_detection", {}).get("sensitivity", 0.7)
-        self._escalation_threshold = cfg.get("crisis_detection", {}).get("escalation_threshold", 0.9)
-        self._alternative_generation_enabled = cfg.get("alternative_generation", {}).get("enabled", True)
-        self._therapeutic_tone = cfg.get("alternative_generation", {}).get("therapeutic_tone", True)
+        self._crisis_detection_enabled = cfg.get("crisis_detection", {}).get(
+            "enabled", True
+        )
+        self._crisis_sensitivity = cfg.get("crisis_detection", {}).get(
+            "sensitivity", 0.7
+        )
+        self._escalation_threshold = cfg.get("crisis_detection", {}).get(
+            "escalation_threshold", 0.9
+        )
+        self._alternative_generation_enabled = cfg.get(
+            "alternative_generation", {}
+        ).get("enabled", True)
+        self._therapeutic_tone = cfg.get("alternative_generation", {}).get(
+            "therapeutic_tone", True
+        )
 
         # Monitoring and alerting
         self._violation_count = 0
         self._crisis_count = 0
         self._escalation_count = 0
 
-    def validate_text(self, text: str, *, include_audit: bool = True, context: Optional[Dict[str, Any]] = None) -> ValidationResult:
+    def validate_text(
+        self,
+        text: str,
+        *,
+        include_audit: bool = True,
+        context: dict[str, Any] | None = None,
+    ) -> ValidationResult:
         """Enhanced text validation with comprehensive analysis."""
-        audit: List[Dict[str, Any]] = []
+        audit: list[dict[str, Any]] = []
         if include_audit:
-            audit.append({"event": "validate_text.start", "text_length": len(text or "")})
+            audit.append(
+                {"event": "validate_text.start", "text_length": len(text or "")}
+            )
 
         text = text or ""
 
@@ -611,7 +705,9 @@ class TherapeuticValidator:
         # Comprehensive analysis
         overall_sentiment = self._engine._analyze_sentiment(text)
         crisis_detected = any(f.crisis_type is not None for f in findings)
-        crisis_types = list(set(f.crisis_type for f in findings if f.crisis_type is not None))
+        crisis_types = list(
+            set(f.crisis_type for f in findings if f.crisis_type is not None)
+        )
         escalation_recommended = any(f.escalation_required for f in findings)
 
         # Determine overall level with enhanced logic
@@ -624,18 +720,26 @@ class TherapeuticValidator:
             self._violation_count += 1
 
         # Enhanced scoring based on multiple factors
-        score = self._calculate_comprehensive_score(findings, overall_sentiment, crisis_detected)
+        score = self._calculate_comprehensive_score(
+            findings, overall_sentiment, crisis_detected
+        )
 
         # Calculate therapeutic appropriateness
-        therapeutic_appropriateness = self._assess_therapeutic_appropriateness(findings, overall_sentiment)
+        therapeutic_appropriateness = self._assess_therapeutic_appropriateness(
+            findings, overall_sentiment
+        )
 
         # Generate alternative content if needed
         alternative_content = None
         if level != SafetyLevel.SAFE and self._alternative_generation_enabled:
-            alternative_content = self._generate_therapeutic_alternative(text, findings, level)
+            alternative_content = self._generate_therapeutic_alternative(
+                text, findings, level
+            )
 
         # Monitoring flags
-        monitoring_flags = self._generate_monitoring_flags(findings, overall_sentiment, crisis_detected)
+        monitoring_flags = self._generate_monitoring_flags(
+            findings, overall_sentiment, crisis_detected
+        )
 
         # Update counters
         if crisis_detected:
@@ -644,15 +748,17 @@ class TherapeuticValidator:
             self._escalation_count += 1
 
         if include_audit:
-            audit.append({
-                "event": "validate_text.end",
-                "findings_count": len(findings),
-                "result_level": level.value,
-                "crisis_detected": crisis_detected,
-                "escalation_recommended": escalation_recommended,
-                "overall_sentiment": overall_sentiment,
-                "therapeutic_appropriateness": therapeutic_appropriateness,
-            })
+            audit.append(
+                {
+                    "event": "validate_text.end",
+                    "findings_count": len(findings),
+                    "result_level": level.value,
+                    "crisis_detected": crisis_detected,
+                    "escalation_recommended": escalation_recommended,
+                    "overall_sentiment": overall_sentiment,
+                    "therapeutic_appropriateness": therapeutic_appropriateness,
+                }
+            )
 
         return ValidationResult(
             level=level,
@@ -668,7 +774,9 @@ class TherapeuticValidator:
             monitoring_flags=monitoring_flags,
         )
 
-    def _calculate_comprehensive_score(self, findings: List[ValidationFinding], sentiment: float, crisis_detected: bool) -> float:
+    def _calculate_comprehensive_score(
+        self, findings: list[ValidationFinding], sentiment: float, crisis_detected: bool
+    ) -> float:
         """Calculate comprehensive safety score based on multiple factors."""
         if not findings:
             return 1.0
@@ -703,7 +811,9 @@ class TherapeuticValidator:
 
         return max(0.0, min(1.0, base_score))
 
-    def _assess_therapeutic_appropriateness(self, findings: List[ValidationFinding], sentiment: float) -> float:
+    def _assess_therapeutic_appropriateness(
+        self, findings: list[ValidationFinding], sentiment: float
+    ) -> float:
         """Assess how therapeutically appropriate the content is."""
         if not findings:
             return 1.0
@@ -730,7 +840,9 @@ class TherapeuticValidator:
 
         return max(0.0, min(1.0, appropriateness))
 
-    def _generate_monitoring_flags(self, findings: List[ValidationFinding], sentiment: float, crisis_detected: bool) -> List[str]:
+    def _generate_monitoring_flags(
+        self, findings: list[ValidationFinding], sentiment: float, crisis_detected: bool
+    ) -> list[str]:
         """Generate monitoring flags for safety oversight."""
         flags = []
 
@@ -765,7 +877,9 @@ class TherapeuticValidator:
             "Could you clarify what support you’re seeking?"
         )
 
-    def _generate_therapeutic_alternative(self, original: str, findings: List[ValidationFinding], level: SafetyLevel) -> str:
+    def _generate_therapeutic_alternative(
+        self, original: str, findings: list[ValidationFinding], level: SafetyLevel
+    ) -> str:
         """Generate therapeutic alternatives based on content analysis."""
         if not self._alternative_generation_enabled:
             return self._basic_alternative(level)
@@ -805,9 +919,11 @@ class TherapeuticValidator:
                 "I hear that you're going through a really difficult time. Depression can make everything feel overwhelming, "
                 "but you don't have to face this alone. Professional support can make a real difference. "
                 "Would you like to talk about what's been weighing on you, or explore some resources that might help?"
-            )
+            ),
         }
-        return alternatives.get(crisis_type, self._basic_alternative(SafetyLevel.BLOCKED))
+        return alternatives.get(
+            crisis_type, self._basic_alternative(SafetyLevel.BLOCKED)
+        )
 
     def _professional_boundary_alternative(self) -> str:
         """Generate professional boundary alternatives."""
@@ -852,9 +968,11 @@ class TherapeuticValidator:
             "Could you clarify what support you're seeking?"
         )
 
-    def get_monitoring_metrics(self) -> Dict[str, Any]:
+    def get_monitoring_metrics(self) -> dict[str, Any]:
         """Get monitoring metrics for safety oversight."""
-        total_estimated = max(10, self._violation_count * 2)  # Rough estimate of total validations
+        total_estimated = max(
+            10, self._violation_count * 2
+        )  # Rough estimate of total validations
         return {
             "total_validations_estimated": total_estimated,
             "violation_count": self._violation_count,
@@ -879,26 +997,39 @@ class TherapeuticValidator:
         # Alert conditions
         if result.escalation_recommended:
             return True
-        if result.crisis_detected and any(ct in [CrisisType.SUICIDAL_IDEATION, CrisisType.SELF_HARM] for ct in result.crisis_types):
+        if result.crisis_detected and any(
+            ct in [CrisisType.SUICIDAL_IDEATION, CrisisType.SELF_HARM]
+            for ct in result.crisis_types
+        ):
             return True
         if result.level == SafetyLevel.BLOCKED and result.score < 0.2:
             return True
 
         return False
 
-    def update_configuration(self, new_config: Dict[str, Any]) -> None:
+    def update_configuration(self, new_config: dict[str, Any]) -> None:
         """Update the validator configuration and rebuild the engine."""
         self._config.update(new_config)
         self._engine = SafetyRuleEngine.from_config(self._config)
 
         # Update enhanced configuration options
-        self._crisis_detection_enabled = self._config.get("crisis_detection", {}).get("enabled", True)
-        self._crisis_sensitivity = self._config.get("crisis_detection", {}).get("sensitivity", 0.7)
-        self._escalation_threshold = self._config.get("crisis_detection", {}).get("escalation_threshold", 0.9)
-        self._alternative_generation_enabled = self._config.get("alternative_generation", {}).get("enabled", True)
-        self._therapeutic_tone = self._config.get("alternative_generation", {}).get("therapeutic_tone", True)
+        self._crisis_detection_enabled = self._config.get("crisis_detection", {}).get(
+            "enabled", True
+        )
+        self._crisis_sensitivity = self._config.get("crisis_detection", {}).get(
+            "sensitivity", 0.7
+        )
+        self._escalation_threshold = self._config.get("crisis_detection", {}).get(
+            "escalation_threshold", 0.9
+        )
+        self._alternative_generation_enabled = self._config.get(
+            "alternative_generation", {}
+        ).get("enabled", True)
+        self._therapeutic_tone = self._config.get("alternative_generation", {}).get(
+            "therapeutic_tone", True
+        )
 
-    def add_therapeutic_guideline(self, guideline: Dict[str, Any]) -> None:
+    def add_therapeutic_guideline(self, guideline: dict[str, Any]) -> None:
         """Add a new therapeutic guideline rule."""
         if "rules" not in self._config:
             self._config["rules"] = []
@@ -912,28 +1043,30 @@ class TherapeuticValidator:
             return False
 
         original_count = len(self._config["rules"])
-        self._config["rules"] = [rule for rule in self._config["rules"] if rule.get("id") != rule_id]
+        self._config["rules"] = [
+            rule for rule in self._config["rules"] if rule.get("id") != rule_id
+        ]
 
         if len(self._config["rules"]) < original_count:
             self.update_configuration({})  # Rebuild with current config
             return True
         return False
 
-    def get_therapeutic_guidelines(self) -> List[Dict[str, Any]]:
+    def get_therapeutic_guidelines(self) -> list[dict[str, Any]]:
         """Get all current therapeutic guidelines."""
         return self._config.get("rules", [])
 
-    def export_configuration(self) -> Dict[str, Any]:
+    def export_configuration(self) -> dict[str, Any]:
         """Export the current configuration for backup or sharing."""
         return self._config.copy()
 
-    def import_configuration(self, config: Dict[str, Any]) -> None:
+    def import_configuration(self, config: dict[str, Any]) -> None:
         """Import a configuration, replacing the current one."""
         self._config = config.copy()
         self.update_configuration({})  # Rebuild with new config
 
     @staticmethod
-    def _default_config() -> Dict[str, Any]:
+    def _default_config() -> dict[str, Any]:
         # Enhanced defaults with comprehensive therapeutic safety rules
         return {
             "rules": [
@@ -1015,18 +1148,18 @@ class TherapeuticValidator:
             "crisis_detection": {
                 "enabled": True,
                 "sensitivity": 0.7,
-                "escalation_threshold": 0.9
+                "escalation_threshold": 0.9,
             },
             "alternative_generation": {
                 "enabled": True,
                 "therapeutic_tone": True,
-                "supportive_messaging": True
+                "supportive_messaging": True,
             },
             "monitoring": {
                 "enabled": True,
                 "track_violations": True,
-                "alert_on_escalation": True
-            }
+                "alert_on_escalation": True,
+            },
         }
 
 
@@ -1037,11 +1170,11 @@ class CrisisInterventionManager:
     and monitoring of crisis situations with comprehensive logging and reporting.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the Crisis Intervention Manager."""
         self.config = config or self._default_crisis_config()
-        self.active_interventions: Dict[str, CrisisIntervention] = {}
-        self.intervention_history: List[CrisisIntervention] = []
+        self.active_interventions: dict[str, CrisisIntervention] = {}
+        self.intervention_history: list[CrisisIntervention] = []
 
         # Statistics tracking
         self.total_interventions = 0
@@ -1054,12 +1187,14 @@ class CrisisInterventionManager:
 
         # Initialize logging
         import logging
+
         self.logger = logging.getLogger(__name__ + ".CrisisInterventionManager")
 
-    def assess_crisis(self, validation_result: ValidationResult, session_context: Dict[str, Any]) -> CrisisAssessment:
+    def assess_crisis(
+        self, validation_result: ValidationResult, session_context: dict[str, Any]
+    ) -> CrisisAssessment:
         """Assess the severity and type of crisis from validation results."""
         import time
-        import uuid
 
         if not validation_result.crisis_detected:
             return CrisisAssessment(
@@ -1072,7 +1207,7 @@ class CrisisInterventionManager:
                 intervention_recommended=InterventionType.AUTOMATED_RESPONSE,
                 escalation_required=False,
                 assessment_timestamp=time.time(),
-                context=session_context
+                context=session_context,
             )
 
         # Determine crisis level based on multiple factors
@@ -1083,13 +1218,17 @@ class CrisisInterventionManager:
         protective_factors = self._identify_protective_factors(session_context)
 
         # Determine intervention type
-        intervention_type = self._determine_intervention_type(crisis_level, validation_result)
+        intervention_type = self._determine_intervention_type(
+            crisis_level, validation_result
+        )
 
         # Check for immediate risk
         immediate_risk = self._assess_immediate_risk(validation_result, crisis_level)
 
         # Calculate overall confidence
-        confidence = self._calculate_crisis_confidence(validation_result, session_context)
+        confidence = self._calculate_crisis_confidence(
+            validation_result, session_context
+        )
 
         return CrisisAssessment(
             crisis_level=crisis_level,
@@ -1099,12 +1238,15 @@ class CrisisInterventionManager:
             protective_factors=protective_factors,
             immediate_risk=immediate_risk,
             intervention_recommended=intervention_type,
-            escalation_required=validation_result.escalation_recommended or immediate_risk,
+            escalation_required=validation_result.escalation_recommended
+            or immediate_risk,
             assessment_timestamp=time.time(),
-            context=session_context
+            context=session_context,
         )
 
-    def initiate_intervention(self, assessment: CrisisAssessment, session_id: str, user_id: str) -> CrisisIntervention:
+    def initiate_intervention(
+        self, assessment: CrisisAssessment, session_id: str, user_id: str
+    ) -> CrisisIntervention:
         """Initiate a crisis intervention based on the assessment."""
         import time
         import uuid
@@ -1116,7 +1258,7 @@ class CrisisInterventionManager:
             session_id=session_id,
             user_id=user_id,
             crisis_assessment=assessment,
-            created_timestamp=time.time()
+            created_timestamp=time.time(),
         )
 
         # Store active intervention
@@ -1140,7 +1282,11 @@ class CrisisInterventionManager:
         try:
             # This would be injected in a real implementation
             # For now, we'll add a simple alert mechanism
-            alert_severity = "critical" if assessment.crisis_level == CrisisLevel.CRITICAL else "high"
+            alert_severity = (
+                "critical"
+                if assessment.crisis_level == CrisisLevel.CRITICAL
+                else "high"
+            )
             self.logger.warning(
                 f"CRISIS ALERT: {alert_severity.upper()} intervention {intervention_id} "
                 f"for crisis types {[ct.value for ct in assessment.crisis_types]}"
@@ -1150,7 +1296,9 @@ class CrisisInterventionManager:
 
         return intervention
 
-    def _determine_crisis_level(self, validation_result: ValidationResult, context: Dict[str, Any]) -> CrisisLevel:
+    def _determine_crisis_level(
+        self, validation_result: ValidationResult, context: dict[str, Any]
+    ) -> CrisisLevel:
         """Determine the crisis level based on validation results and context."""
         # High-risk crisis types
         high_risk_types = {CrisisType.SUICIDAL_IDEATION, CrisisType.SELF_HARM}
@@ -1158,10 +1306,16 @@ class CrisisInterventionManager:
         # Check for critical indicators - more specific criteria
         if any(ct in high_risk_types for ct in validation_result.crisis_types):
             # Critical: Very low safety score AND escalation recommended
-            if validation_result.score < 0.15 and validation_result.escalation_recommended:
+            if (
+                validation_result.score < 0.15
+                and validation_result.escalation_recommended
+            ):
                 return CrisisLevel.CRITICAL
             # High: Low safety score OR escalation recommended
-            elif validation_result.score < 0.25 or validation_result.escalation_recommended:
+            elif (
+                validation_result.score < 0.25
+                or validation_result.escalation_recommended
+            ):
                 return CrisisLevel.HIGH
             # Moderate: Crisis detected but not severe
             else:
@@ -1169,7 +1323,10 @@ class CrisisInterventionManager:
 
         # Severe depression with high confidence
         if CrisisType.SEVERE_DEPRESSION in validation_result.crisis_types:
-            if validation_result.score < 0.2 and validation_result.escalation_recommended:
+            if (
+                validation_result.score < 0.2
+                and validation_result.escalation_recommended
+            ):
                 return CrisisLevel.HIGH
             else:
                 return CrisisLevel.MODERATE
@@ -1177,15 +1334,20 @@ class CrisisInterventionManager:
         # Other crisis types - default to moderate
         if validation_result.crisis_detected:
             # Check overall sentiment and therapeutic appropriateness for level
-            if (validation_result.overall_sentiment and validation_result.overall_sentiment < -0.8 and
-                validation_result.therapeutic_appropriateness < 0.2):
+            if (
+                validation_result.overall_sentiment
+                and validation_result.overall_sentiment < -0.8
+                and validation_result.therapeutic_appropriateness < 0.2
+            ):
                 return CrisisLevel.HIGH
             else:
                 return CrisisLevel.MODERATE
 
         return CrisisLevel.LOW
 
-    def _identify_risk_factors(self, validation_result: ValidationResult, context: Dict[str, Any]) -> List[str]:
+    def _identify_risk_factors(
+        self, validation_result: ValidationResult, context: dict[str, Any]
+    ) -> list[str]:
         """Identify risk factors from validation results and context."""
         risk_factors = []
 
@@ -1194,13 +1356,20 @@ class CrisisInterventionManager:
             risk_factors.extend(["suicidal_ideation", "death_wish", "hopelessness"])
 
         if CrisisType.SELF_HARM in validation_result.crisis_types:
-            risk_factors.extend(["self_harm_behavior", "self_punishment", "coping_mechanism"])
+            risk_factors.extend(
+                ["self_harm_behavior", "self_punishment", "coping_mechanism"]
+            )
 
         if CrisisType.SEVERE_DEPRESSION in validation_result.crisis_types:
-            risk_factors.extend(["severe_depression", "worthlessness", "emotional_numbness"])
+            risk_factors.extend(
+                ["severe_depression", "worthlessness", "emotional_numbness"]
+            )
 
         # Sentiment-based risk factors
-        if validation_result.overall_sentiment and validation_result.overall_sentiment < -0.7:
+        if (
+            validation_result.overall_sentiment
+            and validation_result.overall_sentiment < -0.7
+        ):
             risk_factors.append("severe_negative_sentiment")
 
         # Context-based risk factors
@@ -1212,7 +1381,7 @@ class CrisisInterventionManager:
 
         return list(set(risk_factors))  # Remove duplicates
 
-    def _identify_protective_factors(self, context: Dict[str, Any]) -> List[str]:
+    def _identify_protective_factors(self, context: dict[str, Any]) -> list[str]:
         """Identify protective factors from context."""
         protective_factors = []
 
@@ -1234,7 +1403,9 @@ class CrisisInterventionManager:
 
         return protective_factors
 
-    def _determine_intervention_type(self, crisis_level: CrisisLevel, validation_result: ValidationResult) -> InterventionType:
+    def _determine_intervention_type(
+        self, crisis_level: CrisisLevel, validation_result: ValidationResult
+    ) -> InterventionType:
         """Determine the appropriate intervention type."""
         if crisis_level == CrisisLevel.CRITICAL:
             return InterventionType.EMERGENCY_SERVICES
@@ -1245,7 +1416,9 @@ class CrisisInterventionManager:
         else:
             return InterventionType.AUTOMATED_RESPONSE
 
-    def _assess_immediate_risk(self, validation_result: ValidationResult, crisis_level: CrisisLevel) -> bool:
+    def _assess_immediate_risk(
+        self, validation_result: ValidationResult, crisis_level: CrisisLevel
+    ) -> bool:
         """Assess if there is immediate risk requiring urgent intervention."""
         # Critical level always indicates immediate risk
         if crisis_level == CrisisLevel.CRITICAL:
@@ -1253,7 +1426,10 @@ class CrisisInterventionManager:
 
         # High-risk crisis types with low safety scores
         high_risk_types = {CrisisType.SUICIDAL_IDEATION, CrisisType.SELF_HARM}
-        if any(ct in high_risk_types for ct in validation_result.crisis_types) and validation_result.score < 0.3:
+        if (
+            any(ct in high_risk_types for ct in validation_result.crisis_types)
+            and validation_result.score < 0.3
+        ):
             return True
 
         # Multiple crisis types present
@@ -1262,19 +1438,26 @@ class CrisisInterventionManager:
 
         return False
 
-    def _calculate_crisis_confidence(self, validation_result: ValidationResult, context: Dict[str, Any]) -> float:
+    def _calculate_crisis_confidence(
+        self, validation_result: ValidationResult, context: dict[str, Any]
+    ) -> float:
         """Calculate overall confidence in crisis assessment."""
         if not validation_result.crisis_detected:
             return 0.0
 
         # Base confidence from validation findings
         if validation_result.findings:
-            base_confidence = sum(f.confidence for f in validation_result.findings) / len(validation_result.findings)
+            base_confidence = sum(
+                f.confidence for f in validation_result.findings
+            ) / len(validation_result.findings)
         else:
             base_confidence = 0.5
 
         # Adjust based on sentiment
-        if validation_result.overall_sentiment and validation_result.overall_sentiment < -0.5:
+        if (
+            validation_result.overall_sentiment
+            and validation_result.overall_sentiment < -0.5
+        ):
             base_confidence += 0.1
 
         # Adjust based on therapeutic appropriateness
@@ -1295,7 +1478,9 @@ class CrisisInterventionManager:
 
         try:
             # Generate appropriate response based on crisis type
-            response_message = self._generate_crisis_response(intervention.crisis_assessment)
+            response_message = self._generate_crisis_response(
+                intervention.crisis_assessment
+            )
 
             # Record the action
             action = InterventionAction(
@@ -1304,12 +1489,14 @@ class CrisisInterventionManager:
                 timestamp=time.time(),
                 success=True,
                 response_time_ms=(time.perf_counter() - start_time) * 1000,
-                metadata={"response_message": response_message}
+                metadata={"response_message": response_message},
             )
 
             intervention.actions_taken.append(action)
 
-            self.logger.info(f"Immediate response executed for intervention {intervention.intervention_id}")
+            self.logger.info(
+                f"Immediate response executed for intervention {intervention.intervention_id}"
+            )
 
         except Exception as e:
             # Record failed action
@@ -1319,16 +1506,17 @@ class CrisisInterventionManager:
                 timestamp=time.time(),
                 success=False,
                 response_time_ms=(time.perf_counter() - start_time) * 1000,
-                metadata={"error": str(e)}
+                metadata={"error": str(e)},
             )
 
             intervention.actions_taken.append(action)
 
-            self.logger.error(f"Failed to execute immediate response for intervention {intervention.intervention_id}: {e}")
+            self.logger.error(
+                f"Failed to execute immediate response for intervention {intervention.intervention_id}: {e}"
+            )
 
     def _handle_escalation(self, intervention: CrisisIntervention) -> None:
         """Handle escalation procedures for crisis intervention."""
-        import time
 
         intervention.escalation_status = EscalationStatus.PENDING
 
@@ -1345,7 +1533,9 @@ class CrisisInterventionManager:
 
         except Exception as e:
             intervention.escalation_status = EscalationStatus.FAILED
-            self.logger.error(f"Escalation failed for intervention {intervention.intervention_id}: {e}")
+            self.logger.error(
+                f"Escalation failed for intervention {intervention.intervention_id}: {e}"
+            )
 
     def _escalate_to_emergency_services(self, intervention: CrisisIntervention) -> None:
         """Escalate to emergency services for critical situations."""
@@ -1364,10 +1554,12 @@ class CrisisInterventionManager:
             response_time_ms=(time.perf_counter() - start_time) * 1000,
             metadata={
                 "crisis_level": intervention.crisis_assessment.crisis_level.value,
-                "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
+                "crisis_types": [
+                    ct.value for ct in intervention.crisis_assessment.crisis_types
+                ],
                 "user_id": intervention.user_id,
-                "session_id": intervention.session_id
-            }
+                "session_id": intervention.session_id,
+            },
         )
 
         intervention.actions_taken.append(action)
@@ -1396,10 +1588,12 @@ class CrisisInterventionManager:
             response_time_ms=(time.perf_counter() - start_time) * 1000,
             metadata={
                 "crisis_level": intervention.crisis_assessment.crisis_level.value,
-                "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
+                "crisis_types": [
+                    ct.value for ct in intervention.crisis_assessment.crisis_types
+                ],
                 "risk_factors": intervention.crisis_assessment.risk_factors,
-                "protective_factors": intervention.crisis_assessment.protective_factors
-            }
+                "protective_factors": intervention.crisis_assessment.protective_factors,
+            },
         )
 
         intervention.actions_taken.append(action)
@@ -1439,7 +1633,7 @@ class CrisisInterventionManager:
             "You can contact the National Suicide Prevention Lifeline at 988 for immediate support."
         )
 
-    def _load_response_templates(self) -> Dict[CrisisType, Dict[str, str]]:
+    def _load_response_templates(self) -> dict[CrisisType, dict[str, str]]:
         """Load crisis response templates for different crisis types and levels."""
         return {
             CrisisType.SUICIDAL_IDEATION: {
@@ -1461,7 +1655,7 @@ class CrisisInterventionManager:
                 "low": (
                     "I hear that you're going through a difficult time. If you're having thoughts of suicide, please know that help is available. "
                     "The National Suicide Prevention Lifeline (988) is available 24/7. Would you like to explore some coping strategies together?"
-                )
+                ),
             },
             CrisisType.SELF_HARM: {
                 "critical": (
@@ -1482,7 +1676,7 @@ class CrisisInterventionManager:
                 "low": (
                     "I hear that you're struggling with difficult feelings. If you're thinking about self-harm, please know that there are "
                     "healthier ways to cope. Would you like to explore some grounding techniques or talk about what's been on your mind?"
-                )
+                ),
             },
             CrisisType.SEVERE_DEPRESSION: {
                 "critical": (
@@ -1503,15 +1697,19 @@ class CrisisInterventionManager:
                 "low": (
                     "I hear that you're feeling down and struggling. These feelings are valid, and it's okay to reach out for support. "
                     "Would you like to talk about what's been on your mind, or explore some ways to take care of yourself?"
-                )
-            }
+                ),
+            },
         }
 
-    def get_intervention_status(self, intervention_id: str) -> Optional[CrisisIntervention]:
+    def get_intervention_status(
+        self, intervention_id: str
+    ) -> CrisisIntervention | None:
         """Get the status of a specific intervention."""
         return self.active_interventions.get(intervention_id)
 
-    def resolve_intervention(self, intervention_id: str, resolution_notes: str = "") -> bool:
+    def resolve_intervention(
+        self, intervention_id: str, resolution_notes: str = ""
+    ) -> bool:
         """Mark an intervention as resolved."""
         import time
 
@@ -1532,7 +1730,7 @@ class CrisisInterventionManager:
 
         return True
 
-    def get_crisis_metrics(self) -> Dict[str, Any]:
+    def get_crisis_metrics(self) -> dict[str, Any]:
         """Get comprehensive crisis intervention metrics."""
         active_count = len(self.active_interventions)
         total_count = self.total_interventions
@@ -1540,13 +1738,17 @@ class CrisisInterventionManager:
 
         # Crisis level distribution
         crisis_levels = {}
-        for intervention in list(self.active_interventions.values()) + self.intervention_history:
+        for intervention in (
+            list(self.active_interventions.values()) + self.intervention_history
+        ):
             level = intervention.crisis_assessment.crisis_level.value
             crisis_levels[level] = crisis_levels.get(level, 0) + 1
 
         # Crisis type distribution
         crisis_types = {}
-        for intervention in list(self.active_interventions.values()) + self.intervention_history:
+        for intervention in (
+            list(self.active_interventions.values()) + self.intervention_history
+        ):
             for crisis_type in intervention.crisis_assessment.crisis_types:
                 type_name = crisis_type.value
                 crisis_types[type_name] = crisis_types.get(type_name, 0) + 1
@@ -1560,12 +1762,14 @@ class CrisisInterventionManager:
             "emergency_contacts": self.emergency_contacts,
             "crisis_level_distribution": crisis_levels,
             "crisis_type_distribution": crisis_types,
-            "average_response_time_ms": self._calculate_average_response_time()
+            "average_response_time_ms": self._calculate_average_response_time(),
         }
 
     def _calculate_average_response_time(self) -> float:
         """Calculate average response time for interventions."""
-        all_interventions = list(self.active_interventions.values()) + self.intervention_history
+        all_interventions = (
+            list(self.active_interventions.values()) + self.intervention_history
+        )
 
         if not all_interventions:
             return 0.0
@@ -1580,30 +1784,26 @@ class CrisisInterventionManager:
 
         return total_time / max(1, action_count)
 
-    def _default_crisis_config(self) -> Dict[str, Any]:
+    def _default_crisis_config(self) -> dict[str, Any]:
         """Default configuration for crisis intervention."""
         return {
-            "escalation_thresholds": {
-                "critical": 0.9,
-                "high": 0.7,
-                "moderate": 0.5
-            },
+            "escalation_thresholds": {"critical": 0.9, "high": 0.7, "moderate": 0.5},
             "response_timeouts": {
                 "immediate_response_ms": 1000,
                 "escalation_timeout_ms": 5000,
-                "emergency_timeout_ms": 2000
+                "emergency_timeout_ms": 2000,
             },
             "monitoring": {
                 "track_all_interventions": True,
                 "log_escalations": True,
-                "alert_on_emergency": True
+                "alert_on_emergency": True,
             },
             "notifications": {
                 "human_oversight_enabled": True,
                 "emergency_services_enabled": True,
                 "email_notifications": False,
-                "webhook_notifications": False
-            }
+                "webhook_notifications": False,
+            },
         }
 
 
@@ -1614,11 +1814,11 @@ class EmergencyProtocolEngine:
     for different crisis situations with comprehensive logging and monitoring.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the Emergency Protocol Engine."""
         self.config = config or self._default_protocol_config()
-        self.active_protocols: Dict[str, Dict[str, Any]] = {}
-        self.protocol_history: List[Dict[str, Any]] = []
+        self.active_protocols: dict[str, dict[str, Any]] = {}
+        self.protocol_history: list[dict[str, Any]] = []
 
         # Statistics tracking
         self.protocols_executed = 0
@@ -1627,9 +1827,15 @@ class EmergencyProtocolEngine:
 
         # Initialize logging
         import logging
+
         self.logger = logging.getLogger(__name__ + ".EmergencyProtocolEngine")
 
-    def execute_protocol(self, crisis_type: CrisisType, crisis_level: CrisisLevel, context: Dict[str, Any]) -> Dict[str, Any]:
+    def execute_protocol(
+        self,
+        crisis_type: CrisisType,
+        crisis_level: CrisisLevel,
+        context: dict[str, Any],
+    ) -> dict[str, Any]:
         """Execute the appropriate emergency protocol for the given crisis type and level."""
         import time
         import uuid
@@ -1646,7 +1852,7 @@ class EmergencyProtocolEngine:
             "steps_executed": [],
             "success": False,
             "error": None,
-            "response_time_ms": 0.0
+            "response_time_ms": 0.0,
         }
 
         self.active_protocols[protocol_id] = protocol_execution
@@ -1663,12 +1869,16 @@ class EmergencyProtocolEngine:
 
                 # If a critical step fails, abort protocol
                 if step.get("critical", False) and not step_result["success"]:
-                    raise Exception(f"Critical protocol step failed: {step_result['error']}")
+                    raise Exception(
+                        f"Critical protocol step failed: {step_result['error']}"
+                    )
 
             protocol_execution["success"] = True
             self.successful_protocols += 1
 
-            self.logger.info(f"Emergency protocol {protocol_id} executed successfully for {crisis_type.value}")
+            self.logger.info(
+                f"Emergency protocol {protocol_id} executed successfully for {crisis_type.value}"
+            )
 
         except Exception as e:
             protocol_execution["error"] = str(e)
@@ -1679,7 +1889,9 @@ class EmergencyProtocolEngine:
 
         finally:
             # Calculate response time
-            protocol_execution["response_time_ms"] = (time.perf_counter() - start_time) * 1000
+            protocol_execution["response_time_ms"] = (
+                time.perf_counter() - start_time
+            ) * 1000
 
             # Move to history
             self.protocol_history.append(protocol_execution.copy())
@@ -1687,7 +1899,9 @@ class EmergencyProtocolEngine:
 
         return protocol_execution
 
-    def _get_protocol_steps(self, crisis_type: CrisisType, crisis_level: CrisisLevel) -> List[Dict[str, Any]]:
+    def _get_protocol_steps(
+        self, crisis_type: CrisisType, crisis_level: CrisisLevel
+    ) -> list[dict[str, Any]]:
         """Get the protocol steps for a specific crisis type and level."""
         protocols = self.config.get("protocols", {})
 
@@ -1707,7 +1921,9 @@ class EmergencyProtocolEngine:
 
         return level_steps
 
-    def _execute_protocol_step(self, step: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+    def _execute_protocol_step(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Execute a single protocol step."""
         import time
 
@@ -1718,7 +1934,7 @@ class EmergencyProtocolEngine:
             "success": False,
             "response_time_ms": 0.0,
             "output": None,
-            "error": None
+            "error": None,
         }
 
         try:
@@ -1760,7 +1976,9 @@ class EmergencyProtocolEngine:
 
         return step_result
 
-    def _generate_protocol_response(self, step: Dict[str, Any], context: Dict[str, Any]) -> str:
+    def _generate_protocol_response(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> str:
         """Generate a protocol-specific response message."""
         template = step.get("template", "")
 
@@ -1769,12 +1987,14 @@ class EmergencyProtocolEngine:
             user_id=context.get("user_id", "unknown"),
             session_id=context.get("session_id", "unknown"),
             crisis_type=context.get("crisis_type", "unknown"),
-            timestamp=time.strftime("%Y-%m-%d %H:%M:%S")
+            timestamp=time.strftime("%Y-%m-%d %H:%M:%S"),
         )
 
         return response
 
-    def _log_protocol_event(self, step: Dict[str, Any], context: Dict[str, Any]) -> None:
+    def _log_protocol_event(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> None:
         """Log a protocol event."""
         log_level = step.get("log_level", "info").lower()
         message = step.get("message", "Protocol event")
@@ -1791,7 +2011,9 @@ class EmergencyProtocolEngine:
         else:
             self.logger.info(formatted_message)
 
-    def _notify_human_oversight(self, step: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+    def _notify_human_oversight(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Notify human oversight personnel."""
         notification = {
             "type": "human_oversight",
@@ -1799,7 +2021,7 @@ class EmergencyProtocolEngine:
             "message": step.get("message", "Human oversight required"),
             "context": context,
             "timestamp": time.time(),
-            "channels": step.get("channels", ["email", "dashboard"])
+            "channels": step.get("channels", ["email", "dashboard"]),
         }
 
         # In a real implementation, this would send actual notifications
@@ -1807,7 +2029,9 @@ class EmergencyProtocolEngine:
 
         return notification
 
-    def _contact_emergency_services(self, step: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+    def _contact_emergency_services(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Contact emergency services."""
         emergency_contact = {
             "type": "emergency_services",
@@ -1815,15 +2039,19 @@ class EmergencyProtocolEngine:
             "reason": step.get("reason", "Mental health crisis"),
             "context": context,
             "timestamp": time.time(),
-            "location": context.get("location", "unknown")
+            "location": context.get("location", "unknown"),
         }
 
         # In a real implementation, this would contact actual emergency services
-        self.logger.critical(f"EMERGENCY SERVICES CONTACT: {emergency_contact['reason']}")
+        self.logger.critical(
+            f"EMERGENCY SERVICES CONTACT: {emergency_contact['reason']}"
+        )
 
         return emergency_contact
 
-    def _provide_crisis_resources(self, step: Dict[str, Any], context: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def _provide_crisis_resources(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Provide crisis resources to the user."""
         resources = step.get("resources", [])
 
@@ -1834,19 +2062,21 @@ class EmergencyProtocolEngine:
                     "name": "National Suicide Prevention Lifeline",
                     "phone": "988",
                     "description": "24/7 crisis support",
-                    "website": "https://suicidepreventionlifeline.org"
+                    "website": "https://suicidepreventionlifeline.org",
                 },
                 {
                     "name": "Crisis Text Line",
                     "text": "HOME to 741741",
                     "description": "24/7 text-based crisis support",
-                    "website": "https://crisistextline.org"
-                }
+                    "website": "https://crisistextline.org",
+                },
             ]
 
         return resources
 
-    def _schedule_followup(self, step: Dict[str, Any], context: Dict[str, Any]) -> Dict[str, Any]:
+    def _schedule_followup(
+        self, step: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any]:
         """Schedule follow-up contact."""
         followup = {
             "type": "followup",
@@ -1854,16 +2084,18 @@ class EmergencyProtocolEngine:
             "method": step.get("method", "system_check"),
             "context": context,
             "scheduled_time": time.time() + (step.get("interval_hours", 24) * 3600),
-            "priority": step.get("priority", "high")
+            "priority": step.get("priority", "high"),
         }
 
         self.logger.info(f"Follow-up scheduled for {followup['interval_hours']} hours")
 
         return followup
 
-    def get_protocol_metrics(self) -> Dict[str, Any]:
+    def get_protocol_metrics(self) -> dict[str, Any]:
         """Get comprehensive protocol execution metrics."""
-        success_rate = (self.successful_protocols / max(1, self.protocols_executed)) * 100
+        success_rate = (
+            self.successful_protocols / max(1, self.protocols_executed)
+        ) * 100
 
         # Protocol type distribution
         protocol_types = {}
@@ -1874,7 +2106,11 @@ class EmergencyProtocolEngine:
         # Average response times by crisis type
         avg_response_times = {}
         for crisis_type in protocol_types.keys():
-            times = [p["response_time_ms"] for p in self.protocol_history if p["crisis_type"] == crisis_type]
+            times = [
+                p["response_time_ms"]
+                for p in self.protocol_history
+                if p["crisis_type"] == crisis_type
+            ]
             avg_response_times[crisis_type] = sum(times) / len(times) if times else 0.0
 
         return {
@@ -1884,10 +2120,10 @@ class EmergencyProtocolEngine:
             "success_rate_percent": success_rate,
             "protocol_type_distribution": protocol_types,
             "average_response_times_ms": avg_response_times,
-            "active_protocols": len(self.active_protocols)
+            "active_protocols": len(self.active_protocols),
         }
 
-    def _default_protocol_config(self) -> Dict[str, Any]:
+    def _default_protocol_config(self) -> dict[str, Any]:
         """Default configuration for emergency protocols."""
         return {
             "protocols": {
@@ -1897,24 +2133,24 @@ class EmergencyProtocolEngine:
                             "type": "log_event",
                             "log_level": "critical",
                             "message": "CRITICAL SUICIDAL IDEATION: User {user_id} in session {session_id}",
-                            "critical": True
+                            "critical": True,
                         },
                         {
                             "type": "generate_response",
                             "template": "I'm deeply concerned about what you've shared. Your life has value and there are people who want to help. Please contact emergency services (911) or the National Suicide Prevention Lifeline at 988 immediately.",
-                            "critical": True
+                            "critical": True,
                         },
                         {
                             "type": "contact_emergency",
                             "service": "911",
                             "reason": "Suicidal ideation - critical risk",
-                            "critical": True
+                            "critical": True,
                         },
                         {
                             "type": "notify_human",
                             "priority": "critical",
                             "message": "CRITICAL: Suicidal ideation detected - emergency services contacted",
-                            "channels": ["email", "sms", "dashboard"]
+                            "channels": ["email", "sms", "dashboard"],
                         },
                         {
                             "type": "provide_resources",
@@ -1922,147 +2158,128 @@ class EmergencyProtocolEngine:
                                 {
                                     "name": "National Suicide Prevention Lifeline",
                                     "phone": "988",
-                                    "description": "24/7 crisis support"
+                                    "description": "24/7 crisis support",
                                 }
-                            ]
-                        }
+                            ],
+                        },
                     ],
                     "high": [
                         {
                             "type": "log_event",
                             "log_level": "warning",
-                            "message": "HIGH RISK SUICIDAL IDEATION: User {user_id} in session {session_id}"
+                            "message": "HIGH RISK SUICIDAL IDEATION: User {user_id} in session {session_id}",
                         },
                         {
                             "type": "generate_response",
-                            "template": "I'm very worried about you and want to help you stay safe. Please reach out to the National Suicide Prevention Lifeline at 988 or contact a mental health professional immediately."
+                            "template": "I'm very worried about you and want to help you stay safe. Please reach out to the National Suicide Prevention Lifeline at 988 or contact a mental health professional immediately.",
                         },
                         {
                             "type": "notify_human",
                             "priority": "high",
                             "message": "High risk suicidal ideation detected - immediate oversight required",
-                            "channels": ["email", "dashboard"]
+                            "channels": ["email", "dashboard"],
                         },
-                        {
-                            "type": "provide_resources"
-                        },
+                        {"type": "provide_resources"},
                         {
                             "type": "schedule_followup",
                             "interval_hours": 2,
-                            "priority": "high"
-                        }
+                            "priority": "high",
+                        },
                     ],
                     "moderate": [
                         {
                             "type": "log_event",
                             "log_level": "warning",
-                            "message": "MODERATE SUICIDAL IDEATION: User {user_id} in session {session_id}"
+                            "message": "MODERATE SUICIDAL IDEATION: User {user_id} in session {session_id}",
                         },
                         {
                             "type": "generate_response",
-                            "template": "I'm concerned about what you've shared. Having thoughts of suicide can be frightening, but you don't have to face this alone. Please consider reaching out to the National Suicide Prevention Lifeline at 988."
+                            "template": "I'm concerned about what you've shared. Having thoughts of suicide can be frightening, but you don't have to face this alone. Please consider reaching out to the National Suicide Prevention Lifeline at 988.",
                         },
                         {
                             "type": "notify_human",
                             "priority": "medium",
                             "message": "Moderate suicidal ideation detected - oversight recommended",
-                            "channels": ["dashboard"]
+                            "channels": ["dashboard"],
                         },
-                        {
-                            "type": "provide_resources"
-                        },
-                        {
-                            "type": "schedule_followup",
-                            "interval_hours": 6
-                        }
-                    ]
+                        {"type": "provide_resources"},
+                        {"type": "schedule_followup", "interval_hours": 6},
+                    ],
                 },
                 "self_harm": {
                     "critical": [
                         {
                             "type": "log_event",
                             "log_level": "critical",
-                            "message": "CRITICAL SELF-HARM RISK: User {user_id} in session {session_id}"
+                            "message": "CRITICAL SELF-HARM RISK: User {user_id} in session {session_id}",
                         },
                         {
                             "type": "generate_response",
-                            "template": "I'm very concerned about your safety. Self-harm can be dangerous and I want to help you stay safe. Please contact emergency services (911) if you're in immediate danger."
+                            "template": "I'm very concerned about your safety. Self-harm can be dangerous and I want to help you stay safe. Please contact emergency services (911) if you're in immediate danger.",
                         },
                         {
                             "type": "contact_emergency",
                             "service": "911",
-                            "reason": "Self-harm - immediate danger"
+                            "reason": "Self-harm - immediate danger",
                         },
                         {
                             "type": "notify_human",
                             "priority": "critical",
                             "message": "CRITICAL: Self-harm risk - emergency services contacted",
-                            "channels": ["email", "sms", "dashboard"]
-                        }
+                            "channels": ["email", "sms", "dashboard"],
+                        },
                     ],
                     "high": [
                         {
                             "type": "log_event",
                             "log_level": "warning",
-                            "message": "HIGH RISK SELF-HARM: User {user_id} in session {session_id}"
+                            "message": "HIGH RISK SELF-HARM: User {user_id} in session {session_id}",
                         },
                         {
                             "type": "generate_response",
-                            "template": "I'm worried about you and want to help you stay safe. Self-harm might feel like a way to cope, but there are healthier alternatives. Please consider reaching out to a mental health professional."
+                            "template": "I'm worried about you and want to help you stay safe. Self-harm might feel like a way to cope, but there are healthier alternatives. Please consider reaching out to a mental health professional.",
                         },
                         {
                             "type": "notify_human",
                             "priority": "high",
-                            "message": "High risk self-harm detected - immediate oversight required"
+                            "message": "High risk self-harm detected - immediate oversight required",
                         },
-                        {
-                            "type": "schedule_followup",
-                            "interval_hours": 4
-                        }
-                    ]
+                        {"type": "schedule_followup", "interval_hours": 4},
+                    ],
                 },
                 "severe_depression": {
                     "high": [
                         {
                             "type": "log_event",
                             "log_level": "warning",
-                            "message": "SEVERE DEPRESSION: User {user_id} in session {session_id}"
+                            "message": "SEVERE DEPRESSION: User {user_id} in session {session_id}",
                         },
                         {
                             "type": "generate_response",
-                            "template": "I hear that you're going through an incredibly difficult time. Depression can make everything feel hopeless, but professional support can make a real difference."
+                            "template": "I hear that you're going through an incredibly difficult time. Depression can make everything feel hopeless, but professional support can make a real difference.",
                         },
                         {
                             "type": "notify_human",
                             "priority": "medium",
-                            "message": "Severe depression detected - professional referral recommended"
+                            "message": "Severe depression detected - professional referral recommended",
                         },
-                        {
-                            "type": "schedule_followup",
-                            "interval_hours": 12
-                        }
+                        {"type": "schedule_followup", "interval_hours": 12},
                     ]
                 },
                 "default": [
                     {
                         "type": "log_event",
                         "log_level": "info",
-                        "message": "Crisis protocol executed for user {user_id}"
+                        "message": "Crisis protocol executed for user {user_id}",
                     },
                     {
                         "type": "generate_response",
-                        "template": "I'm here to support you. Please let me know how I can help, and consider reaching out to a mental health professional if you need additional support."
-                    }
-                ]
+                        "template": "I'm here to support you. Please let me know how I can help, and consider reaching out to a mental health professional if you need additional support.",
+                    },
+                ],
             },
-            "timeouts": {
-                "step_timeout_ms": 5000,
-                "protocol_timeout_ms": 30000
-            },
-            "retry_policy": {
-                "max_retries": 3,
-                "retry_delay_ms": 1000
-            }
+            "timeouts": {"step_timeout_ms": 5000, "protocol_timeout_ms": 30000},
+            "retry_policy": {"max_retries": 3, "retry_delay_ms": 1000},
         }
 
 
@@ -2073,11 +2290,11 @@ class HumanOversightEscalation:
     service coordination with comprehensive tracking and reporting.
     """
 
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """Initialize the Human Oversight Escalation system."""
         self.config = config or self._default_escalation_config()
-        self.active_escalations: Dict[str, Dict[str, Any]] = {}
-        self.escalation_history: List[Dict[str, Any]] = []
+        self.active_escalations: dict[str, dict[str, Any]] = {}
+        self.escalation_history: list[dict[str, Any]] = []
 
         # Statistics tracking
         self.total_escalations = 0
@@ -2087,9 +2304,12 @@ class HumanOversightEscalation:
 
         # Initialize logging
         import logging
+
         self.logger = logging.getLogger(__name__ + ".HumanOversightEscalation")
 
-    def escalate_to_human(self, intervention: CrisisIntervention, escalation_type: str = "standard") -> Dict[str, Any]:
+    def escalate_to_human(
+        self, intervention: CrisisIntervention, escalation_type: str = "standard"
+    ) -> dict[str, Any]:
         """Escalate a crisis intervention to human oversight."""
         import time
         import uuid
@@ -2101,7 +2321,9 @@ class HumanOversightEscalation:
             "intervention_id": intervention.intervention_id,
             "escalation_type": escalation_type,
             "crisis_level": intervention.crisis_assessment.crisis_level.value,
-            "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
+            "crisis_types": [
+                ct.value for ct in intervention.crisis_assessment.crisis_types
+            ],
             "user_id": intervention.user_id,
             "session_id": intervention.session_id,
             "timestamp": time.time(),
@@ -2109,7 +2331,7 @@ class HumanOversightEscalation:
             "status": "pending",
             "assigned_human": None,
             "response_received": False,
-            "resolution_time": None
+            "resolution_time": None,
         }
 
         self.active_escalations[escalation_id] = escalation
@@ -2125,7 +2347,9 @@ class HumanOversightEscalation:
 
         return escalation
 
-    def escalate_to_emergency_services(self, intervention: CrisisIntervention, emergency_type: str = "mental_health") -> Dict[str, Any]:
+    def escalate_to_emergency_services(
+        self, intervention: CrisisIntervention, emergency_type: str = "mental_health"
+    ) -> dict[str, Any]:
         """Escalate to emergency services for critical situations."""
         import time
         import uuid
@@ -2138,14 +2362,18 @@ class HumanOversightEscalation:
             "escalation_type": "emergency_services",
             "emergency_type": emergency_type,
             "crisis_level": intervention.crisis_assessment.crisis_level.value,
-            "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
+            "crisis_types": [
+                ct.value for ct in intervention.crisis_assessment.crisis_types
+            ],
             "user_id": intervention.user_id,
             "session_id": intervention.session_id,
             "timestamp": time.time(),
             "emergency_contacts": [],
             "status": "critical",
             "response_time_required": "immediate",
-            "location_info": intervention.crisis_assessment.context.get("location", "unknown")
+            "location_info": intervention.crisis_assessment.context.get(
+                "location", "unknown"
+            ),
         }
 
         self.active_escalations[escalation_id] = escalation
@@ -2161,7 +2389,9 @@ class HumanOversightEscalation:
 
         return escalation
 
-    def _send_notifications(self, escalation: Dict[str, Any], intervention: CrisisIntervention) -> None:
+    def _send_notifications(
+        self, escalation: dict[str, Any], intervention: CrisisIntervention
+    ) -> None:
         """Send notifications to appropriate human oversight personnel."""
         crisis_level = intervention.crisis_assessment.crisis_level
         escalation_type = escalation["escalation_type"]
@@ -2171,7 +2401,9 @@ class HumanOversightEscalation:
 
         for channel in channels:
             try:
-                notification_result = self._send_notification(channel, escalation, intervention)
+                notification_result = self._send_notification(
+                    channel, escalation, intervention
+                )
                 escalation["notifications_sent"].append(notification_result)
 
                 if notification_result["success"]:
@@ -2183,7 +2415,9 @@ class HumanOversightEscalation:
                 self.failed_notifications += 1
                 self.logger.error(f"Failed to send notification via {channel}: {e}")
 
-    def _get_notification_channels(self, crisis_level: CrisisLevel, escalation_type: str) -> List[str]:
+    def _get_notification_channels(
+        self, crisis_level: CrisisLevel, escalation_type: str
+    ) -> list[str]:
         """Determine appropriate notification channels based on crisis level and type."""
         channels = []
 
@@ -2198,11 +2432,15 @@ class HumanOversightEscalation:
 
         # Filter based on configuration
         enabled_channels = self.config.get("notification_channels", {})
-        channels = [ch for ch in channels if enabled_channels.get(ch, {}).get("enabled", False)]
+        channels = [
+            ch for ch in channels if enabled_channels.get(ch, {}).get("enabled", False)
+        ]
 
         return channels
 
-    def _send_notification(self, channel: str, escalation: Dict[str, Any], intervention: CrisisIntervention) -> Dict[str, Any]:
+    def _send_notification(
+        self, channel: str, escalation: dict[str, Any], intervention: CrisisIntervention
+    ) -> dict[str, Any]:
         """Send a notification via the specified channel."""
         import time
 
@@ -2214,7 +2452,7 @@ class HumanOversightEscalation:
             "success": False,
             "response_time_ms": 0.0,
             "message_id": None,
-            "error": None
+            "error": None,
         }
 
         try:
@@ -2247,7 +2485,9 @@ class HumanOversightEscalation:
 
         return notification
 
-    def _generate_notification_content(self, escalation: Dict[str, Any], intervention: CrisisIntervention) -> Dict[str, Any]:
+    def _generate_notification_content(
+        self, escalation: dict[str, Any], intervention: CrisisIntervention
+    ) -> dict[str, Any]:
         """Generate notification content for human oversight."""
         return {
             "subject": f"CRISIS INTERVENTION ESCALATION - {escalation['crisis_level'].upper()}",
@@ -2264,66 +2504,100 @@ class HumanOversightEscalation:
                 f"Immediate Risk: {intervention.crisis_assessment.immediate_risk}\n\n"
                 f"Please review and respond immediately."
             ),
-            "priority": "high" if escalation["crisis_level"] in ["high", "critical"] else "medium",
+            "priority": (
+                "high"
+                if escalation["crisis_level"] in ["high", "critical"]
+                else "medium"
+            ),
             "metadata": {
                 "escalation_id": escalation["escalation_id"],
                 "intervention_id": escalation["intervention_id"],
                 "crisis_level": escalation["crisis_level"],
-                "user_id": escalation["user_id"]
-            }
+                "user_id": escalation["user_id"],
+            },
         }
 
-    def _send_email_notification(self, content: Dict[str, Any], escalation: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_email_notification(
+        self, content: dict[str, Any], escalation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send email notification (placeholder implementation)."""
         # In a real implementation, this would send actual emails
         self.logger.info(f"EMAIL NOTIFICATION: {content['subject']}")
         return {
             "message_id": f"email_{escalation['escalation_id']}",
-            "recipients": self.config.get("notification_channels", {}).get("email", {}).get("recipients", []),
-            "delivery_status": "sent"
+            "recipients": self.config.get("notification_channels", {})
+            .get("email", {})
+            .get("recipients", []),
+            "delivery_status": "sent",
         }
 
-    def _send_sms_notification(self, content: Dict[str, Any], escalation: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_sms_notification(
+        self, content: dict[str, Any], escalation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send SMS notification (placeholder implementation)."""
         # In a real implementation, this would send actual SMS messages
-        self.logger.warning(f"SMS NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
+        self.logger.warning(
+            f"SMS NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
+        )
         return {
             "message_id": f"sms_{escalation['escalation_id']}",
-            "recipients": self.config.get("notification_channels", {}).get("sms", {}).get("recipients", []),
-            "delivery_status": "sent"
+            "recipients": self.config.get("notification_channels", {})
+            .get("sms", {})
+            .get("recipients", []),
+            "delivery_status": "sent",
         }
 
-    def _send_phone_notification(self, content: Dict[str, Any], escalation: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_phone_notification(
+        self, content: dict[str, Any], escalation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send phone notification (placeholder implementation)."""
         # In a real implementation, this would make actual phone calls
-        self.logger.critical(f"PHONE NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
+        self.logger.critical(
+            f"PHONE NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
+        )
         return {
             "message_id": f"phone_{escalation['escalation_id']}",
-            "recipients": self.config.get("notification_channels", {}).get("phone", {}).get("recipients", []),
-            "delivery_status": "attempted"
+            "recipients": self.config.get("notification_channels", {})
+            .get("phone", {})
+            .get("recipients", []),
+            "delivery_status": "attempted",
         }
 
-    def _send_dashboard_notification(self, content: Dict[str, Any], escalation: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_dashboard_notification(
+        self, content: dict[str, Any], escalation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send dashboard notification (placeholder implementation)."""
         # In a real implementation, this would update a monitoring dashboard
-        self.logger.info(f"DASHBOARD NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
+        self.logger.info(
+            f"DASHBOARD NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
+        )
         return {
             "message_id": f"dashboard_{escalation['escalation_id']}",
-            "dashboard_url": self.config.get("notification_channels", {}).get("dashboard", {}).get("url", ""),
-            "delivery_status": "posted"
+            "dashboard_url": self.config.get("notification_channels", {})
+            .get("dashboard", {})
+            .get("url", ""),
+            "delivery_status": "posted",
         }
 
-    def _send_pager_notification(self, content: Dict[str, Any], escalation: Dict[str, Any]) -> Dict[str, Any]:
+    def _send_pager_notification(
+        self, content: dict[str, Any], escalation: dict[str, Any]
+    ) -> dict[str, Any]:
         """Send pager notification (placeholder implementation)."""
         # In a real implementation, this would send to pager systems
-        self.logger.critical(f"PAGER NOTIFICATION: Crisis escalation {escalation['escalation_id']}")
+        self.logger.critical(
+            f"PAGER NOTIFICATION: Crisis escalation {escalation['escalation_id']}"
+        )
         return {
             "message_id": f"pager_{escalation['escalation_id']}",
-            "recipients": self.config.get("notification_channels", {}).get("pager", {}).get("recipients", []),
-            "delivery_status": "sent"
+            "recipients": self.config.get("notification_channels", {})
+            .get("pager", {})
+            .get("recipients", []),
+            "delivery_status": "sent",
         }
 
-    def _contact_emergency_services(self, escalation: Dict[str, Any], intervention: CrisisIntervention) -> None:
+    def _contact_emergency_services(
+        self, escalation: dict[str, Any], intervention: CrisisIntervention
+    ) -> None:
         """Contact emergency services for critical situations."""
         emergency_type = escalation.get("emergency_type", "mental_health")
 
@@ -2347,13 +2621,13 @@ class HumanOversightEscalation:
             "user_info": {
                 "user_id": escalation["user_id"],
                 "session_id": escalation["session_id"],
-                "location": escalation.get("location_info", "unknown")
+                "location": escalation.get("location_info", "unknown"),
             },
             "crisis_details": {
                 "types": escalation["crisis_types"],
                 "level": escalation["crisis_level"],
-                "immediate_risk": intervention.crisis_assessment.immediate_risk
-            }
+                "immediate_risk": intervention.crisis_assessment.immediate_risk,
+            },
         }
 
         escalation["emergency_contacts"].append(emergency_contact)
@@ -2363,7 +2637,9 @@ class HumanOversightEscalation:
             f"for escalation {escalation['escalation_id']}"
         )
 
-    def acknowledge_escalation(self, escalation_id: str, human_id: str, response_notes: str = "") -> bool:
+    def acknowledge_escalation(
+        self, escalation_id: str, human_id: str, response_notes: str = ""
+    ) -> bool:
         """Acknowledge an escalation by a human oversight person."""
         import time
 
@@ -2383,7 +2659,9 @@ class HumanOversightEscalation:
 
         return True
 
-    def resolve_escalation(self, escalation_id: str, resolution_notes: str = "") -> bool:
+    def resolve_escalation(
+        self, escalation_id: str, resolution_notes: str = ""
+    ) -> bool:
         """Mark an escalation as resolved."""
         import time
 
@@ -2403,14 +2681,16 @@ class HumanOversightEscalation:
 
         return True
 
-    def get_escalation_status(self, escalation_id: str) -> Optional[Dict[str, Any]]:
+    def get_escalation_status(self, escalation_id: str) -> dict[str, Any] | None:
         """Get the status of a specific escalation."""
         return self.active_escalations.get(escalation_id)
 
-    def get_escalation_metrics(self) -> Dict[str, Any]:
+    def get_escalation_metrics(self) -> dict[str, Any]:
         """Get comprehensive escalation metrics."""
         total_notifications = self.successful_notifications + self.failed_notifications
-        notification_success_rate = (self.successful_notifications / max(1, total_notifications)) * 100
+        notification_success_rate = (
+            self.successful_notifications / max(1, total_notifications)
+        ) * 100
 
         # Response time analysis
         response_times = []
@@ -2419,11 +2699,15 @@ class HumanOversightEscalation:
                 response_time = escalation["response_time"] - escalation["timestamp"]
                 response_times.append(response_time)
 
-        avg_response_time = sum(response_times) / len(response_times) if response_times else 0.0
+        avg_response_time = (
+            sum(response_times) / len(response_times) if response_times else 0.0
+        )
 
         # Escalation type distribution
         escalation_types = {}
-        for escalation in list(self.active_escalations.values()) + self.escalation_history:
+        for escalation in (
+            list(self.active_escalations.values()) + self.escalation_history
+        ):
             esc_type = escalation.get("escalation_type", "unknown")
             escalation_types[esc_type] = escalation_types.get(esc_type, 0) + 1
 
@@ -2436,10 +2720,10 @@ class HumanOversightEscalation:
             "failed_notifications": self.failed_notifications,
             "notification_success_rate_percent": notification_success_rate,
             "average_response_time_seconds": avg_response_time,
-            "escalation_type_distribution": escalation_types
+            "escalation_type_distribution": escalation_types,
         }
 
-    def _default_escalation_config(self) -> Dict[str, Any]:
+    def _default_escalation_config(self) -> dict[str, Any]:
         """Default configuration for human oversight escalation."""
         return {
             "notification_channels": {
@@ -2447,56 +2731,56 @@ class HumanOversightEscalation:
                     "enabled": True,
                     "recipients": ["crisis-team@example.com", "supervisor@example.com"],
                     "smtp_server": "smtp.example.com",
-                    "smtp_port": 587
+                    "smtp_port": 587,
                 },
                 "sms": {
                     "enabled": True,
                     "recipients": ["+1234567890", "+0987654321"],
-                    "service_provider": "twilio"
+                    "service_provider": "twilio",
                 },
                 "phone": {
                     "enabled": False,
                     "recipients": ["+1234567890"],
-                    "service_provider": "twilio"
+                    "service_provider": "twilio",
                 },
                 "dashboard": {
                     "enabled": True,
                     "url": "https://dashboard.example.com/crisis",
-                    "api_key": "dashboard_api_key"
+                    "api_key": "dashboard_api_key",
                 },
                 "pager": {
                     "enabled": False,
                     "recipients": ["pager123", "pager456"],
-                    "service_provider": "pagerduty"
-                }
+                    "service_provider": "pagerduty",
+                },
             },
             "escalation_rules": {
                 "critical": {
                     "immediate_notification": True,
                     "required_channels": ["sms", "phone", "email"],
-                    "response_timeout_minutes": 5
+                    "response_timeout_minutes": 5,
                 },
                 "high": {
                     "immediate_notification": True,
                     "required_channels": ["sms", "email"],
-                    "response_timeout_minutes": 15
+                    "response_timeout_minutes": 15,
                 },
                 "moderate": {
                     "immediate_notification": False,
                     "required_channels": ["email", "dashboard"],
-                    "response_timeout_minutes": 60
-                }
+                    "response_timeout_minutes": 60,
+                },
             },
             "emergency_services": {
                 "mental_health_crisis": "988",
                 "medical_emergency": "911",
-                "general_emergency": "911"
+                "general_emergency": "911",
             },
             "retry_policy": {
                 "max_retries": 3,
                 "retry_delay_minutes": 2,
-                "escalate_on_failure": True
-            }
+                "escalate_on_failure": True,
+            },
         }
 
 
@@ -2507,11 +2791,13 @@ class SafetyMonitoringDashboard:
     therapeutic safety validation and crisis intervention activities.
     """
 
-    def __init__(self,
-                 therapeutic_validator: Optional[TherapeuticValidator] = None,
-                 crisis_manager: Optional[CrisisInterventionManager] = None,
-                 escalation_system: Optional[HumanOversightEscalation] = None,
-                 protocol_engine: Optional[EmergencyProtocolEngine] = None):
+    def __init__(
+        self,
+        therapeutic_validator: TherapeuticValidator | None = None,
+        crisis_manager: CrisisInterventionManager | None = None,
+        escalation_system: HumanOversightEscalation | None = None,
+        protocol_engine: EmergencyProtocolEngine | None = None,
+    ):
         """Initialize the Safety Monitoring Dashboard."""
         self.therapeutic_validator = therapeutic_validator
         self.crisis_manager = crisis_manager
@@ -2519,19 +2805,20 @@ class SafetyMonitoringDashboard:
         self.protocol_engine = protocol_engine
 
         # Real-time monitoring data
-        self.active_sessions: Dict[str, Dict[str, Any]] = {}
-        self.alert_queue: List[Dict[str, Any]] = []
-        self.monitoring_metrics: Dict[str, Any] = {}
+        self.active_sessions: dict[str, dict[str, Any]] = {}
+        self.alert_queue: list[dict[str, Any]] = []
+        self.monitoring_metrics: dict[str, Any] = {}
 
         # Historical data for trending
-        self.historical_data: List[Dict[str, Any]] = []
-        self.trend_analysis: Dict[str, Any] = {}
+        self.historical_data: list[dict[str, Any]] = []
+        self.trend_analysis: dict[str, Any] = {}
 
         # Initialize logging
         import logging
+
         self.logger = logging.getLogger(__name__ + ".SafetyMonitoringDashboard")
 
-    def get_real_time_status(self) -> Dict[str, Any]:
+    def get_real_time_status(self) -> dict[str, Any]:
         """Get real-time status of all safety systems."""
         import time
 
@@ -2540,7 +2827,7 @@ class SafetyMonitoringDashboard:
             "system_health": "healthy",
             "active_sessions": len(self.active_sessions),
             "active_alerts": len(self.alert_queue),
-            "components": {}
+            "components": {},
         }
 
         # Therapeutic Validator status
@@ -2551,7 +2838,7 @@ class SafetyMonitoringDashboard:
                 "total_validations": validator_metrics.get("total_validations", 0),
                 "violation_count": validator_metrics.get("violation_count", 0),
                 "crisis_count": validator_metrics.get("crisis_count", 0),
-                "escalation_count": validator_metrics.get("escalation_count", 0)
+                "escalation_count": validator_metrics.get("escalation_count", 0),
             }
 
         # Crisis Intervention Manager status
@@ -2562,7 +2849,7 @@ class SafetyMonitoringDashboard:
                 "active_interventions": crisis_metrics.get("active_interventions", 0),
                 "total_interventions": crisis_metrics.get("total_interventions", 0),
                 "success_rate_percent": crisis_metrics.get("success_rate_percent", 0),
-                "emergency_contacts": crisis_metrics.get("emergency_contacts", 0)
+                "emergency_contacts": crisis_metrics.get("emergency_contacts", 0),
             }
 
         # Human Oversight Escalation status
@@ -2572,8 +2859,12 @@ class SafetyMonitoringDashboard:
                 "status": "active",
                 "active_escalations": escalation_metrics.get("active_escalations", 0),
                 "total_escalations": escalation_metrics.get("total_escalations", 0),
-                "emergency_escalations": escalation_metrics.get("emergency_escalations", 0),
-                "notification_success_rate": escalation_metrics.get("notification_success_rate_percent", 0)
+                "emergency_escalations": escalation_metrics.get(
+                    "emergency_escalations", 0
+                ),
+                "notification_success_rate": escalation_metrics.get(
+                    "notification_success_rate_percent", 0
+                ),
             }
 
         # Emergency Protocol Engine status
@@ -2583,7 +2874,7 @@ class SafetyMonitoringDashboard:
                 "status": "active",
                 "protocols_executed": protocol_metrics.get("protocols_executed", 0),
                 "success_rate_percent": protocol_metrics.get("success_rate_percent", 0),
-                "active_protocols": protocol_metrics.get("active_protocols", 0)
+                "active_protocols": protocol_metrics.get("active_protocols", 0),
             }
 
         # Determine overall system health
@@ -2591,7 +2882,7 @@ class SafetyMonitoringDashboard:
 
         return status
 
-    def get_crisis_dashboard(self) -> Dict[str, Any]:
+    def get_crisis_dashboard(self) -> dict[str, Any]:
         """Get comprehensive crisis intervention dashboard data."""
         dashboard = {
             "summary": self._get_crisis_summary(),
@@ -2599,12 +2890,12 @@ class SafetyMonitoringDashboard:
             "recent_escalations": self._get_recent_escalations(),
             "crisis_trends": self._get_crisis_trends(),
             "performance_metrics": self._get_performance_metrics(),
-            "alerts": self._get_active_alerts()
+            "alerts": self._get_active_alerts(),
         }
 
         return dashboard
 
-    def _get_crisis_summary(self) -> Dict[str, Any]:
+    def _get_crisis_summary(self) -> dict[str, Any]:
         """Get crisis intervention summary statistics."""
         summary = {
             "total_interventions_today": 0,
@@ -2612,18 +2903,22 @@ class SafetyMonitoringDashboard:
             "critical_interventions": 0,
             "emergency_contacts_today": 0,
             "average_response_time_ms": 0.0,
-            "success_rate_percent": 0.0
+            "success_rate_percent": 0.0,
         }
 
         if self.crisis_manager:
             metrics = self.crisis_manager.get_crisis_metrics()
-            summary.update({
-                "active_interventions": metrics.get("active_interventions", 0),
-                "total_interventions_today": metrics.get("total_interventions", 0),
-                "emergency_contacts_today": metrics.get("emergency_contacts", 0),
-                "average_response_time_ms": metrics.get("average_response_time_ms", 0.0),
-                "success_rate_percent": metrics.get("success_rate_percent", 0.0)
-            })
+            summary.update(
+                {
+                    "active_interventions": metrics.get("active_interventions", 0),
+                    "total_interventions_today": metrics.get("total_interventions", 0),
+                    "emergency_contacts_today": metrics.get("emergency_contacts", 0),
+                    "average_response_time_ms": metrics.get(
+                        "average_response_time_ms", 0.0
+                    ),
+                    "success_rate_percent": metrics.get("success_rate_percent", 0.0),
+                }
+            )
 
             # Count critical interventions
             critical_count = 0
@@ -2634,106 +2929,126 @@ class SafetyMonitoringDashboard:
 
         return summary
 
-    def _get_active_interventions(self) -> List[Dict[str, Any]]:
+    def _get_active_interventions(self) -> list[dict[str, Any]]:
         """Get list of currently active interventions."""
         active_interventions = []
 
         if self.crisis_manager:
             for intervention in self.crisis_manager.active_interventions.values():
-                active_interventions.append({
-                    "intervention_id": intervention.intervention_id,
-                    "user_id": intervention.user_id,
-                    "session_id": intervention.session_id,
-                    "crisis_level": intervention.crisis_assessment.crisis_level.value,
-                    "crisis_types": [ct.value for ct in intervention.crisis_assessment.crisis_types],
-                    "created_timestamp": intervention.created_timestamp,
-                    "escalation_status": intervention.escalation_status.value,
-                    "human_notified": intervention.human_notified,
-                    "emergency_contacted": intervention.emergency_contacted,
-                    "actions_taken": len(intervention.actions_taken)
-                })
+                active_interventions.append(
+                    {
+                        "intervention_id": intervention.intervention_id,
+                        "user_id": intervention.user_id,
+                        "session_id": intervention.session_id,
+                        "crisis_level": intervention.crisis_assessment.crisis_level.value,
+                        "crisis_types": [
+                            ct.value
+                            for ct in intervention.crisis_assessment.crisis_types
+                        ],
+                        "created_timestamp": intervention.created_timestamp,
+                        "escalation_status": intervention.escalation_status.value,
+                        "human_notified": intervention.human_notified,
+                        "emergency_contacted": intervention.emergency_contacted,
+                        "actions_taken": len(intervention.actions_taken),
+                    }
+                )
 
         # Sort by creation time (most recent first)
         active_interventions.sort(key=lambda x: x["created_timestamp"], reverse=True)
 
         return active_interventions
 
-    def _get_recent_escalations(self) -> List[Dict[str, Any]]:
+    def _get_recent_escalations(self) -> list[dict[str, Any]]:
         """Get list of recent escalations."""
         recent_escalations = []
 
         if self.escalation_system:
             # Get active escalations
             for escalation in self.escalation_system.active_escalations.values():
-                recent_escalations.append({
-                    "escalation_id": escalation["escalation_id"],
-                    "intervention_id": escalation["intervention_id"],
-                    "escalation_type": escalation["escalation_type"],
-                    "crisis_level": escalation["crisis_level"],
-                    "user_id": escalation["user_id"],
-                    "timestamp": escalation["timestamp"],
-                    "status": escalation["status"],
-                    "notifications_sent": len(escalation.get("notifications_sent", [])),
-                    "response_received": escalation.get("response_received", False)
-                })
+                recent_escalations.append(
+                    {
+                        "escalation_id": escalation["escalation_id"],
+                        "intervention_id": escalation["intervention_id"],
+                        "escalation_type": escalation["escalation_type"],
+                        "crisis_level": escalation["crisis_level"],
+                        "user_id": escalation["user_id"],
+                        "timestamp": escalation["timestamp"],
+                        "status": escalation["status"],
+                        "notifications_sent": len(
+                            escalation.get("notifications_sent", [])
+                        ),
+                        "response_received": escalation.get("response_received", False),
+                    }
+                )
 
             # Get recent resolved escalations (last 10)
             recent_resolved = self.escalation_system.escalation_history[-10:]
             for escalation in recent_resolved:
-                recent_escalations.append({
-                    "escalation_id": escalation["escalation_id"],
-                    "intervention_id": escalation["intervention_id"],
-                    "escalation_type": escalation["escalation_type"],
-                    "crisis_level": escalation["crisis_level"],
-                    "user_id": escalation["user_id"],
-                    "timestamp": escalation["timestamp"],
-                    "status": escalation["status"],
-                    "notifications_sent": len(escalation.get("notifications_sent", [])),
-                    "response_received": escalation.get("response_received", False),
-                    "resolution_time": escalation.get("resolution_time")
-                })
+                recent_escalations.append(
+                    {
+                        "escalation_id": escalation["escalation_id"],
+                        "intervention_id": escalation["intervention_id"],
+                        "escalation_type": escalation["escalation_type"],
+                        "crisis_level": escalation["crisis_level"],
+                        "user_id": escalation["user_id"],
+                        "timestamp": escalation["timestamp"],
+                        "status": escalation["status"],
+                        "notifications_sent": len(
+                            escalation.get("notifications_sent", [])
+                        ),
+                        "response_received": escalation.get("response_received", False),
+                        "resolution_time": escalation.get("resolution_time"),
+                    }
+                )
 
         # Sort by timestamp (most recent first)
         recent_escalations.sort(key=lambda x: x["timestamp"], reverse=True)
 
         return recent_escalations[:20]  # Return last 20
 
-    def _get_crisis_trends(self) -> Dict[str, Any]:
+    def _get_crisis_trends(self) -> dict[str, Any]:
         """Get crisis trend analysis."""
         trends = {
             "hourly_interventions": [],
             "crisis_type_distribution": {},
             "crisis_level_trends": {},
-            "response_time_trends": []
+            "response_time_trends": [],
         }
 
         if self.crisis_manager:
             metrics = self.crisis_manager.get_crisis_metrics()
-            trends["crisis_type_distribution"] = metrics.get("crisis_type_distribution", {})
-            trends["crisis_level_distribution"] = metrics.get("crisis_level_distribution", {})
+            trends["crisis_type_distribution"] = metrics.get(
+                "crisis_type_distribution", {}
+            )
+            trends["crisis_level_distribution"] = metrics.get(
+                "crisis_level_distribution", {}
+            )
 
         # In a real implementation, this would analyze historical data
         # For now, we'll provide placeholder trend data
         import time
+
         current_hour = int(time.time() // 3600)
 
         for i in range(24):  # Last 24 hours
             hour = current_hour - (23 - i)
-            trends["hourly_interventions"].append({
-                "hour": hour,
-                "interventions": 0,  # Would be calculated from historical data
-                "critical_interventions": 0
-            })
+            trends["hourly_interventions"].append(
+                {
+                    "hour": hour,
+                    "interventions": 0,  # Would be calculated from historical data
+                    "critical_interventions": 0,
+                }
+            )
 
         return trends
 
-    def _get_performance_metrics(self) -> Dict[str, Any]:
+    def _get_performance_metrics(self) -> dict[str, Any]:
         """Get comprehensive performance metrics."""
         metrics = {
             "validation_performance": {},
             "intervention_performance": {},
             "escalation_performance": {},
-            "protocol_performance": {}
+            "protocol_performance": {},
         }
 
         # Validation performance
@@ -2741,9 +3056,15 @@ class SafetyMonitoringDashboard:
             validator_metrics = self.therapeutic_validator.get_monitoring_metrics()
             metrics["validation_performance"] = {
                 "total_validations": validator_metrics.get("total_validations", 0),
-                "average_validation_time_ms": validator_metrics.get("average_validation_time_ms", 0.0),
-                "crisis_detection_rate": validator_metrics.get("crisis_detection_rate", 0.0),
-                "false_positive_rate": validator_metrics.get("false_positive_rate", 0.0)
+                "average_validation_time_ms": validator_metrics.get(
+                    "average_validation_time_ms", 0.0
+                ),
+                "crisis_detection_rate": validator_metrics.get(
+                    "crisis_detection_rate", 0.0
+                ),
+                "false_positive_rate": validator_metrics.get(
+                    "false_positive_rate", 0.0
+                ),
             }
 
         # Intervention performance
@@ -2751,37 +3072,53 @@ class SafetyMonitoringDashboard:
             crisis_metrics = self.crisis_manager.get_crisis_metrics()
             metrics["intervention_performance"] = {
                 "success_rate_percent": crisis_metrics.get("success_rate_percent", 0.0),
-                "average_response_time_ms": crisis_metrics.get("average_response_time_ms", 0.0),
-                "escalation_rate": (crisis_metrics.get("escalations_triggered", 0) /
-                                  max(1, crisis_metrics.get("total_interventions", 1))) * 100
+                "average_response_time_ms": crisis_metrics.get(
+                    "average_response_time_ms", 0.0
+                ),
+                "escalation_rate": (
+                    crisis_metrics.get("escalations_triggered", 0)
+                    / max(1, crisis_metrics.get("total_interventions", 1))
+                )
+                * 100,
             }
 
         # Escalation performance
         if self.escalation_system:
             escalation_metrics = self.escalation_system.get_escalation_metrics()
             metrics["escalation_performance"] = {
-                "notification_success_rate": escalation_metrics.get("notification_success_rate_percent", 0.0),
-                "average_response_time_seconds": escalation_metrics.get("average_response_time_seconds", 0.0),
-                "emergency_escalation_rate": (escalation_metrics.get("emergency_escalations", 0) /
-                                             max(1, escalation_metrics.get("total_escalations", 1))) * 100
+                "notification_success_rate": escalation_metrics.get(
+                    "notification_success_rate_percent", 0.0
+                ),
+                "average_response_time_seconds": escalation_metrics.get(
+                    "average_response_time_seconds", 0.0
+                ),
+                "emergency_escalation_rate": (
+                    escalation_metrics.get("emergency_escalations", 0)
+                    / max(1, escalation_metrics.get("total_escalations", 1))
+                )
+                * 100,
             }
 
         # Protocol performance
         if self.protocol_engine:
             protocol_metrics = self.protocol_engine.get_protocol_metrics()
             metrics["protocol_performance"] = {
-                "success_rate_percent": protocol_metrics.get("success_rate_percent", 0.0),
-                "average_response_times_ms": protocol_metrics.get("average_response_times_ms", {})
+                "success_rate_percent": protocol_metrics.get(
+                    "success_rate_percent", 0.0
+                ),
+                "average_response_times_ms": protocol_metrics.get(
+                    "average_response_times_ms", {}
+                ),
             }
 
         return metrics
 
-    def _get_active_alerts(self) -> List[Dict[str, Any]]:
+    def _get_active_alerts(self) -> list[dict[str, Any]]:
         """Get currently active alerts."""
         # Return current alert queue
         return self.alert_queue.copy()
 
-    def _assess_system_health(self, status: Dict[str, Any]) -> str:
+    def _assess_system_health(self, status: dict[str, Any]) -> str:
         """Assess overall system health based on component status."""
         # Check for critical conditions
         crisis_component = status.get("components", {}).get("crisis_manager", {})
@@ -2807,7 +3144,13 @@ class SafetyMonitoringDashboard:
 
         return "healthy"
 
-    def add_alert(self, alert_type: str, message: str, severity: str = "medium", metadata: Optional[Dict[str, Any]] = None) -> str:
+    def add_alert(
+        self,
+        alert_type: str,
+        message: str,
+        severity: str = "medium",
+        metadata: dict[str, Any] | None = None,
+    ) -> str:
         """Add a new alert to the monitoring system."""
         import time
         import uuid
@@ -2824,7 +3167,7 @@ class SafetyMonitoringDashboard:
             "metadata": metadata or {},
             "acknowledged": False,
             "acknowledged_by": None,
-            "acknowledged_at": None
+            "acknowledged_at": None,
         }
 
         self.alert_queue.append(alert)
@@ -2857,7 +3200,9 @@ class SafetyMonitoringDashboard:
 
         return False
 
-    def resolve_alert(self, alert_id: str, resolved_by: str, resolution_notes: str = "") -> bool:
+    def resolve_alert(
+        self, alert_id: str, resolved_by: str, resolution_notes: str = ""
+    ) -> bool:
         """Resolve an alert."""
         import time
 
@@ -2872,12 +3217,14 @@ class SafetyMonitoringDashboard:
                 self.historical_data.append(alert.copy())
                 del self.alert_queue[i]
 
-                self.logger.info(f"Alert {alert_id} resolved by {resolved_by}: {resolution_notes}")
+                self.logger.info(
+                    f"Alert {alert_id} resolved by {resolved_by}: {resolution_notes}"
+                )
                 return True
 
         return False
 
-    def get_safety_report(self, time_range_hours: int = 24) -> Dict[str, Any]:
+    def get_safety_report(self, time_range_hours: int = 24) -> dict[str, Any]:
         """Generate comprehensive safety report for specified time range."""
         import time
 
@@ -2888,14 +3235,14 @@ class SafetyMonitoringDashboard:
             "report_period": {
                 "start_time": start_time,
                 "end_time": end_time,
-                "duration_hours": time_range_hours
+                "duration_hours": time_range_hours,
             },
             "executive_summary": {},
             "validation_summary": {},
             "crisis_summary": {},
             "escalation_summary": {},
             "protocol_summary": {},
-            "recommendations": []
+            "recommendations": [],
         }
 
         # Executive summary
@@ -2904,24 +3251,30 @@ class SafetyMonitoringDashboard:
             "crisis_interventions": 0,
             "emergency_escalations": 0,
             "system_availability": "99.9%",
-            "overall_safety_score": 95.0
+            "overall_safety_score": 95.0,
         }
 
         # Populate with actual data if components are available
         if self.therapeutic_validator:
             validator_metrics = self.therapeutic_validator.get_monitoring_metrics()
             report["validation_summary"] = validator_metrics
-            report["executive_summary"]["total_validations"] = validator_metrics.get("total_validations", 0)
+            report["executive_summary"]["total_validations"] = validator_metrics.get(
+                "total_validations", 0
+            )
 
         if self.crisis_manager:
             crisis_metrics = self.crisis_manager.get_crisis_metrics()
             report["crisis_summary"] = crisis_metrics
-            report["executive_summary"]["crisis_interventions"] = crisis_metrics.get("total_interventions", 0)
+            report["executive_summary"]["crisis_interventions"] = crisis_metrics.get(
+                "total_interventions", 0
+            )
 
         if self.escalation_system:
             escalation_metrics = self.escalation_system.get_escalation_metrics()
             report["escalation_summary"] = escalation_metrics
-            report["executive_summary"]["emergency_escalations"] = escalation_metrics.get("emergency_escalations", 0)
+            report["executive_summary"]["emergency_escalations"] = (
+                escalation_metrics.get("emergency_escalations", 0)
+            )
 
         if self.protocol_engine:
             protocol_metrics = self.protocol_engine.get_protocol_metrics()
@@ -2932,7 +3285,7 @@ class SafetyMonitoringDashboard:
 
         return report
 
-    def _generate_recommendations(self, report: Dict[str, Any]) -> List[str]:
+    def _generate_recommendations(self, report: dict[str, Any]) -> list[str]:
         """Generate recommendations based on safety report data."""
         recommendations = []
 
@@ -2982,7 +3335,9 @@ class SafetyMonitoringDashboard:
                 )
 
         if not recommendations:
-            recommendations.append("All safety metrics are within acceptable ranges. Continue current monitoring and intervention protocols.")
+            recommendations.append(
+                "All safety metrics are within acceptable ranges. Continue current monitoring and intervention protocols."
+            )
 
         return recommendations
 
@@ -2992,6 +3347,7 @@ class SafetyMonitoringDashboard:
 
         if format_type.lower() == "json":
             import json
+
             return json.dumps(dashboard_data, indent=2, default=str)
         elif format_type.lower() == "csv":
             # In a real implementation, this would convert to CSV format
@@ -3000,9 +3356,10 @@ class SafetyMonitoringDashboard:
             raise ValueError(f"Unsupported export format: {format_type}")
 
 
+import time
+
 # ---- Redis-backed rules provider and SafetyService ----
 from typing import cast
-import time
 
 try:
     from redis.asyncio import Redis as _Redis
@@ -3018,16 +3375,23 @@ class SafetyRulesProvider:
     - Fallback to file path (env TTA_SAFETY_RULES_CONFIG) if Redis unavailable or key missing
     """
 
-    def __init__(self, redis_client: Optional["_Redis"] = None, *, redis_key: str = "ao:safety:rules", cache_ttl_s: float = 2.0, file_fallback_path: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        redis_client: _Redis | None = None,
+        *,
+        redis_key: str = "ao:safety:rules",
+        cache_ttl_s: float = 2.0,
+        file_fallback_path: str | None = None,
+    ) -> None:
         self._redis = redis_client
         self._key = redis_key
         self._ttl = float(cache_ttl_s)
         self._file = file_fallback_path
-        self._cached_raw: Optional[str] = None
+        self._cached_raw: str | None = None
         self._cached_at: float = 0.0
-        self._last_source: Optional[str] = None
+        self._last_source: str | None = None
 
-    async def get_config(self) -> Dict[str, Any]:
+    async def get_config(self) -> dict[str, Any]:
         now = time.time()
         if self._cached_raw is not None and (now - self._cached_at) < self._ttl:
             try:
@@ -3035,8 +3399,8 @@ class SafetyRulesProvider:
             except Exception:
                 pass
         # Try Redis first
-        cfg: Optional[Dict[str, Any]] = None
-        raw: Optional[str] = None
+        cfg: dict[str, Any] | None = None
+        raw: str | None = None
         if self._redis is not None:
             try:
                 b = await cast("_Redis", self._redis).get(self._key)
@@ -3052,13 +3416,14 @@ class SafetyRulesProvider:
                 path = self._file
                 if not path:
                     import os
+
                     path = os.environ.get("TTA_SAFETY_RULES_CONFIG")
                 if path:
                     if path.lower().endswith((".yaml", ".yml")) and yaml is not None:
-                        with open(path, "r", encoding="utf-8") as f:
+                        with open(path, encoding="utf-8") as f:
                             cfg = yaml.safe_load(f)
                     else:
-                        with open(path, "r", encoding="utf-8") as f:
+                        with open(path, encoding="utf-8") as f:
                             cfg = json.load(f)
                     raw = json.dumps(cfg)
                     self._last_source = f"file:{path}"
@@ -3073,7 +3438,7 @@ class SafetyRulesProvider:
         self._cached_at = now
         return cfg
 
-    def status(self) -> Dict[str, Any]:
+    def status(self) -> dict[str, Any]:
         return {
             "last_reload_ts": self._cached_at or None,
             "source": self._last_source,
@@ -3094,11 +3459,13 @@ class SafetyService:
     the underlying raw JSON changes (TTL handled by provider).
     """
 
-    def __init__(self, enabled: bool = False, provider: Optional[SafetyRulesProvider] = None) -> None:
+    def __init__(
+        self, enabled: bool = False, provider: SafetyRulesProvider | None = None
+    ) -> None:
         self._enabled = bool(enabled)
         self._provider = provider or SafetyRulesProvider(redis_client=None)
-        self._last_raw: Optional[str] = None
-        self._validator: Optional[TherapeuticValidator] = None
+        self._last_raw: str | None = None
+        self._validator: TherapeuticValidator | None = None
 
     def set_enabled(self, enabled: bool) -> None:
         self._enabled = bool(enabled)
@@ -3117,7 +3484,12 @@ class SafetyService:
     async def validate_text(self, text: str) -> ValidationResult:
         if not self._enabled:
             # Fast path when disabled
-            return ValidationResult(level=SafetyLevel.SAFE, findings=[], score=1.0, audit=[{"event": "disabled"}])
+            return ValidationResult(
+                level=SafetyLevel.SAFE,
+                findings=[],
+                score=1.0,
+                audit=[{"event": "disabled"}],
+            )
         v = await self._ensure_validator()
         return v.validate_text(text)
 
@@ -3126,8 +3498,10 @@ class SafetyService:
         return v.suggest_alternative(reason=level, original=original)
 
 
-_global_safety_service: Optional[SafetyService] = None
-_global_safety_locked: bool = False  # When True, do not auto-refresh from env (component-managed)
+_global_safety_service: SafetyService | None = None
+_global_safety_locked: bool = (
+    False  # When True, do not auto-refresh from env (component-managed)
+)
 
 
 def get_global_safety_service() -> SafetyService:
@@ -3137,26 +3511,34 @@ def get_global_safety_service() -> SafetyService:
     """
     global _global_safety_service, _global_safety_locked
     import os
+
     if _global_safety_service is None:
         enabled = False
         try:
-            enabled = str(os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")).lower() in ("1", "true", "yes")
+            enabled = str(
+                os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")
+            ).lower() in ("1", "true", "yes")
             redis_client = None
             if _Redis is not None:
                 url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
                 try:
                     import redis.asyncio as aioredis  # type: ignore
+
                     redis_client = aioredis.from_url(url)
                 except Exception:
                     redis_client = None
             provider = SafetyRulesProvider(redis_client=redis_client)
             _global_safety_service = SafetyService(enabled=enabled, provider=provider)
         except Exception:
-            _global_safety_service = SafetyService(enabled=False, provider=SafetyRulesProvider(redis_client=None))
+            _global_safety_service = SafetyService(
+                enabled=False, provider=SafetyRulesProvider(redis_client=None)
+            )
     else:
         if not _global_safety_locked:
             try:
-                enabled = str(os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")).lower() in ("1", "true", "yes")
+                enabled = str(
+                    os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")
+                ).lower() in ("1", "true", "yes")
                 _global_safety_service.set_enabled(enabled)
             except Exception:
                 pass
@@ -3165,7 +3547,8 @@ def get_global_safety_service() -> SafetyService:
 
 
 # Testing/Component hook
-_def_test_override: Optional[SafetyService] = None
+_def_test_override: SafetyService | None = None
+
 
 def set_global_safety_service_for_testing(svc: SafetyService) -> None:
     global _global_safety_service, _global_safety_locked

@@ -19,6 +19,7 @@ const Chat: React.FC = () => {
   );
   const { selectedCharacter } = useSelector((state: RootState) => state.character);
   const { profile } = useSelector((state: RootState) => state.player);
+  const { isAuthenticated, token } = useSelector((state: RootState) => state.auth);
   
   const [inputValue, setInputValue] = useState('');
   const [isInputFocused, setIsInputFocused] = useState(false);
@@ -48,22 +49,38 @@ const Chat: React.FC = () => {
   }, [messageHistory, announce]);
 
   useEffect(() => {
-    // Connect to WebSocket
+    // Only connect to WebSocket when authentication and profile data are available
+    if (!isAuthenticated || !token || !profile?.player_id) {
+      console.log('WebSocket connection delayed - waiting for authentication and profile data', {
+        isAuthenticated,
+        hasToken: !!token,
+        hasProfile: !!profile?.player_id
+      });
+      return;
+    }
+
+    console.log('Initiating WebSocket connection with required data available');
     websocketService.connect(sessionId);
 
     return () => {
       websocketService.disconnect();
     };
-  }, [sessionId]);
+  }, [sessionId, isAuthenticated, token, profile?.player_id]);
 
   const handleSendMessage = (content: string) => {
     if (!content.trim() || !isConnected) return;
-    
-    websocketService.sendMessage(content.trim(), {
-      character_id: selectedCharacter?.id,
-      player_id: profile?.player_id,
-    });
-    setInputValue('');
+
+    try {
+      websocketService.sendMessage(content.trim(), {
+        character_id: selectedCharacter?.character_id,
+        player_id: profile?.player_id,
+      });
+      // Only clear input if message was sent successfully
+      setInputValue('');
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      // Don't clear input if sending failed
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -279,7 +296,7 @@ const Chat: React.FC = () => {
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyPress}
                 onFocus={() => setIsInputFocused(true)}
                 onBlur={() => setIsInputFocused(false)}
                 placeholder={isConnected ? "Type your message..." : "Connecting..."}

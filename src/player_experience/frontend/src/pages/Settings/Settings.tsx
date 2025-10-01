@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
-import { 
+import {
   fetchSettings,
   updateTherapeuticLocal,
   updatePrivacyLocal,
@@ -9,6 +9,8 @@ import {
   updateAccessibilityLocal,
   updateTherapeuticSettings,
   updatePrivacySettings,
+  updateNotificationSettings,
+  updateAccessibilitySettings,
   exportPlayerData,
   deletePlayerData,
   markChangesSaved
@@ -17,6 +19,7 @@ import TherapeuticSettingsSection from '../../components/Settings/TherapeuticSet
 import PrivacySettingsSection from '../../components/Settings/PrivacySettingsSection';
 import CrisisSupportSection from '../../components/Settings/CrisisSupportSection';
 import DataManagementSection from '../../components/Settings/DataManagementSection';
+import { ModelManagementSection } from '../../components/ModelManagement';
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch();
@@ -35,17 +38,30 @@ const Settings: React.FC = () => {
   }, [dispatch, profile?.player_id]);
 
   const handleSaveSettings = async () => {
-    if (!profile?.player_id) return;
+    if (!profile?.player_id) {
+      console.error('Cannot save settings: No player profile available');
+      return;
+    }
 
     try {
-      await dispatch(updateTherapeuticSettings({ 
-        playerId: profile.player_id, 
-        settings: therapeutic 
+      await dispatch(updateTherapeuticSettings({
+        playerId: profile.player_id,
+        settings: therapeutic
       }) as any);
-      
-      await dispatch(updatePrivacySettings({ 
-        playerId: profile.player_id, 
-        settings: privacy 
+
+      await dispatch(updatePrivacySettings({
+        playerId: profile.player_id,
+        settings: privacy
+      }) as any);
+
+      await dispatch(updateNotificationSettings({
+        playerId: profile.player_id,
+        settings: notifications
+      }) as any);
+
+      await dispatch(updateAccessibilitySettings({
+        playerId: profile.player_id,
+        settings: accessibility
       }) as any);
 
       dispatch(markChangesSaved());
@@ -65,6 +81,7 @@ const Settings: React.FC = () => {
 
   const tabs = [
     { id: 'therapeutic', label: 'Therapeutic', icon: '🧠' },
+    { id: 'models', label: 'AI Models', icon: '🤖' },
     { id: 'privacy', label: 'Privacy & Data', icon: '🔒' },
     { id: 'notifications', label: 'Notifications', icon: '🔔' },
     { id: 'accessibility', label: 'Accessibility', icon: '♿' },
@@ -148,6 +165,10 @@ const Settings: React.FC = () => {
               settings={therapeutic}
               onUpdate={(updates) => dispatch(updateTherapeuticLocal(updates))}
             />
+          )}
+
+          {activeTab === 'models' && (
+            <ModelManagementSection />
           )}
 
           {activeTab === 'privacy' && (

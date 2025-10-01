@@ -6,6 +6,16 @@ import './index.css';
 import App from './App';
 import { store } from './store/store';
 import reportWebVitals from './reportWebVitals';
+import { initializeSecureStorage } from './utils/secureStorage';
+import { initializeSessionRestoration } from './utils/sessionRestoration';
+import ErrorBoundary from './components/ErrorBoundary';
+import { NotificationProvider } from './components/Notifications';
+
+// Initialize secure storage and migrate from localStorage if needed
+initializeSecureStorage();
+
+// Initialize session restoration
+initializeSessionRestoration();
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -13,11 +23,15 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </Provider>
+    <ErrorBoundary>
+      <Provider store={store}>
+        <NotificationProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </NotificationProvider>
+      </Provider>
+    </ErrorBoundary>
   </React.StrictMode>
 );
 

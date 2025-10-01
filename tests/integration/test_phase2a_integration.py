@@ -3,54 +3,55 @@ Integration tests for Phase 2A TTA Platform components
 Tests multi-stakeholder web interfaces, AI/ML integration, and Neo4j living worlds
 """
 
-import pytest
 import asyncio
 import json
-from datetime import datetime, timedelta
-from typing import Dict, Any
+from datetime import datetime
+from typing import Any
+
 import aiohttp
-import aioredis
+import pytest
+import redis.asyncio as aioredis
 from neo4j import AsyncGraphDatabase
 
-from src.api_gateway.interfaces.patient_api import router as patient_router
-from src.living_worlds.neo4j_integration import LivingWorldsManager
 from src.ai_components.langgraph_integration import TherapeuticWorkflowManager
-from src.components.therapeutic_systems_enhanced.therapeutic_integration_system import TherapeuticIntegrationSystem
+from src.components.therapeutic_systems_enhanced.therapeutic_integration_system import (
+    TherapeuticIntegrationSystem,
+)
+from src.living_worlds.neo4j_integration import LivingWorldsManager
+
 
 class TestPhase2AIntegration:
     """Integration tests for Phase 2A components"""
-    
+
     @pytest.fixture
     async def setup_test_environment(self):
         """Set up test environment with all Phase 2A services"""
         # Initialize test databases
         self.redis = aioredis.from_url("redis://localhost:6379/1")  # Test DB
         self.neo4j_driver = AsyncGraphDatabase.driver(
-            "bolt://localhost:7687",
-            auth=("neo4j", "test_password")
+            "bolt://localhost:7687", auth=("neo4j", "test_password")
         )
-        
+
         # Initialize managers
         self.living_worlds = LivingWorldsManager(
             neo4j_uri="bolt://localhost:7687",
             neo4j_user="neo4j",
             neo4j_password="test_password",
-            redis_url="redis://localhost:6379/1"
+            redis_url="redis://localhost:6379/1",
         )
-        
+
         self.workflow_manager = TherapeuticWorkflowManager(
-            openai_api_key="test-key",
-            redis_url="redis://localhost:6379/1"
+            openai_api_key="test-key", redis_url="redis://localhost:6379/1"
         )
-        
+
         self.therapeutic_system = TherapeuticIntegrationSystem()
-        
+
         # Initialize all systems
         await self.living_worlds.initialize()
         await self.workflow_manager.initialize()
-        
+
         yield
-        
+
         # Cleanup
         await self.redis.flushdb()
         await self.redis.close()
@@ -62,21 +63,21 @@ class TestPhase2AIntegration:
         """Test patient interface integration with backend services"""
         patient_id = "test_patient_123"
         session_id = "test_session_456"
-        
+
         # Test session creation
         session_data = {
             "patient_id": patient_id,
             "therapeutic_framework": "Narrative",
             "initial_difficulty": 3,
-            "goals": ["emotional_regulation", "coping_skills"]
+            "goals": ["emotional_regulation", "coping_skills"],
         }
-        
+
         # Simulate API call to create session
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 "http://localhost:8001/api/patient/sessions",
                 json=session_data,
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 session_response = await response.json()
@@ -88,25 +89,21 @@ class TestPhase2AIntegration:
     async def test_living_worlds_integration(self, setup_test_environment):
         """Test Neo4j living worlds system integration"""
         patient_id = "test_patient_123"
-        
+
         # Create a character in the living world
         character = await self.living_worlds.create_character(
             character_id="char_001",
             name="Dr. Sarah",
-            personality_traits={
-                "empathy": 0.9,
-                "wisdom": 0.8,
-                "patience": 0.85
-            },
+            personality_traits={"empathy": 0.9, "wisdom": 0.8, "patience": 0.85},
             background="A compassionate therapist who specializes in narrative therapy",
             therapeutic_role="primary_therapist",
-            patient_id=patient_id
+            patient_id=patient_id,
         )
-        
+
         assert character.id == "char_001"
         assert character.type == "character"
         assert character.properties["name"] == "Dr. Sarah"
-        
+
         # Create a narrative thread
         narrative = await self.living_worlds.create_narrative_thread(
             thread_id="narrative_001",
@@ -114,21 +111,21 @@ class TestPhase2AIntegration:
             description="A therapeutic narrative focused on emotional regulation",
             therapeutic_goals=["emotional_regulation", "self_awareness"],
             patient_id=patient_id,
-            difficulty_level=3
+            difficulty_level=3,
         )
-        
+
         assert narrative.id == "narrative_001"
         assert narrative.type == "narrative_thread"
-        
+
         # Test relationship creation
         relationship = await self.living_worlds.create_relationship(
             source_id="char_001",
             target_id=patient_id,
             relationship_type="therapeutic_alliance",
             strength=0.7,
-            properties={"trust_level": "building", "rapport": "good"}
+            properties={"trust_level": "building", "rapport": "good"},
         )
-        
+
         assert relationship.relationship_type == "therapeutic_alliance"
         assert relationship.strength == 0.7
 
@@ -137,39 +134,35 @@ class TestPhase2AIntegration:
         """Test LangGraph AI workflow integration"""
         patient_id = "test_patient_123"
         session_id = "test_session_456"
-        
+
         # Test therapeutic conversation workflow
         therapeutic_context = {
             "framework": "CBT",
-            "emotional_state": {
-                "valence": -0.3,
-                "arousal": 0.6,
-                "crisis_risk": "low"
-            },
+            "emotional_state": {"valence": -0.3, "arousal": 0.6, "crisis_risk": "low"},
             "current_scenario": "Patient expressing anxiety about work",
-            "safety_level": "safe"
+            "safety_level": "safe",
         }
-        
+
         feature_flags = {
             "ai_narrative_enhancement": True,
             "living_worlds_system": True,
-            "crisis_support": True
+            "crisis_support": True,
         }
-        
+
         # Process patient input through AI workflow
         response = await self.workflow_manager.process_patient_input(
             patient_id=patient_id,
             session_id=session_id,
             user_message="I'm feeling really anxious about my presentation tomorrow",
             therapeutic_context=therapeutic_context,
-            feature_flags=feature_flags
+            feature_flags=feature_flags,
         )
-        
+
         assert "response" in response
         assert "emotional_state" in response
         assert "safety_level" in response
         assert response["safety_level"] in ["safe", "needs_support", "crisis"]
-        
+
         # Verify response is therapeutic and appropriate
         assert len(response["response"]) > 0
         assert isinstance(response["emotional_state"], dict)
@@ -178,21 +171,21 @@ class TestPhase2AIntegration:
     async def test_clinical_dashboard_integration(self, setup_test_environment):
         """Test clinical dashboard real-time monitoring"""
         clinician_id = "clinician_001"
-        
+
         # Test dashboard data retrieval
         async with aiohttp.ClientSession() as session:
             async with session.get(
                 f"http://localhost:8002/api/clinical/dashboard/{clinician_id}",
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 dashboard_data = await response.json()
-                
+
                 assert "patients" in dashboard_data
                 assert "alerts" in dashboard_data
                 assert "metrics" in dashboard_data
                 assert "schedule" in dashboard_data
-                
+
                 # Verify metrics structure
                 metrics = dashboard_data["metrics"]
                 assert "totalPatients" in metrics
@@ -205,42 +198,36 @@ class TestPhase2AIntegration:
         """Test integration between therapeutic systems"""
         patient_id = "test_patient_123"
         session_id = "test_session_456"
-        
+
         # Initialize therapeutic session
         session_config = {
             "session_id": session_id,
             "patient_id": patient_id,
             "therapeutic_framework": "Narrative",
             "initial_difficulty": 3,
-            "goals": ["emotional_regulation"]
+            "goals": ["emotional_regulation"],
         }
-        
+
         await self.therapeutic_system.initialize_session(session_config)
-        
+
         # Test progress update
         progress_data = {
-            "emotional_state": {
-                "valence": 0.2,
-                "arousal": 0.4,
-                "dominance": 0.6
-            },
+            "emotional_state": {"valence": 0.2, "arousal": 0.4, "dominance": 0.6},
             "engagement_level": 75,
             "user_choices": [
                 {
                     "choice_id": "choice_001",
                     "choice_text": "I want to talk about my feelings",
-                    "emotional_impact": 0.3
+                    "emotional_impact": 0.3,
                 }
             ],
-            "session_duration": 1800  # 30 minutes
+            "session_duration": 1800,  # 30 minutes
         }
-        
+
         result = await self.therapeutic_system.update_progress(
-            session_id=session_id,
-            patient_id=patient_id,
-            progress_data=progress_data
+            session_id=session_id, patient_id=patient_id, progress_data=progress_data
         )
-        
+
         assert result["status"] == "updated"
         assert "safety_assessment" in result
         assert "recommendations" in result
@@ -250,40 +237,40 @@ class TestPhase2AIntegration:
         """Test crisis intervention across all systems"""
         patient_id = "test_patient_123"
         session_id = "test_session_456"
-        
+
         # Simulate crisis scenario
         crisis_message = "I can't take this anymore, I want to end it all"
-        
+
         therapeutic_context = {
             "framework": "Crisis",
             "emotional_state": {
                 "valence": -0.9,
                 "arousal": 0.8,
-                "crisis_risk": "crisis"
+                "crisis_risk": "crisis",
             },
-            "safety_level": "crisis"
+            "safety_level": "crisis",
         }
-        
+
         feature_flags = {
             "ai_narrative_enhancement": True,
             "crisis_support": True,
-            "emergency_contacts": True
+            "emergency_contacts": True,
         }
-        
+
         # Process through AI workflow
         response = await self.workflow_manager.process_patient_input(
             patient_id=patient_id,
             session_id=session_id,
             user_message=crisis_message,
             therapeutic_context=therapeutic_context,
-            feature_flags=feature_flags
+            feature_flags=feature_flags,
         )
-        
+
         # Verify crisis response
         assert response["safety_level"] == "crisis"
         assert len(response["interventions_triggered"]) > 0
         assert "crisis" in response["response"].lower()
-        
+
         # Verify crisis intervention was logged
         intervention = response["interventions_triggered"][0]
         assert intervention["type"] == "crisis_intervention"
@@ -296,31 +283,31 @@ class TestPhase2AIntegration:
         feature_flags = {
             "ai_narrative_enhancement": True,
             "living_worlds_system": False,
-            "advanced_therapeutic_gaming": False
+            "advanced_therapeutic_gaming": False,
         }
-        
+
         # Verify feature flags affect behavior
         patient_id = "test_patient_123"
         session_id = "test_session_456"
-        
+
         # Test with AI enhancement enabled
         response_with_ai = await self.workflow_manager.process_patient_input(
             patient_id=patient_id,
             session_id=session_id,
             user_message="How are you today?",
             therapeutic_context={"framework": "CBT"},
-            feature_flags={"ai_narrative_enhancement": True}
+            feature_flags={"ai_narrative_enhancement": True},
         )
-        
+
         # Test with AI enhancement disabled
         response_without_ai = await self.workflow_manager.process_patient_input(
             patient_id=patient_id,
             session_id=session_id,
             user_message="How are you today?",
             therapeutic_context={"framework": "CBT"},
-            feature_flags={"ai_narrative_enhancement": False}
+            feature_flags={"ai_narrative_enhancement": False},
         )
-        
+
         # Responses should differ based on feature flags
         assert response_with_ai != response_without_ai
 
@@ -332,30 +319,30 @@ class TestPhase2AIntegration:
             # Create session via patient API
             session_data = {
                 "patient_id": "test_patient_123",
-                "therapeutic_framework": "Narrative"
+                "therapeutic_framework": "Narrative",
             }
-            
+
             async with session.post(
                 "http://localhost:8001/api/patient/sessions",
                 json=session_data,
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 session_response = await response.json()
                 session_id = session_response["id"]
-            
+
             # Update progress via patient API (should trigger AI workflow)
             progress_data = {
                 "emotional_state": {"valence": 0.5, "arousal": 0.3},
                 "engagement_level": 80,
                 "user_choices": [],
-                "session_duration": 900
+                "session_duration": 900,
             }
-            
+
             async with session.patch(
                 f"http://localhost:8001/api/patient/sessions/{session_id}/progress",
                 json=progress_data,
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 progress_response = await response.json()
@@ -365,7 +352,7 @@ class TestPhase2AIntegration:
     async def test_data_consistency_across_services(self, setup_test_environment):
         """Test data consistency across Redis, Neo4j, and PostgreSQL"""
         patient_id = "test_patient_123"
-        
+
         # Create data in Neo4j (living worlds)
         character = await self.living_worlds.create_character(
             character_id="char_consistency_test",
@@ -373,28 +360,26 @@ class TestPhase2AIntegration:
             personality_traits={"empathy": 0.8},
             background="Test character for consistency",
             therapeutic_role="support",
-            patient_id=patient_id
+            patient_id=patient_id,
         )
-        
+
         # Verify data exists in Neo4j
         world_data = await self.living_worlds.get_patient_world(patient_id)
         assert len(world_data["characters"]) > 0
         assert any(c["id"] == "char_consistency_test" for c in world_data["characters"])
-        
+
         # Create session data that should be cached in Redis
         session_data = {
             "session_id": "consistency_test_session",
             "patient_id": patient_id,
-            "character_interactions": ["char_consistency_test"]
+            "character_interactions": ["char_consistency_test"],
         }
-        
+
         # Cache in Redis
         await self.redis.setex(
-            f"session:{session_data['session_id']}",
-            3600,
-            json.dumps(session_data)
+            f"session:{session_data['session_id']}", 3600, json.dumps(session_data)
         )
-        
+
         # Verify data exists in Redis
         cached_data = await self.redis.get(f"session:{session_data['session_id']}")
         assert cached_data is not None
@@ -409,16 +394,16 @@ class TestPhase2AIntegration:
             # Test high contrast mode endpoint
             async with session.get(
                 "http://localhost:3002/api/accessibility/high-contrast",
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 accessibility_data = await response.json()
                 assert "high_contrast_enabled" in accessibility_data
-            
+
             # Test screen reader compatibility
             async with session.get(
                 "http://localhost:3002/api/accessibility/screen-reader",
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 assert response.status == 200
                 screen_reader_data = await response.json()
@@ -430,43 +415,44 @@ class TestPhase2AIntegration:
         """Test system performance under concurrent load"""
         # Simulate multiple concurrent sessions
         tasks = []
-        
+
         for i in range(10):  # 10 concurrent sessions
             task = self._create_test_session(f"load_test_patient_{i}")
             tasks.append(task)
-        
+
         # Execute all tasks concurrently
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        
+
         # Verify all sessions were created successfully
         successful_results = [r for r in results if not isinstance(r, Exception)]
         assert len(successful_results) == 10
-        
+
         # Verify response times are reasonable (< 5 seconds)
         for result in successful_results:
             assert result["response_time"] < 5.0
 
-    async def _create_test_session(self, patient_id: str) -> Dict[str, Any]:
+    async def _create_test_session(self, patient_id: str) -> dict[str, Any]:
         """Helper method to create a test session"""
         start_time = datetime.utcnow()
-        
+
         session_data = {
             "patient_id": patient_id,
             "therapeutic_framework": "CBT",
-            "initial_difficulty": 3
+            "initial_difficulty": 3,
         }
-        
+
         async with aiohttp.ClientSession() as session:
             async with session.post(
                 "http://localhost:8001/api/patient/sessions",
                 json=session_data,
-                headers={"Authorization": "Bearer test_token"}
+                headers={"Authorization": "Bearer test_token"},
             ) as response:
                 result = await response.json()
                 end_time = datetime.utcnow()
-                
+
                 result["response_time"] = (end_time - start_time).total_seconds()
                 return result
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--asyncio-mode=auto"])

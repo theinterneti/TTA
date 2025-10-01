@@ -1,11 +1,11 @@
 import asyncio
+
 import pytest
 
-from src.agent_orchestration.tools.models import ToolSpec
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 from src.agent_orchestration.tools.coordinator import ToolCoordinator
+from src.agent_orchestration.tools.models import ToolPolicy, ToolSpec
 from src.agent_orchestration.tools.policy_config import ToolPolicyConfig
-from src.agent_orchestration.tools.models import ToolPolicy
+from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 async def noop():
@@ -21,10 +21,14 @@ async def test_registry_idempotency_and_concurrency(redis_client):
     async def factory():
         return ToolSpec(name="same.tool", version="1.0.0", description="x")
 
-    policy = ToolPolicy(config=ToolPolicyConfig(callable_allowlist=[
-        "tests.agent_orchestration.tools.test_registry_idempotency.noop",
-        "test_registry_idempotency.noop",
-    ]))
+    policy = ToolPolicy(
+        config=ToolPolicyConfig(
+            callable_allowlist=[
+                "tests.agent_orchestration.tools.test_registry_idempotency.noop",
+                "test_registry_idempotency.noop",
+            ]
+        )
+    )
 
     coord = ToolCoordinator(registry=reg, policy=policy)
 
@@ -41,10 +45,10 @@ async def test_registry_idempotency_and_concurrency(redis_client):
 
     # concurrent invocations via invocation service
     from src.agent_orchestration.tools.invocation_service import ToolInvocationService
+
     svc = ToolInvocationService(registry=reg, coordinator=coord, policy=policy)
     out = await asyncio.gather(
         svc.invoke_tool_by_spec(existing, noop),
         svc.invoke_tool_by_spec(existing, noop),
     )
     assert out == ["ok", "ok"]
-

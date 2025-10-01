@@ -3,37 +3,41 @@ WebSocket chat router for the Player Experience API.
 
 Implements authenticated WebSocket endpoint for therapeutic chat.
 """
+
 from __future__ import annotations
 
 import json
-import uuid
 import logging
+import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, status
 
-from ..auth import verify_token, TokenData
 from ...database.session_repository import SessionRepository
-from ...managers.session_integration_manager import SessionIntegrationManager
 from ...managers.personalization_service_manager import (
     PersonalizationServiceManager,
     PlayerFeedback,
 )
-from ...models.session import ProgressMarker
+from ...managers.session_integration_manager import SessionIntegrationManager
 from ...models.enums import ProgressMarkerType
+from ...models.session import ProgressMarker
+from ..auth import TokenData, verify_token
 
 # Initialize logger first
 logger = logging.getLogger(__name__)
 
 # Import agent orchestration system
 try:
-    from src.agent_orchestration.realtime.agent_event_integration import get_agent_event_integrator
-    from src.agent_orchestration.therapeutic_safety import (
-        get_global_safety_service,
-        SafetyLevel,
-        CrisisManager
+    from src.agent_orchestration.realtime.agent_event_integration import (
+        get_agent_event_integrator,
     )
+    from src.agent_orchestration.therapeutic_safety import (
+        CrisisManager,
+        SafetyLevel,
+        get_global_safety_service,
+    )
+
     AGENT_ORCHESTRATION_AVAILABLE = True
     THERAPEUTIC_SAFETY_AVAILABLE = True
 except ImportError:
@@ -42,20 +46,24 @@ except ImportError:
     THERAPEUTIC_SAFETY_AVAILABLE = False
 
 # In-memory metrics (testing/observability aid)
-METRICS: Dict[str, int] = {
+METRICS: dict[str, int] = {
     "connections": 0,
     "messages_in": 0,
     "messages_out": 0,
     "crisis_detected": 0,
 }
 
+
 def reset_metrics() -> None:
-    METRICS.update({
-        "connections": 0,
-        "messages_in": 0,
-        "messages_out": 0,
-        "crisis_detected": 0,
-    })
+    METRICS.update(
+        {
+            "connections": 0,
+            "messages_in": 0,
+            "messages_out": 0,
+            "crisis_detected": 0,
+        }
+    )
+
 
 router = APIRouter()
 
@@ -70,7 +78,11 @@ class ConnectionManager:
         await websocket.accept()
         self.active_connections.setdefault(player_id, set()).add(websocket)
         METRICS["connections"] += 1
-        logger.info("ws_connect player_id=%s active=%d", player_id, len(self.active_connections.get(player_id, set())))
+        logger.info(
+            "ws_connect player_id=%s active=%d",
+            player_id,
+            len(self.active_connections.get(player_id, set())),
+        )
 
     def disconnect(self, player_id: str, websocket: WebSocket) -> None:
         conns = self.active_connections.get(player_id)
@@ -80,11 +92,13 @@ class ConnectionManager:
                 self.active_connections.pop(player_id, None)
         logger.info("ws_disconnect player_id=%s", player_id)
 
-    async def send_json(self, websocket: WebSocket, payload: Dict[str, Any]) -> None:
+    async def send_json(self, websocket: WebSocket, payload: dict[str, Any]) -> None:
         METRICS["messages_out"] += 1
         await websocket.send_text(json.dumps(payload))
 
-    async def broadcast_to_player(self, player_id: str, payload: Dict[str, Any]) -> None:
+    async def broadcast_to_player(
+        self, player_id: str, payload: dict[str, Any]
+    ) -> None:
         for ws in self.active_connections.get(player_id, set()):
             await self.send_json(ws, payload)
 
@@ -94,7 +108,7 @@ manager = ConnectionManager()
 
 def _auth_from_ws(websocket: WebSocket) -> TokenData:
     """Extract and verify JWT from query param or headers for WebSocket connections."""
-    token: Optional[str] = None
+    token: str | None = None
     # Try query parameter first
     token = websocket.query_params.get("token")
     if not token:
@@ -113,7 +127,12 @@ def _auth_from_ws(websocket: WebSocket) -> TokenData:
         raise PermissionError(str(e))
 
 
-def _outgoing_message(role: str, content: Dict[str, Any], session_id: str | None = None, metadata: Dict[str, Any] | None = None) -> Dict[str, Any]:
+def _outgoing_message(
+    role: str,
+    content: dict[str, Any],
+    session_id: str | None = None,
+    metadata: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     return {
         "id": f"msg_{uuid.uuid4().hex[:12]}",
         "role": role,
@@ -124,12 +143,14 @@ def _outgoing_message(role: str, content: Dict[str, Any], session_id: str | None
     }
 
 
-def _event_message(event: str, data: Dict[str, Any] | None = None, session_id: str | None = None) -> Dict[str, Any]:
+def _event_message(
+    event: str, data: dict[str, Any] | None = None, session_id: str | None = None
+) -> dict[str, Any]:
     return _outgoing_message(
         role="system",
         content={"event": event, **(data or {})},
         session_id=session_id,
-        metadata={}
+        metadata={},
     )
 
 
@@ -166,7 +187,11 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
     await manager.connect(player_id, websocket)
 
     # Typing indicator opt-in (typing=1|true|yes)
-    typing_flag = (websocket.query_params.get("typing", "0").lower() in {"1", "true", "yes"})
+    typing_flag = websocket.query_params.get("typing", "0").lower() in {
+        "1",
+        "true",
+        "yes",
+    }
 
     # Managers (could be dependency-injected if needed)
     sim = SessionIntegrationManager(SessionRepository())
@@ -182,13 +207,14 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
 
     # Lightweight per-connection rate limit to protect backend (defaults lenient)
     from collections import deque
-    from datetime import timedelta
+
     window = deque()  # timestamps of received messages
     window_seconds = 2  # 2s window
-    max_msgs = 10       # allow up to 10 msgs per 2s per connection
+    max_msgs = 10  # allow up to 10 msgs per 2s per connection
 
     # Input validator for user messages (reuse central security module)
-    from ...security.input_validator import get_security_validator, InputType
+    from ...security.input_validator import InputType, get_security_validator
+
     validator = get_security_validator()
 
     try:
@@ -202,7 +228,9 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
             window.append(now_ts)
             if len(window) > max_msgs:
                 # Soft warn and continue (do not drop connection), echo system notice
-                warn = _outgoing_message("system", {"text": "Rate limit: please slow down."})
+                warn = _outgoing_message(
+                    "system", {"text": "Rate limit: please slow down."}
+                )
                 await manager.send_json(websocket, warn)
                 continue
 
@@ -216,17 +244,22 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
             METRICS["messages_in"] += 1
 
             mtype = msg.get("type")
-            session_id: Optional[str] = msg.get("session_id")
-            metadata: Dict[str, Any] = msg.get("metadata") or {}
-            content: Dict[str, Any] = msg.get("content") or {}
+            session_id: str | None = msg.get("session_id")
+            metadata: dict[str, Any] = msg.get("metadata") or {}
+            content: dict[str, Any] = msg.get("content") or {}
 
             # Basic input validation/sanitization for user messages
             if mtype == "user_message":
                 text = content.get("text", "")
-                vr = validator.validate_and_sanitize(text, input_type=InputType.USER_MESSAGE)
+                vr = validator.validate_and_sanitize(
+                    text, input_type=InputType.USER_MESSAGE
+                )
                 # If invalid or critical issues, send a friendly error and continue
                 if not vr.is_valid and vr.severity.value in {"high", "critical"}:
-                    err = _outgoing_message("system", {"text": "Message contains unsafe content. Please rephrase."})
+                    err = _outgoing_message(
+                        "system",
+                        {"text": "Message contains unsafe content. Please rephrase."},
+                    )
                     await manager.send_json(websocket, err)
                     continue
                 # Apply sanitization if available
@@ -250,17 +283,29 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
 
                 # Progressive feedback: Start typing indicator
                 if typing_flag:
-                    await manager.send_json(websocket, _event_message("typing", {"status": "start"}, session_id))
+                    await manager.send_json(
+                        websocket,
+                        _event_message("typing", {"status": "start"}, session_id),
+                    )
 
                 # Progressive feedback: Analyzing input
-                await manager.send_json(websocket, _event_message("progress", {
-                    "stage": "analyzing",
-                    "message": "Understanding your message..."
-                }, session_id))
+                await manager.send_json(
+                    websocket,
+                    _event_message(
+                        "progress",
+                        {
+                            "stage": "analyzing",
+                            "message": "Understanding your message...",
+                        },
+                        session_id,
+                    ),
+                )
 
                 # Detect crisis via PSM
-                crisis_detected, crisis_types, crisis_resources = psm.detect_crisis_situation(
-                    player_id, text, context={"session_id": session_id, **metadata}
+                crisis_detected, crisis_types, crisis_resources = (
+                    psm.detect_crisis_situation(
+                        player_id, text, context={"session_id": session_id, **metadata}
+                    )
                 )
                 if crisis_detected:
                     METRICS["crisis_detected"] += 1
@@ -273,48 +318,81 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 if AGENT_ORCHESTRATION_AVAILABLE:
                     try:
                         # Progressive feedback: Processing with AI
-                        await manager.send_json(websocket, _event_message("progress", {
-                            "stage": "processing",
-                            "message": "Processing your input..."
-                        }, session_id))
+                        await manager.send_json(
+                            websocket,
+                            _event_message(
+                                "progress",
+                                {
+                                    "stage": "processing",
+                                    "message": "Processing your input...",
+                                },
+                                session_id,
+                            ),
+                        )
 
                         # Get agent event integrator
                         agent_integrator = get_agent_event_integrator()
 
                         # Progressive feedback: Building world context
-                        await manager.send_json(websocket, _event_message("progress", {
-                            "stage": "world_building",
-                            "message": "Building narrative context..."
-                        }, session_id))
+                        await manager.send_json(
+                            websocket,
+                            _event_message(
+                                "progress",
+                                {
+                                    "stage": "world_building",
+                                    "message": "Building narrative context...",
+                                },
+                                session_id,
+                            ),
+                        )
 
                         # Execute complete IPA → WBA → NGA workflow
                         workflow_result = await agent_integrator.execute_complete_workflow(
                             user_input=text,
                             session_id=session_id or "default",
                             world_id=metadata.get("world_id"),
-                            workflow_id=f"chat_{player_id}_{int(datetime.utcnow().timestamp() * 1000)}"
+                            workflow_id=f"chat_{player_id}_{int(datetime.utcnow().timestamp() * 1000)}",
                         )
 
                         # Progressive feedback: Generating response
-                        await manager.send_json(websocket, _event_message("progress", {
-                            "stage": "generating",
-                            "message": "Crafting therapeutic response..."
-                        }, session_id))
+                        await manager.send_json(
+                            websocket,
+                            _event_message(
+                                "progress",
+                                {
+                                    "stage": "generating",
+                                    "message": "Crafting therapeutic response...",
+                                },
+                                session_id,
+                            ),
+                        )
 
                         # Extract narrative response from NGA
-                        ai_response_text = workflow_result.get("nga_result", {}).get("story", text)
+                        ai_response_text = workflow_result.get("nga_result", {}).get(
+                            "story", text
+                        )
 
                         # Therapeutic Safety Validation: Validate AI-generated response
                         if THERAPEUTIC_SAFETY_AVAILABLE:
                             try:
                                 safety_service = get_global_safety_service()
-                                safety_validation_result = await safety_service.validate_text(ai_response_text)
+                                safety_validation_result = (
+                                    await safety_service.validate_text(ai_response_text)
+                                )
 
                                 # If response is blocked, use alternative content
-                                if safety_validation_result.level == SafetyLevel.BLOCKED:
-                                    logger.warning(f"AI response blocked by safety validation for session {session_id}")
-                                    ai_response_text = safety_validation_result.alternative_content or safety_service.suggest_alternative(
-                                        SafetyLevel.BLOCKED, ai_response_text
+                                if (
+                                    safety_validation_result.level
+                                    == SafetyLevel.BLOCKED
+                                ):
+                                    logger.warning(
+                                        f"AI response blocked by safety validation for session {session_id}"
+                                    )
+                                    ai_response_text = (
+                                        safety_validation_result.alternative_content
+                                        or safety_service.suggest_alternative(
+                                            SafetyLevel.BLOCKED, ai_response_text
+                                        )
                                     )
                                     metadata["safety_override"] = True
 
@@ -323,40 +401,64 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                     crisis_manager = CrisisManager()
                                     crisis_assessment = crisis_manager.assess_crisis(
                                         safety_validation_result,
-                                        {"session_id": session_id, "player_id": player_id}
+                                        {
+                                            "session_id": session_id,
+                                            "player_id": player_id,
+                                        },
                                     )
-                                    crisis_intervention = crisis_manager.initiate_intervention(
-                                        crisis_assessment,
-                                        session_id or "default",
-                                        player_id
+                                    crisis_intervention = (
+                                        crisis_manager.initiate_intervention(
+                                            crisis_assessment,
+                                            session_id or "default",
+                                            player_id,
+                                        )
                                     )
-                                    logger.critical(f"Crisis intervention initiated: {crisis_intervention.intervention_id}")
-                                    metadata["crisis_intervention_id"] = crisis_intervention.intervention_id
+                                    logger.critical(
+                                        f"Crisis intervention initiated: {crisis_intervention.intervention_id}"
+                                    )
+                                    metadata["crisis_intervention_id"] = (
+                                        crisis_intervention.intervention_id
+                                    )
 
                                 # Add safety metadata
                                 metadata["safety_validation"] = {
                                     "level": safety_validation_result.level.value,
                                     "score": safety_validation_result.score,
                                     "crisis_detected": safety_validation_result.crisis_detected,
-                                    "escalation_recommended": safety_validation_result.escalation_recommended
+                                    "escalation_recommended": safety_validation_result.escalation_recommended,
                                 }
 
                             except Exception as safety_error:
-                                logger.error(f"Therapeutic safety validation failed: {safety_error}")
+                                logger.error(
+                                    f"Therapeutic safety validation failed: {safety_error}"
+                                )
 
                         # Add workflow metadata
                         metadata["workflow_id"] = workflow_result.get("workflow_id")
-                        metadata["ipa_intent"] = workflow_result.get("ipa_result", {}).get("routing", {}).get("intent")
+                        metadata["ipa_intent"] = (
+                            workflow_result.get("ipa_result", {})
+                            .get("routing", {})
+                            .get("intent")
+                        )
 
-                        logger.info(f"AI response generated via agent orchestration for session {session_id}")
+                        logger.info(
+                            f"AI response generated via agent orchestration for session {session_id}"
+                        )
 
                     except Exception as e:
                         logger.error(f"Agent orchestration failed, using fallback: {e}")
                         # Progressive feedback: Using fallback
-                        await manager.send_json(websocket, _event_message("progress", {
-                            "stage": "fallback",
-                            "message": "Generating response..."
-                        }, session_id))
+                        await manager.send_json(
+                            websocket,
+                            _event_message(
+                                "progress",
+                                {
+                                    "stage": "fallback",
+                                    "message": "Generating response...",
+                                },
+                                session_id,
+                            ),
+                        )
 
                         # Fall back to personalization engine
                         adapted = psm.personalization_engine.personalize_content(
@@ -368,10 +470,17 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         ai_response_text = adapted.get("adapted_content", text)
                 else:
                     # Progressive feedback: Using personalization
-                    await manager.send_json(websocket, _event_message("progress", {
-                        "stage": "personalizing",
-                        "message": "Personalizing response..."
-                    }, session_id))
+                    await manager.send_json(
+                        websocket,
+                        _event_message(
+                            "progress",
+                            {
+                                "stage": "personalizing",
+                                "message": "Personalizing response...",
+                            },
+                            session_id,
+                        ),
+                    )
 
                     # Use personalization engine as fallback
                     adapted = psm.personalization_engine.personalize_content(
@@ -383,50 +492,80 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                     ai_response_text = adapted.get("adapted_content", text)
 
                 # Progressive feedback: Complete
-                await manager.send_json(websocket, _event_message("progress", {
-                    "stage": "complete",
-                    "message": "Response ready"
-                }, session_id))
+                await manager.send_json(
+                    websocket,
+                    _event_message(
+                        "progress",
+                        {"stage": "complete", "message": "Response ready"},
+                        session_id,
+                    ),
+                )
 
                 # Recommendations
-                recs = psm.get_adaptive_recommendations(player_id, context={"session_id": session_id})
+                recs = psm.get_adaptive_recommendations(
+                    player_id, context={"session_id": session_id}
+                )
                 # Build assistant response with optional safety block and interactive resources
                 # Ensure metadata is JSON-serializable (avoid datetimes)
-                safe_recs: List[Dict[str, Any]] = [
+                safe_recs: list[dict[str, Any]] = [
                     {
-                        "recommendation_id": getattr(r, "recommendation_id", getattr(r, "id", "")),
+                        "recommendation_id": getattr(
+                            r, "recommendation_id", getattr(r, "id", "")
+                        ),
                         "title": getattr(r, "title", ""),
                         "description": getattr(r, "description", ""),
-                        "recommendation_type": getattr(r, "recommendation_type", getattr(r, "type", "")),
+                        "recommendation_type": getattr(
+                            r, "recommendation_type", getattr(r, "type", "")
+                        ),
                         "priority": int(getattr(r, "priority", 1)),
                     }
                     for r in (recs or [])
                 ]
-                reply_metadata: Dict[str, Any] = {
+                reply_metadata: dict[str, Any] = {
                     "recommendations": safe_recs,
-                    "safety": {"crisis": bool(crisis_detected), "types": [ct.value for ct in crisis_types] if crisis_detected else []},
+                    "safety": {
+                        "crisis": bool(crisis_detected),
+                        "types": (
+                            [ct.value for ct in crisis_types] if crisis_detected else []
+                        ),
+                    },
                 }
-                reply_content: Dict[str, Any] = {"text": ai_response_text}
-                elements: List[Dict[str, Any]] = []
+                reply_content: dict[str, Any] = {"text": ai_response_text}
+                elements: list[dict[str, Any]] = []
                 if crisis_detected and crisis_resources:
-                    elements.extend([
-                        {
-                            "type": "resource",
-                            "id": res.resource_id,
-                            "label": res.name,
-                            "method": res.contact_method,
-                            "info": res.contact_info,
-                            "emergency": res.is_emergency,
-                        }
-                        for res in crisis_resources
-                    ])
+                    elements.extend(
+                        [
+                            {
+                                "type": "resource",
+                                "id": res.resource_id,
+                                "label": res.name,
+                                "method": res.contact_method,
+                                "info": res.contact_info,
+                                "emergency": res.is_emergency,
+                            }
+                            for res in crisis_resources
+                        ]
+                    )
                 # Suggest interactive buttons for guided exercises on anxious keywords
-                anxious = any(kw in text.lower() for kw in ["anxious", "panic", "overwhelmed", "stressed"]) or bool(crisis_detected)
+                anxious = any(
+                    kw in text.lower()
+                    for kw in ["anxious", "panic", "overwhelmed", "stressed"]
+                ) or bool(crisis_detected)
                 if anxious:
-                    elements.extend([
-                        {"type": "button", "id": "ex_breathing", "label": "Try 4-7-8 breathing"},
-                        {"type": "button", "id": "ex_grounding", "label": "5-4-3-2-1 grounding"},
-                    ])
+                    elements.extend(
+                        [
+                            {
+                                "type": "button",
+                                "id": "ex_breathing",
+                                "label": "Try 4-7-8 breathing",
+                            },
+                            {
+                                "type": "button",
+                                "id": "ex_grounding",
+                                "label": "5-4-3-2-1 grounding",
+                            },
+                        ]
+                    )
                 if elements:
                     reply_content["elements"] = elements
                 reply = _outgoing_message(
@@ -438,6 +577,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
 
                 # Therapeutic audit log for message delivery
                 from ...monitoring.logging_config import get_logger
+
                 get_logger(__name__).therapeutic_audit(
                     "assistant_reply",
                     therapeutic_event="message_delivery",
@@ -448,7 +588,10 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 await manager.send_json(websocket, reply)
 
                 if typing_flag:
-                    await manager.send_json(websocket, _event_message("typing", {"status": "stop"}, session_id))
+                    await manager.send_json(
+                        websocket,
+                        _event_message("typing", {"status": "stop"}, session_id),
+                    )
 
             elif mtype == "interaction":
                 # Handle interactive actions (e.g., button clicks to start/complete exercises)
@@ -456,21 +599,38 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 item_id = content.get("id")
 
                 # Default acknowledgement
-                ack_elements: List[Dict[str, Any]] = [{"type": "ack", "id": item_id, "label": "Received"}]
+                ack_elements: list[dict[str, Any]] = [
+                    {"type": "ack", "id": item_id, "label": "Received"}
+                ]
 
                 # Guided exercise start
-                if action in {"button_click", "start_exercise"} and item_id in {"ex_breathing", "ex_grounding"}:
+                if action in {"button_click", "start_exercise"} and item_id in {
+                    "ex_breathing",
+                    "ex_grounding",
+                }:
                     instructions = {
                         "ex_breathing": "Let's try 4-7-8 breathing. Inhale for 4, hold for 7, exhale for 8. Tap 'Complete' when you're done.",
                         "ex_grounding": "Let's try 5-4-3-2-1 grounding. Name 5 things you see, 4 you can touch, 3 you can hear, 2 you can smell, 1 you can taste. Tap 'Complete' when done.",
                     }[item_id]
                     ack_elements = [
-                        {"type": "instruction", "id": f"{item_id}_steps", "label": instructions},
-                        {"type": "button", "id": f"{item_id}_complete", "label": "Complete"},
+                        {
+                            "type": "instruction",
+                            "id": f"{item_id}_steps",
+                            "label": instructions,
+                        },
+                        {
+                            "type": "button",
+                            "id": f"{item_id}_complete",
+                            "label": "Complete",
+                        },
                     ]
 
                 # Guided exercise completion -> record progress marker
-                elif action in {"button_click", "complete_exercise"} and item_id and item_id.endswith("_complete"):
+                elif (
+                    action in {"button_click", "complete_exercise"}
+                    and item_id
+                    and item_id.endswith("_complete")
+                ):
                     base = item_id.replace("_complete", "")
                     marker = ProgressMarker(
                         marker_id=f"pm_{uuid.uuid4().hex[:10]}",
@@ -481,7 +641,11 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                     )
                     await sim.add_progress_marker(player_id, marker)
                     ack_elements = [
-                        {"type": "progress", "id": marker.marker_id, "label": "Progress recorded"},
+                        {
+                            "type": "progress",
+                            "id": marker.marker_id,
+                            "label": "Progress recorded",
+                        },
                     ]
 
                 ack = _outgoing_message(
@@ -496,20 +660,34 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                     feedback_id=str(uuid.uuid4()),
                     player_id=player_id,
                     session_id=session_id or "",
-                    feedback_type="text" if "text" in content else ("rating" if "rating" in content else "preference_change"),
+                    feedback_type=(
+                        "text"
+                        if "text" in content
+                        else ("rating" if "rating" in content else "preference_change")
+                    ),
                     content=content,
                 )
                 result = psm.process_feedback(player_id, fb)
                 # After processing feedback, push updated recommendations
-                recs = psm.get_adaptive_recommendations(player_id, context={"session_id": session_id})
+                recs = psm.get_adaptive_recommendations(
+                    player_id, context={"session_id": session_id}
+                )
                 note = _outgoing_message(
                     role="system",
                     content={
                         "text": f"Feedback processed. Changes: {', '.join(result.changes_made) or 'none'}.",
-                        "elements": [
-                            {"type": "recommendation", "id": f"rec_{i}", "label": getattr(r, "title", "Recommendation")}  # minimal projection
-                            for i, r in enumerate(recs)
-                        ] if recs else [],
+                        "elements": (
+                            [
+                                {
+                                    "type": "recommendation",
+                                    "id": f"rec_{i}",
+                                    "label": getattr(r, "title", "Recommendation"),
+                                }  # minimal projection
+                                for i, r in enumerate(recs)
+                            ]
+                            if recs
+                            else []
+                        ),
                     },
                     session_id=session_id,
                 )
@@ -520,13 +698,25 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 content = msg.get("content") or {}
                 # Build minimal EnhancedTherapeuticSettings from payload
                 try:
-                    from ...models.therapeutic_settings import EnhancedTherapeuticSettings
-                    from ...models.enums import IntensityLevel
-                    from ...utils.normalization import normalize_intensity, normalize_approaches
+                    from ...models.therapeutic_settings import (
+                        EnhancedTherapeuticSettings,
+                    )
+                    from ...utils.normalization import (
+                        normalize_approaches,
+                        normalize_intensity,
+                    )
+
                     # Normalize values
                     level = normalize_intensity(content.get("intensity_level"))
-                    approaches = normalize_approaches(content.get("preferred_approaches", []))
-                    settings = EnhancedTherapeuticSettings(settings_id="", player_id=player_id, intensity_level=level, preferred_approaches=approaches)
+                    approaches = normalize_approaches(
+                        content.get("preferred_approaches", [])
+                    )
+                    settings = EnhancedTherapeuticSettings(
+                        settings_id="",
+                        player_id=player_id,
+                        intensity_level=level,
+                        preferred_approaches=approaches,
+                    )
                     ok, conflicts = psm.update_therapeutic_settings(player_id, settings)
 
                     # Persist change to the active character's therapeutic profile if session/context available
@@ -534,10 +724,15 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         sess = await sim.get_active_session(player_id)
                         if sess and getattr(sess, "character_id", None):
                             # Use the same repository instance as REST by going through the characters router dependency
-                            from .characters import get_character_manager_dep
                             from ...models.character import TherapeuticProfile
+                            from .characters import get_character_manager_dep
+
                             cmanager = get_character_manager_dep()
-                            current_profile = cmanager.get_character_therapeutic_profile(sess.character_id)
+                            current_profile = (
+                                cmanager.get_character_therapeutic_profile(
+                                    sess.character_id
+                                )
+                            )
                             if current_profile is not None:
                                 updated_profile = TherapeuticProfile(
                                     primary_concerns=current_profile.primary_concerns,
@@ -551,24 +746,49 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                                     readiness_level=current_profile.readiness_level,
                                     therapeutic_approaches=approaches,
                                 )
-                                cmanager.update_character_therapeutic_profile(sess.character_id, updated_profile)
+                                cmanager.update_character_therapeutic_profile(
+                                    sess.character_id, updated_profile
+                                )
                     except Exception as _e:
                         # Non-fatal; continue to respond
                         pass
 
-                    text = "Settings updated successfully" if ok else "Settings updated with warnings"
-                    resp = _outgoing_message("system", {"text": text, "conflicts": [getattr(c, "description", str(c)) for c in conflicts]}, session_id=session_id)
+                    text = (
+                        "Settings updated successfully"
+                        if ok
+                        else "Settings updated with warnings"
+                    )
+                    resp = _outgoing_message(
+                        "system",
+                        {
+                            "text": text,
+                            "conflicts": [
+                                getattr(c, "description", str(c)) for c in conflicts
+                            ],
+                        },
+                        session_id=session_id,
+                    )
                     await manager.send_json(websocket, resp)
                 except Exception as e:
-                    err = _outgoing_message("system", {"text": f"Settings update failed: {e}"}, session_id=session_id)
+                    err = _outgoing_message(
+                        "system",
+                        {"text": f"Settings update failed: {e}"},
+                        session_id=session_id,
+                    )
                     await manager.send_json(websocket, err)
             elif mtype == "switch_context":
                 # Switch active context (character/world/session) and acknowledge
                 try:
                     # Extract desired context (if provided)
-                    target_char = metadata.get("character_id") or content.get("character_id")
+                    target_char = metadata.get("character_id") or content.get(
+                        "character_id"
+                    )
                     target_world = metadata.get("world_id") or content.get("world_id")
-                    target_session = metadata.get("session_id") or content.get("session_id") or session_id
+                    target_session = (
+                        metadata.get("session_id")
+                        or content.get("session_id")
+                        or session_id
+                    )
 
                     # If a session id is provided, try to mark it active (best-effort)
                     if target_session and target_session != session_id:
@@ -582,10 +802,16 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         details.append(f"world {target_world}")
                     if details:
                         msg_text += " to " + ", ".join(details)
-                    ack = _outgoing_message("system", {"text": msg_text + "."}, session_id=session_id)
+                    ack = _outgoing_message(
+                        "system", {"text": msg_text + "."}, session_id=session_id
+                    )
                     await manager.send_json(websocket, ack)
                 except Exception as e:
-                    err = _outgoing_message("system", {"text": f"Context switch failed: {e}"}, session_id=session_id)
+                    err = _outgoing_message(
+                        "system",
+                        {"text": f"Context switch failed: {e}"},
+                        session_id=session_id,
+                    )
                     await manager.send_json(websocket, err)
             else:
                 err = _outgoing_message("system", {"text": "Unknown message type."})
@@ -597,4 +823,3 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
         # Close with internal error
         await websocket.close(code=status.WS_1011_INTERNAL_ERROR)
         manager.disconnect(player_id, websocket)
-

@@ -5,12 +5,14 @@ This module provides optional integration with LangGraph. If LangGraph is not
 installed, the builder/executor gracefully degrade to stubs so the overall
 system remains functional without the dependency.
 """
+
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 try:  # Optional dependency
-    from langgraph.graph import StateGraph, START, END  # type: ignore
+    from langgraph.graph import END, START, StateGraph  # type: ignore
+
     _LANGGRAPH_AVAILABLE = True
 except Exception:  # pragma: no cover - runtime optional
     StateGraph = None  # type: ignore
@@ -18,13 +20,16 @@ except Exception:  # pragma: no cover - runtime optional
     END = "END"  # type: ignore
     _LANGGRAPH_AVAILABLE = False
 
-from .workflow import WorkflowDefinition, AgentStep, OrchestrationResponse as WorkflowOrchestrationResponse
+from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
+from .workflow import (
+    WorkflowDefinition,
+)
 
 
 class LangGraphWorkflowBuilder:
     """Builds a LangGraph graph from a WorkflowDefinition when available."""
 
-    def build(self, definition: WorkflowDefinition) -> Dict[str, Any]:
+    def build(self, definition: WorkflowDefinition) -> dict[str, Any]:
         if not _LANGGRAPH_AVAILABLE:
             return {
                 "type": "graph_stub",
@@ -36,11 +41,12 @@ class LangGraphWorkflowBuilder:
         sg = StateGraph(dict)
 
         def _node_fn_factory(agent_name: str):
-            def _fn(state: Dict[str, Any]) -> Dict[str, Any]:
-                history: List[str] = state.get("history", [])
+            def _fn(state: dict[str, Any]) -> dict[str, Any]:
+                history: list[str] = state.get("history", [])
                 history = list(history) + [agent_name]
                 state["history"] = history
                 return state
+
             return _fn
 
         # Add nodes for sequential steps
@@ -51,7 +57,7 @@ class LangGraphWorkflowBuilder:
         if definition.agent_sequence:
             first = definition.agent_sequence[0].agent.value
             sg.add_edge(START, first)
-            for a, b in zip(definition.agent_sequence, definition.agent_sequence[1:]):
+            for a, b in zip(definition.agent_sequence, definition.agent_sequence[1:], strict=False):
                 sg.add_edge(a.agent.value, b.agent.value)
             sg.add_edge(definition.agent_sequence[-1].agent.value, END)
 
@@ -66,7 +72,9 @@ class LangGraphWorkflowBuilder:
 class LangGraphExecutor:
     """Executes a previously built LangGraph graph."""
 
-    def execute(self, graph: Dict[str, Any], initial_state: Dict[str, Any]) -> WorkflowOrchestrationResponse:
+    def execute(
+        self, graph: dict[str, Any], initial_state: dict[str, Any]
+    ) -> WorkflowOrchestrationResponse:
         if graph.get("type") != "langgraph" or not _LANGGRAPH_AVAILABLE:
             # Fallback: behave like a stub
             return WorkflowOrchestrationResponse(
@@ -87,7 +95,7 @@ class LangGraphExecutor:
                 therapeutic_validation=None,
             )
 
-        result_state: Dict[str, Any] = app.invoke(initial_state)
+        result_state: dict[str, Any] = app.invoke(initial_state)
         return WorkflowOrchestrationResponse(
             response_text="Graph executed (langgraph)",
             updated_context=result_state,
@@ -95,4 +103,3 @@ class LangGraphExecutor:
             performance_metrics={},
             therapeutic_validation=None,
         )
-

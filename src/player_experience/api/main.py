@@ -6,12 +6,13 @@ with appropriate configuration.
 """
 
 import uvicorn
-from .app import app
-from .config import settings
+
+from .config import get_settings
 
 
 def run_server():
     """Run the FastAPI server with uvicorn."""
+    settings = get_settings()
     uvicorn.run(
         "src.player_experience.api.app:app",
         host=settings.host,

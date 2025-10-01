@@ -1,16 +1,15 @@
 import asyncio
-import json
 import uuid
 
 import pytest
 
 from src.agent_orchestration import (
     AgentId,
-    AgentType,
     AgentMessage,
-    MessageType,
-    MessagePriority,
+    AgentType,
     FailureType,
+    MessagePriority,
+    MessageType,
 )
 from src.agent_orchestration.coordinators import RedisMessageCoordinator
 
@@ -24,10 +23,38 @@ async def test_priority_ordering_and_fifo(redis_client):
 
     # Enqueue: LOW then HIGH then two NORMAL
     msgs = [
-        AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT, payload={"i": 1}, priority=MessagePriority.LOW),
-        AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT, payload={"i": 2}, priority=MessagePriority.HIGH),
-        AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT, payload={"i": 3}, priority=MessagePriority.NORMAL),
-        AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT, payload={"i": 4}, priority=MessagePriority.NORMAL),
+        AgentMessage(
+            message_id=uuid.uuid4().hex,
+            sender=sender,
+            recipient=recipient,
+            message_type=MessageType.EVENT,
+            payload={"i": 1},
+            priority=MessagePriority.LOW,
+        ),
+        AgentMessage(
+            message_id=uuid.uuid4().hex,
+            sender=sender,
+            recipient=recipient,
+            message_type=MessageType.EVENT,
+            payload={"i": 2},
+            priority=MessagePriority.HIGH,
+        ),
+        AgentMessage(
+            message_id=uuid.uuid4().hex,
+            sender=sender,
+            recipient=recipient,
+            message_type=MessageType.EVENT,
+            payload={"i": 3},
+            priority=MessagePriority.NORMAL,
+        ),
+        AgentMessage(
+            message_id=uuid.uuid4().hex,
+            sender=sender,
+            recipient=recipient,
+            message_type=MessageType.EVENT,
+            payload={"i": 4},
+            priority=MessagePriority.NORMAL,
+        ),
     ]
     for m in msgs:
         r = await coord.send_message(sender, recipient, m)
@@ -58,11 +85,19 @@ async def test_priority_ordering_and_fifo(redis_client):
 @pytest.mark.asyncio
 async def test_retry_exponential_backoff_and_limits(redis_client):
     coord = RedisMessageCoordinator(redis_client, key_prefix="testao")
-    await coord.configure(retry_attempts=2, backoff_base=0.05, backoff_factor=2.0, backoff_max=1.0)
+    await coord.configure(
+        retry_attempts=2, backoff_base=0.05, backoff_factor=2.0, backoff_max=1.0
+    )
 
     sender = AgentId(type=AgentType.IPA)
     recipient = AgentId(type=AgentType.NGA, instance="retry")
-    m = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.REQUEST, payload={"n": 1})
+    m = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.REQUEST,
+        payload={"n": 1},
+    )
     assert (await coord.send_message(sender, recipient, m)).delivered
 
     # Receive and NACK (transient)
@@ -80,7 +115,9 @@ async def test_retry_exponential_backoff_and_limits(redis_client):
     assert rm2 is not None
 
     # Second NACK should schedule with ~0.1s delay and then go to DLQ after exceeding attempts
-    await coord.nack(recipient, rm2.token, failure=FailureType.TRANSIENT, error="second")
+    await coord.nack(
+        recipient, rm2.token, failure=FailureType.TRANSIENT, error="second"
+    )
     # Too soon
     assert (await coord.receive(recipient, visibility_timeout=0.1)) is None
     await asyncio.sleep(0.12)
@@ -106,7 +143,12 @@ async def test_visibility_timeout_and_recovery(redis_client):
     sender = AgentId(type=AgentType.IPA)
     recipient = AgentId(type=AgentType.WBA, instance="recover")
 
-    m = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT)
+    m = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.EVENT,
+    )
     assert (await coord.send_message(sender, recipient, m)).delivered
 
     rm = await coord.receive(recipient, visibility_timeout=0.05)
@@ -130,8 +172,18 @@ async def test_queue_overflow_graceful(redis_client):
     sender = AgentId(type=AgentType.IPA)
     recipient = AgentId(type=AgentType.NGA, instance="overflow")
 
-    m1 = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.REQUEST)
-    m2 = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.REQUEST)
+    m1 = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.REQUEST,
+    )
+    m2 = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.REQUEST,
+    )
 
     res1 = await coord.send_message(sender, recipient, m1)
     assert res1.delivered is True
@@ -139,4 +191,3 @@ async def test_queue_overflow_graceful(redis_client):
     res2 = await coord.send_message(sender, recipient, m2)
     assert res2.delivered is False
     assert res2.error == "queue full"
-

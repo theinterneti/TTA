@@ -1,6 +1,5 @@
 import os
-import time
-import json
+
 import pytest
 
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
@@ -10,27 +9,31 @@ from src.components.agent_orchestration_component import AgentOrchestrationCompo
 @pytest.mark.asyncio
 async def test_workflow_monitor_metrics_and_diagnostics(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8625,
-        "agent_orchestration.diagnostics.enabled": True,
-        # Enable error handling/monitoring
-        "agent_orchestration.error_handling.enabled": True,
-        "agent_orchestration.workflow": {
-            "timeouts": {"total_seconds": 0.5, "per_step_seconds": 0.2},
-            "audit_retention_days": 1,
-            "timeout_check_interval_s": 0.05,
-            "state_validation_interval_s": 0.05,
-        },
-        "agent_orchestration.tools": {"redis_key_prefix": "ao"},
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8625,
+            "agent_orchestration.diagnostics.enabled": True,
+            # Enable error handling/monitoring
+            "agent_orchestration.error_handling.enabled": True,
+            "agent_orchestration.workflow": {
+                "timeouts": {"total_seconds": 0.5, "per_step_seconds": 0.2},
+                "audit_retention_days": 1,
+                "timeout_check_interval_s": 0.05,
+                "state_validation_interval_s": 0.05,
+            },
+            "agent_orchestration.tools": {"redis_key_prefix": "ao"},
+        }
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     from starlette.testclient import TestClient
+
     client = TestClient(app)
 
     # Simulate a run by interacting with the monitor directly
     from src.agent_orchestration.workflow_monitor import WorkflowMonitor
+
     mon = getattr(comp, "_workflow_monitor", None)
     assert isinstance(mon, WorkflowMonitor)
 
@@ -55,5 +58,5 @@ async def test_workflow_monitor_metrics_and_diagnostics(redis_client):
 
 async def asyncio_sleep(t):
     import asyncio
-    await asyncio.sleep(t)
 
+    await asyncio.sleep(t)

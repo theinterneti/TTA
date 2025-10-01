@@ -1,35 +1,41 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useLocation } from 'react-router-dom';
-import { RootState } from '../../store/store';
+import { RootState, AppDispatch } from '../../store/store';
 import { logout } from '../../store/slices/authSlice';
+import { useTranslation } from '../../services/terminologyTranslation';
 
 const Header: React.FC = () => {
   const location = useLocation();
-  const dispatch = useDispatch();
+  const dispatch = useDispatch<AppDispatch>();
   const { profile } = useSelector((state: RootState) => state.player);
   const { selectedCharacter } = useSelector((state: RootState) => state.character);
   const { isConnected } = useSelector((state: RootState) => state.chat);
+  const { isLoading } = useSelector((state: RootState) => state.auth);
+  const { translate, isEntertainmentMode } = useTranslation();
 
   const getPageTitle = () => {
     switch (location.pathname) {
       case '/dashboard':
-        return 'Dashboard';
+        return isEntertainmentMode() ? 'Adventure Hub' : 'Dashboard';
       case '/characters':
         return 'Character Management';
       case '/worlds':
         return 'World Selection';
       case '/settings':
         return 'Settings';
+      case '/preferences':
+        return translate('Therapeutic Preferences');
       default:
         if (location.pathname.startsWith('/chat')) {
-          return selectedCharacter ? `Chat - ${selectedCharacter.name}` : 'Chat';
+          return selectedCharacter ? `Adventure - ${selectedCharacter.name}` : 'Adventure';
         }
-        return 'TTA Platform';
+        return isEntertainmentMode() ? 'Adventure Platform' : 'TTA Platform';
     }
   };
 
   const handleLogout = () => {
+    console.log('Logout button clicked - dispatching logout action');
     dispatch(logout());
   };
 
@@ -83,17 +89,29 @@ const Header: React.FC = () => {
           <div className="relative">
             <button
               onClick={handleLogout}
-              className="flex items-center space-x-2 px-3 py-2 text-sm text-gray-700 hover:text-gray-900 transition-colors duration-200"
+              disabled={isLoading}
+              className={`flex items-center space-x-2 px-3 py-2 text-sm transition-colors duration-200 ${
+                isLoading
+                  ? 'text-gray-400 cursor-not-allowed'
+                  : 'text-gray-700 hover:text-gray-900'
+              }`}
             >
-              <span>Logout</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                />
-              </svg>
+              <span>{isLoading ? 'Logging out...' : 'Logout'}</span>
+              {isLoading ? (
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="m4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                  />
+                </svg>
+              )}
             </button>
           </div>
         </div>

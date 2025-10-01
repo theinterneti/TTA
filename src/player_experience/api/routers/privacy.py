@@ -5,20 +5,25 @@ This module provides GDPR-compliant endpoints for data export, deletion,
 consent management, and privacy settings.
 """
 
-from typing import Dict, List, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, Response
+import io
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-import io
 
 from ...models.auth import AuthenticatedUser, Permission
 from ...services.privacy_service import (
-    DataPrivacyService, DataExportRequest, DataDeletionRequest,
-    ConsentRecord, PrivacySettings, DataCategory, ProcessingPurpose,
-    DataRetentionPeriod
+    ConsentRecord,
+    DataCategory,
+    DataDeletionRequest,
+    DataExportRequest,
+    DataPrivacyService,
+    DataRetentionPeriod,
+    PrivacySettings,
+    ProcessingPurpose,
 )
 from ..routers.auth import get_current_authenticated_user, require_permission
-
 
 router = APIRouter()
 
@@ -28,51 +33,54 @@ privacy_service = DataPrivacyService()
 
 class ConsentRequest(BaseModel):
     """Request to record user consent."""
+
     purpose: ProcessingPurpose
-    data_categories: List[DataCategory]
+    data_categories: list[DataCategory]
     consent_given: bool
     consent_method: str = "explicit"
-    consent_evidence: Optional[str] = None
+    consent_evidence: str | None = None
 
 
 class ConsentWithdrawalRequest(BaseModel):
     """Request to withdraw consent."""
+
     consent_id: str
 
 
 class PrivacySettingsUpdate(BaseModel):
     """Request to update privacy settings."""
-    data_minimization: Optional[bool] = None
-    purpose_limitation: Optional[bool] = None
-    storage_limitation: Optional[bool] = None
-    marketing_consent: Optional[bool] = None
-    analytics_consent: Optional[bool] = None
-    research_consent: Optional[bool] = None
-    third_party_sharing: Optional[bool] = None
-    data_retention_preference: Optional[DataRetentionPeriod] = None
-    notification_preferences: Optional[Dict[str, bool]] = None
+
+    data_minimization: bool | None = None
+    purpose_limitation: bool | None = None
+    storage_limitation: bool | None = None
+    marketing_consent: bool | None = None
+    analytics_consent: bool | None = None
+    research_consent: bool | None = None
+    third_party_sharing: bool | None = None
+    data_retention_preference: DataRetentionPeriod | None = None
+    notification_preferences: dict[str, bool] | None = None
 
 
-@router.get("/settings", response_model=Dict[str, Any])
+@router.get("/settings", response_model=dict[str, Any])
 async def get_privacy_settings(
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, Any]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, Any]:
     """
     Get current user's privacy settings.
-    
+
     Args:
         user: Current authenticated user
-        
+
     Returns:
         Dict: User's privacy settings
     """
     settings = privacy_service.get_privacy_settings(user.user_id)
-    
+
     if not settings:
         # Return default settings
         settings = PrivacySettings(user_id=user.user_id)
         privacy_service.update_privacy_settings(settings)
-    
+
     return {
         "user_id": settings.user_id,
         "data_minimization": settings.data_minimization,
@@ -84,64 +92,64 @@ async def get_privacy_settings(
         "third_party_sharing": settings.third_party_sharing,
         "data_retention_preference": settings.data_retention_preference.value,
         "notification_preferences": settings.notification_preferences,
-        "updated_at": settings.updated_at.isoformat()
+        "updated_at": settings.updated_at.isoformat(),
     }
 
 
-@router.put("/settings", response_model=Dict[str, str])
+@router.put("/settings", response_model=dict[str, str])
 async def update_privacy_settings(
     settings_update: PrivacySettingsUpdate,
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, str]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, str]:
     """
     Update user's privacy settings.
-    
+
     Args:
         settings_update: Privacy settings to update
         user: Current authenticated user
-        
+
     Returns:
         Dict: Success message
     """
     current_settings = privacy_service.get_privacy_settings(user.user_id)
-    
+
     if not current_settings:
         current_settings = PrivacySettings(user_id=user.user_id)
-    
+
     # Update only provided fields
     update_data = settings_update.dict(exclude_unset=True)
     for field, value in update_data.items():
         if hasattr(current_settings, field):
             setattr(current_settings, field, value)
-    
+
     success = privacy_service.update_privacy_settings(current_settings)
-    
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to update privacy settings"
+            detail="Failed to update privacy settings",
         )
-    
+
     return {"message": "Privacy settings updated successfully"}
 
 
-@router.post("/consent", response_model=Dict[str, str])
+@router.post("/consent", response_model=dict[str, str])
 async def record_consent(
     consent_request: ConsentRequest,
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, str]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, str]:
     """
     Record user consent for data processing.
-    
+
     Args:
         consent_request: Consent details
         user: Current authenticated user
-        
+
     Returns:
         Dict: Consent ID and success message
     """
     from datetime import datetime
-    
+
     consent = ConsentRecord(
         user_id=user.user_id,
         consent_id="",  # Will be generated by service
@@ -150,58 +158,57 @@ async def record_consent(
         consent_given=consent_request.consent_given,
         consent_date=datetime.utcnow(),
         consent_method=consent_request.consent_method,
-        consent_evidence=consent_request.consent_evidence
+        consent_evidence=consent_request.consent_evidence,
     )
-    
+
     consent_id = privacy_service.record_consent(consent)
-    
-    return {
-        "message": "Consent recorded successfully",
-        "consent_id": consent_id
-    }
+
+    return {"message": "Consent recorded successfully", "consent_id": consent_id}
 
 
-@router.post("/consent/withdraw", response_model=Dict[str, str])
+@router.post("/consent/withdraw", response_model=dict[str, str])
 async def withdraw_consent(
     withdrawal_request: ConsentWithdrawalRequest,
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, str]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, str]:
     """
     Withdraw user consent for data processing.
-    
+
     Args:
         withdrawal_request: Consent withdrawal details
         user: Current authenticated user
-        
+
     Returns:
         Dict: Success message
     """
-    success = privacy_service.withdraw_consent(user.user_id, withdrawal_request.consent_id)
-    
+    success = privacy_service.withdraw_consent(
+        user.user_id, withdrawal_request.consent_id
+    )
+
     if not success:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Consent record not found or already withdrawn"
+            detail="Consent record not found or already withdrawn",
         )
-    
+
     return {"message": "Consent withdrawn successfully"}
 
 
-@router.get("/consent", response_model=List[Dict[str, Any]])
+@router.get("/consent", response_model=list[dict[str, Any]])
 async def get_consent_records(
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> List[Dict[str, Any]]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> list[dict[str, Any]]:
     """
     Get user's consent records.
-    
+
     Args:
         user: Current authenticated user
-        
+
     Returns:
         List: User's consent records
     """
     consent_records = privacy_service.consent_records.get(user.user_id, [])
-    
+
     return [
         {
             "consent_id": consent.consent_id,
@@ -210,8 +217,10 @@ async def get_consent_records(
             "consent_given": consent.consent_given,
             "consent_date": consent.consent_date.isoformat(),
             "consent_method": consent.consent_method,
-            "withdrawal_date": consent.withdrawal_date.isoformat() if consent.withdrawal_date else None,
-            "is_active": consent.is_active
+            "withdrawal_date": (
+                consent.withdrawal_date.isoformat() if consent.withdrawal_date else None
+            ),
+            "is_active": consent.is_active,
         }
         for consent in consent_records
     ]
@@ -220,15 +229,15 @@ async def get_consent_records(
 @router.post("/export", response_class=StreamingResponse)
 async def export_user_data(
     export_request: DataExportRequest,
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
 ) -> StreamingResponse:
     """
     Export user data (GDPR Article 20 - Right to data portability).
-    
+
     Args:
         export_request: Data export request details
         user: Current authenticated user
-        
+
     Returns:
         StreamingResponse: ZIP file containing exported data
     """
@@ -236,42 +245,42 @@ async def export_user_data(
     if export_request.user_id != user.user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only export your own data"
+            detail="You can only export your own data",
         )
-    
+
     try:
         export_data = privacy_service.export_user_data(export_request)
-        
+
         # Create streaming response
         export_stream = io.BytesIO(export_data)
-        
+
         return StreamingResponse(
             io.BytesIO(export_data),
             media_type="application/zip",
             headers={
                 "Content-Disposition": f"attachment; filename=user_data_export_{user.user_id}.zip"
-            }
+            },
         )
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Data export failed: {str(e)}"
+            detail=f"Data export failed: {str(e)}",
         )
 
 
-@router.post("/delete", response_model=Dict[str, Any])
+@router.post("/delete", response_model=dict[str, Any])
 async def delete_user_data(
     deletion_request: DataDeletionRequest,
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, Any]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, Any]:
     """
     Delete user data (GDPR Article 17 - Right to erasure).
-    
+
     Args:
         deletion_request: Data deletion request details
         user: Current authenticated user
-        
+
     Returns:
         Dict: Deletion summary
     """
@@ -279,59 +288,59 @@ async def delete_user_data(
     if deletion_request.user_id != user.user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="You can only delete your own data"
+            detail="You can only delete your own data",
         )
-    
+
     try:
         deletion_summary = privacy_service.delete_user_data(deletion_request)
         return deletion_summary
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Data deletion failed: {str(e)}"
+            detail=f"Data deletion failed: {str(e)}",
         )
 
 
-@router.post("/anonymize", response_model=Dict[str, Any])
+@router.post("/anonymize", response_model=dict[str, Any])
 async def anonymize_user_data(
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> Dict[str, Any]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> dict[str, Any]:
     """
     Anonymize user data for research purposes.
-    
+
     Args:
         user: Current authenticated user
-        
+
     Returns:
         Dict: Anonymization summary
     """
     try:
         anonymization_summary = privacy_service.anonymize_user_data(user.user_id)
         return anonymization_summary
-        
+
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Data anonymization failed: {str(e)}"
+            detail=f"Data anonymization failed: {str(e)}",
         )
 
 
-@router.get("/processing-records", response_model=List[Dict[str, Any]])
+@router.get("/processing-records", response_model=list[dict[str, Any]])
 async def get_processing_records(
-    user: AuthenticatedUser = Depends(get_current_authenticated_user)
-) -> List[Dict[str, Any]]:
+    user: AuthenticatedUser = Depends(get_current_authenticated_user),
+) -> list[dict[str, Any]]:
     """
     Get data processing records for the user.
-    
+
     Args:
         user: Current authenticated user
-        
+
     Returns:
         List: Data processing records
     """
     records = privacy_service.get_processing_records(user.user_id)
-    
+
     return [
         {
             "record_id": record.record_id,
@@ -343,26 +352,28 @@ async def get_processing_records(
             "retention_period": record.retention_period.value,
             "created_at": record.created_at.isoformat(),
             "consent_given": record.consent_given,
-            "consent_date": record.consent_date.isoformat() if record.consent_date else None,
+            "consent_date": (
+                record.consent_date.isoformat() if record.consent_date else None
+            ),
             "is_sensitive": record.is_sensitive,
             "cross_border_transfer": record.cross_border_transfer,
-            "automated_decision_making": record.automated_decision_making
+            "automated_decision_making": record.automated_decision_making,
         }
         for record in records
     ]
 
 
 # Admin endpoints for compliance management
-@router.get("/admin/compliance-check", response_model=List[Dict[str, Any]])
+@router.get("/admin/compliance-check", response_model=list[dict[str, Any]])
 async def check_data_retention_compliance(
-    user: AuthenticatedUser = Depends(require_permission(Permission.ACCESS_AUDIT_LOGS))
-) -> List[Dict[str, Any]]:
+    user: AuthenticatedUser = Depends(require_permission(Permission.ACCESS_AUDIT_LOGS)),
+) -> list[dict[str, Any]]:
     """
     Check data retention compliance (admin only).
-    
+
     Args:
         user: Current authenticated user (must have audit log access)
-        
+
     Returns:
         List: Compliance issues requiring attention
     """
@@ -370,23 +381,23 @@ async def check_data_retention_compliance(
     return compliance_issues
 
 
-@router.get("/admin/deletion-log", response_model=List[Dict[str, Any]])
+@router.get("/admin/deletion-log", response_model=list[dict[str, Any]])
 async def get_deletion_log(
     limit: int = 100,
-    user: AuthenticatedUser = Depends(require_permission(Permission.ACCESS_AUDIT_LOGS))
-) -> List[Dict[str, Any]]:
+    user: AuthenticatedUser = Depends(require_permission(Permission.ACCESS_AUDIT_LOGS)),
+) -> list[dict[str, Any]]:
     """
     Get data deletion audit log (admin only).
-    
+
     Args:
         limit: Maximum number of entries to return
         user: Current authenticated user (must have audit log access)
-        
+
     Returns:
         List: Deletion log entries
     """
     deletion_log = privacy_service.deletion_log[-limit:]
-    
+
     return [
         {
             "user_id": entry["user_id"],
@@ -394,17 +405,17 @@ async def get_deletion_log(
             "categories_deleted": entry["deletion_summary"]["categories_deleted"],
             "items_deleted": entry["deletion_summary"]["items_deleted"],
             "items_anonymized": entry["deletion_summary"]["items_anonymized"],
-            "timestamp": entry["timestamp"].isoformat()
+            "timestamp": entry["timestamp"].isoformat(),
         }
         for entry in deletion_log
     ]
 
 
-@router.get("/categories", response_model=List[Dict[str, str]])
-async def get_data_categories() -> List[Dict[str, str]]:
+@router.get("/categories", response_model=list[dict[str, str]])
+async def get_data_categories() -> list[dict[str, str]]:
     """
     Get available data categories for privacy management.
-    
+
     Returns:
         List: Available data categories
     """
@@ -414,11 +425,11 @@ async def get_data_categories() -> List[Dict[str, str]]:
     ]
 
 
-@router.get("/purposes", response_model=List[Dict[str, str]])
-async def get_processing_purposes() -> List[Dict[str, str]]:
+@router.get("/purposes", response_model=list[dict[str, str]])
+async def get_processing_purposes() -> list[dict[str, str]]:
     """
     Get available processing purposes under GDPR.
-    
+
     Returns:
         List: Available processing purposes
     """
@@ -428,11 +439,11 @@ async def get_processing_purposes() -> List[Dict[str, str]]:
     ]
 
 
-@router.get("/retention-periods", response_model=List[Dict[str, str]])
-async def get_retention_periods() -> List[Dict[str, str]]:
+@router.get("/retention-periods", response_model=list[dict[str, str]])
+async def get_retention_periods() -> list[dict[str, str]]:
     """
     Get available data retention periods.
-    
+
     Returns:
         List: Available retention periods
     """

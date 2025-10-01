@@ -1,4 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { conversationAPI } from '../../services/api';
+import { getErrorMessage } from '../../utils/errorHandling';
 
 interface ChatMessage {
   id: string;
@@ -40,6 +42,8 @@ interface ChatState {
   isTyping: boolean;
   connectionError: string | null;
   messageHistory: ChatMessage[];
+  isLoadingHistory: boolean;
+  historyError: string | null;
 }
 
 const initialState: ChatState = {
@@ -49,7 +53,18 @@ const initialState: ChatState = {
   isTyping: false,
   connectionError: null,
   messageHistory: [],
+  isLoadingHistory: false,
+  historyError: null,
 };
+
+// Async thunks
+export const loadConversationHistory = createAsyncThunk(
+  'chat/loadHistory',
+  async ({ sessionId, limit = 50 }: { sessionId: string; limit?: number }) => {
+    const response = await conversationAPI.getHistory(sessionId, limit);
+    return response;
+  }
+);
 
 const chatSlice = createSlice({
   name: 'chat',
@@ -123,6 +138,37 @@ const chatSlice = createSlice({
         state.currentSession.messages = [];
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(loadConversationHistory.pending, (state) => {
+        state.isLoadingHistory = true;
+        state.historyError = null;
+      })
+      .addCase(loadConversationHistory.fulfilled, (state, action) => {
+        state.isLoadingHistory = false;
+
+        // Transform API response to chat messages
+        const messages = action.payload.messages.map((msg: any) => ({
+          id: msg.timestamp, // Use timestamp as ID if no ID provided
+          type: msg.role as 'user' | 'assistant' | 'system',
+          content: msg.content,
+          timestamp: msg.timestamp,
+          metadata: msg.metadata,
+        }));
+
+        state.messageHistory = messages;
+
+        // Update current session if it matches
+        if (state.currentSession && state.currentSession.session_id === action.payload.session_id) {
+          state.currentSession.messages = messages;
+          state.currentSession.last_activity = action.payload.last_activity;
+        }
+      })
+      .addCase(loadConversationHistory.rejected, (state, action) => {
+        state.isLoadingHistory = false;
+        state.historyError = getErrorMessage(action.error, 'Load conversation history');
+      });
   },
 });
 

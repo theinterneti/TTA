@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 class ErrorSeverity(Enum):
     """Severity levels for system errors."""
+
     LOW = "low"  # Minor issues that don't affect functionality
     MEDIUM = "medium"  # Issues that may affect some functionality
     HIGH = "high"  # Issues that significantly impact functionality
@@ -28,6 +29,7 @@ class ErrorSeverity(Enum):
 
 class RecoveryStrategy(Enum):
     """Recovery strategies for different error types."""
+
     RETRY = "retry"  # Retry the failed operation
     FALLBACK = "fallback"  # Use fallback mechanism
     GRACEFUL_DEGRADATION = "graceful_degradation"  # Reduce functionality
@@ -38,6 +40,7 @@ class RecoveryStrategy(Enum):
 
 class SystemStatus(Enum):
     """Status of therapeutic systems."""
+
     HEALTHY = "healthy"
     DEGRADED = "degraded"
     FAILING = "failing"
@@ -48,6 +51,7 @@ class SystemStatus(Enum):
 @dataclass
 class ErrorContext:
     """Context information for system errors."""
+
     error_id: str = field(default_factory=lambda: str(uuid4()))
     error_type: str = ""
     error_message: str = ""
@@ -78,6 +82,7 @@ class ErrorContext:
 @dataclass
 class RecoveryResult:
     """Result of error recovery attempt."""
+
     recovery_id: str = field(default_factory=lambda: str(uuid4()))
     error_id: str = ""
 
@@ -108,6 +113,7 @@ class RecoveryResult:
 @dataclass
 class SystemHealthStatus:
     """Health status of therapeutic systems."""
+
     system_name: str = ""
     status: SystemStatus = SystemStatus.HEALTHY
     last_health_check: datetime = field(default_factory=datetime.utcnow)
@@ -163,19 +169,40 @@ class TherapeuticErrorRecoveryManager:
 
         # Configuration parameters
         self.max_recovery_attempts = self.config.get("max_recovery_attempts", 3)
-        self.health_check_interval_seconds = self.config.get("health_check_interval_seconds", 30)
+        self.health_check_interval_seconds = self.config.get(
+            "health_check_interval_seconds", 30
+        )
         self.error_retention_days = self.config.get("error_retention_days", 7)
-        self.critical_error_escalation_enabled = self.config.get("critical_error_escalation_enabled", True)
-        self.therapeutic_continuity_priority = self.config.get("therapeutic_continuity_priority", True)
+        self.critical_error_escalation_enabled = self.config.get(
+            "critical_error_escalation_enabled", True
+        )
+        self.therapeutic_continuity_priority = self.config.get(
+            "therapeutic_continuity_priority", True
+        )
 
         # Recovery strategies mapping
         self.recovery_strategies = {
             "ConnectionError": [RecoveryStrategy.RETRY, RecoveryStrategy.FALLBACK],
-            "TimeoutError": [RecoveryStrategy.RETRY, RecoveryStrategy.GRACEFUL_DEGRADATION],
-            "ValidationError": [RecoveryStrategy.FALLBACK, RecoveryStrategy.THERAPEUTIC_INTERVENTION],
-            "CriticalError": [RecoveryStrategy.THERAPEUTIC_INTERVENTION, RecoveryStrategy.ESCALATION],
-            "SystemOverload": [RecoveryStrategy.GRACEFUL_DEGRADATION, RecoveryStrategy.SYSTEM_RESTART],
-            "TherapeuticSafetyError": [RecoveryStrategy.THERAPEUTIC_INTERVENTION, RecoveryStrategy.ESCALATION],
+            "TimeoutError": [
+                RecoveryStrategy.RETRY,
+                RecoveryStrategy.GRACEFUL_DEGRADATION,
+            ],
+            "ValidationError": [
+                RecoveryStrategy.FALLBACK,
+                RecoveryStrategy.THERAPEUTIC_INTERVENTION,
+            ],
+            "CriticalError": [
+                RecoveryStrategy.THERAPEUTIC_INTERVENTION,
+                RecoveryStrategy.ESCALATION,
+            ],
+            "SystemOverload": [
+                RecoveryStrategy.GRACEFUL_DEGRADATION,
+                RecoveryStrategy.SYSTEM_RESTART,
+            ],
+            "TherapeuticSafetyError": [
+                RecoveryStrategy.THERAPEUTIC_INTERVENTION,
+                RecoveryStrategy.ESCALATION,
+            ],
         }
 
         # Performance metrics
@@ -198,7 +225,9 @@ class TherapeuticErrorRecoveryManager:
     async def initialize(self):
         """Initialize the error recovery manager."""
         # Start health monitoring
-        self._health_monitoring_task = asyncio.create_task(self._health_monitoring_loop())
+        self._health_monitoring_task = asyncio.create_task(
+            self._health_monitoring_loop()
+        )
 
         logger.info("TherapeuticErrorRecoveryManager initialization complete")
 
@@ -296,7 +325,9 @@ class TherapeuticErrorRecoveryManager:
                 session_id=session_id,
                 therapeutic_context=therapeutic_context or {},
                 stack_trace=traceback.format_exc(),
-                severity=self._assess_error_severity(exception, component, therapeutic_context),
+                severity=self._assess_error_severity(
+                    exception, component, therapeutic_context
+                ),
             )
 
             # Assess therapeutic impact
@@ -313,7 +344,9 @@ class TherapeuticErrorRecoveryManager:
             recovery_result = await self._attempt_recovery(error_context)
 
             # Calculate recovery time
-            recovery_result.recovery_time_seconds = (datetime.utcnow() - start_time).total_seconds()
+            recovery_result.recovery_time_seconds = (
+                datetime.utcnow() - start_time
+            ).total_seconds()
 
             # Store recovery result
             self.recovery_history.append(recovery_result)
@@ -342,7 +375,7 @@ class TherapeuticErrorRecoveryManager:
 
             # Return minimal recovery result
             return RecoveryResult(
-                error_id=getattr(error_context, 'error_id', 'unknown'),
+                error_id=getattr(error_context, "error_id", "unknown"),
                 success=False,
                 strategy_used=RecoveryStrategy.ESCALATION,
                 user_message="An unexpected error occurred. Please try again.",
@@ -353,14 +386,18 @@ class TherapeuticErrorRecoveryManager:
         self,
         exception: Exception,
         component: str,
-        therapeutic_context: dict[str, Any] | None
+        therapeutic_context: dict[str, Any] | None,
     ) -> ErrorSeverity:
         """Assess the severity of an error."""
         try:
             error_type = type(exception).__name__
 
             # Critical errors that affect user safety
-            if error_type in ["CriticalError", "TherapeuticSafetyError", "CrisisDetectionError"]:
+            if error_type in [
+                "CriticalError",
+                "TherapeuticSafetyError",
+                "CrisisDetectionError",
+            ]:
                 return ErrorSeverity.CRITICAL
 
             # High severity errors that affect core functionality
@@ -394,7 +431,9 @@ class TherapeuticErrorRecoveryManager:
         try:
             # Check if error affects therapeutic continuity
             therapeutic_components = [
-                "consequence_system", "emotional_safety_system", "therapeutic_integration_system"
+                "consequence_system",
+                "emotional_safety_system",
+                "therapeutic_integration_system",
             ]
 
             if error_context.component in therapeutic_components:
@@ -411,7 +450,9 @@ class TherapeuticErrorRecoveryManager:
                     error_context.affects_user_safety = True
                     error_context.requires_immediate_attention = True
 
-                if error_context.therapeutic_context.get("therapeutic_session_active", False):
+                if error_context.therapeutic_context.get(
+                    "therapeutic_session_active", False
+                ):
                     error_context.affects_therapeutic_continuity = True
 
             # Critical and high severity errors require immediate attention
@@ -425,7 +466,9 @@ class TherapeuticErrorRecoveryManager:
         """Update system health status based on error."""
         try:
             if component not in self.system_health:
-                self.system_health[component] = SystemHealthStatus(system_name=component)
+                self.system_health[component] = SystemHealthStatus(
+                    system_name=component
+                )
 
             health_status = self.system_health[component]
             health_status.recent_errors += 1
@@ -442,15 +485,20 @@ class TherapeuticErrorRecoveryManager:
 
             # Calculate error rate (errors per hour)
             one_hour_ago = datetime.utcnow() - timedelta(hours=1)
-            recent_errors = len([
-                e for e in self.error_history
-                if e.component == component and e.timestamp > one_hour_ago
-            ])
+            recent_errors = len(
+                [
+                    e
+                    for e in self.error_history
+                    if e.component == component and e.timestamp > one_hour_ago
+                ]
+            )
             health_status.error_rate = recent_errors
 
             # Update availability based on error rate
             if health_status.error_rate > 10:  # More than 10 errors per hour
-                health_status.availability_percentage = max(0, 100 - (health_status.error_rate * 2))
+                health_status.availability_percentage = max(
+                    0, 100 - (health_status.error_rate * 2)
+                )
 
             # Mark system as offline if too many critical errors
             if health_status.critical_errors >= 3:
@@ -466,18 +514,23 @@ class TherapeuticErrorRecoveryManager:
             # Get recovery strategies for this error type
             strategies = self.recovery_strategies.get(
                 error_context.error_type,
-                [RecoveryStrategy.RETRY, RecoveryStrategy.FALLBACK]
+                [RecoveryStrategy.RETRY, RecoveryStrategy.FALLBACK],
             )
 
             # Try each strategy in order
             for strategy in strategies:
-                if error_context.recovery_attempts >= error_context.max_recovery_attempts:
+                if (
+                    error_context.recovery_attempts
+                    >= error_context.max_recovery_attempts
+                ):
                     break
 
                 error_context.recovery_attempts += 1
                 error_context.recovery_strategies_tried.append(strategy)
 
-                recovery_result = await self._execute_recovery_strategy(error_context, strategy)
+                recovery_result = await self._execute_recovery_strategy(
+                    error_context, strategy
+                )
                 recovery_result.error_id = error_context.error_id
 
                 if recovery_result.success:
@@ -512,7 +565,9 @@ class TherapeuticErrorRecoveryManager:
             elif strategy == RecoveryStrategy.GRACEFUL_DEGRADATION:
                 return await self._execute_graceful_degradation_strategy(error_context)
             elif strategy == RecoveryStrategy.THERAPEUTIC_INTERVENTION:
-                return await self._execute_therapeutic_intervention_strategy(error_context)
+                return await self._execute_therapeutic_intervention_strategy(
+                    error_context
+                )
             elif strategy == RecoveryStrategy.SYSTEM_RESTART:
                 return await self._execute_system_restart_strategy(error_context)
             elif strategy == RecoveryStrategy.ESCALATION:
@@ -532,7 +587,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message=f"Recovery strategy {strategy.value} failed",
             )
 
-    async def _execute_retry_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_retry_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute retry recovery strategy."""
         try:
             # Simple retry strategy - mark as successful for now
@@ -553,7 +610,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message="Retry failed",
             )
 
-    async def _execute_fallback_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_fallback_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute fallback recovery strategy."""
         try:
             component = error_context.component
@@ -587,11 +646,14 @@ class TherapeuticErrorRecoveryManager:
                 },
             }
 
-            fallback = fallback_mechanisms.get(component, {
-                "fallback_type": "basic_functionality",
-                "description": f"Use basic functionality for {component}",
-                "therapeutic_message": "We're continuing with essential functionality to support your therapeutic work.",
-            })
+            fallback = fallback_mechanisms.get(
+                component,
+                {
+                    "fallback_type": "basic_functionality",
+                    "description": f"Use basic functionality for {component}",
+                    "therapeutic_message": "We're continuing with essential functionality to support your therapeutic work.",
+                },
+            )
 
             # Mark system as degraded
             self.degraded_systems.add(component)
@@ -605,7 +667,10 @@ class TherapeuticErrorRecoveryManager:
                 fallback_systems_activated=[component],
                 degraded_functionality=[component],
                 user_message=f"We're using a simplified version of {component} to continue your session.",
-                therapeutic_message=fallback.get("therapeutic_message", "We can adapt and continue our therapeutic work."),
+                therapeutic_message=fallback.get(
+                    "therapeutic_message",
+                    "We can adapt and continue our therapeutic work.",
+                ),
             )
 
         except Exception as e:
@@ -616,7 +681,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message="Fallback mechanism failed",
             )
 
-    async def _execute_graceful_degradation_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_graceful_degradation_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute graceful degradation recovery strategy."""
         try:
             component = error_context.component
@@ -629,22 +696,31 @@ class TherapeuticErrorRecoveryManager:
                     "therapeutic_message": "We're maintaining a consistent therapeutic challenge level.",
                 },
                 "character_development_system": {
-                    "degraded_functionality": ["complex_attribute_interactions", "advanced_progression"],
+                    "degraded_functionality": [
+                        "complex_attribute_interactions",
+                        "advanced_progression",
+                    ],
                     "maintained_functionality": ["basic_attribute_tracking"],
                     "therapeutic_message": "Your character growth continues with essential tracking.",
                 },
                 "therapeutic_integration_system": {
-                    "degraded_functionality": ["multi_framework_integration", "advanced_recommendations"],
+                    "degraded_functionality": [
+                        "multi_framework_integration",
+                        "advanced_recommendations",
+                    ],
                     "maintained_functionality": ["single_framework_support"],
                     "therapeutic_message": "We're focusing on core therapeutic principles.",
                 },
             }
 
-            strategy = degradation_strategies.get(component, {
-                "degraded_functionality": ["advanced_features"],
-                "maintained_functionality": ["core_functionality"],
-                "therapeutic_message": "We're maintaining essential functionality for your therapeutic work.",
-            })
+            strategy = degradation_strategies.get(
+                component,
+                {
+                    "degraded_functionality": ["advanced_features"],
+                    "maintained_functionality": ["core_functionality"],
+                    "therapeutic_message": "We're maintaining essential functionality for your therapeutic work.",
+                },
+            )
 
             # Mark system as degraded
             self.degraded_systems.add(component)
@@ -669,7 +745,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message="Graceful degradation failed",
             )
 
-    async def _execute_therapeutic_intervention_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_therapeutic_intervention_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute therapeutic intervention recovery strategy."""
         try:
             # Define therapeutic interventions for different error scenarios
@@ -702,7 +780,9 @@ class TherapeuticErrorRecoveryManager:
             elif error_context.error_type == "SystemOverload":
                 intervention_type = "system_overload"
 
-            intervention = interventions.get(intervention_type, interventions["session_interruption"])
+            intervention = interventions.get(
+                intervention_type, interventions["session_interruption"]
+            )
 
             # Update metrics
             self.metrics["therapeutic_interventions"] += 1
@@ -725,7 +805,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message="Therapeutic intervention failed",
             )
 
-    async def _execute_system_restart_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_system_restart_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute system restart recovery strategy."""
         try:
             component = error_context.component
@@ -754,7 +836,9 @@ class TherapeuticErrorRecoveryManager:
                 user_message="System restart failed",
             )
 
-    async def _execute_escalation_strategy(self, error_context: ErrorContext) -> RecoveryResult:
+    async def _execute_escalation_strategy(
+        self, error_context: ErrorContext
+    ) -> RecoveryResult:
         """Execute escalation recovery strategy."""
         try:
             # Update metrics
@@ -828,13 +912,15 @@ class TherapeuticErrorRecoveryManager:
             start_time = datetime.utcnow()
 
             # Try to call health_check method if available
-            if hasattr(system, 'health_check'):
+            if hasattr(system, "health_check"):
                 health_result = await system.health_check()
                 response_time = (datetime.utcnow() - start_time).total_seconds() * 1000
 
                 # Update system health status
                 if system_name not in self.system_health:
-                    self.system_health[system_name] = SystemHealthStatus(system_name=system_name)
+                    self.system_health[system_name] = SystemHealthStatus(
+                        system_name=system_name
+                    )
 
                 health_status = self.system_health[system_name]
                 health_status.last_health_check = datetime.utcnow()
@@ -857,9 +943,13 @@ class TherapeuticErrorRecoveryManager:
 
                 # Update availability based on response time
                 if response_time > 5000:  # More than 5 seconds
-                    health_status.availability_percentage = max(0, health_status.availability_percentage - 10)
+                    health_status.availability_percentage = max(
+                        0, health_status.availability_percentage - 10
+                    )
                 elif response_time < 1000:  # Less than 1 second
-                    health_status.availability_percentage = min(100, health_status.availability_percentage + 5)
+                    health_status.availability_percentage = min(
+                        100, health_status.availability_percentage + 5
+                    )
 
         except Exception as e:
             logger.error(f"Error checking health of {system_name}: {e}")
@@ -876,13 +966,13 @@ class TherapeuticErrorRecoveryManager:
 
             # Clean up error history
             self.error_history = [
-                error for error in self.error_history
-                if error.timestamp > cutoff_date
+                error for error in self.error_history if error.timestamp > cutoff_date
             ]
 
             # Clean up recovery history
             self.recovery_history = [
-                recovery for recovery in self.recovery_history
+                recovery
+                for recovery in self.recovery_history
                 if recovery.timestamp > cutoff_date
             ]
 
@@ -903,10 +993,13 @@ class TherapeuticErrorRecoveryManager:
         try:
             # Calculate overall health metrics
             total_systems = len(self.system_health)
-            healthy_systems = len([
-                s for s in self.system_health.values()
-                if s.status == SystemStatus.HEALTHY
-            ])
+            healthy_systems = len(
+                [
+                    s
+                    for s in self.system_health.values()
+                    if s.status == SystemStatus.HEALTHY
+                ]
+            )
             degraded_systems = len(self.degraded_systems)
             offline_systems = len(self.offline_systems)
 
@@ -922,15 +1015,18 @@ class TherapeuticErrorRecoveryManager:
 
             # Get recent error statistics
             one_hour_ago = datetime.utcnow() - timedelta(hours=1)
-            recent_errors = len([
-                e for e in self.error_history
-                if e.timestamp > one_hour_ago
-            ])
+            recent_errors = len(
+                [e for e in self.error_history if e.timestamp > one_hour_ago]
+            )
 
-            critical_errors = len([
-                e for e in self.error_history
-                if e.timestamp > one_hour_ago and e.severity == ErrorSeverity.CRITICAL
-            ])
+            critical_errors = len(
+                [
+                    e
+                    for e in self.error_history
+                    if e.timestamp > one_hour_ago
+                    and e.severity == ErrorSeverity.CRITICAL
+                ]
+            )
 
             return {
                 "overall_status": overall_status,
@@ -968,10 +1064,7 @@ class TherapeuticErrorRecoveryManager:
             if not self.recovery_history:
                 return 0.0
 
-            successful_recoveries = len([
-                r for r in self.recovery_history
-                if r.success
-            ])
+            successful_recoveries = len([r for r in self.recovery_history if r.success])
 
             return (successful_recoveries / len(self.recovery_history)) * 100.0
 
@@ -986,9 +1079,12 @@ class TherapeuticErrorRecoveryManager:
             systems_status = {
                 "consequence_system": self.consequence_system is not None,
                 "emotional_safety_system": self.emotional_safety_system is not None,
-                "adaptive_difficulty_engine": self.adaptive_difficulty_engine is not None,
-                "character_development_system": self.character_development_system is not None,
-                "therapeutic_integration_system": self.therapeutic_integration_system is not None,
+                "adaptive_difficulty_engine": self.adaptive_difficulty_engine
+                is not None,
+                "character_development_system": self.character_development_system
+                is not None,
+                "therapeutic_integration_system": self.therapeutic_integration_system
+                is not None,
                 "gameplay_loop_controller": self.gameplay_loop_controller is not None,
                 "replayability_system": self.replayability_system is not None,
                 "collaborative_system": self.collaborative_system is not None,
@@ -1004,7 +1100,8 @@ class TherapeuticErrorRecoveryManager:
                 "active_errors": len(self.active_errors),
                 "degraded_systems": len(self.degraded_systems),
                 "offline_systems": len(self.offline_systems),
-                "health_monitoring_active": self._health_monitoring_task is not None and not self._health_monitoring_task.done(),
+                "health_monitoring_active": self._health_monitoring_task is not None
+                and not self._health_monitoring_task.done(),
                 "therapeutic_systems": systems_status,
                 "systems_available": f"{systems_available}/8",
                 "metrics": self.get_metrics(),
@@ -1025,18 +1122,16 @@ class TherapeuticErrorRecoveryManager:
         # Error breakdown by severity
         error_by_severity = {}
         for severity in ErrorSeverity:
-            error_by_severity[severity.value] = len([
-                e for e in self.error_history
-                if e.severity == severity
-            ])
+            error_by_severity[severity.value] = len(
+                [e for e in self.error_history if e.severity == severity]
+            )
 
         # Recovery breakdown by strategy
         recovery_by_strategy = {}
         for strategy in RecoveryStrategy:
-            recovery_by_strategy[strategy.value] = len([
-                r for r in self.recovery_history
-                if r.strategy_used == strategy
-            ])
+            recovery_by_strategy[strategy.value] = len(
+                [r for r in self.recovery_history if r.strategy_used == strategy]
+            )
 
         return {
             **self.metrics,

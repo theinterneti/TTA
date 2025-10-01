@@ -1,22 +1,24 @@
 """
 ToolCoordinator for dynamic tool generation, validation, and sharing (Task 7.1).
 """
+
 from __future__ import annotations
 
 import asyncio
 import time
-from typing import Awaitable, Callable, Optional
+from collections.abc import Awaitable, Callable
 
-from .models import ToolSpec, ToolPolicy
+from .metrics import get_tool_metrics, run_with_metrics
+from .models import ToolPolicy, ToolSpec
 from .redis_tool_registry import RedisToolRegistry
-from .metrics import run_with_metrics, get_tool_metrics
-
 
 FactoryFn = Callable[[], Awaitable[ToolSpec]] | Callable[[], ToolSpec]
 
 
 class ToolCoordinator:
-    def __init__(self, registry: RedisToolRegistry, policy: ToolPolicy | None = None) -> None:
+    def __init__(
+        self, registry: RedisToolRegistry, policy: ToolPolicy | None = None
+    ) -> None:
         self._registry = registry
         self._policy = policy or ToolPolicy()
         self._locks: dict[str, asyncio.Lock] = {}
@@ -34,7 +36,11 @@ class ToolCoordinator:
         # Acquire a per-signature lock to avoid duplicate creation across tasks.
         async with self._lock_for(signature):
             # Build spec via factory
-            spec = await factory_fn() if asyncio.iscoroutinefunction(factory_fn) else factory_fn()
+            spec = (
+                await factory_fn()
+                if asyncio.iscoroutinefunction(factory_fn)
+                else factory_fn()
+            )
             # Validate safety and constraints before registration
             self._policy.check_safety(spec)
             now = time.time()
@@ -52,9 +58,15 @@ class ToolCoordinator:
                 spec = existing or spec
             return spec
 
-    async def run_tool(self, spec: ToolSpec, fn: Callable[..., object], *args, **kwargs):
+    async def run_tool(
+        self, spec: ToolSpec, fn: Callable[..., object], *args, **kwargs
+    ):
         """Run a tool callable with automatic metrics collection and policy timeouts."""
-        timeout_ms = self._policy.get_timeout_ms() if hasattr(self._policy, "get_timeout_ms") else None
+        timeout_ms = (
+            self._policy.get_timeout_ms()
+            if hasattr(self._policy, "get_timeout_ms")
+            else None
+        )
         res = run_with_metrics(spec.name, spec.version, fn, *args, **kwargs)
         # Async path: enforce timeout via asyncio.wait_for
         if hasattr(res, "__await__"):
@@ -71,29 +83,35 @@ class ToolCoordinator:
             return await res  # type: ignore
         # Sync path: best-effort timeout using a thread
         if timeout_ms and timeout_ms > 0:
-            import threading
             import queue
-            q: "queue.Queue[tuple[str, object]]" = queue.Queue()
+            import threading
+
+            q: queue.Queue[tuple[str, object]] = queue.Queue()
+
             def _runner():
                 try:
                     v = run_with_metrics(spec.name, spec.version, fn, *args, **kwargs)
                     q.put(("ok", v))
                 except BaseException as e:
                     q.put(("err", e))
+
             t = threading.Thread(target=_runner, daemon=True)
             t.start()
             t.join(timeout_ms / 1000.0)
             if t.is_alive():
                 try:
-                    get_tool_metrics().record_failure(spec.name, spec.version, timeout_ms)
+                    get_tool_metrics().record_failure(
+                        spec.name, spec.version, timeout_ms
+                    )
                 except Exception:
                     pass
                 # cannot kill the thread safely; document limitation
-                raise TimeoutError(f"Tool '{spec.name}:{spec.version}' execution exceeded {timeout_ms} ms")
+                raise TimeoutError(
+                    f"Tool '{spec.name}:{spec.version}' execution exceeded {timeout_ms} ms"
+                )
             kind, payload = q.get_nowait()
             if kind == "err":
                 raise payload  # type: ignore
             return payload
         # Default sync path with metrics already collected
         return res
-

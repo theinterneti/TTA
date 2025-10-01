@@ -2,37 +2,37 @@
 ScaleManager extracted from narrative_arc_orchestrator_component.
 Implements impact assessment, causal maintenance, and conflict resolution.
 """
+
 from __future__ import annotations
 
 import logging
-import uuid
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any
 
-from .models import (
-    NarrativeScale,
-    PlayerChoice,
-    ImpactAssessment,
-    NarrativeEvent,
-    ScaleConflict,
-    Resolution,
+from .causal_graph import add_edge, detect_simple_cycles, remove_weak_link
+from .conflict_detection import (
+    detect_character_conflicts,
+    detect_temporal_conflicts,
+    detect_thematic_conflicts,
+    detect_therapeutic_conflicts,
 )
 from .impact_analysis import (
-    calculate_base_magnitude,
-    identify_affected_elements,
-    calculate_causal_strength,
     assess_therapeutic_alignment,
+    calculate_base_magnitude,
+    calculate_causal_strength,
     calculate_confidence_score,
     calculate_temporal_decay,
     create_narrative_event,
     evaluate_cross_scale_influences,
+    identify_affected_elements,
 )
-from .causal_graph import add_edge, detect_simple_cycles, remove_weak_link
-from .conflict_detection import (
-    detect_temporal_conflicts,
-    detect_character_conflicts,
-    detect_thematic_conflicts,
-    detect_therapeutic_conflicts,
+from .models import (
+    ImpactAssessment,
+    NarrativeEvent,
+    NarrativeScale,
+    PlayerChoice,
+    Resolution,
+    ScaleConflict,
 )
 from .resolution_engine import build_simple_resolution
 
@@ -60,9 +60,8 @@ except Exception:
     pass
 
 
-
 class ScaleManager:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
         self.scale_windows = {
             NarrativeScale.SHORT_TERM: config.get("short_term_window", 300),
@@ -70,26 +69,36 @@ class ScaleManager:
             NarrativeScale.LONG_TERM: config.get("long_term_window", 2592000),
             NarrativeScale.EPIC_TERM: config.get("epic_term_window", 31536000),
         }
-        self.active_events: Dict[NarrativeScale, List[NarrativeEvent]] = {scale: [] for scale in NarrativeScale}
-        self.causal_graph: Dict[str, Set[str]] = {}
-        self.active_conflicts: List[ScaleConflict] = []
+        self.active_events: dict[NarrativeScale, list[NarrativeEvent]] = {
+            scale: [] for scale in NarrativeScale
+        }
+        self.causal_graph: dict[str, set[str]] = {}
+        self.active_conflicts: list[ScaleConflict] = []
         logger.info(f"ScaleManager initialized with windows: {self.scale_windows}")
 
-    async def evaluate_choice_impact(self, choice: PlayerChoice, scales: List[NarrativeScale]) -> Dict[NarrativeScale, ImpactAssessment]:
+    async def evaluate_choice_impact(
+        self, choice: PlayerChoice, scales: list[NarrativeScale]
+    ) -> dict[NarrativeScale, ImpactAssessment]:
         try:
-            logger.debug(f"Evaluating choice impact across scales: {[s.value for s in scales]}")
-            impact_assessments: Dict[NarrativeScale, ImpactAssessment] = {}
+            logger.debug(
+                f"Evaluating choice impact across scales: {[s.value for s in scales]}"
+            )
+            impact_assessments: dict[NarrativeScale, ImpactAssessment] = {}
             for scale in scales:
                 assessment = await self._assess_scale_impact(choice, scale)
                 impact_assessments[scale] = assessment
                 if assessment.magnitude > 0.3:
-                    event = await self._create_narrative_event(choice, scale, assessment)
+                    event = await self._create_narrative_event(
+                        choice, scale, assessment
+                    )
                     self.active_events[scale].append(event)
             await self._evaluate_cross_scale_influences(impact_assessments)
             return impact_assessments
         except Exception as e:
             logger.error(f"Error evaluating choice impact: {e}")
-            return {scale: ImpactAssessment(scale=scale, magnitude=0.0) for scale in scales}
+            return {
+                scale: ImpactAssessment(scale=scale, magnitude=0.0) for scale in scales
+            }
 
     async def maintain_causal_relationships(self, session_id: str) -> bool:
         try:
@@ -104,11 +113,15 @@ class ScaleManager:
             logger.error(f"Error maintaining causal relationships: {e}")
             return False
 
-    async def resolve_scale_conflicts(self, conflicts: List[ScaleConflict]) -> List[Resolution]:
+    async def resolve_scale_conflicts(
+        self, conflicts: list[ScaleConflict]
+    ) -> list[Resolution]:
         try:
             logger.info(f"Resolving {len(conflicts)} scale conflicts")
-            resolutions: List[Resolution] = []
-            sorted_conflicts = sorted(conflicts, key=lambda c: (c.resolution_priority, -c.severity))
+            resolutions: list[Resolution] = []
+            sorted_conflicts = sorted(
+                conflicts, key=lambda c: (c.resolution_priority, -c.severity)
+            )
             for conflict in sorted_conflicts:
                 resolution = await self._generate_conflict_resolution(conflict)
                 if resolution:
@@ -119,10 +132,10 @@ class ScaleManager:
             logger.error(f"Error resolving scale conflicts: {e}")
             return []
 
-    async def detect_scale_conflicts(self, session_id: str) -> List[ScaleConflict]:
+    async def detect_scale_conflicts(self, session_id: str) -> list[ScaleConflict]:
         try:
             logger.debug(f"Detecting scale conflicts for session {session_id}")
-            conflicts: List[ScaleConflict] = []
+            conflicts: list[ScaleConflict] = []
             conflicts.extend(await self._detect_temporal_conflicts())
             conflicts.extend(await self._detect_character_conflicts())
             conflicts.extend(await self._detect_thematic_conflicts())
@@ -135,16 +148,20 @@ class ScaleManager:
     def get_scale_window(self, scale: NarrativeScale) -> int:
         return self.scale_windows.get(scale, 300)
 
-    def get_active_events(self, scale: Optional[NarrativeScale] = None) -> List[NarrativeEvent]:
+    def get_active_events(
+        self, scale: NarrativeScale | None = None
+    ) -> list[NarrativeEvent]:
         if scale:
             return self.active_events.get(scale, [])
-        all_events: List[NarrativeEvent] = []
+        all_events: list[NarrativeEvent] = []
         for events in self.active_events.values():
             all_events.extend(events)
         return all_events
 
     # Private helpers extracted
-    async def _assess_scale_impact(self, choice: PlayerChoice, scale: NarrativeScale) -> ImpactAssessment:
+    async def _assess_scale_impact(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> ImpactAssessment:
         base_magnitude = calculate_base_magnitude(choice, scale)
         affected_elements = identify_affected_elements(choice, scale)
         causal_strength = calculate_causal_strength(choice, scale)
@@ -161,7 +178,9 @@ class ScaleManager:
             temporal_decay=temporal_decay,
         )
 
-    def _calculate_base_magnitude(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
+    def _calculate_base_magnitude(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> float:
         scale_multipliers = {
             NarrativeScale.SHORT_TERM: 0.8,
             NarrativeScale.MEDIUM_TERM: 0.5,
@@ -178,14 +197,20 @@ class ScaleManager:
             base *= 1.3
         return min(1.0, base * scale_multipliers.get(scale, 0.5))
 
-    async def _identify_affected_elements(self, choice: PlayerChoice, scale: NarrativeScale) -> List[str]:
-        elements: List[str] = []
+    async def _identify_affected_elements(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> list[str]:
+        elements: list[str] = []
         if scale == NarrativeScale.SHORT_TERM:
             elements.extend(["current_scene", "immediate_dialogue", "character_mood"])
         elif scale == NarrativeScale.MEDIUM_TERM:
-            elements.extend(["character_relationships", "personal_growth", "skill_development"])
+            elements.extend(
+                ["character_relationships", "personal_growth", "skill_development"]
+            )
         elif scale == NarrativeScale.LONG_TERM:
-            elements.extend(["world_state", "faction_relationships", "major_plot_threads"])
+            elements.extend(
+                ["world_state", "faction_relationships", "major_plot_threads"]
+            )
         elif scale == NarrativeScale.EPIC_TERM:
             elements.extend(["generational_legacy", "world_history", "cultural_impact"])
         if "character_name" in choice.metadata:
@@ -194,17 +219,23 @@ class ScaleManager:
             elements.append(f"location_{choice.metadata['location']}")
         return elements
 
-    async def _calculate_causal_strength(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
+    async def _calculate_causal_strength(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> float:
         strength = 0.5
         # moved to impact_analysis.calculate_causal_strength
         return await calculate_causal_strength(choice, scale)  # type: ignore[arg-type]
 
-    async def _assess_therapeutic_alignment(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
+    async def _assess_therapeutic_alignment(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> float:
         align = 0.5
         # moved to impact_analysis.assess_therapeutic_alignment
         return assess_therapeutic_alignment(choice, scale)
 
-    def _calculate_confidence_score(self, choice: PlayerChoice, scale: NarrativeScale) -> float:
+    def _calculate_confidence_score(
+        self, choice: PlayerChoice, scale: NarrativeScale
+    ) -> float:
         confidence = 0.5
         # moved to impact_analysis.calculate_confidence_score
         return calculate_confidence_score(choice, scale)
@@ -219,24 +250,28 @@ class ScaleManager:
         # moved to impact_analysis.calculate_temporal_decay
         return calculate_temporal_decay(scale)
 
-    async def _create_narrative_event(self, choice: PlayerChoice, scale: NarrativeScale, assessment: ImpactAssessment) -> NarrativeEvent:
+    async def _create_narrative_event(
+        self, choice: PlayerChoice, scale: NarrativeScale, assessment: ImpactAssessment
+    ) -> NarrativeEvent:
         return create_narrative_event(choice, scale, assessment)
 
-    async def _evaluate_cross_scale_influences(self, assessments: Dict[NarrativeScale, ImpactAssessment]) -> None:
+    async def _evaluate_cross_scale_influences(
+        self, assessments: dict[NarrativeScale, ImpactAssessment]
+    ) -> None:
         evaluate_cross_scale_influences(self.active_events, assessments)
 
     async def _update_causal_chains(self) -> None:
         # Compute causal links between recent events
         all_events = self.get_active_events()
         for i, ev1 in enumerate(all_events):
-            for ev2 in all_events[i+1:]:
+            for ev2 in all_events[i + 1 :]:
                 if ev1.timestamp <= ev2.timestamp:
                     add_edge(self.causal_graph, ev1.event_id, ev2.event_id)
 
-    async def _validate_causal_consistency(self) -> List[str]:
+    async def _validate_causal_consistency(self) -> list[str]:
         return detect_simple_cycles(self.causal_graph)
 
-    async def _resolve_causal_issues(self, issues: List[str]) -> None:
+    async def _resolve_causal_issues(self, issues: list[str]) -> None:
         for issue in issues:
             logger.warning(f"Resolving causal issue: {issue}")
         remove_weak_link(self.causal_graph)
@@ -246,25 +281,29 @@ class ScaleManager:
         for scale, events in self.active_events.items():
             window = self.get_scale_window(scale)
             cutoff_time = cutoff_now - window
-            self.active_events[scale] = [e for e in events if e.timestamp.timestamp() > cutoff_time]
+            self.active_events[scale] = [
+                e for e in events if e.timestamp.timestamp() > cutoff_time
+            ]
 
-    async def _detect_temporal_conflicts(self) -> List[ScaleConflict]:
+    async def _detect_temporal_conflicts(self) -> list[ScaleConflict]:
         all_events = self.get_active_events()
         return detect_temporal_conflicts(all_events)
 
-    async def _detect_character_conflicts(self) -> List[ScaleConflict]:
+    async def _detect_character_conflicts(self) -> list[ScaleConflict]:
         all_events = self.get_active_events()
         return detect_character_conflicts(all_events)
 
-    async def _detect_thematic_conflicts(self) -> List[ScaleConflict]:
+    async def _detect_thematic_conflicts(self) -> list[ScaleConflict]:
         all_events = self.get_active_events()
         return detect_thematic_conflicts(all_events)
 
-    async def _detect_therapeutic_conflicts(self) -> List[ScaleConflict]:
+    async def _detect_therapeutic_conflicts(self) -> list[ScaleConflict]:
         all_events = self.get_active_events()
         return detect_therapeutic_conflicts(all_events)
 
-    async def _generate_conflict_resolution(self, conflict: ScaleConflict) -> Optional[Resolution]:
+    async def _generate_conflict_resolution(
+        self, conflict: ScaleConflict
+    ) -> Resolution | None:
         return build_simple_resolution(conflict)
 
     async def _implement_resolution(self, resolution: Resolution) -> None:
@@ -273,4 +312,3 @@ class ScaleManager:
 
 
 __all__ = ["ScaleManager"]
-

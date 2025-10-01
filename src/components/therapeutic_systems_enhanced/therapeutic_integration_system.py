@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 class TherapeuticFramework(Enum):
     """8+ therapeutic frameworks supported by the integration system."""
+
     CBT = "cognitive_behavioral_therapy"
     DBT = "dialectical_behavior_therapy"
     ACT = "acceptance_commitment_therapy"
@@ -32,6 +33,7 @@ class TherapeuticFramework(Enum):
 
 class IntegrationStrategy(Enum):
     """Strategies for integrating therapeutic concepts into scenarios."""
+
     DIRECT_TEACHING = "direct_teaching"
     EXPERIENTIAL_LEARNING = "experiential_learning"
     METAPHORICAL_EMBEDDING = "metaphorical_embedding"
@@ -44,6 +46,7 @@ class IntegrationStrategy(Enum):
 
 class ScenarioType(Enum):
     """Types of therapeutic scenarios that can be generated."""
+
     ANXIETY_MANAGEMENT = "anxiety_management"
     DEPRESSION_SUPPORT = "depression_support"
     RELATIONSHIP_SKILLS = "relationship_skills"
@@ -59,6 +62,7 @@ class ScenarioType(Enum):
 @dataclass
 class TherapeuticRecommendation:
     """Represents a personalized therapeutic recommendation."""
+
     recommendation_id: str
     user_id: str
     framework: TherapeuticFramework
@@ -76,6 +80,7 @@ class TherapeuticRecommendation:
 @dataclass
 class TherapeuticScenario:
     """Represents a generated therapeutic scenario."""
+
     scenario_id: str
     user_id: str
     framework: TherapeuticFramework
@@ -96,6 +101,7 @@ class TherapeuticScenario:
 @dataclass
 class IntegrationSession:
     """Tracks a therapeutic integration session."""
+
     session_id: str
     user_id: str
     scenarios_completed: list[str]
@@ -129,10 +135,18 @@ class TherapeuticIntegrationSystem:
         self.scenario_templates = self._initialize_scenario_templates()
 
         # Configuration parameters
-        self.recommendation_refresh_hours = self.config.get("recommendation_refresh_hours", 24)
-        self.max_recommendations_per_user = self.config.get("max_recommendations_per_user", 5)
-        self.scenario_difficulty_adaptation = self.config.get("scenario_difficulty_adaptation", True)
-        self.character_alignment_weight = self.config.get("character_alignment_weight", 0.3)
+        self.recommendation_refresh_hours = self.config.get(
+            "recommendation_refresh_hours", 24
+        )
+        self.max_recommendations_per_user = self.config.get(
+            "max_recommendations_per_user", 5
+        )
+        self.scenario_difficulty_adaptation = self.config.get(
+            "scenario_difficulty_adaptation", True
+        )
+        self.character_alignment_weight = self.config.get(
+            "character_alignment_weight", 0.3
+        )
 
         # Performance metrics
         self.metrics = {
@@ -180,7 +194,11 @@ class TherapeuticIntegrationSystem:
 
             # Analyze user context
             user_context = self._analyze_user_context(
-                user_id, therapeutic_goals, character_data, user_progress, emotional_state
+                user_id,
+                therapeutic_goals,
+                character_data,
+                user_progress,
+                emotional_state,
             )
 
             # Generate framework recommendations
@@ -188,7 +206,9 @@ class TherapeuticIntegrationSystem:
 
             # Create personalized recommendations
             recommendations = []
-            for framework, score in sorted(framework_scores.items(), key=lambda x: x[1], reverse=True):
+            for framework, score in sorted(
+                framework_scores.items(), key=lambda x: x[1], reverse=True
+            ):
                 if len(recommendations) >= self.max_recommendations_per_user:
                     break
 
@@ -300,92 +320,232 @@ class TherapeuticIntegrationSystem:
             # Return fallback scenario
             return self._create_fallback_scenario(user_id, framework, scenario_type)
 
-    def _initialize_framework_configurations(self) -> dict[TherapeuticFramework, dict[str, Any]]:
+    def _initialize_framework_configurations(
+        self,
+    ) -> dict[TherapeuticFramework, dict[str, Any]]:
         """Initialize therapeutic framework configurations."""
         return {
             TherapeuticFramework.CBT: {
                 "name": "Cognitive Behavioral Therapy",
                 "focus": "thought_patterns_and_behaviors",
-                "techniques": ["cognitive_restructuring", "behavioral_activation", "exposure_therapy"],
+                "techniques": [
+                    "cognitive_restructuring",
+                    "behavioral_activation",
+                    "exposure_therapy",
+                ],
                 "suitable_for": ["anxiety", "depression", "phobias", "trauma"],
                 "character_attributes": ["self_awareness", "wisdom", "resilience"],
-                "difficulty_progression": ["identify_thoughts", "challenge_thoughts", "behavioral_experiments"],
+                "difficulty_progression": [
+                    "identify_thoughts",
+                    "challenge_thoughts",
+                    "behavioral_experiments",
+                ],
             },
             TherapeuticFramework.DBT: {
                 "name": "Dialectical Behavior Therapy",
                 "focus": "emotional_regulation_and_interpersonal_skills",
-                "techniques": ["mindfulness", "distress_tolerance", "emotion_regulation", "interpersonal_effectiveness"],
-                "suitable_for": ["emotional_dysregulation", "relationship_issues", "self_harm", "borderline_traits"],
-                "character_attributes": ["emotional_intelligence", "mindfulness", "adaptability"],
-                "difficulty_progression": ["mindfulness_basics", "distress_tolerance", "interpersonal_skills"],
+                "techniques": [
+                    "mindfulness",
+                    "distress_tolerance",
+                    "emotion_regulation",
+                    "interpersonal_effectiveness",
+                ],
+                "suitable_for": [
+                    "emotional_dysregulation",
+                    "relationship_issues",
+                    "self_harm",
+                    "borderline_traits",
+                ],
+                "character_attributes": [
+                    "emotional_intelligence",
+                    "mindfulness",
+                    "adaptability",
+                ],
+                "difficulty_progression": [
+                    "mindfulness_basics",
+                    "distress_tolerance",
+                    "interpersonal_skills",
+                ],
             },
             TherapeuticFramework.ACT: {
                 "name": "Acceptance and Commitment Therapy",
                 "focus": "psychological_flexibility_and_values",
-                "techniques": ["acceptance", "mindfulness", "values_clarification", "committed_action"],
-                "suitable_for": ["anxiety", "depression", "chronic_pain", "substance_use"],
+                "techniques": [
+                    "acceptance",
+                    "mindfulness",
+                    "values_clarification",
+                    "committed_action",
+                ],
+                "suitable_for": [
+                    "anxiety",
+                    "depression",
+                    "chronic_pain",
+                    "substance_use",
+                ],
                 "character_attributes": ["courage", "integrity", "adaptability"],
-                "difficulty_progression": ["values_exploration", "acceptance_practice", "committed_action"],
+                "difficulty_progression": [
+                    "values_exploration",
+                    "acceptance_practice",
+                    "committed_action",
+                ],
             },
             TherapeuticFramework.MINDFULNESS: {
                 "name": "Mindfulness-Based Therapy",
                 "focus": "present_moment_awareness",
-                "techniques": ["meditation", "body_awareness", "breath_work", "mindful_movement"],
+                "techniques": [
+                    "meditation",
+                    "body_awareness",
+                    "breath_work",
+                    "mindful_movement",
+                ],
                 "suitable_for": ["stress", "anxiety", "depression", "chronic_pain"],
                 "character_attributes": ["mindfulness", "self_awareness", "compassion"],
-                "difficulty_progression": ["breath_awareness", "body_scan", "mindful_daily_activities"],
+                "difficulty_progression": [
+                    "breath_awareness",
+                    "body_scan",
+                    "mindful_daily_activities",
+                ],
             },
             TherapeuticFramework.HUMANISTIC: {
                 "name": "Humanistic Therapy",
                 "focus": "self_actualization_and_personal_growth",
-                "techniques": ["unconditional_positive_regard", "empathy", "genuineness", "self_exploration"],
-                "suitable_for": ["self_esteem", "identity_issues", "personal_growth", "life_transitions"],
+                "techniques": [
+                    "unconditional_positive_regard",
+                    "empathy",
+                    "genuineness",
+                    "self_exploration",
+                ],
+                "suitable_for": [
+                    "self_esteem",
+                    "identity_issues",
+                    "personal_growth",
+                    "life_transitions",
+                ],
                 "character_attributes": ["confidence", "empathy", "integrity"],
-                "difficulty_progression": ["self_exploration", "values_clarification", "goal_setting"],
+                "difficulty_progression": [
+                    "self_exploration",
+                    "values_clarification",
+                    "goal_setting",
+                ],
             },
             TherapeuticFramework.PSYCHODYNAMIC: {
                 "name": "Psychodynamic Therapy",
                 "focus": "unconscious_processes_and_past_experiences",
-                "techniques": ["free_association", "transference_analysis", "dream_work", "insight_development"],
-                "suitable_for": ["relationship_patterns", "unresolved_trauma", "personality_issues", "depression"],
-                "character_attributes": ["self_awareness", "wisdom", "emotional_intelligence"],
-                "difficulty_progression": ["pattern_recognition", "insight_development", "integration"],
+                "techniques": [
+                    "free_association",
+                    "transference_analysis",
+                    "dream_work",
+                    "insight_development",
+                ],
+                "suitable_for": [
+                    "relationship_patterns",
+                    "unresolved_trauma",
+                    "personality_issues",
+                    "depression",
+                ],
+                "character_attributes": [
+                    "self_awareness",
+                    "wisdom",
+                    "emotional_intelligence",
+                ],
+                "difficulty_progression": [
+                    "pattern_recognition",
+                    "insight_development",
+                    "integration",
+                ],
             },
             TherapeuticFramework.SOLUTION_FOCUSED: {
                 "name": "Solution-Focused Brief Therapy",
                 "focus": "solutions_and_strengths",
-                "techniques": ["miracle_question", "scaling_questions", "exception_finding", "goal_setting"],
-                "suitable_for": ["goal_achievement", "brief_interventions", "motivation", "life_changes"],
+                "techniques": [
+                    "miracle_question",
+                    "scaling_questions",
+                    "exception_finding",
+                    "goal_setting",
+                ],
+                "suitable_for": [
+                    "goal_achievement",
+                    "brief_interventions",
+                    "motivation",
+                    "life_changes",
+                ],
                 "character_attributes": ["confidence", "resilience", "adaptability"],
-                "difficulty_progression": ["goal_identification", "resource_mapping", "action_planning"],
+                "difficulty_progression": [
+                    "goal_identification",
+                    "resource_mapping",
+                    "action_planning",
+                ],
             },
             TherapeuticFramework.NARRATIVE_THERAPY: {
                 "name": "Narrative Therapy",
                 "focus": "personal_stories_and_meaning_making",
-                "techniques": ["externalization", "unique_outcomes", "re_authoring", "definitional_ceremony"],
-                "suitable_for": ["identity_issues", "trauma", "cultural_issues", "life_transitions"],
+                "techniques": [
+                    "externalization",
+                    "unique_outcomes",
+                    "re_authoring",
+                    "definitional_ceremony",
+                ],
+                "suitable_for": [
+                    "identity_issues",
+                    "trauma",
+                    "cultural_issues",
+                    "life_transitions",
+                ],
                 "character_attributes": ["wisdom", "integrity", "empathy"],
-                "difficulty_progression": ["story_exploration", "externalization", "re_authoring"],
+                "difficulty_progression": [
+                    "story_exploration",
+                    "externalization",
+                    "re_authoring",
+                ],
             },
             TherapeuticFramework.GESTALT: {
                 "name": "Gestalt Therapy",
                 "focus": "present_moment_awareness_and_integration",
-                "techniques": ["here_and_now", "contact_and_awareness", "experiments", "phenomenology"],
-                "suitable_for": ["self_awareness", "emotional_integration", "relationship_issues", "creativity"],
-                "character_attributes": ["self_awareness", "emotional_intelligence", "adaptability"],
-                "difficulty_progression": ["awareness_building", "contact_experiments", "integration"],
+                "techniques": [
+                    "here_and_now",
+                    "contact_and_awareness",
+                    "experiments",
+                    "phenomenology",
+                ],
+                "suitable_for": [
+                    "self_awareness",
+                    "emotional_integration",
+                    "relationship_issues",
+                    "creativity",
+                ],
+                "character_attributes": [
+                    "self_awareness",
+                    "emotional_intelligence",
+                    "adaptability",
+                ],
+                "difficulty_progression": [
+                    "awareness_building",
+                    "contact_experiments",
+                    "integration",
+                ],
             },
             TherapeuticFramework.EMDR: {
                 "name": "EMDR Therapy",
                 "focus": "trauma_processing_and_integration",
-                "techniques": ["bilateral_stimulation", "resource_installation", "trauma_processing", "future_template"],
+                "techniques": [
+                    "bilateral_stimulation",
+                    "resource_installation",
+                    "trauma_processing",
+                    "future_template",
+                ],
                 "suitable_for": ["trauma", "ptsd", "anxiety", "phobias"],
                 "character_attributes": ["resilience", "courage", "self_awareness"],
-                "difficulty_progression": ["stabilization", "processing", "integration"],
+                "difficulty_progression": [
+                    "stabilization",
+                    "processing",
+                    "integration",
+                ],
             },
         }
 
-    def _initialize_integration_strategies(self) -> dict[IntegrationStrategy, dict[str, Any]]:
+    def _initialize_integration_strategies(
+        self,
+    ) -> dict[IntegrationStrategy, dict[str, Any]]:
         """Initialize integration strategy configurations."""
         return {
             IntegrationStrategy.DIRECT_TEACHING: {
@@ -444,49 +604,112 @@ class TherapeuticIntegrationSystem:
             ScenarioType.ANXIETY_MANAGEMENT: {
                 "title": "Facing the Challenge",
                 "base_description": "Navigate an anxiety-provoking situation using therapeutic techniques",
-                "therapeutic_goals": ["anxiety_reduction", "coping_skills", "confidence_building"],
-                "practice_opportunities": ["breathing_exercises", "cognitive_restructuring", "gradual_exposure"],
-                "reflection_prompts": ["What thoughts came up?", "How did your body feel?", "What helped most?"],
+                "therapeutic_goals": [
+                    "anxiety_reduction",
+                    "coping_skills",
+                    "confidence_building",
+                ],
+                "practice_opportunities": [
+                    "breathing_exercises",
+                    "cognitive_restructuring",
+                    "gradual_exposure",
+                ],
+                "reflection_prompts": [
+                    "What thoughts came up?",
+                    "How did your body feel?",
+                    "What helped most?",
+                ],
                 "estimated_duration": 15,
             },
             ScenarioType.DEPRESSION_SUPPORT: {
                 "title": "Finding Light in Darkness",
                 "base_description": "Work through depressive thoughts and feelings with therapeutic support",
-                "therapeutic_goals": ["mood_improvement", "behavioral_activation", "hope_building"],
-                "practice_opportunities": ["activity_scheduling", "thought_challenging", "self_compassion"],
-                "reflection_prompts": ["What small step can you take?", "What are you grateful for?", "How can you be kind to yourself?"],
+                "therapeutic_goals": [
+                    "mood_improvement",
+                    "behavioral_activation",
+                    "hope_building",
+                ],
+                "practice_opportunities": [
+                    "activity_scheduling",
+                    "thought_challenging",
+                    "self_compassion",
+                ],
+                "reflection_prompts": [
+                    "What small step can you take?",
+                    "What are you grateful for?",
+                    "How can you be kind to yourself?",
+                ],
                 "estimated_duration": 20,
             },
             ScenarioType.RELATIONSHIP_SKILLS: {
                 "title": "Building Connections",
                 "base_description": "Practice interpersonal skills in relationship scenarios",
-                "therapeutic_goals": ["communication_improvement", "boundary_setting", "empathy_development"],
-                "practice_opportunities": ["active_listening", "assertiveness", "conflict_resolution"],
-                "reflection_prompts": ["How did you communicate?", "What boundaries are important?", "How did you show empathy?"],
+                "therapeutic_goals": [
+                    "communication_improvement",
+                    "boundary_setting",
+                    "empathy_development",
+                ],
+                "practice_opportunities": [
+                    "active_listening",
+                    "assertiveness",
+                    "conflict_resolution",
+                ],
+                "reflection_prompts": [
+                    "How did you communicate?",
+                    "What boundaries are important?",
+                    "How did you show empathy?",
+                ],
                 "estimated_duration": 18,
             },
             ScenarioType.EMOTIONAL_REGULATION: {
                 "title": "Mastering Emotions",
                 "base_description": "Learn to understand and regulate emotional responses",
-                "therapeutic_goals": ["emotional_awareness", "regulation_skills", "distress_tolerance"],
-                "practice_opportunities": ["emotion_identification", "coping_strategies", "mindfulness"],
-                "reflection_prompts": ["What emotion did you feel?", "What triggered it?", "What helped you cope?"],
+                "therapeutic_goals": [
+                    "emotional_awareness",
+                    "regulation_skills",
+                    "distress_tolerance",
+                ],
+                "practice_opportunities": [
+                    "emotion_identification",
+                    "coping_strategies",
+                    "mindfulness",
+                ],
+                "reflection_prompts": [
+                    "What emotion did you feel?",
+                    "What triggered it?",
+                    "What helped you cope?",
+                ],
                 "estimated_duration": 16,
             },
             ScenarioType.CONFIDENCE_BUILDING: {
                 "title": "Stepping Into Power",
                 "base_description": "Build confidence through challenging but supportive scenarios",
-                "therapeutic_goals": ["self_efficacy", "courage_development", "positive_self_talk"],
-                "practice_opportunities": ["assertiveness_training", "success_visualization", "strength_identification"],
-                "reflection_prompts": ["What strengths did you use?", "How did you feel afterward?", "What would you tell a friend?"],
+                "therapeutic_goals": [
+                    "self_efficacy",
+                    "courage_development",
+                    "positive_self_talk",
+                ],
+                "practice_opportunities": [
+                    "assertiveness_training",
+                    "success_visualization",
+                    "strength_identification",
+                ],
+                "reflection_prompts": [
+                    "What strengths did you use?",
+                    "How did you feel afterward?",
+                    "What would you tell a friend?",
+                ],
                 "estimated_duration": 14,
             },
         }
 
     def _analyze_user_context(
-        self, user_id: str, therapeutic_goals: list[str] | None,
-        character_data: dict[str, Any] | None, user_progress: dict[str, Any] | None,
-        emotional_state: dict[str, Any] | None
+        self,
+        user_id: str,
+        therapeutic_goals: list[str] | None,
+        character_data: dict[str, Any] | None,
+        user_progress: dict[str, Any] | None,
+        emotional_state: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Analyze user context for personalized recommendations."""
         context = {
@@ -505,25 +728,37 @@ class TherapeuticIntegrationSystem:
             attributes = character_data["attributes"]
             if isinstance(attributes, dict):
                 # Find top 3 attributes (strengths)
-                sorted_attrs = sorted(attributes.items(), key=lambda x: x[1], reverse=True)
+                sorted_attrs = sorted(
+                    attributes.items(), key=lambda x: x[1], reverse=True
+                )
                 context["character_strengths"] = [attr[0] for attr in sorted_attrs[:3]]
 
                 # Find bottom 3 attributes (growth areas)
-                context["character_growth_areas"] = [attr[0] for attr in sorted_attrs[-3:]]
+                context["character_growth_areas"] = [
+                    attr[0] for attr in sorted_attrs[-3:]
+                ]
 
         # Analyze emotional state
         if emotional_state:
-            context["emotional_stability"] = emotional_state.get("emotional_stability", 0.7)
+            context["emotional_stability"] = emotional_state.get(
+                "emotional_stability", 0.7
+            )
             context["crisis_risk"] = emotional_state.get("crisis_detected", False)
 
         # Analyze user progress
         if user_progress:
-            context["difficulty_preference"] = user_progress.get("preferred_difficulty", "moderate")
-            context["preferred_frameworks"] = user_progress.get("successful_frameworks", [])
+            context["difficulty_preference"] = user_progress.get(
+                "preferred_difficulty", "moderate"
+            )
+            context["preferred_frameworks"] = user_progress.get(
+                "successful_frameworks", []
+            )
 
         return context
 
-    def _calculate_framework_suitability(self, user_context: dict[str, Any]) -> dict[TherapeuticFramework, float]:
+    def _calculate_framework_suitability(
+        self, user_context: dict[str, Any]
+    ) -> dict[TherapeuticFramework, float]:
         """Calculate suitability scores for each therapeutic framework."""
         scores = {}
 
@@ -544,7 +779,10 @@ class TherapeuticIntegrationSystem:
 
             # Crisis risk adjustment
             if user_context.get("crisis_risk", False):
-                if framework in [TherapeuticFramework.DBT, TherapeuticFramework.MINDFULNESS]:
+                if framework in [
+                    TherapeuticFramework.DBT,
+                    TherapeuticFramework.MINDFULNESS,
+                ]:
                     score += 0.3  # Prioritize stabilizing frameworks
                 else:
                     score -= 0.2  # Deprioritize complex frameworks during crisis
@@ -558,7 +796,11 @@ class TherapeuticIntegrationSystem:
             emotional_stability = user_context.get("emotional_stability", 0.7)
             if emotional_stability < 0.5:
                 # Prioritize stabilizing frameworks for low emotional stability
-                if framework in [TherapeuticFramework.DBT, TherapeuticFramework.MINDFULNESS, TherapeuticFramework.HUMANISTIC]:
+                if framework in [
+                    TherapeuticFramework.DBT,
+                    TherapeuticFramework.MINDFULNESS,
+                    TherapeuticFramework.HUMANISTIC,
+                ]:
                     score += 0.2
 
             scores[framework] = min(1.0, max(0.0, score))  # Clamp to 0-1 range
@@ -566,7 +808,11 @@ class TherapeuticIntegrationSystem:
         return scores
 
     def _create_recommendation(
-        self, user_id: str, framework: TherapeuticFramework, score: float, user_context: dict[str, Any]
+        self,
+        user_id: str,
+        framework: TherapeuticFramework,
+        score: float,
+        user_context: dict[str, Any],
     ) -> TherapeuticRecommendation:
         """Create a therapeutic recommendation."""
         config = self.framework_configurations[framework]
@@ -576,13 +822,19 @@ class TherapeuticIntegrationSystem:
         scenario_type = self._determine_scenario_type(therapeutic_goals, framework)
 
         # Determine integration strategy
-        integration_strategy = self._determine_integration_strategy(user_context, framework)
+        integration_strategy = self._determine_integration_strategy(
+            user_context, framework
+        )
 
         # Calculate character alignment
-        character_alignment = self._calculate_character_alignment(user_context, framework)
+        character_alignment = self._calculate_character_alignment(
+            user_context, framework
+        )
 
         # Generate rationale
-        rationale = self._generate_recommendation_rationale(framework, score, user_context)
+        rationale = self._generate_recommendation_rationale(
+            framework, score, user_context
+        )
 
         return TherapeuticRecommendation(
             recommendation_id=str(uuid4()),
@@ -598,7 +850,9 @@ class TherapeuticIntegrationSystem:
             character_alignment=character_alignment,
         )
 
-    def _determine_scenario_type(self, therapeutic_goals: list[str], framework: TherapeuticFramework) -> ScenarioType:
+    def _determine_scenario_type(
+        self, therapeutic_goals: list[str], framework: TherapeuticFramework
+    ) -> ScenarioType:
         """Determine appropriate scenario type based on goals and framework."""
         # Goal to scenario type mapping
         goal_mappings = {
@@ -630,7 +884,9 @@ class TherapeuticIntegrationSystem:
 
         return framework_defaults.get(framework, ScenarioType.CONFIDENCE_BUILDING)
 
-    def _determine_integration_strategy(self, user_context: dict[str, Any], framework: TherapeuticFramework) -> IntegrationStrategy:
+    def _determine_integration_strategy(
+        self, user_context: dict[str, Any], framework: TherapeuticFramework
+    ) -> IntegrationStrategy:
         """Determine appropriate integration strategy."""
         # Crisis situations need direct, supportive approaches
         if user_context.get("crisis_risk", False):
@@ -652,9 +908,13 @@ class TherapeuticIntegrationSystem:
             TherapeuticFramework.NARRATIVE_THERAPY: IntegrationStrategy.METAPHORICAL_EMBEDDING,
         }
 
-        return framework_strategies.get(framework, IntegrationStrategy.EXPERIENTIAL_LEARNING)
+        return framework_strategies.get(
+            framework, IntegrationStrategy.EXPERIENTIAL_LEARNING
+        )
 
-    def _calculate_character_alignment(self, user_context: dict[str, Any], framework: TherapeuticFramework) -> dict[str, float]:
+    def _calculate_character_alignment(
+        self, user_context: dict[str, Any], framework: TherapeuticFramework
+    ) -> dict[str, float]:
         """Calculate character attribute alignment with framework."""
         config = self.framework_configurations[framework]
         framework_attributes = config["character_attributes"]
@@ -669,7 +929,12 @@ class TherapeuticIntegrationSystem:
 
         return alignment
 
-    def _generate_recommendation_rationale(self, framework: TherapeuticFramework, score: float, user_context: dict[str, Any]) -> str:
+    def _generate_recommendation_rationale(
+        self,
+        framework: TherapeuticFramework,
+        score: float,
+        user_context: dict[str, Any],
+    ) -> str:
         """Generate human-readable rationale for recommendation."""
         config = self.framework_configurations[framework]
         framework_name = config["name"]
@@ -678,23 +943,37 @@ class TherapeuticIntegrationSystem:
 
         # Add goal alignment
         therapeutic_goals = user_context.get("therapeutic_goals", [])
-        matching_goals = [goal for goal in therapeutic_goals if goal in config["suitable_for"]]
+        matching_goals = [
+            goal for goal in therapeutic_goals if goal in config["suitable_for"]
+        ]
         if matching_goals:
-            rationale_parts.append(f"aligns with your goals: {', '.join(matching_goals)}")
+            rationale_parts.append(
+                f"aligns with your goals: {', '.join(matching_goals)}"
+            )
 
         # Add character strengths
         character_strengths = user_context.get("character_strengths", [])
-        matching_strengths = [strength for strength in character_strengths if strength in config["character_attributes"]]
+        matching_strengths = [
+            strength
+            for strength in character_strengths
+            if strength in config["character_attributes"]
+        ]
         if matching_strengths:
-            rationale_parts.append(f"builds on your strengths: {', '.join(matching_strengths)}")
+            rationale_parts.append(
+                f"builds on your strengths: {', '.join(matching_strengths)}"
+            )
 
         # Add crisis consideration
         if user_context.get("crisis_risk", False):
-            rationale_parts.append("provides stabilizing support during difficult times")
+            rationale_parts.append(
+                "provides stabilizing support during difficult times"
+            )
 
         return " because it " + ", and ".join(rationale_parts[1:]) + "."
 
-    def _estimate_duration(self, framework: TherapeuticFramework, scenario_type: ScenarioType) -> int:
+    def _estimate_duration(
+        self, framework: TherapeuticFramework, scenario_type: ScenarioType
+    ) -> int:
         """Estimate duration for framework and scenario combination."""
         base_durations = {
             ScenarioType.ANXIETY_MANAGEMENT: 15,
@@ -720,7 +999,9 @@ class TherapeuticIntegrationSystem:
 
         return int(base_duration * modifier)
 
-    def _get_scenario_template(self, framework: TherapeuticFramework, scenario_type: ScenarioType) -> dict[str, Any]:
+    def _get_scenario_template(
+        self, framework: TherapeuticFramework, scenario_type: ScenarioType
+    ) -> dict[str, Any]:
         """Get scenario template for framework and type combination."""
         base_template = self.scenario_templates.get(scenario_type, {})
         framework_config = self.framework_configurations.get(framework, {})
@@ -729,13 +1010,18 @@ class TherapeuticIntegrationSystem:
         template = base_template.copy()
         template["framework"] = framework
         template["framework_techniques"] = framework_config.get("techniques", [])
-        template["framework_focus"] = framework_config.get("focus", "general_therapeutic_support")
+        template["framework_focus"] = framework_config.get(
+            "focus", "general_therapeutic_support"
+        )
 
         return template
 
     def _personalize_scenario(
-        self, template: dict[str, Any], character_data: dict[str, Any] | None,
-        difficulty_level: str | None, session_context: dict[str, Any] | None
+        self,
+        template: dict[str, Any],
+        character_data: dict[str, Any] | None,
+        difficulty_level: str | None,
+        session_context: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Personalize scenario based on character data and context."""
         personalized = template.copy()
@@ -745,7 +1031,9 @@ class TherapeuticIntegrationSystem:
             character_data["name"]
 
         personalized["title"] = template.get("title", "Therapeutic Journey")
-        personalized["description"] = template.get("base_description", "A therapeutic scenario tailored for growth")
+        personalized["description"] = template.get(
+            "base_description", "A therapeutic scenario tailored for growth"
+        )
 
         # Create narrative context
         personalized["narrative_context"] = self._create_narrative_context(
@@ -776,7 +1064,10 @@ class TherapeuticIntegrationSystem:
         return personalized
 
     def _create_narrative_context(
-        self, template: dict[str, Any], character_data: dict[str, Any] | None, difficulty_level: str | None
+        self,
+        template: dict[str, Any],
+        character_data: dict[str, Any] | None,
+        difficulty_level: str | None,
     ) -> str:
         """Create narrative context for the scenario."""
         framework = template.get("framework", TherapeuticFramework.CBT)
@@ -784,11 +1075,13 @@ class TherapeuticIntegrationSystem:
 
         context_parts = [
             f"In this therapeutic scenario, you'll explore {scenario_focus}",
-            f"using {framework.value.replace('_', ' ')} approaches."
+            f"using {framework.value.replace('_', ' ')} approaches.",
         ]
 
         if character_data and "name" in character_data:
-            context_parts.append(f"Your character {character_data['name']} will guide you through this journey.")
+            context_parts.append(
+                f"Your character {character_data['name']} will guide you through this journey."
+            )
 
         if difficulty_level:
             difficulty_descriptions = {
@@ -797,13 +1090,19 @@ class TherapeuticIntegrationSystem:
                 "moderate": "with balanced challenge and support",
                 "challenging": "with meaningful challenges to promote growth",
                 "hard": "with significant challenges for advanced growth",
-                "very_hard": "with complex challenges for deep transformation"
+                "very_hard": "with complex challenges for deep transformation",
             }
-            context_parts.append(difficulty_descriptions.get(difficulty_level, "with appropriate support"))
+            context_parts.append(
+                difficulty_descriptions.get(
+                    difficulty_level, "with appropriate support"
+                )
+            )
 
         return " ".join(context_parts)
 
-    def _adapt_practice_opportunities(self, base_opportunities: list[str], difficulty_level: str | None) -> list[str]:
+    def _adapt_practice_opportunities(
+        self, base_opportunities: list[str], difficulty_level: str | None
+    ) -> list[str]:
         """Adapt practice opportunities based on difficulty level."""
         if not difficulty_level or difficulty_level in ["moderate", "challenging"]:
             return base_opportunities
@@ -818,16 +1117,16 @@ class TherapeuticIntegrationSystem:
         elif difficulty_level in ["hard", "very_hard"]:
             # Add advanced opportunities for harder levels
             advanced = base_opportunities.copy()
-            advanced.extend([
-                "advanced_integration",
-                "complex_application",
-                "independent_practice"
-            ])
+            advanced.extend(
+                ["advanced_integration", "complex_application", "independent_practice"]
+            )
             return advanced
 
         return base_opportunities
 
-    def _create_character_involvement(self, character_data: dict[str, Any] | None, template: dict[str, Any]) -> dict[str, str]:
+    def _create_character_involvement(
+        self, character_data: dict[str, Any] | None, template: dict[str, Any]
+    ) -> dict[str, str]:
         """Create character involvement in the scenario."""
         involvement = {
             "role": "therapeutic_guide",
@@ -848,30 +1147,36 @@ class TherapeuticIntegrationSystem:
 
         return involvement
 
-    def _create_success_criteria(self, template: dict[str, Any], difficulty_level: str | None) -> list[str]:
+    def _create_success_criteria(
+        self, template: dict[str, Any], difficulty_level: str | None
+    ) -> list[str]:
         """Create success criteria for the scenario."""
         base_criteria = [
             "Engage with therapeutic concepts",
             "Practice new skills or insights",
-            "Reflect on the experience"
+            "Reflect on the experience",
         ]
 
         if difficulty_level in ["hard", "very_hard"]:
-            base_criteria.extend([
-                "Demonstrate skill integration",
-                "Apply learning to personal situations",
-                "Show evidence of therapeutic growth"
-            ])
+            base_criteria.extend(
+                [
+                    "Demonstrate skill integration",
+                    "Apply learning to personal situations",
+                    "Show evidence of therapeutic growth",
+                ]
+            )
         elif difficulty_level in ["very_easy", "easy"]:
             base_criteria = [
                 "Participate in the scenario",
                 "Try one new therapeutic technique",
-                "Share one insight or feeling"
+                "Share one insight or feeling",
             ]
 
         return base_criteria
 
-    def _create_fallback_recommendation(self, user_id: str) -> TherapeuticRecommendation:
+    def _create_fallback_recommendation(
+        self, user_id: str
+    ) -> TherapeuticRecommendation:
         """Create a fallback recommendation when generation fails."""
         return TherapeuticRecommendation(
             recommendation_id=str(uuid4()),
@@ -881,13 +1186,19 @@ class TherapeuticIntegrationSystem:
             integration_strategy=IntegrationStrategy.EXPERIENTIAL_LEARNING,
             priority_score=0.6,
             rationale="Mindfulness-based confidence building provides a gentle, supportive therapeutic approach.",
-            expected_outcomes=["stress_reduction", "self_awareness", "emotional_regulation"],
+            expected_outcomes=[
+                "stress_reduction",
+                "self_awareness",
+                "emotional_regulation",
+            ],
             estimated_duration=15,
             difficulty_level="moderate",
             character_alignment={"mindfulness": 0.7, "confidence": 0.6},
         )
 
-    def _create_fallback_scenario(self, user_id: str, framework: TherapeuticFramework, scenario_type: ScenarioType) -> TherapeuticScenario:
+    def _create_fallback_scenario(
+        self, user_id: str, framework: TherapeuticFramework, scenario_type: ScenarioType
+    ) -> TherapeuticScenario:
         """Create a fallback scenario when generation fails."""
         return TherapeuticScenario(
             scenario_id=str(uuid4()),
@@ -897,11 +1208,30 @@ class TherapeuticIntegrationSystem:
             title="Therapeutic Growth Journey",
             description="A supportive therapeutic scenario designed for personal growth and healing.",
             narrative_context="Explore therapeutic concepts in a safe, supportive environment.",
-            therapeutic_goals=["personal_growth", "self_awareness", "emotional_wellbeing"],
-            practice_opportunities=["mindful_reflection", "gentle_exploration", "supportive_practice"],
-            reflection_prompts=["How are you feeling?", "What did you notice?", "What would help you?"],
-            success_criteria=["Participate with openness", "Practice self-compassion", "Take one small step"],
-            character_involvement={"role": "supportive_guide", "interaction_style": "gentle_companion"},
+            therapeutic_goals=[
+                "personal_growth",
+                "self_awareness",
+                "emotional_wellbeing",
+            ],
+            practice_opportunities=[
+                "mindful_reflection",
+                "gentle_exploration",
+                "supportive_practice",
+            ],
+            reflection_prompts=[
+                "How are you feeling?",
+                "What did you notice?",
+                "What would help you?",
+            ],
+            success_criteria=[
+                "Participate with openness",
+                "Practice self-compassion",
+                "Take one small step",
+            ],
+            character_involvement={
+                "role": "supportive_guide",
+                "interaction_style": "gentle_companion",
+            },
             difficulty_level="moderate",
             estimated_duration=15,
         )
@@ -915,7 +1245,13 @@ class TherapeuticIntegrationSystem:
                 "integration_strategies": len(IntegrationStrategy),
                 "scenario_types": len(ScenarioType),
                 "users_with_recommendations": len(self.user_recommendations),
-                "total_scenarios_generated": len([s for scenarios in self.generated_scenarios.values() for s in scenarios]),
+                "total_scenarios_generated": len(
+                    [
+                        s
+                        for scenarios in self.generated_scenarios.values()
+                        for s in scenarios
+                    ]
+                ),
                 "framework_configurations": len(self.framework_configurations),
                 "metrics": self.get_metrics(),
             }
@@ -930,8 +1266,12 @@ class TherapeuticIntegrationSystem:
     def get_metrics(self) -> dict[str, Any]:
         """Get therapeutic integration system metrics."""
         # Calculate additional metrics
-        total_recommendations = sum(len(recs) for recs in self.user_recommendations.values())
-        total_scenarios = sum(len(scenarios) for scenarios in self.generated_scenarios.values())
+        total_recommendations = sum(
+            len(recs) for recs in self.user_recommendations.values()
+        )
+        total_scenarios = sum(
+            len(scenarios) for scenarios in self.generated_scenarios.values()
+        )
 
         average_recommendation_score = 0.0
         if total_recommendations > 0:

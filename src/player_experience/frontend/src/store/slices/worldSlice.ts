@@ -84,7 +84,7 @@ export const checkWorldCompatibility = createAsyncThunk(
   'world/checkCompatibility',
   async ({ characterId, worldId }: { characterId: string; worldId: string }) => {
     const response = await worldAPI.checkCompatibility(characterId, worldId);
-    return { worldId, ...response };
+    return { worldId, ...(response as any) };
   }
 );
 

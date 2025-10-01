@@ -1,5 +1,4 @@
-import asyncio
-import os
+
 import pytest
 
 from src.agent_orchestration.resources import ResourceManager, ResourceRequirements
@@ -28,5 +27,3 @@ async def test_allocate_resources_exceeds_cpu_limit():
     req = ResourceRequirements(cpu_threads=8)
     alloc = await rm.allocate_resources(agent_id=None, resource_requirements=req)
     assert alloc.granted is False
-
-

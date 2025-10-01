@@ -38,8 +38,21 @@ interface PlayerState {
   error: string | null;
 }
 
+// Initialize from localStorage
+const getInitialProfile = (): PlayerProfile | null => {
+  const profileStr = localStorage.getItem('player_profile');
+  if (profileStr) {
+    try {
+      return JSON.parse(profileStr);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+};
+
 const initialState: PlayerState = {
-  profile: null,
+  profile: getInitialProfile(),
   dashboard: null,
   isLoading: false,
   error: null,

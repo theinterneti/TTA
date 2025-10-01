@@ -1,12 +1,11 @@
-import pytest
 
 from src.agent_orchestration import (
-    WorkflowManager,
-    WorkflowDefinition,
-    WorkflowType,
     AgentStep,
     AgentType,
     OrchestrationRequest,
+    WorkflowDefinition,
+    WorkflowManager,
+    WorkflowType,
 )
 
 
@@ -82,4 +81,3 @@ def test_update_run_metadata():
     assert wm.update_run_metadata(run_id, {"key": "value"}) is True
     run_state = wm.get_run_state(run_id)
     assert run_state.metadata.get("key") == "value"
-

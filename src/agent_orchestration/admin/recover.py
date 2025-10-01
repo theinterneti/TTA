@@ -1,15 +1,14 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Dict
 
 from redis.asyncio import Redis
 
 from src.agent_orchestration.coordinators import RedisMessageCoordinator
-from src.agent_orchestration.models import AgentType, AgentId
+from src.agent_orchestration.models import AgentId, AgentType
 
 
-async def run_recovery(redis_url: str, key_prefix: str = "ao") -> Dict[str, int]:
+async def run_recovery(redis_url: str, key_prefix: str = "ao") -> dict[str, int]:
     """Run global recovery and return per-agent recovered counts.
 
     Uses coordinator.recover_pending() per agent to compute exact recovered counts.
@@ -17,7 +16,7 @@ async def run_recovery(redis_url: str, key_prefix: str = "ao") -> Dict[str, int]
     redis = Redis.from_url(redis_url)
     coord = RedisMessageCoordinator(redis, key_prefix=key_prefix)
 
-    per_agent: Dict[str, int] = {}
+    per_agent: dict[str, int] = {}
     for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
         pattern = f"{key_prefix}:reserved_deadlines:{at.value}:*"
         async for key in redis.scan_iter(match=pattern):
@@ -35,8 +34,11 @@ async def run_recovery(redis_url: str, key_prefix: str = "ao") -> Dict[str, int]
 
 def main() -> int:
     import argparse
+
     parser = argparse.ArgumentParser(description="Agent Orchestration Admin - Recovery")
-    parser.add_argument("redis_url", nargs="?", default="redis://localhost:6379/0", help="Redis URL")
+    parser.add_argument(
+        "redis_url", nargs="?", default="redis://localhost:6379/0", help="Redis URL"
+    )
     parser.add_argument("--key-prefix", default="ao", help="Redis key prefix")
     args = parser.parse_args()
 
@@ -53,4 +55,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

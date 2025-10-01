@@ -1,9 +1,7 @@
-import os
-import sys
-import subprocess
+
 import pytest
 
-from src.common.process_utils import run, ProcessError
+from src.common.process_utils import ProcessError, run
 
 
 def test_run_success_echo():
@@ -35,4 +33,3 @@ def test_no_shell_injection():
     # Ensure passing a string raises (we require List[str])
     with pytest.raises(ValueError):
         run("echo hello")  # type: ignore[arg-type]
-
