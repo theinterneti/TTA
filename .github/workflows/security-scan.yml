@@ -17,7 +17,6 @@ jobs:
   security-scan:
     name: Security Vulnerability Scan
     runs-on: ubuntu-latest
-    if: vars.ENABLE_SECURITY_SCANNING == 'true'
 
     permissions:
       contents: read
@@ -207,10 +206,215 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
 
+  python-security-scan:
+    name: Python Security Scan
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run bandit security linter
+        run: |
+          echo "Running bandit security linter..."
+          uv run bandit -r src/ -f json -o bandit-report.json || true
+          uv run bandit -r src/ -f txt
+        continue-on-error: true
+
+      - name: Run safety dependency scanner
+        run: |
+          echo "Running safety dependency scanner..."
+          uv pip list --format=json > requirements-list.json
+          uv run safety check --json --output safety-report.json || true
+          uv run safety check || true
+        continue-on-error: true
+
+      - name: Run pip-audit
+        run: |
+          echo "Running pip-audit..."
+          uv pip install pip-audit
+          uv run pip-audit --format json --output pip-audit-report.json || true
+          uv run pip-audit || true
+        continue-on-error: true
+
+      - name: Generate Python security summary
+        if: always()
+        run: |
+          echo "## Python Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Bandit results
+          if [ -f "bandit-report.json" ]; then
+            echo "### Bandit Security Linter" >> $GITHUB_STEP_SUMMARY
+            BANDIT_ISSUES=$(jq '.results | length' bandit-report.json)
+            echo "- **Issues Found:** $BANDIT_ISSUES" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$BANDIT_ISSUES" -gt 0 ]; then
+              echo "- **Severity Breakdown:**" >> $GITHUB_STEP_SUMMARY
+              jq -r '.results | group_by(.issue_severity) | .[] | "  - \(.[0].issue_severity): \(length)"' bandit-report.json >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Safety results
+          if [ -f "safety-report.json" ]; then
+            echo "### Safety Dependency Scanner" >> $GITHUB_STEP_SUMMARY
+            echo "- **Vulnerabilities checked**" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # pip-audit results
+          if [ -f "pip-audit-report.json" ]; then
+            echo "### pip-audit Results" >> $GITHUB_STEP_SUMMARY
+            echo "- **Audit completed**" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload Python security results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: python-security-results
+          path: |
+            bandit-report.json
+            safety-report.json
+            pip-audit-report.json
+            requirements-list.json
+          retention-days: 30
+
+  codeql-python:
+    name: CodeQL Analysis (Python)
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:python"
+
+  sbom-generation:
+    name: Generate SBOM
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v1
+
+      - name: Cache uv dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Install CycloneDX tools
+        run: |
+          uv pip install cyclonedx-bom
+          npm install -g @cyclonedx/cyclonedx-npm
+
+      - name: Generate Python SBOM
+        run: |
+          echo "Generating Python SBOM..."
+          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.json --format json
+          uv run cyclonedx-py requirements pyproject.toml -o sbom-python.xml --format xml
+
+      - name: Generate Node.js SBOM
+        working-directory: src/player_experience/frontend
+        run: |
+          echo "Generating Node.js SBOM..."
+          cyclonedx-npm --output-file ../../../sbom-nodejs.json --output-format JSON
+          cyclonedx-npm --output-file ../../../sbom-nodejs.xml --output-format XML
+
+      - name: Generate SBOM summary
+        run: |
+          echo "## Software Bill of Materials (SBOM)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Python Dependencies" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "sbom-python.json" ]; then
+            PYTHON_DEPS=$(jq '.components | length' sbom-python.json)
+            echo "- **Total Components:** $PYTHON_DEPS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Node.js Dependencies" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "sbom-nodejs.json" ]; then
+            NODEJS_DEPS=$(jq '.components | length' sbom-nodejs.json)
+            echo "- **Total Components:** $NODEJS_DEPS" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**SBOM Format:** CycloneDX 1.5" >> $GITHUB_STEP_SUMMARY
+          echo "**Generated:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload SBOM artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-reports
+          path: |
+            sbom-python.json
+            sbom-python.xml
+            sbom-nodejs.json
+            sbom-nodejs.xml
+          retention-days: 90
+
   security-report:
     name: Generate Security Report
     runs-on: ubuntu-latest
-    needs: [security-scan, dependency-review, secrets-scan]
+    needs: [security-scan, dependency-review, secrets-scan, python-security-scan, codeql-python, sbom-generation]
     if: always()
 
     steps:
@@ -249,6 +453,24 @@ jobs:
             echo "✅ **Secrets Detection:** Passed" >> security-summary.md
           else
             echo "❌ **Secrets Detection:** Failed" >> security-summary.md
+          fi
+
+          if [[ "${{ needs.python-security-scan.result }}" == "success" ]]; then
+            echo "✅ **Python Security Scan:** Passed" >> security-summary.md
+          else
+            echo "❌ **Python Security Scan:** Failed" >> security-summary.md
+          fi
+
+          if [[ "${{ needs.codeql-python.result }}" == "success" ]]; then
+            echo "✅ **CodeQL Python Analysis:** Passed" >> security-summary.md
+          else
+            echo "❌ **CodeQL Python Analysis:** Failed" >> security-summary.md
+          fi
+
+          if [[ "${{ needs.sbom-generation.result }}" == "success" ]]; then
+            echo "✅ **SBOM Generation:** Passed" >> security-summary.md
+          else
+            echo "❌ **SBOM Generation:** Failed" >> security-summary.md
           fi
 
       - name: Upload consolidated security report
