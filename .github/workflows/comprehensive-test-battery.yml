@@ -64,12 +64,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install pytest pytest-asyncio pytest-cov
-        
-    - name: Install test battery dependencies
-      run: |
-        pip install psutil pydantic cryptography websockets aiohttp
+        # Install project with dev dependencies (includes pytest, pytest-asyncio, pytest-cov)
+        # All required dependencies (psutil, pydantic, cryptography, websockets, aiohttp) are in pyproject.toml
+        pip install -e .[dev]
         
     - name: Run PR validation tests
       run: |
