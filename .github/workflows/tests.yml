@@ -149,7 +149,7 @@ jobs:
           # /-/healthy only checks if process is running, /-/ready checks if initialization is complete
           echo "Waiting for Prometheus to be ready (initialization may take up to 2 minutes)..."
 
-          # Use curl instead of wget for more reliable health checks
+          # Use wget (available in Prometheus container) with proper flags
           # Track attempts outside of timeout subshell
           max_attempts=24  # 24 attempts × 5 seconds = 120 seconds
           attempt=0
@@ -159,7 +159,10 @@ jobs:
             attempt=$((attempt + 1))
             echo "  Attempt $attempt/$max_attempts: Checking Prometheus readiness..."
 
-            if docker exec tta-prometheus curl -f -s http://localhost:9090/-/ready > /dev/null 2>&1; then
+            # wget returns 0 on success (HTTP 200), non-zero on failure
+            # -O- outputs to stdout, --spider would skip download but we need to check response
+            # -q for quiet mode, --server-response to see HTTP status
+            if docker exec tta-prometheus wget -q -O- http://localhost:9090/-/ready > /dev/null 2>&1; then
               ready=true
               echo "✅ Prometheus is ready to serve traffic (after $attempt attempts)"
               break
@@ -178,6 +181,10 @@ jobs:
             echo ""
             echo "=== Prometheus Container Status ==="
             docker ps -a --filter "name=tta-prometheus"
+            echo ""
+            echo "=== Testing wget availability and /-/ready endpoint manually ==="
+            docker exec tta-prometheus wget --version || echo "wget not available"
+            docker exec tta-prometheus wget -O- http://localhost:9090/-/ready || echo "/-/ready endpoint failed"
             exit 1
           fi
 
