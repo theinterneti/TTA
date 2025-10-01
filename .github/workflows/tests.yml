@@ -188,9 +188,50 @@ jobs:
             exit 1
           fi
 
-          echo "Waiting for Grafana to be healthy..."
-          timeout 60 bash -c 'until docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>&1 | grep -q "200 OK"; do sleep 2; done'
-          echo "✅ Grafana is healthy"
+          # Wait for Grafana to initialize before starting health checks
+          # Grafana needs time for: web server startup, database init, plugin installation, provisioning
+          # The Docker Compose healthcheck has start_period: 30s, so we match that here
+          echo "Waiting 30 seconds for Grafana to initialize (plugin installation, database setup)..."
+          sleep 30
+
+          echo "Waiting for Grafana to be healthy (initialization may take up to 90 seconds)..."
+
+          # Use wget (available in Grafana container) with proper flags
+          # Track attempts outside of timeout subshell
+          max_attempts=18  # 18 attempts × 5 seconds = 90 seconds (total 120s with 30s delay)
+          attempt=0
+          healthy=false
+
+          while [ $attempt -lt $max_attempts ]; do
+            attempt=$((attempt + 1))
+            echo "  Attempt $attempt/$max_attempts: Checking Grafana health..."
+
+            # wget returns 0 on success (HTTP 200), non-zero on failure
+            # Check if /api/health returns 200 OK
+            if docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>&1 | grep -q "200 OK"; then
+              healthy=true
+              echo "✅ Grafana is healthy (after $attempt attempts)"
+              break
+            fi
+
+            if [ $attempt -lt $max_attempts ]; then
+              sleep 5
+            fi
+          done
+
+          if [ "$healthy" = false ]; then
+            echo "❌ Grafana failed to become healthy after $max_attempts attempts (120 seconds total)"
+            echo ""
+            echo "=== Final Grafana Logs (last 50 lines) ==="
+            docker logs tta-grafana --tail 50
+            echo ""
+            echo "=== Grafana Container Status ==="
+            docker ps -a --filter "name=tta-grafana"
+            echo ""
+            echo "=== Testing /api/health endpoint manually ==="
+            docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || echo "/api/health endpoint failed"
+            exit 1
+          fi
 
       - name: Validate monitoring infrastructure
         run: |
