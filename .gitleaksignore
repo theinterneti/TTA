@@ -1,0 +1,40 @@
+# GitLeaks Ignore File
+# This file contains confirmed false positives that should be excluded from secret scanning
+# Format: <fingerprint> - <reason>
+
+# API Documentation Example Tokens
+# These are example JWT tokens used in API documentation and schema examples
+# They are not real secrets and are safe to commit
+
+# API_DOCUMENTATION.md - Example JWT tokens in API response documentation
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/API_DOCUMENTATION.md:generic-api-key:52
+# Reason: Example access_token in POST /api/v1/auth/login response documentation (line 52)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT, not a real token
+
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/API_DOCUMENTATION.md:generic-api-key:53
+# Reason: Example refresh_token in POST /api/v1/auth/login response documentation (line 53)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT, not a real token
+
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/API_DOCUMENTATION.md:generic-api-key:69
+# Reason: Example refresh_token in POST /api/v1/auth/refresh request documentation (line 69)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT, not a real token
+
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/API_DOCUMENTATION.md:generic-api-key:76
+# Reason: Example access_token in POST /api/v1/auth/refresh response documentation (line 76)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT, not a real token
+
+# validation_schemas.py - Example JWT tokens in Pydantic schema examples
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/validation_schemas.py:generic-api-key:72
+# Reason: Example access_token in TokenResponse schema json_schema_extra (line 72)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT for API schema documentation
+
+5c4789db87f3392c1f95f131800b07e9fe07faf3:src/player_experience/api/validation_schemas.py:generic-api-key:73
+# Reason: Example refresh_token in TokenResponse schema json_schema_extra (line 73)
+# Value: "eyJ0eXAiOiJKV1QiLCJhbGc..." - truncated example JWT for API schema documentation
+
+# Security Note:
+# All tokens above are intentionally truncated example values ("eyJ0eXAiOiJKV1QiLCJhbGc...")
+# used for API documentation purposes. They are not complete, valid JWT tokens and cannot
+# be used for authentication. Real JWT tokens are generated at runtime and never committed
+# to the repository.
+
