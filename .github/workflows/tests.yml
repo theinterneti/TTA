@@ -207,8 +207,9 @@ jobs:
             echo "  Attempt $attempt/$max_attempts: Checking Grafana health..."
 
             # wget returns 0 on success (HTTP 200), non-zero on failure
-            # Check if /api/health returns 200 OK
-            if docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>&1 | grep -q "200 OK"; then
+            # --spider checks if file exists without downloading
+            # Just check exit code, don't grep for "200 OK" (wget --spider doesn't output that)
+            if docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health > /dev/null 2>&1; then
               healthy=true
               echo "✅ Grafana is healthy (after $attempt attempts)"
               break
