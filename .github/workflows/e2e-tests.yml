@@ -19,7 +19,7 @@ on:
           - all
           - auth
           - dashboard
-          - character
+          - character-management
           - chat
           - settings
           - accessibility
@@ -64,7 +64,7 @@ jobs:
       fail-fast: false
       matrix:
         browser: [chromium, firefox, webkit]
-        test-suite: [auth, dashboard, character, chat, settings, accessibility, responsive]
+        test-suite: [auth, dashboard, character-management, chat, settings, accessibility, responsive]
         exclude:
           # Reduce matrix size for faster CI - run accessibility and responsive only on chromium
           - browser: firefox
@@ -179,7 +179,7 @@ jobs:
       fail-fast: false
       matrix:
         device: ["Mobile Chrome", "Mobile Safari"]
-        test-suite: [auth, dashboard, character, chat, responsive]
+        test-suite: [auth, dashboard, character-management, chat, responsive]
 
     steps:
       - name: Checkout code
