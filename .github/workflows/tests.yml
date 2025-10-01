@@ -121,6 +121,26 @@ jobs:
 
           docker compose -f docker-compose.monitoring.yml -f docker-compose.ci-override.yml up -d prometheus grafana
 
+          # Debug: Show container status and logs before health checks
+          echo "=== Container Status ==="
+          docker ps -a
+
+          echo ""
+          echo "=== Prometheus Startup Logs ==="
+          docker logs tta-prometheus
+
+          echo ""
+          echo "=== Prometheus Process Status ==="
+          docker exec tta-prometheus ps aux || echo "Failed to check process status"
+
+          echo ""
+          echo "=== Prometheus Configuration Files ==="
+          docker exec tta-prometheus ls -la /etc/prometheus/ || echo "Failed to list config files"
+
+          echo ""
+          echo "=== Checking if prometheus-ci.yml exists ==="
+          docker exec tta-prometheus cat /etc/prometheus/prometheus-ci.yml || echo "prometheus-ci.yml not found!"
+
           # Wait for services to be ready
           # Add startup delay to reduce unnecessary polling during known initialization period
           sleep 15
@@ -128,13 +148,38 @@ jobs:
           # Use /-/ready endpoint (correct endpoint per Prometheus docs for checking readiness to serve traffic)
           # /-/healthy only checks if process is running, /-/ready checks if initialization is complete
           echo "Waiting for Prometheus to be ready (initialization may take up to 2 minutes)..."
-          attempts=0
-          timeout 120 bash -c 'until docker exec tta-prometheus wget --spider http://localhost:9090/-/ready 2>&1 | grep -q "200 OK"; do
-            attempts=$((attempts + 1))
-            echo "  Attempt $attempts: Prometheus not ready yet, waiting..."
-            sleep 5
-          done'
-          echo "✅ Prometheus is ready to serve traffic"
+
+          # Use curl instead of wget for more reliable health checks
+          # Track attempts outside of timeout subshell
+          max_attempts=24  # 24 attempts × 5 seconds = 120 seconds
+          attempt=0
+          ready=false
+
+          while [ $attempt -lt $max_attempts ]; do
+            attempt=$((attempt + 1))
+            echo "  Attempt $attempt/$max_attempts: Checking Prometheus readiness..."
+
+            if docker exec tta-prometheus curl -f -s http://localhost:9090/-/ready > /dev/null 2>&1; then
+              ready=true
+              echo "✅ Prometheus is ready to serve traffic (after $attempt attempts)"
+              break
+            fi
+
+            if [ $attempt -lt $max_attempts ]; then
+              sleep 5
+            fi
+          done
+
+          if [ "$ready" = false ]; then
+            echo "❌ Prometheus failed to become ready after $max_attempts attempts (120 seconds)"
+            echo ""
+            echo "=== Final Prometheus Logs (last 50 lines) ==="
+            docker logs tta-prometheus --tail 50
+            echo ""
+            echo "=== Prometheus Container Status ==="
+            docker ps -a --filter "name=tta-prometheus"
+            exit 1
+          fi
 
           echo "Waiting for Grafana to be healthy..."
           timeout 60 bash -c 'until docker exec tta-grafana wget --no-verbose --tries=1 --spider http://localhost:3000/api/health 2>&1 | grep -q "200 OK"; do sleep 2; done'
