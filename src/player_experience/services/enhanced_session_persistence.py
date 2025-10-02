@@ -80,8 +80,8 @@ class EnhancedSessionPersistence:
             player_id = session_data.get("player_id")
             if player_id:
                 player_sessions_key = f"tta:player_sessions:{player_id}"
-                await self.redis_client.sadd(player_sessions_key, session_id)
-                await self.redis_client.expire(player_sessions_key, self.analytics_ttl)
+                await self.redis_client.sadd(player_sessions_key, session_id)  # type: ignore[misc]
+                await self.redis_client.expire(player_sessions_key, self.analytics_ttl)  # type: ignore[misc]
 
             logger.info(f"Saved enhanced session state for {session_id}")
             return True
@@ -178,7 +178,7 @@ class EnhancedSessionPersistence:
         try:
             # Get player's session IDs
             player_sessions_key = f"tta:player_sessions:{player_id}"
-            session_ids = await self.redis_client.smembers(player_sessions_key)
+            session_ids = await self.redis_client.smembers(player_sessions_key)  # type: ignore[misc]
 
             analytics_list = []
             for session_id in list(session_ids)[:limit]:
