@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import logging
 from collections import Counter, defaultdict
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from ..database.session_repository import SessionRepository
@@ -97,7 +97,7 @@ class ProgressTrackingService:
 
             # Track therapeutic approaches if available
             if hasattr(s, "therapeutic_approaches_used"):
-                for approach in s.therapeutic_approaches_used:
+                for approach in s.therapeutic_approaches_used:  # type: ignore[attr-defined]
                     therapeutic_approaches_used[approach] += 1
 
             # Enhanced highlight collection with therapeutic value assessment
@@ -410,7 +410,7 @@ class ProgressTrackingService:
         approach_effectiveness = defaultdict(list)
         for summary in summaries:
             if hasattr(summary, "therapeutic_approaches_used"):
-                for approach in summary.therapeutic_approaches_used:
+                for approach in summary.therapeutic_approaches_used:  # type: ignore[attr-defined]
                     # Use session duration as proxy for effectiveness
                     effectiveness = min(1.0, summary.duration_minutes / 30.0)
                     approach_effectiveness[approach].append(effectiveness)
@@ -628,7 +628,9 @@ class ProgressTrackingService:
 
         return base_description
 
-    def _calculate_current_streak(self, session_dates: list[datetime]) -> int:
+    def _calculate_current_streak(
+        self, session_dates: list[datetime] | list[date]
+    ) -> int:
         """Calculate current consecutive days with sessions (timezone-robust)."""
         if not session_dates:
             return 0
@@ -640,7 +642,9 @@ class ProgressTrackingService:
             pick_reference_today,
         )
 
-        dates = [(d.date() if hasattr(d, "date") else d) for d in session_dates]
+        dates = [
+            (d.date() if isinstance(d, datetime) else d) for d in session_dates
+        ]
         ref_today = pick_reference_today(dates)
         # Guard: if ref_today is not today (local or UTC), there is no current streak
         today_local = _dt.now().date()
