@@ -28,22 +28,26 @@ from ..auth import TokenData, verify_token
 logger = logging.getLogger(__name__)
 
 # Import agent orchestration system
+# Use lowercase to avoid Pyright constant redefinition warnings
+agent_orchestration_available: bool
+therapeutic_safety_available: bool
+
 try:
     from src.agent_orchestration.realtime.agent_event_integration import (
         get_agent_event_integrator,
     )
     from src.agent_orchestration.therapeutic_safety import (
-        CrisisManager,
+        CrisisInterventionManager,
         SafetyLevel,
         get_global_safety_service,
     )
 
-    AGENT_ORCHESTRATION_AVAILABLE = True
-    THERAPEUTIC_SAFETY_AVAILABLE = True
+    agent_orchestration_available = True
+    therapeutic_safety_available = True
 except ImportError:
     logger.warning("Agent orchestration system not available, using fallback responses")
-    AGENT_ORCHESTRATION_AVAILABLE = False
-    THERAPEUTIC_SAFETY_AVAILABLE = False
+    agent_orchestration_available = False
+    therapeutic_safety_available = False
 
 # In-memory metrics (testing/observability aid)
 METRICS: dict[str, int] = {
@@ -315,7 +319,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                 safety_validation_result = None
                 crisis_intervention = None
 
-                if AGENT_ORCHESTRATION_AVAILABLE:
+                if agent_orchestration_available:
                     try:
                         # Progressive feedback: Processing with AI
                         await manager.send_json(
@@ -331,7 +335,9 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         )
 
                         # Get agent event integrator
-                        agent_integrator = get_agent_event_integrator()
+                        agent_integrator = get_agent_event_integrator(
+                            agent_id=f"chat_agent_{player_id}"
+                        )
 
                         # Progressive feedback: Building world context
                         await manager.send_json(
@@ -347,7 +353,8 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         )
 
                         # Execute complete IPA → WBA → NGA workflow
-                        workflow_result = await agent_integrator.execute_complete_workflow(
+                        # Note: Runtime type differs from static type - agent_integrator has execute_complete_workflow at runtime
+                        workflow_result = await agent_integrator.execute_complete_workflow(  # type: ignore[attr-defined]
                             user_input=text,
                             session_id=session_id or "default",
                             world_id=metadata.get("world_id"),
@@ -373,7 +380,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
                         )
 
                         # Therapeutic Safety Validation: Validate AI-generated response
-                        if THERAPEUTIC_SAFETY_AVAILABLE:
+                        if therapeutic_safety_available:
                             try:
                                 safety_service = get_global_safety_service()
                                 safety_validation_result = (
@@ -398,7 +405,7 @@ async def websocket_chat_endpoint(websocket: WebSocket) -> None:
 
                                 # If crisis detected in AI response, initiate intervention
                                 if safety_validation_result.crisis_detected:
-                                    crisis_manager = CrisisManager()
+                                    crisis_manager = CrisisInterventionManager()
                                     crisis_assessment = crisis_manager.assess_crisis(
                                         safety_validation_result,
                                         {
