@@ -12,16 +12,18 @@ from ...monitoring.metrics_collector import get_metrics_collector
 
 # Import Prometheus metrics with fallback
 try:
-    from ...monitoring.prometheus_metrics import (
+    from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
         CONTENT_TYPE_LATEST,
     )
-    from ...monitoring.prometheus_metrics import (
+    from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
         get_metrics_collector as get_prometheus_collector,
     )
 
-    PROMETHEUS_AVAILABLE = True
+    prometheus_available = True
 except ImportError:
-    PROMETHEUS_AVAILABLE = False
+    prometheus_available = False
+
+PROMETHEUS_AVAILABLE = prometheus_available
 
 router = APIRouter()
 
