@@ -161,10 +161,10 @@ def verify_token(token: str) -> TokenData:
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        player_id: str = payload.get("sub")
-        username: str = payload.get("username")
-        email: str = payload.get("email")
-        exp_timestamp: int = payload.get("exp")
+        player_id: str | None = payload.get("sub")
+        username: str | None = payload.get("username")
+        email: str | None = payload.get("email")
+        exp_timestamp: int | None = payload.get("exp")
 
         if player_id is None:
             raise AuthenticationError("Invalid token: missing player ID")
