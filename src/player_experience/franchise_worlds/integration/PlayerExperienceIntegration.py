@@ -11,9 +11,17 @@ import json
 from pathlib import Path
 from typing import Any
 
-from ..managers.world_management_module import WorldManagementModule
-from ..models.enums import DifficultyLevel, TherapeuticApproach
-from ..models.world import WorldDetails, WorldParameters
+from ..managers.world_management_module import (  # type: ignore[import-not-found]
+    WorldManagementModule,
+)
+from ..models.enums import (  # type: ignore[import-not-found]
+    DifficultyLevel,
+    TherapeuticApproach,
+)
+from ..models.world import (  # type: ignore[import-not-found]
+    WorldDetails,
+    WorldParameters,
+)
 
 
 class FranchiseWorldBridge:
@@ -21,7 +29,7 @@ class FranchiseWorldBridge:
     Bridge between TypeScript franchise world system and Python TTA API
     """
 
-    def __init__(self, franchise_world_path: str = None):
+    def __init__(self, franchise_world_path: str | None = None):
         self.franchise_world_path = franchise_world_path or str(
             Path(__file__).parent.parent
         )
@@ -99,8 +107,12 @@ class FranchiseWorldBridge:
             franchise_worlds = await self.get_franchise_worlds()
 
             for world_config in franchise_worlds:
+                franchise_id = world_config.get("franchiseId")
+                if not franchise_id:
+                    continue
+
                 world_details = await self.convert_franchise_world_to_tta(
-                    world_config.get("franchiseId")
+                    franchise_id
                 )
 
                 if world_details:
@@ -174,6 +186,9 @@ class FranchiseWorldBridge:
                 return None
 
             params_data = result.get("parameters")
+            if not params_data:
+                return None
+
             return self._convert_to_world_parameters(params_data)
 
         except Exception as e:
@@ -181,7 +196,7 @@ class FranchiseWorldBridge:
             return None
 
     async def _run_node_script(
-        self, script_name: str, args: dict[str, Any] = None
+        self, script_name: str, args: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """
         Run a Node.js script in the franchise world system
