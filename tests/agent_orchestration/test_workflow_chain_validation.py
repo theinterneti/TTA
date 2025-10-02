@@ -97,7 +97,7 @@ class TestWorkflowChainValidation:
             operation_type=OperationType.WORKFLOW_EXECUTION,
             workflow_id="complete_chain_test",
             user_id="workflow_test_user",
-        ) as operation_id:
+        ):
 
             start_time = time.time()
 
@@ -138,7 +138,7 @@ class TestWorkflowChainValidation:
         entities = ipa_result["entities"]
         assert isinstance(entities, list)
         # Should extract job-related entities
-        job_related = any(
+        any(
             "job" in str(entity).lower() or "work" in str(entity).lower()
             for entity in entities
         )
@@ -258,7 +258,7 @@ class TestWorkflowChainValidation:
 
         # Validate data flow: IPA → NGA (direct)
         # IPA intent should influence NGA therapeutic approach
-        ipa_intent = ipa_result.get("intent", "")
+        ipa_result.get("intent", "")
         therapeutic_elements = nga_result.get("therapeutic_elements", [])
 
         # Intent should be reflected in therapeutic approach

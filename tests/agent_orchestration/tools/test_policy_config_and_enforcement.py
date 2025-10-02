@@ -60,14 +60,14 @@ async def test_policy_enforcement_matrix(redis_client):
     reg = RedisToolRegistry(redis_client, key_prefix="testao_policy_matrix")
 
     cases = [
-        (dict(allow_network_tools=False), ["network"], True),
-        (dict(allow_network_tools=True), ["network"], False),
-        (dict(allow_filesystem_tools=False), ["filesystem"], True),
-        (dict(allow_filesystem_tools=True), ["filesystem"], False),
-        (dict(allow_process_tools=False), ["process"], True),
-        (dict(allow_process_tools=True), ["process"], False),
+        ({"allow_network_tools": False}, ["network"], True),
+        ({"allow_network_tools": True}, ["network"], False),
+        ({"allow_filesystem_tools": False}, ["filesystem"], True),
+        ({"allow_filesystem_tools": True}, ["filesystem"], False),
+        ({"allow_process_tools": False}, ["process"], True),
+        ({"allow_process_tools": True}, ["process"], False),
         (
-            dict(allow_network_tools=False, allow_filesystem_tools=False),
+            {"allow_network_tools": False, "allow_filesystem_tools": False},
             ["network", "filesystem"],
             True,
         ),

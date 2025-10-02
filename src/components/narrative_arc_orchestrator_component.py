@@ -567,7 +567,6 @@ class ScaleManager:
         self, choice: PlayerChoice, scale: NarrativeScale
     ) -> float:
         """Calculate confidence in the impact assessment."""
-        confidence = 0.7  # Base confidence
 
         # Higher confidence for shorter scales
         scale_confidence = {

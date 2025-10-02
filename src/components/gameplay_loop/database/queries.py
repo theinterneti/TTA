@@ -154,7 +154,7 @@ class GameplayQueries:
         MATCH (s:{self.schema.NODE_LABELS['SESSION']} {{user_id: $user_id}})
               -[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->
               (p:{self.schema.NODE_LABELS['PROGRESS']})
-        RETURN 
+        RETURN
             count(p) as total_progress_markers,
             collect(DISTINCT p.progress_type) as progress_types,
             collect(DISTINCT p.therapeutic_domains) as therapeutic_domains,
@@ -212,7 +212,7 @@ class GameplayQueries:
         OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['MADE_CHOICE']}]->(choices:{self.schema.NODE_LABELS['CHOICE']})
         OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->(progress:{self.schema.NODE_LABELS['PROGRESS']})
         OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['HAS_SCENE']}]->(scenes:{self.schema.NODE_LABELS['SCENE']})
-        RETURN 
+        RETURN
             s,
             count(DISTINCT choices) as total_choices,
             count(DISTINCT progress) as total_progress_markers,
@@ -229,7 +229,7 @@ class GameplayQueries:
         OPTIONAL MATCH (s)-[made:{self.schema.RELATIONSHIPS['MADE_CHOICE']}]->(c:{self.schema.NODE_LABELS['CHOICE']})
         WHERE c.choice_type IN ['therapeutic', 'skill_building', 'emotional_regulation']
         OPTIONAL MATCH (s)-[:{self.schema.RELATIONSHIPS['ACHIEVES_PROGRESS']}]->(p:{self.schema.NODE_LABELS['PROGRESS']})
-        RETURN 
+        RETURN
             count(DISTINCT s) as total_sessions,
             sum(s.total_session_time) as total_time,
             count(made) as therapeutic_choices_made,

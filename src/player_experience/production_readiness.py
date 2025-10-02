@@ -705,7 +705,7 @@ class ProductionReadinessValidator:
     async def _run_load_test(self) -> dict[str, Any]:
         """Run a basic load test."""
         try:
-            benchmark = PerformanceBenchmark(self.base_url)
+            PerformanceBenchmark(self.base_url)
 
             # Run a lightweight load test
             config = LoadTester.create_load_test(

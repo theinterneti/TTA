@@ -163,9 +163,7 @@ class CompatibilityChecker:
                 approach.value for approach in goal.therapeutic_approaches
             )
 
-        world_approaches = set(
-            approach.value for approach in world.therapeutic_approaches
-        )
+        world_approaches = {approach.value for approach in world.therapeutic_approaches}
 
         if not character_approaches:
             # If character has no specific preferences, give moderate score

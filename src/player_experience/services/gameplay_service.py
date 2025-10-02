@@ -39,7 +39,7 @@ class GameplayService:
             from ...orchestration.orchestrator import TTAOrchestrator
 
             # Get the orchestrator instance (this would be dependency injected in production)
-            settings = get_settings()
+            get_settings()
             orchestrator = TTAOrchestrator()
 
             # Get the gameplay loop component

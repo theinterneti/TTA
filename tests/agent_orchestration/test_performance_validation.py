@@ -178,7 +178,7 @@ class TestPerformanceValidation:
                 workflow_id=f"perf_test_{i+1}",
                 user_id=user_id,
                 metadata={"complexity": scenario["complexity"]},
-            ) as operation_id:
+            ):
 
                 start_time = time.time()
 
@@ -582,7 +582,7 @@ class TestPerformanceValidation:
             workflow_id="e2e_performance_test",
             user_id=user_id,
             metadata={"test_type": "end_to_end_validation"},
-        ) as operation_id:
+        ):
 
             start_time = time.time()
 

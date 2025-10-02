@@ -363,19 +363,19 @@ class PlayerProfileRepository:
             characters: $characters,
             active_sessions: $active_sessions
         })
-        
+
         // Create therapeutic preferences
         CREATE (tp:TherapeuticPreferences $therapeutic_prefs)
         CREATE (p)-[:HAS_THERAPEUTIC_PREFERENCES]->(tp)
-        
+
         // Create privacy settings
         CREATE (ps:PrivacySettings $privacy_settings)
         CREATE (p)-[:HAS_PRIVACY_SETTINGS]->(ps)
-        
+
         // Create progress summary
         CREATE (pr:ProgressSummary $progress_summary)
         CREATE (p)-[:HAS_PROGRESS_SUMMARY]->(pr)
-        
+
         RETURN p
         """
 

@@ -517,7 +517,7 @@ class TestReportGenerator:
 </head>
 <body>
     <h1>TTA Comprehensive Test Report</h1>
-    
+
     <div class="summary">
         <h2>Executive Summary</h2>
         <p><strong>Total Tests:</strong> {report_data['executive_summary']['total_tests']}</p>
@@ -526,7 +526,7 @@ class TestReportGenerator:
         <p><strong>Success Rate:</strong> {report_data['executive_summary']['success_rate']:.1f}%</p>
         <p><strong>Duration:</strong> {report_data['executive_summary']['total_duration_minutes']:.1f} minutes</p>
     </div>
-    
+
     <h2>Category Results</h2>
     <table>
         <tr><th>Category</th><th>Total</th><th>Passed</th><th>Failed</th><th>Success Rate</th></tr>
@@ -535,12 +535,12 @@ class TestReportGenerator:
             for cat, data in report_data['category_results'].items()
         ])}
     </table>
-    
+
     <h2>Recommendations</h2>
     <ul>
         {''.join([f"<li><strong>{rec['title']}:</strong> {rec['description']}</li>" for rec in report_data['recommendations']])}
     </ul>
-    
+
     <p><em>Generated at: {report_data['report_metadata']['generated_at']}</em></p>
 </body>
 </html>

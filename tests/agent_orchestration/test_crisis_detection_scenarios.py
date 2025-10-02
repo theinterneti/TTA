@@ -337,7 +337,7 @@ class TestCrisisInterventionMechanisms:
         assert high_confidence_result.escalation_recommended
 
         # Lower confidence might not trigger escalation
-        low_confidence_result = self.validator.validate_text("I feel sad")
+        self.validator.validate_text("I feel sad")
         # Don't assert false here as it depends on implementation
 
     def test_monitoring_flag_generation(self):
@@ -394,7 +394,6 @@ class TestCrisisInterventionMechanisms:
                 ), f"Alternative lacks supportive language: {alternative}"
 
                 # Should not be dismissive or harsh
-                harsh_indicators = ["no", "can't", "won't", "refuse", "deny", "stop"]
                 # Note: Some of these might appear in therapeutic context, so we check overall tone
 
                 # Should be reasonably long (not just a short dismissal)

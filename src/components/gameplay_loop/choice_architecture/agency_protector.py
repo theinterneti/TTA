@@ -80,9 +80,7 @@ class AgencyProtector:
             logger.info(f"Ensuring meaningful agency for {len(choices)} choices")
 
             # Assess current agency level
-            agency_assessment = await self._assess_choice_agency(
-                choices, scene, session_state
-            )
+            await self._assess_choice_agency(choices, scene, session_state)
 
             # Filter out manipulative or low-agency choices
             filtered_choices = await self._filter_manipulative_choices(
@@ -287,7 +285,7 @@ class AgencyProtector:
         average_agency = total_agency / len(choices) if choices else 0
 
         # Assess choice variety
-        choice_types = set(choice.choice_type for choice in choices)
+        choice_types = {choice.choice_type for choice in choices}
         type_variety = len(choice_types) / len(ChoiceType)
 
         # Assess difficulty balance
@@ -430,9 +428,7 @@ class AgencyProtector:
 
         # Count difficulty levels
         gentle_count = sum(1 for d in difficulty_levels if d == DifficultyLevel.GENTLE)
-        standard_count = sum(
-            1 for d in difficulty_levels if d == DifficultyLevel.STANDARD
-        )
+        sum(1 for d in difficulty_levels if d == DifficultyLevel.STANDARD)
         challenging_count = sum(
             1 for d in difficulty_levels if d == DifficultyLevel.CHALLENGING
         )

@@ -396,7 +396,7 @@ class ResourceManager:
                 total = torch.cuda.get_device_properties(0).total_memory
                 # Estimate free as total - allocated
                 used = torch.cuda.memory_allocated(0)
-                free = max(0, int(total - used))
+                max(0, int(total - used))
                 limit = int(total * self.gpu_memory_limit_fraction)
                 headroom = max(0, limit - used)
                 want = int(req.gpu_memory_bytes or 0)

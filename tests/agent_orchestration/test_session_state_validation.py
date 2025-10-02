@@ -100,7 +100,7 @@ class TestSessionStateValidation:
 
         # Extract context from first interaction
         first_wba_result = first_result.get("wba_result", {})
-        first_world_state = first_wba_result.get("world_state", {})
+        first_wba_result.get("world_state", {})
 
         # Wait to ensure persistence
         await asyncio.sleep(0.2)

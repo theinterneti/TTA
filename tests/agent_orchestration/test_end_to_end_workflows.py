@@ -357,7 +357,7 @@ class TestMessageRoutingIntegration:
             # Process through agent sequence
             ipa_result = await mock_ipa.process({"text": scenario["player_input"]})
             wba_result = await mock_wba.process(ipa_result)
-            nga_result = await mock_nga.process(wba_result)
+            await mock_nga.process(wba_result)
 
             # Verify transformations
             assert len(transformed_messages) == 3, "Expected 3 message transformations"

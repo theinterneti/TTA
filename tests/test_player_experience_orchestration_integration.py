@@ -407,7 +407,7 @@ player_experience:
   api:
     host: "0.0.0.0"
     port: 8080
-    cors_origins: 
+    cors_origins:
       - "http://localhost:3000"
   web:
     port: 3000

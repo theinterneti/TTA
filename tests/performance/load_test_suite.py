@@ -577,7 +577,7 @@ class TTALoadTester:
 
         # Success rate by test type
         plt.subplot(2, 2, 3)
-        test_names = list(set(r.test_name for r in self.results))
+        test_names = list({r.test_name for r in self.results})
         success_rates = []
         for test_name in test_names:
             test_results = [r for r in self.results if r.test_name == test_name]

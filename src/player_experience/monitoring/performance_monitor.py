@@ -151,7 +151,7 @@ class RequestTracker:
         """Update concurrent users metric."""
         with self.lock:
             unique_users = len(
-                set(ctx.user_id for ctx in self.active_requests.values() if ctx.user_id)
+                {ctx.user_id for ctx in self.active_requests.values() if ctx.user_id}
             )
             self.metrics_collector.record_gauge("concurrent_users", unique_users)
 

@@ -259,7 +259,6 @@ class TestAlternativeGeneration:
                 ), f"No supportive language in: {alt}"
 
                 # Should not contain harsh language
-                harsh_words = ["no", "can't", "won't", "refuse", "deny"]
                 # Note: "can't" might appear in therapeutic context, so we check for overall tone
 
 

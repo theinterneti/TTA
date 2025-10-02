@@ -509,7 +509,6 @@ class TestCompleteWorkflowChains:
         self, real_ipa_proxy, real_wba_proxy, real_nga_proxy
     ):
         """Test error recovery in workflow chains."""
-        session_id = "error_recovery_001"
 
         # Test with invalid inputs to trigger error handling
         error_scenarios = [

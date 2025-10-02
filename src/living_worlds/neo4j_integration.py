@@ -220,10 +220,10 @@ class LivingWorldsManager:
                 n.last_updated = datetime(),
                 n.active = true,
                 n.progress = 0.0
-            
+
             MERGE (p:Patient {id: $patient_id})
             MERGE (n)-[:ASSIGNED_TO]->(p)
-            
+
             RETURN n
             """
 
@@ -314,7 +314,7 @@ class LivingWorldsManager:
             OPTIONAL MATCH (p)<-[:ASSIGNED_TO]-(n:NarrativeThread)
             OPTIONAL MATCH (p)<-[:OCCURS_IN]-(e:Event)
             OPTIONAL MATCH (p)<-[:LOCATED_IN]-(l:Location)
-            
+
             RETURN p,
                    collect(DISTINCT c) as characters,
                    collect(DISTINCT n) as narrative_threads,
@@ -359,7 +359,7 @@ class LivingWorldsManager:
                 n.last_updated = datetime(),
                 n.player_choices = n.player_choices + $player_choices,
                 n.emotional_impact = $emotional_impact
-            
+
             CREATE (e:Event {
                 id: randomUUID(),
                 type: 'progress_update',
@@ -369,9 +369,9 @@ class LivingWorldsManager:
                 emotional_impact: $emotional_impact,
                 timestamp: datetime()
             })
-            
+
             MERGE (n)-[:HAS_EVENT]->(e)
-            
+
             RETURN n, e
             """
 
@@ -432,10 +432,10 @@ class LivingWorldsManager:
         """Evolve the living world based on patient interactions"""
         try:
             # Get current world state
-            world_state = await self.get_patient_world(patient_id)
+            await self.get_patient_world(patient_id)
 
             # Analyze session data for world evolution triggers
-            emotional_changes = session_data.get("emotional_changes", {})
+            session_data.get("emotional_changes", {})
             player_choices = session_data.get("player_choices", [])
             therapeutic_progress = session_data.get("therapeutic_progress", {})
 
@@ -473,14 +473,14 @@ class LivingWorldsManager:
         async with self.driver.session() as session:
             query = """
             MATCH (c:Character {id: $character_id})-[r:RELATES_TO]-(p:Patient {id: $patient_id})
-            SET r.strength = CASE 
+            SET r.strength = CASE
                 WHEN $emotional_impact > 0 THEN r.strength + 0.1
                 WHEN $emotional_impact < 0 THEN r.strength - 0.05
                 ELSE r.strength
             END,
             r.last_interaction = datetime(),
             r.interaction_count = coalesce(r.interaction_count, 0) + 1
-            
+
             RETURN r.strength as new_strength
             """
 

@@ -208,7 +208,7 @@ Please generate a JSON response with the following structure:
     ],
     "main_storylines": [
         "Storyline 1",
-        "Storyline 2", 
+        "Storyline 2",
         "Storyline 3"
     ],
     "therapeutic_techniques": [

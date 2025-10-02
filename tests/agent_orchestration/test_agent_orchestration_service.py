@@ -555,7 +555,7 @@ async def test_workflow_type_determination_error_handling(
 ):
     """Test workflow type determination error handling."""
     # Mock to raise exception during processing
-    with patch("src.agent_orchestration.service.logger") as mock_logger:
+    with patch("src.agent_orchestration.service.logger"):
         # Should return collaborative workflow as fallback
         result = await orchestration_service._determine_workflow_type(
             "test input", sample_session_context

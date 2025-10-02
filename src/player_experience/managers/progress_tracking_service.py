@@ -147,9 +147,9 @@ class ProgressTrackingService:
 
         # Analyze progress markers from active sessions
         marker_analysis = self._analyze_progress_markers(active_sessions)
-        skill_markers = marker_analysis["skills_acquired"]
-        breakthrough_markers = marker_analysis["breakthroughs"]
-        goal_markers = marker_analysis["therapeutic_goals"]
+        marker_analysis["skills_acquired"]
+        marker_analysis["breakthroughs"]
+        marker_analysis["therapeutic_goals"]
 
         # Detect and create milestones
         new_milestones, milestone_highlights = (

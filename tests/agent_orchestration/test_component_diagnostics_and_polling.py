@@ -43,7 +43,7 @@ async def test_poll_queue_metrics_once(redis_client):
     # Run one polling cycle
     await comp._poll_queue_metrics_once()
 
-    snap = coord.metrics.snapshot()
+    coord.metrics.snapshot()
     # At least some gauges should be present
     assert any(
         k.startswith("ipa:testpoll|") or k.startswith("ipa:testpoll")

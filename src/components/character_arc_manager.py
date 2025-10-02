@@ -378,9 +378,7 @@ class CharacterArcManagerComponent(Component):
             await self._update_relationship_dynamics(character_arc, interaction)
 
             # Check for milestone progression
-            milestone_progress = await self._check_milestone_progression(
-                character_arc, interaction
-            )
+            await self._check_milestone_progression(character_arc, interaction)
 
             # Update therapeutic modeling
             await self._update_therapeutic_modeling(character_arc, interaction)
@@ -927,7 +925,6 @@ class CharacterArcManagerComponent(Component):
             therapeutic_modeling = []
 
             # Match character traits to therapeutic concepts
-            personality = character_arc.base_personality
 
             for concept_data in self.therapeutic_concepts:
                 concept = TherapeuticConcept(
@@ -1213,7 +1210,6 @@ class CharacterArcManagerComponent(Component):
             # For now, we'll return a placeholder that reflects the character's current state
 
             stage = character_arc.current_stage
-            personality = character_arc.personality_evolution
 
             # Generate response based on stage and personality
             if stage == ArcStage.INTRODUCTION:

@@ -208,7 +208,7 @@ def create_model_schema(model_class: type) -> dict[str, Any]:
         # Check if field has a default value
         if hasattr(model_class, "__dataclass_fields__"):
             field_info = model_class.__dataclass_fields__.get(field_name)
-            if field_info and field_info.default == field_info.default_factory == None:
+            if field_info and field_info.default == field_info.default_factory is None:
                 schema["required"].append(field_name)
 
     return schema

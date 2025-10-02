@@ -362,13 +362,7 @@ class RealtimeDashboardManager:
 
         try:
             # Create dashboard update event
-            event_data = {
-                "event_type": "dashboard_update",
-                "dashboard_type": dashboard_data.dashboard_type.value,
-                "timestamp": dashboard_data.timestamp,
-                "data": dashboard_data.data,
-                "metadata": dashboard_data.metadata,
-            }
+            pass
 
             # This would be sent to WebSocket connections subscribed to this dashboard type
             # Implementation would depend on WebSocket manager integration
@@ -388,7 +382,7 @@ class RealtimeDashboardManager:
         # Send recent data points
         recent_data = data_list[-10:]  # Last 10 data points
 
-        snapshot_data = {
+        {
             "event_type": "dashboard_snapshot",
             "dashboard_type": dashboard_type.value,
             "data_points": [

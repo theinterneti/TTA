@@ -711,7 +711,7 @@ class RedisAgentRegistry(AgentRegistry):
         """
         try:
             cap_key = self._capability_key(agent_id)
-            px = max(1, int(self._ttl * 1000))
+            max(1, int(self._ttl * 1000))
 
             # Check if capability data exists
             exists = await self._redis.exists(cap_key)

@@ -304,7 +304,7 @@ class TestEndToEndValidation:
 
         # The narrative should show awareness of being a psychology student
         story = second_result["story"]
-        psychology_context = any(
+        any(
             word in story.lower()
             for word in ["psychology", "student", "sarah", "college"]
         )

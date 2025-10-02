@@ -483,20 +483,20 @@ class APIDocumentationGenerator:
             padding: 20px;
             color: #333;
         }}
-        
+
         h1, h2, h3, h4 {{
             color: #2c3e50;
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
         }}
-        
+
         code {{
             background-color: #f8f9fa;
             padding: 2px 4px;
             border-radius: 3px;
             font-family: 'Monaco', 'Consolas', monospace;
         }}
-        
+
         pre {{
             background-color: #f8f9fa;
             padding: 15px;
@@ -504,31 +504,31 @@ class APIDocumentationGenerator:
             overflow-x: auto;
             border-left: 4px solid #007bff;
         }}
-        
+
         table {{
             border-collapse: collapse;
             width: 100%;
             margin: 15px 0;
         }}
-        
+
         th, td {{
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
         }}
-        
+
         th {{
             background-color: #f8f9fa;
             font-weight: 600;
         }}
-        
+
         .endpoint {{
             background-color: #f8f9fa;
             padding: 10px;
             border-radius: 5px;
             margin: 10px 0;
         }}
-        
+
         .method {{
             display: inline-block;
             padding: 4px 8px;
@@ -537,34 +537,34 @@ class APIDocumentationGenerator:
             color: white;
             margin-right: 10px;
         }}
-        
+
         .method.get {{ background-color: #28a745; }}
         .method.post {{ background-color: #007bff; }}
         .method.put {{ background-color: #ffc107; color: #000; }}
         .method.delete {{ background-color: #dc3545; }}
         .method.patch {{ background-color: #6f42c1; }}
-        
+
         .toc {{
             background-color: #f8f9fa;
             padding: 20px;
             border-radius: 5px;
             margin: 20px 0;
         }}
-        
+
         .toc ul {{
             list-style-type: none;
             padding-left: 0;
         }}
-        
+
         .toc li {{
             margin: 5px 0;
         }}
-        
+
         .toc a {{
             text-decoration: none;
             color: #007bff;
         }}
-        
+
         .toc a:hover {{
             text-decoration: underline;
         }}
@@ -574,7 +574,7 @@ class APIDocumentationGenerator:
     <div id="content">
         {self._markdown_to_html(markdown_content)}
     </div>
-    
+
     <script>
         // Add syntax highlighting and interactive features
         document.addEventListener('DOMContentLoaded', function() {{
@@ -588,7 +588,7 @@ class APIDocumentationGenerator:
                     const methodSpan = document.createElement('span');
                     methodSpan.className = `method ${{method}}`;
                     methodSpan.textContent = method.toUpperCase();
-                    
+
                     const path = text.replace(methodMatch[0], '');
                     header.innerHTML = '';
                     header.appendChild(methodSpan);

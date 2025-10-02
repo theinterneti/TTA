@@ -84,7 +84,7 @@ async def test_concurrent_registry_and_coordinator(redis_client):
 
     # cleanup while listing
     await reg.touch_last_used("kg.query", "1.0.2")
-    lst_before = await reg.list_tools()
+    await reg.list_tools()
     removed = await reg.cleanup_expired(max_idle_seconds=0.0)
     # Even if removed due to threshold, operations should be safe
     assert removed >= 0

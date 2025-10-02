@@ -255,13 +255,13 @@ class TherapeuticWorkflowManager:
 
         assessment_prompt = f"""
         Analyze the emotional state of this patient message: "{user_message}"
-        
+
         Consider:
         - Emotional valence (positive/negative)
         - Arousal level (calm/excited)
         - Crisis indicators
         - Therapeutic needs
-        
+
         Respond with a JSON object containing:
         - valence: float (-1.0 to 1.0)
         - arousal: float (0.0 to 1.0)
@@ -325,20 +325,20 @@ class TherapeuticWorkflowManager:
         # Build therapeutic prompt
         therapeutic_prompt = f"""
         You are a compassionate AI therapeutic assistant. Respond to this patient message: "{user_message}"
-        
+
         Patient context:
         - Emotional state: {emotional_state}
         - Current scenario: {state["current_scenario"]}
         - Therapeutic framework: {therapeutic_context.get("framework", "CBT")}
         - Safety level: {therapeutic_context.get("safety_level", "safe")}
-        
+
         Guidelines:
         - Be empathetic and validating
         - Use therapeutic techniques appropriate to the framework
         - Encourage reflection and growth
         - Maintain professional boundaries
         - If crisis indicators present, prioritize safety
-        
+
         Provide a supportive, therapeutic response that helps the patient process their experience.
         """
 
@@ -380,12 +380,12 @@ class TherapeuticWorkflowManager:
         """Handle crisis intervention workflow"""
         crisis_response = """
         I'm concerned about your safety and wellbeing. You're not alone, and help is available.
-        
+
         Immediate resources:
         • National Suicide Prevention Lifeline: 988
         • Crisis Text Line: Text HOME to 741741
         • Emergency Services: 911
-        
+
         Please reach out to one of these resources or a trusted person in your life.
         Would you like me to help you create a safety plan?
         """

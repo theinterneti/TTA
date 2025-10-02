@@ -217,7 +217,7 @@ class CharacterRepository:
             except Exception as e:
                 logger.error(f"Failed to get character from Neo4j: {e}")
                 # Fall back to in-memory storage
-                character = self._characters.get(character_id)
+                self._characters.get(character_id)
         else:
             return self._characters.get(character_id)
 

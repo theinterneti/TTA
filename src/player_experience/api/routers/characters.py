@@ -468,7 +468,9 @@ async def create_character(
         # Convert request to domain models. Sanitize both display and background names to match model constraints.
         import re
 
-        sanitize = lambda s: re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip()
+        def sanitize(s):
+            return re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip()
+
         sanitized_name = sanitize(request.name)
         character = manager.create_character(
             current_player.player_id,

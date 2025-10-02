@@ -235,13 +235,11 @@ class WorldDetails:
         score_factors.append(readiness_score * 0.3)
 
         # Therapeutic approach alignment
-        character_approaches = set(
+        character_approaches = {
             approach.value
             for approach in character_therapeutic_profile.therapeutic_goals
-        )
-        world_approaches = set(
-            approach.value for approach in self.therapeutic_approaches
-        )
+        }
+        world_approaches = {approach.value for approach in self.therapeutic_approaches}
         approach_overlap = len(character_approaches.intersection(world_approaches))
         approach_score = (
             approach_overlap / max(len(world_approaches), 1)

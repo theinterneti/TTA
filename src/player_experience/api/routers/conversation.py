@@ -1105,11 +1105,11 @@ async def get_session_statistics(
             "active_conversations": len(_CONVERSATIONS),
             "active_session_states": len(_SESSION_STATES),
             "total_emotional_themes": len(
-                set(
+                {
                     theme
                     for session_state in _SESSION_STATES.values()
                     for theme in session_state.get("emotional_themes", [])
-                )
+                }
             ),
             "total_interactions": sum(
                 session_state.get("interaction_count", 0)

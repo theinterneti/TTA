@@ -366,7 +366,7 @@ class DiagnosticsAPI:
             monitor = get_response_time_monitor()
 
             # Get recent statistics
-            stats = monitor.get_statistics(time_window_minutes=60)
+            monitor.get_statistics(time_window_minutes=60)
 
             # Find relevant statistics for this agent
             # This is a simplified approach - in practice, you'd need to

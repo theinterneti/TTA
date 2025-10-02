@@ -268,7 +268,7 @@ class TestWebSocketRealAgentIntegration:
         await asyncio.sleep(0.1)
 
         # Process with IPA (should generate progressive feedback)
-        ipa_result = await ipa_proxy.process(
+        await ipa_proxy.process(
             {"text": "I carefully examine the ancient runes on the temple wall"}
         )
 
@@ -324,7 +324,7 @@ class TestWebSocketRealAgentIntegration:
         await asyncio.sleep(0.1)
 
         # Report an error
-        error_id = await error_manager.report_error(
+        await error_manager.report_error(
             error_type="agent_communication_failure",
             error_message="Failed to connect to IPA service",
             severity=ErrorSeverity.HIGH,
@@ -641,7 +641,7 @@ class TestWebSocketRealAgentIntegration:
         await asyncio.sleep(0.1)
 
         # Process with each agent individually
-        ipa_result = await ipa_proxy.process(
+        await ipa_proxy.process(
             {"text": "I want to explore the mysterious cave system"}
         )
 
@@ -652,7 +652,7 @@ class TestWebSocketRealAgentIntegration:
             }
         )
 
-        nga_result = await nga_proxy.process(
+        await nga_proxy.process(
             {
                 "prompt": "Continue the cave exploration story",
                 "context": {

@@ -357,7 +357,7 @@ class TestBatteryDashboard:
         <body>
             <div class="container">
                 <h1>🧪 TTA Comprehensive Test Battery Dashboard</h1>
-                
+
                 <div class="card">
                     <h2>Current Status</h2>
                     <div id="current-status" class="status-grid">
@@ -379,38 +379,38 @@ class TestBatteryDashboard:
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="card">
                     <h2>Real-time Log</h2>
                     <div id="log">Connecting to test battery...</div>
                 </div>
-                
+
                 <div class="card">
                     <h2>Service Status</h2>
                     <div id="service-status">Loading...</div>
                 </div>
             </div>
-            
+
             <script>
                 // Use secure WebSocket (wss://) in production, ws:// only for local development
                 // nosemgrep: javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket
                 const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'; // nosemgrep
                 const ws = new WebSocket(`${protocol}//${window.location.host}/dashboard/test-battery/ws`);
                 const log = document.getElementById('log');
-                
+
                 function addLog(message) {
                     const timestamp = new Date().toLocaleTimeString();
                     log.innerHTML += `[${timestamp}] ${message}\\n`;
                     log.scrollTop = log.scrollHeight;
                 }
-                
+
                 ws.onopen = function() {
                     addLog('Connected to test battery dashboard');
                 };
-                
+
                 ws.onmessage = function(event) {
                     const message = JSON.parse(event.data);
-                    
+
                     if (message.type === 'battery_status') {
                         updateBatteryStatus(message.data);
                         addLog(`Battery status: ${message.data.status} (${message.data.success_rate}% success)`);
@@ -418,13 +418,13 @@ class TestBatteryDashboard:
                         addLog(`Test ${message.data.name}: ${message.data.status}`);
                     }
                 };
-                
+
                 function updateBatteryStatus(status) {
                     document.getElementById('success-rate').textContent = status.success_rate + '%';
                     document.getElementById('total-tests').textContent = status.total_tests;
                     document.getElementById('service-mode').textContent = status.mock_mode ? 'Mock' : 'Real';
                 }
-                
+
                 // Load initial data
                 fetch('/dashboard/test-battery/status')
                     .then(response => response.json())
@@ -432,7 +432,7 @@ class TestBatteryDashboard:
                         if (data.current_status) {
                             updateBatteryStatus(data.current_status);
                         }
-                        
+
                         const serviceStatus = document.getElementById('service-status');
                         if (data.service_status && data.service_status.services) {
                             let html = '<div class="status-grid">';

@@ -178,7 +178,9 @@ class Character:
         # Ensure names are consistent after sanitization; allow display names with digits by comparing letters-only
         import re
 
-        norm = lambda s: re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip().lower()
+        def norm(s):
+            return re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip().lower()
+
         if norm(self.name) != norm(self.background.name):
             raise ValueError("Character name must match background name")
 

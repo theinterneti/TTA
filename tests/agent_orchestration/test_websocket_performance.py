@@ -394,9 +394,7 @@ class TestWebSocketPerformance:
                 source="performance_test",
             )
 
-            sent_count = await high_capacity_websocket_manager.broadcast_event(
-                large_event
-            )
+            await high_capacity_websocket_manager.broadcast_event(large_event)
             await asyncio.sleep(0.1)  # Brief pause between messages
 
         await asyncio.sleep(1.0)  # Wait for message processing

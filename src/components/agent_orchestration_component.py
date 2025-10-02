@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from src.orchestration.component import Component
 from src.orchestration.decorators import log_entry_exit, timing_decorator
@@ -24,7 +24,7 @@ _DEF_UNITS = {
 }
 
 
-def _parse_bytes(v: Any) -> Optional[int]:
+def _parse_bytes(v: Any) -> int | None:
     if v is None:
         return None
     try:
@@ -236,7 +236,7 @@ class AgentOrchestrationComponent(Component):
                     self._state_validator = StateValidator(
                         self._redis_client, key_prefix="ao"
                     )
-                    svi = float(
+                    float(
                         self.config.get(
                             "agent_orchestration.workflow.state_validation_interval_s",
                             10.0,
@@ -1958,7 +1958,6 @@ class AgentOrchestrationComponent(Component):
 
             # Tool metrics
             tool_exec = {}
-            tool_cache = {"hits": 0, "misses": 0}
             try:
                 from src.agent_orchestration.tools.metrics import get_tool_metrics
 
@@ -1970,7 +1969,7 @@ class AgentOrchestrationComponent(Component):
                     self, "_tool_registry", None
                 )
                 if reg:
-                    tool_cache = await reg.cache_stats()
+                    await reg.cache_stats()
             except Exception:
                 pass
             # Set counters (note: prometheus_client counters can only inc; we inc to target absolute on first pass)
@@ -2565,7 +2564,7 @@ class AgentOrchestrationComponent(Component):
         @app.get("/policy/status")
         async def policy_status() -> dict:
             try:
-                pol_cfg = getattr(self._tool_policy, "config", None)
+                getattr(self._tool_policy, "config", None)
                 src = "env"
                 try:
                     import os

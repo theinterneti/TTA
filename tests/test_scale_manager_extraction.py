@@ -7,9 +7,7 @@ from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
 
 def test_scale_manager_evaluate_choice_impact_smoke():
     sm = ScaleManager(config={})
-    choice = PlayerChoice(
-        choice_id="c1", session_id="s1", choice_text="Test", metadata={}
-    )
+    PlayerChoice(choice_id="c1", session_id="s1", choice_text="Test", metadata={})
     res = sm.get_scale_window(NarrativeScale.SHORT_TERM)
     assert isinstance(res, int)
 

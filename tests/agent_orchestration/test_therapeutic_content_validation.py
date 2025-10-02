@@ -147,7 +147,7 @@ class TestTherapeuticContentValidation:
 
             # World state should incorporate therapeutic context
             world_state_text = json.dumps(world_state).lower()
-            therapeutic_context_integrated = any(
+            any(
                 element in world_state_text
                 for element in scenario["expected_therapeutic_elements"]
             )
@@ -155,7 +155,7 @@ class TestTherapeuticContentValidation:
             # Validate NGA therapeutic content generation
             nga_result = result.get("nga_result", {})
             therapeutic_elements = nga_result.get("therapeutic_elements", [])
-            narrative = nga_result.get("narrative", "")
+            nga_result.get("narrative", "")
 
             assert len(therapeutic_elements) > 0
 

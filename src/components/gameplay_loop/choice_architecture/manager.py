@@ -243,9 +243,7 @@ class ChoiceArchitectureManager:
         }
 
         # Determine needed choice types based on therapeutic focus
-        therapeutic_choice_count = max(
-            1, int(self.max_choices * self.therapeutic_choice_ratio)
-        )
+        max(1, int(self.max_choices * self.therapeutic_choice_ratio))
 
         if "mindfulness" in scene.therapeutic_focus:
             requirements["choice_types_needed"].append(ChoiceType.THERAPEUTIC)

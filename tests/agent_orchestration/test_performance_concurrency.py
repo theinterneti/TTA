@@ -160,7 +160,7 @@ class TestConcurrentWorkflowExecution:
                 result["execution_time"] for result in successful_results
             ]
             avg_execution_time = statistics.mean(execution_times)
-            max_execution_time = max(execution_times)
+            max(execution_times)
 
             assert (
                 avg_execution_time <= scenario["expected_avg_response_time"]
@@ -509,7 +509,7 @@ class TestPerformanceBenchmarks:
             # Get initial resource usage
             process = psutil.Process(os.getpid())
             initial_memory = process.memory_info().rss / 1024 / 1024  # MB
-            initial_cpu_percent = process.cpu_percent()
+            process.cpu_percent()
 
             workflow_manager = WorkflowManager()
 
@@ -612,7 +612,7 @@ class TestPerformanceBenchmarks:
                 ]
 
                 max_memory = max(memory_values)
-                avg_memory = statistics.mean(memory_values)
+                statistics.mean(memory_values)
                 memory_increase = max_memory - initial_memory
 
                 max_cpu = max(cpu_values) if cpu_values else 0
@@ -816,7 +816,7 @@ class TestAgentPoolScaling:
                             selected_agents[agent_type] = selected_agent
 
                     # Simulate workflow execution with selected agents
-                    workflow_start = time.time()
+                    time.time()
 
                     try:
                         # Process through each agent in sequence

@@ -186,7 +186,7 @@ async def test_message_coordinator_integration(integration_service):
     assert coordinator is not None
 
     # Test basic coordinator functionality
-    agent_id = AgentId(type=AgentType.IPA, instance="test")
+    AgentId(type=AgentType.IPA, instance="test")
 
     # This should not raise an exception
     try:
@@ -208,7 +208,7 @@ async def test_agent_registry_integration(integration_service):
 
     # Test agent lookup (should handle missing agents gracefully)
     agent_id = AgentId(type=AgentType.IPA, instance="test")
-    agent = registry.get_agent(agent_id)
+    registry.get_agent(agent_id)
     # Agent may be None if not registered, which is fine for this test
 
 

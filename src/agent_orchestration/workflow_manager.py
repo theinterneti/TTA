@@ -154,7 +154,7 @@ class WorkflowManager:
 
             # Optionally build/execute a graph (no-op if not available)
             graph = self._lg_builder.build(definition)
-            graph_response = self._lg_executor.execute(
+            self._lg_executor.execute(
                 graph, {"history": [h.step.agent.value for h in run_state.history]}
             )
 

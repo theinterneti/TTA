@@ -314,8 +314,8 @@ class VisualizationGenerator:
         fig.update_layout(
             title="Cohort Performance Comparison",
             xaxis_title="Cohorts",
-            yaxis=dict(title="Success Rate", side="left"),
-            yaxis2=dict(title="Engagement Score", side="right", overlaying="y"),
+            yaxis={"title": "Success Rate", "side": "left"},
+            yaxis2={"title": "Engagement Score", "side": "right", "overlaying": "y"},
             hovermode="x unified",
         )
 
@@ -346,7 +346,7 @@ class ReportGenerator:
                 body { font-family: Arial, sans-serif; margin: 40px; }
                 .header { border-bottom: 2px solid #333; padding-bottom: 20px; }
                 .section { margin: 30px 0; }
-                .metric { display: inline-block; margin: 10px 20px; padding: 15px; 
+                .metric { display: inline-block; margin: 10px 20px; padding: 15px;
                          border: 1px solid #ddd; border-radius: 5px; }
                 .chart { margin: 20px 0; }
             </style>
@@ -358,7 +358,7 @@ class ReportGenerator:
                 <p><strong>Generated:</strong> {{ generated_at }}</p>
                 <p><strong>Period:</strong> {{ date_range_start }} to {{ date_range_end }}</p>
             </div>
-            
+
             <div class="section">
                 <h2>Key Metrics</h2>
                 {% for metric in key_metrics %}
@@ -369,12 +369,12 @@ class ReportGenerator:
                 </div>
                 {% endfor %}
             </div>
-            
+
             <div class="section">
                 <h2>Trend Analysis</h2>
                 <p>{{ trend_analysis.analysis }}</p>
             </div>
-            
+
             <div class="section">
                 <h2>Visualizations</h2>
                 {% for viz in visualizations %}

@@ -215,8 +215,8 @@ class TestFreeModelsFilter:
             )
             max_cost = float(os.getenv("OPENROUTER_MAX_COST_PER_TOKEN", "0.001"))
 
-            assert show_free_only == True
-            assert prefer_free == False
+            assert show_free_only
+            assert not prefer_free
             assert max_cost == 0.0005
 
     def test_api_response_format(self):
@@ -283,16 +283,16 @@ class TestOpenRouterProviderMethods:
         # Test with config dict
         config = {"test_key": True}
         result = get_bool_config(config, "test_key", "TEST_ENV", False)
-        assert result == True
+        assert result
 
         # Test with environment variable
         with patch.dict(os.environ, {"TEST_ENV": "true"}):
             result = get_bool_config({}, "missing_key", "TEST_ENV", False)
-            assert result == True
+            assert result
 
         # Test with default
         result = get_bool_config({}, "missing_key", "MISSING_ENV", False)
-        assert result == False
+        assert not result
 
     def test_get_float_config_method(self):
         """Test the _get_float_config method logic."""

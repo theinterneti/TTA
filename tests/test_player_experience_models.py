@@ -487,7 +487,7 @@ class TestValidation(unittest.TestCase):
         """Test model validation failure."""
         # Create an invalid profile (this will fail in __post_init__)
         with self.assertRaises(ValueError):
-            profile = PlayerProfile(
+            PlayerProfile(
                 player_id="",  # Invalid empty ID
                 username="testuser",
                 email="test@example.com",

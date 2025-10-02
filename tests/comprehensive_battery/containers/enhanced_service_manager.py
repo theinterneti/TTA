@@ -246,13 +246,19 @@ class EnhancedServiceManager:
 
             # Health check the containerized service
             if config.name == "neo4j":
-                health_check_func = lambda: self.health_checker.check_neo4j_health_with_credential_fallback(
-                    service_uri
-                )
+
+                def health_check_func():
+                    return (
+                        self.health_checker.check_neo4j_health_with_credential_fallback(
+                            service_uri
+                        )
+                    )
+
             elif config.name == "redis":
-                health_check_func = lambda: self.health_checker.check_redis_health(
-                    service_uri
-                )
+
+                def health_check_func():
+                    return self.health_checker.check_redis_health(service_uri)
+
             else:
                 raise ValueError(f"Unknown service: {config.name}")
 
@@ -310,9 +316,7 @@ class EnhancedServiceManager:
         try:
             if config.name == "neo4j":
                 # Use a dummy URI for mock initialization
-                mock_driver = await self.mock_manager.get_neo4j_driver(
-                    "bolt://mock:7687"
-                )
+                await self.mock_manager.get_neo4j_driver("bolt://mock:7687")
                 return ServiceStatus(
                     name=config.name,
                     backend=ServiceBackend.MOCK,
@@ -320,9 +324,7 @@ class EnhancedServiceManager:
                     uri="mock://neo4j",
                 )
             elif config.name == "redis":
-                mock_client = await self.mock_manager.get_redis_client(
-                    "redis://mock:6379"
-                )
+                await self.mock_manager.get_redis_client("redis://mock:6379")
                 return ServiceStatus(
                     name=config.name,
                     backend=ServiceBackend.MOCK,

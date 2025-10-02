@@ -250,8 +250,8 @@ async def test_circuit_breaker_cleanup(redis_client):
     registry = CircuitBreakerRegistry(redis_client, key_prefix="test_cleanup")
 
     # Create some circuit breakers
-    cb1 = await registry.get_or_create("cleanup_test1")
-    cb2 = await registry.get_or_create("cleanup_test2")
+    await registry.get_or_create("cleanup_test1")
+    await registry.get_or_create("cleanup_test2")
 
     # Verify they exist
     names = await registry.list_names()

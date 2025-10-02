@@ -211,7 +211,7 @@ class ModelManagementComponent(Component):
 
             # Unload found instances
             for key in keys_to_remove:
-                instance = self.active_models[key]
+                self.active_models[key]
                 provider_name = key.split(":")[0]
 
                 if provider_name in self.providers:

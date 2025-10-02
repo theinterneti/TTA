@@ -154,11 +154,11 @@ class TestPlayerProfileManager(unittest.TestCase):
         """Test player profile creation with invalid privacy settings."""
         # Test invalid data retention period (too short)
         with self.assertRaises(ValueError):
-            invalid_privacy = PrivacySettings(data_retention_period_days=15)
+            PrivacySettings(data_retention_period_days=15)
 
         # Test invalid data retention period (too long)
         with self.assertRaises(ValueError):
-            invalid_privacy = PrivacySettings(data_retention_period_days=3000)
+            PrivacySettings(data_retention_period_days=3000)
 
     def test_get_player_profile_success(self):
         """Test successful player profile retrieval."""
@@ -399,7 +399,7 @@ class TestPlayerProfileManager(unittest.TestCase):
         """Test privacy settings update with invalid settings."""
         # Execute and verify - the validation happens in the model constructor
         with self.assertRaises(ValueError):
-            invalid_privacy = PrivacySettings(data_retention_period_days=15)
+            PrivacySettings(data_retention_period_days=15)
 
     def test_export_player_data_success(self):
         """Test successful player data export."""

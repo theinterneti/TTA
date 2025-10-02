@@ -3021,8 +3021,8 @@ class NarrativeCoherenceEngine(Component):
 
             for theme1, theme2 in conflicting_themes:
                 # Check if conflicting themes appear in overlapping storylines
-                storylines1 = set(s.thread_id for s in theme_storylines.get(theme1, []))
-                storylines2 = set(s.thread_id for s in theme_storylines.get(theme2, []))
+                storylines1 = {s.thread_id for s in theme_storylines.get(theme1, [])}
+                storylines2 = {s.thread_id for s in theme_storylines.get(theme2, [])}
 
                 if storylines1.intersection(storylines2):
                     issues.append(

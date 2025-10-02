@@ -706,7 +706,7 @@ class TherapeuticValidator:
         overall_sentiment = self._engine._analyze_sentiment(text)
         crisis_detected = any(f.crisis_type is not None for f in findings)
         crisis_types = list(
-            set(f.crisis_type for f in findings if f.crisis_type is not None)
+            {f.crisis_type for f in findings if f.crisis_type is not None}
         )
         escalation_recommended = any(f.escalation_required for f in findings)
 

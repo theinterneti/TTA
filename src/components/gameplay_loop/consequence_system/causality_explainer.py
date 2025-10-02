@@ -291,7 +291,7 @@ class CausalityExplainer:
                 break
 
         # Apply modifiers based on clarity level
-        modifiers = self.clarity_levels[clarity_level]["template_modifiers"]
+        self.clarity_levels[clarity_level]["template_modifiers"]
 
         if clarity_level == "gentle":
             explanation = f"Gently, {explanation.lower()}"

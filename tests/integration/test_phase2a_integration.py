@@ -62,7 +62,6 @@ class TestPhase2AIntegration:
     async def test_patient_interface_integration(self, setup_test_environment):
         """Test patient interface integration with backend services"""
         patient_id = "test_patient_123"
-        session_id = "test_session_456"
 
         # Test session creation
         session_data = {
@@ -280,11 +279,6 @@ class TestPhase2AIntegration:
     async def test_feature_flag_integration(self, setup_test_environment):
         """Test feature flag system across all interfaces"""
         # Test feature flags in patient interface
-        feature_flags = {
-            "ai_narrative_enhancement": True,
-            "living_worlds_system": False,
-            "advanced_therapeutic_gaming": False,
-        }
 
         # Verify feature flags affect behavior
         patient_id = "test_patient_123"
@@ -354,7 +348,7 @@ class TestPhase2AIntegration:
         patient_id = "test_patient_123"
 
         # Create data in Neo4j (living worlds)
-        character = await self.living_worlds.create_character(
+        await self.living_worlds.create_character(
             character_id="char_consistency_test",
             name="Test Character",
             personality_traits={"empathy": 0.8},

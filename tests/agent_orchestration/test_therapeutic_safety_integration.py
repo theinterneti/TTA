@@ -117,7 +117,7 @@ class TestTherapeuticValidatorIntegration:
         # Use content that triggers escalation but not blocking
         escalation_input = "I feel sad and need help"
 
-        with patch("src.agent_orchestration.service.logger") as mock_logger:
+        with patch("src.agent_orchestration.service.logger"):
             # Should not raise exception but should log if escalation occurs
             await self.service._validate_therapeutic_safety(
                 escalation_input, self.session_context

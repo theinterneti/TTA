@@ -137,7 +137,7 @@ class TestPrivacyCompliance(unittest.TestCase):
         """Test complete data export workflow (GDPR Article 20)."""
         # Set up test data
         therapeutic_content = "User shared personal therapeutic insights during session"
-        data_id = self.privacy_service.encrypt_therapeutic_content(
+        self.privacy_service.encrypt_therapeutic_content(
             self.test_user_id, therapeutic_content
         )
 
@@ -151,7 +151,7 @@ class TestPrivacyCompliance(unittest.TestCase):
             consent_date=datetime.utcnow(),
             consent_method="explicit",
         )
-        consent_id = self.privacy_service.record_consent(consent)
+        self.privacy_service.record_consent(consent)
 
         # Export data in JSON format
         export_request = DataExportRequest(
@@ -249,7 +249,7 @@ class TestPrivacyCompliance(unittest.TestCase):
         """Test data anonymization for research purposes."""
         # Set up test data
         therapeutic_content = "Patient John Smith discussed anxiety with Dr. Johnson at john.smith@email.com"
-        data_id = self.privacy_service.encrypt_therapeutic_content(
+        self.privacy_service.encrypt_therapeutic_content(
             self.test_user_id, therapeutic_content
         )
 
@@ -387,7 +387,7 @@ class TestPrivacyCompliance(unittest.TestCase):
         """Test implementation of GDPR rights."""
         # Set up test data
         therapeutic_content = "Test therapeutic content for GDPR rights testing"
-        data_id = self.privacy_service.encrypt_therapeutic_content(
+        self.privacy_service.encrypt_therapeutic_content(
             self.test_user_id, therapeutic_content
         )
 

@@ -115,9 +115,7 @@ class TestCrisisInterventionManager:
         session_context = {"session_id": "test", "user_id": "user1"}
 
         assessment = self.crisis_manager.assess_crisis(result, session_context)
-        intervention = self.crisis_manager.initiate_intervention(
-            assessment, "test", "user1"
-        )
+        self.crisis_manager.initiate_intervention(assessment, "test", "user1")
 
         metrics = self.crisis_manager.get_crisis_metrics()
 

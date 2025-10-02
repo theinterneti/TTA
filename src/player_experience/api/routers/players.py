@@ -325,12 +325,10 @@ def _normalize_privacy_settings_dict(data: dict[str, Any]) -> dict[str, Any]:
             result[k2] = v
     return result
 
-    characters: list[str] = Field(..., description="List of character IDs")
-    therapeutic_preferences: dict[str, Any] = Field(
-        ..., description="Therapeutic preferences"
-    )
-    privacy_settings: dict[str, Any] = Field(..., description="Privacy settings")
-    progress_summary: dict[str, Any] = Field(..., description="Progress summary")
+    Field(..., description="List of character IDs")
+    Field(..., description="Therapeutic preferences")
+    Field(..., description="Privacy settings")
+    Field(..., description="Progress summary")
 
 
 class PlayerListResponse(BaseModel):
