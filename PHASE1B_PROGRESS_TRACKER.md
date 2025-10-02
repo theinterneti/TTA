@@ -14,7 +14,9 @@
 | 1B.1 | ✅ COMPLETE | 23 | 451 | 0.5h |
 | 1B.2 | ✅ COMPLETE | 127 (24 manual + 103 automated) | 330 | 1.5h |
 | 1B.3 | ⚠️ PARTIAL | 40 (30 B007 + 10 F841) | 290 (86 F841 deferred + 204 other) | 1.25h |
-| 1B.4 | 🔄 IN PROGRESS | - | - | - |
+| 1B.4 | ✅ SUBSTANTIAL | 179 (auto-fixed) | 111 (manual review needed) | 0.5h |
+
+**TOTAL PHASE 1B:** 369 errors fixed | 111 remaining | 3.75h spent
 
 ---
 
