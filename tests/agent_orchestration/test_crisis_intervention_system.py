@@ -352,7 +352,7 @@ class TestSafetyMonitoringDashboard:
         assert len(status["components"]) == 4
 
         # All components should be active
-        for component, data in status["components"].items():
+        for _, data in status["components"].items():
             assert data["status"] == "active"
 
     def test_crisis_dashboard(self):

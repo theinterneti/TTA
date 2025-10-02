@@ -800,7 +800,7 @@ class AgencyProtector:
         # Check for empowering therapeutic approaches
         empowering_approaches = self.empowerment_guidelines["therapeutic_empowerment"]
 
-        for approach, description in empowering_approaches.items():
+        for approach, _ in empowering_approaches.items():
             if approach.replace("_", " ") in choice.description.lower():
                 empowerment_score += 0.1
 

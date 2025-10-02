@@ -444,13 +444,13 @@ class IntelligentAgentCoordinator:
 
     async def _reserve_agents(self, decision: SchedulingDecision) -> None:
         """Reserve agents for a scheduling decision."""
-        for agent_type, agent_id in decision.selected_agents.items():
+        for _, agent_id in decision.selected_agents.items():
             if agent_id in self.agent_profiles:
                 self.agent_profiles[agent_id].current_load += 1
 
     async def _release_agents(self, decision: SchedulingDecision) -> None:
         """Release agents after workflow completion."""
-        for agent_type, agent_id in decision.selected_agents.items():
+        for _, agent_id in decision.selected_agents.items():
             if agent_id in self.agent_profiles:
                 self.agent_profiles[agent_id].current_load = max(
                     0, self.agent_profiles[agent_id].current_load - 1

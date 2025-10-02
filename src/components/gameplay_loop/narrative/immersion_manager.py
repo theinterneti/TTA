@@ -469,7 +469,7 @@ class ImmersionManager:
         content_lower = scene.narrative_content.lower()
         total_sensory_words = 0
 
-        for sense_type, keywords in sensory_keywords.items():
+        for _, keywords in sensory_keywords.items():
             sense_count = sum(1 for keyword in keywords if keyword in content_lower)
             total_sensory_words += sense_count
 

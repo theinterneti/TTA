@@ -172,7 +172,7 @@ class TestCoreGameplayLoopIntegration:
         therapeutic_insights = []
         learning_opportunities = []
 
-        for i in range(3):
+        for _ in range(3):
             if not session.available_choices:
                 break
 

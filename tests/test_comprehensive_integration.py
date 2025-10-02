@@ -63,7 +63,7 @@ async def test_service_status_reporting(mock_service_manager):
     assert "redis" in status
 
     # Each service should have status and details
-    for service_name, service_info in status.items():
+    for _, service_info in status.items():
         assert "status" in service_info
         assert service_info["status"] in ["real", "mock"]
 

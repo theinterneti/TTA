@@ -89,7 +89,7 @@ async def test_optimization_engine_integration():
     await collector.start()
 
     # Add some slow operations to trigger optimization
-    for i in range(10):
+    for _ in range(10):
         collector.record_duration(
             ResponseTimeCategory.MESSAGE_PROCESSING,
             "slow_operation",

@@ -819,9 +819,7 @@ class APIDocumentationGenerator:
                         content.append("")
 
                         if "content" in response:
-                            for content_type, content_schema in response[
-                                "content"
-                            ].items():
+                            for _, content_schema in response["content"].items():
                                 if "schema" in content_schema:
                                     schema = content_schema["schema"]
                                     content.append("```json")

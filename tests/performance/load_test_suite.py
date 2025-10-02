@@ -469,7 +469,7 @@ class TTALoadTester:
             test_stats[result.test_name]["response_times"].append(result.response_time)
 
         # Calculate per-test statistics
-        for test_name, stats in test_stats.items():
+        for _, stats in test_stats.items():
             stats["success_rate"] = (
                 stats["successful"] / stats["total"] if stats["total"] > 0 else 0
             )

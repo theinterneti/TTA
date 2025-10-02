@@ -20,7 +20,7 @@ def detect_simple_cycles(graph: dict[str, set[str]]) -> list[str]:
 
 
 def remove_weak_link(graph: dict[str, set[str]]) -> None:
-    for src, dsts in list(graph.items()):
+    for _, dsts in list(graph.items()):
         if not dsts:
             continue
         dst = next(iter(dsts))

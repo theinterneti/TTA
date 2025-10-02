@@ -161,7 +161,7 @@ class TestTherapeuticValidatorPerformance:
 
         times = []
 
-        for i, text in enumerate(large_texts):
+        for _, text in enumerate(large_texts):
             start_time = time.perf_counter()
             result = self.validator.validate_text(text)
             end_time = time.perf_counter()

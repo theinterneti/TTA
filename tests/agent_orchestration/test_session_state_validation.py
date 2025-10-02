@@ -446,7 +446,7 @@ class TestSessionStateValidation:
 
         results = []
 
-        for i, interaction in enumerate(interactions):
+        for _, interaction in enumerate(interactions):
             result = await orchestration_service.process_user_input(
                 user_input=interaction,
                 session_id=session_id,

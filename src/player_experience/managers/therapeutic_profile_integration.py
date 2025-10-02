@@ -431,7 +431,7 @@ class TherapeuticProfileIntegrationService:
                 experiences.append("high-stress environment")
 
         # Extract from relationships
-        for rel_type, description in background.relationships.items():
+        for rel_type, _ in background.relationships.items():
             if rel_type == "family":
                 experiences.append("strong family connections")
             elif rel_type == "professional":

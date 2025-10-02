@@ -134,7 +134,7 @@ class ConservativeOptimizer(OptimizationAlgorithm):
             if v.category == ResponseTimeCategory.MESSAGE_PROCESSING
         }
 
-        for stat_key, stat in message_stats.items():
+        for _, stat in message_stats.items():
             # If P95 response time is high, suggest reducing queue size or increasing timeout
             if stat.p95_duration > 5.0:  # 5 seconds threshold
                 # Look for queue size parameter
@@ -182,7 +182,7 @@ class AggressiveOptimizer(OptimizationAlgorithm):
         results = []
 
         # More aggressive timeout adjustments
-        for stat_key, stat in stats.items():
+        for _, stat in stats.items():
             if stat.success_rate < 0.9:  # Less than 90% success rate
                 # Increase timeout parameters
                 timeout_params = [
@@ -241,7 +241,7 @@ class StatisticalOptimizer(OptimizationAlgorithm):
             k: v for k, v in stats.items() if v.sample_count >= self.min_samples
         }
 
-        for stat_key, stat in high_confidence_stats.items():
+        for _, stat in high_confidence_stats.items():
             # Calculate coefficient of variation (CV) to assess consistency
             cv = (
                 (stat.p95_duration - stat.median_duration) / stat.median_duration

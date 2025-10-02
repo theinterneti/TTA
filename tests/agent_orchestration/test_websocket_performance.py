@@ -386,7 +386,7 @@ class TestWebSocketPerformance:
         await asyncio.sleep(0.5)  # Let connections establish
 
         # Send large messages
-        for i in range(messages_per_connection):
+        for _ in range(messages_per_connection):
             large_event = AgentStatusEvent(
                 agent_id="large_message_agent",
                 status=AgentStatus.PROCESSING,

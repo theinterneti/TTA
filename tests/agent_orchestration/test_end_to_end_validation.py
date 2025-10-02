@@ -361,7 +361,7 @@ class TestEndToEndValidation:
         # Validate all workflows completed successfully
         assert len(results) == num_concurrent
 
-        for result, session_id, user_id in results:
+        for result, session_id, _ in results:
             assert result is not None
             assert "story" in result
             assert result["session_id"] == session_id

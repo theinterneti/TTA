@@ -299,7 +299,7 @@ class GameplayLoopComponent(Component):
             }
 
             # Get detailed session information
-            for session_id, session in self.gameplay_controller.active_sessions.items():
+            for _, session in self.gameplay_controller.active_sessions.items():
                 status = "active" if session.is_active else "inactive"
                 session_stats["sessions_by_status"][status] = (
                     session_stats["sessions_by_status"].get(status, 0) + 1

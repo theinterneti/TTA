@@ -88,7 +88,7 @@ class StateValidator:
                     except Exception:
                         pass
                     # Run up to two passes to be robust to immediate writes
-                    for pass_idx, cutoff in enumerate(passes):
+                    for _, cutoff in enumerate(passes):
                         cut = (
                             cutoff
                             if cutoff is not None

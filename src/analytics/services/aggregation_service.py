@@ -277,7 +277,7 @@ class AnalyticsAggregationService:
 
             # Detect patterns for each cohort
             all_patterns = []
-            for cohort, users in cohort_data.items():
+            for _, users in cohort_data.items():
                 # Aggregate session data for pattern detection
                 all_sessions = []
                 all_progress = []
@@ -348,7 +348,7 @@ class AnalyticsAggregationService:
             cohort_stats[cohort]["pattern_types"].add(pattern.pattern_type)
 
         # Calculate averages and convert sets to lists
-        for cohort, stats in cohort_stats.items():
+        for _, stats in cohort_stats.items():
             if stats["pattern_count"] > 0:
                 stats["avg_confidence"] /= stats["pattern_count"]
             stats["pattern_types"] = list(stats["pattern_types"])
