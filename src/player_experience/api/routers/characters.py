@@ -6,7 +6,7 @@ authentication, authorization (owner-only), and API documentation.
 """
 
 from fastapi import APIRouter, Depends, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ...database.character_repository import CharacterRepository
@@ -42,8 +42,9 @@ def _is_test_env() -> bool:
         # ENVIRONMENT env var is used in settings selection
         import os
 
-        from config import settings
+        from ...api.config import get_settings  # type: ignore[import-not-found]
 
+        settings = get_settings()
         return (
             os.getenv("ENVIRONMENT", "development").lower() == "test"
             or settings.debug
@@ -404,9 +405,15 @@ def _schema_to_profile(s: TherapeuticProfileSchema) -> TherapeuticProfile:
 async def list_characters(
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> list[CharacterResponse]:
+) -> list[CharacterResponse] | JSONResponse:
     try:
-        chars = manager.get_player_characters(current_player.player_id)
+        player_id = current_player.player_id
+        if player_id is None:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"detail": "Player ID not found in token"},
+            )
+        chars = manager.get_player_characters(player_id)
         return [_character_to_response(c) for c in chars]
     except Exception:
         return JSONResponse(
@@ -427,7 +434,7 @@ async def get_character(
     character_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> CharacterResponse:
+) -> CharacterResponse | JSONResponse:
     try:
         character = manager.get_character(character_id)
         if not character:
@@ -463,7 +470,7 @@ async def create_character(
     request: CreateCharacterRequest,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> CharacterResponse:
+) -> CharacterResponse | JSONResponse:
     try:
         # Convert request to domain models. Sanitize both display and background names to match model constraints.
         import re
@@ -471,9 +478,15 @@ async def create_character(
         def sanitize(s):
             return re.sub(r"[^a-zA-Z\s\-']+", "", (s or "")).strip()
 
+        player_id = current_player.player_id
+        if player_id is None:
+            return JSONResponse(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                content={"detail": "Player ID not found in token"},
+            )
         sanitized_name = sanitize(request.name)
         character = manager.create_character(
-            current_player.player_id,
+            player_id,
             CharacterCreationData(
                 name=sanitized_name,
                 appearance=_schema_to_appearance(request.appearance),
@@ -509,7 +522,7 @@ async def update_character(
     request: UpdateCharacterRequest,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> CharacterResponse:
+) -> CharacterResponse | JSONResponse:
     try:
         existing = manager.get_character(character_id)
         if not existing:
@@ -572,7 +585,7 @@ async def delete_character(
     character_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> None:
+) -> Response:
     try:
         existing = manager.get_character(character_id)
         if not existing:
@@ -594,7 +607,7 @@ async def delete_character(
                 status_code=status.HTTP_404_NOT_FOUND,
                 content={"detail": "Character not found"},
             )
-        return None
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     except Exception:
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -614,7 +627,7 @@ async def get_character_therapeutic_profile(
     character_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> TherapeuticProfileSchema:
+) -> TherapeuticProfileSchema | JSONResponse:
     try:
         character = manager.get_character(character_id)
         if not character:
@@ -657,7 +670,7 @@ async def update_character_therapeutic_profile(
     request: TherapeuticProfileSchema,
     current_player: TokenData = Depends(get_current_active_player),
     manager: CharacterAvatarManager = Depends(get_character_manager_dep),
-) -> TherapeuticProfileSchema:
+) -> TherapeuticProfileSchema | JSONResponse:
     try:
         character = manager.get_character(character_id)
         if not character:
@@ -684,6 +697,11 @@ async def update_character_therapeutic_profile(
 
         # Return updated profile
         profile = manager.get_character_therapeutic_profile(character_id)
+        if profile is None:
+            return JSONResponse(
+                status_code=status.HTTP_404_NOT_FOUND,
+                content={"detail": "Therapeutic profile not found"},
+            )
         return _profile_to_schema(profile)
     except ValueError as e:
         return JSONResponse(
