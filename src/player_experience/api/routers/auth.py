@@ -62,7 +62,10 @@ except Exception as e:
 
         import redis
 
-        from ..database.user_repository import User, UserRole
+        from ..database.user_repository import (  # type: ignore[import-not-found]
+            User,
+            UserRole,
+        )
 
         class RedisUserRepository:
             def __init__(self):
@@ -113,7 +116,7 @@ except Exception as e:
                 if not user_id:
                     return None
 
-                user_data = self.redis_client.hgetall(f"user:{user_id}")
+                user_data: dict[str, str] = self.redis_client.hgetall(f"user:{user_id}")  # type: ignore[assignment]
                 if not user_data:
                     return None
 
@@ -127,15 +130,16 @@ except Exception as e:
                 )
 
             def username_exists(self, username: str) -> bool:
-                return self.redis_client.exists(f"username:{username}")
+                return bool(self.redis_client.exists(f"username:{username}"))
 
             def email_exists(self, email: str) -> bool:
-                return self.redis_client.exists(f"email:{email}")
+                return bool(self.redis_client.exists(f"email:{email}"))
 
             def update_last_login(self, user_id: str) -> bool:
-                return self.redis_client.hset(
+                result = self.redis_client.hset(
                     f"user:{user_id}", "last_login", datetime.utcnow().isoformat()
                 )
+                return bool(result)
 
         user_repository = RedisUserRepository()
         print("✅ Redis UserRepository fallback initialized")
@@ -296,8 +300,13 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
         client_ip = get_client_ip(request)
         user_agent = request.headers.get("User-Agent")
 
-        # Authenticate user
-        user = auth_service.authenticate_user(credentials, client_ip)
+        # Authenticate user - convert LoginRequest to UserCredentials
+        from ...models.auth import UserCredentials
+
+        user_creds = UserCredentials(
+            username=credentials.username, password=credentials.password
+        )
+        user = auth_service.authenticate_user(user_creds, client_ip)
 
         if not user:
             raise HTTPException(
