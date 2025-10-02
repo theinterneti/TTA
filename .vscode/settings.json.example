@@ -1,0 +1,108 @@
+{
+  // Python Language Server Settings (Pylance)
+  "python.languageServer": "Pylance",
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingImports": "error",
+    "reportMissingTypeStubs": "none",
+    "reportUnusedImport": "information",
+    "reportUnusedClass": "information",
+    "reportUnusedFunction": "information",
+    "reportUnusedVariable": "information",
+    "reportDuplicateImport": "warning",
+    "reportOptionalSubscript": "warning",
+    "reportOptionalMemberAccess": "warning",
+    "reportOptionalCall": "warning",
+    "reportOptionalIterable": "warning",
+    "reportOptionalContextManager": "warning",
+    "reportOptionalOperand": "warning",
+    "reportUntypedFunctionDecorator": "none",
+    "reportUntypedClassDecorator": "none",
+    "reportUntypedBaseClass": "none",
+    "reportUnknownParameterType": "none",
+    "reportUnknownArgumentType": "none",
+    "reportUnknownLambdaType": "none",
+    "reportUnknownVariableType": "none",
+    "reportUnknownMemberType": "none",
+    "reportMissingParameterType": "none",
+    "reportMissingTypeArgument": "none",
+    "reportUndefinedVariable": "error",
+    "reportUnboundVariable": "error"
+  },
+  
+  // Inlay Hints (show inferred types inline)
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "editor.inlayHints.enabled": "on",
+  
+  // Import Organization
+  "python.analysis.importFormat": "absolute",
+  "python.analysis.completeFunctionParens": true,
+  
+  // Indexing and Performance
+  "python.analysis.indexing": true,
+  "python.analysis.packageIndexDepths": [
+    {
+      "name": "src",
+      "depth": 10
+    }
+  ],
+  
+  // Python Environment
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  
+  // Testing
+  "python.testing.pytestEnabled": true,
+  "python.testing.unittestEnabled": false,
+  "python.testing.pytestArgs": [
+    "tests",
+    "-v"
+  ],
+  
+  // Formatting and Linting
+  "python.formatting.provider": "none",
+  "editor.formatOnSave": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  
+  // File Associations
+  "files.associations": {
+    "*.py": "python",
+    "pyrightconfig.json": "jsonc"
+  },
+  
+  // Editor Settings
+  "editor.rulers": [88, 120],
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  
+  // Exclude from File Watcher
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/node_modules/**": true,
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/*.pyc": true,
+    "**/monkeytype.sqlite3": true
+  },
+  
+  // Search Exclusions
+  "search.exclude": {
+    "**/.git": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    "**/monkeytype.sqlite3": true
+  }
+}
+
