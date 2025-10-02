@@ -65,8 +65,9 @@ class GameplayService:
                 logger.warning(f"Safety service not available: {e}")
 
             # Create integration layer
+            # Type: gameplay_component is Component but GameplayLoopIntegration expects GameplayLoopComponent
             self._integration = GameplayLoopIntegration(
-                gameplay_component=gameplay_component,
+                gameplay_component=gameplay_component,  # type: ignore[arg-type]
                 agent_orchestration=agent_orchestration,
                 safety_service=safety_service,
             )
@@ -224,11 +225,11 @@ class GameplayService:
 
         try:
             # Authenticate user first
-            from ..api.auth import AuthenticationError, get_current_player
+            from ..api.auth import AuthenticationError, verify_token
 
             try:
-                user_info = get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {"error": "Invalid user information", "code": "AUTH_ERROR"}
@@ -287,11 +288,11 @@ class GameplayService:
 
         try:
             # Authenticate user first
-            from ..api.auth import AuthenticationError, get_current_player
+            from ..api.auth import AuthenticationError, verify_token
 
             try:
-                user_info = get_current_player(auth_token)
-                user_id = user_info.get("user_id") or user_info.get("username")
+                token_data = verify_token(auth_token)
+                user_id = token_data.player_id or token_data.username
 
                 if not user_id:
                     return {"error": "Invalid user information", "code": "AUTH_ERROR"}
