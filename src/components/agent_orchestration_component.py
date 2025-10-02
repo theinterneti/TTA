@@ -7,9 +7,10 @@ message coordination, and agent proxy registration in subsequent tasks.
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
-from typing import Any
+from typing import Any, Optional
 
 from src.orchestration.component import Component
 from src.orchestration.decorators import log_entry_exit, timing_decorator

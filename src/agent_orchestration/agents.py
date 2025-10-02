@@ -10,7 +10,14 @@ from typing import Any
 
 from .interfaces import AgentProxy, MessageCoordinator
 from .messaging import FailureType, MessageResult, ReceivedMessage
-from .models import AgentId, AgentMessage, AgentType, MessagePriority, MessageType
+from .models import (
+    AgentCapabilitySet,
+    AgentId,
+    AgentMessage,
+    AgentType,
+    MessagePriority,
+    MessageType,
+)
 from .performance import get_step_aggregator
 from .state import AgentRuntimeStatus
 
@@ -528,8 +535,6 @@ class AgentRegistry:
                 summary["degraded"] += 1
                 await self._maybe_restart(agent)
         return summary
-
-        return results
 
     def start_periodic_health_checks(self, interval_s: float = 15.0) -> None:
         self._health_interval_s = float(interval_s)

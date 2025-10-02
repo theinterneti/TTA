@@ -236,9 +236,6 @@ class CharacterRepository:
                 return None
 
             return self._deserialize_character(record["c"])
-        if character and character.is_active:
-            return character
-        return None
 
     def get_characters_by_player(self, player_id: str) -> list[Character]:
         """

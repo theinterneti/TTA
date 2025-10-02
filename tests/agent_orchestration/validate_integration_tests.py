@@ -115,7 +115,7 @@ def validate_test_discovery():
                     if ".py:" in line and line.strip().split(":")[-1].strip().isdigit():
                         count = int(line.strip().split(":")[-1].strip())
                         total_tests += count
-            except:
+            except Exception:
                 pass
 
     print(f"\n📊 TOTAL INTEGRATION TESTS DISCOVERED: {total_tests}")

@@ -396,7 +396,7 @@ class TTALoadTester:
                 if success:
                     try:
                         response_data = await response.json()
-                    except:
+                    except Exception:
                         response_data = await response.text()
                 else:
                     error_message = await response.text()
