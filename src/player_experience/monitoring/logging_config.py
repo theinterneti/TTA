@@ -102,7 +102,7 @@ class StructuredLogRecord:
         return record_dict
 
 
-class StructuredFormatter(jsonlogger.JsonFormatter):
+class StructuredFormatter(jsonlogger.JsonFormatter):  # type: ignore[name-defined]
     """Custom JSON formatter for structured logging."""
 
     def __init__(self, *args, **kwargs):
@@ -130,17 +130,17 @@ class StructuredFormatter(jsonlogger.JsonFormatter):
         level_mapping = {"DEBUG": 0, "INFO": 1, "WARNING": 2, "ERROR": 3, "CRITICAL": 4}
         log_record["severity"] = level_mapping.get(record.levelname, 1)
 
-        # Add category if available
+        # Add category if available (custom attribute added dynamically)
         if hasattr(record, "category"):
-            log_record["category"] = record.category
+            log_record["category"] = record.category  # type: ignore[attr-defined]
 
-        # Add context if available
-        if hasattr(record, "context") and record.context:
-            log_record.update(record.context.to_dict())
+        # Add context if available (custom attribute added dynamically)
+        if hasattr(record, "context") and record.context:  # type: ignore[attr-defined]
+            log_record.update(record.context.to_dict())  # type: ignore[attr-defined]
 
-        # Add metadata if available
-        if hasattr(record, "metadata") and record.metadata:
-            log_record.update(record.metadata)
+        # Add metadata if available (custom attribute added dynamically)
+        if hasattr(record, "metadata") and record.metadata:  # type: ignore[attr-defined]
+            log_record.update(record.metadata)  # type: ignore[attr-defined]
 
 
 class SecurityAuditFormatter(StructuredFormatter):
@@ -284,9 +284,10 @@ class StructuredLogger:
         record.metadata = metadata or {}
 
         # Add exception information if available
-        if exc_info and sys.exc_info()[0]:
+        exc_type = sys.exc_info()[0]
+        if exc_info and exc_type:
             record.exception_info = {
-                "type": sys.exc_info()[0].__name__,
+                "type": exc_type.__name__,
                 "message": str(sys.exc_info()[1]),
                 "traceback": traceback.format_exc(),
             }
