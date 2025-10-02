@@ -12,7 +12,7 @@ from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Any
+from typing import Any, Callable
 
 import redis
 from redis import Redis
@@ -85,7 +85,9 @@ class RateLimiter(ABC):
         self.lock = threading.RLock()
 
     @abstractmethod
-    def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
+    def check_limit(
+        self, identifier: str, endpoint: str | None = None
+    ) -> RateLimitResult:
         """Check if request is within rate limit."""
         pass
 
@@ -105,9 +107,9 @@ class RateLimiter(ABC):
     def get_identifier(
         self,
         ip_address: str,
-        user_id: str = None,
-        api_key: str = None,
-        endpoint: str = None,
+        user_id: str | None = None,
+        api_key: str | None = None,
+        endpoint: str | None = None,
     ) -> str:
         """Get rate limit identifier based on scope."""
         if self.config.scope == RateLimitScope.GLOBAL:
@@ -137,7 +139,9 @@ class TokenBucketRateLimiter(RateLimiter):
             }
         )
 
-    def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
+    def check_limit(
+        self, identifier: str, endpoint: str | None = None
+    ) -> RateLimitResult:
         """Check token bucket rate limit."""
         if self.is_whitelisted(identifier):
             return RateLimitResult(
@@ -212,7 +216,9 @@ class SlidingWindowRateLimiter(RateLimiter):
         super().__init__(config)
         self.windows: dict[str, deque] = defaultdict(lambda: deque())
 
-    def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
+    def check_limit(
+        self, identifier: str, endpoint: str | None = None
+    ) -> RateLimitResult:
         """Check sliding window rate limit."""
         if self.is_whitelisted(identifier):
             return RateLimitResult(
@@ -296,7 +302,9 @@ class RedisRateLimiter(RateLimiter):
         super().__init__(config)
         self.redis = redis_client
 
-    def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
+    def check_limit(
+        self, identifier: str, endpoint: str | None = None
+    ) -> RateLimitResult:
         """Check rate limit using Redis."""
         if self.is_whitelisted(identifier):
             return RateLimitResult(
@@ -417,7 +425,9 @@ class AdaptiveRateLimiter(RateLimiter):
                 category=LogCategory.PERFORMANCE,
             )
 
-    def check_limit(self, identifier: str, endpoint: str = None) -> RateLimitResult:
+    def check_limit(
+        self, identifier: str, endpoint: str | None = None
+    ) -> RateLimitResult:
         """Check adaptive rate limit."""
         # Get base result
         result = self.base_limiter.check_limit(identifier, endpoint)
@@ -449,7 +459,9 @@ class AdaptiveRateLimiter(RateLimiter):
 class RateLimitMiddleware:
     """Middleware for applying rate limiting to requests."""
 
-    def __init__(self, rate_limiter: RateLimiter, get_identifier_func: callable = None):
+    def __init__(
+        self, rate_limiter: RateLimiter, get_identifier_func: Callable | None = None
+    ):
         self.rate_limiter = rate_limiter
         self.get_identifier = get_identifier_func or self._default_get_identifier
 
@@ -468,21 +480,25 @@ class RateLimitMiddleware:
             result = self.rate_limiter.check_limit(identifier, endpoint)
 
             if not result.allowed:
+                # Provide defaults for optional fields
+                retry_after = result.retry_after or 60
+                limit_type = result.limit_type or "rate_limit"
+
                 # Log rate limit violation
                 logger.warning(
                     f"Rate limit exceeded for {identifier}",
                     category=LogCategory.SECURITY,
                     context=LogContext(ip_address=identifier, endpoint=endpoint),
                     metadata={
-                        "limit_type": result.limit_type,
-                        "retry_after": result.retry_after,
+                        "limit_type": limit_type,
+                        "retry_after": retry_after,
                     },
                 )
 
                 raise RateLimitExceeded(
-                    f"Rate limit exceeded. Try again in {result.retry_after} seconds.",
-                    result.retry_after,
-                    result.limit_type,
+                    f"Rate limit exceeded. Try again in {retry_after} seconds.",
+                    retry_after,
+                    limit_type,
                 )
 
             # Add rate limit headers to response
