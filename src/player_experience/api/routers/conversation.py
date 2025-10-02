@@ -102,14 +102,14 @@ async def _persist_conversation_to_redis(
         messages_key = f"{CONVERSATION_MESSAGES_KEY_PREFIX}{session_id}"
         await redis_client.delete(messages_key)  # Clear existing
         if messages:
-            await redis_client.rpush(
+            await redis_client.rpush(  # type: ignore[misc]
                 messages_key, *[json.dumps(msg) for msg in messages]
             )
             await redis_client.expire(messages_key, 86400 * 30)  # 30 days TTL
 
         # Add to player's conversation index
         player_index_key = f"{CONVERSATION_INDEX_KEY_PREFIX}{player_id}"
-        await redis_client.sadd(player_index_key, session_id)
+        await redis_client.sadd(player_index_key, session_id)  # type: ignore[misc]
         await redis_client.expire(player_index_key, 86400 * 90)  # 90 days TTL
 
         logger.info(
@@ -150,7 +150,7 @@ async def _load_conversation_from_redis(
 
         # Load messages
         messages_key = f"{CONVERSATION_MESSAGES_KEY_PREFIX}{session_id}"
-        messages_data = await redis_client.lrange(messages_key, 0, -1)
+        messages_data = await redis_client.lrange(messages_key, 0, -1)  # type: ignore[misc]
         messages = [json.loads(msg) for msg in messages_data] if messages_data else []
 
         logger.info(
@@ -211,7 +211,7 @@ class EnhancedSessionState(BaseModel):
     last_updated: str
 
     # Enhanced tracking
-    session_analytics: SessionAnalytics = Field(default_factory=SessionAnalytics)
+    session_analytics: SessionAnalytics | None = Field(default=None)
     therapeutic_interventions_used: list[str] = Field(default_factory=list)
     emotional_state_history: list[dict[str, Any]] = Field(default_factory=list)
     milestone_achievements: list[dict[str, Any]] = Field(default_factory=list)
@@ -270,7 +270,7 @@ class EnhancedTherapeuticAI:
         }
 
     async def _generate_openrouter_response(
-        self, user_message: str, context: dict[str, Any] = None
+        self, user_message: str, context: dict[str, Any] | None = None
     ) -> tuple[str, dict[str, Any]] | None:
         """Generate response using OpenRouter API."""
         if not self.has_openrouter:
@@ -448,7 +448,7 @@ Focus on evidence-based therapeutic assessment. Be objective and supportive."""
         }
 
     async def generate_response(
-        self, user_message: str, context: dict[str, Any] = None
+        self, user_message: str, context: dict[str, Any] | None = None
     ) -> tuple[str, dict[str, Any]]:
         """Generate a therapeutic response based on user input."""
         context = context or {}
@@ -513,6 +513,12 @@ async def send_message(
     """Send a message and receive a therapeutic response."""
     try:
         player_id = current_player.player_id
+        if player_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Player ID not found in token",
+            )
+
         session_id = request.session_id
         user_message = request.message.strip()
 
@@ -704,6 +710,7 @@ async def send_message(
         conversation["last_activity"] = datetime.utcnow().isoformat()
 
         # Persist conversation history to Redis
+        assert player_id is not None  # Already checked above
         await _persist_conversation_to_redis(
             session_id=session_id,
             player_id=player_id,
@@ -743,6 +750,12 @@ async def get_conversation_history(
     """Get conversation history for a session."""
     try:
         player_id = current_player.player_id
+        if player_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Player ID not found in token",
+            )
+
         conversation = None
 
         # Try to load from Redis first
@@ -1038,6 +1051,11 @@ async def get_player_session_analytics(
     """Get comprehensive session analytics for the current player."""
     try:
         player_id = current_player.player_id
+        if player_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Player ID not found in token",
+            )
 
         # Get analytics from Redis if available
         analytics_list = []
