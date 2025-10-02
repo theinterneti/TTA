@@ -305,6 +305,7 @@ class SessionRepository:
 
     async def _create_session_in_neo4j(self, session: SessionContext) -> None:
         """Create session in Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             CREATE (s:Session {
@@ -349,6 +350,7 @@ class SessionRepository:
 
     async def _update_session_in_neo4j(self, session: SessionContext) -> None:
         """Update session in Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             MATCH (s:Session {session_id: $session_id})
@@ -382,6 +384,7 @@ class SessionRepository:
 
     async def _get_session_from_neo4j(self, session_id: str) -> SessionContext | None:
         """Retrieve session from Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             MATCH (s:Session {session_id: $session_id})
@@ -401,6 +404,7 @@ class SessionRepository:
         self, player_id: str, statuses: list[SessionStatus]
     ) -> list[SessionContext]:
         """Get player sessions from Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             MATCH (s:Session {player_id: $player_id})
@@ -426,6 +430,7 @@ class SessionRepository:
         self, character_id: str, statuses: list[SessionStatus]
     ) -> list[SessionContext]:
         """Get character sessions from Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             MATCH (s:Session {character_id: $character_id})
@@ -451,6 +456,7 @@ class SessionRepository:
         self, player_id: str, limit: int
     ) -> list[SessionSummary]:
         """Get session summaries from Neo4j database."""
+        assert self.neo4j_driver is not None, "Neo4j driver must be initialized"
         async with self.neo4j_driver.session() as neo4j_session:
             query = """
             MATCH (s:Session {player_id: $player_id})
