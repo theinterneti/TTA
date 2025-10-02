@@ -165,7 +165,6 @@ class LoadStressTestSuite:
             users = load_test_data["users"][:story_count]
             scenarios = load_test_data["scenarios"]
 
-            start_metrics = await self._capture_system_metrics()
             start_time = time.time()
 
             # Create concurrent story generation tasks
@@ -285,7 +284,7 @@ class LoadStressTestSuite:
 
             # Create memory-intensive tasks
             tasks = []
-            for i in range(20):
+            for _ in range(20):
                 task = asyncio.create_task(self._memory_intensive_operation())
                 tasks.append(task)
 
@@ -346,7 +345,7 @@ class LoadStressTestSuite:
             connection_tasks = []
             max_connections = 100
 
-            for i in range(max_connections):
+            for _ in range(max_connections):
                 task = asyncio.create_task(self._create_database_connection())
                 connection_tasks.append(task)
 
@@ -469,7 +468,7 @@ class LoadStressTestSuite:
             baseline_time = await self._measure_operation_time()
 
             # Create load spike
-            for i in range(spike_size):
+            for _ in range(spike_size):
                 task = asyncio.create_task(self._spike_load_operation())
                 spike_tasks.append(task)
 
@@ -532,7 +531,7 @@ class LoadStressTestSuite:
 
             # Create and cleanup resources under load
             cleanup_tasks = []
-            for i in range(30):
+            for _ in range(30):
                 task = asyncio.create_task(self._create_and_cleanup_resources())
                 cleanup_tasks.append(task)
 

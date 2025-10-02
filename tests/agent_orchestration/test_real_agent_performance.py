@@ -92,11 +92,11 @@ class TestRealAgentPerformance:
 
         start_time = time.time()
 
-        for i in range(num_requests):
+        for _ in range(num_requests):
             request_start = time.time()
 
             try:
-                result = await proxy.process(test_input)
+                _result = await proxy.process(test_input)
                 request_end = time.time()
 
                 latency = (
@@ -214,7 +214,7 @@ class TestRealAgentPerformance:
 
                 # IPA processing
                 ipa_start = time.time()
-                ipa_result = await performance_proxies["ipa"].process(
+                _ipa_result = await performance_proxies["ipa"].process(
                     {"text": f"worker {worker_id} explores the dungeon"}
                 )
                 ipa_time = time.time() - ipa_start
@@ -231,7 +231,7 @@ class TestRealAgentPerformance:
 
                 # NGA processing
                 nga_start = time.time()
-                nga_result = await performance_proxies["nga"].process(
+                _nga_result = await performance_proxies["nga"].process(
                     {
                         "prompt": f"Worker {worker_id} story in dungeon",
                         "context": {
@@ -324,7 +324,7 @@ class TestRealAgentPerformance:
                 request_start = time.time()
 
                 try:
-                    result = await ipa_proxy.process(
+                    _result = await ipa_proxy.process(
                         {"text": f"sustained load test request {request_count}"}
                     )
                     request_end = time.time()
