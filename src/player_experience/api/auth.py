@@ -285,9 +285,7 @@ class AuthService:
     """Service class for authentication operations."""
 
     @staticmethod
-    async def authenticate_player(
-        username: str, password: str
-    ) -> PlayerProfile | None:
+    async def authenticate_player(username: str, password: str) -> PlayerProfile | None:
         """
         Authenticate a player with username and password.
 

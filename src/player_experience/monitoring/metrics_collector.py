@@ -279,9 +279,7 @@ class MetricsCollector:
             self.counters[name] += value
             self._record_metric_point(name, value, MetricType.COUNTER, tags)
 
-    def record_gauge(
-        self, name: str, value: float, tags: dict[str, str] | None = None
-    ):
+    def record_gauge(self, name: str, value: float, tags: dict[str, str] | None = None):
         """Record a gauge metric."""
         with self.lock:
             self.gauges[name] = value

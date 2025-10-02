@@ -1,4 +1,3 @@
-
 from src.components.narrative_arc_orchestrator.models import (
     NarrativeScale,
     PlayerChoice,

@@ -5,7 +5,6 @@ This module provides endpoints for world discovery and management.
 This is a placeholder implementation - full implementation will be done in task 7.4.
 """
 
-
 from fastapi import APIRouter, Depends
 
 from ..auth import TokenData, get_current_active_player

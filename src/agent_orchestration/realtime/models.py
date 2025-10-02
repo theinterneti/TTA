@@ -102,15 +102,11 @@ class WorkflowProgressEvent(WebSocketEvent):
     )
     current_step: str | None = Field(None, description="Current workflow step")
     total_steps: int | None = Field(None, description="Total number of steps")
-    completed_steps: int | None = Field(
-        None, description="Number of completed steps"
-    )
+    completed_steps: int | None = Field(None, description="Number of completed steps")
     estimated_completion: float | None = Field(
         None, description="Estimated completion timestamp"
     )
-    user_id: str | None = Field(
-        None, description="User associated with the workflow"
-    )
+    user_id: str | None = Field(None, description="User associated with the workflow")
 
 
 class SystemMetricsEvent(WebSocketEvent):
@@ -134,9 +130,7 @@ class SystemMetricsEvent(WebSocketEvent):
     active_workflows: int | None = Field(
         None, ge=0, description="Number of active workflows"
     )
-    message_queue_size: int | None = Field(
-        None, ge=0, description="Message queue size"
-    )
+    message_queue_size: int | None = Field(None, ge=0, description="Message queue size")
     response_time_avg: float | None = Field(
         None, ge=0.0, description="Average response time in seconds"
     )
@@ -164,9 +158,7 @@ class ProgressiveFeedbackEvent(WebSocketEvent):
     estimated_remaining: float | None = Field(
         None, description="Estimated remaining time in seconds"
     )
-    user_id: str | None = Field(
-        None, description="User associated with the operation"
-    )
+    user_id: str | None = Field(None, description="User associated with the operation")
 
 
 class OptimizationEvent(WebSocketEvent):
@@ -175,14 +167,10 @@ class OptimizationEvent(WebSocketEvent):
     event_type: Literal[EventType.OPTIMIZATION] = Field(default=EventType.OPTIMIZATION)
     optimization_type: str = Field(..., description="Type of optimization")
     parameter_name: str = Field(..., description="Parameter being optimized")
-    old_value: float | int | str = Field(
-        ..., description="Previous parameter value"
-    )
+    old_value: float | int | str = Field(..., description="Previous parameter value")
     new_value: float | int | str = Field(..., description="New parameter value")
     improvement_metric: str | None = Field(None, description="Metric that improved")
-    improvement_value: float | None = Field(
-        None, description="Amount of improvement"
-    )
+    improvement_value: float | None = Field(None, description="Amount of improvement")
     confidence_score: float | None = Field(
         None, ge=0.0, le=1.0, description="Confidence in optimization"
     )
@@ -198,9 +186,7 @@ class ConnectionStatusEvent(WebSocketEvent):
     status: str = Field(
         ..., description="Connection status (connected, disconnected, error)"
     )
-    user_id: str | None = Field(
-        None, description="User associated with the connection"
-    )
+    user_id: str | None = Field(None, description="User associated with the connection")
     client_info: dict[str, Any] = Field(
         default_factory=dict, description="Client information"
     )

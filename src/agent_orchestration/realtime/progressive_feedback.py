@@ -326,9 +326,7 @@ class ProgressiveFeedbackManager:
         operation = self.active_operations.get(operation_id)
         return operation.to_dict() if operation else None
 
-    def get_active_operations(
-        self, user_id: str | None = None
-    ) -> list[dict[str, Any]]:
+    def get_active_operations(self, user_id: str | None = None) -> list[dict[str, Any]]:
         """Get all active operations, optionally filtered by user."""
         operations = []
 

@@ -353,9 +353,7 @@ class EventPublisher:
                 sent_count = await manager.broadcast_event(event)
                 return sent_count >= 0  # Consider success if no error occurred
             else:
-                logger.warning(
-                    "WebSocket manager does not have broadcast_event method"
-                )
+                logger.warning("WebSocket manager does not have broadcast_event method")
                 return False
         except Exception as e:
             logger.error(f"Failed to broadcast to WebSocket manager: {e}")

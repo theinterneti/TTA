@@ -5,7 +5,6 @@ This module provides REST endpoints for character management with
 authentication, authorization (owner-only), and API documentation.
 """
 
-
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator

@@ -264,7 +264,9 @@ class WorkflowStateVerifier:
         if len(messages) != len(expected_sequence):
             return False
 
-        for i, (message, expected_agent) in enumerate(zip(messages, expected_sequence, strict=False)):
+        for i, (message, expected_agent) in enumerate(
+            zip(messages, expected_sequence, strict=False)
+        ):
             if message.recipient_id.type != expected_agent:
                 return False
 

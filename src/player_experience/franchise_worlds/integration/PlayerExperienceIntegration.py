@@ -286,9 +286,7 @@ class FranchiseWorldAPI:
         """List available franchise worlds"""
         return await self.bridge.get_franchise_worlds(genre)
 
-    async def get_franchise_world_details(
-        self, world_id: str
-    ) -> dict[str, Any] | None:
+    async def get_franchise_world_details(self, world_id: str) -> dict[str, Any] | None:
         """Get detailed information about a specific franchise world"""
         world_details = await self.bridge.convert_franchise_world_to_tta(world_id)
         if world_details:

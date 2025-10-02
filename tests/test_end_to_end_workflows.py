@@ -298,7 +298,9 @@ class TestEndToEndUserWorkflows:
             websocket.receive_text()  # Welcome message
 
             # Interact with each character
-            for i, (character, session) in enumerate(zip(characters, sessions, strict=False)):
+            for i, (character, session) in enumerate(
+                zip(characters, sessions, strict=False)
+            ):
                 switch_message = {
                     "type": "switch_context",
                     "metadata": {

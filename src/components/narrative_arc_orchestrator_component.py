@@ -628,7 +628,9 @@ class ScaleManager:
             scale=scale,
             timestamp=datetime.now(),
             causal_chain=[choice.choice_id],
-            impact_scope=dict.fromkeys(assessment.affected_elements, assessment.magnitude),
+            impact_scope=dict.fromkeys(
+                assessment.affected_elements, assessment.magnitude
+            ),
             therapeutic_relevance=assessment.therapeutic_alignment,
             player_agency_preserved=True,
             event_type="player_choice",
@@ -1049,9 +1051,7 @@ class ScaleManager:
         except Exception as e:
             logger.error(f"Error resolving scale violation: {e}")
 
-    async def _find_weakest_causal_link(
-        self, event_chain: list[str]
-    ) -> tuple | None:
+    async def _find_weakest_causal_link(self, event_chain: list[str]) -> tuple | None:
         """Find the weakest causal link in a chain."""
         try:
             # This would analyze causal strength between consecutive events

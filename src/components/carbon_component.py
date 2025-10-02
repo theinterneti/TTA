@@ -252,9 +252,7 @@ class CarbonComponent(Component):
 
         logger.info(f"Emissions data saved to {filename}")
 
-    def get_carbon_decorator(
-        self, project_name: str | None = None
-    ) -> Callable[[F], F]:
+    def get_carbon_decorator(self, project_name: str | None = None) -> Callable[[F], F]:
         """
         Get a decorator for tracking carbon emissions of a function.
 

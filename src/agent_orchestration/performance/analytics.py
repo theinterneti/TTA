@@ -374,7 +374,8 @@ class PerformanceAnalytics:
         y_mean = statistics.mean(data_points)
 
         numerator = sum(
-            (x - x_mean) * (y - y_mean) for x, y in zip(x_values, data_points, strict=False)
+            (x - x_mean) * (y - y_mean)
+            for x, y in zip(x_values, data_points, strict=False)
         )
         denominator = sum((x - x_mean) ** 2 for x in x_values)
 

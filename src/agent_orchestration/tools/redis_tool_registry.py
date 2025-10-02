@@ -113,9 +113,7 @@ class RedisToolRegistry:
             await self._cache.set(key, spec)
             return True
 
-    async def get_tool(
-        self, name: str, version: str | None = None
-    ) -> ToolSpec | None:
+    async def get_tool(self, name: str, version: str | None = None) -> ToolSpec | None:
         if version is None:
             # pick latest by lexicographic version ordering (simple heuristic)
             members = await self._redis.smembers(self._idx)

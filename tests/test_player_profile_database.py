@@ -230,8 +230,6 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
             mock_disconnect.assert_called_once()
 
 
-
-
 class TestPlayerProfileRepository(unittest.TestCase):
     """Test PlayerProfileRepository functionality."""
 

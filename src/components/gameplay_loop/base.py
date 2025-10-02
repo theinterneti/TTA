@@ -183,9 +183,7 @@ class GameplayLoopComponent(Component, ABC):
         logger.info(f"Created session context {session_id} for user {user_id}")
         return context
 
-    async def get_session_context(
-        self, session_id: str
-    ) -> GameplayLoopContext | None:
+    async def get_session_context(self, session_id: str) -> GameplayLoopContext | None:
         """Get an existing session context."""
         context = self._active_contexts.get(session_id)
         if context:

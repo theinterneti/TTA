@@ -2,7 +2,6 @@
 Integration tests for World Management API endpoints (7.4).
 """
 
-
 import pytest
 from fastapi.testclient import TestClient
 from jose import jwt

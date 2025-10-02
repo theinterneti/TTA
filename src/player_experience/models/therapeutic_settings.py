@@ -130,9 +130,7 @@ class EnhancedTherapeuticSettings:
 
     # Adaptation settings
     adaptive_difficulty: bool = True
-    learning_style_preference: str | None = (
-        None  # visual, auditory, kinesthetic, mixed
-    )
+    learning_style_preference: str | None = None  # visual, auditory, kinesthetic, mixed
     progress_celebration_style: str = "moderate"  # minimal, moderate, enthusiastic
 
     # Session preferences

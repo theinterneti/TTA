@@ -5,7 +5,6 @@ This module contains comprehensive tests for the narrative coherence engine
 including validation, contradiction detection, and conflict resolution.
 """
 
-
 # Import test data classes
 from dataclasses import dataclass, field
 from enum import Enum

@@ -792,9 +792,7 @@ class CoherenceValidator:
 
         return corrections
 
-    async def _generate_generic_correction(
-        self, issue: ConsistencyIssue
-    ) -> str | None:
+    async def _generate_generic_correction(self, issue: ConsistencyIssue) -> str | None:
         """Generate a generic correction suggestion for an issue."""
         if issue.issue_type == ConsistencyIssueType.LORE_VIOLATION:
             return f"Review and revise content to align with established lore for {', '.join(issue.affected_elements)}"

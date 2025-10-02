@@ -51,6 +51,9 @@ try:
         chat,
         conversation,
         gameplay,
+    )
+    from .routers import metrics as metrics_router
+    from .routers import (
         openrouter_auth,
         players,
         progress,
@@ -58,7 +61,6 @@ try:
         settings,
         worlds,
     )
-    from .routers import metrics as metrics_router
 except ImportError:
     from src.player_experience.api.routers import (
         auth,
@@ -66,6 +68,9 @@ except ImportError:
         chat,
         conversation,
         gameplay,
+    )
+    from src.player_experience.api.routers import metrics as metrics_router
+    from src.player_experience.api.routers import (
         openrouter_auth,
         players,
         progress,
@@ -73,7 +78,6 @@ except ImportError:
         settings,
         worlds,
     )
-    from src.player_experience.api.routers import metrics as metrics_router
 
 try:
     from .config import get_settings

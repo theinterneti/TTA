@@ -438,9 +438,7 @@ class CoherenceValidator:
                     corrections.append(correction)
         return corrections
 
-    async def _generate_generic_correction(
-        self, issue: ConsistencyIssue
-    ) -> str | None:
+    async def _generate_generic_correction(self, issue: ConsistencyIssue) -> str | None:
         if issue.issue_type == ConsistencyIssueType.LORE_VIOLATION:
             return f"Review and revise content to align with established lore for {', '.join(issue.affected_elements)}"
         elif issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:

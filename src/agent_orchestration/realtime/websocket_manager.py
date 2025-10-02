@@ -1203,9 +1203,7 @@ class WebSocketConnectionManager:
         )
         return True
 
-    def get_connection_subscriptions(
-        self, connection_id: str
-    ) -> dict[str, Any] | None:
+    def get_connection_subscriptions(self, connection_id: str) -> dict[str, Any] | None:
         """Get subscription information for a connection."""
         connection = self.connections.get(connection_id)
         if not connection:

@@ -57,7 +57,9 @@ class LangGraphWorkflowBuilder:
         if definition.agent_sequence:
             first = definition.agent_sequence[0].agent.value
             sg.add_edge(START, first)
-            for a, b in zip(definition.agent_sequence, definition.agent_sequence[1:], strict=False):
+            for a, b in zip(
+                definition.agent_sequence, definition.agent_sequence[1:], strict=False
+            ):
                 sg.add_edge(a.agent.value, b.agent.value)
             sg.add_edge(definition.agent_sequence[-1].agent.value, END)
 

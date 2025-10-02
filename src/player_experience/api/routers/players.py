@@ -192,7 +192,9 @@ class CreatePlayerRequest(BaseModel):
         min_length=8,
         description="Player's password (optional for profile creation)",
     )
-    therapeutic_preferences: TherapeuticPreferencesRequest | dict[str, Any] | None = Field(None, description="Therapeutic preferences")
+    therapeutic_preferences: TherapeuticPreferencesRequest | dict[str, Any] | None = (
+        Field(None, description="Therapeutic preferences")
+    )
     privacy_settings: PrivacySettingsRequest | dict[str, Any] | None = Field(
         None, description="Privacy settings"
     )

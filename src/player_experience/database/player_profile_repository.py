@@ -550,7 +550,9 @@ class PlayerProfileRepository:
 
                     # Restore authentication data if present (temporary solution)
                     if "password_hash" in privacy_settings_data:
-                        privacy_settings.password_hash = privacy_settings_data["password_hash"]
+                        privacy_settings.password_hash = privacy_settings_data[
+                            "password_hash"
+                        ]
                     if "role" in privacy_settings_data:
                         privacy_settings.role = privacy_settings_data["role"]
 

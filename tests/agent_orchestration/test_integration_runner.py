@@ -88,7 +88,6 @@ def test_mock_workflow_execution():
 def test_test_data_fixtures():
     """Test that test data fixtures are properly structured."""
 
-
     # Mock pytest fixture behavior
     class MockFixture:
         def __init__(self, fixture_func):

@@ -487,9 +487,7 @@ class WorkflowProgressTracker:
         workflow = self.active_workflows.get(workflow_id)
         return workflow.to_dict() if workflow else None
 
-    def get_active_workflows(
-        self, user_id: str | None = None
-    ) -> list[dict[str, Any]]:
+    def get_active_workflows(self, user_id: str | None = None) -> list[dict[str, Any]]:
         """Get all active workflows, optionally filtered by user."""
         workflows = []
 

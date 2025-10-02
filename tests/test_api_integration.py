@@ -4,7 +4,6 @@ Integration tests for the FastAPI application.
 This module tests the actual server startup and basic functionality.
 """
 
-
 import pytest
 from fastapi.testclient import TestClient
 

@@ -380,9 +380,7 @@ class SessionRepository:
                 },
             )
 
-    async def _get_session_from_neo4j(
-        self, session_id: str
-    ) -> SessionContext | None:
+    async def _get_session_from_neo4j(self, session_id: str) -> SessionContext | None:
         """Retrieve session from Neo4j database."""
         async with self.neo4j_driver.session() as neo4j_session:
             query = """

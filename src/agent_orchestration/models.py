@@ -249,9 +249,7 @@ class CapabilityMatchCriteria(BaseModel):
     )
 
     # Performance constraints
-    max_duration_ms: int | None = Field(
-        None, description="Maximum acceptable duration"
-    )
+    max_duration_ms: int | None = Field(None, description="Maximum acceptable duration")
     resource_constraints: dict[str, Any] = Field(
         default_factory=dict, description="Resource constraints"
     )
