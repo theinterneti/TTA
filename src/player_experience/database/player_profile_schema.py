@@ -113,11 +113,11 @@ class PlayerProfileSchemaManager:
                     if isinstance(e, AuthError):
                         raise PlayerProfileSchemaError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
                     elif isinstance(e, _ServiceUnavailable):
                         raise PlayerProfileSchemaError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
             except _ClientError as e:
                 # Retry only on AuthenticationRateLimit variant
                 emsg = str(e)
@@ -142,17 +142,17 @@ class PlayerProfileSchemaManager:
                     else:
                         raise PlayerProfileSchemaError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
                 else:
                     # Other ClientErrors fail fast
                     raise PlayerProfileSchemaError(
                         f"Unexpected error connecting to Neo4j: {e}"
-                    )
+                    ) from e
             except Exception as e:
                 # Unexpected errors should fail fast per requirement
                 raise PlayerProfileSchemaError(
                     f"Unexpected error connecting to Neo4j: {e}"
-                )
+                ) from e
         # Should not reach here; safety net
         if last_exc is not None:
             raise PlayerProfileSchemaError(

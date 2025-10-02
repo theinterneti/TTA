@@ -118,11 +118,11 @@ class PlayerProfileRepository:
                     if isinstance(e, AuthError):
                         raise PlayerProfileRepositoryError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
                     elif isinstance(e, _ServiceUnavailable):
                         raise PlayerProfileRepositoryError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
             except _ClientError as e:
                 emsg = str(e)
                 if ("AuthenticationRateLimit" in emsg) or (
@@ -146,15 +146,15 @@ class PlayerProfileRepository:
                     else:
                         raise PlayerProfileRepositoryError(
                             f"Failed to connect to Neo4j after retries: {e}"
-                        )
+                        ) from e
                 else:
                     raise PlayerProfileRepositoryError(
                         f"Unexpected error connecting to Neo4j: {e}"
-                    )
+                    ) from e
             except Exception as e:
                 raise PlayerProfileRepositoryError(
                     f"Unexpected error connecting to Neo4j: {e}"
-                )
+                ) from e
         if last_exc is not None:
             raise PlayerProfileRepositoryError(
                 f"Failed to connect to Neo4j after retries: {last_exc}"
@@ -413,17 +413,17 @@ class PlayerProfileRepository:
                 logger.error(f"Player profile already exists: {profile.player_id}")
                 raise PlayerProfileRepositoryError(
                     f"Player profile already exists: {profile.player_id}"
-                )
+                ) from e
             else:
                 logger.error(f"Error creating player profile: {e}")
                 raise PlayerProfileRepositoryError(
                     f"Error creating player profile: {e}"
-                )
+                ) from e
         except Exception as e:
             logger.error(f"Unexpected error creating player profile: {e}")
             raise PlayerProfileRepositoryError(
                 f"Unexpected error creating player profile: {e}"
-            )
+            ) from e
 
     def get_player_profile(self, player_id: str) -> PlayerProfile | None:
         """
@@ -670,7 +670,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error retrieving player profile {player_id}: {e}")
-            raise PlayerProfileRepositoryError(f"Error retrieving player profile: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error retrieving player profile: {e}"
+            ) from e
 
     def update_player_profile(self, profile: PlayerProfile) -> bool:
         """
@@ -753,7 +755,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error updating player profile {profile.player_id}: {e}")
-            raise PlayerProfileRepositoryError(f"Error updating player profile: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error updating player profile: {e}"
+            ) from e
 
     def delete_player_profile(self, player_id: str) -> bool:
         """
@@ -793,7 +797,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error deleting player profile {player_id}: {e}")
-            raise PlayerProfileRepositoryError(f"Error deleting player profile: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error deleting player profile: {e}"
+            ) from e
 
     def get_player_by_username(self, username: str) -> PlayerProfile | None:
         """
@@ -827,7 +833,7 @@ class PlayerProfileRepository:
             logger.error(f"Error retrieving player by username {username}: {e}")
             raise PlayerProfileRepositoryError(
                 f"Error retrieving player by username: {e}"
-            )
+            ) from e
 
     def get_player_by_email(self, email: str) -> PlayerProfile | None:
         """
@@ -859,7 +865,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error retrieving player by email {email}: {e}")
-            raise PlayerProfileRepositoryError(f"Error retrieving player by email: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error retrieving player by email: {e}"
+            ) from e
 
     def list_active_players(self, limit: int = 100) -> list[PlayerProfile]:
         """
@@ -896,7 +904,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error listing active players: {e}")
-            raise PlayerProfileRepositoryError(f"Error listing active players: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error listing active players: {e}"
+            ) from e
 
     def username_exists(self, username: str) -> bool:
         """
@@ -926,7 +936,7 @@ class PlayerProfileRepository:
             logger.error(f"Error checking username existence {username}: {e}")
             raise PlayerProfileRepositoryError(
                 f"Error checking username existence: {e}"
-            )
+            ) from e
 
     def email_exists(self, email: str) -> bool:
         """
@@ -954,7 +964,9 @@ class PlayerProfileRepository:
 
         except Exception as e:
             logger.error(f"Error checking email existence {email}: {e}")
-            raise PlayerProfileRepositoryError(f"Error checking email existence: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error checking email existence: {e}"
+            ) from e
 
 
 # Utility functions for player profile repository operations
