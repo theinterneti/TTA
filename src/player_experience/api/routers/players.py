@@ -9,7 +9,7 @@ import os
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, Field, field_validator
 
 from ...database.player_profile_repository import (
@@ -522,12 +522,12 @@ async def players_root(
 )
 async def create_player(
     request: CreatePlayerRequest,
+    http_request: Request,
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
     current_player: TokenData | None = Depends(
         lambda: None
     ),  # Auth optional for create
-    http_request: Request = None,
-) -> PlayerResponse:
+) -> PlayerResponse | JSONResponse:
     """
     Create a new player profile.
 
@@ -574,11 +574,7 @@ async def create_player(
             if current_player is not None
             else None
         )
-        if (
-            token_pid is None
-            and http_request is not None
-            and hasattr(http_request, "state")
-        ):
+        if token_pid is None and hasattr(http_request, "state"):
             # AuthenticationMiddleware stores token data on request.state.current_player
             token_pid = getattr(
                 getattr(http_request.state, "current_player", None), "player_id", None
@@ -593,6 +589,11 @@ async def create_player(
 
         return convert_player_to_response(player)
 
+    except PrivacyViolationError as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": f"Privacy violation: {str(e)}"},
+        )
     except PlayerProfileManagerError as e:
         if "already exists" in str(e).lower():
             return JSONResponse(
@@ -600,11 +601,6 @@ async def create_player(
             )
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
-        )
-    except PrivacyViolationError as e:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": f"Privacy violation: {str(e)}"},
         )
     except Exception:
         return JSONResponse(
@@ -631,7 +627,7 @@ async def get_player(
     player_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> PlayerResponse:
+) -> PlayerResponse | JSONResponse:
     """
     Get a player profile by ID.
 
@@ -706,7 +702,7 @@ async def update_player(
     request: UpdatePlayerRequest,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> PlayerResponse:
+) -> PlayerResponse | JSONResponse:
     """
     Update a player profile.
 
@@ -780,6 +776,11 @@ async def update_player(
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN, content={"detail": str(e)}
         )
+    except PrivacyViolationError as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"detail": f"Privacy violation: {str(e)}"},
+        )
     except PlayerProfileManagerError as e:
         if "already exists" in str(e).lower():
             return JSONResponse(
@@ -787,11 +788,6 @@ async def update_player(
             )
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
-        )
-    except PrivacyViolationError as e:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            content={"detail": f"Privacy violation: {str(e)}"},
         )
     except Exception:
         return JSONResponse(
@@ -818,7 +814,7 @@ async def delete_player(
     player_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> None:
+) -> Response:
     """
     Delete a player profile.
 
@@ -849,6 +845,8 @@ async def delete_player(
                 status_code=status.HTTP_404_NOT_FOUND,
                 content={"detail": "Player profile not found"},
             )
+
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     except DataAccessRestrictedError as e:
         return JSONResponse(
@@ -923,7 +921,7 @@ async def export_player_data(
     player_id: str,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> PlayerDataExportResponse:
+) -> PlayerDataExportResponse | JSONResponse:
     """
     Export all player data.
 
@@ -996,7 +994,7 @@ async def update_therapeutic_preferences(
     request: TherapeuticPreferencesRequest,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> PlayerResponse:
+) -> PlayerResponse | JSONResponse:
     """
     Update therapeutic preferences for a player.
 
@@ -1081,7 +1079,7 @@ async def update_privacy_settings(
     request: PrivacySettingsRequest,
     current_player: TokenData = Depends(get_current_active_player),
     manager: PlayerProfileManager = Depends(get_player_manager_dep),
-) -> PlayerResponse:
+) -> PlayerResponse | JSONResponse:
     """
     Update privacy settings for a player.
 
@@ -1135,14 +1133,14 @@ async def update_privacy_settings(
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN, content={"detail": str(e)}
         )
-    except PlayerProfileManagerError as e:
-        return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
-        )
     except PrivacyViolationError as e:
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"detail": f"Privacy violation: {str(e)}"},
+        )
+    except PlayerProfileManagerError as e:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST, content={"detail": str(e)}
         )
     except Exception:
         return JSONResponse(
