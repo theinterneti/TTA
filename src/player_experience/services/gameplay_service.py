@@ -9,8 +9,6 @@ a clean interface for API endpoints.
 import logging
 from typing import Any
 
-from ..api.config import get_settings
-
 logger = logging.getLogger(__name__)
 
 
@@ -39,7 +37,6 @@ class GameplayService:
             from ...orchestration.orchestrator import TTAOrchestrator
 
             # Get the orchestrator instance (this would be dependency injected in production)
-            get_settings()
             orchestrator = TTAOrchestrator()
 
             # Get the gameplay loop component
