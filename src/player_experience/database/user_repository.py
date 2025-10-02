@@ -77,7 +77,7 @@ class UserRepository:
     def close(self) -> None:
         """Close database connection."""
         if self._connected:
-            self.player_repo.close()
+            self.player_repo.disconnect()
             self._connected = False
             logger.info("UserRepository connection closed")
 
@@ -136,8 +136,9 @@ class UserRepository:
 
             # Store authentication data in privacy settings metadata (temporary solution)
             # In production, this should be in a separate User authentication table
-            player_profile.privacy_settings.password_hash = password_hash
-            player_profile.privacy_settings.role = role.value
+            # Using setattr for dynamic attributes not in the dataclass definition
+            setattr(player_profile.privacy_settings, "password_hash", password_hash)
+            setattr(player_profile.privacy_settings, "role", role.value)
 
             # Save to database
             success = self.player_repo.create_player_profile(player_profile)
