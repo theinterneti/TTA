@@ -30,13 +30,15 @@ router = APIRouter(prefix="/openrouter/auth", tags=["openrouter-auth"])
 security = HTTPBearer(auto_error=False)
 
 # Encryption for API keys (in production, use proper key management)
-ENCRYPTION_KEY = os.getenv("OPENROUTER_ENCRYPTION_KEY")
-if not ENCRYPTION_KEY:
+encryption_key = os.getenv("OPENROUTER_ENCRYPTION_KEY")
+if not encryption_key:
     # Generate a key for development (in production, use proper key management)
-    ENCRYPTION_KEY = Fernet.generate_key().decode()
+    encryption_key = Fernet.generate_key().decode()
     logger.warning(
         "Using generated encryption key for development. Use proper key management in production."
     )
+
+ENCRYPTION_KEY = encryption_key
 
 fernet = Fernet(
     ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY
