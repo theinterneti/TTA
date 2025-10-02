@@ -5,14 +5,14 @@ This module provides endpoints for world discovery and management.
 This is a placeholder implementation - full implementation will be done in task 7.4.
 """
 
-from fastapi import APIRouter, Depends
+from enum import Enum
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
-from enum import Enum
-
-from fastapi import HTTPException, status
 from pydantic import BaseModel, Field
 
 from ...managers.world_management_module import WorldManagementModule
@@ -69,7 +69,7 @@ class WorldDetails(BaseModel):
     key_characters: list[dict[str, str]] = Field(default_factory=list)
     main_storylines: list[str] = Field(default_factory=list)
     therapeutic_techniques_used: list[str] = Field(default_factory=list)
-    prerequisites: list[dict[str, str]] = Field(default_factory=list)
+    prerequisites: list[dict[str, Any]] = Field(default_factory=list)
     recommended_therapeutic_readiness: float = 0.5
     content_warnings: list[str] = Field(default_factory=list)
     available_parameters: list[str] = Field(default_factory=list)
@@ -106,7 +106,7 @@ class CompatibilityReport(BaseModel):
     recommendations: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     prerequisites_met: bool = True
-    unmet_prerequisites: list[dict[str, str]] = Field(default_factory=list)
+    unmet_prerequisites: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class WorldCustomizationRequest(BaseModel):
