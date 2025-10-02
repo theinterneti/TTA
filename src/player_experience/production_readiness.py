@@ -750,12 +750,15 @@ class ProductionReadinessValidator:
             https_url = self.base_url.replace("http://", "https://")
             async with aiohttp.ClientSession() as session:
                 async with session.get(f"{https_url}/health") as response:
+                    ssl_info = "N/A"
+                    if response.connection and response.connection.transport:
+                        ssl_info = str(
+                            response.connection.transport.get_extra_info("ssl_object")
+                        )
                     return {
                         "enabled": True,
                         "status_code": response.status,
-                        "ssl_info": str(
-                            response.connection.transport.get_extra_info("ssl_object")
-                        ),
+                        "ssl_info": ssl_info,
                     }
         except Exception as e:
             return {"enabled": False, "error": str(e)}
