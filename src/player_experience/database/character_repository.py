@@ -88,6 +88,7 @@ class CharacterRepository:
 
     def _create_character_neo4j(self, character: Character):
         """Create character in Neo4j database."""
+        assert self.driver is not None, "Driver must be initialized"
         with self.driver.session() as session:
             # Serialize complex objects to JSON
             appearance_json = json.dumps(
@@ -186,8 +187,10 @@ class CharacterRepository:
                 is_active=character.is_active,
             )
 
-            created_id = result.single()["character_id"]
-            logger.debug(f"Character {created_id} created in Neo4j")
+            record = result.single()
+            if record:
+                created_id = record["character_id"]
+                logger.debug(f"Character {created_id} created in Neo4j")
 
     def _create_character_memory(self, character: Character):
         """Create character in in-memory storage."""
@@ -223,6 +226,7 @@ class CharacterRepository:
 
     def _get_character_neo4j(self, character_id: str) -> Character | None:
         """Get character from Neo4j database."""
+        assert self.driver is not None, "Driver must be initialized"
         with self.driver.session() as session:
             query = """
             MATCH (c:Character {character_id: $character_id})
@@ -259,6 +263,7 @@ class CharacterRepository:
 
     def _get_characters_by_player_neo4j(self, player_id: str) -> list[Character]:
         """Get characters by player from Neo4j database."""
+        assert self.driver is not None, "Driver must be initialized"
         with self.driver.session() as session:
             query = """
             MATCH (c:Character {player_id: $player_id, is_active: true})
@@ -432,7 +437,7 @@ class CharacterRepository:
             return None
 
     def search_characters(
-        self, player_id: str, name_filter: str = None
+        self, player_id: str, name_filter: str | None = None
     ) -> list[Character]:
         """
         Search characters for a player with optional name filter.
