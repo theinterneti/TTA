@@ -32,8 +32,12 @@ try:
     )
     if prototype_path not in sys.path:
         sys.path.append(prototype_path)
-    from personalization_engine import PersonalizationEngine
-    from progress_based_therapeutic_adaptation import ProgressBasedTherapeuticAdaptation
+    from personalization_engine import (  # type: ignore[import-not-found]
+        PersonalizationEngine,
+    )
+    from progress_based_therapeutic_adaptation import (  # type: ignore[import-not-found]
+        ProgressBasedTherapeuticAdaptation,
+    )
 except (ImportError, NameError, ModuleNotFoundError) as e:
     # Fallback for testing - create mock classes
     logger.warning(
