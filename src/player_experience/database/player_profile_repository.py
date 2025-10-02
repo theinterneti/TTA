@@ -71,7 +71,7 @@ class PlayerProfileRepository:
         self.uri = uri
         self.username = username
         self.password = password
-        self.driver: Driver | None = None
+        self.driver: "Driver | None" = None  # type: ignore[name-defined]
 
     def connect(self) -> None:
         """Establish connection to Neo4j database with retry/backoff for readiness races."""
@@ -91,9 +91,11 @@ class PlayerProfileRepository:
         attempts = 6
         for attempt in range(attempts):
             try:
+                assert GraphDatabase is not None, "GraphDatabase must be available"
                 self.driver = GraphDatabase.driver(
                     self.uri, auth=(self.username, self.password)
                 )
+                assert self.driver is not None, "Driver must be initialized"
                 with self.driver.session() as session:
                     session.run("RETURN 1")
                 logger.info(f"PlayerProfileRepository connected to Neo4j at {self.uri}")
@@ -549,12 +551,15 @@ class PlayerProfileRepository:
                     )
 
                     # Restore authentication data if present (temporary solution)
+                    # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        privacy_settings.password_hash = privacy_settings_data[
-                            "password_hash"
-                        ]
+                        setattr(
+                            privacy_settings,
+                            "password_hash",
+                            privacy_settings_data["password_hash"],
+                        )
                     if "role" in privacy_settings_data:
-                        privacy_settings.role = privacy_settings_data["role"]
+                        setattr(privacy_settings, "role", privacy_settings_data["role"])
 
                 # Reconstruct progress summary
                 progress_summary = ProgressSummary()
@@ -587,7 +592,7 @@ class PlayerProfileRepository:
                         progress_summary_data.get("most_effective_world_type")
                     )
 
-                    def _to_datetime(val):
+                    def _to_datetime(val: Any) -> datetime | None:
                         if isinstance(val, datetime):
                             return val
                         if val is None:
@@ -596,7 +601,9 @@ class PlayerProfileRepository:
                         conv = getattr(val, "to_native", None)
                         if callable(conv):
                             try:
-                                return conv()
+                                result = conv()
+                                if isinstance(result, datetime):
+                                    return result
                             except Exception:
                                 pass
                         if isinstance(val, str):
@@ -619,13 +626,15 @@ class PlayerProfileRepository:
                         progress_summary.next_recommended_session = parsed_next
 
                 # Reconstruct player profile
-                def _to_dt_profile(val):
+                def _to_dt_profile(val: Any) -> datetime | None:
                     if isinstance(val, datetime):
                         return val
                     conv = getattr(val, "to_native", None)
                     if callable(conv):
                         try:
-                            return conv()
+                            result = conv()
+                            if isinstance(result, datetime):
+                                return result
                         except Exception:
                             pass
                     if isinstance(val, str):
