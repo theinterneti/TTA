@@ -14,21 +14,21 @@ T = TypeVar("T")
 class PlayerExperienceEncoder(json.JSONEncoder):
     """Custom JSON encoder for player experience data models."""
 
-    def default(self, obj: Any) -> Any:
+    def default(self, o: Any) -> Any:
         """Convert objects to JSON-serializable format."""
-        if isinstance(obj, datetime):
-            return obj.isoformat()
+        if isinstance(o, datetime):
+            return o.isoformat()
 
-        if isinstance(obj, timedelta):
-            return obj.total_seconds()
+        if isinstance(o, timedelta):
+            return o.total_seconds()
 
-        if isinstance(obj, Enum):
-            return obj.value
+        if isinstance(o, Enum):
+            return o.value
 
-        if is_dataclass(obj):
-            return asdict(obj)
+        if is_dataclass(o) and not isinstance(o, type):
+            return asdict(o)  # type: ignore[arg-type]
 
-        return super().default(obj)
+        return super().default(o)
 
 
 def serialize_model(model: Any) -> str:
@@ -44,7 +44,7 @@ def serialize_model(model: Any) -> str:
     return json.dumps(model, cls=PlayerExperienceEncoder, indent=2)
 
 
-def serialize_model_to_dict(model: Any) -> dict[str, Any]:
+def serialize_model_to_dict(model: Any) -> dict[str, Any] | Any:
     """
     Serialize a data model to dictionary.
 
@@ -52,10 +52,10 @@ def serialize_model_to_dict(model: Any) -> dict[str, Any]:
         model: The data model to serialize
 
     Returns:
-        Dictionary representation
+        Dictionary representation or the model itself if not a dataclass
     """
-    if is_dataclass(model):
-        result = asdict(model)
+    if is_dataclass(model) and not isinstance(model, type):
+        result = asdict(model)  # type: ignore[arg-type]
         return _convert_special_types(result)
 
     return model
@@ -242,7 +242,11 @@ def _get_field_schema(field_type: type) -> dict[str, Any]:
         if field_type.__origin__ is dict:
             return {"type": "object"}
 
-    if hasattr(field_type, "__bases__") and Enum in field_type.__bases__:
+    if (
+        hasattr(field_type, "__bases__")
+        and isinstance(field_type, type)
+        and issubclass(field_type, Enum)
+    ):
         return {"type": "string", "enum": [item.value for item in field_type]}
 
     if is_dataclass(field_type):
