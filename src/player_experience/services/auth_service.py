@@ -149,7 +149,7 @@ class MFAService:
 
         img = qr.make_image(fill_color="black", back_color="white")
         img_buffer = io.BytesIO()
-        img.save(img_buffer, format="PNG")
+        img.save(img_buffer, "PNG")  # type: ignore[call-arg]
         img_buffer.seek(0)
 
         qr_code_data = base64.b64encode(img_buffer.getvalue()).decode()
@@ -523,6 +523,12 @@ class EnhancedAuthService:
 
             if not user_id or not username:
                 raise AuthenticationError("Invalid token payload")
+
+            if not session_id:
+                raise AuthenticationError("Invalid token: missing session_id")
+
+            if not email:
+                raise AuthenticationError("Invalid token: missing email")
 
             # Verify session is still active
             session = self.active_sessions.get(session_id)
