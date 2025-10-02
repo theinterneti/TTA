@@ -7,7 +7,7 @@ import asyncio
 import os
 import sys
 
-import psycopg2
+import psycopg2  # type: ignore[import-untyped]
 import redis
 from neo4j import GraphDatabase
 
