@@ -1,0 +1,102 @@
+# Prometheus configuration for TTA Analytics Services
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # Analytics Aggregation Service
+  - job_name: 'analytics-aggregation'
+    static_configs:
+      - targets: ['analytics-aggregation:8095']
+        labels:
+          service: 'analytics-aggregation'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Analytics Reporting Service
+  - job_name: 'analytics-reporting'
+    static_configs:
+      - targets: ['analytics-reporting:8096']
+        labels:
+          service: 'analytics-reporting'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Real-time Monitoring Service
+  - job_name: 'analytics-monitoring'
+    static_configs:
+      - targets: ['analytics-monitoring:8097']
+        labels:
+          service: 'analytics-monitoring'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # PostgreSQL Analytics Database
+  - job_name: 'postgres-analytics'
+    static_configs:
+      - targets: ['tta-analytics-postgres:5432']
+        labels:
+          service: 'postgres-analytics'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 60s
+    scrape_timeout: 10s
+
+  # Redis Analytics Cache
+  - job_name: 'redis-analytics'
+    static_configs:
+      - targets: ['tta-analytics-redis:6379']
+        labels:
+          service: 'redis-analytics'
+          environment: 'production'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Integration with existing TTA services
+  - job_name: 'tta-player-api'
+    static_configs:
+      - targets: ['host.docker.internal:3004']
+        labels:
+          service: 'tta-player-api'
+          environment: 'staging'
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # TTA Health Check Service
+  - job_name: 'tta-health-check'
+    static_configs:
+      - targets: ['host.docker.internal:8090']
+        labels:
+          service: 'tta-health-check'
+          environment: 'staging'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+# Alerting rules (optional)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Recording rules for analytics
+rule_files:
+  - "analytics_rules.yml"

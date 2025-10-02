@@ -1,0 +1,200 @@
+# TTA Player Experience API - Staging Environment Dockerfile
+# Multi-stage build optimized for staging deployment
+
+# =============================================================================
+# BUILD STAGE - Dependencies and compilation
+# =============================================================================
+FROM python:3.11-slim as builder
+
+# Build arguments
+ARG ENVIRONMENT=staging
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+
+# Set build environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install UV package manager for faster dependency resolution
+RUN pip install uv
+
+# Set work directory
+WORKDIR /app
+
+# Copy dependency files and README for package metadata
+COPY pyproject.toml uv.lock README.md ./
+
+# Install Python dependencies with UV (faster than pip)
+RUN uv sync --frozen --no-dev --no-editable
+
+# =============================================================================
+# RUNTIME STAGE - Production-like staging environment
+# =============================================================================
+FROM python:3.11-slim as runtime
+
+# Runtime arguments
+ARG ENVIRONMENT=staging
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+
+# Set runtime environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH" \
+    PYTHONPATH="/app" \
+    ENVIRONMENT=${ENVIRONMENT} \
+    BUILD_DATE=${BUILD_DATE} \
+    VERSION=${VERSION} \
+    GIT_COMMIT=${GIT_COMMIT}
+
+# Install runtime system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user for security
+RUN groupadd -r tta && useradd -r -g tta -d /app -s /bin/bash tta
+
+# Set work directory
+WORKDIR /app
+
+# Copy virtual environment from builder stage
+COPY --from=builder /app/.venv /app/.venv
+
+# Copy application source code with proper ownership
+COPY --chown=tta:tta src ./src
+COPY --chown=tta:tta config ./config
+COPY --chown=tta:tta pyproject.toml ./
+
+# Create necessary directories with proper permissions (optimized)
+RUN mkdir -p /app/logs /app/cache /app/tmp /app/data \
+    && chown -R tta:tta /app/logs /app/cache /app/tmp /app/data
+
+# Copy staging-specific configuration files (if they exist)
+RUN mkdir -p ./config
+COPY --chown=tta:tta config/ ./config/
+
+# Install additional staging-specific tools
+RUN . /app/.venv/bin/activate && pip install --no-cache-dir \
+    prometheus-client \
+    sentry-sdk[fastapi] \
+    structlog
+
+# Switch to non-root user
+USER tta
+
+# Expose application port
+EXPOSE 8080
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Add labels for container management
+LABEL maintainer="TTA Development Team" \
+      version="${VERSION}" \
+      environment="${ENVIRONMENT}" \
+      build-date="${BUILD_DATE}" \
+      git-commit="${GIT_COMMIT}" \
+      description="TTA Player Experience API - Staging Environment" \
+      com.tta.service="player-api" \
+      com.tta.environment="staging" \
+      com.tta.monitoring="enabled"
+
+# Create startup script for staging-specific initialization
+COPY --chown=tta:tta <<EOF /app/start-staging.sh
+#!/bin/bash
+set -e
+
+echo "Starting TTA Player Experience API - Staging Environment"
+echo "Environment: \$ENVIRONMENT"
+echo "Build Date: \$BUILD_DATE"
+echo "Version: \$VERSION"
+echo "Git Commit: \$GIT_COMMIT"
+
+# Wait for database services to be ready
+echo "Waiting for database services..."
+python -c "
+import time
+import sys
+import asyncio
+from src.common.database.connections import wait_for_databases
+
+async def main():
+    try:
+        await wait_for_databases(timeout=60)
+        print('All databases are ready')
+    except Exception as e:
+        print(f'Database connection failed: {e}')
+        sys.exit(1)
+
+asyncio.run(main())
+"
+
+# Run database migrations if needed
+echo "Running database migrations..."
+python -m src.player_experience.api.migrations
+
+# Start the application
+echo "Starting Player Experience API..."
+exec uvicorn src.player_experience.api.app:app \
+    --host 0.0.0.0 \
+    --port 8080 \
+    --workers 4 \
+    --worker-class uvicorn.workers.UvicornWorker \
+    --access-log \
+    --log-level info \
+    --no-use-colors
+EOF
+
+RUN chmod +x /app/start-staging.sh
+
+# Default command
+CMD ["/app/start-staging.sh"]
+
+# =============================================================================
+# DEVELOPMENT STAGE - For local staging development
+# =============================================================================
+FROM runtime as development
+
+# Switch back to root for development tools installation
+USER root
+
+# Install development tools
+RUN . /app/.venv/bin/activate && pip install --no-cache-dir \
+    pytest \
+    pytest-asyncio \
+    pytest-cov \
+    black \
+    isort \
+    mypy \
+    pre-commit
+
+# Install debugging tools
+RUN apt-get update && apt-get install -y \
+    vim \
+    htop \
+    strace \
+    && rm -rf /var/lib/apt/lists/*
+
+# Switch back to tta user
+USER tta
+
+# Override command for development
+CMD ["uvicorn", "src.player_experience.api.app:app", "--host", "0.0.0.0", "--port", "8080", "--reload", "--log-level", "debug"]

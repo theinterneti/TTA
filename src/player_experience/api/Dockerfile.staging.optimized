@@ -1,0 +1,125 @@
+# TTA Player Experience API - Optimized Staging Dockerfile
+# Resolves Docker build hanging issues through improved layering and reduced context
+
+# =============================================================================
+# BUILD STAGE - Dependencies and compilation
+# =============================================================================
+FROM python:3.11-slim as builder
+
+# Build arguments
+ARG ENVIRONMENT=staging
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+
+# Set build environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create user and directories EARLY to avoid large chown operations
+RUN groupadd --gid 1000 tta \
+    && useradd --uid 1000 --gid tta --shell /bin/bash --create-home tta
+
+# Create app directory with proper ownership from the start
+RUN mkdir -p /app/logs /app/cache /app/tmp /app/data \
+    && chown -R tta:tta /app
+
+# Install UV package manager for faster dependency resolution
+RUN pip install uv
+
+# Set working directory
+WORKDIR /app
+
+# Copy only dependency files first (better layer caching)
+COPY --chown=tta:tta pyproject.toml uv.lock README.md ./
+
+# Install dependencies in virtual environment
+RUN uv venv .venv && \
+    uv sync --frozen --no-dev --no-editable
+
+# =============================================================================
+# RUNTIME STAGE - Optimized for staging deployment
+# =============================================================================
+FROM python:3.11-slim as runtime
+
+# Runtime environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/app/.venv/bin:$PATH" \
+    ENVIRONMENT=staging
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install UV for runtime package management
+RUN pip install uv
+
+# Create user and directories (same as builder stage)
+RUN groupadd --gid 1000 tta \
+    && useradd --uid 1000 --gid tta --shell /bin/bash --create-home tta
+
+# Create app directory structure with proper ownership
+RUN mkdir -p /app/logs /app/cache /app/tmp /app/data \
+    && chown -R tta:tta /app
+
+# Set working directory
+WORKDIR /app
+
+# Copy virtual environment from builder stage
+COPY --from=builder --chown=tta:tta /app/.venv /app/.venv
+
+# Copy application code (minimal, specific files only)
+COPY --chown=tta:tta src/player_experience/api/ ./
+COPY --chown=tta:tta src/player_experience/utils/ ./utils/
+COPY --chown=tta:tta src/player_experience/models/ ./models/
+COPY --chown=tta:tta src/player_experience/services/ ./services/
+COPY --chown=tta:tta src/player_experience/database/ ./database/
+COPY --chown=tta:tta src/player_experience/security/ ./security/
+COPY --chown=tta:tta src/player_experience/managers/ ./managers/
+COPY --chown=tta:tta src/monitoring/ ./monitoring/
+COPY --chown=tta:tta pyproject.toml ./
+
+# Copy staging-specific configuration files
+COPY --chown=tta:tta config/*staging* ./config/
+
+# Install additional staging-specific tools using UV
+RUN . /app/.venv/bin/activate && \
+    uv pip install --no-cache \
+    prometheus-client \
+    sentry-sdk[fastapi] \
+    structlog
+
+# Switch to non-root user BEFORE any file operations
+USER tta
+
+# Expose application port
+EXPOSE 8080
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Labels for metadata
+LABEL maintainer="TTA Development Team" \
+      version="${VERSION}" \
+      environment="${ENVIRONMENT}" \
+      build-date="${BUILD_DATE}" \
+      git-commit="${GIT_COMMIT}"
+
+# Default command
+CMD ["/app/.venv/bin/uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

@@ -177,7 +177,7 @@ def verify_token(token: str) -> TokenData:
 
         return TokenData(player_id=player_id, username=username, email=email, exp=exp)
     except JWTError as e:
-        raise AuthenticationError(f"Invalid token: {str(e)}")
+        raise AuthenticationError(f"Invalid token: {str(e)}") from e
 
 
 def create_tokens_for_player(player: PlayerProfile) -> Token:
@@ -234,7 +234,7 @@ async def get_current_player(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
 
 async def get_current_active_player(
@@ -356,4 +356,4 @@ class AuthService:
             )
 
         except JWTError as e:
-            raise AuthenticationError(f"Invalid refresh token: {str(e)}")
+            raise AuthenticationError(f"Invalid refresh token: {str(e)}") from e

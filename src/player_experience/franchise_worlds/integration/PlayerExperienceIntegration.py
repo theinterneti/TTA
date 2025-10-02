@@ -212,7 +212,7 @@ class FranchiseWorldBridge:
         try:
             return json.loads(stdout.decode())
         except json.JSONDecodeError as e:
-            raise Exception(f"Invalid JSON response: {e}")
+            raise Exception(f"Invalid JSON response: {e}") from e
 
     def _convert_to_world_details(self, world_data: dict[str, Any]) -> WorldDetails:
         """

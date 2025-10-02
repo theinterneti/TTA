@@ -506,7 +506,7 @@ class RateLimitMiddleware:
                     "X-RateLimit-Remaining": "0",
                     "X-RateLimit-Reset": str(int(result.reset_time.timestamp())),
                 },
-            )
+            ) from None
 
 
 def create_rate_limiter(

@@ -189,7 +189,7 @@ class IPAAdapter:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_process_input(text)
             else:
-                raise AgentCommunicationError(f"IPA communication failed: {e}")
+                raise AgentCommunicationError(f"IPA communication failed: {e}") from e
 
     def _mock_process_input(self, text: str) -> dict[str, Any]:
         """Fallback mock implementation for IPA processing."""
@@ -283,7 +283,7 @@ class WBAAdapter:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_process_world(world_id, updates)
             else:
-                raise AgentCommunicationError(f"WBA communication failed: {e}")
+                raise AgentCommunicationError(f"WBA communication failed: {e}") from e
 
     def _mock_process_world(
         self, world_id: str, updates: dict[str, Any] | None = None
@@ -374,7 +374,7 @@ class NGAAdapter:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_generate_narrative(prompt, context)
             else:
-                raise AgentCommunicationError(f"NGA communication failed: {e}")
+                raise AgentCommunicationError(f"NGA communication failed: {e}") from e
 
     def _mock_generate_narrative(
         self, prompt: str, context: dict[str, Any] | None = None

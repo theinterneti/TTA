@@ -1,0 +1,37 @@
+# Dockerfile for Analytics Aggregation Service
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY src/analytics/requirements.txt /app/requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy application code
+COPY src/analytics/services/aggregation_service.py /app/aggregation_service.py
+COPY src/analytics/__init__.py /app/__init__.py
+
+# Create non-root user
+RUN useradd --create-home --shell /bin/bash analytics
+RUN chown -R analytics:analytics /app
+USER analytics
+
+# Expose port
+EXPOSE 8095
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8095/health || exit 1
+
+# Run the application
+CMD ["python", "aggregation_service.py"]

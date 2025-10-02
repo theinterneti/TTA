@@ -182,7 +182,7 @@ async def start_therapeutic_session(
 
     except Exception as e:
         logger.error(f"Failed to start therapeutic session: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to start session")
+        raise HTTPException(status_code=500, detail="Failed to start session") from e
 
 
 @router.patch("/sessions/{session_id}/progress")
@@ -249,7 +249,7 @@ async def update_session_progress(
 
     except Exception as e:
         logger.error(f"Failed to update session progress: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to update progress")
+        raise HTTPException(status_code=500, detail="Failed to update progress") from e
 
 
 @router.post("/interventions")
@@ -280,7 +280,9 @@ async def trigger_intervention(
 
     except Exception as e:
         logger.error(f"Failed to trigger intervention: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to trigger intervention")
+        raise HTTPException(
+            status_code=500, detail="Failed to trigger intervention"
+        ) from e
 
 
 @router.get("/profile", response_model=PatientProfile)
@@ -324,7 +326,7 @@ async def get_patient_profile(patient_id: str = Depends(get_current_patient)):
 
     except Exception as e:
         logger.error(f"Failed to get patient profile: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to get profile")
+        raise HTTPException(status_code=500, detail="Failed to get profile") from e
 
 
 # Background tasks

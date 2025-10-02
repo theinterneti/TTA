@@ -266,7 +266,7 @@ async def export_user_data(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Data export failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/delete", response_model=dict[str, Any])
@@ -299,7 +299,7 @@ async def delete_user_data(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Data deletion failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/anonymize", response_model=dict[str, Any])
@@ -323,7 +323,7 @@ async def anonymize_user_data(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Data anonymization failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/processing-records", response_model=list[dict[str, Any]])

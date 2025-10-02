@@ -1,0 +1,272 @@
+# TTA Player Experience Frontend - Staging Environment Dockerfile
+# Multi-stage build optimized for staging deployment
+
+# =============================================================================
+# BUILD STAGE - Node.js build environment
+# =============================================================================
+FROM node:18-alpine as builder
+
+# Build arguments
+ARG VITE_API_BASE_URL=http://localhost:8081
+ARG VITE_WS_URL=ws://localhost:8081
+ARG VITE_ENVIRONMENT=staging
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+
+# Set build environment variables
+ENV NODE_ENV=staging \
+    VITE_API_BASE_URL=${VITE_API_BASE_URL} \
+    VITE_WS_URL=${VITE_WS_URL} \
+    VITE_ENVIRONMENT=${VITE_ENVIRONMENT} \
+    BUILD_DATE=${BUILD_DATE} \
+    VERSION=${VERSION} \
+    GIT_COMMIT=${GIT_COMMIT}
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++
+
+# Set work directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY yarn.lock* ./
+
+# Install dependencies with yarn for better caching
+RUN yarn install --frozen-lockfile --production=false
+
+# Copy source code
+COPY . .
+
+# Build the application for staging
+RUN yarn build:staging
+
+# =============================================================================
+# RUNTIME STAGE - Nginx serving static files
+# =============================================================================
+FROM nginx:alpine as runtime
+
+# Runtime arguments
+ARG BUILD_DATE
+ARG VERSION
+ARG GIT_COMMIT
+ARG ENVIRONMENT=staging
+
+# Set runtime environment variables
+ENV ENVIRONMENT=${ENVIRONMENT} \
+    BUILD_DATE=${BUILD_DATE} \
+    VERSION=${VERSION} \
+    GIT_COMMIT=${GIT_COMMIT}
+
+# Install additional tools for staging
+RUN apk add --no-cache \
+    curl \
+    jq \
+    bash
+
+# Copy built application from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy staging-specific nginx configuration
+COPY nginx.staging.conf /etc/nginx/nginx.conf
+
+# Create nginx user and set permissions
+RUN addgroup -g 101 -S nginx \
+    && adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G nginx -g nginx nginx \
+    && chown -R nginx:nginx /usr/share/nginx/html \
+    && chown -R nginx:nginx /var/cache/nginx \
+    && chown -R nginx:nginx /var/log/nginx \
+    && chown -R nginx:nginx /etc/nginx/conf.d \
+    && touch /var/run/nginx.pid \
+    && chown -R nginx:nginx /var/run/nginx.pid
+
+# Create staging-specific configuration
+COPY --chown=nginx:nginx <<EOF /etc/nginx/conf.d/staging.conf
+server {
+    listen 3000;
+    server_name localhost;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Security headers for staging
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' ws: wss:;" always;
+
+    # Staging-specific headers
+    add_header X-Environment "staging" always;
+    add_header X-Build-Date "${BUILD_DATE}" always;
+    add_header X-Version "${VERSION}" always;
+
+    # Enable gzip compression
+    gzip on;
+    gzip_vary on;
+    gzip_min_length 1024;
+    gzip_proxied any;
+    gzip_comp_level 6;
+    gzip_types
+        text/plain
+        text/css
+        text/xml
+        text/javascript
+        application/json
+        application/javascript
+        application/xml+rss
+        application/atom+xml
+        image/svg+xml;
+
+    # Cache static assets
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+        add_header X-Environment "staging" always;
+    }
+
+    # Handle client-side routing
+    location / {
+        try_files \$uri \$uri/ /index.html;
+        add_header X-Environment "staging" always;
+    }
+
+    # Health check endpoint
+    location /health {
+        access_log off;
+        return 200 '{"status":"healthy","environment":"staging","service":"player-frontend"}';
+        add_header Content-Type application/json;
+        add_header X-Environment "staging" always;
+    }
+
+    # API proxy for development (optional)
+    location /api/ {
+        proxy_pass http://player-api-staging:8080/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+        proxy_cache_bypass \$http_upgrade;
+    }
+
+    # WebSocket proxy
+    location /ws/ {
+        proxy_pass http://player-api-staging:8080/ws/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade \$http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
+    }
+
+    # Logging
+    access_log /var/log/nginx/staging-access.log;
+    error_log /var/log/nginx/staging-error.log;
+}
+EOF
+
+# Create startup script for staging-specific initialization
+COPY --chown=nginx:nginx <<EOF /docker-entrypoint.d/99-staging-init.sh
+#!/bin/bash
+set -e
+
+echo "Initializing TTA Player Frontend - Staging Environment"
+echo "Environment: \$ENVIRONMENT"
+echo "Build Date: \$BUILD_DATE"
+echo "Version: \$VERSION"
+echo "Git Commit: \$GIT_COMMIT"
+
+# Create runtime configuration file
+cat > /usr/share/nginx/html/config.js << EOL
+window.TTA_CONFIG = {
+  environment: '\$ENVIRONMENT',
+  apiBaseUrl: '\$VITE_API_BASE_URL',
+  wsUrl: '\$VITE_WS_URL',
+  buildDate: '\$BUILD_DATE',
+  version: '\$VERSION',
+  gitCommit: '\$GIT_COMMIT',
+  features: {
+    analytics: true,
+    debugging: true,
+    monitoring: true
+  }
+};
+EOL
+
+echo "Staging configuration created successfully"
+EOF
+
+RUN chmod +x /docker-entrypoint.d/99-staging-init.sh
+
+# Switch to non-root user
+USER nginx
+
+# Expose port
+EXPOSE 3000
+
+# Add health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/health || exit 1
+
+# Add labels for container management
+LABEL maintainer="TTA Development Team" \
+      version="${VERSION}" \
+      environment="${ENVIRONMENT}" \
+      build-date="${BUILD_DATE}" \
+      git-commit="${GIT_COMMIT}" \
+      description="TTA Player Experience Frontend - Staging Environment" \
+      com.tta.service="player-frontend" \
+      com.tta.environment="staging"
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"]
+
+# =============================================================================
+# DEVELOPMENT STAGE - For local staging development with hot reload
+# =============================================================================
+FROM node:18-alpine as development
+
+# Development arguments
+ARG VITE_API_BASE_URL=http://localhost:8081
+ARG VITE_WS_URL=ws://localhost:8081
+ARG VITE_ENVIRONMENT=staging
+
+# Set development environment variables
+ENV NODE_ENV=development \
+    VITE_API_BASE_URL=${VITE_API_BASE_URL} \
+    VITE_WS_URL=${VITE_WS_URL} \
+    VITE_ENVIRONMENT=${VITE_ENVIRONMENT}
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++
+
+# Set work directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies including dev dependencies
+RUN npm ci --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+# Expose port for development server
+EXPOSE 3000
+
+# Start development server with hot reload
+CMD ["npm", "start"]

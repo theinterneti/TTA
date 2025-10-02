@@ -1,0 +1,55 @@
+# Simple staging Dockerfile to avoid hanging issues
+FROM python:3.11-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV ENVIRONMENT=staging
+
+# Create app user
+RUN groupadd -r tta && useradd -r -g tta tta
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    wget \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install UV for faster Python package management
+RUN pip install uv
+
+# Copy requirements first for better caching
+COPY pyproject.toml uv.lock README.md ./
+
+# Install Python dependencies
+RUN uv sync --frozen --no-dev --no-editable
+
+# Copy application code
+COPY src ./src
+COPY config ./config
+
+# Create directories (simplified approach)
+RUN mkdir -p /app/logs
+RUN mkdir -p /app/cache  
+RUN mkdir -p /app/tmp
+RUN mkdir -p /app/data
+
+# Set ownership
+RUN chown -R tta:tta /app
+
+# Switch to non-root user
+USER tta
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Start command
+CMD ["uv", "run", "python", "-m", "src.player_experience.api.main"]

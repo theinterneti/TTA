@@ -124,7 +124,7 @@ def _auth_from_ws(websocket: WebSocket) -> TokenData:
         return verify_token(token)
     except Exception as e:
         # Normalize auth errors to PermissionError for WebSocket close codes
-        raise PermissionError(str(e))
+        raise PermissionError(str(e)) from e
 
 
 def _outgoing_message(

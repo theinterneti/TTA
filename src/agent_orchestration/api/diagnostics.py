@@ -228,7 +228,7 @@ class DiagnosticsAPI:
             logger.error(f"Failed to get agents diagnostics: {e}")
             raise HTTPException(
                 status_code=500, detail="Failed to retrieve diagnostics"
-            )
+            ) from e
 
     async def _get_agent_diagnostics(
         self,
@@ -462,7 +462,7 @@ class DiagnosticsAPI:
             logger.error(f"Failed to get system summary: {e}")
             raise HTTPException(
                 status_code=500, detail="Failed to retrieve system summary"
-            )
+            ) from e
 
     async def _get_system_health(self) -> dict[str, Any]:
         """Get simple system health check."""

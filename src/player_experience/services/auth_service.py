@@ -548,7 +548,7 @@ class EnhancedAuthService:
             )
 
         except JWTError as e:
-            raise AuthenticationError(f"Invalid token: {str(e)}")
+            raise AuthenticationError(f"Invalid token: {str(e)}") from e
 
     def require_permission(
         self, user: AuthenticatedUser, permission: Permission

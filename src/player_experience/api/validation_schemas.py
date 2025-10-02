@@ -244,7 +244,7 @@ class TherapeuticGoalValidator:
             except ValueError:
                 raise ValidationError(
                     "Invalid date format. Use ISO 8601 format", "target_date"
-                )
+                ) from None
         return target_date
 
 

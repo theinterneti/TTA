@@ -205,7 +205,7 @@ async def health_check():
         }
     except Exception as e:
         logger.error("Health check failed", error=str(e))
-        raise HTTPException(status_code=503, detail="Service unhealthy")
+        raise HTTPException(status_code=503, detail="Service unhealthy") from e
 
 
 # Metrics endpoint for Prometheus
@@ -241,7 +241,7 @@ async def custom_metrics():
         }
     except Exception as e:
         logger.error("Failed to generate custom metrics", error=str(e))
-        raise HTTPException(status_code=500, detail="Metrics generation failed")
+        raise HTTPException(status_code=500, detail="Metrics generation failed") from e
 
 
 # Error handlers

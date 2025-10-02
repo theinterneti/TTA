@@ -136,12 +136,14 @@ class PlayerProfileManager:
 
         except PlayerProfileRepositoryError as e:
             logger.error(f"Repository error creating player profile: {e}")
-            raise PlayerProfileManagerError(f"Failed to create player profile: {e}")
+            raise PlayerProfileManagerError(
+                f"Failed to create player profile: {e}"
+            ) from e
         except Exception as e:
             logger.error(f"Unexpected error creating player profile: {e}")
             raise PlayerProfileManagerError(
                 f"Unexpected error creating player profile: {e}"
-            )
+            ) from e
 
     def get_player_profile(
         self, player_id: str, accessor_id: str | None = None
@@ -180,7 +182,9 @@ class PlayerProfileManager:
 
         except PlayerProfileRepositoryError as e:
             logger.error(f"Repository error retrieving player profile {player_id}: {e}")
-            raise PlayerProfileManagerError(f"Failed to retrieve player profile: {e}")
+            raise PlayerProfileManagerError(
+                f"Failed to retrieve player profile: {e}"
+            ) from e
         except DataAccessRestrictedError:
             # Re-raise privacy violations
             raise
@@ -188,7 +192,7 @@ class PlayerProfileManager:
             logger.error(f"Unexpected error retrieving player profile {player_id}: {e}")
             raise PlayerProfileManagerError(
                 f"Unexpected error retrieving player profile: {e}"
-            )
+            ) from e
 
     def update_player_profile(
         self, player_id: str, updates: dict[str, Any], accessor_id: str | None = None
@@ -244,7 +248,9 @@ class PlayerProfileManager:
 
         except PlayerProfileRepositoryError as e:
             logger.error(f"Repository error updating player profile {player_id}: {e}")
-            raise PlayerProfileManagerError(f"Failed to update player profile: {e}")
+            raise PlayerProfileManagerError(
+                f"Failed to update player profile: {e}"
+            ) from e
         except DataAccessRestrictedError:
             # Re-raise privacy violations
             raise
@@ -252,7 +258,7 @@ class PlayerProfileManager:
             logger.error(f"Unexpected error updating player profile {player_id}: {e}")
             raise PlayerProfileManagerError(
                 f"Unexpected error updating player profile: {e}"
-            )
+            ) from e
 
     def delete_player_profile(
         self, player_id: str, accessor_id: str | None = None
@@ -298,7 +304,9 @@ class PlayerProfileManager:
 
         except PlayerProfileRepositoryError as e:
             logger.error(f"Repository error deleting player profile {player_id}: {e}")
-            raise PlayerProfileManagerError(f"Failed to delete player profile: {e}")
+            raise PlayerProfileManagerError(
+                f"Failed to delete player profile: {e}"
+            ) from e
         except DataAccessRestrictedError:
             # Re-raise privacy violations
             raise
@@ -306,7 +314,7 @@ class PlayerProfileManager:
             logger.error(f"Unexpected error deleting player profile {player_id}: {e}")
             raise PlayerProfileManagerError(
                 f"Unexpected error deleting player profile: {e}"
-            )
+            ) from e
 
     def get_player_by_username(
         self, username: str, accessor_id: str | None = None
@@ -330,7 +338,9 @@ class PlayerProfileManager:
 
         except Exception as e:
             logger.error(f"Error retrieving player by username {username}: {e}")
-            raise PlayerProfileManagerError(f"Error retrieving player by username: {e}")
+            raise PlayerProfileManagerError(
+                f"Error retrieving player by username: {e}"
+            ) from e
 
     def get_player_by_email(
         self, email: str, accessor_id: str | None = None
@@ -354,7 +364,9 @@ class PlayerProfileManager:
 
         except Exception as e:
             logger.error(f"Error retrieving player by email: {e}")
-            raise PlayerProfileManagerError(f"Error retrieving player by email: {e}")
+            raise PlayerProfileManagerError(
+                f"Error retrieving player by email: {e}"
+            ) from e
 
     def update_therapeutic_preferences(
         self,
@@ -547,7 +559,7 @@ class PlayerProfileManager:
 
         except Exception as e:
             logger.error(f"Error exporting player data {player_id}: {e}")
-            raise PlayerProfileManagerError(f"Error exporting player data: {e}")
+            raise PlayerProfileManagerError(f"Error exporting player data: {e}") from e
 
     def get_access_log(
         self, player_id: str, accessor_id: str | None = None

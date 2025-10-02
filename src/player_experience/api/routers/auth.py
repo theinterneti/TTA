@@ -199,7 +199,7 @@ def get_current_authenticated_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
 
 def require_permission(permission: Permission):
@@ -212,7 +212,9 @@ def require_permission(permission: Permission):
             auth_service.require_permission(user, permission)
             return user
         except AuthorizationError as e:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN, detail=str(e)
+            ) from e
 
     return check_permission
 
@@ -227,7 +229,9 @@ def require_mfa_verification():
             auth_service.require_mfa_verification(user)
             return user
         except AuthenticationError as e:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+            ) from e
 
     return check_mfa
 
@@ -265,12 +269,12 @@ async def register(registration: UserRegistration, request: Request) -> dict[str
 
     except HTTPException as e:
         # Re-raise explicit HTTP errors without converting to 500
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Registration failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -348,15 +352,15 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
     except HTTPException as e:
         # Preserve explicitly raised HTTP errors
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Login failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/mfa/verify", response_model=LoginResponse)
@@ -406,14 +410,16 @@ async def verify_mfa(verification: MFAVerification, request: Request) -> LoginRe
         )
 
     except MFAError as e:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e)
+        ) from e
     except HTTPException as e:
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"MFA verification failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/mfa/setup", response_model=MFASetupResponse)
@@ -444,14 +450,16 @@ async def setup_mfa(
         )
 
     except MFAError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
     except HTTPException as e:
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"MFA setup failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/refresh", response_model=Token)
@@ -475,7 +483,7 @@ async def refresh_token(refresh_request: RefreshTokenRequest) -> Token:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=str(e),
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
 
 @router.post("/logout")
@@ -510,12 +518,12 @@ async def logout(
         return {"message": "Successfully logged out"}
 
     except HTTPException as e:
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Logout failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.post("/logout-all")
@@ -549,12 +557,12 @@ async def logout_all_sessions(
         return {"message": "Successfully logged out from all sessions"}
 
     except HTTPException as e:
-        raise e
+        raise e from e
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Logout all failed: {str(e)}",
-        )
+        ) from e
 
 
 @router.get("/me", response_model=dict[str, Any])
@@ -614,7 +622,7 @@ async def verify_token_endpoint(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
-        )
+        ) from e
 
 
 # Role-based access control endpoints
