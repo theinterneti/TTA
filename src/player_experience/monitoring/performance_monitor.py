@@ -652,7 +652,7 @@ class PerformanceMonitor:
 # Decorators for automatic performance tracking
 
 
-def track_performance(endpoint: str = None, track_args: bool = False):
+def track_performance(endpoint: str | None = None, track_args: bool = False):
     """Decorator to automatically track function performance."""
 
     def decorator(func):
@@ -660,11 +660,14 @@ def track_performance(endpoint: str = None, track_args: bool = False):
         if endpoint is None:
             endpoint = f"{func.__module__}.{func.__name__}"
 
+        # Store as local variable for type narrowing
+        endpoint_str: str = endpoint
+
         if asyncio.iscoroutinefunction(func):
 
             @functools.wraps(func)
             async def async_wrapper(*args, **kwargs):
-                request_id = f"{endpoint}_{int(time.time() * 1000000)}"
+                request_id = f"{endpoint_str}_{int(time.time() * 1000000)}"
                 monitor = get_performance_monitor()
 
                 metadata = {}
@@ -673,7 +676,7 @@ def track_performance(endpoint: str = None, track_args: bool = False):
                     metadata["kwargs_count"] = len(kwargs)
 
                 with monitor.request_tracker.track_request(
-                    request_id, endpoint, "FUNCTION", **metadata
+                    request_id, endpoint_str, "FUNCTION", **metadata
                 ):
                     return await func(*args, **kwargs)
 
@@ -682,7 +685,7 @@ def track_performance(endpoint: str = None, track_args: bool = False):
 
             @functools.wraps(func)
             def sync_wrapper(*args, **kwargs):
-                request_id = f"{endpoint}_{int(time.time() * 1000000)}"
+                request_id = f"{endpoint_str}_{int(time.time() * 1000000)}"
                 monitor = get_performance_monitor()
 
                 metadata = {}
@@ -691,7 +694,7 @@ def track_performance(endpoint: str = None, track_args: bool = False):
                     metadata["kwargs_count"] = len(kwargs)
 
                 with monitor.request_tracker.track_request(
-                    request_id, endpoint, "FUNCTION", **metadata
+                    request_id, endpoint_str, "FUNCTION", **metadata
                 ):
                     return func(*args, **kwargs)
 
@@ -700,22 +703,25 @@ def track_performance(endpoint: str = None, track_args: bool = False):
     return decorator
 
 
-def track_database_query(query_type: str = None):
+def track_database_query(query_type: str | None = None):
     """Decorator to automatically track database query performance."""
 
     def decorator(func):
         nonlocal query_type
         if query_type is None:
-            query_type = func.__name__
+            query_type = str(func.__name__)
+
+        # Store as local variable for type narrowing
+        query_type_str: str = query_type
 
         if asyncio.iscoroutinefunction(func):
 
             @functools.wraps(func)
             async def async_wrapper(*args, **kwargs):
-                query_id = f"{query_type}_{int(time.time() * 1000000)}"
+                query_id = f"{query_type_str}_{int(time.time() * 1000000)}"
                 monitor = get_performance_monitor()
 
-                with monitor.db_tracker.track_query(query_id, query_type):
+                with monitor.db_tracker.track_query(query_id, query_type_str):
                     return await func(*args, **kwargs)
 
             return async_wrapper
@@ -723,10 +729,10 @@ def track_database_query(query_type: str = None):
 
             @functools.wraps(func)
             def sync_wrapper(*args, **kwargs):
-                query_id = f"{query_type}_{int(time.time() * 1000000)}"
+                query_id = f"{query_type_str}_{int(time.time() * 1000000)}"
                 monitor = get_performance_monitor()
 
-                with monitor.db_tracker.track_query(query_id, query_type):
+                with monitor.db_tracker.track_query(query_id, query_type_str):
                     return func(*args, **kwargs)
 
             return sync_wrapper
