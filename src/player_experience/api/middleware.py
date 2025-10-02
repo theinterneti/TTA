@@ -420,9 +420,12 @@ class CrisisDetectionMiddleware(BaseHTTPMiddleware):
                 # Recreate request with body for next handler
                 from starlette.requests import Request as StarletteRequest
 
+                async def receive() -> dict[str, str | bytes]:
+                    return {"type": "http.request", "body": body}
+
                 request = StarletteRequest(
                     request.scope,
-                    receive=lambda: {"type": "http.request", "body": body},
+                    receive=receive,
                 )
 
             except Exception:
