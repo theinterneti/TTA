@@ -6,6 +6,7 @@ player profile management with proper constraints and indexes.
 """
 
 import logging
+from typing import Any
 
 try:
     from neo4j import Driver, GraphDatabase, Result, Session
@@ -59,7 +60,7 @@ class PlayerProfileSchemaManager:
         self.uri = uri
         self.username = username
         self.password = password
-        self.driver: Driver | None = None
+        self.driver: Any = None
 
         # Schema version for player profile extensions
         self.player_schema_version = "1.0.0"
@@ -83,10 +84,13 @@ class PlayerProfileSchemaManager:
         attempts = 6
         for attempt in range(attempts):
             try:
+                if GraphDatabase is None:
+                    raise ImportError("neo4j package not installed")
                 self.driver = GraphDatabase.driver(
                     self.uri, auth=(self.username, self.password)
                 )
                 # Verify readiness
+                assert self.driver is not None
                 with self.driver.session() as session:
                     session.run("RETURN 1")
                 logger.info(f"Connected to Neo4j at {self.uri}")
