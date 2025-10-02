@@ -6,8 +6,8 @@ This module provides configuration management for the FastAPI application.
 
 import os
 
-from pydantic import ConfigDict, Field, field_validator
-from pydantic_settings import BaseSettings
+from pydantic import Field, field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class APISettings(BaseSettings):
@@ -30,7 +30,7 @@ class APISettings(BaseSettings):
     refresh_token_expire_days: int = 7
 
     # CORS settings
-    cors_origins: str | None = Field(default=None, env="API_CORS_ORIGINS")
+    cors_origins: str | None = Field(default=None, validation_alias="API_CORS_ORIGINS")
     cors_allow_credentials: bool = True
     cors_allow_methods: list[str] = ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"]
     cors_allow_headers: list[str] = ["*"]
@@ -40,11 +40,11 @@ class APISettings(BaseSettings):
     rate_limit_period: int = 60  # seconds
 
     # Database settings
-    database_url: str | None = Field(default=None, env="DATABASE_URL")
-    redis_url: str = Field(default="redis://localhost:6379", env="REDIS_URL")
-    neo4j_uri: str = Field(default="bolt://localhost:7687", env="NEO4J_URI")
-    neo4j_username: str = Field(default="neo4j", env="NEO4J_USER")
-    neo4j_password: str = Field(default="password", env="NEO4J_PASSWORD")
+    database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
+    redis_url: str = Field(default="redis://localhost:6379", validation_alias="REDIS_URL")
+    neo4j_uri: str = Field(default="bolt://localhost:7687", validation_alias="NEO4J_URI")
+    neo4j_username: str = Field(default="neo4j", validation_alias="NEO4J_USER")
+    neo4j_password: str = Field(default="password", validation_alias="NEO4J_PASSWORD")
 
     # Logging settings
     log_level: str = "INFO"
@@ -55,12 +55,20 @@ class APISettings(BaseSettings):
     crisis_hotline: str = "988"  # National Suicide Prevention Lifeline
 
     # Error Monitoring and Performance Tracking (Sentry)
-    sentry_dsn: str | None = Field(None, env="SENTRY_DSN")
-    sentry_environment: str = Field("development", env="SENTRY_ENVIRONMENT")
-    sentry_traces_sample_rate: float = Field(1.0, env="SENTRY_TRACES_SAMPLE_RATE")
-    sentry_profiles_sample_rate: float = Field(1.0, env="SENTRY_PROFILES_SAMPLE_RATE")
-    sentry_send_default_pii: bool = Field(False, env="SENTRY_SEND_DEFAULT_PII")
-    sentry_enable_logs: bool = Field(True, env="SENTRY_ENABLE_LOGS")
+    sentry_dsn: str | None = Field(default=None, validation_alias="SENTRY_DSN")
+    sentry_environment: str = Field(
+        default="development", validation_alias="SENTRY_ENVIRONMENT"
+    )
+    sentry_traces_sample_rate: float = Field(
+        default=1.0, validation_alias="SENTRY_TRACES_SAMPLE_RATE"
+    )
+    sentry_profiles_sample_rate: float = Field(
+        default=1.0, validation_alias="SENTRY_PROFILES_SAMPLE_RATE"
+    )
+    sentry_send_default_pii: bool = Field(
+        default=False, validation_alias="SENTRY_SEND_DEFAULT_PII"
+    )
+    sentry_enable_logs: bool = Field(default=True, validation_alias="SENTRY_ENABLE_LOGS")
 
     @field_validator("cors_origins", mode="after")
     @classmethod
@@ -94,7 +102,7 @@ class APISettings(BaseSettings):
             return [i.strip() for i in v.split(",")]
         return v
 
-    model_config = ConfigDict(
+    model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=False,
         env_parse_none_str="",
@@ -158,7 +166,7 @@ class TestingSettings(APISettings):
     log_level: str = "DEBUG"
 
     # Use in-memory databases for testing
-    database_url: str = "sqlite:///:memory:"
+    database_url: str | None = "sqlite:///:memory:"
     redis_url: str = "redis://localhost:6379/1"  # Use different Redis DB for tests
 
     # Disable rate limiting for tests
