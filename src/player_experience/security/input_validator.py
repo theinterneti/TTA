@@ -55,7 +55,7 @@ class ValidationError(Exception):
     def __init__(
         self,
         message: str,
-        field: str = None,
+        field: str | None = None,
         severity: ValidationSeverity = ValidationSeverity.MEDIUM,
     ):
         super().__init__(message)
@@ -66,7 +66,7 @@ class ValidationError(Exception):
 class SanitizationError(Exception):
     """Exception raised when input sanitization fails."""
 
-    def __init__(self, message: str, original_input: str = None):
+    def __init__(self, message: str, original_input: str | None = None):
         super().__init__(message)
         self.original_input = original_input
 
@@ -332,8 +332,8 @@ class InputValidator:
         self,
         input_data: str,
         input_type: InputType,
-        field_name: str = None,
-        context: dict[str, Any] = None,
+        field_name: str | None = None,
+        context: dict[str, Any] | None = None,
     ) -> ValidationResult:
         """
         Validate input data against rules for the specified type.
@@ -411,8 +411,8 @@ class InputValidator:
         self,
         input_data: str,
         rule: ValidationRule,
-        field_name: str = None,
-        context: dict[str, Any] = None,
+        field_name: str | None = None,
+        context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Apply a single validation rule."""
         result = {"is_valid": True, "message": "", "sanitized": None}
@@ -697,7 +697,7 @@ class SecurityValidator:
         }
 
     def validate_and_sanitize(
-        self, input_data: str, input_type: InputType, field_name: str = None
+        self, input_data: str, input_type: InputType, field_name: str | None = None
     ) -> ValidationResult:
         """Validate and sanitize input with comprehensive security checks."""
         # First, run standard validation
