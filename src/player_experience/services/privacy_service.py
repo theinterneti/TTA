@@ -278,7 +278,7 @@ class AnonymizationService:
         self,
         dataset: list[dict[str, Any]],
         k: int = 5,
-        quasi_identifiers: list[str] = None,
+        quasi_identifiers: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         """Apply k-anonymity to dataset."""
         if quasi_identifiers is None:
