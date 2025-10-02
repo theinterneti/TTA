@@ -8,6 +8,7 @@ and safety considerations.
 
 import logging
 from dataclasses import dataclass
+from typing import Any
 
 from ..models.character import Character, TherapeuticProfile
 from ..models.enums import DifficultyLevel
@@ -443,7 +444,7 @@ class CompatibilityChecker:
 
     def assess_world_suitability(
         self, character: Character, world: WorldDetails
-    ) -> dict[str, any]:
+    ) -> dict[str, Any]:
         """
         Assess overall suitability of a world for a character.
 
