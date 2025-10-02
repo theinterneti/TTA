@@ -9,7 +9,7 @@ import os
 from contextlib import asynccontextmanager
 
 import sentry_sdk
-import structlog
+import structlog  # type: ignore[import-not-found]
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -24,14 +24,19 @@ from prometheus_client import (
 )
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.starlette import StarletteIntegration
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
-from slowapi.util import get_remote_address
+from slowapi import (  # type: ignore[import-not-found]
+    Limiter,
+    _rate_limit_exceeded_handler,
+)
+from slowapi.errors import RateLimitExceeded  # type: ignore[import-not-found]
+from slowapi.util import get_remote_address  # type: ignore[import-not-found]
 
 from ..integration.PlayerExperienceIntegration import FranchiseWorldAPI
 
 # Import routers
-from .routers.franchise_worlds import router as franchise_worlds_router
+from .routers.franchise_worlds import (  # type: ignore[import-not-found]
+    router as franchise_worlds_router,
+)
 
 # Configure structured logging
 structlog.configure(
@@ -66,7 +71,7 @@ if SENTRY_DSN and ENVIRONMENT == "production":
         dsn=SENTRY_DSN,
         integrations=[
             StarletteIntegration(transaction_style="endpoint"),
-            FastApiIntegration(auto_enable=True),
+            FastApiIntegration(),
         ],
         traces_sample_rate=0.1,
         environment=ENVIRONMENT,
