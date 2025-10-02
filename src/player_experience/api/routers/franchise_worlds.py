@@ -14,7 +14,7 @@ from ...franchise_worlds.integration.PlayerExperienceIntegration import (
     FranchiseWorldAPI,
 )
 from ...models.player import PlayerProfile
-from ..dependencies import get_current_player
+from ..dependencies import get_current_player  # type: ignore[import-not-found]
 
 # Initialize the franchise world API
 franchise_api = FranchiseWorldAPI()
