@@ -353,10 +353,10 @@ class MetricsCollector:
                 p99_response_time=self.gauges.get("response_time_p99", 0.0),
                 error_rate=self.gauges.get("error_rate", 0.0),
                 throughput=self.gauges.get("throughput", 0.0),
-                concurrent_users=self.gauges.get("concurrent_users", 0),
+                concurrent_users=int(self.gauges.get("concurrent_users", 0)),
                 memory_usage_mb=self.gauges.get("memory_usage_mb", 0.0),
                 cpu_usage_percent=self.gauges.get("cpu_usage_percent", 0.0),
-                active_connections=self.gauges.get("active_connections", 0),
+                active_connections=int(self.gauges.get("active_connections", 0)),
             )
 
     def get_database_metrics(self) -> DatabaseMetrics:
@@ -366,8 +366,8 @@ class MetricsCollector:
                 query_count=self.counters.get("db_queries_total", 0),
                 average_query_time=self.gauges.get("db_query_time_avg", 0.0),
                 slow_query_count=self.counters.get("db_slow_queries", 0),
-                connection_pool_size=self.gauges.get("db_pool_size", 0),
-                active_connections=self.gauges.get("db_active_connections", 0),
+                connection_pool_size=int(self.gauges.get("db_pool_size", 0)),
+                active_connections=int(self.gauges.get("db_active_connections", 0)),
                 failed_queries=self.counters.get("db_failed_queries", 0),
                 cache_hit_rate=self.gauges.get("db_cache_hit_rate", 0.0),
                 index_usage_rate=self.gauges.get("db_index_usage_rate", 0.0),
@@ -388,7 +388,7 @@ class MetricsCollector:
                 hit_rate=hit_rate,
                 eviction_count=self.counters.get("cache_evictions", 0),
                 memory_usage_mb=self.gauges.get("cache_memory_mb", 0.0),
-                key_count=self.gauges.get("cache_key_count", 0),
+                key_count=int(self.gauges.get("cache_key_count", 0)),
                 average_get_time=self.gauges.get("cache_get_time_avg", 0.0),
                 average_set_time=self.gauges.get("cache_set_time_avg", 0.0),
             )
@@ -402,11 +402,26 @@ class MetricsCollector:
                 (total_errors / total_requests * 100) if total_requests > 0 else 0.0
             )
 
+            # Ensure dict types are correct (str keys, int values)
+            errors_by_type_raw = self.counters.get("errors_by_type", {})
+            errors_by_type: dict[str, int] = (
+                {str(k): int(v) for k, v in errors_by_type_raw.items()}
+                if isinstance(errors_by_type_raw, dict)
+                else {}
+            )
+
+            errors_by_endpoint_raw = self.counters.get("errors_by_endpoint", {})
+            errors_by_endpoint: dict[str, int] = (
+                {str(k): int(v) for k, v in errors_by_endpoint_raw.items()}
+                if isinstance(errors_by_endpoint_raw, dict)
+                else {}
+            )
+
             return ErrorMetrics(
                 total_errors=total_errors,
                 error_rate=error_rate,
-                errors_by_type=dict(self.counters.get("errors_by_type", {})),
-                errors_by_endpoint=dict(self.counters.get("errors_by_endpoint", {})),
+                errors_by_type=errors_by_type,
+                errors_by_endpoint=errors_by_endpoint,
                 critical_errors=self.counters.get("critical_errors", 0),
                 recovery_time=self.gauges.get("recovery_time", 0.0),
             )
@@ -415,7 +430,7 @@ class MetricsCollector:
         """Get user engagement metrics."""
         with self.lock:
             return UserEngagementMetrics(
-                active_users=self.gauges.get("active_users", 0),
+                active_users=int(self.gauges.get("active_users", 0)),
                 session_duration_avg=self.gauges.get("session_duration_avg", 0.0),
                 therapeutic_interactions=self.counters.get(
                     "therapeutic_interactions", 0
