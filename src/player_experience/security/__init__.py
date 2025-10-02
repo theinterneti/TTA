@@ -27,7 +27,7 @@ from .rate_limiter import (
 # Optional: audit_logger may be unavailable in minimal test envs.
 # Provide graceful import fallback to avoid breaking module import during tests.
 try:
-    from .audit_logger import (
+    from .audit_logger import (  # type: ignore[import-not-found]
         AuditEvent,
         AuditEventType,
         AuditLogger,
@@ -42,7 +42,7 @@ except Exception:  # pragma: no cover - test fallback
     TherapeuticDataAuditor = object  # type: ignore
 # Optional: ddos_protection module may be unavailable in minimal test envs.
 try:
-    from .ddos_protection import (
+    from .ddos_protection import (  # type: ignore[import-not-found]
         AttackDetector,
         DDoSProtection,
         SecurityIncident,
@@ -55,7 +55,7 @@ except Exception:  # pragma: no cover - test fallback
     SecurityIncident = object  # type: ignore
 # Optional: vulnerability_scanner may be unavailable in minimal test envs.
 try:
-    from .vulnerability_scanner import (
+    from .vulnerability_scanner import (  # type: ignore[import-not-found]
         ComplianceChecker,
         SecurityTest,
         SecurityTestResult,
@@ -68,7 +68,7 @@ except Exception:  # pragma: no cover - test fallback
     ComplianceChecker = object  # type: ignore
 # Optional: encryption_service may be unavailable in minimal test envs.
 try:
-    from .encryption_service import (
+    from .encryption_service import (  # type: ignore[import-not-found]
         DataClassification,
         EncryptionConfig,
         EncryptionService,
