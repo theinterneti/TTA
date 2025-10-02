@@ -88,7 +88,7 @@ class BenchmarkResult:
     failed_requests: int = 0
     response_times: list[float] = field(default_factory=list)
     error_details: list[dict[str, Any]] = field(default_factory=list)
-    system_metrics: dict[str, list[float]] = field(default_factory=dict)
+    system_metrics: dict[str, list[Any]] = field(default_factory=dict)
     throughput: float = 0.0
     success_rate: float = 0.0
 
@@ -228,7 +228,7 @@ class LoadGenerator(ABC):
 class HTTPLoadGenerator(LoadGenerator):
     """HTTP load generator for API testing."""
 
-    def __init__(self, base_url: str, headers: dict[str, str] = None):
+    def __init__(self, base_url: str, headers: dict[str, str] | None = None):
         self.base_url = base_url.rstrip("/")
         self.headers = headers or {}
         self.session = None
@@ -389,7 +389,7 @@ class HTTPLoadGenerator(LoadGenerator):
         config: BenchmarkConfig,
         result: BenchmarkResult,
         duration: float,
-        concurrent_users: int = None,
+        concurrent_users: int | None = None,
     ):
         """Execute constant load for a specific duration."""
         if concurrent_users is None:
@@ -431,6 +431,7 @@ class HTTPLoadGenerator(LoadGenerator):
             start_time = time.time()
 
             try:
+                assert self.session is not None  # Initialized in generate_load
                 async with self.session.get(url) as response:
                     await response.text()  # Read response body
 
