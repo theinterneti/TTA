@@ -65,10 +65,6 @@ def init_sentry(settings: APISettings) -> None:
         # Additional configuration for therapeutic application
         before_send=_before_send_filter,
         before_send_transaction=_before_send_transaction_filter,
-        # Enable performance profiling
-        _experiments={
-            "profiles_sample_rate": settings.sentry_profiles_sample_rate,
-        },
         # Release tracking (can be set via environment variable)
         release=None,  # Will be auto-detected from git or environment
         # Additional options for better error context
@@ -279,4 +275,4 @@ def capture_therapeutic_message(
         scope.set_tag("application", "tta-therapeutic")
         scope.set_tag("component", "player-experience")
 
-        sentry_sdk.capture_message(message, level=level)
+        sentry_sdk.capture_message(message, level=level)  # type: ignore[arg-type]
