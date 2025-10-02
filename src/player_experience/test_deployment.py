@@ -56,7 +56,7 @@ class DeploymentValidator:
         test_name: str,
         success: bool,
         message: str = "",
-        details: dict[str, Any] = None,
+        details: dict[str, Any] | None = None,
     ):
         """Log a test result."""
         result = {
