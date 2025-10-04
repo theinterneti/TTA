@@ -1,5 +1,12 @@
 # TTA - Therapeutic Text Adventure
 
+[![Tests](https://github.com/theinterneti/TTA/workflows/Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/tests.yml)
+[![Code Quality](https://github.com/theinterneti/TTA/workflows/Code%20Quality/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/code-quality.yml)
+[![Security Scan](https://github.com/theinterneti/TTA/workflows/Security%20Scan/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/security-scan.yml)
+[![E2E Tests](https://github.com/theinterneti/TTA/workflows/E2E%20Tests/badge.svg)](https://github.com/theinterneti/TTA/actions/workflows/e2e-tests.yml)
+
+> AI-powered therapeutic text adventure platform combining evidence-based mental health support with engaging interactive storytelling
+
 This repository contains the code for the Therapeutic Text Adventure (TTA) project, which consists of two main components:
 
 ## Repository Structure
