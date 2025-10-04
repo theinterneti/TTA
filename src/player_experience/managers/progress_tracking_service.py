@@ -642,9 +642,7 @@ class ProgressTrackingService:
             pick_reference_today,
         )
 
-        dates = [
-            (d.date() if isinstance(d, datetime) else d) for d in session_dates
-        ]
+        dates = [(d.date() if isinstance(d, datetime) else d) for d in session_dates]
         ref_today = pick_reference_today(dates)
         # Guard: if ref_today is not today (local or UTC), there is no current streak
         today_local = _dt.now().date()

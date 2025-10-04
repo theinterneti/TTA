@@ -41,8 +41,12 @@ class APISettings(BaseSettings):
 
     # Database settings
     database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
-    redis_url: str = Field(default="redis://localhost:6379", validation_alias="REDIS_URL")
-    neo4j_uri: str = Field(default="bolt://localhost:7687", validation_alias="NEO4J_URI")
+    redis_url: str = Field(
+        default="redis://localhost:6379", validation_alias="REDIS_URL"
+    )
+    neo4j_uri: str = Field(
+        default="bolt://localhost:7687", validation_alias="NEO4J_URI"
+    )
     neo4j_username: str = Field(default="neo4j", validation_alias="NEO4J_USER")
     neo4j_password: str = Field(default="password", validation_alias="NEO4J_PASSWORD")
 
@@ -68,7 +72,9 @@ class APISettings(BaseSettings):
     sentry_send_default_pii: bool = Field(
         default=False, validation_alias="SENTRY_SEND_DEFAULT_PII"
     )
-    sentry_enable_logs: bool = Field(default=True, validation_alias="SENTRY_ENABLE_LOGS")
+    sentry_enable_logs: bool = Field(
+        default=True, validation_alias="SENTRY_ENABLE_LOGS"
+    )
 
     @field_validator("cors_origins", mode="after")
     @classmethod

@@ -82,6 +82,10 @@ dependencies = [
     # MCP Integration
     "fastmcp>=0.4.1",
     "mcp>=1.6.0",
+    # LangChain and LangGraph
+    "langchain-core>=0.3.0",
+    "langchain-openai>=0.2.0",
+    "langgraph>=0.2.0",
     # Utilities
     "python-dotenv>=1.0.0",
     "tqdm>=4.65.0",
@@ -134,22 +138,22 @@ minimal = [
     "pandas>=2.0.0",
     "scikit-learn>=1.2.0",
     "matplotlib>=3.7.0",
-    
+
     # Deep Learning
     "torch>=2.0.0",
     "transformers>=4.30.0",
     "huggingface_hub>=0.20.0",
-    
+
     # Database
     "neo4j>=5.8.0",
     "redis>=6.0.0",
-    
+
     # API and Web
     "fastapi>=0.95.0",
     "uvicorn>=0.22.0",
     "pydantic>=2.0.0",
     "httpx>=0.24.0",
-    
+
     # Utilities
     "python-dotenv>=1.0.0",
     "tqdm>=4.65.0",
@@ -172,10 +176,10 @@ gpu = [
     "torchaudio>=2.6.0",
     "tensorboard>=2.19.0",
     "tensorboardX>=2.6.0",
-    
+
     # Computer Vision with GPU dependencies
     "pycocotools>=2.0.8",
-    
+
     # GPU Utilities
     "pynvml>=12.0.0",
     "py3nvml>=0.2.7",
@@ -189,6 +193,13 @@ Repository = "https://github.com/your-org/tta"
 Documentation = "https://github.com/your-org/tta/docs"
 
 [tool.uv]
+# ============================================================================
+# UV PROJECT CONFIGURATION
+# ============================================================================
+# These settings work in conjunction with uv.toml to ensure consistent
+# virtual environment management across all contexts.
+
+# Development dependencies (installed with --dev or when default-groups includes "dev")
 dev-dependencies = [
     "pytest>=7.3.1",
     "pytest-asyncio>=0.23.0",
@@ -203,6 +214,35 @@ dev-dependencies = [
     "mypy>=1.3.0",
     "ruff>=0.11.0",
     "testcontainers>=4.12.0",
+]
+
+# Managed project environment (ensures UV manages the virtual environment)
+managed = true
+
+# Default dependency groups to install
+# "dev" is included by default for development workflow
+default-groups = ["dev"]
+
+# Python version preference
+# Prefer UV-managed Python installations for consistency
+python-preference = "managed"
+
+# Dependency resolution environments
+# Restrict to Linux (WSL2) and Python 3.10+ for faster resolution
+environments = [
+    "sys_platform == 'linux'",
+    "python_version >= '3.10'",
+]
+
+# Cache configuration for WSL2 optimization
+# Use project-local cache to avoid cross-filesystem overhead
+cache-dir = "./.uv_cache"
+
+# Cache invalidation keys
+# Rebuild when these files change
+cache-keys = [
+    { file = "pyproject.toml" },
+    { file = "uv.lock" },
 ]
 
 [tool.black]

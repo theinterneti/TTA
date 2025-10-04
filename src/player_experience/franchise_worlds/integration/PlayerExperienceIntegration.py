@@ -111,9 +111,7 @@ class FranchiseWorldBridge:
                 if not franchise_id:
                     continue
 
-                world_details = await self.convert_franchise_world_to_tta(
-                    franchise_id
-                )
+                world_details = await self.convert_franchise_world_to_tta(franchise_id)
 
                 if world_details:
                     # Register with TTA world manager

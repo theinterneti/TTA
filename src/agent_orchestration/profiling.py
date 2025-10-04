@@ -307,7 +307,9 @@ class CoordinationBenchmark:
             scenario_name = scenario["name"]
             logger.info(f"Running benchmark scenario: {scenario_name}")
 
-            async def coordination_func(request_id: int):
+            async def coordination_func(
+                request_id: int, scenario=scenario
+            ):  # Bind scenario to avoid loop variable issue
                 """Coordination function for this scenario."""
                 return await self._execute_scenario(agent_proxies, scenario, request_id)
 

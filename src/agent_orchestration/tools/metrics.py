@@ -5,7 +5,11 @@ Tool execution metrics aggregator for dynamic tools.
 from __future__ import annotations
 
 import time
+from collections.abc import Callable, Generator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
+from functools import wraps
+from typing import Any, TypeVar
 
 
 @dataclass
@@ -79,12 +83,6 @@ class ToolMetrics:
 
 
 # Lightweight decorator and context manager for automatic metrics
-import time as _time
-from collections.abc import Callable, Generator
-from contextlib import contextmanager
-from functools import wraps
-from typing import Any, TypeVar
-
 F = TypeVar("F", bound=Callable[..., Any])
 
 
@@ -94,7 +92,7 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
     def _decorator(fn: F) -> F:
         @wraps(fn)
         def _wrapped(*args, **kwargs):
-            start = _time.perf_counter()
+            start = time.perf_counter()
             try:
                 res = fn(*args, **kwargs)
                 if hasattr(res, "__await__"):
@@ -102,14 +100,14 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
                     async def _awaitable():
                         try:
                             r = await res  # type: ignore
-                            dur = (_time.perf_counter() - start) * 1000.0
+                            dur = (time.perf_counter() - start) * 1000.0
                             try:
                                 get_tool_metrics().record_success(name, version, dur)
                             except Exception:
                                 pass
                             return r
                         except Exception:
-                            dur = (_time.perf_counter() - start) * 1000.0
+                            dur = (time.perf_counter() - start) * 1000.0
                             try:
                                 get_tool_metrics().record_failure(name, version, dur)
                             except Exception:
@@ -118,14 +116,14 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
 
                     return _awaitable()
                 # sync path
-                dur = (_time.perf_counter() - start) * 1000.0
+                dur = (time.perf_counter() - start) * 1000.0
                 try:
                     get_tool_metrics().record_success(name, version, dur)
                 except Exception:
                     pass
                 return res
             except Exception:
-                dur = (_time.perf_counter() - start) * 1000.0
+                dur = (time.perf_counter() - start) * 1000.0
                 try:
                     get_tool_metrics().record_failure(name, version, dur)
                 except Exception:
@@ -139,16 +137,16 @@ def tool_execution(name: str, version: str) -> Callable[[F], F]:
 
 @contextmanager
 def tool_exec_context(name: str, version: str) -> Generator[None, None, None]:
-    start = _time.perf_counter()
+    start = time.perf_counter()
     try:
         yield
-        dur = (_time.perf_counter() - start) * 1000.0
+        dur = (time.perf_counter() - start) * 1000.0
         try:
             get_tool_metrics().record_success(name, version, dur)
         except Exception:
             pass
     except Exception:
-        dur = (_time.perf_counter() - start) * 1000.0
+        dur = (time.perf_counter() - start) * 1000.0
         try:
             get_tool_metrics().record_failure(name, version, dur)
         except Exception:

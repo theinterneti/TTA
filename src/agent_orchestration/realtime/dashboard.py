@@ -19,10 +19,7 @@ from .event_publisher import EventPublisher
 
 # Import alerting system with fallback
 try:
-    from ...monitoring.realtime_alerts import (
-        console_notification_handler,
-        get_alert_manager,
-    )
+    from ...monitoring.realtime_alerts import get_alert_manager
 
     ALERTING_AVAILABLE = True
 except ImportError:
