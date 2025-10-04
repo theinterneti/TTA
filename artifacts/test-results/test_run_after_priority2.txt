@@ -1,0 +1,211 @@
+.....F........................ssssssssss...s......s.FFFFs.ssssssssssss.s [  7%]
+ssss.....................................sssssssssssssss................ [ 15%]
+.........sssssssF.FFF...ss.........sssssssssssssssssssssssssssssssssss.. [ 22%]
+....ssssssssssssssssssssss...sssssssssssssssssssss...s.s................ [ 30%]
+.........sss..sssssssssssssss..........sssssssssssssssssssssssssssss.... [ 37%]
+..s.sssssssEEEEFFFFFFFFFFFF...F.FF...................................F.. [ 45%]
+..............s...............sssssssssssFFFF.FF..................F..... [ 52%]
+...............FF...FFFFFFF............................................. [ 60%]
+........................................................................ [ 68%]
+........................................................................ [ 75%]
+............ssss........................................................ [ 83%]
+..................................ss.................................s.. [ 90%]
+.........................................F.FF.F.F....................... [ 98%]
+FF...F.....sssss                                                         [100%]
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/pydantic/fields.py:1093: 12 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/fields.py:1093: PydanticDeprecatedSince20: Using extra keyword arguments on `Field` is deprecated and will be removed. Use `json_schema_extra` instead. (Extra keys: 'env'). Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn(
+
+src/agent_orchestration/models.py:127
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/models.py:127: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('version')
+
+src/agent_orchestration/models.py:135
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/models.py:135: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('name')
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_fields.py:198
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_fields.py:198: UserWarning: Field name "schema" in "ToolParameter" shadows an attribute in parent "BaseModel"
+    warnings.warn(
+
+.venv/lib/python3.12/site-packages/codecarbon/core/gpu.py:4
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/codecarbon/core/gpu.py:4: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+    import pynvml
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: 18 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:298: 33 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:298: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://docs.pydantic.dev/2.11/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(
+
+src/components/narrative_arc_orchestrator/scale_manager.py:48
+  /home/thein/recovered-tta-storytelling/src/components/narrative_arc_orchestrator/scale_manager.py:48: DeprecationWarning: There is no current event loop
+    return super().get_event_loop()
+
+tests/agent_orchestration/test_performance_validation.py:29
+  /home/thein/recovered-tta-storytelling/tests/agent_orchestration/test_performance_validation.py:29: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests/agent_orchestration/test_real_agent_performance.py:38
+  /home/thein/recovered-tta-storytelling/tests/agent_orchestration/test_real_agent_performance.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests/agent_orchestration/test_websocket_performance.py:53
+  /home/thein/recovered-tta-storytelling/tests/agent_orchestration/test_websocket_performance.py:53: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests/comprehensive_battery/utils/test_data_generator.py:28
+  /home/thein/recovered-tta-storytelling/tests/comprehensive_battery/utils/test_data_generator.py:28: PytestCollectionWarning: cannot collect test class 'TestUserProfile' because it has a __init__ constructor (from: tests/comprehensive_battery/utils/test_data_generator.py)
+    @dataclass
+
+tests/comprehensive_battery/utils/test_data_generator.py:41
+  /home/thein/recovered-tta-storytelling/tests/comprehensive_battery/utils/test_data_generator.py:41: PytestCollectionWarning: cannot collect test class 'TestScenario' because it has a __init__ constructor (from: tests/comprehensive_battery/utils/test_data_generator.py)
+    @dataclass
+
+tests/comprehensive_battery/utils/test_data_generator.py:53
+  /home/thein/recovered-tta-storytelling/tests/comprehensive_battery/utils/test_data_generator.py:53: PytestCollectionWarning: cannot collect test class 'TestDataGenerator' because it has a __init__ constructor (from: tests/comprehensive_battery/utils/test_data_generator.py)
+    class TestDataGenerator:
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_api_integration.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_api_structure.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_character_management_api.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_end_to_end_workflows.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_metrics_endpoint.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_progress_viz_endpoint.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_websocket_chat_backend.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_websocket_chat_backend_task8_2.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_websocket_chat_interactive.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_websocket_chat_typing_and_metrics.py)
+    class TestingSettings(APISettings):
+
+src/player_experience/api/config.py:155
+  /home/thein/recovered-tta-storytelling/src/player_experience/api/config.py:155: PytestCollectionWarning: cannot collect test class 'TestingSettings' because it has a __init__ constructor (from: tests/test_world_management_api.py)
+    class TestingSettings(APISettings):
+
+tests/agent_orchestration/test_agent_orchestration_service.py::test_process_user_input_not_initialized
+tests/agent_orchestration/test_agent_orchestration_service.py::test_session_context_update
+tests/agent_orchestration/test_agent_orchestration_service.py::test_error_recovery_scenarios
+  /usr/lib/python3.12/unittest/mock.py:2188: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    def __init__(self, name, parent):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/agent_orchestration/test_crisis_intervention_system.py::TestHumanOversightEscalation::test_escalation_metrics
+  /usr/lib/python3.12/logging/__init__.py:200: RuntimeWarning: coroutine 'AsyncMockMixin._execute_mock_call' was never awaited
+    def _is_internal_frame(frame):
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+tests/integration/test_gameplay_loop_integration.py::TestGameplayService::test_service_not_initialized
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/config_schema.py:62: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('version')
+
+tests/integration/test_gameplay_loop_integration.py::TestGameplayService::test_service_not_initialized
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/config_schema.py:94: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('instance')
+
+tests/integration/test_gameplay_loop_integration.py::TestGameplayService::test_service_not_initialized
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/config_schema.py:141: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('heartbeat_interval')
+
+tests/test_api_integration.py::test_error_handling
+tests/test_end_to_end_workflows.py::TestEndToEndUserWorkflows::test_multi_character_workflow
+tests/test_end_to_end_workflows.py::TestErrorHandlingAndRecovery::test_invalid_data_handling
+tests/test_player_management_api.py::TestPlayerManagementAPI::test_create_player_validation_error
+tests/test_player_management_api.py::TestPlayerManagementAPI::test_update_player_validation_error
+tests/test_player_management_api.py::TestPlayerManagementAPI::test_privacy_settings_validation_error
+tests/test_player_management_api.py::TestPlayerManagementAPI::test_therapeutic_preferences_validation_error
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/starlette/_exception_handler.py:59: DeprecationWarning: 'HTTP_422_UNPROCESSABLE_ENTITY' is deprecated. Use 'HTTP_422_UNPROCESSABLE_CONTENT' instead.
+    response = await handler(conn, exc)
+
+tests/test_character_avatar_manager.py: 16 warnings
+tests/test_player_experience_manager.py: 4 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/neo4j/_sync/driver.py:547: DeprecationWarning: Relying on Driver's destructor to close the session is deprecated. Please make sure to close the session. Use it as a context (`with` statement) or make sure to call `.close()` explicitly. Future versions of the driver will not close drivers automatically.
+    _deprecation_warn(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/agent_orchestration/test_agent_orchestration_service.py::test_process_user_input_therapeutic_safety_error
+FAILED tests/agent_orchestration/test_agents_and_proxies.py::test_agent_process_timeout_and_metrics
+FAILED tests/agent_orchestration/test_agents_and_proxies.py::test_input_processor_validation_and_retry
+FAILED tests/agent_orchestration/test_agents_and_proxies.py::test_world_builder_cache_and_updates
+FAILED tests/agent_orchestration/test_agents_and_proxies.py::test_narrative_generator_filtering
+FAILED tests/agent_orchestration/test_integration_runner.py::test_integration_test_structure
+FAILED tests/agent_orchestration/test_integration_runner.py::test_test_data_fixtures
+FAILED tests/agent_orchestration/test_integration_runner.py::test_performance_metrics_utility
+FAILED tests/agent_orchestration/test_integration_runner.py::test_workflow_state_verifier
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_create_session_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_create_session_auth_failure
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_process_choice_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_process_choice_session_not_found
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_get_session_status_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_get_session_status_access_denied
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_end_session_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_get_user_sessions_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_health_check_success
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_missing_authorization_header
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_invalid_request_body
+FAILED tests/integration/test_gameplay_api.py::TestGameplayAPI::test_internal_server_error_handling
+FAILED tests/integration/test_gameplay_loop_integration.py::TestGameplayLoopIntegration::test_create_authenticated_session_auth_failure
+FAILED tests/integration/test_gameplay_loop_integration.py::TestGameplayLoopIntegration::test_process_validated_choice_access_denied
+FAILED tests/integration/test_gameplay_loop_integration.py::TestGameplayLoopIntegration::test_safety_validation_high_risk_content
+FAILED tests/test_character_avatar_manager.py::TestCharacterAvatarManager::test_delete_character
+FAILED tests/test_end_to_end_workflows.py::TestEndToEndUserWorkflows::test_complete_new_user_journey
+FAILED tests/test_end_to_end_workflows.py::TestEndToEndUserWorkflows::test_multi_character_workflow
+FAILED tests/test_end_to_end_workflows.py::TestEndToEndUserWorkflows::test_therapeutic_settings_adaptation_workflow
+FAILED tests/test_end_to_end_workflows.py::TestConcurrentUserScenarios::test_concurrent_websocket_connections
+FAILED tests/test_end_to_end_workflows.py::TestConcurrentUserScenarios::test_session_state_consistency_under_load
+FAILED tests/test_end_to_end_workflows.py::TestErrorHandlingAndRecovery::test_network_interruption_recovery
+FAILED tests/test_enhanced_authentication.py::TestAuthenticationAPI::test_register_endpoint
+FAILED tests/test_metrics_endpoint.py::test_metrics_endpoint_available_in_debug
+FAILED tests/test_metrics_endpoint.py::test_metrics_endpoint_hidden_in_production
+FAILED tests/test_model_management.py::TestHardwareDetector::test_detect_system_resources
+FAILED tests/test_model_management.py::TestHardwareDetector::test_recommend_models
+FAILED tests/test_model_management.py::TestOpenRouterProvider::test_provider_initialization
+FAILED tests/test_model_management.py::TestOpenRouterProvider::test_get_available_models
+FAILED tests/test_model_management.py::TestModelSelector::test_select_model
+FAILED tests/test_model_management.py::TestIntegration::test_end_to_end_generation
+FAILED tests/test_model_management.py::TestErrorHandling::test_provider_failure_fallback
+FAILED tests/test_websocket_chat_backend.py::test_user_message_roundtrip - As...
+FAILED tests/test_websocket_chat_backend_task8_2.py::test_user_message_includes_recommendations_and_no_crisis_by_default
+FAILED tests/test_websocket_chat_backend_task8_2.py::test_crisis_detection_includes_resources
+FAILED tests/test_websocket_chat_interactive.py::test_interactive_buttons_suggested_on_anxiety
+FAILED tests/test_websocket_chat_typing_and_metrics.py::test_typing_events_emitted_when_opt_in
+FAILED tests/test_world_management_module.py::TestWorldManagementModule::test_get_available_worlds_with_character
+FAILED tests/test_world_management_module.py::TestWorldManagementModule::test_get_available_worlds_without_character
+FAILED tests/test_world_management_module.py::TestWorldManagementModule::test_initialization
+ERROR tests/integration/test_core_gameplay_loop.py::TestCoreGameplayLoopIntegration::test_complete_gameplay_session_flow
+ERROR tests/integration/test_core_gameplay_loop.py::TestCoreGameplayLoopIntegration::test_therapeutic_progression_validation
+ERROR tests/integration/test_core_gameplay_loop.py::TestCoreGameplayLoopIntegration::test_emotional_state_adaptation
+ERROR tests/integration/test_core_gameplay_loop.py::TestCoreGameplayLoopIntegration::test_session_lifecycle_management
