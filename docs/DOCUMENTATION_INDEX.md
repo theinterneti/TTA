@@ -58,6 +58,13 @@ Located in `docs/operations/`
 - **[TTA Analytics Executive Summary](operations/monitoring/tta_analytics_executive_summary.md)** - Analytics summary
 - **[TTA Data Visualization Assessment](operations/monitoring/tta_data_visualization_assessment.md)** - Visualization tools
 
+### 🏥 Clinical & Therapeutic
+Located in `docs/clinical/`
+
+- **[Evidence-Based Frameworks](clinical/EVIDENCE_BASED_FRAMEWORKS.md)** - Therapeutic approaches (CBT, DBT, ACT, Mindfulness, Trauma-Informed Care)
+- **[Clinical Consultation Framework](clinical/CLINICAL_CONSULTATION_FRAMEWORK.md)** - Clinical oversight and validation structure
+- **[Therapeutic Content Overview](clinical/THERAPEUTIC_CONTENT_OVERVIEW.md)** - Therapeutic content guidelines and management
+
 ### 🔌 Integration
 Located in `docs/integration/`
 
@@ -95,6 +102,11 @@ Located in `docs/environments/`
 2. [Testing Directories Analysis](testing/TESTING_DIRECTORIES_ANALYSIS.md)
 3. [Environment Setup Guide](environments/ENVIRONMENT_SETUP_GUIDE.md)
 4. [Testing Database Setup](setup/TESTING_DATABASE_SETUP.md)
+
+### Clinical Consultant / Therapist
+1. [Evidence-Based Frameworks](clinical/EVIDENCE_BASED_FRAMEWORKS.md)
+2. [Clinical Consultation Framework](clinical/CLINICAL_CONSULTATION_FRAMEWORK.md)
+3. [Therapeutic Content Overview](clinical/THERAPEUTIC_CONTENT_OVERVIEW.md)
 
 ### System Administrator
 1. [Environment Setup Guide](environments/ENVIRONMENT_SETUP_GUIDE.md)
