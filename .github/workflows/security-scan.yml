@@ -83,24 +83,24 @@ jobs:
       - name: Check for high-severity vulnerabilities
         run: |
           echo "Checking for high-severity vulnerabilities..."
-          
+
           # Check npm audit results
           if [ -f "npm-audit-root.json" ]; then
             HIGH_VULNS=$(jq '.metadata.vulnerabilities.high // 0' npm-audit-root.json)
             CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit-root.json)
             echo "Root dependencies - High: $HIGH_VULNS, Critical: $CRITICAL_VULNS"
-            
+
             if [ "$HIGH_VULNS" -gt 0 ] || [ "$CRITICAL_VULNS" -gt 0 ]; then
               echo "❌ High or critical vulnerabilities found in root dependencies"
               echo "high_vulns_found=true" >> $GITHUB_ENV
             fi
           fi
-          
+
           if [ -f "npm-audit-frontend.json" ]; then
             HIGH_VULNS=$(jq '.metadata.vulnerabilities.high // 0' npm-audit-frontend.json)
             CRITICAL_VULNS=$(jq '.metadata.vulnerabilities.critical // 0' npm-audit-frontend.json)
             echo "Frontend dependencies - High: $HIGH_VULNS, Critical: $CRITICAL_VULNS"
-            
+
             if [ "$HIGH_VULNS" -gt 0 ] || [ "$CRITICAL_VULNS" -gt 0 ]; then
               echo "❌ High or critical vulnerabilities found in frontend dependencies"
               echo "high_vulns_found=true" >> $GITHUB_ENV
@@ -115,18 +115,18 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> security-report.md
           echo "**Commit:** ${{ github.sha }}" >> security-report.md
           echo "" >> security-report.md
-          
+
           echo "## NPM Audit Results" >> security-report.md
           if [ -f "npm-audit-root.json" ]; then
             echo "### Root Dependencies" >> security-report.md
             jq -r '.metadata.vulnerabilities | to_entries[] | "- \(.key | ascii_upcase): \(.value)"' npm-audit-root.json >> security-report.md
           fi
-          
+
           if [ -f "npm-audit-frontend.json" ]; then
             echo "### Frontend Dependencies" >> security-report.md
             jq -r '.metadata.vulnerabilities | to_entries[] | "- \(.key | ascii_upcase): \(.value)"' npm-audit-frontend.json >> security-report.md
           fi
-          
+
           echo "" >> security-report.md
           echo "## Recommendations" >> security-report.md
           echo "- Review and update vulnerable dependencies" >> security-report.md
@@ -158,10 +158,10 @@ jobs:
           status: failure
           text: |
             🚨 Security vulnerabilities detected!
-            
+
             **Branch:** ${{ github.ref_name }}
             **Commit:** ${{ github.sha }}
-            
+
             Please review the security scan results and address vulnerabilities.
             [View Results](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
           webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -180,7 +180,6 @@ jobs:
         with:
           fail-on-severity: moderate
           allow-licenses: MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC
-          deny-licenses: GPL-2.0, GPL-3.0
 
   secrets-scan:
     name: Secrets Detection
@@ -435,20 +434,20 @@ jobs:
           echo "**Branch:** ${{ github.ref_name }}" >> security-summary.md
           echo "**Commit:** ${{ github.sha }}" >> security-summary.md
           echo "" >> security-summary.md
-          
+
           # Check job results
           if [[ "${{ needs.security-scan.result }}" == "success" ]]; then
             echo "✅ **Vulnerability Scan:** Passed" >> security-summary.md
           else
             echo "❌ **Vulnerability Scan:** Failed" >> security-summary.md
           fi
-          
+
           if [[ "${{ needs.dependency-review.result }}" == "success" ]]; then
             echo "✅ **Dependency Review:** Passed" >> security-summary.md
           else
             echo "❌ **Dependency Review:** Failed" >> security-summary.md
           fi
-          
+
           if [[ "${{ needs.secrets-scan.result }}" == "success" ]]; then
             echo "✅ **Secrets Detection:** Passed" >> security-summary.md
           else

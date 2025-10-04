@@ -132,7 +132,7 @@ class GameplayLoopController:
 
             # Store session
             self.active_sessions[session_state.session_id] = gameplay_session
-            await self.database_manager.save_session_state(session_state)
+            await self.database_manager.create_session(session_state)
 
             logger.info(f"Session {session_state.session_id} started successfully")
             return gameplay_session
