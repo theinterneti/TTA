@@ -1,0 +1,756 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.realtime.progressive_feedback &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.realtime.progressive_feedback</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.realtime.progressive_feedback</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Progressive feedback mechanisms for long-running agent orchestration operations.</span>
+
+<span class="sd">This module provides streaming response systems, incremental update mechanisms,</span>
+<span class="sd">and progress tracking for workflows and operations that take significant time</span>
+<span class="sd">to complete.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AgentStatus</span><span class="p">,</span>
+    <span class="n">create_agent_status_event</span><span class="p">,</span>
+    <span class="n">create_progressive_feedback_event</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OperationProgress">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.OperationProgress">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">OperationProgress</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks progress for a long-running operation.&quot;&quot;&quot;</span>
+
+    <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">operation_type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">last_update</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">current_stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;initializing&quot;</span>
+    <span class="n">progress_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">total_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">completed_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">estimated_completion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">intermediate_results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
+    <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="OperationProgress.update_progress">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.OperationProgress.update_progress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">update_progress</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">completed_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">estimated_completion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">intermediate_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update operation progress.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">stage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_stage</span> <span class="o">=</span> <span class="n">stage</span>
+
+        <span class="k">if</span> <span class="n">progress_percentage</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">100.0</span><span class="p">,</span> <span class="n">progress_percentage</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">completed_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">completed_steps</span> <span class="o">=</span> <span class="n">completed_steps</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">=</span> <span class="p">(</span><span class="n">completed_steps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
+
+        <span class="k">if</span> <span class="n">estimated_completion</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">estimated_completion</span> <span class="o">=</span> <span class="n">estimated_completion</span>
+
+        <span class="k">if</span> <span class="n">intermediate_result</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">intermediate_result</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OperationProgress.get_estimated_remaining">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.OperationProgress.get_estimated_remaining">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_estimated_remaining</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate estimated remaining time.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_completion</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_completion</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span>
+            <span class="n">total_estimated</span> <span class="o">=</span> <span class="n">elapsed</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">total_estimated</span> <span class="o">-</span> <span class="n">elapsed</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="OperationProgress.to_dict">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.OperationProgress.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to dictionary representation.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;operation_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_id</span><span class="p">,</span>
+            <span class="s2">&quot;operation_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+            <span class="s2">&quot;last_update&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_update</span><span class="p">,</span>
+            <span class="s2">&quot;current_stage&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_stage</span><span class="p">,</span>
+            <span class="s2">&quot;progress_percentage&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_percentage</span><span class="p">,</span>
+            <span class="s2">&quot;total_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_steps</span><span class="p">,</span>
+            <span class="s2">&quot;completed_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">completed_steps</span><span class="p">,</span>
+            <span class="s2">&quot;estimated_completion&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">estimated_completion</span><span class="p">,</span>
+            <span class="s2">&quot;estimated_remaining&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_estimated_remaining</span><span class="p">(),</span>
+            <span class="s2">&quot;intermediate_results&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">intermediate_results</span><span class="p">,</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">status</span><span class="p">,</span>
+            <span class="s2">&quot;error_message&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="p">,</span>
+            <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+        <span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressiveFeedbackManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Manages progressive feedback for long-running operations.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">event_publisher</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">update_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">max_updates_per_operation</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">stream_intermediate_results</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">cleanup_interval</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>  <span class="c1"># 5 minutes</span>
+        <span class="n">operation_timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">3600.0</span><span class="p">,</span>  <span class="c1"># 1 hour</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span> <span class="o">=</span> <span class="n">event_publisher</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">update_interval</span> <span class="o">=</span> <span class="n">update_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_updates_per_operation</span> <span class="o">=</span> <span class="n">max_updates_per_operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stream_intermediate_results</span> <span class="o">=</span> <span class="n">stream_intermediate_results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span> <span class="o">=</span> <span class="n">cleanup_interval</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_timeout</span> <span class="o">=</span> <span class="n">operation_timeout</span>
+
+        <span class="c1"># Operation tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">OperationProgress</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">set</span><span class="p">[</span><span class="n">Callable</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ProgressiveFeedbackManager initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.start">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.start">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the progressive feedback manager.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_loop</span><span class="p">())</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ProgressiveFeedbackManager started&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.stop">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.stop">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the progressive feedback manager.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span>
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="c1"># Complete all active operations</span>
+        <span class="k">for</span> <span class="n">operation_id</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_operation</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="s2">&quot;manager_shutdown&quot;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;ProgressiveFeedbackManager stopped&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.start_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.start_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">total_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">estimated_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start tracking a new long-running operation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operation_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">operation_id</span> <span class="o">=</span> <span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span>
+
+        <span class="c1"># Create operation progress tracker</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="n">OperationProgress</span><span class="p">(</span>
+            <span class="n">operation_id</span><span class="o">=</span><span class="n">operation_id</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">total_steps</span><span class="o">=</span><span class="n">total_steps</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">estimated_duration</span><span class="p">:</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">estimated_completion</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">estimated_duration</span>
+
+        <span class="c1"># Store operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Send initial progress event</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_progress_event</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="s2">&quot;Operation started&quot;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Started tracking operation: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">operation_type</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation_id</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.update_operation_progress">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.update_operation_progress">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_operation_progress</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">progress_percentage</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">completed_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">estimated_completion</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">intermediate_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update progress for an operation.&quot;&quot;&quot;</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">operation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation not found: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check update limits</span>
+        <span class="n">update_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">update_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_updates_per_operation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Max updates reached for operation: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Update operation progress</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">update_progress</span><span class="p">(</span>
+            <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">,</span>
+            <span class="n">progress_percentage</span><span class="o">=</span><span class="n">progress_percentage</span><span class="p">,</span>
+            <span class="n">completed_steps</span><span class="o">=</span><span class="n">completed_steps</span><span class="p">,</span>
+            <span class="n">estimated_completion</span><span class="o">=</span><span class="n">estimated_completion</span><span class="p">,</span>
+            <span class="n">intermediate_result</span><span class="o">=</span><span class="n">intermediate_result</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Send progress event</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_progress_event</span><span class="p">(</span>
+            <span class="n">operation</span><span class="p">,</span> <span class="n">message</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Progress update: </span><span class="si">{</span><span class="n">stage</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="s1">&#39;continuing&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Increment update count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">update_count</span> <span class="o">+</span> <span class="mi">1</span>
+
+        <span class="c1"># Call registered callbacks</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_operation_callbacks</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.complete_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.complete_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">final_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Operation completed&quot;</span><span class="p">,</span>
+        <span class="n">final_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Complete an operation.&quot;&quot;&quot;</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">operation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation not found: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Update final status</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">100.0</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="n">operation</span><span class="o">.</span><span class="n">progress_percentage</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">final_result</span><span class="p">:</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">final_result</span><span class="p">)</span>
+
+        <span class="c1"># Send final progress event</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_progress_event</span><span class="p">(</span><span class="n">operation</span><span class="p">,</span> <span class="n">final_message</span><span class="p">)</span>
+
+        <span class="c1"># Call final callbacks</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_operation_callbacks</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="n">operation</span><span class="p">)</span>
+
+        <span class="c1"># Clean up</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Completed operation: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="s1">&#39;success&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">success</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;failed&#39;</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.fail_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.fail_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fail_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">error_details</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mark an operation as failed.&quot;&quot;&quot;</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">operation</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Operation not found: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">operation</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
+
+        <span class="k">if</span> <span class="n">error_details</span><span class="p">:</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="p">[</span><span class="s2">&quot;error_details&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_details</span>
+
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">complete_operation</span><span class="p">(</span>
+            <span class="n">operation_id</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Operation failed: </span><span class="si">{</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.add_operation_callback">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.add_operation_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_operation_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">OperationProgress</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a callback for operation updates.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operation_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.remove_operation_callback">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.remove_operation_callback">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_operation_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">callback</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">OperationProgress</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a callback for operation updates.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operation_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">callback</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.get_operation_status">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.get_operation_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_operation_status</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current status of an operation.&quot;&quot;&quot;</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span> <span class="k">if</span> <span class="n">operation</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.get_active_operations">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.get_active_operations">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_active_operations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all active operations, optionally filtered by user.&quot;&quot;&quot;</span>
+        <span class="n">operations</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">operation</span><span class="o">.</span><span class="n">user_id</span> <span class="o">==</span> <span class="n">user_id</span><span class="p">:</span>
+                <span class="n">operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">operations</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_send_progress_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="n">OperationProgress</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send a progressive feedback event.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">intermediate_result</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_intermediate_results</span> <span class="ow">and</span> <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="p">:</span>
+                <span class="n">intermediate_result</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_progressive_feedback_event</span><span class="p">(</span>
+                <span class="n">operation_id</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">operation_id</span><span class="p">,</span>
+                <span class="n">operation_type</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">operation_type</span><span class="p">,</span>
+                <span class="n">stage</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">current_stage</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+                <span class="n">progress_percentage</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">progress_percentage</span><span class="p">,</span>
+                <span class="n">intermediate_result</span><span class="o">=</span><span class="n">intermediate_result</span><span class="p">,</span>
+                <span class="n">estimated_remaining</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">get_estimated_remaining</span><span class="p">(),</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">operation</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send progress event: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_call_operation_callbacks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">operation</span><span class="p">:</span> <span class="n">OperationProgress</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Call all registered callbacks for an operation.&quot;&quot;&quot;</span>
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_callbacks</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="n">callbacks</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">iscoroutinefunction</span><span class="p">(</span><span class="n">callback</span><span class="p">):</span>
+                    <span class="k">await</span> <span class="n">callback</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">callback</span><span class="p">(</span><span class="n">operation</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in operation callback: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task to clean up stale operations.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span><span class="p">)</span>
+
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">stale_operations</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="k">for</span> <span class="n">operation_id</span><span class="p">,</span> <span class="n">operation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="c1"># Check for timeout</span>
+                    <span class="k">if</span> <span class="n">current_time</span> <span class="o">-</span> <span class="n">operation</span><span class="o">.</span><span class="n">start_time</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_timeout</span><span class="p">:</span>
+                        <span class="n">stale_operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+                    <span class="c1"># Check for stale updates</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">current_time</span> <span class="o">-</span> <span class="n">operation</span><span class="o">.</span><span class="n">last_update</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span> <span class="o">*</span> <span class="mi">2</span>
+                    <span class="p">):</span>
+                        <span class="n">stale_operations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">operation_id</span><span class="p">)</span>
+
+                <span class="c1"># Clean up stale operations</span>
+                <span class="k">for</span> <span class="n">operation_id</span> <span class="ow">in</span> <span class="n">stale_operations</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">fail_operation</span><span class="p">(</span>
+                        <span class="n">operation_id</span><span class="p">,</span>
+                        <span class="s2">&quot;Operation timed out or became stale&quot;</span><span class="p">,</span>
+                        <span class="p">{</span><span class="s2">&quot;cleanup_reason&quot;</span><span class="p">:</span> <span class="s2">&quot;timeout_or_stale&quot;</span><span class="p">},</span>
+                    <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">stale_operations</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cleaned up </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">stale_operations</span><span class="p">)</span><span class="si">}</span><span class="s2"> stale operations&quot;</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.get_statistics">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.get_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get progressive feedback manager statistics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;is_running&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_running</span><span class="p">,</span>
+            <span class="s2">&quot;active_operations&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">),</span>
+            <span class="s2">&quot;total_updates&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+            <span class="s2">&quot;configuration&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;update_interval&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_interval</span><span class="p">,</span>
+                <span class="s2">&quot;max_updates_per_operation&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_updates_per_operation</span><span class="p">,</span>
+                <span class="s2">&quot;stream_intermediate_results&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">stream_intermediate_results</span><span class="p">,</span>
+                <span class="s2">&quot;cleanup_interval&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_interval</span><span class="p">,</span>
+                <span class="s2">&quot;operation_timeout&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">operation_timeout</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;operations_by_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_operations_by_type</span><span class="p">(),</span>
+            <span class="s2">&quot;operations_by_user&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_operations_by_user</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_operations_by_type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count of operations by type.&quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">operation</span><span class="o">.</span><span class="n">operation_type</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation</span><span class="o">.</span><span class="n">operation_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">counts</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_operations_by_user</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get count of operations by user.&quot;&quot;&quot;</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">operation</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">or</span> <span class="s2">&quot;anonymous&quot;</span>
+            <span class="n">counts</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">counts</span>
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.track_agent_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.track_agent_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">track_agent_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">operation_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">estimated_duration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start tracking a specific agent operation with enhanced feedback.&quot;&quot;&quot;</span>
+        <span class="n">operation_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">agent_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">operation_type</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">uuid4</span><span class="p">()</span><span class="o">.</span><span class="n">hex</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Create operation progress tracker</span>
+        <span class="n">operation</span> <span class="o">=</span> <span class="n">OperationProgress</span><span class="p">(</span>
+            <span class="n">operation_id</span><span class="o">=</span><span class="n">operation_id</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;agent_</span><span class="si">{</span><span class="n">operation_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add agent-specific metadata</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;agent_id&quot;</span><span class="p">:</span> <span class="n">agent_id</span><span class="p">,</span>
+                <span class="s2">&quot;workflow_id&quot;</span><span class="p">:</span> <span class="n">workflow_id</span><span class="p">,</span>
+                <span class="s2">&quot;estimated_duration&quot;</span><span class="p">:</span> <span class="n">estimated_duration</span><span class="p">,</span>
+                <span class="s2">&quot;operation_start&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">operation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># Send initial agent status event</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+            <span class="n">initial_event</span> <span class="o">=</span> <span class="n">create_agent_status_event</span><span class="p">(</span>
+                <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">AgentStatus</span><span class="o">.</span><span class="n">PROCESSING</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Started </span><span class="si">{</span><span class="n">operation_type</span><span class="si">}</span><span class="s2"> operation&quot;</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;operation_id&quot;</span><span class="p">:</span> <span class="n">operation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;workflow_id&quot;</span><span class="p">:</span> <span class="n">workflow_id</span><span class="p">,</span>
+                    <span class="s2">&quot;estimated_duration&quot;</span><span class="p">:</span> <span class="n">estimated_duration</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">initial_event</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Started tracking agent operation: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">operation_id</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.update_agent_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.update_agent_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_agent_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">progress</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">stage</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">intermediate_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update progress for an agent operation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operation_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_id&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update operation progress</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">update_progress</span><span class="p">(</span>
+            <span class="n">stage</span><span class="o">=</span><span class="n">stage</span><span class="p">,</span>
+            <span class="n">progress_percentage</span><span class="o">=</span><span class="n">progress</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="n">intermediate_result</span><span class="o">=</span><span class="n">intermediate_result</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Increment update count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">operation_update_counts</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">operation_id</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Send progressive feedback event</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="p">:</span>
+            <span class="n">feedback_event</span> <span class="o">=</span> <span class="n">create_progressive_feedback_event</span><span class="p">(</span>
+                <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+                <span class="n">operation_id</span><span class="o">=</span><span class="n">operation_id</span><span class="p">,</span>
+                <span class="n">progress</span><span class="o">=</span><span class="n">progress</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">message</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Stage: </span><span class="si">{</span><span class="n">stage</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">intermediate_result</span><span class="o">=</span><span class="n">intermediate_result</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">feedback_event</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ProgressiveFeedbackManager.complete_agent_operation">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.realtime.progressive_feedback.html#src.agent_orchestration.realtime.progressive_feedback.ProgressiveFeedbackManager.complete_agent_operation">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">complete_agent_operation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">final_result</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Complete an agent operation.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">operation_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">operation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_operations</span><span class="p">[</span><span class="n">operation_id</span><span class="p">]</span>
+        <span class="n">agent_id</span> <span class="o">=</span> <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;agent_id&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Update operation status</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="s2">&quot;failed&quot;</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">progress_percentage</span> <span class="o">=</span> <span class="mf">100.0</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">error_message</span> <span class="o">=</span> <span class="n">error_message</span>
+
+        <span class="k">if</span> <span class="n">final_result</span><span class="p">:</span>
+            <span class="n">operation</span><span class="o">.</span><span class="n">intermediate_results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">final_result</span><span class="p">)</span>
+
+        <span class="c1"># Send completion event</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span> <span class="ow">and</span> <span class="n">agent_id</span><span class="p">:</span>
+            <span class="n">status</span> <span class="o">=</span> <span class="n">AgentStatus</span><span class="o">.</span><span class="n">COMPLETED</span> <span class="k">if</span> <span class="n">success</span> <span class="k">else</span> <span class="n">AgentStatus</span><span class="o">.</span><span class="n">ERROR</span>
+            <span class="n">completion_event</span> <span class="o">=</span> <span class="n">create_agent_status_event</span><span class="p">(</span>
+                <span class="n">agent_id</span><span class="o">=</span><span class="n">agent_id</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">,</span>
+                <span class="n">message</span><span class="o">=</span><span class="n">error_message</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="n">operation</span><span class="o">.</span><span class="n">operation_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;operation_id&quot;</span><span class="p">:</span> <span class="n">operation_id</span><span class="p">,</span>
+                    <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">operation</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+                    <span class="s2">&quot;final_result&quot;</span><span class="p">:</span> <span class="n">final_result</span><span class="p">,</span>
+                    <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="n">success</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_publisher</span><span class="o">.</span><span class="n">publish_event</span><span class="p">(</span><span class="n">completion_event</span><span class="p">)</span>
+
+        <span class="c1"># Mark for cleanup</span>
+        <span class="n">operation</span><span class="o">.</span><span class="n">last_update</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed agent operation: </span><span class="si">{</span><span class="n">operation_id</span><span class="si">}</span><span class="s2">, success: </span><span class="si">{</span><span class="n">success</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

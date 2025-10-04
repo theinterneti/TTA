@@ -1,9 +1,13 @@
 import asyncio
 from datetime import datetime, timedelta
 
-from src.player_experience.managers.progress_tracking_service import ProgressTrackingService
-from src.player_experience.models.session import SessionSummary, SessionContext, TherapeuticSettings
-from src.player_experience.models.enums import SessionStatus, ProgressMarkerType
+from src.player_experience.managers.progress_tracking_service import (
+    ProgressTrackingService,
+)
+from src.player_experience.models.enums import SessionStatus
+from src.player_experience.models.session import (
+    SessionSummary,
+)
 
 
 class MockSessionRepository:
@@ -15,7 +19,11 @@ class MockSessionRepository:
         return self._summaries[:limit]
 
     async def get_player_active_sessions(self, player_id: str):
-        return [s for s in self._sessions if s.player_id == player_id and s.status == SessionStatus.ACTIVE]
+        return [
+            s
+            for s in self._sessions
+            if s.player_id == player_id and s.status == SessionStatus.ACTIVE
+        ]
 
 
 def test_highlights_created_for_session_milestone():
@@ -47,6 +55,7 @@ def test_highlights_created_for_session_milestone():
         assert any(h.highlight_type == "milestone" for h in hl)
         titles = [h.title for h in hl]
         assert any("Session Milestone" in t for t in titles)
+
     asyncio.run(run())
 
 
@@ -79,5 +88,5 @@ def test_highlights_created_for_streak_milestone():
         assert any(h.highlight_type == "milestone" for h in hl)
         titles = [h.title for h in hl]
         assert any("Streak Achievement" in t for t in titles)
-    asyncio.run(run())
 
+    asyncio.run(run())

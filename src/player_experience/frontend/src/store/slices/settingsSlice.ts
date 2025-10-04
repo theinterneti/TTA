@@ -108,6 +108,22 @@ export const updatePrivacySettings = createAsyncThunk(
   }
 );
 
+export const updateNotificationSettings = createAsyncThunk(
+  'settings/updateNotifications',
+  async ({ playerId, settings }: { playerId: string; settings: Partial<NotificationSettings> }) => {
+    const response = await settingsAPI.updateNotificationSettings(playerId, settings);
+    return response;
+  }
+);
+
+export const updateAccessibilitySettings = createAsyncThunk(
+  'settings/updateAccessibility',
+  async ({ playerId, settings }: { playerId: string; settings: Partial<AccessibilitySettings> }) => {
+    const response = await settingsAPI.updateAccessibilitySettings(playerId, settings);
+    return response;
+  }
+);
+
 export const exportPlayerData = createAsyncThunk(
   'settings/exportData',
   async (playerId: string) => {
@@ -178,6 +194,14 @@ const settingsSlice = createSlice({
       })
       .addCase(updatePrivacySettings.fulfilled, (state, action) => {
         state.privacy = action.payload;
+        state.hasUnsavedChanges = false;
+      })
+      .addCase(updateNotificationSettings.fulfilled, (state, action) => {
+        state.notifications = action.payload;
+        state.hasUnsavedChanges = false;
+      })
+      .addCase(updateAccessibilitySettings.fulfilled, (state, action) => {
+        state.accessibility = action.payload;
         state.hasUnsavedChanges = false;
       });
   },

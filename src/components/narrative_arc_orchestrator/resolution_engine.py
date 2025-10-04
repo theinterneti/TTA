@@ -2,10 +2,10 @@
 Resolution engine helpers.
 Utilities to build and apply narrative conflict resolutions.
 """
+
 from __future__ import annotations
 
 import uuid
-from typing import Optional
 
 from .models import Resolution, ScaleConflict
 
@@ -28,4 +28,3 @@ def apply_resolution(resolution: Resolution) -> None:
 
 
 __all__ = ["Resolution", "build_simple_resolution", "apply_resolution"]
-

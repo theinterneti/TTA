@@ -1,28 +1,32 @@
 import os
+
 import pytest
 
-from src.components.agent_orchestration_component import AgentOrchestrationComponent
 from src.agent_orchestration.tools.metrics import get_tool_metrics
+from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_tools_summary_and_prom_export(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8611,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.tools": {
-            "redis_key_prefix": "ao",
-            "cache_ttl_s": 0.5,
-            "cache_max_items": 32,
-            "max_prometheus_tools": 5,
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8611,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.tools": {
+                "redis_key_prefix": "ao",
+                "cache_ttl_s": 0.5,
+                "cache_max_items": 32,
+                "max_prometheus_tools": 5,
+            },
         }
-    })
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     from starlette.testclient import TestClient
+
     client = TestClient(app)
 
     # seed tool metrics without invoking real tools
@@ -32,7 +36,9 @@ async def test_tools_summary_and_prom_export(redis_client):
     tm.record_success("fs.read", "1.0.0", 5.0)
 
     # summary endpoint
-    res = client.get("/tools/summary?limit=10&status=&name_prefix=&sort_by=last_used_at&order=desc")
+    res = client.get(
+        "/tools/summary?limit=10&status=&name_prefix=&sort_by=last_used_at&order=desc"
+    )
     assert res.status_code == 200
     js = res.json()
     assert "items" in js and isinstance(js["items"], list)
@@ -48,4 +54,3 @@ async def test_tools_summary_and_prom_export(redis_client):
     assert "agent_orchestration_tool_duration_seconds_bucket" in body
 
     assert comp._stop_impl() is True
-

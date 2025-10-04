@@ -1,0 +1,523 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>agent_orchestration.models &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">agent_orchestration.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for agent_orchestration.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Core data models for Agent Orchestration.</span>
+
+<span class="sd">These minimal pydantic models define the contract for agent communication and</span>
+<span class="sd">orchestration requests/responses. They intentionally avoid implementation</span>
+<span class="sd">specifics; richer models can be added in follow-up tasks.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">validator</span>
+
+
+<div class="viewcode-block" id="AgentType">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">IPA</span> <span class="o">=</span> <span class="s2">&quot;input_processor&quot;</span>
+    <span class="n">WBA</span> <span class="o">=</span> <span class="s2">&quot;world_builder&quot;</span>
+    <span class="n">NGA</span> <span class="o">=</span> <span class="s2">&quot;narrative_generator&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MessageType">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.MessageType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MessageType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">REQUEST</span> <span class="o">=</span> <span class="s2">&quot;request&quot;</span>
+    <span class="n">RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;response&quot;</span>
+    <span class="n">EVENT</span> <span class="o">=</span> <span class="s2">&quot;event&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MessagePriority">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.MessagePriority">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MessagePriority</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+    <span class="n">LOW</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">NORMAL</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="mi">9</span></div>
+
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">RoutingKey</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">topic</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AgentId">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentId">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentId</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">AgentType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Logical agent type&quot;</span><span class="p">)</span>
+    <span class="n">instance</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional instance identifier (for sharded/pooled agents)&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="AgentMessage">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentMessage">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentMessage</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">message_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+    <span class="n">sender</span><span class="p">:</span> <span class="n">AgentId</span>
+    <span class="n">recipient</span><span class="p">:</span> <span class="n">AgentId</span>
+    <span class="n">message_type</span><span class="p">:</span> <span class="n">MessageType</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="n">MessagePriority</span> <span class="o">=</span> <span class="n">MessagePriority</span><span class="o">.</span><span class="n">NORMAL</span>
+    <span class="n">routing</span><span class="p">:</span> <span class="n">RoutingKey</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">RoutingKey</span><span class="p">)</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ISO-8601 timestamp; may be set by coordinator&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OrchestrationRequest">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.OrchestrationRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrchestrationRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">entrypoint</span><span class="p">:</span> <span class="n">AgentType</span> <span class="o">=</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span>
+    <span class="nb">input</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="OrchestrationResponse">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.OrchestrationResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OrchestrationResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+    <span class="n">response_text</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">updated_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">workflow_metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Agent Capability System Models</span>
+
+
+<div class="viewcode-block" id="CapabilityType">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of capabilities that agents can advertise.&quot;&quot;&quot;</span>
+
+    <span class="n">PROCESSING</span> <span class="o">=</span> <span class="s2">&quot;processing&quot;</span>  <span class="c1"># Input/output processing capabilities</span>
+    <span class="n">GENERATION</span> <span class="o">=</span> <span class="s2">&quot;generation&quot;</span>  <span class="c1"># Content generation capabilities</span>
+    <span class="n">ANALYSIS</span> <span class="o">=</span> <span class="s2">&quot;analysis&quot;</span>  <span class="c1"># Analysis and validation capabilities</span>
+    <span class="n">COORDINATION</span> <span class="o">=</span> <span class="s2">&quot;coordination&quot;</span>  <span class="c1"># Workflow coordination capabilities</span>
+    <span class="n">STORAGE</span> <span class="o">=</span> <span class="s2">&quot;storage&quot;</span>  <span class="c1"># Data storage and retrieval capabilities</span>
+    <span class="n">COMMUNICATION</span> <span class="o">=</span> <span class="s2">&quot;communication&quot;</span>  <span class="c1"># Inter-agent communication capabilities</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityScope">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityScope">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityScope</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scope of capability operation.&quot;&quot;&quot;</span>
+
+    <span class="n">SESSION</span> <span class="o">=</span> <span class="s2">&quot;session&quot;</span>  <span class="c1"># Session-scoped operations</span>
+    <span class="n">GLOBAL</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span>  <span class="c1"># Global operations across sessions</span>
+    <span class="n">INSTANCE</span> <span class="o">=</span> <span class="s2">&quot;instance&quot;</span>  <span class="c1"># Instance-specific operations</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityStatus">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityStatus</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Status of a capability.&quot;&quot;&quot;</span>
+
+    <span class="n">ACTIVE</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>  <span class="c1"># Capability is active and available</span>
+    <span class="n">DEPRECATED</span> <span class="o">=</span> <span class="s2">&quot;deprecated&quot;</span>  <span class="c1"># Capability is deprecated but still functional</span>
+    <span class="n">DISABLED</span> <span class="o">=</span> <span class="s2">&quot;disabled&quot;</span>  <span class="c1"># Capability is temporarily disabled</span>
+    <span class="n">EXPERIMENTAL</span> <span class="o">=</span> <span class="s2">&quot;experimental&quot;</span>  <span class="c1"># Capability is experimental/beta</span></div>
+
+
+
+<div class="viewcode-block" id="AgentCapability">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapability">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentCapability</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a single capability that an agent can provide.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique name of the capability&quot;</span><span class="p">)</span>
+    <span class="nb">type</span><span class="p">:</span> <span class="n">CapabilityType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of capability&quot;</span><span class="p">)</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Semantic version of the capability (e.g., &#39;1.0.0&#39;)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Human-readable description&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Operational metadata</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="n">CapabilityScope</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">CapabilityScope</span><span class="o">.</span><span class="n">SESSION</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Scope of operation&quot;</span>
+    <span class="p">)</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">CapabilityStatus</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">CapabilityStatus</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current status&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Capability requirements and constraints</span>
+    <span class="n">required_inputs</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Required input fields&quot;</span>
+    <span class="p">)</span>
+    <span class="n">optional_inputs</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Optional input fields&quot;</span>
+    <span class="p">)</span>
+    <span class="n">output_schema</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;JSON schema for outputs&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Performance and resource metadata</span>
+    <span class="n">estimated_duration_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Estimated execution time in milliseconds&quot;</span>
+    <span class="p">)</span>
+    <span class="n">resource_requirements</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Resource requirements (CPU, memory, etc.)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Compatibility and dependencies</span>
+    <span class="n">compatible_versions</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compatible capability versions&quot;</span>
+    <span class="p">)</span>
+    <span class="n">dependencies</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Required dependencies&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Searchable tags&quot;</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Additional metadata&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="AgentCapability.validate_version">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapability.validate_version">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_version</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate semantic version format.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s1">&#39;Version must follow semantic versioning (e.g., &quot;1.0.0&quot; or &quot;1.0.0-beta.1&quot;)&#39;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="AgentCapability.validate_name">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapability.validate_name">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_name</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate capability name format.&quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[a-z][a-z0-9_]*$&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Capability name must start with lowercase letter and contain only lowercase letters, numbers, and underscores&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AgentCapabilitySet">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapabilitySet">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentCapabilitySet</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Collection of capabilities for an agent.&quot;&quot;&quot;</span>
+
+    <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent identifier&quot;</span><span class="p">)</span>
+    <span class="n">capabilities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapability</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of capabilities&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Capability set metadata</span>
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;1.0.0&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Version of the capability set&quot;</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Last update timestamp&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Discovery and routing metadata</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Priority for capability matching (1-10, higher is better)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">load_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current load factor (0.0-1.0)&quot;</span><span class="p">)</span>
+    <span class="n">availability</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether agent is available for new requests&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="AgentCapabilitySet.get_capability">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapabilitySet.get_capability">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capability</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AgentCapability</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get a specific capability by name and optionally version.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">cap</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">name</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">version</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">cap</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="n">version</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">cap</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AgentCapabilitySet.has_capability">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapabilitySet.has_capability">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">has_capability</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if agent has a specific capability.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_capability</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="AgentCapabilitySet.get_capabilities_by_type">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapabilitySet.get_capabilities_by_type">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_capabilities_by_type</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability_type</span><span class="p">:</span> <span class="n">CapabilityType</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapability</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all capabilities of a specific type.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">cap</span> <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span> <span class="k">if</span> <span class="n">cap</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">capability_type</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="AgentCapabilitySet.get_active_capabilities">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentCapabilitySet.get_active_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_active_capabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapability</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all active capabilities.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">cap</span> <span class="k">for</span> <span class="n">cap</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">capabilities</span> <span class="k">if</span> <span class="n">cap</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="n">CapabilityStatus</span><span class="o">.</span><span class="n">ACTIVE</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="CapabilityMatchCriteria">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityMatchCriteria">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityMatchCriteria</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Criteria for matching agent capabilities.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Basic matching criteria</span>
+    <span class="n">capability_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Specific capability name to match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">capability_type</span><span class="p">:</span> <span class="n">CapabilityType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of capability required&quot;</span>
+    <span class="p">)</span>
+    <span class="n">required_inputs</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Required input fields&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Version constraints</span>
+    <span class="n">min_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Minimum capability version&quot;</span><span class="p">)</span>
+    <span class="n">max_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum capability version&quot;</span><span class="p">)</span>
+    <span class="n">preferred_version</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Preferred capability version&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Performance constraints</span>
+    <span class="n">max_duration_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum acceptable duration&quot;</span><span class="p">)</span>
+    <span class="n">resource_constraints</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Resource constraints&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Availability constraints</span>
+    <span class="n">require_available</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Require agent to be available&quot;</span>
+    <span class="p">)</span>
+    <span class="n">max_load_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum acceptable load factor&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Tags and metadata</span>
+    <span class="n">required_tags</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">set</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Required capability tags&quot;</span>
+    <span class="p">)</span>
+    <span class="n">metadata_filters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Metadata filters&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityMatchResult">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityMatchResult">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityMatchResult</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of capability matching.&quot;&quot;&quot;</span>
+
+    <span class="n">agent_id</span><span class="p">:</span> <span class="n">AgentId</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Matched agent identifier&quot;</span><span class="p">)</span>
+    <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Matched capability&quot;</span><span class="p">)</span>
+    <span class="n">match_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Match score (0.0-1.0)&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Match details</span>
+    <span class="n">exact_match</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether this is an exact match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">version_match</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether version requirements are met&quot;</span>
+    <span class="p">)</span>
+    <span class="n">performance_match</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether performance requirements are met&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Agent status at match time</span>
+    <span class="n">agent_load_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent load factor at match time&quot;</span>
+    <span class="p">)</span>
+    <span class="n">agent_availability</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Agent availability at match time&quot;</span>
+    <span class="p">)</span>
+    <span class="n">estimated_wait_time_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Estimated wait time for agent&quot;</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityDiscoveryRequest">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityDiscoveryRequest">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityDiscoveryRequest</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Request for discovering agents with specific capabilities.&quot;&quot;&quot;</span>
+
+    <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Matching criteria&quot;</span><span class="p">)</span>
+    <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Maximum number of results to return&quot;</span>
+    <span class="p">)</span>
+    <span class="n">include_degraded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Include agents with degraded performance&quot;</span>
+    <span class="p">)</span>
+    <span class="n">sort_by</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;match_score&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Sort results by field&quot;</span><span class="p">)</span>
+    <span class="n">sort_descending</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Sort in descending order&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityDiscoveryResponse">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.CapabilityDiscoveryResponse">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityDiscoveryResponse</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Response from capability discovery.&quot;&quot;&quot;</span>
+
+    <span class="n">matches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Matched capabilities&quot;</span>
+    <span class="p">)</span>
+    <span class="n">total_agents_searched</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Total number of agents searched&quot;</span>
+    <span class="p">)</span>
+    <span class="n">search_duration_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Search duration in milliseconds&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Discovery metadata</span>
+    <span class="n">discovery_timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Discovery timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">cache_hit</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether results came from cache&quot;</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

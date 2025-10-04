@@ -14,20 +14,20 @@ Classes:
 """
 
 import logging
-import asyncio
 import uuid
-from datetime import datetime
-from typing import Any, Dict, List, Optional, Union, Set
 from dataclasses import dataclass, field
+from datetime import datetime
 from enum import Enum
+from typing import Any
 
-from ..orchestration.component import Component, ComponentStatus
+from ..orchestration.component import Component
 
 logger = logging.getLogger(__name__)
 
 # Import integration module
 try:
     from .character_arc_integration import CharacterArcIntegration
+
     INTEGRATION_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"Character arc integration not available: {e}")
@@ -37,6 +37,7 @@ except ImportError as e:
 
 class ArcStage(Enum):
     """Character development stages."""
+
     INTRODUCTION = "introduction"
     ESTABLISHMENT = "establishment"
     DEVELOPMENT = "development"
@@ -48,6 +49,7 @@ class ArcStage(Enum):
 
 class RelationshipType(Enum):
     """Types of relationships between characters and player."""
+
     STRANGER = "stranger"
     ACQUAINTANCE = "acquaintance"
     FRIEND = "friend"
@@ -62,147 +64,161 @@ class RelationshipType(Enum):
 @dataclass
 class ArcMilestone:
     """Represents a significant point in character development."""
+
     milestone_id: str
     name: str
     description: str
     stage: ArcStage
-    requirements: List[str] = field(default_factory=list)
-    rewards: List[str] = field(default_factory=list)
-    therapeutic_themes: List[str] = field(default_factory=list)
-    completion_criteria: Dict[str, Any] = field(default_factory=dict)
+    requirements: list[str] = field(default_factory=list)
+    rewards: list[str] = field(default_factory=list)
+    therapeutic_themes: list[str] = field(default_factory=list)
+    completion_criteria: dict[str, Any] = field(default_factory=dict)
     is_completed: bool = False
-    completion_date: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    completion_date: datetime | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class RelationshipState:
     """Tracks relationship dynamics between characters."""
+
     character_id: str
     relationship_type: RelationshipType
     trust_level: float = 0.5  # 0.0 to 1.0
     affection_level: float = 0.5  # 0.0 to 1.0
     respect_level: float = 0.5  # 0.0 to 1.0
-    shared_experiences: List[str] = field(default_factory=list)
-    conflicts: List[str] = field(default_factory=list)
-    last_interaction: Optional[datetime] = None
+    shared_experiences: list[str] = field(default_factory=list)
+    conflicts: list[str] = field(default_factory=list)
+    last_interaction: datetime | None = None
     interaction_count: int = 0
-    relationship_history: List[Dict[str, Any]] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    relationship_history: list[dict[str, Any]] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class TherapeuticConcept:
     """Represents a therapeutic concept modeled by a character."""
+
     concept_id: str
     name: str
     description: str
     modeling_method: str  # "behavior", "dialogue", "story_arc", "conflict_resolution"
     effectiveness_score: float = 0.0
     player_receptivity: float = 0.0
-    integration_opportunities: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    integration_opportunities: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class CharacterArc:
     """Data model representing a character's development arc."""
+
     character_id: str
     character_name: str
     current_stage: ArcStage
-    development_trajectory: List[ArcMilestone] = field(default_factory=list)
-    personality_evolution: Dict[str, float] = field(default_factory=dict)
-    relationship_dynamics: Dict[str, RelationshipState] = field(default_factory=dict)
-    therapeutic_modeling: List[TherapeuticConcept] = field(default_factory=list)
-    growth_potential: Dict[str, float] = field(default_factory=dict)
-    base_personality: Dict[str, Any] = field(default_factory=dict)
-    current_goals: List[str] = field(default_factory=list)
-    completed_milestones: List[str] = field(default_factory=list)
-    active_conflicts: List[str] = field(default_factory=list)
-    character_history: List[Dict[str, Any]] = field(default_factory=list)
+    development_trajectory: list[ArcMilestone] = field(default_factory=list)
+    personality_evolution: dict[str, float] = field(default_factory=dict)
+    relationship_dynamics: dict[str, RelationshipState] = field(default_factory=dict)
+    therapeutic_modeling: list[TherapeuticConcept] = field(default_factory=list)
+    growth_potential: dict[str, float] = field(default_factory=dict)
+    base_personality: dict[str, Any] = field(default_factory=dict)
+    current_goals: list[str] = field(default_factory=list)
+    completed_milestones: list[str] = field(default_factory=list)
+    active_conflicts: list[str] = field(default_factory=list)
+    character_history: list[dict[str, Any]] = field(default_factory=list)
     last_updated: datetime = field(default_factory=datetime.now)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class InteractionContext:
     """Context for character interactions."""
+
     session_id: str
     scene_id: str
     location: str
-    participants: List[str] = field(default_factory=list)
+    participants: list[str] = field(default_factory=list)
     mood: str = "neutral"
     tension_level: float = 0.5
     therapeutic_opportunity: bool = False
-    previous_interactions: List[str] = field(default_factory=list)
-    environmental_factors: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    previous_interactions: list[str] = field(default_factory=list)
+    environmental_factors: dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class PlayerInteraction:
     """Represents an interaction between player and character."""
+
     interaction_id: str
     session_id: str
     character_id: str
     player_choice: str
     character_response: str
     interaction_type: str = "dialogue"
-    emotional_impact: Dict[str, float] = field(default_factory=dict)
-    relationship_changes: Dict[str, float] = field(default_factory=dict)
+    emotional_impact: dict[str, float] = field(default_factory=dict)
+    relationship_changes: dict[str, float] = field(default_factory=dict)
     therapeutic_relevance: float = 0.0
     timestamp: datetime = field(default_factory=datetime.now)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class CharacterResponse:
     """Response generated by a character."""
+
     response_id: str
     character_id: str
     response_text: str
     emotional_tone: str = "neutral"
     personality_consistency_score: float = 1.0
-    therapeutic_modeling: List[str] = field(default_factory=list)
-    relationship_impact: Dict[str, float] = field(default_factory=dict)
+    therapeutic_modeling: list[str] = field(default_factory=list)
+    relationship_impact: dict[str, float] = field(default_factory=dict)
     arc_progression: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
 
 
 class CharacterArcManagerComponent(Component):
     """
     Component for managing dynamic character development and relationship evolution.
-    
+
     This component handles character arc initialization, development tracking,
     response generation with personality consistency, and milestone resolution.
     """
-    
+
     def __init__(self, config: Any):
         """
         Initialize the Character Arc Manager component.
-        
+
         Args:
             config: Configuration object
         """
-        super().__init__(config, name="character_arc_manager", 
-                        dependencies=["neo4j", "redis"])
-        
+        super().__init__(
+            config, name="character_arc_manager", dependencies=["neo4j", "redis"]
+        )
+
         # Configuration
-        self.port = self.config.get("tta.prototype.components.character_arc_manager.port", 8503)
-        self.max_concurrent_arcs = self.config.get("tta.prototype.components.character_arc_manager.max_concurrent_arcs", 50)
-        
+        self.port = self.config.get(
+            "tta.prototype.components.character_arc_manager.port", 8503
+        )
+        self.max_concurrent_arcs = self.config.get(
+            "tta.prototype.components.character_arc_manager.max_concurrent_arcs", 50
+        )
+
         # Character arc storage
-        self.active_arcs: Dict[str, CharacterArc] = {}
-        self.arc_templates: Dict[str, Dict[str, Any]] = {}
-        
+        self.active_arcs: dict[str, CharacterArc] = {}
+        self.arc_templates: dict[str, dict[str, Any]] = {}
+
         # Personality consistency tracking
-        self.personality_models: Dict[str, Dict[str, Any]] = {}
-        
+        self.personality_models: dict[str, dict[str, Any]] = {}
+
         # Therapeutic integration settings
-        self.therapeutic_weight = self.config.get("tta.prototype.components.character_arc_manager.therapeutic_weight", 0.3)
+        self.therapeutic_weight = self.config.get(
+            "tta.prototype.components.character_arc_manager.therapeutic_weight", 0.3
+        )
         self.therapeutic_concepts = self._load_therapeutic_concepts()
-        
+
         # Initialize integration with Character Development System
         self.integration = None
         if INTEGRATION_AVAILABLE:
@@ -210,103 +226,119 @@ class CharacterArcManagerComponent(Component):
                 self.integration = CharacterArcIntegration(self)
                 logger.info("Character Development System integration enabled")
             except Exception as e:
-                logger.warning(f"Failed to initialize Character Development System integration: {e}")
-        
+                logger.warning(
+                    f"Failed to initialize Character Development System integration: {e}"
+                )
+
         logger.info(f"CharacterArcManager initialized on port {self.port}")
-    
+
     def _start_impl(self) -> bool:
         """
         Start the Character Arc Manager component.
-        
+
         Returns:
             bool: True if started successfully
         """
         try:
             logger.info("Starting Character Arc Manager component")
-            
+
             # Initialize arc templates
             self._initialize_arc_templates()
-            
+
             # Load existing character arcs from database
             # This would connect to Neo4j in a real implementation
             logger.info("Loading existing character arcs...")
-            
+
             # Initialize personality models
             self._initialize_personality_models()
-            
-            logger.info(f"Character Arc Manager started successfully on port {self.port}")
+
+            logger.info(
+                f"Character Arc Manager started successfully on port {self.port}"
+            )
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to start Character Arc Manager: {e}")
             return False
-    
+
     def _stop_impl(self) -> bool:
         """
         Stop the Character Arc Manager component.
-        
+
         Returns:
             bool: True if stopped successfully
         """
         try:
             logger.info("Stopping Character Arc Manager component")
-            
+
             # Save current arc states to database
             logger.info("Saving character arc states...")
-            
+
             # Clear active arcs
             self.active_arcs.clear()
             self.personality_models.clear()
-            
+
             logger.info("Character Arc Manager stopped successfully")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to stop Character Arc Manager: {e}")
             return False
-    
-    async def initialize_character_arc(self, character_id: str, base_personality: Dict[str, Any]) -> CharacterArc:
+
+    async def initialize_character_arc(
+        self, character_id: str, base_personality: dict[str, Any]
+    ) -> CharacterArc:
         """
         Initialize a character arc with base personality and development trajectory.
-        
+
         Args:
             character_id: Unique identifier for the character
             base_personality: Base personality traits and characteristics
-            
+
         Returns:
             CharacterArc: Initialized character arc
         """
         try:
             logger.info(f"Initializing character arc for {character_id}")
-            
+
             # Create character arc
             character_arc = CharacterArc(
                 character_id=character_id,
-                character_name=base_personality.get("name", f"Character_{character_id}"),
+                character_name=base_personality.get(
+                    "name", f"Character_{character_id}"
+                ),
                 current_stage=ArcStage.INTRODUCTION,
                 base_personality=base_personality.copy(),
-                personality_evolution=base_personality.copy()
+                personality_evolution=base_personality.copy(),
             )
-            
+
             # Generate development trajectory
             trajectory = await self._generate_development_trajectory(character_arc)
             character_arc.development_trajectory = trajectory
-            
+
             # Initialize growth potential
-            character_arc.growth_potential = await self._calculate_growth_potential(character_arc)
-            
+            character_arc.growth_potential = await self._calculate_growth_potential(
+                character_arc
+            )
+
             # Set up therapeutic modeling opportunities
-            character_arc.therapeutic_modeling = await self._identify_therapeutic_opportunities(character_arc)
-            
+            character_arc.therapeutic_modeling = (
+                await self._identify_therapeutic_opportunities(character_arc)
+            )
+
             # Store the arc
             self.active_arcs[character_id] = character_arc
-            
+
             # Initialize personality model for consistent responses
-            self.personality_models[character_id] = await self._create_personality_model(character_arc)
-            
-            logger.info(f"Character arc initialized for {character_id} with {len(trajectory)} milestones")
+            self.personality_models[character_id] = (
+                await self._create_personality_model(character_arc)
+            )
+
+            logger.info(
+                f"Character arc initialized for {character_id} with {len(trajectory)} milestones"
+            )
             return character_arc
-            
+
         except Exception as e:
             logger.error(f"Error initializing character arc for {character_id}: {e}")
             # Return minimal arc on error
@@ -314,103 +346,123 @@ class CharacterArcManagerComponent(Component):
                 character_id=character_id,
                 character_name=f"Character_{character_id}",
                 current_stage=ArcStage.INTRODUCTION,
-                base_personality=base_personality
+                base_personality=base_personality,
             )
-    
-    async def update_character_development(self, character_id: str, interaction: PlayerInteraction) -> bool:
+
+    async def update_character_development(
+        self, character_id: str, interaction: PlayerInteraction
+    ) -> bool:
         """
         Update character development based on player interaction.
-        
+
         Args:
             character_id: Character to update
             interaction: Player interaction that affects the character
-            
+
         Returns:
             bool: True if update was successful
         """
         try:
             logger.debug(f"Updating character development for {character_id}")
-            
+
             if character_id not in self.active_arcs:
                 logger.warning(f"No active arc found for character {character_id}")
                 return False
-            
+
             character_arc = self.active_arcs[character_id]
-            
+
             # Update personality evolution
             await self._update_personality_evolution(character_arc, interaction)
-            
+
             # Update relationship dynamics
             await self._update_relationship_dynamics(character_arc, interaction)
-            
+
             # Check for milestone progression
-            milestone_progress = await self._check_milestone_progression(character_arc, interaction)
-            
+            await self._check_milestone_progression(character_arc, interaction)
+
             # Update therapeutic modeling
             await self._update_therapeutic_modeling(character_arc, interaction)
-            
+
             # Update character goals based on development
             await self._update_character_goals(character_arc, interaction)
-            
+
             # Record interaction in character history
-            character_arc.character_history.append({
-                "interaction_id": interaction.interaction_id,
-                "timestamp": interaction.timestamp,
-                "player_choice": interaction.player_choice,
-                "character_response": interaction.character_response,
-                "emotional_impact": interaction.emotional_impact,
-                "relationship_changes": interaction.relationship_changes
-            })
-            
+            character_arc.character_history.append(
+                {
+                    "interaction_id": interaction.interaction_id,
+                    "timestamp": interaction.timestamp,
+                    "player_choice": interaction.player_choice,
+                    "character_response": interaction.character_response,
+                    "emotional_impact": interaction.emotional_impact,
+                    "relationship_changes": interaction.relationship_changes,
+                }
+            )
+
             # Update last modified timestamp
             character_arc.last_updated = datetime.now()
-            
+
             logger.debug(f"Character development updated for {character_id}")
             return True
-            
+
         except Exception as e:
-            logger.error(f"Error updating character development for {character_id}: {e}")
+            logger.error(
+                f"Error updating character development for {character_id}: {e}"
+            )
             return False
-    
-    async def generate_character_response(self, character_id: str, context: InteractionContext) -> CharacterResponse:
+
+    async def generate_character_response(
+        self, character_id: str, context: InteractionContext
+    ) -> CharacterResponse:
         """
         Generate a character response that maintains personality consistency.
-        
+
         Args:
             character_id: Character generating the response
             context: Context for the interaction
-            
+
         Returns:
             CharacterResponse: Generated response with metadata
         """
         try:
             logger.debug(f"Generating character response for {character_id}")
-            
+
             if character_id not in self.active_arcs:
                 logger.warning(f"No active arc found for character {character_id}")
                 return self._generate_default_response(character_id, context)
-            
+
             character_arc = self.active_arcs[character_id]
             personality_model = self.personality_models.get(character_id, {})
-            
+
             # Generate response based on current personality and arc stage
-            response_text = await self._generate_response_text(character_arc, context, personality_model)
-            
+            response_text = await self._generate_response_text(
+                character_arc, context, personality_model
+            )
+
             # Determine emotional tone
-            emotional_tone = await self._determine_emotional_tone(character_arc, context)
-            
+            emotional_tone = await self._determine_emotional_tone(
+                character_arc, context
+            )
+
             # Calculate personality consistency score
-            consistency_score = await self._calculate_consistency_score(character_arc, response_text, context)
-            
+            consistency_score = await self._calculate_consistency_score(
+                character_arc, response_text, context
+            )
+
             # Identify therapeutic modeling opportunities
-            therapeutic_modeling = await self._identify_response_therapeutic_modeling(character_arc, response_text, context)
-            
+            therapeutic_modeling = await self._identify_response_therapeutic_modeling(
+                character_arc, response_text, context
+            )
+
             # Calculate relationship impact
-            relationship_impact = await self._calculate_relationship_impact(character_arc, response_text, context)
-            
+            relationship_impact = await self._calculate_relationship_impact(
+                character_arc, response_text, context
+            )
+
             # Calculate arc progression
-            arc_progression = await self._calculate_arc_progression(character_arc, response_text, context)
-            
+            arc_progression = await self._calculate_arc_progression(
+                character_arc, response_text, context
+            )
+
             response = CharacterResponse(
                 response_id=str(uuid.uuid4()),
                 character_id=character_id,
@@ -423,152 +475,198 @@ class CharacterArcManagerComponent(Component):
                 metadata={
                     "context": context,
                     "current_stage": character_arc.current_stage.value,
-                    "personality_traits": character_arc.personality_evolution
-                }
+                    "personality_traits": character_arc.personality_evolution,
+                },
             )
-            
-            logger.debug(f"Generated response for {character_id} with consistency score {consistency_score:.2f}")
+
+            logger.debug(
+                f"Generated response for {character_id} with consistency score {consistency_score:.2f}"
+            )
             return response
-            
+
         except Exception as e:
             logger.error(f"Error generating character response for {character_id}: {e}")
             return self._generate_default_response(character_id, context)
-    
-    async def resolve_character_arc_milestone(self, character_id: str, milestone: ArcMilestone) -> Dict[str, Any]:
+
+    async def resolve_character_arc_milestone(
+        self, character_id: str, milestone: ArcMilestone
+    ) -> dict[str, Any]:
         """
         Resolve a character arc milestone and update development.
-        
+
         Args:
             character_id: Character whose milestone is being resolved
             milestone: Milestone to resolve
-            
+
         Returns:
             Dict containing resolution results and next steps
         """
         try:
-            logger.info(f"Resolving milestone {milestone.name} for character {character_id}")
-            
+            logger.info(
+                f"Resolving milestone {milestone.name} for character {character_id}"
+            )
+
             if character_id not in self.active_arcs:
                 logger.warning(f"No active arc found for character {character_id}")
                 return {"success": False, "error": "Character arc not found"}
-            
+
             character_arc = self.active_arcs[character_id]
-            
+
             # Check if milestone requirements are met
-            requirements_met = await self._check_milestone_requirements(character_arc, milestone)
-            
+            requirements_met = await self._check_milestone_requirements(
+                character_arc, milestone
+            )
+
             if not requirements_met:
                 logger.info(f"Milestone requirements not met for {milestone.name}")
                 return {
                     "success": False,
                     "reason": "requirements_not_met",
-                    "missing_requirements": await self._get_missing_requirements(character_arc, milestone)
+                    "missing_requirements": await self._get_missing_requirements(
+                        character_arc, milestone
+                    ),
                 }
-            
+
             # Mark milestone as completed
             milestone.is_completed = True
             milestone.completion_date = datetime.now()
             character_arc.completed_milestones.append(milestone.milestone_id)
-            
+
             # Apply milestone rewards and changes
-            resolution_results = await self._apply_milestone_resolution(character_arc, milestone)
-            
+            resolution_results = await self._apply_milestone_resolution(
+                character_arc, milestone
+            )
+
             # Update character stage if appropriate
             new_stage = await self._determine_next_stage(character_arc, milestone)
             if new_stage != character_arc.current_stage:
-                logger.info(f"Character {character_id} progressing from {character_arc.current_stage.value} to {new_stage.value}")
+                logger.info(
+                    f"Character {character_id} progressing from {character_arc.current_stage.value} to {new_stage.value}"
+                )
                 character_arc.current_stage = new_stage
-            
+
             # Generate new milestones if needed
-            new_milestones = await self._generate_next_milestones(character_arc, milestone)
+            new_milestones = await self._generate_next_milestones(
+                character_arc, milestone
+            )
             character_arc.development_trajectory.extend(new_milestones)
-            
+
             # Update therapeutic modeling based on milestone
-            await self._update_therapeutic_modeling_from_milestone(character_arc, milestone)
-            
+            await self._update_therapeutic_modeling_from_milestone(
+                character_arc, milestone
+            )
+
             resolution_data = {
                 "success": True,
                 "milestone_id": milestone.milestone_id,
                 "milestone_name": milestone.name,
                 "completion_date": milestone.completion_date,
-                "new_stage": new_stage.value if new_stage != character_arc.current_stage else None,
+                "new_stage": (
+                    new_stage.value
+                    if new_stage != character_arc.current_stage
+                    else None
+                ),
                 "rewards_applied": resolution_results.get("rewards", []),
-                "personality_changes": resolution_results.get("personality_changes", {}),
+                "personality_changes": resolution_results.get(
+                    "personality_changes", {}
+                ),
                 "new_milestones": [m.name for m in new_milestones],
-                "therapeutic_progress": resolution_results.get("therapeutic_progress", [])
+                "therapeutic_progress": resolution_results.get(
+                    "therapeutic_progress", []
+                ),
             }
-            
-            logger.info(f"Successfully resolved milestone {milestone.name} for character {character_id}")
+
+            logger.info(
+                f"Successfully resolved milestone {milestone.name} for character {character_id}"
+            )
             return resolution_data
-            
+
         except Exception as e:
             logger.error(f"Error resolving milestone for character {character_id}: {e}")
             return {"success": False, "error": str(e)}
-    
-    def get_character_arc(self, character_id: str) -> Optional[CharacterArc]:
+
+    def get_character_arc(self, character_id: str) -> CharacterArc | None:
         """Get the current character arc for a character."""
         return self.active_arcs.get(character_id)
-    
-    def get_active_characters(self) -> List[str]:
+
+    def get_active_characters(self) -> list[str]:
         """Get list of all active character IDs."""
         return list(self.active_arcs.keys())
-    
-    def get_character_stage(self, character_id: str) -> Optional[ArcStage]:
+
+    def get_character_stage(self, character_id: str) -> ArcStage | None:
         """Get the current development stage for a character."""
         arc = self.active_arcs.get(character_id)
         return arc.current_stage if arc else None
-    
-    def get_character_milestones(self, character_id: str) -> List[ArcMilestone]:
+
+    def get_character_milestones(self, character_id: str) -> list[ArcMilestone]:
         """Get all milestones for a character."""
         arc = self.active_arcs.get(character_id)
         return arc.development_trajectory if arc else []
-    
+
     # Integration methods with Character Development System
-    
-    async def initialize_integrated_character_arc(self, character_id: str, base_personality: Dict[str, Any]) -> CharacterArc:
+
+    async def initialize_integrated_character_arc(
+        self, character_id: str, base_personality: dict[str, Any]
+    ) -> CharacterArc:
         """Initialize character arc with Character Development System integration."""
         if self.integration:
             try:
-                character_arc, character_state = await self.integration.initialize_character_integration(
-                    character_id, base_personality
+                character_arc, character_state = (
+                    await self.integration.initialize_character_integration(
+                        character_id, base_personality
+                    )
                 )
                 logger.info(f"Initialized integrated character arc for {character_id}")
                 return character_arc
             except Exception as e:
                 logger.error(f"Failed to initialize integrated character: {e}")
                 # Fall back to regular initialization
-                return await self.initialize_character_arc(character_id, base_personality)
+                return await self.initialize_character_arc(
+                    character_id, base_personality
+                )
         else:
             return await self.initialize_character_arc(character_id, base_personality)
-    
-    async def update_integrated_character_development(self, character_id: str, interaction: PlayerInteraction) -> bool:
+
+    async def update_integrated_character_development(
+        self, character_id: str, interaction: PlayerInteraction
+    ) -> bool:
         """Update character development with Character Development System integration."""
         if self.integration:
             try:
-                success = await self.integration.process_integrated_interaction(character_id, interaction)
+                success = await self.integration.process_integrated_interaction(
+                    character_id, interaction
+                )
                 if success:
-                    logger.debug(f"Updated integrated character development for {character_id}")
+                    logger.debug(
+                        f"Updated integrated character development for {character_id}"
+                    )
                     return True
                 else:
-                    logger.warning(f"Integrated update failed for {character_id}, falling back to arc-only update")
+                    logger.warning(
+                        f"Integrated update failed for {character_id}, falling back to arc-only update"
+                    )
             except Exception as e:
                 logger.error(f"Error in integrated character update: {e}")
-        
+
         # Fall back to regular update
         return await self.update_character_development(character_id, interaction)
-    
-    async def generate_integrated_character_response(self, character_id: str, context: InteractionContext) -> Dict[str, Any]:
+
+    async def generate_integrated_character_response(
+        self, character_id: str, context: InteractionContext
+    ) -> dict[str, Any]:
         """Generate character response with Character Development System integration."""
         if self.integration:
             try:
-                integrated_response = await self.integration.generate_integrated_character_response(
-                    character_id, context
+                integrated_response = (
+                    await self.integration.generate_integrated_character_response(
+                        character_id, context
+                    )
                 )
                 logger.debug(f"Generated integrated response for {character_id}")
                 return integrated_response
             except Exception as e:
                 logger.error(f"Error generating integrated response: {e}")
-        
+
         # Fall back to regular response generation
         response = await self.generate_character_response(character_id, context)
         return {
@@ -578,16 +676,22 @@ class CharacterArcManagerComponent(Component):
             "therapeutic_modeling": response.therapeutic_modeling,
             "relationship_impact": response.relationship_impact,
             "arc_progression": response.arc_progression,
-            "metadata": response.metadata
+            "metadata": response.metadata,
         }
-    
-    async def sync_with_character_development_system(self, character_id: str, force_sync: bool = False) -> bool:
+
+    async def sync_with_character_development_system(
+        self, character_id: str, force_sync: bool = False
+    ) -> bool:
         """Synchronize character data with Character Development System."""
         if self.integration:
             try:
-                success = await self.integration.sync_character_data(character_id, force_sync)
+                success = await self.integration.sync_character_data(
+                    character_id, force_sync
+                )
                 if success:
-                    logger.debug(f"Synced character {character_id} with Character Development System")
+                    logger.debug(
+                        f"Synced character {character_id} with Character Development System"
+                    )
                 return success
             except Exception as e:
                 logger.error(f"Error syncing character {character_id}: {e}")
@@ -595,17 +699,21 @@ class CharacterArcManagerComponent(Component):
         else:
             logger.warning("Character Development System integration not available")
             return False
-    
-    async def get_integrated_character_summary(self, character_id: str) -> Dict[str, Any]:
+
+    async def get_integrated_character_summary(
+        self, character_id: str
+    ) -> dict[str, Any]:
         """Get comprehensive character summary from both systems."""
         if self.integration:
             try:
-                summary = await self.integration.get_integrated_character_summary(character_id)
+                summary = await self.integration.get_integrated_character_summary(
+                    character_id
+                )
                 logger.debug(f"Retrieved integrated summary for {character_id}")
                 return summary
             except Exception as e:
                 logger.error(f"Error getting integrated summary: {e}")
-        
+
         # Fall back to arc-only summary
         arc = self.get_character_arc(character_id)
         if arc:
@@ -616,66 +724,82 @@ class CharacterArcManagerComponent(Component):
                     "completed_milestones": len(arc.completed_milestones),
                     "active_goals": len(arc.current_goals),
                     "therapeutic_modeling": len(arc.therapeutic_modeling),
-                    "relationship_count": len(arc.relationship_dynamics)
+                    "relationship_count": len(arc.relationship_dynamics),
                 },
                 "integration_status": {
                     "systems_connected": False,
-                    "reason": "Integration not available"
-                }
+                    "reason": "Integration not available",
+                },
             }
         else:
             return {"error": "Character not found"}
-    
+
     # Private helper methods
-    
+
     def _initialize_arc_templates(self) -> None:
         """Initialize character arc templates for different character types."""
         try:
             logger.info("Initializing character arc templates")
-            
+
             # Basic character arc template
             self.arc_templates["basic"] = {
                 "stages": [stage.value for stage in ArcStage],
                 "milestones_per_stage": 2,
                 "therapeutic_opportunities": ["growth", "resilience", "empathy"],
-                "personality_traits": ["openness", "conscientiousness", "extraversion", "agreeableness", "neuroticism"]
+                "personality_traits": [
+                    "openness",
+                    "conscientiousness",
+                    "extraversion",
+                    "agreeableness",
+                    "neuroticism",
+                ],
             }
-            
+
             # Mentor character template
             self.arc_templates["mentor"] = {
-                "stages": [ArcStage.ESTABLISHMENT.value, ArcStage.DEVELOPMENT.value, ArcStage.GROWTH.value],
+                "stages": [
+                    ArcStage.ESTABLISHMENT.value,
+                    ArcStage.DEVELOPMENT.value,
+                    ArcStage.GROWTH.value,
+                ],
                 "milestones_per_stage": 3,
                 "therapeutic_opportunities": ["wisdom_sharing", "guidance", "support"],
-                "personality_traits": ["wisdom", "patience", "empathy", "experience"]
+                "personality_traits": ["wisdom", "patience", "empathy", "experience"],
             }
-            
+
             # Companion character template
             self.arc_templates["companion"] = {
                 "stages": [stage.value for stage in ArcStage],
                 "milestones_per_stage": 3,
-                "therapeutic_opportunities": ["friendship", "loyalty", "emotional_support"],
-                "personality_traits": ["loyalty", "humor", "courage", "compassion"]
+                "therapeutic_opportunities": [
+                    "friendship",
+                    "loyalty",
+                    "emotional_support",
+                ],
+                "personality_traits": ["loyalty", "humor", "courage", "compassion"],
             }
-            
-            logger.info(f"Initialized {len(self.arc_templates)} character arc templates")
-            
+
+            logger.info(
+                f"Initialized {len(self.arc_templates)} character arc templates"
+            )
+
         except Exception as e:
             logger.error(f"Error initializing arc templates: {e}")
-    
+
     def _initialize_personality_models(self) -> None:
         """Initialize personality models for consistent character responses."""
         try:
             logger.info("Initializing personality models")
-            
+
             # This would load pre-trained personality models in a real implementation
             # For now, we'll use basic trait-based models
-            
+
             logger.info("Personality models initialized")
-            
+
         except Exception as e:
             logger.error(f"Error initializing personality models: {e}")
-    
-    def _load_therapeutic_concepts(self) -> List[Dict[str, Any]]:
+
+    def _load_therapeutic_concepts(self) -> list[dict[str, Any]]:
         """Load available therapeutic concepts for character modeling."""
         try:
             # This would load from a database or configuration file
@@ -684,38 +808,52 @@ class CharacterArcManagerComponent(Component):
                     "id": "resilience",
                     "name": "Resilience",
                     "description": "Ability to bounce back from adversity",
-                    "modeling_methods": ["overcoming_challenges", "positive_coping", "growth_mindset"]
+                    "modeling_methods": [
+                        "overcoming_challenges",
+                        "positive_coping",
+                        "growth_mindset",
+                    ],
                 },
                 {
                     "id": "empathy",
                     "name": "Empathy",
                     "description": "Understanding and sharing others' feelings",
-                    "modeling_methods": ["active_listening", "emotional_validation", "perspective_taking"]
+                    "modeling_methods": [
+                        "active_listening",
+                        "emotional_validation",
+                        "perspective_taking",
+                    ],
                 },
                 {
                     "id": "self_compassion",
                     "name": "Self-Compassion",
                     "description": "Being kind to oneself during difficult times",
-                    "modeling_methods": ["self_forgiveness", "mindful_awareness", "common_humanity"]
-                }
+                    "modeling_methods": [
+                        "self_forgiveness",
+                        "mindful_awareness",
+                        "common_humanity",
+                    ],
+                },
             ]
-            
+
             logger.info(f"Loaded {len(concepts)} therapeutic concepts")
             return concepts
-            
+
         except Exception as e:
             logger.error(f"Error loading therapeutic concepts: {e}")
             return []
-    
-    async def _generate_development_trajectory(self, character_arc: CharacterArc) -> List[ArcMilestone]:
+
+    async def _generate_development_trajectory(
+        self, character_arc: CharacterArc
+    ) -> list[ArcMilestone]:
         """Generate development trajectory with milestones for a character."""
         try:
             milestones = []
-            
+
             # Get template for character type
             template = self.arc_templates.get("basic", {})
             milestones_per_stage = template.get("milestones_per_stage", 2)
-            
+
             # Generate milestones for each stage
             for stage in ArcStage:
                 for i in range(milestones_per_stage):
@@ -726,53 +864,68 @@ class CharacterArcManagerComponent(Component):
                         stage=stage,
                         requirements=[f"requirement_{stage.value}_{i+1}"],
                         rewards=[f"reward_{stage.value}_{i+1}"],
-                        therapeutic_themes=template.get("therapeutic_opportunities", [])[:1]
+                        therapeutic_themes=template.get(
+                            "therapeutic_opportunities", []
+                        )[:1],
                     )
                     milestones.append(milestone)
-            
-            logger.debug(f"Generated {len(milestones)} milestones for character {character_arc.character_id}")
+
+            logger.debug(
+                f"Generated {len(milestones)} milestones for character {character_arc.character_id}"
+            )
             return milestones
-            
+
         except Exception as e:
             logger.error(f"Error generating development trajectory: {e}")
             return []
-    
-    async def _calculate_growth_potential(self, character_arc: CharacterArc) -> Dict[str, float]:
+
+    async def _calculate_growth_potential(
+        self, character_arc: CharacterArc
+    ) -> dict[str, float]:
         """Calculate growth potential in different areas for a character."""
         try:
             growth_potential = {}
-            
+
             # Base growth potential on personality traits
             personality = character_arc.base_personality
-            
+
             # Calculate potential for different growth areas
-            growth_areas = ["emotional_intelligence", "resilience", "empathy", "wisdom", "courage"]
-            
+            growth_areas = [
+                "emotional_intelligence",
+                "resilience",
+                "empathy",
+                "wisdom",
+                "courage",
+            ]
+
             for area in growth_areas:
                 # Base potential on existing traits
                 base_potential = 0.5
-                
+
                 # Adjust based on personality traits
                 if area in personality:
                     base_potential = min(1.0, personality[area] + 0.3)
-                
+
                 growth_potential[area] = base_potential
-            
-            logger.debug(f"Calculated growth potential for character {character_arc.character_id}")
+
+            logger.debug(
+                f"Calculated growth potential for character {character_arc.character_id}"
+            )
             return growth_potential
-            
+
         except Exception as e:
             logger.error(f"Error calculating growth potential: {e}")
             return {}
-    
-    async def _identify_therapeutic_opportunities(self, character_arc: CharacterArc) -> List[TherapeuticConcept]:
+
+    async def _identify_therapeutic_opportunities(
+        self, character_arc: CharacterArc
+    ) -> list[TherapeuticConcept]:
         """Identify therapeutic concepts this character can model."""
         try:
             therapeutic_modeling = []
-            
+
             # Match character traits to therapeutic concepts
-            personality = character_arc.base_personality
-            
+
             for concept_data in self.therapeutic_concepts:
                 concept = TherapeuticConcept(
                     concept_id=concept_data["id"],
@@ -781,18 +934,22 @@ class CharacterArcManagerComponent(Component):
                     modeling_method="behavior",  # Default method
                     effectiveness_score=0.7,  # Default effectiveness
                     player_receptivity=0.5,  # Default receptivity
-                    integration_opportunities=concept_data.get("modeling_methods", [])
+                    integration_opportunities=concept_data.get("modeling_methods", []),
                 )
                 therapeutic_modeling.append(concept)
-            
-            logger.debug(f"Identified {len(therapeutic_modeling)} therapeutic opportunities for character {character_arc.character_id}")
+
+            logger.debug(
+                f"Identified {len(therapeutic_modeling)} therapeutic opportunities for character {character_arc.character_id}"
+            )
             return therapeutic_modeling
-            
+
         except Exception as e:
             logger.error(f"Error identifying therapeutic opportunities: {e}")
             return []
-    
-    async def _create_personality_model(self, character_arc: CharacterArc) -> Dict[str, Any]:
+
+    async def _create_personality_model(
+        self, character_arc: CharacterArc
+    ) -> dict[str, Any]:
         """Create a personality model for consistent character responses."""
         try:
             personality_model = {
@@ -801,34 +958,38 @@ class CharacterArcManagerComponent(Component):
                 "response_patterns": {},
                 "emotional_tendencies": {},
                 "speech_patterns": {},
-                "behavioral_patterns": {}
+                "behavioral_patterns": {},
             }
-            
+
             # Initialize response patterns based on personality
             personality = character_arc.base_personality
-            
+
             # Set emotional tendencies
             personality_model["emotional_tendencies"] = {
                 "default_mood": personality.get("default_mood", "neutral"),
                 "emotional_volatility": personality.get("emotional_volatility", 0.3),
-                "empathy_level": personality.get("empathy", 0.5)
+                "empathy_level": personality.get("empathy", 0.5),
             }
-            
+
             # Set speech patterns
             personality_model["speech_patterns"] = {
                 "formality_level": personality.get("formality", 0.5),
                 "verbosity": personality.get("verbosity", 0.5),
-                "humor_tendency": personality.get("humor", 0.3)
+                "humor_tendency": personality.get("humor", 0.3),
             }
-            
-            logger.debug(f"Created personality model for character {character_arc.character_id}")
+
+            logger.debug(
+                f"Created personality model for character {character_arc.character_id}"
+            )
             return personality_model
-            
+
         except Exception as e:
             logger.error(f"Error creating personality model: {e}")
             return {}
-    
-    def _generate_default_response(self, character_id: str, context: InteractionContext) -> CharacterResponse:
+
+    def _generate_default_response(
+        self, character_id: str, context: InteractionContext
+    ) -> CharacterResponse:
         """Generate a default response when character arc is not available."""
         return CharacterResponse(
             response_id=str(uuid.uuid4()),
@@ -836,9 +997,9 @@ class CharacterArcManagerComponent(Component):
             response_text="I'm not sure how to respond to that right now.",
             emotional_tone="neutral",
             personality_consistency_score=0.5,
-            metadata={"fallback_response": True}
+            metadata={"fallback_response": True},
         )
-    
+
     # Additional helper methods would be implemented here for:
     # - _update_personality_evolution
     # - _update_relationship_dynamics
@@ -857,135 +1018,165 @@ class CharacterArcManagerComponent(Component):
     # - _determine_next_stage
     # - _generate_next_milestones
     # - _update_therapeutic_modeling_from_milestone
-    
+
     # These methods would contain the detailed implementation logic
-    # for character development, response generation, and milestone management 
-   
-    async def _update_personality_evolution(self, character_arc: CharacterArc, interaction: PlayerInteraction) -> None:
+    # for character development, response generation, and milestone management
+
+    async def _update_personality_evolution(
+        self, character_arc: CharacterArc, interaction: PlayerInteraction
+    ) -> None:
         """Update character personality based on interaction."""
         try:
             # Apply personality changes based on interaction
             emotional_impact = interaction.emotional_impact
-            
+
             for trait, impact in emotional_impact.items():
                 if trait in character_arc.personality_evolution:
                     # Apply gradual personality evolution
                     current_value = character_arc.personality_evolution[trait]
                     change_rate = 0.05  # Small incremental changes
                     new_value = current_value + (impact * change_rate)
-                    character_arc.personality_evolution[trait] = max(0.0, min(1.0, new_value))
-            
-            logger.debug(f"Updated personality evolution for character {character_arc.character_id}")
-            
+                    character_arc.personality_evolution[trait] = max(
+                        0.0, min(1.0, new_value)
+                    )
+
+            logger.debug(
+                f"Updated personality evolution for character {character_arc.character_id}"
+            )
+
         except Exception as e:
             logger.error(f"Error updating personality evolution: {e}")
-    
-    async def _update_relationship_dynamics(self, character_arc: CharacterArc, interaction: PlayerInteraction) -> None:
+
+    async def _update_relationship_dynamics(
+        self, character_arc: CharacterArc, interaction: PlayerInteraction
+    ) -> None:
         """Update relationship dynamics based on interaction."""
         try:
             player_id = "player"  # Default player identifier
-            
+
             # Get or create relationship state
             if player_id not in character_arc.relationship_dynamics:
                 character_arc.relationship_dynamics[player_id] = RelationshipState(
                     character_id=character_arc.character_id,
-                    relationship_type=RelationshipType.STRANGER
+                    relationship_type=RelationshipType.STRANGER,
                 )
-            
+
             relationship = character_arc.relationship_dynamics[player_id]
-            
+
             # Update relationship metrics
             for metric, change in interaction.relationship_changes.items():
                 if hasattr(relationship, metric):
                     current_value = getattr(relationship, metric)
                     new_value = max(0.0, min(1.0, current_value + change))
                     setattr(relationship, metric, new_value)
-            
+
             # Update interaction tracking
             relationship.last_interaction = interaction.timestamp
             relationship.interaction_count += 1
-            
+
             # Add to shared experiences
             relationship.shared_experiences.append(interaction.interaction_id)
-            
+
             # Update relationship history
-            relationship.relationship_history.append({
-                "interaction_id": interaction.interaction_id,
-                "timestamp": interaction.timestamp,
-                "changes": interaction.relationship_changes,
-                "emotional_impact": interaction.emotional_impact
-            })
-            
-            logger.debug(f"Updated relationship dynamics for character {character_arc.character_id}")
-            
+            relationship.relationship_history.append(
+                {
+                    "interaction_id": interaction.interaction_id,
+                    "timestamp": interaction.timestamp,
+                    "changes": interaction.relationship_changes,
+                    "emotional_impact": interaction.emotional_impact,
+                }
+            )
+
+            logger.debug(
+                f"Updated relationship dynamics for character {character_arc.character_id}"
+            )
+
         except Exception as e:
             logger.error(f"Error updating relationship dynamics: {e}")
-    
-    async def _check_milestone_progression(self, character_arc: CharacterArc, interaction: PlayerInteraction) -> List[str]:
+
+    async def _check_milestone_progression(
+        self, character_arc: CharacterArc, interaction: PlayerInteraction
+    ) -> list[str]:
         """Check if any milestones can progress based on interaction."""
         try:
             progressed_milestones = []
-            
+
             for milestone in character_arc.development_trajectory:
                 if milestone.is_completed:
                     continue
-                
+
                 # Check if interaction contributes to milestone progress
-                if await self._interaction_contributes_to_milestone(milestone, interaction):
+                if await self._interaction_contributes_to_milestone(
+                    milestone, interaction
+                ):
                     # Update milestone progress (simplified)
-                    milestone.metadata["progress"] = milestone.metadata.get("progress", 0.0) + 0.1
-                    
+                    milestone.metadata["progress"] = (
+                        milestone.metadata.get("progress", 0.0) + 0.1
+                    )
+
                     # Check if milestone is ready for completion
                     if milestone.metadata.get("progress", 0.0) >= 1.0:
                         progressed_milestones.append(milestone.milestone_id)
-            
+
             return progressed_milestones
-            
+
         except Exception as e:
             logger.error(f"Error checking milestone progression: {e}")
             return []
-    
-    async def _interaction_contributes_to_milestone(self, milestone: ArcMilestone, interaction: PlayerInteraction) -> bool:
+
+    async def _interaction_contributes_to_milestone(
+        self, milestone: ArcMilestone, interaction: PlayerInteraction
+    ) -> bool:
         """Check if an interaction contributes to milestone progress."""
         try:
             # Check if interaction type matches milestone requirements
             if interaction.interaction_type in milestone.requirements:
                 return True
-            
+
             # Check therapeutic relevance
             if interaction.therapeutic_relevance > 0.5 and milestone.therapeutic_themes:
                 return True
-            
+
             # Check emotional impact alignment
             if any(impact > 0.3 for impact in interaction.emotional_impact.values()):
                 return True
-            
+
             return False
-            
+
         except Exception as e:
             logger.error(f"Error checking milestone contribution: {e}")
             return False
-    
-    async def _update_therapeutic_modeling(self, character_arc: CharacterArc, interaction: PlayerInteraction) -> None:
+
+    async def _update_therapeutic_modeling(
+        self, character_arc: CharacterArc, interaction: PlayerInteraction
+    ) -> None:
         """Update therapeutic modeling based on interaction."""
         try:
             for concept in character_arc.therapeutic_modeling:
                 # Update effectiveness based on player response
                 if interaction.therapeutic_relevance > 0.5:
-                    concept.effectiveness_score = min(1.0, concept.effectiveness_score + 0.05)
-                    concept.player_receptivity = min(1.0, concept.player_receptivity + 0.03)
-            
-            logger.debug(f"Updated therapeutic modeling for character {character_arc.character_id}")
-            
+                    concept.effectiveness_score = min(
+                        1.0, concept.effectiveness_score + 0.05
+                    )
+                    concept.player_receptivity = min(
+                        1.0, concept.player_receptivity + 0.03
+                    )
+
+            logger.debug(
+                f"Updated therapeutic modeling for character {character_arc.character_id}"
+            )
+
         except Exception as e:
             logger.error(f"Error updating therapeutic modeling: {e}")
-    
-    async def _update_character_goals(self, character_arc: CharacterArc, interaction: PlayerInteraction) -> None:
+
+    async def _update_character_goals(
+        self, character_arc: CharacterArc, interaction: PlayerInteraction
+    ) -> None:
         """Update character goals based on development."""
         try:
             # This would implement goal updating logic based on character development
             # For now, we'll keep it simple
-            
+
             # Add new goals based on current stage
             stage_goals = {
                 ArcStage.INTRODUCTION: ["establish_presence", "build_rapport"],
@@ -994,56 +1185,62 @@ class CharacterArcManagerComponent(Component):
                 ArcStage.CONFLICT: ["resolve_tensions", "test_bonds"],
                 ArcStage.GROWTH: ["demonstrate_change", "support_player"],
                 ArcStage.RESOLUTION: ["achieve_closure", "celebrate_growth"],
-                ArcStage.TRANSFORMATION: ["embody_change", "inspire_others"]
+                ArcStage.TRANSFORMATION: ["embody_change", "inspire_others"],
             }
-            
+
             current_goals = stage_goals.get(character_arc.current_stage, [])
             for goal in current_goals:
                 if goal not in character_arc.current_goals:
                     character_arc.current_goals.append(goal)
-            
+
             logger.debug(f"Updated character goals for {character_arc.character_id}")
-            
+
         except Exception as e:
             logger.error(f"Error updating character goals: {e}")
-    
-    async def _generate_response_text(self, character_arc: CharacterArc, context: InteractionContext, personality_model: Dict[str, Any]) -> str:
+
+    async def _generate_response_text(
+        self,
+        character_arc: CharacterArc,
+        context: InteractionContext,
+        personality_model: dict[str, Any],
+    ) -> str:
         """Generate response text based on character personality and context."""
         try:
             # This would use AI models to generate contextually appropriate responses
             # For now, we'll return a placeholder that reflects the character's current state
-            
+
             stage = character_arc.current_stage
-            personality = character_arc.personality_evolution
-            
+
             # Generate response based on stage and personality
             if stage == ArcStage.INTRODUCTION:
                 response = f"Hello there! I'm {character_arc.character_name}. Nice to meet you."
             elif stage == ArcStage.ESTABLISHMENT:
-                response = f"I'm getting to know you better. This is interesting."
+                response = "I'm getting to know you better. This is interesting."
             elif stage == ArcStage.DEVELOPMENT:
-                response = f"We've been through quite a journey together, haven't we?"
+                response = "We've been through quite a journey together, haven't we?"
             elif stage == ArcStage.CONFLICT:
-                response = f"Things are complicated right now, but we'll figure it out."
+                response = "Things are complicated right now, but we'll figure it out."
             elif stage == ArcStage.GROWTH:
-                response = f"I feel like I'm changing, and it's because of our experiences together."
+                response = "I feel like I'm changing, and it's because of our experiences together."
             elif stage == ArcStage.RESOLUTION:
-                response = f"Looking back, I can see how much we've both grown."
+                response = "Looking back, I can see how much we've both grown."
             else:  # TRANSFORMATION
-                response = f"I'm not the same person I was when we first met. Thank you for that."
-            
+                response = "I'm not the same person I was when we first met. Thank you for that."
+
             return response
-            
+
         except Exception as e:
             logger.error(f"Error generating response text: {e}")
             return "I'm not sure what to say right now."
-    
-    async def _determine_emotional_tone(self, character_arc: CharacterArc, context: InteractionContext) -> str:
+
+    async def _determine_emotional_tone(
+        self, character_arc: CharacterArc, context: InteractionContext
+    ) -> str:
         """Determine emotional tone for character response."""
         try:
             # Base tone on personality and context
             personality = character_arc.personality_evolution
-            
+
             # Default emotional tones based on personality traits
             if personality.get("cheerfulness", 0.5) > 0.7:
                 return "cheerful"
@@ -1057,19 +1254,24 @@ class CharacterArcManagerComponent(Component):
                 return "sympathetic"
             else:
                 return "neutral"
-                
+
         except Exception as e:
             logger.error(f"Error determining emotional tone: {e}")
             return "neutral"
-    
-    async def _calculate_consistency_score(self, character_arc: CharacterArc, response_text: str, context: InteractionContext) -> float:
+
+    async def _calculate_consistency_score(
+        self,
+        character_arc: CharacterArc,
+        response_text: str,
+        context: InteractionContext,
+    ) -> float:
         """Calculate personality consistency score for response."""
         try:
             # This would implement sophisticated consistency checking
             # For now, we'll return a high score if basic consistency is maintained
-            
+
             base_score = 0.8
-            
+
             # Check if response aligns with current stage
             stage_keywords = {
                 ArcStage.INTRODUCTION: ["hello", "meet", "nice"],
@@ -1078,92 +1280,118 @@ class CharacterArcManagerComponent(Component):
                 ArcStage.CONFLICT: ["complicated", "figure", "difficult"],
                 ArcStage.GROWTH: ["changing", "feel", "experiences"],
                 ArcStage.RESOLUTION: ["grown", "looking", "back"],
-                ArcStage.TRANSFORMATION: ["not the same", "thank", "different"]
+                ArcStage.TRANSFORMATION: ["not the same", "thank", "different"],
             }
-            
+
             current_keywords = stage_keywords.get(character_arc.current_stage, [])
             if any(keyword in response_text.lower() for keyword in current_keywords):
                 base_score += 0.1
-            
+
             return min(1.0, base_score)
-            
+
         except Exception as e:
             logger.error(f"Error calculating consistency score: {e}")
             return 0.5
-    
-    async def _identify_response_therapeutic_modeling(self, character_arc: CharacterArc, response_text: str, context: InteractionContext) -> List[str]:
+
+    async def _identify_response_therapeutic_modeling(
+        self,
+        character_arc: CharacterArc,
+        response_text: str,
+        context: InteractionContext,
+    ) -> list[str]:
         """Identify therapeutic concepts modeled in the response."""
         try:
             therapeutic_modeling = []
-            
+
             # Check for therapeutic concepts in response
             for concept in character_arc.therapeutic_modeling:
                 if concept.name.lower() in response_text.lower():
                     therapeutic_modeling.append(concept.concept_id)
-            
+
             # Check for therapeutic themes
             therapeutic_keywords = {
                 "resilience": ["overcome", "bounce back", "strength", "persevere"],
                 "empathy": ["understand", "feel", "sorry", "care"],
                 "growth": ["learn", "grow", "change", "better"],
-                "support": ["help", "support", "together", "here for you"]
+                "support": ["help", "support", "together", "here for you"],
             }
-            
+
             for theme, keywords in therapeutic_keywords.items():
                 if any(keyword in response_text.lower() for keyword in keywords):
                     if theme not in therapeutic_modeling:
                         therapeutic_modeling.append(theme)
-            
+
             return therapeutic_modeling
-            
+
         except Exception as e:
             logger.error(f"Error identifying therapeutic modeling: {e}")
             return []
-    
-    async def _calculate_relationship_impact(self, character_arc: CharacterArc, response_text: str, context: InteractionContext) -> Dict[str, float]:
+
+    async def _calculate_relationship_impact(
+        self,
+        character_arc: CharacterArc,
+        response_text: str,
+        context: InteractionContext,
+    ) -> dict[str, float]:
         """Calculate impact of response on relationships."""
         try:
             relationship_impact = {}
-            
+
             # Analyze response for relationship-affecting content
-            positive_keywords = ["thank", "appreciate", "care", "love", "friend", "trust"]
+            positive_keywords = [
+                "thank",
+                "appreciate",
+                "care",
+                "love",
+                "friend",
+                "trust",
+            ]
             negative_keywords = ["angry", "disappointed", "hurt", "betrayed", "upset"]
-            
-            positive_count = sum(1 for keyword in positive_keywords if keyword in response_text.lower())
-            negative_count = sum(1 for keyword in negative_keywords if keyword in response_text.lower())
-            
+
+            positive_count = sum(
+                1 for keyword in positive_keywords if keyword in response_text.lower()
+            )
+            negative_count = sum(
+                1 for keyword in negative_keywords if keyword in response_text.lower()
+            )
+
             # Calculate impact on different relationship metrics
             if positive_count > negative_count:
                 relationship_impact = {
                     "trust_level": 0.05,
                     "affection_level": 0.03,
-                    "respect_level": 0.02
+                    "respect_level": 0.02,
                 }
             elif negative_count > positive_count:
                 relationship_impact = {
                     "trust_level": -0.03,
                     "affection_level": -0.02,
-                    "respect_level": -0.01
+                    "respect_level": -0.01,
                 }
             else:
                 relationship_impact = {
                     "trust_level": 0.01,
                     "affection_level": 0.01,
-                    "respect_level": 0.01
+                    "respect_level": 0.01,
                 }
-            
+
             return relationship_impact
-            
+
         except Exception as e:
             logger.error(f"Error calculating relationship impact: {e}")
             return {}
-    
-    async def _calculate_arc_progression(self, character_arc: CharacterArc, response_text: str, context: InteractionContext) -> float:
+
+    async def _calculate_arc_progression(
+        self,
+        character_arc: CharacterArc,
+        response_text: str,
+        context: InteractionContext,
+    ) -> float:
         """Calculate how much the response advances the character arc."""
         try:
             # Base progression on response quality and stage appropriateness
             base_progression = 0.02  # Small incremental progress
-            
+
             # Increase progression for stage-appropriate responses
             stage_progression_multipliers = {
                 ArcStage.INTRODUCTION: 1.5,
@@ -1172,91 +1400,105 @@ class CharacterArcManagerComponent(Component):
                 ArcStage.CONFLICT: 1.4,
                 ArcStage.GROWTH: 1.6,
                 ArcStage.RESOLUTION: 1.3,
-                ArcStage.TRANSFORMATION: 1.1
+                ArcStage.TRANSFORMATION: 1.1,
             }
-            
-            multiplier = stage_progression_multipliers.get(character_arc.current_stage, 1.0)
+
+            multiplier = stage_progression_multipliers.get(
+                character_arc.current_stage, 1.0
+            )
             progression = base_progression * multiplier
-            
+
             # Increase for therapeutic modeling
             if context.therapeutic_opportunity:
                 progression *= 1.2
-            
+
             return min(0.1, progression)  # Cap at 10% progression per response
-            
+
         except Exception as e:
             logger.error(f"Error calculating arc progression: {e}")
             return 0.01
-    
-    async def _check_milestone_requirements(self, character_arc: CharacterArc, milestone: ArcMilestone) -> bool:
+
+    async def _check_milestone_requirements(
+        self, character_arc: CharacterArc, milestone: ArcMilestone
+    ) -> bool:
         """Check if milestone requirements are met."""
         try:
             # Check completion criteria
             for requirement in milestone.requirements:
                 if requirement not in character_arc.completed_milestones:
                     # Check if requirement is met through other means
-                    if not await self._is_requirement_satisfied(character_arc, requirement):
+                    if not await self._is_requirement_satisfied(
+                        character_arc, requirement
+                    ):
                         return False
-            
+
             # Check stage appropriateness
             if milestone.stage != character_arc.current_stage:
                 return False
-            
+
             # Check progress threshold
             progress = milestone.metadata.get("progress", 0.0)
             if progress < 1.0:
                 return False
-            
+
             return True
-            
+
         except Exception as e:
             logger.error(f"Error checking milestone requirements: {e}")
             return False
-    
-    async def _is_requirement_satisfied(self, character_arc: CharacterArc, requirement: str) -> bool:
+
+    async def _is_requirement_satisfied(
+        self, character_arc: CharacterArc, requirement: str
+    ) -> bool:
         """Check if a specific requirement is satisfied."""
         try:
             # This would implement detailed requirement checking
             # For now, we'll use simple heuristics
-            
+
             if "interaction" in requirement:
                 return len(character_arc.character_history) > 5
             elif "relationship" in requirement:
                 player_relationship = character_arc.relationship_dynamics.get("player")
                 return player_relationship and player_relationship.trust_level > 0.5
             elif "growth" in requirement:
-                return any(value > 0.6 for value in character_arc.growth_potential.values())
-            
+                return any(
+                    value > 0.6 for value in character_arc.growth_potential.values()
+                )
+
             return False
-            
+
         except Exception as e:
             logger.error(f"Error checking requirement satisfaction: {e}")
             return False
-    
-    async def _get_missing_requirements(self, character_arc: CharacterArc, milestone: ArcMilestone) -> List[str]:
+
+    async def _get_missing_requirements(
+        self, character_arc: CharacterArc, milestone: ArcMilestone
+    ) -> list[str]:
         """Get list of missing requirements for a milestone."""
         try:
             missing_requirements = []
-            
+
             for requirement in milestone.requirements:
                 if not await self._is_requirement_satisfied(character_arc, requirement):
                     missing_requirements.append(requirement)
-            
+
             return missing_requirements
-            
+
         except Exception as e:
             logger.error(f"Error getting missing requirements: {e}")
             return milestone.requirements.copy()
-    
-    async def _apply_milestone_resolution(self, character_arc: CharacterArc, milestone: ArcMilestone) -> Dict[str, Any]:
+
+    async def _apply_milestone_resolution(
+        self, character_arc: CharacterArc, milestone: ArcMilestone
+    ) -> dict[str, Any]:
         """Apply the effects of milestone resolution."""
         try:
             resolution_results = {
                 "rewards": [],
                 "personality_changes": {},
-                "therapeutic_progress": []
+                "therapeutic_progress": [],
             }
-            
+
             # Apply rewards
             for reward in milestone.rewards:
                 resolution_results["rewards"].append(reward)
@@ -1266,48 +1508,64 @@ class CharacterArcManagerComponent(Component):
                     if trait in character_arc.personality_evolution:
                         character_arc.personality_evolution[trait] += 0.1
                         resolution_results["personality_changes"][trait] = 0.1
-            
+
             # Apply therapeutic progress
             for theme in milestone.therapeutic_themes:
                 resolution_results["therapeutic_progress"].append(theme)
                 # Update therapeutic modeling effectiveness
                 for concept in character_arc.therapeutic_modeling:
                     if concept.name.lower() == theme.lower():
-                        concept.effectiveness_score = min(1.0, concept.effectiveness_score + 0.1)
-            
+                        concept.effectiveness_score = min(
+                            1.0, concept.effectiveness_score + 0.1
+                        )
+
             return resolution_results
-            
+
         except Exception as e:
             logger.error(f"Error applying milestone resolution: {e}")
-            return {"rewards": [], "personality_changes": {}, "therapeutic_progress": []}
-    
-    async def _determine_next_stage(self, character_arc: CharacterArc, milestone: ArcMilestone) -> ArcStage:
+            return {
+                "rewards": [],
+                "personality_changes": {},
+                "therapeutic_progress": [],
+            }
+
+    async def _determine_next_stage(
+        self, character_arc: CharacterArc, milestone: ArcMilestone
+    ) -> ArcStage:
         """Determine if character should progress to next stage."""
         try:
             current_stage = character_arc.current_stage
-            
+
             # Check if all milestones for current stage are completed
-            current_stage_milestones = [m for m in character_arc.development_trajectory if m.stage == current_stage]
-            completed_current_stage = sum(1 for m in current_stage_milestones if m.is_completed)
-            
+            current_stage_milestones = [
+                m
+                for m in character_arc.development_trajectory
+                if m.stage == current_stage
+            ]
+            completed_current_stage = sum(
+                1 for m in current_stage_milestones if m.is_completed
+            )
+
             # Progress to next stage if most milestones are completed
             if completed_current_stage >= len(current_stage_milestones) * 0.8:
                 stages = list(ArcStage)
                 current_index = stages.index(current_stage)
                 if current_index < len(stages) - 1:
                     return stages[current_index + 1]
-            
+
             return current_stage
-            
+
         except Exception as e:
             logger.error(f"Error determining next stage: {e}")
             return character_arc.current_stage
-    
-    async def _generate_next_milestones(self, character_arc: CharacterArc, completed_milestone: ArcMilestone) -> List[ArcMilestone]:
+
+    async def _generate_next_milestones(
+        self, character_arc: CharacterArc, completed_milestone: ArcMilestone
+    ) -> list[ArcMilestone]:
         """Generate new milestones based on character development."""
         try:
             new_milestones = []
-            
+
             # Generate follow-up milestones based on completed milestone
             if completed_milestone.stage == ArcStage.INTRODUCTION:
                 # Generate establishment milestones
@@ -1318,33 +1576,43 @@ class CharacterArcManagerComponent(Component):
                     stage=ArcStage.ESTABLISHMENT,
                     requirements=["multiple_interactions", "positive_relationship"],
                     rewards=["trust_increase", "personality_reveal"],
-                    therapeutic_themes=["trust", "connection"]
+                    therapeutic_themes=["trust", "connection"],
                 )
                 new_milestones.append(milestone)
-            
+
             # Add more milestone generation logic for other stages
-            
+
             return new_milestones
-            
+
         except Exception as e:
             logger.error(f"Error generating next milestones: {e}")
             return []
-    
-    async def _update_therapeutic_modeling_from_milestone(self, character_arc: CharacterArc, milestone: ArcMilestone) -> None:
+
+    async def _update_therapeutic_modeling_from_milestone(
+        self, character_arc: CharacterArc, milestone: ArcMilestone
+    ) -> None:
         """Update therapeutic modeling based on milestone completion."""
         try:
             # Enhance therapeutic concepts related to the milestone
             for theme in milestone.therapeutic_themes:
                 for concept in character_arc.therapeutic_modeling:
                     if concept.name.lower() == theme.lower():
-                        concept.effectiveness_score = min(1.0, concept.effectiveness_score + 0.15)
-                        concept.player_receptivity = min(1.0, concept.player_receptivity + 0.1)
-                        
+                        concept.effectiveness_score = min(
+                            1.0, concept.effectiveness_score + 0.15
+                        )
+                        concept.player_receptivity = min(
+                            1.0, concept.player_receptivity + 0.1
+                        )
+
                         # Add new integration opportunities
-                        new_opportunities = [f"milestone_{milestone.milestone_id}_integration"]
+                        new_opportunities = [
+                            f"milestone_{milestone.milestone_id}_integration"
+                        ]
                         concept.integration_opportunities.extend(new_opportunities)
-            
-            logger.debug(f"Updated therapeutic modeling from milestone for character {character_arc.character_id}")
-            
+
+            logger.debug(
+                f"Updated therapeutic modeling from milestone for character {character_arc.character_id}"
+            )
+
         except Exception as e:
             logger.error(f"Error updating therapeutic modeling from milestone: {e}")

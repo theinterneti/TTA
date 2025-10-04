@@ -293,6 +293,101 @@ player_experience:
     compatibility_threshold: 0.6
     world_cache_ttl: 86400
 
+# Model Management Configuration
+model_management:
+  enabled: true
+  default_provider: "openrouter"
+
+  # Provider Configurations
+  providers:
+    openrouter:
+      enabled: true
+      api_key: "${OPENROUTER_API_KEY}"
+      base_url: "https://openrouter.ai/api/v1"
+      free_models_only: false
+      cost_limit_per_request: 0.01
+      preferred_models:
+        - "meta-llama/llama-3.1-8b-instruct:free"
+        - "microsoft/phi-3-mini-128k-instruct:free"
+        - "qwen/qwen-2-7b-instruct:free"
+
+    ollama:
+      enabled: true
+      base_url: "http://localhost:11434"
+      docker_enabled: true
+      docker_image: "ollama/ollama:latest"
+      gpu_enabled: true
+      auto_pull_models: true
+      preferred_models:
+        - "llama3.1:8b"
+        - "qwen2.5:7b"
+        - "phi3:mini"
+
+    local:
+      enabled: false  # Disabled by default due to resource requirements
+      models_cache_dir: "./models"
+      max_concurrent_models: 2
+      auto_quantization: true
+      gpu_memory_fraction: 0.8
+      preferred_models:
+        - "microsoft/DialoGPT-medium"
+        - "gpt2"
+
+    lm_studio:
+      enabled: false  # Disabled by default, enable if LM Studio is running
+      base_url: "http://localhost:1234"
+
+    custom_api:
+      enabled: false  # Disabled by default, configure as needed
+      custom_providers:
+        openai:
+          enabled: false
+          api_key: "${OPENAI_API_KEY}"
+          base_url: "https://api.openai.com/v1"
+          api_type: "openai"
+        anthropic:
+          enabled: false
+          api_key: "${ANTHROPIC_API_KEY}"
+          base_url: "https://api.anthropic.com"
+          api_type: "anthropic"
+
+  # Model Selection Strategy
+  selection_strategy:
+    algorithm: "performance_based"  # performance_based, cost_based, availability_based
+    prefer_free_models: true
+    therapeutic_safety_threshold: 7.0
+    max_latency_ms: 5000
+    quality_threshold: 6.0
+
+  # Fallback Configuration
+  fallback_config:
+    enabled: true
+    max_retries: 3
+    exclude_failed_models_minutes: 30
+    fallback_strategy: "performance_based"
+    prefer_different_provider: true
+
+  # Performance Monitoring
+  performance_monitoring:
+    enabled: true
+    metrics_retention_days: 30
+    aggregation_interval_minutes: 5
+    real_time_monitoring: true
+
+  # Hardware Detection
+  hardware_detection:
+    enabled: true
+    gpu_detection: true
+    memory_threshold_gb: 4
+    cpu_core_threshold: 4
+
+  # Therapeutic Safety
+  therapeutic_safety:
+    enabled: true
+    minimum_safety_score: 7.0
+    content_filtering: true
+    crisis_detection: true
+
 # Environment Configuration
 environment:
   name: development

@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../services/terminologyTranslation';
+import { FullUIModeToggle } from './UIModeToggle';
 
 interface TherapeuticSettings {
   intensity_level: 'LOW' | 'MEDIUM' | 'HIGH';
@@ -24,16 +26,17 @@ const TherapeuticSettingsSection: React.FC<TherapeuticSettingsSectionProps> = ({
 }) => {
   const [customApproach, setCustomApproach] = useState('');
   const [showCustomApproachInput, setShowCustomApproachInput] = useState(false);
+  const { translate, isEntertainmentMode } = useTranslation();
 
   const therapeuticApproaches = [
-    'Cognitive Behavioral Therapy (CBT)',
-    'Mindfulness-Based Therapy',
-    'Narrative Therapy',
-    'Solution-Focused Brief Therapy',
-    'Acceptance & Commitment Therapy',
-    'Dialectical Behavior Therapy',
-    'Humanistic Therapy',
-    'Psychodynamic Therapy',
+    isEntertainmentMode() ? 'Problem-Solving Stories (CBT)' : 'Cognitive Behavioral Therapy (CBT)',
+    isEntertainmentMode() ? 'Mindful Adventures' : 'Mindfulness-Based Therapy',
+    isEntertainmentMode() ? 'Personal Story Exploration' : 'Narrative Therapy',
+    isEntertainmentMode() ? 'Goal-Focused Journeys' : 'Solution-Focused Brief Therapy',
+    isEntertainmentMode() ? 'Values-Based Adventures' : 'Acceptance & Commitment Therapy',
+    isEntertainmentMode() ? 'Emotional Balance Training' : 'Dialectical Behavior Therapy',
+    isEntertainmentMode() ? 'Self-Discovery Stories' : 'Humanistic Therapy',
+    isEntertainmentMode() ? 'Deep Character Exploration' : 'Psychodynamic Therapy',
   ];
 
   const handleIntensityChange = (intensity: 'LOW' | 'MEDIUM' | 'HIGH') => {

@@ -3,9 +3,9 @@ from __future__ import annotations
 import json
 import logging
 import time
-from typing import Any, Dict, List
+from typing import Any
 
-from .models import AgentType, AgentId
+from .models import AgentType
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +26,13 @@ class StateValidator:
         self._redis = redis
         self._pfx = key_prefix.rstrip(":")
 
-    async def validate_and_repair(self) -> Dict[str, Any]:
+    async def validate_and_repair(self) -> dict[str, Any]:
         repaired = 0
         errors = 0
         # First try a coordinator-driven recovery for robust token handling
         try:
             from .coordinators import RedisMessageCoordinator
+
             coord = RedisMessageCoordinator(self._redis, key_prefix=self._pfx)
             recovered = await coord.recover_pending(None)
             repaired += int(recovered or 0)
@@ -44,19 +45,27 @@ class StateValidator:
             for at in (AgentType.IPA, AgentType.WBA, AgentType.NGA):
                 # Build instances set from both deadlines zsets and reserved hashes to avoid SCAN timing gaps
                 instances: set[str] = set()
-                async for key in self._redis.scan_iter(match=f"{self._pfx}:reserved_deadlines:{at.value}:*"):
+                async for key in self._redis.scan_iter(
+                    match=f"{self._pfx}:reserved_deadlines:{at.value}:*"
+                ):
                     k = key.decode() if isinstance(key, (bytes, bytearray)) else key
                     instances.add(k.split(":")[-1])
-                async for key in self._redis.scan_iter(match=f"{self._pfx}:reserved:{at.value}:*"):
+                async for key in self._redis.scan_iter(
+                    match=f"{self._pfx}:reserved:{at.value}:*"
+                ):
                     k = key.decode() if isinstance(key, (bytes, bytearray)) else key
                     instances.add(k.split(":")[-1])
                 # Also union with KEYS results (robustness in tests/small envs)
                 try:
-                    klist = await self._redis.keys(f"{self._pfx}:reserved_deadlines:{at.value}:*")
+                    klist = await self._redis.keys(
+                        f"{self._pfx}:reserved_deadlines:{at.value}:*"
+                    )
                     for kk in klist or []:
                         k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
                         instances.add(k.split(":")[-1])
-                    klist2 = await self._redis.keys(f"{self._pfx}:reserved:{at.value}:*")
+                    klist2 = await self._redis.keys(
+                        f"{self._pfx}:reserved:{at.value}:*"
+                    )
                     for kk in klist2 or []:
                         k = kk.decode() if isinstance(kk, (bytes, bytearray)) else kk
                         instances.add(k.split(":")[-1])
@@ -69,20 +78,35 @@ class StateValidator:
                     try:
                         from .coordinators import RedisMessageCoordinator
                         from .models import AgentId
-                        coord = RedisMessageCoordinator(self._redis, key_prefix=self._pfx)
-                        repaired += int(await coord.recover_pending(AgentId(type=at, instance=inst)))
+
+                        coord = RedisMessageCoordinator(
+                            self._redis, key_prefix=self._pfx
+                        )
+                        repaired += int(
+                            await coord.recover_pending(AgentId(type=at, instance=inst))
+                        )
                     except Exception:
                         pass
                     # Run up to two passes to be robust to immediate writes
-                    for pass_idx, cutoff in enumerate(passes):
-                        cut = cutoff if cutoff is not None else int(time.time() * 1_000_000)
-                        zr_tokens = await self._redis.zrangebyscore(dkey, min=-1, max=cut)
+                    for _, cutoff in enumerate(passes):
+                        cut = (
+                            cutoff
+                            if cutoff is not None
+                            else int(time.time() * 1_000_000)
+                        )
+                        zr_tokens = await self._redis.zrangebyscore(
+                            dkey, min=-1, max=cut
+                        )
                         # Also consider tokens from reserved hash with missing or past deadlines (robust against timing)
                         extra_tokens: list = []
                         try:
                             htokens = await self._redis.hkeys(self._res_hash(at, inst))
                             for ht in htokens or []:
-                                htok = ht.decode() if isinstance(ht, (bytes, bytearray)) else ht
+                                htok = (
+                                    ht.decode()
+                                    if isinstance(ht, (bytes, bytearray))
+                                    else ht
+                                )
                                 try:
                                     dscore = await self._redis.zscore(dkey, htok)
                                 except Exception:
@@ -94,14 +118,20 @@ class StateValidator:
                         # Merge and de-duplicate tokens
                         tokens_set = set()
                         for tb in zr_tokens or []:
-                            tokens_set.add(tb.decode() if isinstance(tb, (bytes, bytearray)) else tb)
+                            tokens_set.add(
+                                tb.decode()
+                                if isinstance(tb, (bytes, bytearray))
+                                else tb
+                            )
                         for et in extra_tokens:
                             tokens_set.add(et)
                         if not tokens_set:
                             continue
                         for tok in tokens_set:
                             try:
-                                payload = await self._redis.hget(self._res_hash(at, inst), tok)
+                                payload = await self._redis.hget(
+                                    self._res_hash(at, inst), tok
+                                )
                                 if not payload:
                                     # Token expired but payload already reclaimed elsewhere; clean up deadline and count as repaired
                                     await self._redis.zrem(dkey, tok)
@@ -109,13 +139,23 @@ class StateValidator:
                                     continue
                                 # Requeue to sched
                                 try:
-                                    pdata = payload if isinstance(payload, str) else payload.decode()
+                                    pdata = (
+                                        payload
+                                        if isinstance(payload, str)
+                                        else payload.decode()
+                                    )
                                     data = json.loads(pdata)
                                     prio = int(data.get("priority", 5))
-                                    await self._redis.zadd(self._sched_key(at, inst, prio), {payload: cut})
-                                    await self._redis.rpush(self._queue_key(at, inst), payload)
+                                    await self._redis.zadd(
+                                        self._sched_key(at, inst, prio), {payload: cut}
+                                    )
+                                    await self._redis.rpush(
+                                        self._queue_key(at, inst), payload
+                                    )
                                 except Exception:
-                                    await self._redis.rpush(self._dlq_key(at, inst), payload)
+                                    await self._redis.rpush(
+                                        self._dlq_key(at, inst), payload
+                                    )
                                 # Cleanup reservation
                                 await self._redis.hdel(self._res_hash(at, inst), tok)
                                 await self._redis.zrem(dkey, tok)
@@ -133,24 +173,45 @@ class StateValidator:
                         inst = k.split(":")[-1]
                         hkeys = await self._redis.hkeys(k)
                         for ht in hkeys or []:
-                            tok = ht.decode() if isinstance(ht, (bytes, bytearray)) else ht
+                            tok = (
+                                ht.decode()
+                                if isinstance(ht, (bytes, bytearray))
+                                else ht
+                            )
                             try:
-                                dscore = await self._redis.zscore(f"{self._pfx}:reserved_deadlines:{at.value}:{inst}", tok)
+                                dscore = await self._redis.zscore(
+                                    f"{self._pfx}:reserved_deadlines:{at.value}:{inst}",
+                                    tok,
+                                )
                             except Exception:
                                 dscore = None
                             if dscore is None or float(dscore) <= float(now2):
                                 payload = await self._redis.hget(k, tok)
                                 if payload:
                                     try:
-                                        pdata = payload if isinstance(payload, str) else payload.decode()
+                                        pdata = (
+                                            payload
+                                            if isinstance(payload, str)
+                                            else payload.decode()
+                                        )
                                         qmsg = json.loads(pdata)
                                         prio = int(qmsg.get("priority", 5))
-                                        await self._redis.zadd(self._sched_key(at, inst, prio), {payload: now2})
-                                        await self._redis.rpush(self._queue_key(at, inst), payload)
+                                        await self._redis.zadd(
+                                            self._sched_key(at, inst, prio),
+                                            {payload: now2},
+                                        )
+                                        await self._redis.rpush(
+                                            self._queue_key(at, inst), payload
+                                        )
                                     except Exception:
-                                        await self._redis.rpush(self._dlq_key(at, inst), payload)
+                                        await self._redis.rpush(
+                                            self._dlq_key(at, inst), payload
+                                        )
                                 await self._redis.hdel(k, tok)
-                                await self._redis.zrem(f"{self._pfx}:reserved_deadlines:{at.value}:{inst}", tok)
+                                await self._redis.zrem(
+                                    f"{self._pfx}:reserved_deadlines:{at.value}:{inst}",
+                                    tok,
+                                )
                                 repaired += 1
             except Exception:
                 pass
@@ -178,22 +239,35 @@ class StateValidator:
                         continue
                     for tb in tokens:
                         tok_field = tb  # keep original bytes if bytes
-                        payload = await self._redis.hget(f"{self._pfx}:reserved:{at.value}:{inst}", tok_field)
+                        payload = await self._redis.hget(
+                            f"{self._pfx}:reserved:{at.value}:{inst}", tok_field
+                        )
                         if payload:
                             # Reschedule using original payload bytes
                             try:
                                 # Derive priority without decoding by attempting JSON load; fallback to NORMAL
                                 prio = 5
                                 try:
-                                    pd = payload if isinstance(payload, str) else payload.decode()
+                                    pd = (
+                                        payload
+                                        if isinstance(payload, str)
+                                        else payload.decode()
+                                    )
                                     jd = json.loads(pd)
                                     prio = int(jd.get("priority", 5))
                                 except Exception:
                                     prio = 5
-                                await self._redis.zadd(f"{self._pfx}:sched:{at.value}:{inst}:prio:{prio}", {payload: now3})
+                                await self._redis.zadd(
+                                    f"{self._pfx}:sched:{at.value}:{inst}:prio:{prio}",
+                                    {payload: now3},
+                                )
                             except Exception:
-                                await self._redis.rpush(f"{self._pfx}:dlq:{at.value}:{inst}", payload)
-                        await self._redis.hdel(f"{self._pfx}:reserved:{at.value}:{inst}", tok_field)
+                                await self._redis.rpush(
+                                    f"{self._pfx}:dlq:{at.value}:{inst}", payload
+                                )
+                        await self._redis.hdel(
+                            f"{self._pfx}:reserved:{at.value}:{inst}", tok_field
+                        )
                         await self._redis.zrem(dkey, tok_field)
                         repaired += 1
         except Exception:
@@ -218,4 +292,3 @@ class StateValidator:
             await self._redis.hincrby(f"{self._pfx}:wf:metrics", name, int(inc))
         except Exception:
             pass
-

@@ -1,0 +1,1304 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.services.error_recovery_manager &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.services.error_recovery_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.services.error_recovery_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Error Handling and Recovery System for Core Gameplay Loop</span>
+
+<span class="sd">This module provides comprehensive error handling and recovery mechanisms with fallback</span>
+<span class="sd">systems for all major components, graceful degradation for system failures, session</span>
+<span class="sd">state recovery and backup mechanisms, and user-friendly error explanations that</span>
+<span class="sd">maintain therapeutic context and continuity.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">contextlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">asynccontextmanager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.narrative.events</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EventBus</span><span class="p">,</span>
+    <span class="n">EventType</span><span class="p">,</span>
+    <span class="n">NarrativeEvent</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ErrorSeverity">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorSeverity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorSeverity</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Severity levels for errors.&quot;&quot;&quot;</span>
+
+    <span class="n">LOW</span> <span class="o">=</span> <span class="s2">&quot;low&quot;</span>  <span class="c1"># Minor issues that don&#39;t affect core functionality</span>
+    <span class="n">MEDIUM</span> <span class="o">=</span> <span class="s2">&quot;medium&quot;</span>  <span class="c1"># Issues that may affect some functionality</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>  <span class="c1"># Issues that significantly impact functionality</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span>  <span class="c1"># Issues that prevent core functionality</span>
+    <span class="n">THERAPEUTIC_CRITICAL</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;therapeutic_critical&quot;</span>  <span class="c1"># Issues that could affect therapeutic safety</span>
+    <span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorCategory">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorCategory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorCategory</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Categories of errors for better handling.&quot;&quot;&quot;</span>
+
+    <span class="n">SYSTEM_ERROR</span> <span class="o">=</span> <span class="s2">&quot;system_error&quot;</span>  <span class="c1"># General system failures</span>
+    <span class="n">THERAPEUTIC_ERROR</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_error&quot;</span>  <span class="c1"># Therapeutic system failures</span>
+    <span class="n">SESSION_ERROR</span> <span class="o">=</span> <span class="s2">&quot;session_error&quot;</span>  <span class="c1"># Session management failures</span>
+    <span class="n">DATA_ERROR</span> <span class="o">=</span> <span class="s2">&quot;data_error&quot;</span>  <span class="c1"># Data corruption or loss</span>
+    <span class="n">NETWORK_ERROR</span> <span class="o">=</span> <span class="s2">&quot;network_error&quot;</span>  <span class="c1"># Network connectivity issues</span>
+    <span class="n">VALIDATION_ERROR</span> <span class="o">=</span> <span class="s2">&quot;validation_error&quot;</span>  <span class="c1"># Input validation failures</span>
+    <span class="n">INTEGRATION_ERROR</span> <span class="o">=</span> <span class="s2">&quot;integration_error&quot;</span>  <span class="c1"># Inter-system integration failures</span>
+    <span class="n">PERFORMANCE_ERROR</span> <span class="o">=</span> <span class="s2">&quot;performance_error&quot;</span>  <span class="c1"># Performance degradation issues</span></div>
+
+
+
+<div class="viewcode-block" id="RecoveryStrategy">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.RecoveryStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecoveryStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recovery strategies for different error types.&quot;&quot;&quot;</span>
+
+    <span class="n">RETRY</span> <span class="o">=</span> <span class="s2">&quot;retry&quot;</span>  <span class="c1"># Retry the failed operation</span>
+    <span class="n">FALLBACK</span> <span class="o">=</span> <span class="s2">&quot;fallback&quot;</span>  <span class="c1"># Use fallback mechanism</span>
+    <span class="n">GRACEFUL_DEGRADATION</span> <span class="o">=</span> <span class="s2">&quot;graceful_degradation&quot;</span>  <span class="c1"># Reduce functionality gracefully</span>
+    <span class="n">SESSION_RECOVERY</span> <span class="o">=</span> <span class="s2">&quot;session_recovery&quot;</span>  <span class="c1"># Recover session state</span>
+    <span class="n">THERAPEUTIC_INTERVENTION</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_intervention&quot;</span>  <span class="c1"># Trigger therapeutic support</span>
+    <span class="n">USER_NOTIFICATION</span> <span class="o">=</span> <span class="s2">&quot;user_notification&quot;</span>  <span class="c1"># Notify user with guidance</span>
+    <span class="n">ESCALATION</span> <span class="o">=</span> <span class="s2">&quot;escalation&quot;</span>  <span class="c1"># Escalate to human oversight</span>
+    <span class="n">SYSTEM_RESTART</span> <span class="o">=</span> <span class="s2">&quot;system_restart&quot;</span>  <span class="c1"># Restart affected systems</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorContext">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorContext">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorContext</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context information for error handling.&quot;&quot;&quot;</span>
+
+    <span class="n">error_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+    <span class="c1"># Error details</span>
+    <span class="n">error_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">error_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">error_category</span><span class="p">:</span> <span class="n">ErrorCategory</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SYSTEM_ERROR</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">ErrorSeverity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span>
+
+    <span class="c1"># System context</span>
+    <span class="n">component</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Error data</span>
+    <span class="n">exception_details</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">stack_trace</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">system_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Recovery context</span>
+    <span class="n">recovery_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">max_recovery_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">recovery_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecoveryStrategy</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Therapeutic context</span>
+    <span class="n">therapeutic_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">affects_therapeutic_safety</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">requires_therapeutic_intervention</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="RecoveryResult">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.RecoveryResult">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RecoveryResult</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Result of a recovery attempt.&quot;&quot;&quot;</span>
+
+    <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">strategy_used</span><span class="p">:</span> <span class="n">RecoveryStrategy</span> <span class="o">=</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span>
+    <span class="n">recovery_time_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+    <span class="c1"># Recovery details</span>
+    <span class="n">actions_taken</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">fallback_used</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">data_recovered</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># User impact</span>
+    <span class="n">user_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">therapeutic_message</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">requires_user_action</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># System state</span>
+    <span class="n">system_functional</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">degraded_functionality</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Follow-up</span>
+    <span class="n">monitoring_required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">escalation_needed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="SystemBackup">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.SystemBackup">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SystemBackup</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Backup of critical system state.&quot;&quot;&quot;</span>
+
+    <span class="n">backup_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+    <span class="c1"># Backup metadata</span>
+    <span class="n">backup_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>  <span class="c1"># full, incremental, emergency</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Backed up data</span>
+    <span class="n">session_state</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_progress</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">character_development</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">user_preferences</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Backup integrity</span>
+    <span class="n">checksum</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">is_valid</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">corruption_detected</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="ErrorRecoveryManager">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ErrorRecoveryManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main system for comprehensive error handling and recovery.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_bus</span><span class="p">:</span> <span class="n">EventBus</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span> <span class="o">=</span> <span class="n">event_bus</span>
+
+        <span class="c1"># Error tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ErrorContext</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ErrorContext</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecoveryResult</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># System state tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_health</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">component_status</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># component -&gt; status</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="c1"># Backup management</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SystemBackup</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup_schedule</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Recovery strategies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">recovery_strategies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_recovery_strategies</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fallback_mechanisms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_fallback_mechanisms</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_interventions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_therapeutic_interventions</span><span class="p">()</span>
+
+        <span class="c1"># Configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent_errors</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">backup_retention_days</span> <span class="o">=</span> <span class="mi">30</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">error_history_limit</span> <span class="o">=</span> <span class="mi">1000</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;errors_handled&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;successful_recoveries&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;failed_recoveries&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_interventions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;session_recoveries&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;data_recoveries&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;escalations&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;system_restarts&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_recovery_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ErrorCategory</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">RecoveryStrategy</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load recovery strategies for different error categories.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SYSTEM_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SYSTEM_RESTART</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">THERAPEUTIC_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">THERAPEUTIC_INTERVENTION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SESSION_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">DATA_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">NETWORK_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">VALIDATION_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">THERAPEUTIC_INTERVENTION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">INTEGRATION_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">PERFORMANCE_ERROR</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SYSTEM_RESTART</span><span class="p">,</span>
+                <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_fallback_mechanisms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load fallback mechanisms for different components.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;narrative_engine&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;simplified_narrative&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Use simplified narrative generation when main engine fails&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;choice_processor&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basic_choice_handling&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Use basic choice processing without advanced features&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;therapeutic_integrator&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;safety_mode&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Maintain therapeutic safety with reduced functionality&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;character_development&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;progress_preservation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Preserve character progress without new development&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;session_manager&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;basic_session_handling&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Basic session management without advanced features&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;collaborative_system&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;fallback_type&quot;</span><span class="p">:</span> <span class="s2">&quot;solo_mode&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Fall back to solo play when collaborative features fail&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;maintains_therapeutic_context&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;performance_impact&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_therapeutic_interventions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load therapeutic intervention templates for error scenarios.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;session_interruption&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;I notice we&#39;ve encountered a brief technical interruption. This is a normal part of using technology, and it doesn&#39;t affect the value of our therapeutic work together.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">:</span> <span class="s2">&quot;normalizing_technical_difficulties&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;coping_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;mindful_acceptance&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reassurance&quot;</span><span class="p">:</span> <span class="s2">&quot;Your progress and insights remain safe and valuable.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;data_recovery&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;We&#39;re working to restore your session information. While we do this, let&#39;s take a moment to reflect on what we&#39;ve discovered together so far.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">:</span> <span class="s2">&quot;reflection_and_integration&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;coping_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;present_moment_awareness&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reassurance&quot;</span><span class="p">:</span> <span class="s2">&quot;The insights you&#39;ve gained are within you and cannot be lost.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;system_degradation&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;We&#39;re experiencing some technical limitations right now, but we can continue our therapeutic work in a simplified way that still supports your growth.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">:</span> <span class="s2">&quot;adaptability_and_resilience&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;coping_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;flexible_thinking&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reassurance&quot;</span><span class="p">:</span> <span class="s2">&quot;Therapeutic growth can happen even when conditions aren&#39;t perfect.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;collaborative_failure&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;The group features aren&#39;t available right now, but this gives us an opportunity to focus on your individual therapeutic journey.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">:</span> <span class="s2">&quot;individual_strength_and_autonomy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;coping_strategy&quot;</span><span class="p">:</span> <span class="s2">&quot;self_reliance&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reassurance&quot;</span><span class="p">:</span> <span class="s2">&quot;You have the inner resources to continue growing on your own.&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ErrorRecoveryManager.handle_error">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.handle_error">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">handle_error</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">exception</span><span class="p">:</span> <span class="ne">Exception</span><span class="p">,</span>
+        <span class="n">component</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">therapeutic_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle an error with comprehensive recovery mechanisms.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create error context</span>
+            <span class="n">error_context</span> <span class="o">=</span> <span class="n">ErrorContext</span><span class="p">(</span>
+                <span class="n">error_type</span><span class="o">=</span><span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">error_message</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">),</span>
+                <span class="n">component</span><span class="o">=</span><span class="n">component</span><span class="p">,</span>
+                <span class="n">function</span><span class="o">=</span><span class="n">function</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">stack_trace</span><span class="o">=</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span>
+                <span class="n">therapeutic_context</span><span class="o">=</span><span class="n">therapeutic_context</span> <span class="ow">or</span> <span class="p">{},</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Categorize and assess severity</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_categorize_error</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assess_error_severity</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+
+            <span class="c1"># Check if this affects therapeutic safety</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assess_therapeutic_impact</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+
+            <span class="c1"># Store error context</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">[</span><span class="n">error_context</span><span class="o">.</span><span class="n">error_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">error_context</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+
+            <span class="c1"># Publish error event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_publish_error_event</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+
+            <span class="c1"># Attempt recovery</span>
+            <span class="n">recovery_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_attempt_recovery</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+
+            <span class="c1"># Store recovery result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">recovery_result</span><span class="p">)</span>
+
+            <span class="c1"># Update metrics</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;errors_handled&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">recovery_result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;successful_recoveries&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;failed_recoveries&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Clean up if recovery successful</span>
+            <span class="k">if</span> <span class="n">recovery_result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">error_context</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">recovery_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in error handling system: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Return basic recovery result to prevent infinite recursion</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;We&#39;re experiencing technical difficulties. Please try again in a moment.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;Technical challenges are a normal part of life. Let&#39;s practice patience and resilience.&quot;</span><span class="p">,</span>
+                <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ErrorRecoveryManager.error_handling_context">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.error_handling_context">[docs]</a>
+    <span class="nd">@asynccontextmanager</span>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">error_handling_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">component</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">therapeutic_context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Context manager for automatic error handling.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">recovery_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">handle_error</span><span class="p">(</span>
+                <span class="n">e</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">function</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">therapeutic_context</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Re-raise if recovery failed and escalation is needed</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">recovery_result</span><span class="o">.</span><span class="n">success</span> <span class="ow">and</span> <span class="n">recovery_result</span><span class="o">.</span><span class="n">escalation_needed</span><span class="p">:</span>
+                <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="ErrorRecoveryManager.create_system_backup">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.create_system_backup">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_system_backup</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">backup_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;full&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SystemBackup</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a backup of critical system state.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">backup</span> <span class="o">=</span> <span class="n">SystemBackup</span><span class="p">(</span>
+                <span class="n">backup_type</span><span class="o">=</span><span class="n">backup_type</span><span class="p">,</span> <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span> <span class="n">session_id</span><span class="o">=</span><span class="n">session_id</span>
+            <span class="p">)</span>
+
+            <span class="c1"># This would integrate with actual system components to get state</span>
+            <span class="c1"># For now, we&#39;ll create a placeholder structure</span>
+            <span class="n">backup</span><span class="o">.</span><span class="n">session_state</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session_id</span><span class="p">,</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="s2">&quot;backup_type&quot;</span><span class="p">:</span> <span class="n">backup_type</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Calculate checksum for integrity verification</span>
+            <span class="n">backup</span><span class="o">.</span><span class="n">checksum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_backup_checksum</span><span class="p">(</span><span class="n">backup</span><span class="p">)</span>
+
+            <span class="c1"># Store backup</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="p">[</span><span class="n">backup</span><span class="o">.</span><span class="n">backup_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">backup</span>
+
+            <span class="c1"># Schedule cleanup of old backups</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_schedule_backup_cleanup</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">backup</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create system backup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="ErrorRecoveryManager.restore_from_backup">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.restore_from_backup">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">restore_from_backup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backup_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restore system state from a backup.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">backup</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">backup_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">backup</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Backup not found&quot;</span><span class="p">,</span>
+                    <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Verify backup integrity</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verify_backup_integrity</span><span class="p">(</span><span class="n">backup</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Backup is corrupted and cannot be restored&quot;</span><span class="p">,</span>
+                    <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Restore session state</span>
+            <span class="n">recovery_result</span> <span class="o">=</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;backup_restored&quot;</span><span class="p">],</span>
+                <span class="n">data_recovered</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Your session has been restored from a recent backup.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;We&#39;ve successfully recovered your progress. This shows the resilience built into our therapeutic journey together.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;session_recoveries&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;data_recoveries&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">recovery_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to restore from backup </span><span class="si">{</span><span class="n">backup_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Failed to restore from backup&quot;</span><span class="p">,</span>
+                <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_categorize_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Categorize the error for appropriate handling.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_type</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="c1"># Categorize based on error type and component</span>
+            <span class="k">if</span> <span class="s2">&quot;therapeutic&quot;</span> <span class="ow">in</span> <span class="n">component</span> <span class="ow">or</span> <span class="s2">&quot;safety&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">THERAPEUTIC_ERROR</span>
+            <span class="k">elif</span> <span class="s2">&quot;session&quot;</span> <span class="ow">in</span> <span class="n">component</span> <span class="ow">or</span> <span class="s2">&quot;state&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SESSION_ERROR</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="s2">&quot;data&quot;</span> <span class="ow">in</span> <span class="n">error_type</span>
+                <span class="ow">or</span> <span class="s2">&quot;corruption&quot;</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">DATA_ERROR</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="s2">&quot;network&quot;</span> <span class="ow">in</span> <span class="n">error_type</span>
+                <span class="ow">or</span> <span class="s2">&quot;connection&quot;</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">NETWORK_ERROR</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="s2">&quot;validation&quot;</span> <span class="ow">in</span> <span class="n">error_type</span>
+                <span class="ow">or</span> <span class="s2">&quot;invalid&quot;</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">VALIDATION_ERROR</span>
+            <span class="k">elif</span> <span class="s2">&quot;integration&quot;</span> <span class="ow">in</span> <span class="n">component</span> <span class="ow">or</span> <span class="s2">&quot;orchestration&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">INTEGRATION_ERROR</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="s2">&quot;performance&quot;</span> <span class="ow">in</span> <span class="n">error_type</span>
+                <span class="ow">or</span> <span class="s2">&quot;timeout&quot;</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">PERFORMANCE_ERROR</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SYSTEM_ERROR</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to categorize error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">=</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SYSTEM_ERROR</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_assess_error_severity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assess the severity of the error.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">error_message</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="c1"># Critical severity indicators</span>
+            <span class="n">critical_indicators</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;critical&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;fatal&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crash&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;corruption&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;security&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_safety&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emergency&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="c1"># High severity indicators</span>
+            <span class="n">high_indicators</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;session&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;data_loss&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;safety&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;character_development&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;progress&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Medium severity indicators</span>
+            <span class="n">medium_indicators</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;validation&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;processing&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;integration&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;performance&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">indicator</span> <span class="ow">in</span> <span class="n">error_message</span> <span class="ow">or</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">component</span>
+                <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">critical_indicators</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">CRITICAL</span>
+            <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">indicator</span> <span class="ow">in</span> <span class="n">error_message</span> <span class="ow">or</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">component</span>
+                <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">high_indicators</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span>
+            <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">indicator</span> <span class="ow">in</span> <span class="n">error_message</span> <span class="ow">or</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">component</span>
+                <span class="k">for</span> <span class="n">indicator</span> <span class="ow">in</span> <span class="n">medium_indicators</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">LOW</span>
+
+            <span class="c1"># Special case for therapeutic safety</span>
+            <span class="k">if</span> <span class="s2">&quot;therapeutic&quot;</span> <span class="ow">in</span> <span class="n">component</span> <span class="ow">and</span> <span class="s2">&quot;safety&quot;</span> <span class="ow">in</span> <span class="n">error_message</span><span class="p">:</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">THERAPEUTIC_CRITICAL</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to assess error severity: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_assess_therapeutic_impact</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assess if the error affects therapeutic safety or continuity.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">therapeutic_components</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;therapeutic&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;safety&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotional&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;character&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;session&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;narrative&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;choice&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="n">safety_keywords</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;safety&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;intervention&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emergency&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;critical&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_boundary&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_distress&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Check if error affects therapeutic components</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">comp</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">therapeutic_components</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">affects_therapeutic_safety</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Check if error message contains safety keywords</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">keyword</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">safety_keywords</span>
+            <span class="p">):</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">affects_therapeutic_safety</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">requires_therapeutic_intervention</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># Check therapeutic context</span>
+            <span class="k">if</span> <span class="n">error_context</span><span class="o">.</span><span class="n">therapeutic_context</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">error_context</span><span class="o">.</span><span class="n">therapeutic_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;in_crisis&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">error_context</span><span class="o">.</span><span class="n">requires_therapeutic_intervention</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">=</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">THERAPEUTIC_CRITICAL</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">error_context</span><span class="o">.</span><span class="n">therapeutic_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_distress_level&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+                    <span class="o">&gt;</span> <span class="mf">0.7</span>
+                <span class="p">):</span>
+                    <span class="n">error_context</span><span class="o">.</span><span class="n">affects_therapeutic_safety</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to assess therapeutic impact: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Err on the side of caution</span>
+            <span class="n">error_context</span><span class="o">.</span><span class="n">affects_therapeutic_safety</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_attempt_recovery</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Attempt to recover from the error using appropriate strategies.&quot;&quot;&quot;</span>
+        <span class="n">recovery_start_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get recovery strategies for this error category</span>
+            <span class="n">strategies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_strategies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span><span class="p">,</span>
+                <span class="p">[</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">],</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Try each strategy in order</span>
+            <span class="k">for</span> <span class="n">strategy</span> <span class="ow">in</span> <span class="n">strategies</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">error_context</span><span class="o">.</span><span class="n">recovery_attempts</span>
+                    <span class="o">&gt;=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">max_recovery_attempts</span>
+                <span class="p">):</span>
+                    <span class="k">break</span>
+
+                <span class="n">error_context</span><span class="o">.</span><span class="n">recovery_attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">recovery_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_recovery_strategy</span><span class="p">(</span>
+                    <span class="n">error_context</span><span class="p">,</span> <span class="n">strategy</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">recovery_result</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+                    <span class="n">recovery_result</span><span class="o">.</span><span class="n">recovery_time_seconds</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">recovery_start_time</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+                    <span class="k">return</span> <span class="n">recovery_result</span>
+
+            <span class="c1"># If all strategies failed, escalate</span>
+            <span class="n">recovery_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_recovery_strategy</span><span class="p">(</span>
+                <span class="n">error_context</span><span class="p">,</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span>
+            <span class="p">)</span>
+            <span class="n">recovery_result</span><span class="o">.</span><span class="n">recovery_time_seconds</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">recovery_start_time</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="n">recovery_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to attempt recovery: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;We&#39;re experiencing technical difficulties. Our team has been notified.&quot;</span><span class="p">,</span>
+                <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">recovery_time_seconds</span><span class="o">=</span><span class="p">(</span>
+                    <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">recovery_start_time</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_recovery_strategy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">RecoveryStrategy</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute a specific recovery strategy.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_retry_operation</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_fallback_mechanism</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graceful_degradation</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recover_session_state</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">THERAPEUTIC_INTERVENTION</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_therapeutic_intervention</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_notify_user</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_escalate_error</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SYSTEM_RESTART</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_restart_system_component</span><span class="p">(</span><span class="n">error_context</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">strategy_used</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Unknown recovery strategy&quot;</span><span class="p">,</span>
+                    <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute recovery strategy </span><span class="si">{</span><span class="n">strategy</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Recovery attempt failed&quot;</span><span class="p">,</span>
+                <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_retry_operation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Retry the failed operation.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Simple retry mechanism - in a real implementation, this would</span>
+            <span class="c1"># retry the actual failed operation</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>  <span class="c1"># Brief delay before retry</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;operation_retried&quot;</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Operation completed successfully after retry.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;Sometimes we need to try again, and that&#39;s perfectly okay. Persistence is a valuable skill.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Retry operation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Retry attempt failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_use_fallback_mechanism</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Use fallback mechanism for the failed component.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">fallback</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_mechanisms</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">fallback</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;No fallback mechanism available&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Mark component as degraded</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_status</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;degraded&quot;</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">fallback_used</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;fallback_activated_</span><span class="si">{</span><span class="n">fallback</span><span class="p">[</span><span class="s1">&#39;fallback_type&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="n">degraded_functionality</span><span class="o">=</span><span class="p">[</span><span class="n">component</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;We&#39;re using a simplified version of </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2"> to continue your session.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="n">fallback</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;therapeutic_message&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;We can adapt and continue our therapeutic work even when things don&#39;t go as planned.&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fallback mechanism failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">FALLBACK</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Fallback mechanism failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_graceful_degradation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Implement graceful degradation of system functionality.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+            <span class="c1"># Disable non-essential features</span>
+            <span class="n">degraded_features</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="s2">&quot;collaborative&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">degraded_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;collaborative_features&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;replayability&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">degraded_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;exploration_features&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="s2">&quot;character&quot;</span> <span class="ow">in</span> <span class="n">component</span><span class="p">:</span>
+                <span class="n">degraded_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;character_development&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">degraded_features</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;advanced_features&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;graceful_degradation_activated&quot;</span><span class="p">],</span>
+                <span class="n">degraded_functionality</span><span class="o">=</span><span class="n">degraded_features</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Some advanced features are temporarily unavailable, but your core therapeutic experience continues.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;We&#39;re focusing on the essential elements of your therapeutic journey. Sometimes simplicity can be just as powerful.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Graceful degradation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">GRACEFUL_DEGRADATION</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Graceful degradation failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_recover_session_state</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recover session state from backup.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">error_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;No session ID available for recovery&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Find most recent backup for this session</span>
+            <span class="n">session_backups</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">backup</span>
+                <span class="k">for</span> <span class="n">backup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">backup</span><span class="o">.</span><span class="n">session_id</span> <span class="o">==</span> <span class="n">error_context</span><span class="o">.</span><span class="n">session_id</span>
+            <span class="p">]</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">session_backups</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                    <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                    <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;No backup available for session recovery&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Use most recent backup</span>
+            <span class="n">latest_backup</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">session_backups</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">restore_from_backup</span><span class="p">(</span><span class="n">latest_backup</span><span class="o">.</span><span class="n">backup_id</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session recovery failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SESSION_RECOVERY</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Session recovery failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_therapeutic_intervention</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide therapeutic intervention for error scenarios.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Determine intervention type based on error</span>
+            <span class="n">intervention_type</span> <span class="o">=</span> <span class="s2">&quot;session_interruption&quot;</span>  <span class="c1"># default</span>
+
+            <span class="k">if</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">==</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">DATA_ERROR</span><span class="p">:</span>
+                <span class="n">intervention_type</span> <span class="o">=</span> <span class="s2">&quot;data_recovery&quot;</span>
+            <span class="k">elif</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span> <span class="o">==</span> <span class="n">ErrorCategory</span><span class="o">.</span><span class="n">SYSTEM_ERROR</span><span class="p">:</span>
+                <span class="n">intervention_type</span> <span class="o">=</span> <span class="s2">&quot;system_degradation&quot;</span>
+            <span class="k">elif</span> <span class="s2">&quot;collaborative&quot;</span> <span class="ow">in</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">intervention_type</span> <span class="o">=</span> <span class="s2">&quot;collaborative_failure&quot;</span>
+
+            <span class="n">intervention</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_interventions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">intervention_type</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;therapeutic_interventions&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">THERAPEUTIC_INTERVENTION</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;therapeutic_intervention_provided&quot;</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="n">intervention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;message&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;We&#39;re here to support you through this technical difficulty.&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="n">intervention</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                    <span class="s2">&quot;reassurance&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Your therapeutic journey continues to be valuable and meaningful.&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">monitoring_required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Therapeutic intervention failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">THERAPEUTIC_INTERVENTION</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Therapeutic intervention failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_notify_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Notify user about the error with appropriate messaging.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create user-friendly error message</span>
+            <span class="k">if</span> <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">LOW</span><span class="p">:</span>
+                <span class="n">user_message</span> <span class="o">=</span> <span class="s2">&quot;We encountered a minor technical issue, but everything is working normally now.&quot;</span>
+                <span class="n">therapeutic_message</span> <span class="o">=</span> <span class="s2">&quot;Small challenges like this are part of life. We can handle them together.&quot;</span>
+            <span class="k">elif</span> <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">MEDIUM</span><span class="p">:</span>
+                <span class="n">user_message</span> <span class="o">=</span> <span class="s2">&quot;We&#39;re experiencing some technical difficulties. Your progress is safe and we&#39;re working to resolve this.&quot;</span>
+                <span class="n">therapeutic_message</span> <span class="o">=</span> <span class="s2">&quot;Technical challenges give us opportunities to practice patience and resilience.&quot;</span>
+            <span class="k">elif</span> <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span> <span class="o">==</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span><span class="p">:</span>
+                <span class="n">user_message</span> <span class="o">=</span> <span class="s2">&quot;We&#39;ve encountered a significant technical issue. We&#39;re working to restore full functionality.&quot;</span>
+                <span class="n">therapeutic_message</span> <span class="o">=</span> <span class="s2">&quot;Even when facing difficulties, we can find ways to continue our therapeutic work together.&quot;</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># CRITICAL or THERAPEUTIC_CRITICAL</span>
+                <span class="n">user_message</span> <span class="o">=</span> <span class="s2">&quot;We&#39;re experiencing serious technical difficulties. Our team has been notified and is working on a solution.&quot;</span>
+                <span class="n">therapeutic_message</span> <span class="o">=</span> <span class="s2">&quot;In challenging moments like this, remember that your therapeutic insights and growth remain with you.&quot;</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;user_notified&quot;</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="n">user_message</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="n">therapeutic_message</span><span class="p">,</span>
+                <span class="n">requires_user_action</span><span class="o">=</span><span class="n">error_context</span><span class="o">.</span><span class="n">severity</span>
+                <span class="ow">in</span> <span class="p">[</span><span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">HIGH</span><span class="p">,</span> <span class="n">ErrorSeverity</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User notification failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">USER_NOTIFICATION</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Failed to generate user notification&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_escalate_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Escalate error to human oversight.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Log escalation</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error escalated: </span><span class="si">{</span><span class="n">error_context</span><span class="o">.</span><span class="n">error_id</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">error_context</span><span class="o">.</span><span class="n">error_message</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;escalations&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;error_escalated&quot;</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Our technical team has been notified and will address this issue promptly.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;While we work on the technical aspects, remember that your therapeutic journey and insights remain valuable.&quot;</span><span class="p">,</span>
+                <span class="n">escalation_needed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">monitoring_required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error escalation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">ESCALATION</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;Escalation failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_restart_system_component</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RecoveryResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Restart a system component.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span>
+
+            <span class="c1"># Mark component for restart</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_status</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;restarting&quot;</span>
+
+            <span class="c1"># Simulate component restart</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+            <span class="c1"># Mark component as healthy</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">component_status</span><span class="p">[</span><span class="n">component</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;healthy&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;system_restarts&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SYSTEM_RESTART</span><span class="p">,</span>
+                <span class="n">actions_taken</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;component_restarted&quot;</span><span class="p">],</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">component</span><span class="si">}</span><span class="s2"> system has been restarted and is now functioning normally.&quot;</span><span class="p">,</span>
+                <span class="n">therapeutic_message</span><span class="o">=</span><span class="s2">&quot;Sometimes a fresh start is exactly what we need. This applies to both technology and personal growth.&quot;</span><span class="p">,</span>
+                <span class="n">monitoring_required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;System restart failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">RecoveryResult</span><span class="p">(</span>
+                <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">strategy_used</span><span class="o">=</span><span class="n">RecoveryStrategy</span><span class="o">.</span><span class="n">SYSTEM_RESTART</span><span class="p">,</span>
+                <span class="n">user_message</span><span class="o">=</span><span class="s2">&quot;System restart failed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_publish_error_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">error_context</span><span class="p">:</span> <span class="n">ErrorContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish error event for monitoring and logging.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">error_event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">ERROR_EVENT</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">error_context</span><span class="o">.</span><span class="n">session_id</span> <span class="ow">or</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">error_context</span><span class="o">.</span><span class="n">user_id</span> <span class="ow">or</span> <span class="s2">&quot;system&quot;</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;error_id&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_id</span><span class="p">,</span>
+                    <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_type</span><span class="p">,</span>
+                    <span class="s2">&quot;error_category&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">error_category</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;severity&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;component&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">component</span><span class="p">,</span>
+                    <span class="s2">&quot;function&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">function</span><span class="p">,</span>
+                    <span class="s2">&quot;affects_therapeutic_safety&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">affects_therapeutic_safety</span><span class="p">,</span>
+                    <span class="s2">&quot;requires_therapeutic_intervention&quot;</span><span class="p">:</span> <span class="n">error_context</span><span class="o">.</span><span class="n">requires_therapeutic_intervention</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">error_event</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to publish error event: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_backup_checksum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backup</span><span class="p">:</span> <span class="n">SystemBackup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate checksum for backup integrity verification.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Simple checksum calculation - in production, use proper hashing</span>
+            <span class="n">data_str</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">backup</span><span class="o">.</span><span class="n">session_state</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">backup</span><span class="o">.</span><span class="n">session_state</span>
+                <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">hash</span><span class="p">(</span><span class="n">data_str</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to calculate backup checksum: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;invalid&quot;</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_verify_backup_integrity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">backup</span><span class="p">:</span> <span class="n">SystemBackup</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Verify backup integrity using checksum.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">calculated_checksum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_backup_checksum</span><span class="p">(</span><span class="n">backup</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">calculated_checksum</span> <span class="o">==</span> <span class="n">backup</span><span class="o">.</span><span class="n">checksum</span> <span class="ow">and</span> <span class="n">backup</span><span class="o">.</span><span class="n">is_valid</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to verify backup integrity: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_schedule_backup_cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Schedule cleanup of old backups.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cutoff_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backup_retention_days</span><span class="p">)</span>
+
+            <span class="c1"># Find old backups</span>
+            <span class="n">old_backups</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">backup_id</span>
+                <span class="k">for</span> <span class="n">backup_id</span><span class="p">,</span> <span class="n">backup</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">backup</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&lt;</span> <span class="n">cutoff_date</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Remove old backups</span>
+            <span class="k">for</span> <span class="n">backup_id</span> <span class="ow">in</span> <span class="n">old_backups</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="p">[</span><span class="n">backup_id</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to schedule backup cleanup: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ErrorRecoveryManager.get_system_health_status">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.get_system_health_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_system_health_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get comprehensive system health status.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">active_errors_by_severity</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">severity</span> <span class="o">=</span> <span class="n">error</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span>
+                <span class="n">active_errors_by_severity</span><span class="p">[</span><span class="n">severity</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">active_errors_by_severity</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">severity</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;overall_status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span> <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span> <span class="k">else</span> <span class="s2">&quot;degraded&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;active_errors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">),</span>
+                <span class="s2">&quot;active_errors_by_severity&quot;</span><span class="p">:</span> <span class="n">active_errors_by_severity</span><span class="p">,</span>
+                <span class="s2">&quot;degraded_components&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="p">),</span>
+                <span class="s2">&quot;component_status&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">component_status</span><span class="p">),</span>
+                <span class="s2">&quot;recent_errors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="n">e</span>
+                        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">:]</span>
+                        <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+                <span class="s2">&quot;recovery_success_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_recovery_success_rate</span><span class="p">(),</span>
+                <span class="s2">&quot;system_backups_available&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="p">),</span>
+                <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get system health status: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;overall_status&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Failed to get health status&quot;</span><span class="p">}</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_recovery_success_rate</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate recovery success rate.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">1.0</span>
+
+            <span class="n">successful_recoveries</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">success</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">successful_recoveries</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to calculate recovery success rate: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+<div class="viewcode-block" id="ErrorRecoveryManager.get_metrics">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get error handling and recovery metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;active_errors&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_errors</span><span class="p">),</span>
+            <span class="s2">&quot;error_history_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_history</span><span class="p">),</span>
+            <span class="s2">&quot;recovery_history_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recovery_history</span><span class="p">),</span>
+            <span class="s2">&quot;degraded_components&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">degraded_components</span><span class="p">),</span>
+            <span class="s2">&quot;system_backups&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">system_backups</span><span class="p">),</span>
+            <span class="s2">&quot;recovery_success_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_recovery_success_rate</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ErrorRecoveryManager.health_check">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.services.error_recovery_manager.html#src.components.gameplay_loop.services.ErrorRecoveryManager.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform health check of error recovery system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;recovery_strategies_loaded&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">strategies</span><span class="p">)</span> <span class="k">for</span> <span class="n">strategies</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">recovery_strategies</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;fallback_mechanisms_loaded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fallback_mechanisms</span><span class="p">),</span>
+            <span class="s2">&quot;therapeutic_interventions_loaded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_interventions</span><span class="p">),</span>
+            <span class="s2">&quot;system_health&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_system_health_status</span><span class="p">(),</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

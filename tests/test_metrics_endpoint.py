@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from fastapi.testclient import TestClient
 
 from src.player_experience.api.app import create_app
@@ -9,6 +8,7 @@ from src.player_experience.api.config import TestingSettings
 
 def _make_client() -> TestClient:
     import src.player_experience.api.config as config_module
+
     config_module.settings = TestingSettings()
     app = create_app()
     return TestClient(app)
@@ -26,9 +26,10 @@ def test_metrics_endpoint_available_in_debug() -> None:
 def test_metrics_endpoint_hidden_in_production() -> None:
     # Simulate production settings
     import src.player_experience.api.config as config_module
+
     # Use DevelopmentSettings with debug=False to mimic production behavior without strong key validation
     dev = config_module.DevelopmentSettings()
-    object.__setattr__(dev, 'debug', False)
+    object.__setattr__(dev, "debug", False)
     config_module.settings = dev
     app = create_app()
     client = TestClient(app)
@@ -36,4 +37,3 @@ def test_metrics_endpoint_hidden_in_production() -> None:
     resp = client.get("/metrics")
     # For security, we return 404 when not allowed
     assert resp.status_code == 404
-

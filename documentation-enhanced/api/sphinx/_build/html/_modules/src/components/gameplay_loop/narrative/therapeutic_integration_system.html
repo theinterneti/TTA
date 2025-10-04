@@ -1,0 +1,1299 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.therapeutic_integration_system &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.therapeutic_integration_system</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.narrative.therapeutic_integration_system</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Therapeutic Integration System for Core Gameplay Loop</span>
+
+<span class="sd">This module provides natural therapeutic concept embedding, progress tracking,</span>
+<span class="sd">and adaptive therapeutic approaches for meaningful therapeutic adventures.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.services.session_state</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionState</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventBus</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">NarrativeEvent</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TherapeuticApproach">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticApproach">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticApproach</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Therapeutic approaches for concept integration.&quot;&quot;&quot;</span>
+
+    <span class="n">COGNITIVE_BEHAVIORAL</span> <span class="o">=</span> <span class="s2">&quot;cognitive_behavioral&quot;</span>
+    <span class="n">DIALECTICAL_BEHAVIORAL</span> <span class="o">=</span> <span class="s2">&quot;dialectical_behavioral&quot;</span>
+    <span class="n">MINDFULNESS_BASED</span> <span class="o">=</span> <span class="s2">&quot;mindfulness_based&quot;</span>
+    <span class="n">ACCEPTANCE_COMMITMENT</span> <span class="o">=</span> <span class="s2">&quot;acceptance_commitment&quot;</span>
+    <span class="n">NARRATIVE_THERAPY</span> <span class="o">=</span> <span class="s2">&quot;narrative_therapy&quot;</span>
+    <span class="n">SOLUTION_FOCUSED</span> <span class="o">=</span> <span class="s2">&quot;solution_focused&quot;</span>
+    <span class="n">HUMANISTIC</span> <span class="o">=</span> <span class="s2">&quot;humanistic&quot;</span>
+    <span class="n">PSYCHODYNAMIC</span> <span class="o">=</span> <span class="s2">&quot;psychodynamic&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="IntegrationStrategy">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.IntegrationStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">IntegrationStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Strategies for therapeutic concept integration.&quot;&quot;&quot;</span>
+
+    <span class="n">DIRECT_TEACHING</span> <span class="o">=</span> <span class="s2">&quot;direct_teaching&quot;</span>
+    <span class="n">EXPERIENTIAL_LEARNING</span> <span class="o">=</span> <span class="s2">&quot;experiential_learning&quot;</span>
+    <span class="n">METAPHORICAL_EMBEDDING</span> <span class="o">=</span> <span class="s2">&quot;metaphorical_embedding&quot;</span>
+    <span class="n">SKILL_PRACTICE</span> <span class="o">=</span> <span class="s2">&quot;skill_practice&quot;</span>
+    <span class="n">REFLECTION_PROMPTING</span> <span class="o">=</span> <span class="s2">&quot;reflection_prompting&quot;</span>
+    <span class="n">MODELING_DEMONSTRATION</span> <span class="o">=</span> <span class="s2">&quot;modeling_demonstration&quot;</span>
+    <span class="n">GRADUAL_EXPOSURE</span> <span class="o">=</span> <span class="s2">&quot;gradual_exposure&quot;</span>
+    <span class="n">COLLABORATIVE_EXPLORATION</span> <span class="o">=</span> <span class="s2">&quot;collaborative_exploration&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ProgressMilestone">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.ProgressMilestone">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressMilestone</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of therapeutic progress milestones.&quot;&quot;&quot;</span>
+
+    <span class="n">SKILL_ACQUISITION</span> <span class="o">=</span> <span class="s2">&quot;skill_acquisition&quot;</span>
+    <span class="n">INSIGHT_DEVELOPMENT</span> <span class="o">=</span> <span class="s2">&quot;insight_development&quot;</span>
+    <span class="n">BEHAVIORAL_CHANGE</span> <span class="o">=</span> <span class="s2">&quot;behavioral_change&quot;</span>
+    <span class="n">EMOTIONAL_REGULATION</span> <span class="o">=</span> <span class="s2">&quot;emotional_regulation&quot;</span>
+    <span class="n">RELATIONSHIP_IMPROVEMENT</span> <span class="o">=</span> <span class="s2">&quot;relationship_improvement&quot;</span>
+    <span class="n">GOAL_ACHIEVEMENT</span> <span class="o">=</span> <span class="s2">&quot;goal_achievement&quot;</span>
+    <span class="n">RESILIENCE_BUILDING</span> <span class="o">=</span> <span class="s2">&quot;resilience_building&quot;</span>
+    <span class="n">SELF_AWARENESS_GROWTH</span> <span class="o">=</span> <span class="s2">&quot;self_awareness_growth&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ResistanceType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistanceType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResistanceType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of therapeutic resistance.&quot;&quot;&quot;</span>
+
+    <span class="n">COGNITIVE_RESISTANCE</span> <span class="o">=</span> <span class="s2">&quot;cognitive_resistance&quot;</span>
+    <span class="n">EMOTIONAL_AVOIDANCE</span> <span class="o">=</span> <span class="s2">&quot;emotional_avoidance&quot;</span>
+    <span class="n">BEHAVIORAL_RELUCTANCE</span> <span class="o">=</span> <span class="s2">&quot;behavioral_reluctance&quot;</span>
+    <span class="n">MOTIVATIONAL_AMBIVALENCE</span> <span class="o">=</span> <span class="s2">&quot;motivational_ambivalence&quot;</span>
+    <span class="n">TRUST_ISSUES</span> <span class="o">=</span> <span class="s2">&quot;trust_issues&quot;</span>
+    <span class="n">OVERWHELM_RESPONSE</span> <span class="o">=</span> <span class="s2">&quot;overwhelm_response&quot;</span>
+    <span class="n">PERFECTIONISM</span> <span class="o">=</span> <span class="s2">&quot;perfectionism&quot;</span>
+    <span class="n">LEARNED_HELPLESSNESS</span> <span class="o">=</span> <span class="s2">&quot;learned_helplessness&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticConcept">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticConcept">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticConcept</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a therapeutic concept to be integrated.&quot;&quot;&quot;</span>
+
+    <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Therapeutic framework</span>
+    <span class="n">approach</span><span class="p">:</span> <span class="n">TherapeuticApproach</span> <span class="o">=</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span>
+    <span class="n">core_principles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">learning_objectives</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Integration details</span>
+    <span class="n">integration_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">IntegrationStrategy</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">story_metaphors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">practice_scenarios</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Prerequisites and dependencies</span>
+    <span class="n">prerequisite_concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">difficulty_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># 1-10 scale</span>
+    <span class="n">estimated_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="c1"># Assessment criteria</span>
+    <span class="n">mastery_indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">progress_markers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_practiced</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">mastery_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0-1.0</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticProgress">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticProgress">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticProgress</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks therapeutic progress for a user.&quot;&quot;&quot;</span>
+
+    <span class="n">progress_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Progress tracking</span>
+    <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">concept_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">approach</span><span class="p">:</span> <span class="n">TherapeuticApproach</span> <span class="o">=</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span>
+
+    <span class="c1"># Progress metrics</span>
+    <span class="n">initial_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">current_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">target_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">progress_rate</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># Progress per session</span>
+
+    <span class="c1"># Practice tracking</span>
+    <span class="n">practice_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">successful_applications</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">total_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># Milestone tracking</span>
+    <span class="n">milestones_achieved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressMilestone</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">milestone_dates</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">datetime</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Story integration</span>
+    <span class="n">story_contexts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">character_developments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">narrative_celebrations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">started_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">estimated_completion</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="ResistancePattern">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.ResistancePattern">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ResistancePattern</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracks patterns of therapeutic resistance.&quot;&quot;&quot;</span>
+
+    <span class="n">pattern_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Resistance details</span>
+    <span class="n">resistance_type</span><span class="p">:</span> <span class="n">ResistanceType</span> <span class="o">=</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">COGNITIVE_RESISTANCE</span>
+    <span class="n">concept_areas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">triggers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">manifestations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Pattern analysis</span>
+    <span class="n">frequency</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">intensity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0-1.0</span>
+    <span class="n">duration_pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>  <span class="c1"># brief, moderate, extended</span>
+
+    <span class="c1"># Adaptive responses</span>
+    <span class="n">successful_interventions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">alternative_approaches</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">bypass_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">first_observed</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_observed</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">resolution_status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;active&quot;</span>  <span class="c1"># active, improving, resolved</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticIntegration">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegration">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticIntegration</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a specific therapeutic integration in a story context.&quot;&quot;&quot;</span>
+
+    <span class="n">integration_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Integration details</span>
+    <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">strategy</span><span class="p">:</span> <span class="n">IntegrationStrategy</span> <span class="o">=</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">EXPERIENTIAL_LEARNING</span>
+    <span class="n">story_context</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Implementation</span>
+    <span class="n">narrative_embedding</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">character_involvement</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">practice_opportunities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Feedback and assessment</span>
+    <span class="n">immediate_feedback</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">story_outcomes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">character_reactions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+
+    <span class="c1"># Effectiveness tracking</span>
+    <span class="n">user_engagement</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0-1.0</span>
+    <span class="n">concept_understanding</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0-1.0</span>
+    <span class="n">skill_demonstration</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>  <span class="c1"># 0.0-1.0</span>
+    <span class="n">emotional_response</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">effectiveness_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticIntegrationSystem</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main system for therapeutic concept integration and progress tracking.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_bus</span><span class="p">:</span> <span class="n">EventBus</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span> <span class="o">=</span> <span class="n">event_bus</span>
+
+        <span class="c1"># Therapeutic concept library</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">TherapeuticConcept</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concept_templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_concept_templates</span><span class="p">()</span>
+
+        <span class="c1"># Progress tracking</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticProgress</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ResistancePattern</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integration_history</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">TherapeuticIntegration</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Integration strategies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integration_strategies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_integration_strategies</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">story_metaphors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_story_metaphors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">celebration_templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_celebration_templates</span><span class="p">()</span>
+
+        <span class="c1"># Configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">progress_threshold</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># Threshold for milestone achievement</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resistance_detection_threshold</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">3</span>  <span class="c1"># Number of failed attempts before detecting resistance</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adaptation_sensitivity</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mf">0.7</span>  <span class="c1"># Sensitivity to user response for approach adaptation</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;concepts_integrated&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;progress_milestones_achieved&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;resistance_patterns_detected&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;adaptive_interventions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;celebration_events&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_concept_templates</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">TherapeuticApproach</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load therapeutic concept templates for different approaches.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Thought Challenging&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning to identify and challenge unhelpful thought patterns&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;core_principles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Thoughts affect feelings&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Evidence-based thinking&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Balanced perspective&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;learning_objectives&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Identify cognitive distortions&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Generate alternative thoughts&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Evaluate evidence&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;story_metaphors&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Detective investigating clues&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Scientist testing hypotheses&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Judge weighing evidence&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Behavioral Activation&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Increasing engagement in meaningful and rewarding activities&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;core_principles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Action leads to mood improvement&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Values-based living&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Gradual progress&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;learning_objectives&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Identify valued activities&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Schedule pleasant events&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Monitor mood changes&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;story_metaphors&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Hero embarking on quests&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Gardener tending plants&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Explorer discovering new lands&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
+            <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">MINDFULNESS_BASED</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Present Moment Awareness&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Developing ability to stay present and aware in the current moment&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;core_principles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Non-judgmental awareness&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Acceptance of present experience&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Observing without reacting&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;learning_objectives&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Practice mindful breathing&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Notice mind wandering&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Return attention to present&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;story_metaphors&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Wise sage observing nature&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Lighthouse keeper watching storms&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Mountain remaining steady&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">DIALECTICAL_BEHAVIORAL</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Distress Tolerance&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning to tolerate and survive crisis situations without making them worse&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;core_principles&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Distress is temporary&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Survival over solving&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Radical acceptance&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;learning_objectives&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Use TIPP skills&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Practice distraction techniques&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Accept difficult emotions&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;story_metaphors&quot;</span><span class="p">:</span> <span class="p">[</span>
+                        <span class="s2">&quot;Sailor weathering storms&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Warrior enduring battles&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Tree bending in wind&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;difficulty_level&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_integration_strategies</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">IntegrationStrategy</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load integration strategy configurations.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">EXPERIENTIAL_LEARNING</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Learning through direct experience and practice in story scenarios&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;implementation&quot;</span><span class="p">:</span> <span class="s2">&quot;Create situations where users must apply therapeutic skills&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;feedback_style&quot;</span><span class="p">:</span> <span class="s2">&quot;Natural consequences and character reactions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">METAPHORICAL_EMBEDDING</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Using story metaphors to represent therapeutic concepts&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;implementation&quot;</span><span class="p">:</span> <span class="s2">&quot;Embed concepts in fantasy/adventure metaphors&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;feedback_style&quot;</span><span class="p">:</span> <span class="s2">&quot;Symbolic outcomes and metaphorical progress&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">SKILL_PRACTICE</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Direct practice of therapeutic skills in story context&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;implementation&quot;</span><span class="p">:</span> <span class="s2">&quot;Present clear skill practice opportunities&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;feedback_style&quot;</span><span class="p">:</span> <span class="s2">&quot;Explicit skill feedback and coaching&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">REFLECTION_PROMPTING</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Encouraging reflection on experiences and insights&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;implementation&quot;</span><span class="p">:</span> <span class="s2">&quot;Use character dialogue to prompt self-reflection&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;feedback_style&quot;</span><span class="p">:</span> <span class="s2">&quot;Validating insights and encouraging deeper thinking&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;engagement_level&quot;</span><span class="p">:</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_story_metaphors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load story metaphors for different therapeutic concepts.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;emotional_regulation&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;Taming wild dragons (emotions) through understanding and patience&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Learning to navigate stormy seas with skill and wisdom&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Becoming a master gardener who tends to all plants (emotions) with care&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;anxiety_management&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;Facing the shadow monsters that grow smaller when approached with courage&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Learning to be a lighthouse keeper who remains steady in all weather&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Becoming a skilled archer who breathes deeply before each shot&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;depression_recovery&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;Climbing out of the deep cave with the help of inner light and companions&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Tending a garden back to life after a long winter&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Rebuilding a village with patience, one stone at a time&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_celebration_templates</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">ProgressMilestone</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load celebration templates for different milestone types.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">SKILL_ACQUISITION</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;The wise mentor acknowledges your growing mastery with a proud smile&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Your character gains a new ability that reflects your real-world skill development&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The community celebrates your newfound wisdom with a festival in your honor&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">INSIGHT_DEVELOPMENT</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;A moment of clarity illuminates the path ahead like sunrise after a long night&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The ancient oracle nods approvingly as you demonstrate deep understanding&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Your character&#39;s eyes shine with newfound wisdom that others notice and admire&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+            <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">BEHAVIORAL_CHANGE</span><span class="p">:</span> <span class="p">[</span>
+                <span class="s2">&quot;Your actions inspire others in the story to follow your positive example&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;The consequences of your new approach create ripples of positive change&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Your character becomes known for their transformed way of being in the world&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.integrate_therapeutic_concept">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.integrate_therapeutic_concept">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">integrate_therapeutic_concept</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">story_context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">IntegrationStrategy</span> <span class="o">=</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">EXPERIENTIAL_LEARNING</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticIntegration</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Integrate a therapeutic concept into the current story context.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get or create therapeutic concept</span>
+            <span class="n">concept</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_concept</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="n">session_state</span><span class="p">)</span>
+
+            <span class="c1"># Create integration</span>
+            <span class="n">integration</span> <span class="o">=</span> <span class="n">TherapeuticIntegration</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+                <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+                <span class="n">story_context</span><span class="o">=</span><span class="n">story_context</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Generate narrative embedding</span>
+            <span class="n">integration</span><span class="o">.</span><span class="n">narrative_embedding</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_narrative_embedding</span><span class="p">(</span>
+                <span class="n">concept</span><span class="p">,</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">story_context</span><span class="p">,</span> <span class="n">session_state</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create practice opportunities</span>
+            <span class="n">integration</span><span class="o">.</span><span class="n">practice_opportunities</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_practice_opportunities</span><span class="p">(</span>
+                    <span class="n">concept</span><span class="p">,</span> <span class="n">strategy</span><span class="p">,</span> <span class="n">story_context</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Generate immediate feedback framework</span>
+            <span class="n">integration</span><span class="o">.</span><span class="n">immediate_feedback</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_feedback_framework</span><span class="p">(</span>
+                <span class="n">concept</span><span class="p">,</span> <span class="n">strategy</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Store integration</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_history</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">integration_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">integration_history</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">integration</span><span class="p">)</span>
+
+            <span class="c1"># Update session context</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;current_therapeutic_integration&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">integration</span><span class="o">.</span><span class="n">integration_id</span>
+            <span class="p">)</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;therapeutic_concept_active&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">concept_id</span>
+
+            <span class="c1"># Publish integration event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_publish_integration_event</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">integration</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;concepts_integrated&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">return</span> <span class="n">integration</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to integrate therapeutic concept </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2"> for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Return minimal integration</span>
+            <span class="k">return</span> <span class="n">TherapeuticIntegration</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+                <span class="n">strategy</span><span class="o">=</span><span class="n">strategy</span><span class="p">,</span>
+                <span class="n">story_context</span><span class="o">=</span><span class="n">story_context</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_or_create_concept</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticConcept</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get existing concept or create from template.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">concept_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">[</span><span class="n">concept_id</span><span class="p">]</span>
+
+        <span class="c1"># Try to create from template based on therapeutic goals</span>
+        <span class="n">therapeutic_goals</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">therapeutic_goals</span>
+        <span class="n">user_approach</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s2">&quot;preferred_therapeutic_approach&quot;</span><span class="p">,</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Find matching template</span>
+        <span class="k">if</span> <span class="n">user_approach</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept_templates</span><span class="p">:</span>
+            <span class="n">templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept_templates</span><span class="p">[</span><span class="n">user_approach</span><span class="p">]</span>
+
+            <span class="c1"># Match concept_id to template name or create generic</span>
+            <span class="k">for</span> <span class="n">template</span> <span class="ow">in</span> <span class="n">templates</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">concept_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">template</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">):</span>
+                    <span class="n">concept</span> <span class="o">=</span> <span class="n">TherapeuticConcept</span><span class="p">(</span>
+                        <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                        <span class="n">description</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">],</span>
+                        <span class="n">approach</span><span class="o">=</span><span class="n">user_approach</span><span class="p">,</span>
+                        <span class="n">core_principles</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;core_principles&quot;</span><span class="p">],</span>
+                        <span class="n">learning_objectives</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;learning_objectives&quot;</span><span class="p">],</span>
+                        <span class="n">story_metaphors</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;story_metaphors&quot;</span><span class="p">],</span>
+                        <span class="n">difficulty_level</span><span class="o">=</span><span class="n">template</span><span class="p">[</span><span class="s2">&quot;difficulty_level&quot;</span><span class="p">],</span>
+                    <span class="p">)</span>
+
+                    <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">[</span><span class="n">concept_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">concept</span>
+                    <span class="k">return</span> <span class="n">concept</span>
+
+        <span class="c1"># Create generic concept if no template found</span>
+        <span class="n">concept</span> <span class="o">=</span> <span class="n">TherapeuticConcept</span><span class="p">(</span>
+            <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">concept_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Therapeutic concept: </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">approach</span><span class="o">=</span><span class="n">user_approach</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">[</span><span class="n">concept_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">concept</span>
+        <span class="k">return</span> <span class="n">concept</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_generate_narrative_embedding</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">concept</span><span class="p">:</span> <span class="n">TherapeuticConcept</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">IntegrationStrategy</span><span class="p">,</span>
+        <span class="n">story_context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate narrative embedding for therapeutic concept.&quot;&quot;&quot;</span>
+        <span class="n">strategy_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_strategies</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">METAPHORICAL_EMBEDDING</span><span class="p">:</span>
+            <span class="c1"># Use story metaphors</span>
+            <span class="k">if</span> <span class="n">concept</span><span class="o">.</span><span class="n">story_metaphors</span><span class="p">:</span>
+                <span class="n">metaphor</span> <span class="o">=</span> <span class="n">concept</span><span class="o">.</span><span class="n">story_metaphors</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Use first metaphor</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;In this moment, you find yourself </span><span class="si">{</span><span class="n">metaphor</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">story_context</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">EXPERIENTIAL_LEARNING</span><span class="p">:</span>
+            <span class="c1"># Create experiential scenario</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The situation before you presents an opportunity to practice </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">story_context</span><span class="si">}</span><span class="s2"> How you respond will shape both the story and your own growth.&quot;</span>
+
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">SKILL_PRACTICE</span><span class="p">:</span>
+            <span class="c1"># Direct skill practice</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;This is a perfect moment to apply the </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> skills you&#39;ve been developing. </span><span class="si">{</span><span class="n">story_context</span><span class="si">}</span><span class="s2"> Take a moment to consider which techniques might be most helpful here.&quot;</span>
+
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">REFLECTION_PROMPTING</span><span class="p">:</span>
+            <span class="c1"># Encourage reflection</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;As you navigate this situation, you might notice connections to </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">story_context</span><span class="si">}</span><span class="s2"> What insights arise as you consider your options?&quot;</span>
+
+        <span class="c1"># Default embedding</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The current situation offers insights into </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">story_context</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_create_practice_opportunities</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">concept</span><span class="p">:</span> <span class="n">TherapeuticConcept</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">IntegrationStrategy</span><span class="p">,</span>
+        <span class="n">story_context</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create practice opportunities for the therapeutic concept.&quot;&quot;&quot;</span>
+        <span class="n">opportunities</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Base opportunities on learning objectives</span>
+        <span class="k">for</span> <span class="n">objective</span> <span class="ow">in</span> <span class="n">concept</span><span class="o">.</span><span class="n">learning_objectives</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">EXPERIENTIAL_LEARNING</span><span class="p">:</span>
+                <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Experience </span><span class="si">{</span><span class="n">objective</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> through story choices and consequences&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">SKILL_PRACTICE</span><span class="p">:</span>
+                <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Practice </span><span class="si">{</span><span class="n">objective</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> in a safe story environment&quot;</span>
+                <span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">REFLECTION_PROMPTING</span><span class="p">:</span>
+                <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Reflect on how </span><span class="si">{</span><span class="n">objective</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2"> applies to your character&#39;s situation&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># Add strategy-specific opportunities</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">METAPHORICAL_EMBEDDING</span><span class="p">:</span>
+            <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Explore the metaphorical representation of the therapeutic concept&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">MODELING_DEMONSTRATION</span><span class="p">:</span>
+            <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Observe how story characters model the therapeutic approach&quot;</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">COLLABORATIVE_EXPLORATION</span><span class="p">:</span>
+            <span class="n">opportunities</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Work with story characters to explore different approaches&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">opportunities</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># Limit to 3 opportunities</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_generate_feedback_framework</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">concept</span><span class="p">:</span> <span class="n">TherapeuticConcept</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="n">IntegrationStrategy</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate framework for providing immediate feedback.&quot;&quot;&quot;</span>
+        <span class="n">strategy_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">integration_strategies</span><span class="p">[</span><span class="n">strategy</span><span class="p">]</span>
+        <span class="n">feedback_style</span> <span class="o">=</span> <span class="n">strategy_config</span><span class="p">[</span><span class="s2">&quot;feedback_style&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">feedback_style</span> <span class="o">==</span> <span class="s2">&quot;Natural consequences and character reactions&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Story outcomes and character responses will reflect your application of </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> principles&quot;</span>
+        <span class="k">elif</span> <span class="n">feedback_style</span> <span class="o">==</span> <span class="s2">&quot;Symbolic outcomes and metaphorical progress&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Metaphorical progress in the story will mirror your development in </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="n">feedback_style</span> <span class="o">==</span> <span class="s2">&quot;Explicit skill feedback and coaching&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Characters will provide direct feedback on your </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> skill application&quot;</span>
+        <span class="k">elif</span> <span class="n">feedback_style</span> <span class="o">==</span> <span class="s2">&quot;Validating insights and encouraging deeper thinking&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Story characters will validate your insights about </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> and encourage deeper exploration&quot;</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;The story will provide feedback on your </span><span class="si">{</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> practice&quot;</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_publish_integration_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">integration</span><span class="p">:</span> <span class="n">TherapeuticIntegration</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish therapeutic integration event.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+            <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">THERAPEUTIC_CONCEPT_INTEGRATED</span><span class="p">,</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;integration_id&quot;</span><span class="p">:</span> <span class="n">integration</span><span class="o">.</span><span class="n">integration_id</span><span class="p">,</span>
+                <span class="s2">&quot;concept_id&quot;</span><span class="p">:</span> <span class="n">integration</span><span class="o">.</span><span class="n">concept_id</span><span class="p">,</span>
+                <span class="s2">&quot;strategy&quot;</span><span class="p">:</span> <span class="n">integration</span><span class="o">.</span><span class="n">strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;story_context&quot;</span><span class="p">:</span> <span class="n">integration</span><span class="o">.</span><span class="n">story_context</span><span class="p">,</span>
+                <span class="s2">&quot;narrative_embedding&quot;</span><span class="p">:</span> <span class="n">integration</span><span class="o">.</span><span class="n">narrative_embedding</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.track_therapeutic_progress">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.track_therapeutic_progress">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">track_therapeutic_progress</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">progress_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticProgress</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Track therapeutic progress for a specific concept.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+
+            <span class="c1"># Find existing progress or create new</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">[</span><span class="n">user_id</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">concept_id</span> <span class="o">==</span> <span class="n">concept_id</span><span class="p">:</span>
+                        <span class="n">progress</span> <span class="o">=</span> <span class="n">p</span>
+                        <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">progress</span><span class="p">:</span>
+                <span class="c1"># Create new progress tracking</span>
+                <span class="n">concept</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_or_create_concept</span><span class="p">(</span><span class="n">concept_id</span><span class="p">,</span> <span class="n">session_state</span><span class="p">)</span>
+                <span class="n">progress</span> <span class="o">=</span> <span class="n">TherapeuticProgress</span><span class="p">(</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                    <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                    <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+                    <span class="n">concept_name</span><span class="o">=</span><span class="n">concept</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">approach</span><span class="o">=</span><span class="n">concept</span><span class="o">.</span><span class="n">approach</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">progress</span><span class="p">)</span>
+
+            <span class="c1"># Update progress metrics</span>
+            <span class="k">if</span> <span class="s2">&quot;skill_demonstration&quot;</span> <span class="ow">in</span> <span class="n">progress_data</span><span class="p">:</span>
+                <span class="n">skill_level</span> <span class="o">=</span> <span class="n">progress_data</span><span class="p">[</span><span class="s2">&quot;skill_demonstration&quot;</span><span class="p">]</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">current_level</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">current_level</span><span class="p">,</span> <span class="n">skill_level</span><span class="p">)</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">progress_rate</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">current_level</span> <span class="o">-</span> <span class="n">progress</span><span class="o">.</span><span class="n">initial_level</span>
+                <span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">progress</span><span class="o">.</span><span class="n">practice_sessions</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;practice_attempt&quot;</span> <span class="ow">in</span> <span class="n">progress_data</span><span class="p">:</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">practice_sessions</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">total_attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">progress_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;successful&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="n">progress</span><span class="o">.</span><span class="n">successful_applications</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Check for milestone achievement</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_milestone_achievement</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">session_state</span><span class="p">)</span>
+
+            <span class="c1"># Update story integration</span>
+            <span class="k">if</span> <span class="s2">&quot;story_context&quot;</span> <span class="ow">in</span> <span class="n">progress_data</span><span class="p">:</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">story_contexts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">progress_data</span><span class="p">[</span><span class="s2">&quot;story_context&quot;</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="s2">&quot;character_development&quot;</span> <span class="ow">in</span> <span class="n">progress_data</span><span class="p">:</span>
+                <span class="n">progress</span><span class="o">.</span><span class="n">character_developments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">progress_data</span><span class="p">[</span><span class="s2">&quot;character_development&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="n">progress</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+            <span class="c1"># Publish progress event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_publish_progress_event</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">progress</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to track therapeutic progress for concept </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2">, user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="c1"># Return minimal progress</span>
+            <span class="k">return</span> <span class="n">TherapeuticProgress</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">concept_id</span><span class="o">=</span><span class="n">concept_id</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_milestone_achievement</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="n">TherapeuticProgress</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if therapeutic milestones have been achieved.&quot;&quot;&quot;</span>
+        <span class="n">milestones_achieved</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Skill acquisition milestone</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">current_level</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_threshold</span>
+            <span class="ow">and</span> <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">SKILL_ACQUISITION</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span>
+        <span class="p">):</span>
+            <span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">SKILL_ACQUISITION</span><span class="p">)</span>
+
+        <span class="c1"># Behavioral change milestone</span>
+        <span class="n">success_rate</span> <span class="o">=</span> <span class="n">progress</span><span class="o">.</span><span class="n">successful_applications</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span> <span class="n">progress</span><span class="o">.</span><span class="n">total_attempts</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">success_rate</span> <span class="o">&gt;=</span> <span class="mf">0.7</span>
+            <span class="ow">and</span> <span class="n">progress</span><span class="o">.</span><span class="n">total_attempts</span> <span class="o">&gt;=</span> <span class="mi">5</span>
+            <span class="ow">and</span> <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">BEHAVIORAL_CHANGE</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span>
+        <span class="p">):</span>
+            <span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">BEHAVIORAL_CHANGE</span><span class="p">)</span>
+
+        <span class="c1"># Insight development milestone</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">progress</span><span class="o">.</span><span class="n">story_contexts</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+            <span class="ow">and</span> <span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">INSIGHT_DEVELOPMENT</span>
+            <span class="ow">not</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span>
+        <span class="p">):</span>
+            <span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProgressMilestone</span><span class="o">.</span><span class="n">INSIGHT_DEVELOPMENT</span><span class="p">)</span>
+
+        <span class="c1"># Process achieved milestones</span>
+        <span class="k">for</span> <span class="n">milestone</span> <span class="ow">in</span> <span class="n">milestones_achieved</span><span class="p">:</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_celebrate_milestone</span><span class="p">(</span><span class="n">progress</span><span class="p">,</span> <span class="n">milestone</span><span class="p">,</span> <span class="n">session_state</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">milestone_dates</span><span class="p">[</span><span class="n">milestone</span><span class="o">.</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;progress_milestones_achieved&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_celebrate_milestone</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">progress</span><span class="p">:</span> <span class="n">TherapeuticProgress</span><span class="p">,</span>
+        <span class="n">milestone</span><span class="p">:</span> <span class="n">ProgressMilestone</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create celebration for achieved milestone.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get celebration template</span>
+            <span class="n">celebration_templates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">celebration_templates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">milestone</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;Your growth and progress are recognized and celebrated&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="n">celebration</span> <span class="o">=</span> <span class="n">celebration_templates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Use first template</span>
+
+            <span class="c1"># Customize celebration</span>
+            <span class="n">celebration</span> <span class="o">=</span> <span class="n">celebration</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{concept}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_name</span><span class="p">)</span>
+            <span class="n">celebration</span> <span class="o">=</span> <span class="n">celebration</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">{milestone}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">milestone</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Add to progress tracking</span>
+            <span class="n">progress</span><span class="o">.</span><span class="n">narrative_celebrations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">celebration</span><span class="p">)</span>
+
+            <span class="c1"># Update session context</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;recent_milestone&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;concept&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_name</span><span class="p">,</span>
+                <span class="s2">&quot;celebration&quot;</span><span class="p">:</span> <span class="n">celebration</span><span class="p">,</span>
+                <span class="s2">&quot;achieved_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Publish celebration event</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">MILESTONE_ACHIEVED</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;milestone_type&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;concept_id&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_id</span><span class="p">,</span>
+                    <span class="s2">&quot;concept_name&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_name</span><span class="p">,</span>
+                    <span class="s2">&quot;celebration&quot;</span><span class="p">:</span> <span class="n">celebration</span><span class="p">,</span>
+                    <span class="s2">&quot;progress_level&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">current_level</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;celebration_events&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to celebrate milestone </span><span class="si">{</span><span class="n">milestone</span><span class="si">}</span><span class="s2"> for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_publish_progress_event</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span> <span class="n">progress</span><span class="p">:</span> <span class="n">TherapeuticProgress</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Publish therapeutic progress event.&quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+            <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">THERAPEUTIC_PROGRESS_UPDATED</span><span class="p">,</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;progress_id&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">progress_id</span><span class="p">,</span>
+                <span class="s2">&quot;concept_id&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_id</span><span class="p">,</span>
+                <span class="s2">&quot;concept_name&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">concept_name</span><span class="p">,</span>
+                <span class="s2">&quot;current_level&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">current_level</span><span class="p">,</span>
+                <span class="s2">&quot;progress_rate&quot;</span><span class="p">:</span> <span class="n">progress</span><span class="o">.</span><span class="n">progress_rate</span><span class="p">,</span>
+                <span class="s2">&quot;milestones_achieved&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.detect_therapeutic_resistance">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.detect_therapeutic_resistance">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">detect_therapeutic_resistance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">interaction_data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ResistancePattern</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect patterns of therapeutic resistance.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">user_id</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span>
+
+            <span class="c1"># Check for resistance indicators</span>
+            <span class="n">resistance_indicators</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="k">if</span> <span class="n">interaction_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;engagement_level&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.3</span><span class="p">:</span>
+                <span class="n">resistance_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;low_engagement&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">interaction_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;skill_demonstration&quot;</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
+                <span class="n">resistance_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;skill_avoidance&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">interaction_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;emotional_response&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;frustrated&quot;</span><span class="p">:</span>
+                <span class="n">resistance_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;emotional_frustration&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">interaction_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;choice_pattern&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;avoidant&quot;</span><span class="p">:</span>
+                <span class="n">resistance_indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;avoidant_choices&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Check if resistance threshold is met</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">resistance_indicators</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Find existing resistance pattern or create new</span>
+            <span class="n">resistance_pattern</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">[</span><span class="n">user_id</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="p">(</span>
+                        <span class="n">concept_id</span> <span class="ow">in</span> <span class="n">pattern</span><span class="o">.</span><span class="n">concept_areas</span>
+                        <span class="ow">and</span> <span class="n">pattern</span><span class="o">.</span><span class="n">resolution_status</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span>
+                    <span class="p">):</span>
+                        <span class="n">resistance_pattern</span> <span class="o">=</span> <span class="n">pattern</span>
+                        <span class="k">break</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">resistance_pattern</span><span class="p">:</span>
+                <span class="c1"># Determine resistance type</span>
+                <span class="n">resistance_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_resistance_type</span><span class="p">(</span><span class="n">resistance_indicators</span><span class="p">)</span>
+
+                <span class="n">resistance_pattern</span> <span class="o">=</span> <span class="n">ResistancePattern</span><span class="p">(</span>
+                    <span class="n">user_id</span><span class="o">=</span><span class="n">user_id</span><span class="p">,</span>
+                    <span class="n">resistance_type</span><span class="o">=</span><span class="n">resistance_type</span><span class="p">,</span>
+                    <span class="n">concept_areas</span><span class="o">=</span><span class="p">[</span><span class="n">concept_id</span><span class="p">],</span>
+                    <span class="n">triggers</span><span class="o">=</span><span class="n">resistance_indicators</span><span class="p">,</span>
+                    <span class="n">manifestations</span><span class="o">=</span><span class="n">resistance_indicators</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">resistance_pattern</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;resistance_patterns_detected&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Update existing pattern</span>
+                <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">frequency</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">last_observed</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+                <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">manifestations</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">resistance_indicators</span><span class="p">)</span>
+
+            <span class="c1"># Trigger adaptive intervention</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_trigger_adaptive_intervention</span><span class="p">(</span><span class="n">resistance_pattern</span><span class="p">,</span> <span class="n">session_state</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">resistance_pattern</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to detect therapeutic resistance for concept </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2">, user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_resistance_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">ResistanceType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the type of therapeutic resistance based on indicators.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;emotional_frustration&quot;</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">EMOTIONAL_AVOIDANCE</span>
+        <span class="k">elif</span> <span class="s2">&quot;skill_avoidance&quot;</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">BEHAVIORAL_RELUCTANCE</span>
+        <span class="k">elif</span> <span class="s2">&quot;low_engagement&quot;</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">MOTIVATIONAL_AMBIVALENCE</span>
+        <span class="k">elif</span> <span class="s2">&quot;avoidant_choices&quot;</span> <span class="ow">in</span> <span class="n">indicators</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">COGNITIVE_RESISTANCE</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ResistanceType</span><span class="o">.</span><span class="n">COGNITIVE_RESISTANCE</span>  <span class="c1"># Default</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_trigger_adaptive_intervention</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">resistance_pattern</span><span class="p">:</span> <span class="n">ResistancePattern</span><span class="p">,</span> <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger adaptive intervention for therapeutic resistance.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Determine intervention strategy based on resistance type</span>
+            <span class="n">intervention_strategies</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">ResistanceType</span><span class="o">.</span><span class="n">COGNITIVE_RESISTANCE</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Provide alternative perspectives and gentle reframing&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Use Socratic questioning to explore thoughts&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Offer psychoeducation about the therapeutic process&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">ResistanceType</span><span class="o">.</span><span class="n">EMOTIONAL_AVOIDANCE</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Validate emotions and normalize the experience&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Introduce grounding techniques and emotional regulation skills&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Create safe spaces for emotional exploration&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">ResistanceType</span><span class="o">.</span><span class="n">BEHAVIORAL_RELUCTANCE</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Break down skills into smaller, manageable steps&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Provide more scaffolding and support&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Use behavioral experiments and gradual exposure&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">ResistanceType</span><span class="o">.</span><span class="n">MOTIVATIONAL_AMBIVALENCE</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="s2">&quot;Explore values and personal meaning&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Use motivational interviewing techniques&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Highlight discrepancies between values and current behavior&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">}</span>
+
+            <span class="n">strategies</span> <span class="o">=</span> <span class="n">intervention_strategies</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">resistance_type</span><span class="p">,</span>
+                <span class="p">[</span><span class="s2">&quot;Provide additional support and alternative approaches&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update resistance pattern with successful interventions</span>
+            <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">successful_interventions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">strategies</span><span class="p">)</span>
+
+            <span class="c1"># Update session context</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;therapeutic_resistance_detected&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;pattern_id&quot;</span><span class="p">:</span> <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">pattern_id</span><span class="p">,</span>
+                <span class="s2">&quot;resistance_type&quot;</span><span class="p">:</span> <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">resistance_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;intervention_strategies&quot;</span><span class="p">:</span> <span class="n">strategies</span><span class="p">,</span>
+                <span class="s2">&quot;detected_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Publish resistance detection event</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">NarrativeEvent</span><span class="p">(</span>
+                <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">THERAPEUTIC_RESISTANCE_DETECTED</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;pattern_id&quot;</span><span class="p">:</span> <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">pattern_id</span><span class="p">,</span>
+                    <span class="s2">&quot;resistance_type&quot;</span><span class="p">:</span> <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">resistance_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="s2">&quot;concept_areas&quot;</span><span class="p">:</span> <span class="n">resistance_pattern</span><span class="o">.</span><span class="n">concept_areas</span><span class="p">,</span>
+                    <span class="s2">&quot;intervention_strategies&quot;</span><span class="p">:</span> <span class="n">strategies</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;adaptive_interventions&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to trigger adaptive intervention for user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.provide_alternative_pathway">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.provide_alternative_pathway">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">provide_alternative_pathway</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">session_state</span><span class="p">:</span> <span class="n">SessionState</span><span class="p">,</span>
+        <span class="n">concept_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">current_approach</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Provide alternative therapeutic pathway for resistant concepts.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get alternative approaches</span>
+            <span class="n">alternative_approaches</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">approach</span>
+                <span class="k">for</span> <span class="n">approach</span> <span class="ow">in</span> <span class="n">TherapeuticApproach</span>
+                <span class="k">if</span> <span class="n">approach</span> <span class="o">!=</span> <span class="n">current_approach</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Select best alternative based on user profile</span>
+            <span class="n">user_preferences</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">,</span> <span class="p">{})</span>
+            <span class="n">learning_style</span> <span class="o">=</span> <span class="n">user_preferences</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;learning_style&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Match learning style to approach</span>
+            <span class="n">approach_mapping</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;visual&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">NARRATIVE_THERAPY</span><span class="p">,</span>
+                <span class="s2">&quot;experiential&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">ACCEPTANCE_COMMITMENT</span><span class="p">,</span>
+                <span class="s2">&quot;analytical&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span><span class="p">,</span>
+                <span class="s2">&quot;emotional&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">HUMANISTIC</span><span class="p">,</span>
+                <span class="s2">&quot;practical&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">SOLUTION_FOCUSED</span><span class="p">,</span>
+                <span class="s2">&quot;mindful&quot;</span><span class="p">:</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">MINDFULNESS_BASED</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="n">preferred_approach</span> <span class="o">=</span> <span class="n">approach_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">learning_style</span><span class="p">,</span> <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">COGNITIVE_BEHAVIORAL</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">preferred_approach</span> <span class="ow">in</span> <span class="n">alternative_approaches</span><span class="p">:</span>
+                <span class="n">selected_approach</span> <span class="o">=</span> <span class="n">preferred_approach</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">selected_approach</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">alternative_approaches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">alternative_approaches</span>
+                    <span class="k">else</span> <span class="n">current_approach</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Create alternative pathway</span>
+            <span class="n">pathway</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;alternative_approach&quot;</span><span class="p">:</span> <span class="n">selected_approach</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;integration_strategy&quot;</span><span class="p">:</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">COLLABORATIVE_EXPLORATION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;story_adaptation&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;The story adapts to explore </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2"> through </span><span class="si">{</span><span class="n">selected_approach</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> principles&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_level&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pacing&quot;</span><span class="p">:</span> <span class="s2">&quot;gentle&quot;</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Update session context</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;alternative_pathway&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pathway</span>
+
+            <span class="k">return</span> <span class="n">pathway</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to provide alternative pathway for concept </span><span class="si">{</span><span class="n">concept_id</span><span class="si">}</span><span class="s2">, user </span><span class="si">{</span><span class="n">session_state</span><span class="o">.</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;alternative_approach&quot;</span><span class="p">:</span> <span class="n">current_approach</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;integration_strategy&quot;</span><span class="p">:</span> <span class="n">IntegrationStrategy</span><span class="o">.</span><span class="n">REFLECTION_PROMPTING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;story_adaptation&quot;</span><span class="p">:</span> <span class="s2">&quot;The story provides gentle support and alternative perspectives&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;support_level&quot;</span><span class="p">:</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;pacing&quot;</span><span class="p">:</span> <span class="s2">&quot;very_gentle&quot;</span><span class="p">,</span>
+            <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.get_therapeutic_progress_summary">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_therapeutic_progress_summary">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_therapeutic_progress_summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get comprehensive therapeutic progress summary for a user.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">user_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;No progress data available&quot;</span><span class="p">}</span>
+
+        <span class="n">user_progress_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">[</span><span class="n">user_id</span><span class="p">]</span>
+
+        <span class="c1"># Calculate overall metrics</span>
+        <span class="n">total_concepts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">user_progress_list</span><span class="p">)</span>
+        <span class="n">total_milestones</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_progress_list</span><span class="p">)</span>
+        <span class="n">average_progress</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">current_level</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_progress_list</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="mi">1</span><span class="p">,</span> <span class="n">total_concepts</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Get recent progress</span>
+        <span class="n">recent_progress</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">p</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_progress_list</span>
+            <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Get milestone achievements</span>
+        <span class="n">milestone_summary</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">progress</span> <span class="ow">in</span> <span class="n">user_progress_list</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">milestone</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">milestone</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">milestone_summary</span><span class="p">:</span>
+                    <span class="n">milestone_summary</span><span class="p">[</span><span class="n">milestone</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">milestone_summary</span><span class="p">[</span><span class="n">milestone</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">user_id</span><span class="p">,</span>
+            <span class="s2">&quot;total_concepts&quot;</span><span class="p">:</span> <span class="n">total_concepts</span><span class="p">,</span>
+            <span class="s2">&quot;total_milestones&quot;</span><span class="p">:</span> <span class="n">total_milestones</span><span class="p">,</span>
+            <span class="s2">&quot;average_progress&quot;</span><span class="p">:</span> <span class="n">average_progress</span><span class="p">,</span>
+            <span class="s2">&quot;recent_activity&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">recent_progress</span><span class="p">),</span>
+            <span class="s2">&quot;milestone_summary&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="n">count</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">milestone_summary</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;concept_progress&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;concept_id&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">concept_id</span><span class="p">,</span>
+                    <span class="s2">&quot;concept_name&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">concept_name</span><span class="p">,</span>
+                    <span class="s2">&quot;current_level&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">current_level</span><span class="p">,</span>
+                    <span class="s2">&quot;progress_rate&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">progress_rate</span><span class="p">,</span>
+                    <span class="s2">&quot;milestones_achieved&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">m</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">],</span>
+                    <span class="s2">&quot;last_updated&quot;</span><span class="p">:</span> <span class="n">p</span><span class="o">.</span><span class="n">last_updated</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">user_progress_list</span>
+            <span class="p">],</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.get_metrics">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get therapeutic integration system metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;total_concepts_loaded&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_concepts</span><span class="p">),</span>
+            <span class="s2">&quot;active_users_tracked&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user_progress</span><span class="p">),</span>
+            <span class="s2">&quot;resistance_patterns_active&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">([</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">patterns</span> <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">resolution_status</span> <span class="o">==</span> <span class="s2">&quot;active&quot;</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">patterns</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">resistance_patterns</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;integration_strategies_available&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">integration_strategies</span><span class="p">),</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticIntegrationSystem.health_check">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.therapeutic_integration_system.html#src.components.gameplay_loop.narrative.therapeutic_integration_system.TherapeuticIntegrationSystem.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform health check of therapeutic integration system.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;concept_templates_loaded&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span> <span class="k">for</span> <span class="n">templates</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">concept_templates</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;integration_strategies_configured&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">integration_strategies</span><span class="p">),</span>
+            <span class="s2">&quot;story_metaphors_available&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">metaphors</span><span class="p">)</span> <span class="k">for</span> <span class="n">metaphors</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">story_metaphors</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;celebration_templates_loaded&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">templates</span><span class="p">)</span> <span class="k">for</span> <span class="n">templates</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">celebration_templates</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;progress_threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_threshold</span><span class="p">,</span>
+            <span class="s2">&quot;resistance_detection_threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resistance_detection_threshold</span><span class="p">,</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_metrics</span><span class="p">(),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

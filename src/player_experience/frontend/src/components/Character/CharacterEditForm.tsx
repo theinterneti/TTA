@@ -9,18 +9,37 @@ interface Character {
   player_id: string;
   name: string;
   appearance: {
-    description: string;
-    avatar_url?: string;
+    age_range: string;
+    gender_identity: string;
+    physical_description: string;
+    clothing_style: string;
+    distinctive_features: string[];
+    avatar_image_url?: string;
   };
   background: {
-    story: string;
+    name: string;
+    backstory: string;
     personality_traits: string[];
-    goals: string[];
+    core_values: string[];
+    fears_and_anxieties: string[];
+    strengths_and_skills: string[];
+    life_goals: string[];
+    relationships: Record<string, string>;
   };
   therapeutic_profile: {
-    comfort_level: number;
+    primary_concerns: string[];
+    therapeutic_goals: Array<{
+      goal_id: string;
+      description: string;
+      target_date?: string;
+      progress_percentage: number;
+      is_active: boolean;
+      therapeutic_approaches: string[];
+    }>;
     preferred_intensity: IntensityLevel;
-    therapeutic_goals: string[];
+    comfort_zones: string[];
+    readiness_level: number;
+    therapeutic_approaches: string[];
   };
   created_at: string;
   last_active: string;
@@ -40,17 +59,30 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
   const [formData, setFormData] = useState({
     name: character.name,
     appearance: {
-      description: character.appearance.description,
+      age_range: character.appearance.age_range,
+      gender_identity: character.appearance.gender_identity,
+      physical_description: character.appearance.physical_description,
+      clothing_style: character.appearance.clothing_style,
+      distinctive_features: [...character.appearance.distinctive_features],
+      avatar_image_url: character.appearance.avatar_image_url,
     },
     background: {
-      story: character.background.story,
+      name: character.background.name,
+      backstory: character.background.backstory,
       personality_traits: [...character.background.personality_traits],
-      goals: [...character.background.goals],
+      core_values: [...character.background.core_values],
+      fears_and_anxieties: [...character.background.fears_and_anxieties],
+      strengths_and_skills: [...character.background.strengths_and_skills],
+      life_goals: [...character.background.life_goals],
+      relationships: { ...character.background.relationships },
     },
     therapeutic_profile: {
-      comfort_level: character.therapeutic_profile.comfort_level,
-      preferred_intensity: character.therapeutic_profile.preferred_intensity,
+      primary_concerns: [...character.therapeutic_profile.primary_concerns],
       therapeutic_goals: [...character.therapeutic_profile.therapeutic_goals],
+      preferred_intensity: character.therapeutic_profile.preferred_intensity,
+      comfort_zones: [...character.therapeutic_profile.comfort_zones],
+      readiness_level: character.therapeutic_profile.readiness_level,
+      therapeutic_approaches: [...character.therapeutic_profile.therapeutic_approaches],
     },
   });
 
@@ -114,10 +146,12 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
       if (keys.length === 1) {
         return { ...prev, [field]: value };
       } else if (keys.length === 2) {
+        const parentKey = keys[0] as keyof typeof formData;
+        const parentObj = prev[parentKey] as any;
         return {
           ...prev,
           [keys[0]]: {
-            ...prev[keys[0] as keyof typeof formData],
+            ...parentObj,
             [keys[1]]: value,
           },
         };
@@ -134,26 +168,34 @@ const CharacterEditForm: React.FC<CharacterEditFormProps> = ({ character, onClos
   const addArrayItem = (field: string, value: string, setter: (value: string) => void) => {
     if (value.trim()) {
       const keys = field.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [keys[0]]: {
-          ...prev[keys[0] as keyof typeof formData],
-          [keys[1]]: [...(prev[keys[0] as keyof typeof formData] as any)[keys[1]], value.trim()],
-        },
-      }));
+      setFormData(prev => {
+        const parentKey = keys[0] as keyof typeof formData;
+        const parentObj = prev[parentKey] as any;
+        return {
+          ...prev,
+          [keys[0]]: {
+            ...parentObj,
+            [keys[1]]: [...parentObj[keys[1]], value.trim()],
+          },
+        };
+      });
       setter('');
     }
   };
 
   const removeArrayItem = (field: string, index: number) => {
     const keys = field.split('.');
-    setFormData(prev => ({
-      ...prev,
-      [keys[0]]: {
-        ...prev[keys[0] as keyof typeof formData],
-        [keys[1]]: (prev[keys[0] as keyof typeof formData] as any)[keys[1]].filter((_: any, i: number) => i !== index),
-      },
-    }));
+    setFormData(prev => {
+      const parentKey = keys[0] as keyof typeof formData;
+      const parentObj = prev[parentKey] as any;
+      return {
+        ...prev,
+        [keys[0]]: {
+          ...parentObj,
+          [keys[1]]: parentObj[keys[1]].filter((_: any, i: number) => i !== index),
+        },
+      };
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

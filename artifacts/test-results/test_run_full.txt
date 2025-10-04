@@ -1,0 +1,50 @@
+
+=============================== warnings summary ===============================
+.venv/lib/python3.12/site-packages/pydantic/fields.py:1093: 12 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/fields.py:1093: PydanticDeprecatedSince20: Using extra keyword arguments on `Field` is deprecated and will be removed. Use `json_schema_extra` instead. (Extra keys: 'env'). Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warn(
+
+src/agent_orchestration/models.py:127
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/models.py:127: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('version')
+
+src/agent_orchestration/models.py:135
+  /home/thein/recovered-tta-storytelling/src/agent_orchestration/models.py:135: PydanticDeprecatedSince20: Pydantic V1 style `@validator` validators are deprecated. You should migrate to Pydantic V2 style `@field_validator` validators, see the migration guide for more details. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    @validator('name')
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_fields.py:198
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_fields.py:198: UserWarning: Field name "schema" in "ToolParameter" shadows an attribute in parent "BaseModel"
+    warnings.warn(
+
+.venv/lib/python3.12/site-packages/codecarbon/core/gpu.py:4
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/codecarbon/core/gpu.py:4: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+    import pynvml
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: 18 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_config.py:323: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:298: 33 warnings
+  /home/thein/recovered-tta-storytelling/.venv/lib/python3.12/site-packages/pydantic/_internal/_generate_schema.py:298: PydanticDeprecatedSince20: `json_encoders` is deprecated. See https://docs.pydantic.dev/2.11/concepts/serialization/#custom-serializers for alternatives. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.11/migration/
+    warnings.warn(
+
+src/components/narrative_arc_orchestrator/scale_manager.py:48
+  /home/thein/recovered-tta-storytelling/src/components/narrative_arc_orchestrator/scale_manager.py:48: DeprecationWarning: There is no current event loop
+    return super().get_event_loop()
+
+tests/agent_orchestration/test_real_agent_performance.py:38
+  /home/thein/recovered-tta-storytelling/tests/agent_orchestration/test_real_agent_performance.py:38: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+tests/agent_orchestration/test_websocket_performance.py:53
+  /home/thein/recovered-tta-storytelling/tests/agent_orchestration/test_websocket_performance.py:53: PytestUnknownMarkWarning: Unknown pytest.mark.performance - is this a typo?  You can register custom marks to avoid this warning - for details, see https://docs.pytest.org/en/stable/how-to/mark.html
+    @pytest.mark.performance
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+ERROR tests/agent_orchestration/test_end_to_end_validation.py
+ERROR tests/agent_orchestration/test_performance_validation.py
+ERROR tests/agent_orchestration/test_session_state_validation.py
+ERROR tests/agent_orchestration/test_therapeutic_content_validation.py
+ERROR tests/agent_orchestration/test_workflow_chain_validation.py
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 5 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!

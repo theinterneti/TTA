@@ -1,0 +1,86 @@
+{
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/*.pyc",
+    ".venv",
+    "venv",
+    ".git",
+    "build",
+    "dist",
+    "*.egg-info"
+  ],
+  "ignore": [
+    "tests/comprehensive_battery",
+    "tests/e2e"
+  ],
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "stubPath": "typings",
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+  "reportUnusedImport": false,
+  "reportUnusedClass": false,
+  "reportUnusedFunction": false,
+  "reportUnusedVariable": false,
+  "reportDuplicateImport": true,
+  "reportOptionalSubscript": true,
+  "reportOptionalMemberAccess": true,
+  "reportOptionalCall": true,
+  "reportOptionalIterable": true,
+  "reportOptionalContextManager": true,
+  "reportOptionalOperand": true,
+  "reportUntypedFunctionDecorator": false,
+  "reportUntypedClassDecorator": false,
+  "reportUntypedBaseClass": false,
+  "reportUntypedNamedTuple": false,
+  "reportPrivateUsage": false,
+  "reportConstantRedefinition": true,
+  "reportIncompatibleMethodOverride": true,
+  "reportIncompatibleVariableOverride": true,
+  "reportInconsistentConstructor": true,
+  "reportOverlappingOverload": true,
+  "reportMissingSuperCall": false,
+  "reportUninitializedInstanceVariable": false,
+  "reportInvalidStringEscapeSequence": true,
+  "reportUnknownParameterType": false,
+  "reportUnknownArgumentType": false,
+  "reportUnknownLambdaType": false,
+  "reportUnknownVariableType": false,
+  "reportUnknownMemberType": false,
+  "reportMissingParameterType": false,
+  "reportMissingTypeArgument": false,
+  "reportInvalidTypeVarUse": true,
+  "reportCallInDefaultInitializer": false,
+  "reportUnnecessaryIsInstance": false,
+  "reportUnnecessaryCast": false,
+  "reportUnnecessaryComparison": false,
+  "reportAssertAlwaysTrue": false,
+  "reportSelfClsParameterName": true,
+  "reportImplicitStringConcatenation": false,
+  "reportUndefinedVariable": true,
+  "reportUnboundVariable": true,
+  "reportInvalidStubStatement": true,
+  "reportIncompleteStub": false,
+  "reportUnsupportedDunderAll": true,
+  "reportUnusedCoroutine": true,
+  "pythonVersion": "3.12",
+  "pythonPlatform": "Linux",
+  "executionEnvironments": [
+    {
+      "root": "src",
+      "pythonVersion": "3.12",
+      "pythonPlatform": "Linux",
+      "extraPaths": []
+    }
+  ],
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "venvPath": ".",
+  "venv": ".venv"
+}
+

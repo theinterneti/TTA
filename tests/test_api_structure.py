@@ -17,8 +17,9 @@ def test_app():
     """Create a test FastAPI application."""
     # Use test settings
     import src.player_experience.api.config as config_module
+
     config_module.settings = TestingSettings()
-    
+
     app = create_app()
     return app
 
@@ -48,7 +49,7 @@ def test_health_endpoint(client):
 def test_security_headers(client):
     """Test that security headers are added to responses."""
     response = client.get("/")
-    
+
     # Check security headers
     assert "X-Content-Type-Options" in response.headers
     assert response.headers["X-Content-Type-Options"] == "nosniff"
@@ -67,7 +68,7 @@ def test_cors_headers(client):
 def test_rate_limiting_headers(client):
     """Test that rate limiting headers are present."""
     response = client.get("/")
-    
+
     # Check rate limiting headers
     assert "X-RateLimit-Limit" in response.headers
     assert "X-RateLimit-Remaining" in response.headers
@@ -92,10 +93,9 @@ def test_therapeutic_safety_headers(client):
 def test_auth_router_included(client):
     """Test that authentication router is included."""
     # Test a public auth endpoint
-    response = client.post("/api/v1/auth/login", json={
-        "username": "test",
-        "password": "test"
-    })
+    response = client.post(
+        "/api/v1/auth/login", json={"username": "test", "password": "test"}
+    )
     # Should return 401 for invalid credentials, not 404
     assert response.status_code == 401
 
@@ -125,10 +125,10 @@ def test_openapi_docs_available(client):
     """Test that OpenAPI documentation is available."""
     response = client.get("/docs")
     assert response.status_code == 200
-    
+
     response = client.get("/redoc")
     assert response.status_code == 200
-    
+
     response = client.get("/openapi.json")
     assert response.status_code == 200
 
@@ -142,7 +142,7 @@ def test_authentication_middleware_public_routes(client):
         "/redoc",
         "/openapi.json",
     ]
-    
+
     for route in public_routes:
         response = client.get(route)
         # Should not return 401 for public routes
@@ -156,7 +156,7 @@ def test_authentication_middleware_protected_routes(client):
         "/api/v1/characters/",
         "/api/v1/worlds/",
     ]
-    
+
     for route in protected_routes:
         response = client.get(route)
         # Should return 401 for missing authentication
@@ -167,17 +167,16 @@ def test_authentication_middleware_protected_routes(client):
 def test_invalid_authorization_header(client):
     """Test handling of invalid authorization headers."""
     # Test missing Bearer scheme
-    response = client.get(
-        "/api/v1/players/",
-        headers={"Authorization": "InvalidToken"}
-    )
+    response = client.get("/api/v1/players/", headers={"Authorization": "InvalidToken"})
     assert response.status_code == 401
-    assert "Authorization header must be in format: Bearer <token>" in response.json()["message"]
-    
+    assert (
+        "Authorization header must be in format: Bearer <token>"
+        in response.json()["message"]
+    )
+
     # Test invalid token
     response = client.get(
-        "/api/v1/players/",
-        headers={"Authorization": "Bearer invalid-token"}
+        "/api/v1/players/", headers={"Authorization": "Bearer invalid-token"}
     )
     assert response.status_code == 401
     assert "Authentication Failed" in response.json()["error"]

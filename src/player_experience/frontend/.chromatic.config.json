@@ -1,0 +1,29 @@
+{
+  "projectToken": "CHROMATIC_PROJECT_TOKEN",
+  "buildScriptName": "build-storybook",
+  "storybookBuildDir": "storybook-static",
+  "exitZeroOnChanges": true,
+  "exitOnceUploaded": true,
+  "allowConsoleErrors": false,
+  "ignoreLastBuildOnBranch": "main",
+  "skip": "dependabot/**",
+  "externals": [
+    "public/**"
+  ],
+  "fileHashing": true,
+  "zip": true,
+  "junitReport": true,
+  "diagnostics": true,
+  "debug": false,
+  "interactive": false,
+  "autoAcceptChanges": false,
+  "onlyChanged": true,
+  "traceChanged": "expanded",
+  "untraced": [
+    "node_modules/**",
+    "build/**",
+    "dist/**",
+    ".git/**"
+  ],
+  "logLevel": "info"
+}

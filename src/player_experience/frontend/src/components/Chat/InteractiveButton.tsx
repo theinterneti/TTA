@@ -157,9 +157,11 @@ const InteractiveButton: React.FC<InteractiveButtonProps> = ({
         onClick={handleClick}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseLeave={(e) => {
+          handleMouseUp(e);
+          setShowTooltip(false);
+        }}
         onMouseEnter={() => setShowTooltip(true)}
-        onMouseLeave={() => setShowTooltip(false)}
         disabled={disabled || loading}
         className={`
           relative w-full text-left border rounded-lg font-medium transition-all duration-200 

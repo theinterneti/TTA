@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 class ValidationSeverity(Enum):
@@ -29,9 +29,9 @@ class ConsistencyIssue:
     issue_type: ConsistencyIssueType
     severity: ValidationSeverity
     description: str
-    related_content_ids: List[str] = field(default_factory=list)
+    related_content_ids: list[str] = field(default_factory=list)
     confidence_score: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -39,7 +39,7 @@ class ConsistencyIssue:
 class ValidationResult:
     is_valid: bool
     consistency_score: float
-    detected_issues: List[ConsistencyIssue] = field(default_factory=list)
+    detected_issues: list[ConsistencyIssue] = field(default_factory=list)
     lore_consistency: float = 0.0
     character_consistency: float = 0.0
     world_rule_consistency: float = 0.0
@@ -53,12 +53,12 @@ class NarrativeContent:
     content_id: str
     content_type: str
     text: str
-    related_characters: List[str] = field(default_factory=list)
-    related_locations: List[str] = field(default_factory=list)
-    related_events: List[str] = field(default_factory=list)
-    themes: List[str] = field(default_factory=list)
-    therapeutic_concepts: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    related_characters: list[str] = field(default_factory=list)
+    related_locations: list[str] = field(default_factory=list)
+    related_events: list[str] = field(default_factory=list)
+    themes: list[str] = field(default_factory=list)
+    therapeutic_concepts: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -69,7 +69,7 @@ class LoreEntry:
     title: str
     description: str
     canonical: bool = True
-    related_entries: List[str] = field(default_factory=list)
+    related_entries: list[str] = field(default_factory=list)
     importance_weight: float = 1.0
     last_updated: datetime = field(default_factory=datetime.now)
 
@@ -80,8 +80,8 @@ class Contradiction:
     type: str
     severity: ValidationSeverity
     description: str
-    related_issues: List[str] = field(default_factory=list)
-    resolution_suggestions: List[str] = field(default_factory=list)
+    related_issues: list[str] = field(default_factory=list)
+    resolution_suggestions: list[str] = field(default_factory=list)
     confidence_score: float = 0.0
     detected_at: datetime = field(default_factory=datetime.now)
 
@@ -91,12 +91,12 @@ class CreativeSolution:
     solution_id: str
     solution_type: str
     description: str
-    benefits: List[str] = field(default_factory=list)
-    tradeoffs: List[str] = field(default_factory=list)
+    benefits: list[str] = field(default_factory=list)
+    tradeoffs: list[str] = field(default_factory=list)
     narrative_cost: float = 0.0
     player_impact: float = 0.0
-    required_changes: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    required_changes: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -108,7 +108,7 @@ class NarrativeResolution:
     is_successful: bool
     resolution_timestamp: datetime = field(default_factory=datetime.now)
     effectiveness_rating: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -119,7 +119,7 @@ class RetroactiveChange:
     description: str
     justification: str = ""
     in_world_explanation: str = ""
-    impact_scope: List[str] = field(default_factory=list)
+    impact_scope: list[str] = field(default_factory=list)
     timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -127,12 +127,12 @@ class RetroactiveChange:
 class StorylineThread:
     thread_id: str
     title: str
-    participants: List[str] = field(default_factory=list)
-    related_events: List[str] = field(default_factory=list)
-    convergence_points: List[str] = field(default_factory=list)
-    resolution_target: Optional[str] = None
-    dependencies: List[str] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    participants: list[str] = field(default_factory=list)
+    related_events: list[str] = field(default_factory=list)
+    convergence_points: list[str] = field(default_factory=list)
+    resolution_target: str | None = None
+    dependencies: list[str] = field(default_factory=list)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -140,8 +140,7 @@ class ConvergenceValidation:
     session_id: str
     storyline_count: int
     is_convergent: bool
-    strong_connections: List[str] = field(default_factory=list)
-    weak_connections: List[str] = field(default_factory=list)
-    recommendations: List[str] = field(default_factory=list)
+    strong_connections: list[str] = field(default_factory=list)
+    weak_connections: list[str] = field(default_factory=list)
+    recommendations: list[str] = field(default_factory=list)
     convergence_score: float = 0.0
-

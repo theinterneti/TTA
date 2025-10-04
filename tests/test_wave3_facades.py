@@ -1,17 +1,21 @@
-import pytest
-
-# Verify narrative_coherence facades import and names exist
-from src.components.narrative_coherence.contradiction_detector import ContradictionDetector
-from src.components.narrative_coherence.coherence_validator import CoherenceValidator
-from src.components.narrative_coherence.causal_validator import CausalValidator
-from src.components.narrative_coherence.rules import SEVERITY_WEIGHTS_LORE, OVERALL_WEIGHTS
+from src.components.narrative_arc_orchestrator.causal_graph import *  # just ensure module loads
+from src.components.narrative_arc_orchestrator.conflict_detection import ScaleConflict
+from src.components.narrative_arc_orchestrator.impact_analysis import ImpactAssessment
+from src.components.narrative_arc_orchestrator.resolution_engine import Resolution
 
 # Verify narrative_arc_orchestrator facades import and names exist
 from src.components.narrative_arc_orchestrator.scale_manager import ScaleManager
-from src.components.narrative_arc_orchestrator.impact_analysis import ImpactAssessment
-from src.components.narrative_arc_orchestrator.causal_graph import *  # just ensure module loads
-from src.components.narrative_arc_orchestrator.conflict_detection import ScaleConflict
-from src.components.narrative_arc_orchestrator.resolution_engine import Resolution
+from src.components.narrative_coherence.causal_validator import CausalValidator
+from src.components.narrative_coherence.coherence_validator import CoherenceValidator
+
+# Verify narrative_coherence facades import and names exist
+from src.components.narrative_coherence.contradiction_detector import (
+    ContradictionDetector,
+)
+from src.components.narrative_coherence.rules import (
+    OVERALL_WEIGHTS,
+    SEVERITY_WEIGHTS_LORE,
+)
 
 
 def test_facades_importable():
@@ -28,4 +32,3 @@ def test_arc_facades_importable():
     # Modules causal_graph loads
     assert ScaleConflict is not None
     assert Resolution is not None
-

@@ -1,5 +1,6 @@
 ---
-type: "always_apply"
+type: "agent_requested"
+description: "Example description"
 ---
 
 Playwright - testing web apps in the browser

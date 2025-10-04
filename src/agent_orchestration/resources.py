@@ -3,8 +3,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Tuple, Callable, Awaitable
+from typing import Any
 
 # Prefer psutil which is already used elsewhere in the repo
 try:
@@ -17,19 +18,20 @@ logger = logging.getLogger(__name__)
 
 # ---- Data models ----
 
+
 @dataclass
 class ResourceRequirements:
     # Fractions or absolute numbers requested by an agent/step
-    gpu_memory_bytes: Optional[int] = None
-    cpu_threads: Optional[int] = None
-    ram_bytes: Optional[int] = None
+    gpu_memory_bytes: int | None = None
+    cpu_threads: int | None = None
+    ram_bytes: int | None = None
 
 
 @dataclass
 class ResourceAllocation:
     granted: bool
-    reason: Optional[str] = None
-    gpu_device_index: Optional[int] = None
+    reason: str | None = None
+    gpu_device_index: int | None = None
     gpu_memory_bytes: int = 0
     cpu_threads: int = 0
     ram_bytes: int = 0
@@ -41,36 +43,40 @@ class ResourceUsage:
     memory_percent: float
     memory_used_bytes: int
     memory_total_bytes: int
-    process_cpu_percent: Optional[float] = None
-    process_memory_bytes: Optional[int] = None
+    process_cpu_percent: float | None = None
+    process_memory_bytes: int | None = None
     # GPU (best-effort)
     gpu_available: bool = False
     gpu_count: int = 0
-    gpu_utilization: List[float] = field(default_factory=list)  # percent
-    gpu_memory_used_bytes: List[int] = field(default_factory=list)
-    gpu_memory_total_bytes: List[int] = field(default_factory=list)
+    gpu_utilization: list[float] = field(default_factory=list)  # percent
+    gpu_memory_used_bytes: list[int] = field(default_factory=list)
+    gpu_memory_total_bytes: list[int] = field(default_factory=list)
 
 
 @dataclass
 class ResourceUsageReport:
     timestamp: float
     usage: ResourceUsage
-    thresholds_exceeded: Dict[str, Any] = field(default_factory=dict)
+    thresholds_exceeded: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class WorkloadMetrics:
     # Minimal fields to drive optimization
-    queue_lengths: Dict[str, int] = field(default_factory=dict)  # key: agent_type:instance
-    dlq_lengths: Dict[str, int] = field(default_factory=dict)
-    step_latency_ms_p50: Dict[str, float] = field(default_factory=dict)  # key: agent_type
-    step_error_rates: Dict[str, float] = field(default_factory=dict)  # 0..1
+    queue_lengths: dict[str, int] = field(
+        default_factory=dict
+    )  # key: agent_type:instance
+    dlq_lengths: dict[str, int] = field(default_factory=dict)
+    step_latency_ms_p50: dict[str, float] = field(
+        default_factory=dict
+    )  # key: agent_type
+    step_error_rates: dict[str, float] = field(default_factory=dict)  # 0..1
 
 
 @dataclass
 class OptimizationResult:
-    actions: List[str] = field(default_factory=list)
-    details: Dict[str, Any] = field(default_factory=dict)
+    actions: list[str] = field(default_factory=list)
+    details: dict[str, Any] = field(default_factory=dict)
 
 
 class ResourceManager:
@@ -85,8 +91,8 @@ class ResourceManager:
         self,
         *,
         gpu_memory_limit_fraction: float = 0.8,
-        cpu_thread_limit: Optional[int] = None,
-        memory_limit_bytes: Optional[int] = None,
+        cpu_thread_limit: int | None = None,
+        memory_limit_bytes: int | None = None,
         warn_cpu_percent: float = 85.0,
         warn_mem_percent: float = 85.0,
         crit_cpu_percent: float = 95.0,
@@ -95,7 +101,9 @@ class ResourceManager:
         redis_prefix: str = "ao",
         circuit_breaker_registry: Any = None,
     ) -> None:
-        self.gpu_memory_limit_fraction = float(max(0.0, min(1.0, gpu_memory_limit_fraction)))
+        self.gpu_memory_limit_fraction = float(
+            max(0.0, min(1.0, gpu_memory_limit_fraction))
+        )
         self.cpu_thread_limit = cpu_thread_limit
         self.memory_limit_bytes = memory_limit_bytes
         self.warn_cpu_percent = warn_cpu_percent
@@ -106,13 +114,15 @@ class ResourceManager:
         self._pfx = redis_prefix.rstrip(":")
 
         # Internal state
-        self._monitoring_task: Optional[asyncio.Task] = None
-        self._latest_report: Optional[ResourceUsageReport] = None
+        self._monitoring_task: asyncio.Task | None = None
+        self._latest_report: ResourceUsageReport | None = None
         self._emergency_active: bool = False
 
         # Circuit breaker integration for workflow error handling
         self._circuit_breaker_registry = circuit_breaker_registry
-        self._resource_exhaustion_callbacks: List[Callable[[ResourceUsageReport], Awaitable[None]]] = []
+        self._resource_exhaustion_callbacks: list[
+            Callable[[ResourceUsageReport], Awaitable[None]]
+        ] = []
         self._last_exhaustion_alert = 0.0
         self._exhaustion_alert_cooldown = 60.0  # 1 minute cooldown
 
@@ -128,18 +138,24 @@ class ResourceManager:
         """
         usage = self._collect_usage()
         if usage is None:
-            return ResourceAllocation(granted=True, reason="psutil unavailable; cannot evaluate")
+            return ResourceAllocation(
+                granted=True, reason="psutil unavailable; cannot evaluate"
+            )
 
         # CPU check
         if self.cpu_thread_limit is not None and resource_requirements.cpu_threads:
             if resource_requirements.cpu_threads > self.cpu_thread_limit:
-                return ResourceAllocation(granted=False, reason="CPU thread request exceeds limit")
+                return ResourceAllocation(
+                    granted=False, reason="CPU thread request exceeds limit"
+                )
 
         # Memory check
         if resource_requirements.ram_bytes is not None:
             avail_bytes = max(0, usage.memory_total_bytes - usage.memory_used_bytes)
             if resource_requirements.ram_bytes > avail_bytes:
-                return ResourceAllocation(granted=False, reason="Insufficient RAM available")
+                return ResourceAllocation(
+                    granted=False, reason="Insufficient RAM available"
+                )
 
         # GPU check (best-effort)
         gpu_index, grant_gpu_bytes = self._evaluate_gpu_request(resource_requirements)
@@ -163,7 +179,7 @@ class ResourceManager:
                 memory_total_bytes=0,
             )
 
-        thresholds: Dict[str, Any] = {}
+        thresholds: dict[str, Any] = {}
         if usage.cpu_percent >= self.crit_cpu_percent:
             thresholds["cpu"] = {"level": "critical", "value": usage.cpu_percent}
         elif usage.cpu_percent >= self.warn_cpu_percent:
@@ -174,19 +190,25 @@ class ResourceManager:
         elif usage.memory_percent >= self.warn_mem_percent:
             thresholds["memory"] = {"level": "warning", "value": usage.memory_percent}
 
-        report = ResourceUsageReport(timestamp=time.time(), usage=usage, thresholds_exceeded=thresholds)
+        report = ResourceUsageReport(
+            timestamp=time.time(), usage=usage, thresholds_exceeded=thresholds
+        )
         self._latest_report = report
         # Emergency mode flag
-        self._emergency_active = any(v.get("level") == "critical" for v in thresholds.values())
+        self._emergency_active = any(
+            v.get("level") == "critical" for v in thresholds.values()
+        )
 
         # Check for resource exhaustion and trigger workflow error handling
         await self._check_resource_exhaustion(report)
 
         return report
 
-    async def optimize_allocation(self, current_workload: WorkloadMetrics) -> OptimizationResult:
-        actions: List[str] = []
-        details: Dict[str, Any] = {}
+    async def optimize_allocation(
+        self, current_workload: WorkloadMetrics
+    ) -> OptimizationResult:
+        actions: list[str] = []
+        details: dict[str, Any] = {}
 
         # If emergency active, suggest immediate throttling
         if self._emergency_active:
@@ -194,13 +216,17 @@ class ResourceManager:
             details["emergency"] = True
 
         # Use queue lengths to recommend instance scaling (logical recommendations)
-        hot_agents = {k: v for k, v in current_workload.queue_lengths.items() if v >= 10}
+        hot_agents = {
+            k: v for k, v in current_workload.queue_lengths.items() if v >= 10
+        }
         if hot_agents:
             actions.append("rebalance_queues")
             details["hot_agents"] = hot_agents
 
         # If step latencies degraded, suggest lowering concurrency or increasing backoff
-        slow_agents = {k: v for k, v in current_workload.step_latency_ms_p50.items() if v >= 1500.0}
+        slow_agents = {
+            k: v for k, v in current_workload.step_latency_ms_p50.items() if v >= 1500.0
+        }
         if slow_agents:
             actions.append("reduce_concurrency")
             details["slow_agents"] = slow_agents
@@ -218,7 +244,9 @@ class ResourceManager:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                self._monitoring_task = loop.create_task(self._monitor_loop(interval_seconds))
+                self._monitoring_task = loop.create_task(
+                    self._monitor_loop(interval_seconds)
+                )
             else:
                 # In synchronous contexts, run one iteration
                 loop.run_until_complete(self.monitor_usage())
@@ -243,9 +271,13 @@ class ResourceManager:
                     lvl = v.get("level")
                     val = v.get("value")
                     if lvl == "critical":
-                        logger.error("[ResourceManager] Critical %s usage: %s%%", k, val)
+                        logger.error(
+                            "[ResourceManager] Critical %s usage: %s%%", k, val
+                        )
                     elif lvl == "warning":
-                        logger.warning("[ResourceManager] Elevated %s usage: %s%%", k, val)
+                        logger.warning(
+                            "[ResourceManager] Elevated %s usage: %s%%", k, val
+                        )
             except asyncio.CancelledError:
                 break
             except Exception as e:
@@ -253,10 +285,10 @@ class ResourceManager:
             await asyncio.sleep(max(1, int(interval_seconds)))
 
     # ---- Helpers ----
-    def latest_report(self) -> Optional[ResourceUsageReport]:
+    def latest_report(self) -> ResourceUsageReport | None:
         return self._latest_report
 
-    def select_instance_by_queue(self, agent_type_value: int) -> Optional[str]:
+    def select_instance_by_queue(self, agent_type_value: int) -> str | None:
         """
         Choose an instance for the given agent type by minimal queue length.
         Returns instance name (e.g., "i1") or None if unknown.
@@ -273,7 +305,7 @@ class ResourceManager:
         except Exception:
             return None
 
-    def _collect_usage(self) -> Optional[ResourceUsage]:
+    def _collect_usage(self) -> ResourceUsage | None:
         try:
             if psutil is None:
                 return None
@@ -299,6 +331,7 @@ class ResourceManager:
         # Attempt torch.cuda first
         try:
             import torch  # type: ignore
+
             if hasattr(torch, "cuda") and torch.cuda.is_available():
                 usage.gpu_available = True
                 count = torch.cuda.device_count()
@@ -318,6 +351,7 @@ class ResourceManager:
         # Try pynvml
         try:
             import pynvml  # type: ignore
+
             pynvml.nvmlInit()
             count = pynvml.nvmlDeviceGetCount()
             usage.gpu_available = True
@@ -336,6 +370,7 @@ class ResourceManager:
         # Try GPUtil
         try:
             import GPUtil  # type: ignore
+
             gpus = GPUtil.getGPUs()
             if gpus:
                 usage.gpu_available = True
@@ -350,15 +385,18 @@ class ResourceManager:
         except Exception:
             pass
 
-    def _evaluate_gpu_request(self, req: ResourceRequirements) -> Tuple[Optional[int], int]:
+    def _evaluate_gpu_request(
+        self, req: ResourceRequirements
+    ) -> tuple[int | None, int]:
         # Best-effort: grant on device 0 if enough headroom by fraction
         try:
             import torch  # type: ignore
+
             if hasattr(torch, "cuda") and torch.cuda.is_available():
                 total = torch.cuda.get_device_properties(0).total_memory
                 # Estimate free as total - allocated
                 used = torch.cuda.memory_allocated(0)
-                free = max(0, int(total - used))
+                max(0, int(total - used))
                 limit = int(total * self.gpu_memory_limit_fraction)
                 headroom = max(0, limit - used)
                 want = int(req.gpu_memory_bytes or 0)
@@ -389,7 +427,9 @@ class ResourceManager:
         for resource, threshold_info in report.thresholds_exceeded.items():
             if threshold_info.get("level") == "critical":
                 exhaustion_detected = True
-                exhaustion_reasons.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+                exhaustion_reasons.append(
+                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
+                )
 
         if exhaustion_detected:
             self._last_exhaustion_alert = current_time
@@ -398,12 +438,14 @@ class ResourceManager:
                 extra={
                     "exhausted_resources": exhaustion_reasons,
                     "timestamp": current_time,
-                    "event_type": "resource_exhaustion"
-                }
+                    "event_type": "resource_exhaustion",
+                },
             )
 
             # Trigger circuit breakers for resource exhaustion
-            await self._trigger_resource_exhaustion_circuit_breakers(report, exhaustion_reasons)
+            await self._trigger_resource_exhaustion_circuit_breakers(
+                report, exhaustion_reasons
+            )
 
             # Call registered callbacks
             for callback in self._resource_exhaustion_callbacks:
@@ -413,9 +455,7 @@ class ResourceManager:
                     logger.warning(f"Resource exhaustion callback failed: {e}")
 
     async def _trigger_resource_exhaustion_circuit_breakers(
-        self,
-        report: ResourceUsageReport,
-        exhaustion_reasons: List[str]
+        self, report: ResourceUsageReport, exhaustion_reasons: list[str]
     ) -> None:
         """Trigger circuit breakers when resource exhaustion is detected."""
         if not self._circuit_breaker_registry:
@@ -436,22 +476,20 @@ class ResourceManager:
                             extra={
                                 "circuit_breaker_name": cb_name,
                                 "exhaustion_reasons": exhaustion_reasons,
-                                "event_type": "circuit_breaker_resource_exhaustion"
-                            }
+                                "event_type": "circuit_breaker_resource_exhaustion",
+                            },
                         )
         except Exception as e:
             logger.error(f"Failed to trigger resource exhaustion circuit breakers: {e}")
 
     def register_resource_exhaustion_callback(
-        self,
-        callback: Callable[[ResourceUsageReport], Awaitable[None]]
+        self, callback: Callable[[ResourceUsageReport], Awaitable[None]]
     ) -> None:
         """Register a callback to be called when resource exhaustion is detected."""
         self._resource_exhaustion_callbacks.append(callback)
 
     def unregister_resource_exhaustion_callback(
-        self,
-        callback: Callable[[ResourceUsageReport], Awaitable[None]]
+        self, callback: Callable[[ResourceUsageReport], Awaitable[None]]
     ) -> bool:
         """Unregister a resource exhaustion callback."""
         try:
@@ -460,7 +498,9 @@ class ResourceManager:
         except ValueError:
             return False
 
-    async def check_resource_health_for_workflow(self, workflow_name: str) -> Dict[str, Any]:
+    async def check_resource_health_for_workflow(
+        self, workflow_name: str
+    ) -> dict[str, Any]:
         """Check if resources are healthy enough to run a workflow."""
         if not self._latest_report:
             await self.monitor_usage()
@@ -472,21 +512,25 @@ class ResourceManager:
         critical_issues = []
         for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
             if threshold_info.get("level") == "critical":
-                critical_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+                critical_issues.append(
+                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
+                )
 
         if critical_issues:
             return {
                 "healthy": False,
                 "reason": "resource_exhaustion",
                 "critical_issues": critical_issues,
-                "emergency_active": self._emergency_active
+                "emergency_active": self._emergency_active,
             }
 
         # Check for warning levels that might indicate impending issues
         warning_issues = []
         for resource, threshold_info in self._latest_report.thresholds_exceeded.items():
             if threshold_info.get("level") == "warning":
-                warning_issues.append(f"{resource}: {threshold_info.get('value', 0):.1f}%")
+                warning_issues.append(
+                    f"{resource}: {threshold_info.get('value', 0):.1f}%"
+                )
 
         return {
             "healthy": True,
@@ -494,17 +538,18 @@ class ResourceManager:
             "emergency_active": self._emergency_active,
             "usage": {
                 "cpu_percent": self._latest_report.usage.cpu_percent,
-                "memory_percent": self._latest_report.usage.memory_percent
-            }
+                "memory_percent": self._latest_report.usage.memory_percent,
+            },
         }
 
-    def get_resource_exhaustion_status(self) -> Dict[str, Any]:
+    def get_resource_exhaustion_status(self) -> dict[str, Any]:
         """Get current resource exhaustion status."""
         return {
             "emergency_active": self._emergency_active,
             "last_exhaustion_alert": self._last_exhaustion_alert,
             "exhaustion_alert_cooldown": self._exhaustion_alert_cooldown,
             "registered_callbacks": len(self._resource_exhaustion_callbacks),
-            "latest_report_timestamp": self._latest_report.timestamp if self._latest_report else None
+            "latest_report_timestamp": (
+                self._latest_report.timestamp if self._latest_report else None
+            ),
         }
-

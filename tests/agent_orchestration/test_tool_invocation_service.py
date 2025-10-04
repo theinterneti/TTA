@@ -1,12 +1,12 @@
 import asyncio
-import os
+
 import pytest
 
-from src.agent_orchestration.tools.models import ToolSpec, ToolParameter, ToolPolicy
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 from src.agent_orchestration.tools.coordinator import ToolCoordinator
 from src.agent_orchestration.tools.invocation_service import ToolInvocationService
 from src.agent_orchestration.tools.metrics import get_tool_metrics
+from src.agent_orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
+from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 
 
 async def async_ok(a, b):
@@ -21,22 +21,32 @@ def sync_fail():
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_tool_invocation_service_records_metrics_and_policy(redis_client):
-    reg = RedisToolRegistry(redis_client, key_prefix="testao_inv", cache_ttl_s=0.2, cache_max_items=8)
-    policy = ToolPolicy(allow_network_tools=True, allowed_callables=[
-        "tests.agent_orchestration.test_tool_invocation_service.async_ok",
-        "tests.agent_orchestration.test_tool_invocation_service.sync_fail",
-        "test_tool_invocation_service.async_ok",
-        "test_tool_invocation_service.sync_fail",
-    ])
+    reg = RedisToolRegistry(
+        redis_client, key_prefix="testao_inv", cache_ttl_s=0.2, cache_max_items=8
+    )
+    policy = ToolPolicy(
+        allow_network_tools=True,
+        allowed_callables=[
+            "tests.agent_orchestration.test_tool_invocation_service.async_ok",
+            "tests.agent_orchestration.test_tool_invocation_service.sync_fail",
+            "test_tool_invocation_service.async_ok",
+            "test_tool_invocation_service.sync_fail",
+        ],
+    )
     coord = ToolCoordinator(registry=reg, policy=policy)
 
     svc = ToolInvocationService(registry=reg, coordinator=coord, policy=policy)
 
     # Register tool and invoke async function
     spec = ToolSpec(
-        name="math.add", version="1.0.0", description="Add numbers",
-        parameters=[ToolParameter(name="a", schema={"type": "number"}), ToolParameter(name="b", schema={"type": "number"})],
-        returns_schema={"type": "number"}
+        name="math.add",
+        version="1.0.0",
+        description="Add numbers",
+        parameters=[
+            ToolParameter(name="a", schema={"type": "number"}),
+            ToolParameter(name="b", schema={"type": "number"}),
+        ],
+        returns_schema={"type": "number"},
     )
     await reg.register_tool(spec)
 
@@ -61,10 +71,13 @@ async def test_tool_invocation_service_records_metrics_and_policy(redis_client):
 @pytest.mark.asyncio
 async def test_tool_invocation_service_register_and_invoke(redis_client):
     reg = RedisToolRegistry(redis_client, key_prefix="testao_inv2")
-    policy = ToolPolicy(allow_network_tools=True, allowed_callables=[
-        "tests.agent_orchestration.test_tool_invocation_service.async_ok",
-        "test_tool_invocation_service.async_ok",
-    ])  # noqa: E501
+    policy = ToolPolicy(
+        allow_network_tools=True,
+        allowed_callables=[
+            "tests.agent_orchestration.test_tool_invocation_service.async_ok",
+            "test_tool_invocation_service.async_ok",
+        ],
+    )  # noqa: E501
     coord = ToolCoordinator(registry=reg, policy=policy)
     svc = ToolInvocationService(registry=reg, coordinator=coord, policy=policy)
 
@@ -73,4 +86,3 @@ async def test_tool_invocation_service_register_and_invoke(redis_client):
 
     res = await svc.register_and_invoke(factory, "sig-adder-101", async_ok, a=1, b=2)
     assert res == 3
-

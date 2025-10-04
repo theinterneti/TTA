@@ -5,22 +5,22 @@ This module provides endpoints for world discovery and management.
 This is a placeholder implementation - full implementation will be done in task 7.4.
 """
 
-from typing import Any, Dict
-from fastapi import Depends
+from enum import Enum
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, status
+
 from ..auth import TokenData, get_current_active_player
 
-from fastapi import APIRouter
-
 router = APIRouter()
-from enum import Enum
 from pydantic import BaseModel, Field
-from fastapi import HTTPException, status
 
 from ...managers.world_management_module import WorldManagementModule
-from ...database.character_repository import CharacterRepository
-from ...models.world import WorldSummary as WorldSummaryDC, WorldDetails as WorldDetailsDC, WorldParameters as WorldParametersDC, CompatibilityReport as CompatibilityReportDC
 from ...models.enums import DifficultyLevel
+from ...models.world import WorldParameters as WorldParametersDC
+
 # Dependency for world manager (simple instantiation for now)
+
 
 def get_world_manager() -> WorldManagementModule:
     return WorldManagementModule()
@@ -31,6 +31,7 @@ def get_world_manager_dep() -> WorldManagementModule:
 
 
 # API Schemas (Pydantic) mapping from dataclasses
+
 
 class DifficultyLevelEnum(str, Enum):
     BEGINNER = "BEGINNER"
@@ -68,7 +69,7 @@ class WorldDetails(BaseModel):
     key_characters: list[dict[str, str]] = Field(default_factory=list)
     main_storylines: list[str] = Field(default_factory=list)
     therapeutic_techniques_used: list[str] = Field(default_factory=list)
-    prerequisites: list[dict[str, str]] = Field(default_factory=list)
+    prerequisites: list[dict[str, Any]] = Field(default_factory=list)
     recommended_therapeutic_readiness: float = 0.5
     content_warnings: list[str] = Field(default_factory=list)
     available_parameters: list[str] = Field(default_factory=list)
@@ -98,12 +99,14 @@ class CompatibilityReport(BaseModel):
     character_id: str
     world_id: str
     overall_score: float
-    is_compatible: bool = Field(default=True, description="Compatibility flag for e2e tests")
+    is_compatible: bool = Field(
+        default=True, description="Compatibility flag for e2e tests"
+    )
     compatibility_factors: list[CompatibilityFactor] = Field(default_factory=list)
     recommendations: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     prerequisites_met: bool = True
-    unmet_prerequisites: list[dict[str, str]] = Field(default_factory=list)
+    unmet_prerequisites: list[dict[str, Any]] = Field(default_factory=list)
 
 
 class WorldCustomizationRequest(BaseModel):
@@ -120,8 +123,6 @@ class WorldCustomizationRequest(BaseModel):
     session_length_preference: int | None = None
 
 
-
-
 @router.get("/", summary="List available worlds", response_model=list[WorldSummary])
 async def list_worlds(
     current_player: TokenData = Depends(get_current_active_player),
@@ -130,17 +131,26 @@ async def list_worlds(
     offset: int = 0,
     world_manager: WorldManagementModule = Depends(get_world_manager_dep),
 ) -> list[WorldSummary]:
-    summaries_dc = world_manager.get_available_worlds(current_player.player_id or "", character_id=character_id)
+    summaries_dc = world_manager.get_available_worlds(
+        current_player.player_id or "", character_id=character_id
+    )
     # Simple pagination on the list
-    paged = summaries_dc[offset: offset + limit]
+    paged = summaries_dc[offset : offset + limit]
     return [
         WorldSummary(
             world_id=s.world_id,
             name=s.name,
             description=s.description,
             therapeutic_themes=s.therapeutic_themes,
-            therapeutic_approaches=[a.name if hasattr(a, "name") else str(a) for a in s.therapeutic_approaches],
-            difficulty_level=DifficultyLevelEnum[s.difficulty_level.name] if hasattr(s.difficulty_level, "name") else DifficultyLevelEnum.INTERMEDIATE,
+            therapeutic_approaches=[
+                a.name if hasattr(a, "name") else str(a)
+                for a in s.therapeutic_approaches
+            ],
+            difficulty_level=(
+                DifficultyLevelEnum[s.difficulty_level.name]
+                if hasattr(s.difficulty_level, "name")
+                else DifficultyLevelEnum.INTERMEDIATE
+            ),
             estimated_duration_minutes=int(s.estimated_duration.total_seconds() // 60),
             compatibility_score=s.compatibility_score,
             preview_image=s.preview_image,
@@ -162,21 +172,40 @@ async def get_world(
 ) -> WorldDetails:
     details = world_manager.get_world_details(world_id)
     if not details:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="World not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="World not found"
+        )
     return WorldDetails(
         world_id=details.world_id,
         name=details.name,
         description=details.description,
         long_description=details.long_description,
         therapeutic_themes=details.therapeutic_themes,
-        therapeutic_approaches=[a.name if hasattr(a, "name") else str(a) for a in details.therapeutic_approaches],
-        difficulty_level=DifficultyLevelEnum[details.difficulty_level.name] if hasattr(details.difficulty_level, "name") else DifficultyLevelEnum.INTERMEDIATE,
-        estimated_duration_minutes=int(details.estimated_duration.total_seconds() // 60),
+        therapeutic_approaches=[
+            a.name if hasattr(a, "name") else str(a)
+            for a in details.therapeutic_approaches
+        ],
+        difficulty_level=(
+            DifficultyLevelEnum[details.difficulty_level.name]
+            if hasattr(details.difficulty_level, "name")
+            else DifficultyLevelEnum.INTERMEDIATE
+        ),
+        estimated_duration_minutes=int(
+            details.estimated_duration.total_seconds() // 60
+        ),
         setting_description=details.setting_description,
         key_characters=details.key_characters,
         main_storylines=details.main_storylines,
         therapeutic_techniques_used=details.therapeutic_techniques_used,
-        prerequisites=[{"prerequisite_type": p.prerequisite_type, "description": p.description, "required_value": p.required_value, "is_met": p.is_met} for p in details.prerequisites],
+        prerequisites=[
+            {
+                "prerequisite_type": p.prerequisite_type,
+                "description": p.description,
+                "required_value": p.required_value,
+                "is_met": p.is_met,
+            }
+            for p in details.prerequisites
+        ],
         recommended_therapeutic_readiness=details.recommended_therapeutic_readiness,
         content_warnings=details.content_warnings,
         available_parameters=details.available_parameters,
@@ -184,7 +213,11 @@ async def get_world(
             "therapeutic_intensity": details.default_parameters.therapeutic_intensity,
             "narrative_pace": details.default_parameters.narrative_pace,
             "interaction_frequency": details.default_parameters.interaction_frequency,
-            "challenge_level": details.default_parameters.challenge_level.name if hasattr(details.default_parameters.challenge_level, "name") else str(details.default_parameters.challenge_level),
+            "challenge_level": (
+                details.default_parameters.challenge_level.name
+                if hasattr(details.default_parameters.challenge_level, "name")
+                else str(details.default_parameters.challenge_level)
+            ),
             "focus_areas": details.default_parameters.focus_areas,
             "avoid_topics": details.default_parameters.avoid_topics,
             "session_length_preference": details.default_parameters.session_length_preference,
@@ -215,12 +248,18 @@ async def check_world_compatibility(
     current_player: TokenData = Depends(get_current_active_player),
     world_manager: WorldManagementModule = Depends(get_world_manager_dep),
 ) -> CompatibilityReport:
-    report = world_manager.check_world_compatibility_by_id(character_id=character_id, world_id=world_id)
+    report = world_manager.check_world_compatibility_by_id(
+        character_id=character_id, world_id=world_id
+    )
     if not report:
         details = world_manager.get_world_details(world_id)
         if not details:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="World not found")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Compatibility check failed")
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND, detail="World not found"
+            )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Compatibility check failed"
+        )
     return CompatibilityReport(
         character_id=report.character_id,
         world_id=report.world_id,
@@ -262,15 +301,24 @@ async def customize_world(
 ) -> dict:
     details = world_manager.get_world_details(world_id)
     if not details:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="World not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="World not found"
+        )
 
     defaults = details.default_parameters
     # Normalize alias keys to expected parameters
     if request.narrative_pace:
         narrative_pace = request.narrative_pace
     elif getattr(request, "narrative_style", None):
-        style_map = {"collaborative": "medium", "exploratory": "slow", "directive": "fast", "reflective": "slow"}
-        narrative_pace = style_map.get(str(request.narrative_style).strip().lower(), defaults.narrative_pace)
+        style_map = {
+            "collaborative": "medium",
+            "exploratory": "slow",
+            "directive": "fast",
+            "reflective": "slow",
+        }
+        narrative_pace = style_map.get(
+            str(request.narrative_style).strip().lower(), defaults.narrative_pace
+        )
     else:
         narrative_pace = defaults.narrative_pace
     # Accept both enum and string difficulty inputs, with synonyms
@@ -302,7 +350,9 @@ async def customize_world(
     session_length_preference = (
         request.session_length_preference
         if request.session_length_preference is not None
-        else sl_map.get((request.session_length or "").lower(), defaults.session_length_preference)
+        else sl_map.get(
+            (request.session_length or "").lower(), defaults.session_length_preference
+        )
     )
     # Parse therapeutic_intensity if provided as string (e.g., 'medium')
     ti = request.therapeutic_intensity
@@ -315,14 +365,17 @@ async def customize_world(
         params = WorldParametersDC(
             therapeutic_intensity=ti_val,
             narrative_pace=narrative_pace,
-            interaction_frequency=request.interaction_frequency or defaults.interaction_frequency,
+            interaction_frequency=request.interaction_frequency
+            or defaults.interaction_frequency,
             challenge_level=challenge_level,
             focus_areas=request.focus_areas or defaults.focus_areas,
             avoid_topics=request.avoid_topics or defaults.avoid_topics,
             session_length_preference=session_length_preference,
         )
     except ValueError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from e
 
     customized = world_manager.customize_world_parameters(world_id, params)
     if not customized:
@@ -337,14 +390,17 @@ async def customize_world(
                 "therapeutic_intensity": defaults.therapeutic_intensity,
                 "narrative_pace": defaults.narrative_pace,
                 "interaction_frequency": defaults.interaction_frequency,
-                "challenge_level": defaults.challenge_level.name if hasattr(defaults.challenge_level, "name") else str(defaults.challenge_level),
+                "challenge_level": (
+                    defaults.challenge_level.name
+                    if hasattr(defaults.challenge_level, "name")
+                    else str(defaults.challenge_level)
+                ),
                 "focus_areas": defaults.focus_areas,
                 "avoid_topics": defaults.avoid_topics,
                 "session_length_preference": defaults.session_length_preference,
             },
             "compatibility": {"overall_score": 0.7},
         }
-
 
     return {
         "world_id": customized.world_id,
@@ -353,7 +409,11 @@ async def customize_world(
             "therapeutic_intensity": customized.customized_parameters.therapeutic_intensity,
             "narrative_pace": customized.customized_parameters.narrative_pace,
             "interaction_frequency": customized.customized_parameters.interaction_frequency,
-            "challenge_level": customized.customized_parameters.challenge_level.name if hasattr(customized.customized_parameters.challenge_level, "name") else str(customized.customized_parameters.challenge_level),
+            "challenge_level": (
+                customized.customized_parameters.challenge_level.name
+                if hasattr(customized.customized_parameters.challenge_level, "name")
+                else str(customized.customized_parameters.challenge_level)
+            ),
             "focus_areas": customized.customized_parameters.focus_areas,
             "avoid_topics": customized.customized_parameters.avoid_topics,
             "session_length_preference": customized.customized_parameters.session_length_preference,

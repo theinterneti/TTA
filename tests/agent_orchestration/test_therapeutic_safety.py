@@ -1,13 +1,13 @@
 import asyncio
 import json
-import os
+
 import pytest
 
 from src.agent_orchestration.therapeutic_safety import (
     SafetyLevel,
-    TherapeuticValidator,
     SafetyRulesProvider,
     SafetyService,
+    TherapeuticValidator,
 )
 
 
@@ -31,7 +31,18 @@ def test_suggest_alternative_messages():
 
 @pytest.mark.asyncio
 async def test_safety_rules_provider_fallback_file(tmp_path):
-    cfg = {"rules": [{"id": "w", "category": "professional_ethics", "priority": 1, "level": "warning", "pattern": "prescribe", "flags": "i"}]}
+    cfg = {
+        "rules": [
+            {
+                "id": "w",
+                "category": "professional_ethics",
+                "priority": 1,
+                "level": "warning",
+                "pattern": "prescribe",
+                "flags": "i",
+            }
+        ]
+    }
     p = tmp_path / "rules.json"
     p.write_text(json.dumps(cfg), encoding="utf-8")
     prov = SafetyRulesProvider(redis_client=None, file_fallback_path=str(p))
@@ -43,7 +54,18 @@ async def test_safety_rules_provider_fallback_file(tmp_path):
 @pytest.mark.asyncio
 async def test_safety_rules_provider_reads_redis(redis_client):
     # Write a custom cfg to Redis
-    cfg = {"rules": [{"id": "c1", "category": "crisis_detection", "priority": 99, "level": "blocked", "pattern": "self harm", "flags": "i"}]}
+    cfg = {
+        "rules": [
+            {
+                "id": "c1",
+                "category": "crisis_detection",
+                "priority": 99,
+                "level": "blocked",
+                "pattern": "self harm",
+                "flags": "i",
+            }
+        ]
+    }
     await redis_client.set("ao:safety:rules", json.dumps(cfg))
     prov = SafetyRulesProvider(redis_client=redis_client)
     got = await prov.get_config()
@@ -61,15 +83,39 @@ async def test_safety_service_disabled_fast_path():
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_safety_service_live_reload(redis_client):
-    cfg1 = {"rules": [{"id": "w1", "category": "professional_ethics", "priority": 1, "level": "warning", "pattern": "diagnose", "flags": "i"}]}
+    cfg1 = {
+        "rules": [
+            {
+                "id": "w1",
+                "category": "professional_ethics",
+                "priority": 1,
+                "level": "warning",
+                "pattern": "diagnose",
+                "flags": "i",
+            }
+        ]
+    }
     await redis_client.set("ao:safety:rules", json.dumps(cfg1))
-    svc = SafetyService(enabled=True, provider=SafetyRulesProvider(redis_client=redis_client, cache_ttl_s=0.1))
+    svc = SafetyService(
+        enabled=True,
+        provider=SafetyRulesProvider(redis_client=redis_client, cache_ttl_s=0.1),
+    )
     r = await svc.validate_text("Please diagnose me")
     assert r.level == SafetyLevel.WARNING
     # Update cfg to block
-    cfg2 = {"rules": [{"id": "b1", "category": "crisis_detection", "priority": 99, "level": "blocked", "pattern": "kill myself", "flags": "i"}]}
+    cfg2 = {
+        "rules": [
+            {
+                "id": "b1",
+                "category": "crisis_detection",
+                "priority": 99,
+                "level": "blocked",
+                "pattern": "kill myself",
+                "flags": "i",
+            }
+        ]
+    }
     await redis_client.set("ao:safety:rules", json.dumps(cfg2))
     await asyncio.sleep(0.12)
     r2 = await svc.validate_text("I want to kill myself")
     assert r2.level == SafetyLevel.BLOCKED
-

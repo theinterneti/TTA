@@ -1,40 +1,47 @@
 import asyncio
 import os
-import uuid
+
 import pytest
 
-from src.components.agent_orchestration_component import AgentOrchestrationComponent
-from src.agent_orchestration.tools.models import ToolSpec, ToolParameter, ToolPolicy
-from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
 from src.agent_orchestration.tools.coordinator import ToolCoordinator
+from src.agent_orchestration.tools.models import ToolParameter, ToolPolicy, ToolSpec
+from src.agent_orchestration.tools.redis_tool_registry import RedisToolRegistry
+from src.components.agent_orchestration_component import AgentOrchestrationComponent
 
 
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_tools_diagnostics_endpoint(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8610,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.tools": {
-            "redis_key_prefix": "ao",
-            "cache_ttl_s": 0.5,
-            "cache_max_items": 32,
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8610,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.tools": {
+                "redis_key_prefix": "ao",
+                "cache_ttl_s": 0.5,
+                "cache_max_items": 32,
+            },
         }
-    })
+    )
     assert comp._start_impl() is True
     app = comp._create_diagnostics_app()
     from starlette.testclient import TestClient
+
     client = TestClient(app)
 
     # Register a tool
     reg = comp._tool_registry
     import uuid as _uuid
+
     unique_name = f"kg.query.{_uuid.uuid4().hex[:6]}"
     spec = ToolSpec(
-        name=unique_name, version="1.0.0", description="Query KG",
-        parameters=[ToolParameter(name="q", schema={"type": "string"})], returns_schema={"type": "object"}
+        name=unique_name,
+        version="1.0.0",
+        description="Query KG",
+        parameters=[ToolParameter(name="q", schema={"type": "string"})],
+        returns_schema={"type": "object"},
     )
     # register may be False if concurrently registered; still acceptable
     await reg.register_tool(spec)
@@ -52,13 +59,18 @@ async def test_tools_diagnostics_endpoint(redis_client):
 @pytest.mark.redis
 @pytest.mark.asyncio
 async def test_concurrent_registry_and_coordinator(redis_client):
-    reg = RedisToolRegistry(redis_client, key_prefix="testao_conc", cache_ttl_s=0.2, cache_max_items=8)
+    reg = RedisToolRegistry(
+        redis_client, key_prefix="testao_conc", cache_ttl_s=0.2, cache_max_items=8
+    )
     coord = ToolCoordinator(registry=reg, policy=ToolPolicy(allow_network_tools=True))
 
     async def factory():
         return ToolSpec(
-            name="kg.query", version="1.0.2", description="Query KG",
-            parameters=[ToolParameter(name="q", schema={"type": "string"})], returns_schema={"type": "object"}
+            name="kg.query",
+            version="1.0.2",
+            description="Query KG",
+            parameters=[ToolParameter(name="q", schema={"type": "string"})],
+            returns_schema={"type": "object"},
         )
 
     # concurrent create_or_get calls
@@ -72,10 +84,9 @@ async def test_concurrent_registry_and_coordinator(redis_client):
 
     # cleanup while listing
     await reg.touch_last_used("kg.query", "1.0.2")
-    lst_before = await reg.list_tools()
+    await reg.list_tools()
     removed = await reg.cleanup_expired(max_idle_seconds=0.0)
     # Even if removed due to threshold, operations should be safe
     assert removed >= 0
     lst_after = await reg.list_tools()
     assert isinstance(lst_after, list)
-

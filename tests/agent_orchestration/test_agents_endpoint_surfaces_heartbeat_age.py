@@ -1,5 +1,6 @@
 import asyncio
 import os
+
 import pytest
 
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
@@ -9,17 +10,19 @@ from src.components.agent_orchestration_component import AgentOrchestrationCompo
 @pytest.mark.asyncio
 async def test_agents_endpoint_includes_heartbeat_age(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8611,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.agents.auto_register": True,
-        "agent_orchestration.agents.heartbeat_ttl": 1.0,
-        "agent_orchestration.agents.heartbeat_interval": 0.2,
-        "agent_orchestration.agents.ipa.enabled": True,
-        "agent_orchestration.agents.wba.enabled": False,
-        "agent_orchestration.agents.nga.enabled": False,
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8611,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.agents.auto_register": True,
+            "agent_orchestration.agents.heartbeat_ttl": 1.0,
+            "agent_orchestration.agents.heartbeat_interval": 0.2,
+            "agent_orchestration.agents.ipa.enabled": True,
+            "agent_orchestration.agents.wba.enabled": False,
+            "agent_orchestration.agents.nga.enabled": False,
+        }
+    )
     await comp.start()
     # allow /agents to populate
     await asyncio.sleep(0.5)
@@ -32,6 +35,7 @@ async def test_agents_endpoint_includes_heartbeat_age(redis_client):
     assert reg is not None
     try:
         from src.agent_orchestration.registries import RedisAgentRegistry
+
         if isinstance(reg, RedisAgentRegistry):
             lst = await reg.list_registered()
             assert isinstance(lst, list)
@@ -41,4 +45,3 @@ async def test_agents_endpoint_includes_heartbeat_age(redis_client):
         pass
 
     await comp.stop()
-

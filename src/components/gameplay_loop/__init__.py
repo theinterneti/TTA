@@ -6,16 +6,31 @@ gameplay loop system, including narrative presentation, choice architecture,
 consequence systems, and adaptive difficulty management.
 """
 
-from .base import GameplayLoopComponent
-from .session_manager import SessionManager
-from .narrative_engine import NarrativeEngine
 from .choice_architecture import ChoiceArchitectureManager
 from .consequence_system import ConsequenceSystem
+from .controller import GameplayLoopController
+from .database import Neo4jGameplayManager
+from .models import *
+from .narrative import NarrativeEngine
 
 __all__ = [
-    "GameplayLoopComponent",
-    "SessionManager", 
+    # Models
+    "SessionState",
+    "Scene",
+    "Choice",
+    "ConsequenceSet",
+    "TherapeuticContext",
+    "GameplayMetrics",
+    "UserChoice",
+    "ChoiceOutcome",
+    "GameplaySession",
+    "ProgressMarker",
+    "ProgressType",
+    "ValidationResult",
+    # Core Components
+    "Neo4jGameplayManager",
     "NarrativeEngine",
     "ChoiceArchitectureManager",
-    "ConsequenceSystem"
+    "ConsequenceSystem",
+    "GameplayLoopController",
 ]

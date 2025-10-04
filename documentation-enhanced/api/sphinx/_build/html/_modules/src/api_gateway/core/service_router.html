@@ -1,0 +1,558 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.core.service_router &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.core.service_router</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.core.service_router</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Enhanced service router with load balancing and circuit breaker integration.</span>
+
+<span class="sd">This module provides advanced service routing capabilities including</span>
+<span class="sd">load balancing algorithms, circuit breaker patterns, and failover mechanisms.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">ServiceInfo</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..services</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServiceDiscoveryManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.circuit_breaker</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CircuitBreakerConfig</span><span class="p">,</span>
+    <span class="n">CircuitBreakerError</span><span class="p">,</span>
+    <span class="n">CircuitBreakerManager</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.load_balancer</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoadBalancingStrategy</span><span class="p">,</span> <span class="n">create_load_balancer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="FailoverStrategy">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.FailoverStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FailoverStrategy</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Failover strategy types.&quot;&quot;&quot;</span>
+
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="n">IMMEDIATE</span> <span class="o">=</span> <span class="s2">&quot;immediate&quot;</span>
+    <span class="n">RETRY_DIFFERENT_SERVICE</span> <span class="o">=</span> <span class="s2">&quot;retry_different_service&quot;</span>
+    <span class="n">RETRY_WITH_BACKOFF</span> <span class="o">=</span> <span class="s2">&quot;retry_with_backoff&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ServiceRouterConfig">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouterConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServiceRouterConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for service router.&quot;&quot;&quot;</span>
+
+    <span class="n">load_balancing_strategy</span><span class="p">:</span> <span class="n">LoadBalancingStrategy</span> <span class="o">=</span> <span class="n">LoadBalancingStrategy</span><span class="o">.</span><span class="n">HEALTH_BASED</span>
+    <span class="n">failover_strategy</span><span class="p">:</span> <span class="n">FailoverStrategy</span> <span class="o">=</span> <span class="n">FailoverStrategy</span><span class="o">.</span><span class="n">RETRY_DIFFERENT_SERVICE</span>
+    <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">retry_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">circuit_breaker_config</span><span class="p">:</span> <span class="n">CircuitBreakerConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Therapeutic-specific settings</span>
+    <span class="n">therapeutic_max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">therapeutic_retry_delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span>
+    <span class="n">crisis_max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># More aggressive retries for crisis situations</span></div>
+
+
+
+<div class="viewcode-block" id="ServiceRouter">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ServiceRouter</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enhanced service router with load balancing and circuit breaker integration.</span>
+
+<span class="sd">    Provides intelligent service selection, load balancing, circuit breaker protection,</span>
+<span class="sd">    and failover mechanisms with special handling for therapeutic requests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">discovery_manager</span><span class="p">:</span> <span class="n">ServiceDiscoveryManager</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">ServiceRouterConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the service router.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            discovery_manager: Service discovery manager</span>
+<span class="sd">            config: Router configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span> <span class="o">=</span> <span class="n">discovery_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">ServiceRouterConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+        <span class="c1"># Initialize load balancer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span> <span class="o">=</span> <span class="n">create_load_balancer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">load_balancing_strategy</span><span class="p">)</span>
+
+        <span class="c1"># Initialize circuit breaker manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">circuit_breaker_manager</span> <span class="o">=</span> <span class="n">CircuitBreakerManager</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">circuit_breaker_config</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Service selection cache</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="n">ServiceInfo</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cache_ttl</span> <span class="o">=</span> <span class="mf">30.0</span>  <span class="c1"># Cache TTL in seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<div class="viewcode-block" id="ServiceRouter.select_service">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.select_service">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">select_service</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ServiceInfo</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Select the best service instance for a request.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_name: Name of the service to select</span>
+<span class="sd">            gateway_request: Gateway request context</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Selected service instance or None if no healthy service available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get available services</span>
+            <span class="n">services</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_available_services</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">services</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No services available for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Filter services through circuit breakers</span>
+            <span class="n">healthy_services</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">circuit_breaker_manager</span><span class="o">.</span><span class="n">get_healthy_services</span><span class="p">(</span>
+                <span class="n">services</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">healthy_services</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No healthy services available for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># In crisis mode, allow using unhealthy services as last resort</span>
+                <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Crisis mode: using potentially unhealthy services for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">healthy_services</span> <span class="o">=</span> <span class="n">services</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="c1"># Use load balancer to select service</span>
+            <span class="n">selected_service</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">select_service</span><span class="p">(</span>
+                <span class="n">healthy_services</span><span class="p">,</span>
+                <span class="n">therapeutic_priority</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">,</span>
+                <span class="n">crisis_mode</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">selected_service</span><span class="p">:</span>
+                <span class="c1"># Update load balancer metrics</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">increment_connections</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">selected_service</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Selected service </span><span class="si">{</span><span class="n">selected_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> (ID: </span><span class="si">{</span><span class="n">selected_service</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">) &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;for request </span><span class="si">{</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">selected_service</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error selecting service for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="ServiceRouter.route_request_with_failover">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.route_request_with_failover">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">route_request_with_failover</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">,</span>
+        <span class="n">request_func</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Route request with failover and retry logic.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_name: Name of the service</span>
+<span class="sd">            gateway_request: Gateway request context</span>
+<span class="sd">            request_func: Function to execute the request</span>
+<span class="sd">            *args: Arguments for request function</span>
+<span class="sd">            **kwargs: Keyword arguments for request function</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Response from the service</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If all retry attempts fail</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Determine retry parameters based on request type</span>
+        <span class="n">max_retries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_retries</span>
+        <span class="n">retry_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">retry_delay</span>
+
+        <span class="k">if</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">:</span>
+            <span class="n">max_retries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">crisis_max_retries</span>
+            <span class="n">retry_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">therapeutic_retry_delay</span>
+        <span class="k">elif</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">:</span>
+            <span class="n">max_retries</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">therapeutic_max_retries</span>
+            <span class="n">retry_delay</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">therapeutic_retry_delay</span>
+
+        <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">attempted_services</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">attempt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Select service for this attempt</span>
+                <span class="n">selected_service</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">select_service</span><span class="p">(</span>
+                    <span class="n">service_name</span><span class="p">,</span> <span class="n">gateway_request</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">selected_service</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No healthy services available for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Skip if we&#39;ve already tried this service (unless it&#39;s the only option)</span>
+                <span class="n">service_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">selected_service</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">service_id</span> <span class="ow">in</span> <span class="n">attempted_services</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">attempted_services</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="n">attempted_services</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">service_id</span><span class="p">)</span>
+
+                <span class="c1"># Execute request through circuit breaker</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">circuit_breaker_manager</span><span class="o">.</span><span class="n">call_service</span><span class="p">(</span>
+                        <span class="n">selected_service</span><span class="p">,</span>
+                        <span class="n">request_func</span><span class="p">,</span>
+                        <span class="n">selected_service</span><span class="p">,</span>
+                        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+                        <span class="n">therapeutic_request</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">,</span>
+                        <span class="n">crisis_mode</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># Update load balancer with success</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">update_metrics</span><span class="p">(</span>
+                        <span class="n">service_id</span><span class="p">,</span>
+                        <span class="mf">0.0</span><span class="p">,</span>
+                        <span class="kc">True</span><span class="p">,</span>  <span class="c1"># Response time will be updated elsewhere</span>
+                        <span class="n">therapeutic</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">is_therapeutic</span><span class="p">,</span>
+                        <span class="n">crisis</span><span class="o">=</span><span class="n">gateway_request</span><span class="o">.</span><span class="n">crisis_mode</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                    <span class="k">return</span> <span class="n">result</span>
+
+                <span class="k">except</span> <span class="n">CircuitBreakerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Circuit breaker open for </span><span class="si">{</span><span class="n">selected_service</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
+                    <span class="k">continue</span>
+
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="c1"># Decrement connection count</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">decrement_connections</span><span class="p">(</span><span class="n">service_id</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Attempt </span><span class="si">{</span><span class="n">attempt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> failed for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                        <span class="s2">&quot;service_name&quot;</span><span class="p">:</span> <span class="n">service_name</span><span class="p">,</span>
+                        <span class="s2">&quot;attempt&quot;</span><span class="p">:</span> <span class="n">attempt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                        <span class="s2">&quot;max_retries&quot;</span><span class="p">:</span> <span class="n">max_retries</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+                <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
+
+                <span class="c1"># Wait before retry (except on last attempt)</span>
+                <span class="k">if</span> <span class="n">attempt</span> <span class="o">&lt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span>
+                        <span class="n">retry_delay</span> <span class="o">*</span> <span class="p">(</span><span class="n">attempt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="p">)</span>  <span class="c1"># Exponential backoff</span>
+
+        <span class="c1"># All attempts failed</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;All </span><span class="si">{</span><span class="n">max_retries</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> attempts failed for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">extra</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;correlation_id&quot;</span><span class="p">:</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">correlation_id</span><span class="p">,</span>
+                <span class="s2">&quot;service_name&quot;</span><span class="p">:</span> <span class="n">service_name</span><span class="p">,</span>
+                <span class="s2">&quot;attempted_services&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">attempted_services</span><span class="p">),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">last_exception</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">last_exception</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to route request to </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">max_retries</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> attempts&quot;</span>
+            <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_get_available_services</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ServiceInfo</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get available services with caching.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_name: Name of the service</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of available services</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+        <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="c1"># Check cache</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">service_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span>
+            <span class="ow">and</span> <span class="n">service_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span>
+            <span class="ow">and</span> <span class="n">current_time</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cache_ttl</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span>
+
+        <span class="c1"># Fetch from service discovery</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">services</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">get_services_by_name</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
+
+            <span class="c1"># Update cache</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">services</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span><span class="p">[</span><span class="n">service_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">current_time</span>
+
+            <span class="k">return</span> <span class="n">services</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching services for </span><span class="si">{</span><span class="n">service_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Return cached data if available</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="p">[])</span>
+
+<div class="viewcode-block" id="ServiceRouter.update_service_metrics">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.update_service_metrics">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">update_service_metrics</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">service_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">response_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">success</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="n">therapeutic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">crisis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update metrics for a service after request completion.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_id: Service ID</span>
+<span class="sd">            response_time: Response time in seconds</span>
+<span class="sd">            success: Whether the request was successful</span>
+<span class="sd">            therapeutic: Whether this was a therapeutic request</span>
+<span class="sd">            crisis: Whether this was a crisis request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Update load balancer metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">update_metrics</span><span class="p">(</span>
+            <span class="n">service_id</span><span class="p">,</span> <span class="n">response_time</span><span class="p">,</span> <span class="n">success</span><span class="p">,</span> <span class="n">therapeutic</span><span class="p">,</span> <span class="n">crisis</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Update service discovery metrics</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">discovery_manager</span><span class="o">.</span><span class="n">update_service_metrics</span><span class="p">(</span>
+            <span class="n">service_id</span><span class="p">,</span> <span class="n">response_time</span><span class="p">,</span> <span class="n">success</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ServiceRouter.get_load_balancer_metrics">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.get_load_balancer_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_load_balancer_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get load balancer metrics for all services.&quot;&quot;&quot;</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">service_id</span><span class="p">,</span> <span class="n">service_metrics</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_balancer</span><span class="o">.</span><span class="n">service_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="n">service_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;active_connections&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">active_connections</span><span class="p">,</span>
+                <span class="s2">&quot;total_requests&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">total_requests</span><span class="p">,</span>
+                <span class="s2">&quot;successful_requests&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">successful_requests</span><span class="p">,</span>
+                <span class="s2">&quot;failed_requests&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">failed_requests</span><span class="p">,</span>
+                <span class="s2">&quot;average_response_time&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">average_response_time</span><span class="p">,</span>
+                <span class="s2">&quot;health_score&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">health_score</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_load&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">therapeutic_load</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_load&quot;</span><span class="p">:</span> <span class="n">service_metrics</span><span class="o">.</span><span class="n">crisis_load</span><span class="p">,</span>
+            <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">metrics</span></div>
+
+
+<div class="viewcode-block" id="ServiceRouter.get_circuit_breaker_status">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.get_circuit_breaker_status">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_circuit_breaker_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get circuit breaker status for all services.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">circuit_breaker_manager</span><span class="o">.</span><span class="n">get_service_health_summary</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ServiceRouter.clear_service_cache">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.clear_service_cache">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clear_service_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clear service cache.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            service_name: Specific service to clear, or None to clear all</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">service_name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">service_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_cache_update</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="ServiceRouter.health_check">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.core.service_router.html#src.api_gateway.core.ServiceRouter.health_check">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform health check of the service router.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Health check results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Get circuit breaker status</span>
+            <span class="n">circuit_breaker_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_circuit_breaker_status</span><span class="p">()</span>
+
+            <span class="c1"># Count healthy services</span>
+            <span class="n">healthy_services</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="mi">1</span> <span class="k">for</span> <span class="n">status</span> <span class="ow">in</span> <span class="n">circuit_breaker_status</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="s2">&quot;is_healthy&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">total_services</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">circuit_breaker_status</span><span class="p">)</span>
+
+            <span class="c1"># Get load balancer metrics</span>
+            <span class="n">lb_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_load_balancer_metrics</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;healthy&quot;</span> <span class="k">if</span> <span class="n">healthy_services</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;unhealthy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;load_balancing_strategy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">load_balancing_strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;failover_strategy&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">failover_strategy</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;healthy_services&quot;</span><span class="p">:</span> <span class="n">healthy_services</span><span class="p">,</span>
+                <span class="s2">&quot;total_services&quot;</span><span class="p">:</span> <span class="n">total_services</span><span class="p">,</span>
+                <span class="s2">&quot;circuit_breakers&quot;</span><span class="p">:</span> <span class="n">circuit_breaker_status</span><span class="p">,</span>
+                <span class="s2">&quot;load_balancer_metrics&quot;</span><span class="p">:</span> <span class="n">lb_metrics</span><span class="p">,</span>
+                <span class="s2">&quot;cache_size&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_cache</span><span class="p">),</span>
+            <span class="p">}</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Health check failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;error&quot;</span><span class="p">,</span> <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

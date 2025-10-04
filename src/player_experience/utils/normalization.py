@@ -4,12 +4,12 @@ Normalization helpers for therapeutic settings.
 Centralizes alias mapping for TherapeuticApproach and IntensityLevel so both
 REST and WebSocket paths stay consistent.
 """
+
 from __future__ import annotations
 
-from typing import Iterable, List, Union
+from collections.abc import Iterable
 
-from ..models.enums import TherapeuticApproach, IntensityLevel
-
+from ..models.enums import IntensityLevel, TherapeuticApproach
 
 # Canonical alias map for approaches
 _APPROACH_ALIAS = {
@@ -24,7 +24,7 @@ _APPROACH_ALIAS = {
 }
 
 
-def normalize_approach(value: Union[str, TherapeuticApproach]) -> TherapeuticApproach:
+def normalize_approach(value: str | TherapeuticApproach) -> TherapeuticApproach:
     """Normalize a single approach value into a TherapeuticApproach enum.
 
     - Accepts enum or string (case-insensitive for known aliases)
@@ -40,12 +40,14 @@ def normalize_approach(value: Union[str, TherapeuticApproach]) -> TherapeuticApp
     return TherapeuticApproach(key)
 
 
-def normalize_approaches(values: Iterable[Union[str, TherapeuticApproach]]) -> List[TherapeuticApproach]:
+def normalize_approaches(
+    values: Iterable[str | TherapeuticApproach],
+) -> list[TherapeuticApproach]:
     """Normalize a collection of approach designators into enums.
 
     Invalid entries are skipped (conservative behavior).
     """
-    result: List[TherapeuticApproach] = []
+    result: list[TherapeuticApproach] = []
     for v in values or []:
         try:
             result.append(normalize_approach(v))
@@ -55,7 +57,10 @@ def normalize_approaches(values: Iterable[Union[str, TherapeuticApproach]]) -> L
     return result
 
 
-def normalize_intensity(value: Union[str, IntensityLevel, None], default: IntensityLevel = IntensityLevel.MEDIUM) -> IntensityLevel:
+def normalize_intensity(
+    value: str | IntensityLevel | None,
+    default: IntensityLevel = IntensityLevel.MEDIUM,
+) -> IntensityLevel:
     """Normalize an intensity designator to IntensityLevel.
 
     Accepts enum or string; returns provided default for None.
@@ -65,4 +70,3 @@ def normalize_intensity(value: Union[str, IntensityLevel, None], default: Intens
     if isinstance(value, IntensityLevel):
         return value
     return IntensityLevel(str(value))
-

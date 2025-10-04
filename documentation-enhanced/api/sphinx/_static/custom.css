@@ -1,0 +1,170 @@
+/* Custom CSS for TTA Sphinx Documentation */
+
+/* Color scheme */
+:root {
+    --tta-primary: #2980B9;
+    --tta-secondary: #3498DB;
+    --tta-accent: #E74C3C;
+    --tta-success: #27AE60;
+    --tta-warning: #F39C12;
+    --tta-dark: #2C3E50;
+    --tta-light: #ECF0F1;
+}
+
+/* Custom styling for code blocks */
+.highlight {
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+}
+
+.highlight pre {
+    padding: 16px;
+    overflow: auto;
+    font-size: 14px;
+    line-height: 1.45;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+}
+
+/* Improve readability of inline code */
+code.literal {
+    background-color: rgba(27, 31, 35, 0.05);
+    border-radius: 3px;
+    font-size: 85%;
+    margin: 0;
+    padding: 0.2em 0.4em;
+}
+
+/* Style for admonitions */
+.admonition {
+    border-radius: 6px;
+    border-left: 4px solid;
+    margin: 1em 0;
+    padding: 0.5em 1em;
+}
+
+.admonition.note {
+    border-left-color: var(--tta-primary);
+    background-color: rgba(41, 128, 185, 0.1);
+}
+
+.admonition.warning {
+    border-left-color: var(--tta-warning);
+    background-color: rgba(243, 156, 18, 0.1);
+}
+
+.admonition.danger {
+    border-left-color: var(--tta-accent);
+    background-color: rgba(231, 76, 60, 0.1);
+}
+
+.admonition.tip {
+    border-left-color: var(--tta-success);
+    background-color: rgba(39, 174, 96, 0.1);
+}
+
+/* Style for API documentation */
+.py.class, .py.function, .py.method {
+    border-left: 3px solid var(--tta-primary);
+    padding-left: 10px;
+    margin: 1em 0;
+}
+
+.py.class > dt, .py.function > dt, .py.method > dt {
+    background-color: rgba(41, 128, 185, 0.05);
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Improve table styling */
+table.docutils {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    margin: 1em 0;
+}
+
+table.docutils th,
+table.docutils td {
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    text-align: left;
+}
+
+table.docutils th {
+    background-color: var(--tta-light);
+    font-weight: bold;
+}
+
+table.docutils tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Style for version badges */
+.version-badge {
+    display: inline-block;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1;
+    color: #fff;
+    background-color: var(--tta-primary);
+    border-radius: 3px;
+    margin-left: 5px;
+}
+
+/* Improve navigation styling */
+.wy-nav-side {
+    background: linear-gradient(180deg, var(--tta-dark) 0%, #34495e 100%);
+}
+
+.wy-menu-vertical a {
+    color: #d9d9d9;
+}
+
+.wy-menu-vertical a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.wy-menu-vertical li.current a {
+    color: #fff;
+    background-color: var(--tta-primary);
+}
+
+/* Custom styling for mermaid diagrams */
+.mermaid {
+    text-align: center;
+    margin: 2em 0;
+}
+
+/* Responsive improvements */
+@media screen and (max-width: 768px) {
+    .highlight pre {
+        font-size: 12px;
+        padding: 12px;
+    }
+
+    table.docutils {
+        font-size: 14px;
+    }
+
+    table.docutils th,
+    table.docutils td {
+        padding: 6px 8px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .wy-nav-side,
+    .wy-nav-content-wrap .wy-nav-top,
+    .rst-footer-buttons,
+    .rst-versions {
+        display: none !important;
+    }
+
+    .wy-nav-content {
+        margin-left: 0 !important;
+    }
+}

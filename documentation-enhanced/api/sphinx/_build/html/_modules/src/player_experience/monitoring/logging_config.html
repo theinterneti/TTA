@@ -1,0 +1,860 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.monitoring.logging_config &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.monitoring.logging_config</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.monitoring.logging_config</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Comprehensive logging configuration for production-grade monitoring.</span>
+
+<span class="sd">This module provides structured logging, log aggregation, and integration</span>
+<span class="sd">with monitoring systems for the Player Experience Interface.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging.handlers</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">queue</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">threading</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">traceback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">asdict</span><span class="p">,</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pythonjsonlogger</span><span class="w"> </span><span class="kn">import</span> <span class="n">jsonlogger</span>
+
+
+<div class="viewcode-block" id="LogLevel">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.LogLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogLevel</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log levels for structured logging.&quot;&quot;&quot;</span>
+
+    <span class="n">DEBUG</span> <span class="o">=</span> <span class="s2">&quot;DEBUG&quot;</span>
+    <span class="n">INFO</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;WARNING&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;CRITICAL&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LogCategory">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.LogCategory">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogCategory</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Categories for log messages.&quot;&quot;&quot;</span>
+
+    <span class="n">SYSTEM</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span>
+    <span class="n">SECURITY</span> <span class="o">=</span> <span class="s2">&quot;security&quot;</span>
+    <span class="n">PERFORMANCE</span> <span class="o">=</span> <span class="s2">&quot;performance&quot;</span>
+    <span class="n">THERAPEUTIC</span> <span class="o">=</span> <span class="s2">&quot;therapeutic&quot;</span>
+    <span class="n">USER_ACTION</span> <span class="o">=</span> <span class="s2">&quot;user_action&quot;</span>
+    <span class="n">DATABASE</span> <span class="o">=</span> <span class="s2">&quot;database&quot;</span>
+    <span class="n">CACHE</span> <span class="o">=</span> <span class="s2">&quot;cache&quot;</span>
+    <span class="n">API</span> <span class="o">=</span> <span class="s2">&quot;api&quot;</span>
+    <span class="n">WEBSOCKET</span> <span class="o">=</span> <span class="s2">&quot;websocket&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">AUDIT</span> <span class="o">=</span> <span class="s2">&quot;audit&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="LogContext">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.LogContext">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">LogContext</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context information for structured logging.&quot;&quot;&quot;</span>
+
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">correlation_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">therapeutic_session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">world_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="LogContext.to_dict">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.LogContext.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to dictionary, excluding None values.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">asdict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StructuredLogRecord">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogRecord">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">StructuredLogRecord</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Structured log record with enhanced metadata.&quot;&quot;&quot;</span>
+
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">level</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">logger_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">message</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span>
+    <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">LogContext</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+    <span class="n">exception_info</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">stack_trace</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="StructuredLogRecord.to_dict">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogRecord.to_dict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to dictionary for JSON serialization.&quot;&quot;&quot;</span>
+        <span class="n">record_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span><span class="p">,</span>
+            <span class="s2">&quot;logger&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger_name</span><span class="p">,</span>
+            <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">message</span><span class="p">,</span>
+            <span class="s2">&quot;category&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">category</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">exception_info</span><span class="p">:</span>
+            <span class="n">record_dict</span><span class="p">[</span><span class="s2">&quot;exception&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">exception_info</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack_trace</span><span class="p">:</span>
+            <span class="n">record_dict</span><span class="p">[</span><span class="s2">&quot;stack_trace&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stack_trace</span>
+
+        <span class="k">return</span> <span class="n">record_dict</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StructuredFormatter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredFormatter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StructuredFormatter</span><span class="p">(</span><span class="n">jsonlogger</span><span class="o">.</span><span class="n">JsonFormatter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom JSON formatter for structured logging.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">uname</span><span class="p">()</span><span class="o">.</span><span class="n">nodename</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">os</span><span class="p">,</span> <span class="s2">&quot;uname&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;unknown&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">service_name</span> <span class="o">=</span> <span class="s2">&quot;player-experience-interface&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;1.0.0&quot;</span>  <span class="c1"># Should be loaded from config</span>
+
+<div class="viewcode-block" id="StructuredFormatter.add_fields">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredFormatter.add_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add custom fields to log record.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_fields</span><span class="p">(</span><span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">)</span>
+
+        <span class="c1"># Add service metadata</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;service&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_name</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;version&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">version</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;hostname&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;process_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getpid</span><span class="p">()</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;thread_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">get_ident</span><span class="p">()</span>
+
+        <span class="c1"># Ensure timestamp is in ISO format</span>
+        <span class="k">if</span> <span class="s2">&quot;timestamp&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_record</span><span class="p">:</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;timestamp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span> <span class="o">+</span> <span class="s2">&quot;Z&quot;</span>
+
+        <span class="c1"># Add severity mapping for external systems</span>
+        <span class="n">level_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;INFO&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;WARNING&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;ERROR&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;CRITICAL&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;severity&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">level_mapping</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">levelname</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># Add category if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;category&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;category&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">category</span>
+
+        <span class="c1"># Add context if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+            <span class="n">log_record</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+
+        <span class="c1"># Add metadata if available</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;metadata&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">metadata</span><span class="p">:</span>
+            <span class="n">log_record</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SecurityAuditFormatter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.SecurityAuditFormatter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SecurityAuditFormatter</span><span class="p">(</span><span class="n">StructuredFormatter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialized formatter for security audit logs.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="SecurityAuditFormatter.add_fields">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.SecurityAuditFormatter.add_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add security-specific fields.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_fields</span><span class="p">(</span><span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">)</span>
+
+        <span class="c1"># Mark as security audit log</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;audit_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;security&quot;</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;compliance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;gdpr&quot;</span>
+
+        <span class="c1"># Add security-specific metadata</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;security_event&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;security_event&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">security_event</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;risk_level&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;risk_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">risk_level</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TherapeuticAuditFormatter">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.TherapeuticAuditFormatter">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticAuditFormatter</span><span class="p">(</span><span class="n">StructuredFormatter</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Specialized formatter for therapeutic audit logs.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TherapeuticAuditFormatter.add_fields">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.TherapeuticAuditFormatter.add_fields">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_fields</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add therapeutic-specific fields.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_fields</span><span class="p">(</span><span class="n">log_record</span><span class="p">,</span> <span class="n">record</span><span class="p">,</span> <span class="n">message_dict</span><span class="p">)</span>
+
+        <span class="c1"># Mark as therapeutic audit log</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;audit_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;therapeutic&quot;</span>
+        <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;compliance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;hipaa&quot;</span>
+
+        <span class="c1"># Add therapeutic-specific metadata</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;therapeutic_event&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;therapeutic_event&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">therapeutic_event</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;intervention_type&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;intervention_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">intervention_type</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">record</span><span class="p">,</span> <span class="s2">&quot;safety_level&quot;</span><span class="p">):</span>
+            <span class="n">log_record</span><span class="p">[</span><span class="s2">&quot;safety_level&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">record</span><span class="o">.</span><span class="n">safety_level</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="AsyncLogHandler">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.AsyncLogHandler">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AsyncLogHandler</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronous log handler for high-performance logging.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target_handler</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Handler</span><span class="p">,</span> <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_handler</span> <span class="o">=</span> <span class="n">target_handler</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">Queue</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="n">queue_size</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_event</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Event</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_worker</span><span class="p">()</span>
+
+<div class="viewcode-block" id="AsyncLogHandler.start_worker">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.AsyncLogHandler.start_worker">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">start_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the background worker thread.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop_event</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span> <span class="o">=</span> <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_worker_loop</span><span class="p">,</span> <span class="n">daemon</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="AsyncLogHandler.stop_worker">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.AsyncLogHandler.stop_worker">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">stop_worker</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the background worker thread.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_event</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker_thread</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_worker_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background worker loop for processing log records.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop_event</span><span class="o">.</span><span class="n">is_set</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Wait for log records with timeout</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">record</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># Sentinel value to stop</span>
+                        <span class="k">break</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">target_handler</span><span class="o">.</span><span class="n">emit</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">task_done</span><span class="p">()</span>
+                <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Empty</span><span class="p">:</span>
+                    <span class="k">continue</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Log to stderr to avoid infinite recursion</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in async log handler: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AsyncLogHandler.emit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.AsyncLogHandler.emit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">emit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Emit a log record asynchronously.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="o">.</span><span class="n">put_nowait</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">queue</span><span class="o">.</span><span class="n">Full</span><span class="p">:</span>
+            <span class="c1"># Drop the log record if queue is full</span>
+            <span class="c1"># In production, you might want to implement a different strategy</span>
+            <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="AsyncLogHandler.close">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.AsyncLogHandler.close">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Close the handler and clean up resources.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stop_worker</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">target_handler</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="StructuredLogger">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StructuredLogger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Enhanced logger with structured logging capabilities.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="n">LogContext</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_log</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">level</span><span class="p">:</span> <span class="n">LogLevel</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exc_info</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Internal logging method with structured data.&quot;&quot;&quot;</span>
+        <span class="c1"># Merge contexts</span>
+        <span class="n">final_context</span> <span class="o">=</span> <span class="n">LogContext</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+            <span class="n">final_context</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">context</span><span class="p">:</span>
+            <span class="n">final_context</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">}</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Create log record</span>
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">makeRecord</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+            <span class="n">fn</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">lno</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(),</span>
+            <span class="n">exc_info</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()</span> <span class="k">if</span> <span class="n">exc_info</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add structured data</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">category</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">final_context</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}</span>
+
+        <span class="c1"># Add exception information if available</span>
+        <span class="k">if</span> <span class="n">exc_info</span> <span class="ow">and</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">exception_info</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]),</span>
+                <span class="s2">&quot;traceback&quot;</span><span class="p">:</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+<div class="viewcode-block" id="StructuredLogger.debug">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.debug">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">debug</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log debug message.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.info">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.info">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log info message.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.warning">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.warning">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">warning</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">SYSTEM</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log warning message.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.error">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.error">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">error</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exc_info</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log error message.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.critical">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.critical">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">critical</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">category</span><span class="p">:</span> <span class="n">LogCategory</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">exc_info</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log critical message.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span><span class="p">(</span><span class="n">LogLevel</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">category</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.security_audit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.security_audit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">security_audit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">security_event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">risk_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log security audit event.&quot;&quot;&quot;</span>
+        <span class="n">audit_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;security_event&quot;</span><span class="p">:</span> <span class="n">security_event</span><span class="p">,</span> <span class="s2">&quot;risk_level&quot;</span><span class="p">:</span> <span class="n">risk_level</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="n">audit_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">makeRecord</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+            <span class="n">fn</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">lno</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(),</span>
+            <span class="n">exc_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">record</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">SECURITY</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">audit_metadata</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">security_event</span> <span class="o">=</span> <span class="n">security_event</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">risk_level</span> <span class="o">=</span> <span class="n">risk_level</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.therapeutic_audit">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.therapeutic_audit">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">therapeutic_audit</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">message</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">therapeutic_event</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">intervention_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">safety_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;safe&quot;</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Log therapeutic audit event.&quot;&quot;&quot;</span>
+        <span class="n">audit_metadata</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;therapeutic_event&quot;</span><span class="p">:</span> <span class="n">therapeutic_event</span><span class="p">,</span>
+            <span class="s2">&quot;intervention_type&quot;</span><span class="p">:</span> <span class="n">intervention_type</span><span class="p">,</span>
+            <span class="s2">&quot;safety_level&quot;</span><span class="p">:</span> <span class="n">safety_level</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">metadata</span><span class="p">:</span>
+            <span class="n">audit_metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+        <span class="n">record</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">makeRecord</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+            <span class="n">fn</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="n">lno</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="n">message</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(),</span>
+            <span class="n">exc_info</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">record</span><span class="o">.</span><span class="n">category</span> <span class="o">=</span> <span class="n">LogCategory</span><span class="o">.</span><span class="n">THERAPEUTIC</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">context</span> <span class="o">=</span> <span class="n">context</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">audit_metadata</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">therapeutic_event</span> <span class="o">=</span> <span class="n">therapeutic_event</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">intervention_type</span> <span class="o">=</span> <span class="n">intervention_type</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">safety_level</span> <span class="o">=</span> <span class="n">safety_level</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">handle</span><span class="p">(</span><span class="n">record</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StructuredLogger.with_context">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.StructuredLogger.with_context">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">with_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">context_updates</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;StructuredLogger&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new logger with updated context.&quot;&quot;&quot;</span>
+        <span class="n">new_context</span> <span class="o">=</span> <span class="n">LogContext</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="p">:</span>
+            <span class="n">new_context</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
+        <span class="n">new_context</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">context_updates</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">new_context</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="setup_logging">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.setup_logging">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">setup_logging</span><span class="p">(</span>
+    <span class="n">log_level</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span>
+    <span class="n">log_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">enable_console</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">enable_file</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">enable_json</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">enable_async</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">max_file_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">,</span>  <span class="c1"># 100MB</span>
+    <span class="n">backup_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set up comprehensive logging configuration.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        log_level: Minimum log level to capture</span>
+<span class="sd">        log_dir: Directory for log files (defaults to ./logs)</span>
+<span class="sd">        enable_console: Enable console logging</span>
+<span class="sd">        enable_file: Enable file logging</span>
+<span class="sd">        enable_json: Enable JSON formatting</span>
+<span class="sd">        enable_async: Enable asynchronous logging</span>
+<span class="sd">        max_file_size: Maximum size for log files before rotation</span>
+<span class="sd">        backup_count: Number of backup files to keep</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dictionary of configured loggers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Set up log directory</span>
+    <span class="k">if</span> <span class="n">log_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">log_dir</span> <span class="o">=</span> <span class="s2">&quot;./logs&quot;</span>
+
+    <span class="n">log_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">log_dir</span><span class="p">)</span>
+    <span class="n">log_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># Configure root logger</span>
+    <span class="n">root_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+
+    <span class="c1"># Clear existing handlers</span>
+    <span class="n">root_logger</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+    <span class="c1"># Create formatters</span>
+    <span class="k">if</span> <span class="n">enable_json</span><span class="p">:</span>
+        <span class="n">console_formatter</span> <span class="o">=</span> <span class="n">StructuredFormatter</span><span class="p">()</span>
+        <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">StructuredFormatter</span><span class="p">()</span>
+        <span class="n">security_formatter</span> <span class="o">=</span> <span class="n">SecurityAuditFormatter</span><span class="p">()</span>
+        <span class="n">therapeutic_formatter</span> <span class="o">=</span> <span class="n">TherapeuticAuditFormatter</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">console_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> - </span><span class="si">%(name)s</span><span class="s2"> - </span><span class="si">%(levelname)s</span><span class="s2"> - </span><span class="si">%(message)s</span><span class="s2">&quot;</span>
+        <span class="n">console_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">console_format</span><span class="p">)</span>
+        <span class="n">file_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">console_format</span><span class="p">)</span>
+        <span class="n">security_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">console_format</span><span class="p">)</span>
+        <span class="n">therapeutic_formatter</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">Formatter</span><span class="p">(</span><span class="n">console_format</span><span class="p">)</span>
+
+    <span class="n">handlers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Console handler</span>
+    <span class="k">if</span> <span class="n">enable_console</span><span class="p">:</span>
+        <span class="n">console_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">console_formatter</span><span class="p">)</span>
+        <span class="n">console_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+
+        <span class="k">if</span> <span class="n">enable_async</span><span class="p">:</span>
+            <span class="n">console_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+
+        <span class="n">handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">console_handler</span><span class="p">)</span>
+
+    <span class="c1"># File handlers</span>
+    <span class="k">if</span> <span class="n">enable_file</span><span class="p">:</span>
+        <span class="c1"># Main application log</span>
+        <span class="n">app_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+            <span class="n">log_path</span> <span class="o">/</span> <span class="s2">&quot;application.log&quot;</span><span class="p">,</span>
+            <span class="n">maxBytes</span><span class="o">=</span><span class="n">max_file_size</span><span class="p">,</span>
+            <span class="n">backupCount</span><span class="o">=</span><span class="n">backup_count</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">app_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+        <span class="n">app_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+
+        <span class="c1"># Error log</span>
+        <span class="n">error_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+            <span class="n">log_path</span> <span class="o">/</span> <span class="s2">&quot;error.log&quot;</span><span class="p">,</span> <span class="n">maxBytes</span><span class="o">=</span><span class="n">max_file_size</span><span class="p">,</span> <span class="n">backupCount</span><span class="o">=</span><span class="n">backup_count</span>
+        <span class="p">)</span>
+        <span class="n">error_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+        <span class="n">error_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+
+        <span class="c1"># Security audit log</span>
+        <span class="n">security_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+            <span class="n">log_path</span> <span class="o">/</span> <span class="s2">&quot;security_audit.log&quot;</span><span class="p">,</span>
+            <span class="n">maxBytes</span><span class="o">=</span><span class="n">max_file_size</span><span class="p">,</span>
+            <span class="n">backupCount</span><span class="o">=</span><span class="n">backup_count</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">security_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">security_formatter</span><span class="p">)</span>
+        <span class="n">security_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="c1"># Therapeutic audit log</span>
+        <span class="n">therapeutic_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+            <span class="n">log_path</span> <span class="o">/</span> <span class="s2">&quot;therapeutic_audit.log&quot;</span><span class="p">,</span>
+            <span class="n">maxBytes</span><span class="o">=</span><span class="n">max_file_size</span><span class="p">,</span>
+            <span class="n">backupCount</span><span class="o">=</span><span class="n">backup_count</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">therapeutic_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">therapeutic_formatter</span><span class="p">)</span>
+        <span class="n">therapeutic_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="c1"># Performance log</span>
+        <span class="n">performance_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">handlers</span><span class="o">.</span><span class="n">RotatingFileHandler</span><span class="p">(</span>
+            <span class="n">log_path</span> <span class="o">/</span> <span class="s2">&quot;performance.log&quot;</span><span class="p">,</span>
+            <span class="n">maxBytes</span><span class="o">=</span><span class="n">max_file_size</span><span class="p">,</span>
+            <span class="n">backupCount</span><span class="o">=</span><span class="n">backup_count</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">performance_handler</span><span class="o">.</span><span class="n">setFormatter</span><span class="p">(</span><span class="n">file_formatter</span><span class="p">)</span>
+        <span class="n">performance_handler</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">enable_async</span><span class="p">:</span>
+            <span class="n">app_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">app_handler</span><span class="p">)</span>
+            <span class="n">error_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">error_handler</span><span class="p">)</span>
+            <span class="n">security_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">security_handler</span><span class="p">)</span>
+            <span class="n">therapeutic_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">therapeutic_handler</span><span class="p">)</span>
+            <span class="n">performance_handler</span> <span class="o">=</span> <span class="n">AsyncLogHandler</span><span class="p">(</span><span class="n">performance_handler</span><span class="p">)</span>
+
+        <span class="n">handlers</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">app_handler</span><span class="p">,</span> <span class="n">error_handler</span><span class="p">])</span>
+
+        <span class="c1"># Set up specialized loggers</span>
+        <span class="n">security_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;security&quot;</span><span class="p">)</span>
+        <span class="n">security_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">security_handler</span><span class="p">)</span>
+        <span class="n">security_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">therapeutic_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;therapeutic&quot;</span><span class="p">)</span>
+        <span class="n">therapeutic_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">therapeutic_handler</span><span class="p">)</span>
+        <span class="n">therapeutic_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">performance_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;performance&quot;</span><span class="p">)</span>
+        <span class="n">performance_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">performance_handler</span><span class="p">)</span>
+        <span class="n">performance_logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Add handlers to root logger</span>
+    <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="n">handlers</span><span class="p">:</span>
+        <span class="n">root_logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span>
+
+    <span class="c1"># Configure specific loggers</span>
+    <span class="n">loggers</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;root&quot;</span><span class="p">:</span> <span class="n">root_logger</span><span class="p">,</span>
+        <span class="s2">&quot;app&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;player_experience&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;security&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;security&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;therapeutic&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;therapeutic&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;performance&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;performance&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;database&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;database&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;cache&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;cache&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;api&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;api&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;websocket&quot;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;websocket&quot;</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Set appropriate levels</span>
+    <span class="k">for</span> <span class="n">logger</span> <span class="ow">in</span> <span class="n">loggers</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">logging</span><span class="p">,</span> <span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="n">loggers</span></div>
+
+
+
+<div class="viewcode-block" id="get_logger">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.get_logger">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_logger</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">LogContext</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StructuredLogger</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a structured logger instance.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        name: Logger name</span>
+<span class="sd">        context: Optional context information</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        StructuredLogger instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">StructuredLogger</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Context managers for request-scoped logging</span>
+
+
+<div class="viewcode-block" id="RequestLoggingContext">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.RequestLoggingContext">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestLoggingContext</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager for request-scoped logging.&quot;&quot;&quot;</span>
+
+    <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="RequestLoggingContext.__enter__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.RequestLoggingContext.__enter__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LogContext</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enter the context and return log context.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">LogContext</span><span class="p">(</span>
+            <span class="n">request_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">request_id</span><span class="p">,</span>
+            <span class="n">user_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span>
+            <span class="n">ip_address</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ip_address</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestLoggingContext.__exit__">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.RequestLoggingContext.__exit__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exit the context.&quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="with_request_logging">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.with_request_logging">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">with_request_logging</span><span class="p">(</span>
+    <span class="n">request_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ip_address</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Context manager for request-scoped logging.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">RequestLoggingContext</span><span class="p">(</span><span class="n">request_id</span><span class="p">,</span> <span class="n">user_id</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">,</span> <span class="n">ip_address</span><span class="p">)</span></div>
+
+
+
+<span class="c1"># Initialize default logging configuration</span>
+<span class="n">_logging_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<div class="viewcode-block" id="ensure_logging_initialized">
+<a class="viewcode-back" href="../../../../api/src.player_experience.monitoring.logging_config.html#src.player_experience.monitoring.ensure_logging_initialized">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ensure_logging_initialized</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Ensure logging is initialized with default configuration.&quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_logging_initialized</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_logging_initialized</span><span class="p">:</span>
+        <span class="n">setup_logging</span><span class="p">()</span>
+        <span class="n">_logging_initialized</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

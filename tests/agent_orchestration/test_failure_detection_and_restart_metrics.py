@@ -1,5 +1,6 @@
 import asyncio
 import os
+
 import pytest
 
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
@@ -9,20 +10,22 @@ from src.components.agent_orchestration_component import AgentOrchestrationCompo
 @pytest.mark.asyncio
 async def test_failure_detection_and_restart_metrics(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8612,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.monitoring.health_check_interval": 0.2,
-        "agent_orchestration.monitoring.failure_detection_enabled": True,
-        "agent_orchestration.monitoring.failure_detection_interval": 0.2,
-        "agent_orchestration.agents.auto_register": True,
-        "agent_orchestration.agents.heartbeat_ttl": 1.0,
-        "agent_orchestration.agents.heartbeat_interval": 0.2,
-        "agent_orchestration.agents.ipa.enabled": True,
-        "agent_orchestration.agents.wba.enabled": False,
-        "agent_orchestration.agents.nga.enabled": False,
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8612,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.monitoring.health_check_interval": 0.2,
+            "agent_orchestration.monitoring.failure_detection_enabled": True,
+            "agent_orchestration.monitoring.failure_detection_interval": 0.2,
+            "agent_orchestration.agents.auto_register": True,
+            "agent_orchestration.agents.heartbeat_ttl": 1.0,
+            "agent_orchestration.agents.heartbeat_interval": 0.2,
+            "agent_orchestration.agents.ipa.enabled": True,
+            "agent_orchestration.agents.wba.enabled": False,
+            "agent_orchestration.agents.nga.enabled": False,
+        }
+    )
     await comp.start()
     # Short wait to allow background tasks to run
     await asyncio.sleep(0.6)
@@ -47,4 +50,3 @@ async def test_failure_detection_and_restart_metrics(redis_client):
     assert "agent_orchestration_agents_fallbacks_total" in out
 
     await comp.stop()
-

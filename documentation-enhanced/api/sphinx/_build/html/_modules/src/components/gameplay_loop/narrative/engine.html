@@ -1,0 +1,694 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.narrative.engine &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.narrative.engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.narrative.engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Narrative Engine Core</span>
+
+<span class="sd">This module provides the main narrative engine that orchestrates all narrative</span>
+<span class="sd">components for therapeutic text adventures.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.database.neo4j_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">Neo4jGameplayManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.models.core</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GameplaySession</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.services.redis_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedisSessionManager</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">src.components.gameplay_loop.services.session_state</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SessionState</span><span class="p">,</span>
+    <span class="n">SessionStateType</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.events</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventBus</span><span class="p">,</span> <span class="n">EventType</span><span class="p">,</span> <span class="n">NarrativeEvent</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NarrativeMode">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeMode">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NarrativeMode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Narrative engine operating modes.&quot;&quot;&quot;</span>
+
+    <span class="n">GUIDED</span> <span class="o">=</span> <span class="s2">&quot;guided&quot;</span>  <span class="c1"># Structured, therapeutically focused</span>
+    <span class="n">EXPLORATORY</span> <span class="o">=</span> <span class="s2">&quot;exploratory&quot;</span>  <span class="c1"># Open-ended, user-driven</span>
+    <span class="n">CRISIS</span> <span class="o">=</span> <span class="s2">&quot;crisis&quot;</span>  <span class="c1"># Safety-focused with immediate support</span>
+    <span class="n">REFLECTION</span> <span class="o">=</span> <span class="s2">&quot;reflection&quot;</span>  <span class="c1"># Processing and integration focused</span>
+    <span class="n">ADAPTIVE</span> <span class="o">=</span> <span class="s2">&quot;adaptive&quot;</span>  <span class="c1"># AI-driven adaptation based on progress</span></div>
+
+
+
+<div class="viewcode-block" id="EngineState">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.EngineState">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EngineState</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Narrative engine states.&quot;&quot;&quot;</span>
+
+    <span class="n">INITIALIZING</span> <span class="o">=</span> <span class="s2">&quot;initializing&quot;</span>
+    <span class="n">READY</span> <span class="o">=</span> <span class="s2">&quot;ready&quot;</span>
+    <span class="n">RUNNING</span> <span class="o">=</span> <span class="s2">&quot;running&quot;</span>
+    <span class="n">PAUSED</span> <span class="o">=</span> <span class="s2">&quot;paused&quot;</span>
+    <span class="n">TRANSITIONING</span> <span class="o">=</span> <span class="s2">&quot;transitioning&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">SHUTDOWN</span> <span class="o">=</span> <span class="s2">&quot;shutdown&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="NarrativeEngineConfig">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngineConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NarrativeEngineConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for the narrative engine.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Core settings</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">NarrativeMode</span> <span class="o">=</span> <span class="n">NarrativeMode</span><span class="o">.</span><span class="n">GUIDED</span>
+    <span class="n">max_concurrent_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>
+    <span class="n">session_timeout</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Safety settings</span>
+    <span class="n">enable_safety_monitoring</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">crisis_intervention_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">safety_check_interval</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="c1"># Therapeutic settings</span>
+    <span class="n">enable_progress_tracking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">adaptation_sensitivity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.7</span>
+    <span class="n">therapeutic_alignment_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span>
+
+    <span class="c1"># Performance settings</span>
+    <span class="n">cache_scenes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">preload_choices</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">max_scene_history</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">50</span>
+
+    <span class="c1"># Event settings</span>
+    <span class="n">enable_event_logging</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">event_history_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span>
+
+    <span class="c1"># Integration settings</span>
+    <span class="n">redis_session_ttl</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">24</span><span class="p">)</span>
+    <span class="n">neo4j_query_timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span></div>
+
+
+
+<div class="viewcode-block" id="NarrativeEngine">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NarrativeEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main narrative engine orchestrator.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">NarrativeEngineConfig</span><span class="p">,</span>
+        <span class="n">session_manager</span><span class="p">:</span> <span class="n">RedisSessionManager</span><span class="p">,</span>
+        <span class="n">database_manager</span><span class="p">:</span> <span class="n">Neo4jGameplayManager</span><span class="p">,</span>
+        <span class="n">event_bus</span><span class="p">:</span> <span class="n">EventBus</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span> <span class="o">=</span> <span class="n">session_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">database_manager</span> <span class="o">=</span> <span class="n">database_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span> <span class="o">=</span> <span class="n">event_bus</span> <span class="ow">or</span> <span class="n">event_bus</span>
+
+        <span class="c1"># Engine state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">INITIALIZING</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SessionState</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_locks</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Component managers (will be initialized)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene_manager</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">choice_processor</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">flow_controller</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;sessions_started&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;sessions_completed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;scenes_processed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;choices_made&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;safety_interventions&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_moments&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="NarrativeEngine.initialize">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.initialize">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the narrative engine.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Initializing narrative engine...&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Initialize component managers</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.choice_processor</span><span class="w"> </span><span class="kn">import</span> <span class="n">ChoiceProcessor</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.flow_controller</span><span class="w"> </span><span class="kn">import</span> <span class="n">FlowController</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.scene_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">SceneManager</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.therapeutic_integrator</span><span class="w"> </span><span class="kn">import</span> <span class="n">TherapeuticIntegrator</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">scene_manager</span> <span class="o">=</span> <span class="n">SceneManager</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">choice_processor</span> <span class="o">=</span> <span class="n">ChoiceProcessor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">flow_controller</span> <span class="o">=</span> <span class="n">FlowController</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span> <span class="o">=</span> <span class="n">TherapeuticIntegrator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+            <span class="c1"># Initialize components</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_manager</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_processor</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_controller</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+
+            <span class="c1"># Start background tasks</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_safety_monitoring</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_safety_monitoring_loop</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_loop</span><span class="p">())</span>
+
+            <span class="c1"># Subscribe to events</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_event_handlers</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">READY</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Narrative engine initialized successfully&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Publish initialization event</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">publish</span><span class="p">(</span>
+                <span class="n">NarrativeEvent</span><span class="p">(</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="n">EventType</span><span class="o">.</span><span class="n">NARRATIVE_STARTED</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                        <span class="s2">&quot;engine_state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">,</span>
+                    <span class="p">},</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initialize narrative engine: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">ERROR</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.shutdown">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.shutdown">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Shutdown the narrative engine.&quot;&quot;&quot;</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Shutting down narrative engine...&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">SHUTDOWN</span>
+
+        <span class="c1"># Cancel background tasks</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+
+        <span class="c1"># Wait for tasks to complete</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_monitoring_task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_task</span><span class="p">]</span> <span class="k">if</span> <span class="n">t</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tasks</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1"># Save all active sessions</span>
+        <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">session_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to save session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Narrative engine shutdown complete&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.start_session">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.start_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">:</span> <span class="n">GameplaySession</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start a new narrative session.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check capacity</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_concurrent_sessions</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Maximum concurrent sessions reached&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Create session state</span>
+            <span class="n">session_state</span> <span class="o">=</span> <span class="n">SessionState</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">state_type</span><span class="o">=</span><span class="n">SessionStateType</span><span class="o">.</span><span class="n">INITIALIZING</span><span class="p">,</span>
+                <span class="n">therapeutic_goals</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">therapeutic_goals</span><span class="p">,</span>
+                <span class="n">safety_level</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">safety_level</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Initialize session in Redis</span>
+            <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">create_session</span><span class="p">(</span>
+                <span class="n">session_state</span><span class="p">,</span> <span class="n">ttl</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">redis_session_ttl</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to create session in Redis: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="c1"># Add to active sessions</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_state</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session_locks</span><span class="p">[</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+            <span class="c1"># Initialize therapeutic context</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">initialize_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+            <span class="c1"># Transition to active state</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_session_state</span><span class="p">(</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="s2">&quot;Session started&quot;</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Start with initial scene</span>
+            <span class="n">initial_scene</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_controller</span><span class="o">.</span><span class="n">get_initial_scene</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">initial_scene</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enter_scene</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">initial_scene</span><span class="o">.</span><span class="n">scene_id</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;sessions_started&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Started narrative session: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to start session </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.end_session">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.end_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">end_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;End a narrative session.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session not found: </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="n">session_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+
+            <span class="c1"># Transition to completed state</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_session_state</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="p">,</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">COMPLETED</span><span class="p">,</span> <span class="n">reason</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Finalize therapeutic progress</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">finalize_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+            <span class="c1"># Save final state</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+            <span class="c1"># Remove from active sessions</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_locks</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;sessions_completed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Ended narrative session: </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to end session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.enter_scene">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.enter_scene">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">enter_scene</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scene_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enter a new scene in the narrative.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session not found: </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_locks</span><span class="p">[</span><span class="n">session_id</span><span class="p">]:</span>
+                <span class="n">session_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+
+                <span class="c1"># Validate scene transition</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">flow_controller</span><span class="o">.</span><span class="n">can_enter_scene</span><span class="p">(</span>
+                    <span class="n">session_state</span><span class="p">,</span> <span class="n">scene_id</span>
+                <span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Cannot enter scene </span><span class="si">{</span><span class="n">scene_id</span><span class="si">}</span><span class="s2"> for session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+                <span class="c1"># Load scene</span>
+                <span class="n">scene</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_manager</span><span class="o">.</span><span class="n">load_scene</span><span class="p">(</span><span class="n">scene_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">scene</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scene not found: </span><span class="si">{</span><span class="n">scene_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+                <span class="c1"># Safety check</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">validate_scene_safety</span><span class="p">(</span>
+                    <span class="n">session_state</span><span class="p">,</span> <span class="n">scene</span>
+                <span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scene </span><span class="si">{</span><span class="n">scene_id</span><span class="si">}</span><span class="s2"> failed safety validation&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="kc">False</span>
+
+                <span class="c1"># Monitor emotional safety for scene content</span>
+                <span class="n">scene_interaction_data</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">scene</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                    <span class="s2">&quot;scene_id&quot;</span><span class="p">:</span> <span class="n">scene_id</span><span class="p">,</span>
+                    <span class="s2">&quot;scene_type&quot;</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">scene</span><span class="o">.</span><span class="n">scene_type</span><span class="o">.</span><span class="n">value</span>
+                        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;scene_type&quot;</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="s2">&quot;narrative&quot;</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;interaction_type&quot;</span><span class="p">:</span> <span class="s2">&quot;scene_entry&quot;</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">monitor_emotional_safety</span><span class="p">(</span>
+                    <span class="n">session_state</span><span class="p">,</span> <span class="n">scene_interaction_data</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Enter scene</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene_manager</span><span class="o">.</span><span class="n">enter_scene</span><span class="p">(</span><span class="n">session_state</span><span class="p">,</span> <span class="n">scene</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">session_state</span><span class="o">.</span><span class="n">add_scene</span><span class="p">(</span><span class="n">scene_id</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;scenes_processed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">return</span> <span class="n">success</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to enter scene </span><span class="si">{</span><span class="n">scene_id</span><span class="si">}</span><span class="s2"> for session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.process_choice">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.process_choice">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_choice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">choice_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a user choice.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session not found: </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_locks</span><span class="p">[</span><span class="n">session_id</span><span class="p">]:</span>
+                <span class="n">session_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+
+                <span class="c1"># Load choice for emotional safety monitoring</span>
+                <span class="n">choice</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_processor</span><span class="o">.</span><span class="n">load_choice</span><span class="p">(</span><span class="n">choice_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">choice</span><span class="p">:</span>
+                    <span class="c1"># Monitor emotional safety for choice content</span>
+                    <span class="n">choice_interaction_data</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                        <span class="s2">&quot;choice_id&quot;</span><span class="p">:</span> <span class="n">choice_id</span><span class="p">,</span>
+                        <span class="s2">&quot;choice_type&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">choice_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                        <span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">therapeutic_relevance</span><span class="p">,</span>
+                        <span class="s2">&quot;emotional_weight&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">emotional_weight</span><span class="p">,</span>
+                        <span class="s2">&quot;interaction_type&quot;</span><span class="p">:</span> <span class="s2">&quot;choice_made&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;recent_choice&quot;</span><span class="p">:</span> <span class="n">choice</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                    <span class="p">}</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">monitor_emotional_safety</span><span class="p">(</span>
+                        <span class="n">session_state</span><span class="p">,</span> <span class="n">choice_interaction_data</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Process choice</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">choice_processor</span><span class="o">.</span><span class="n">process_choice</span><span class="p">(</span>
+                    <span class="n">session_state</span><span class="p">,</span> <span class="n">choice_id</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+                    <span class="n">session_state</span><span class="o">.</span><span class="n">add_choice</span><span class="p">(</span><span class="n">choice_id</span><span class="p">)</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;choices_made&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">return</span> <span class="n">success</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to process choice </span><span class="si">{</span><span class="n">choice_id</span><span class="si">}</span><span class="s2"> for session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.get_session_state">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.get_session_state">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_session_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SessionState</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get current session state.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+
+        <span class="c1"># Try to load from Redis</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">get_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.pause_session">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.pause_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">pause_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pause a narrative session.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_session_state</span><span class="p">(</span>
+            <span class="n">session_id</span><span class="p">,</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">PAUSED</span><span class="p">,</span> <span class="s2">&quot;User requested pause&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NarrativeEngine.resume_session">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.resume_session">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">resume_session</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resume a paused narrative session.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_transition_session_state</span><span class="p">(</span>
+            <span class="n">session_id</span><span class="p">,</span> <span class="n">SessionStateType</span><span class="o">.</span><span class="n">ACTIVE</span><span class="p">,</span> <span class="s2">&quot;User requested resume&quot;</span>
+        <span class="p">)</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_transition_session_state</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">new_state</span><span class="p">:</span> <span class="n">SessionStateType</span><span class="p">,</span> <span class="n">reason</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Transition session to new state.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">session_id</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+            <span class="n">session_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+            <span class="n">old_state</span> <span class="o">=</span> <span class="n">session_state</span><span class="o">.</span><span class="n">state_type</span>
+
+            <span class="c1"># Record state change</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">record_state_change</span><span class="p">(</span><span class="n">old_state</span><span class="p">,</span> <span class="n">new_state</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">state_type</span> <span class="o">=</span> <span class="n">new_state</span>
+
+            <span class="c1"># Update in Redis</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> transitioned from </span><span class="si">{</span><span class="n">old_state</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">new_state</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to transition session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> state: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_event_handlers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Setup event handlers for the engine.&quot;&quot;&quot;</span>
+        <span class="c1"># Safety event handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">SAFETY_CONCERN_DETECTED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_safety_concern</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">CRISIS_INTERVENTION_NEEDED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_crisis</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Progress event handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span><span class="n">EventType</span><span class="o">.</span><span class="n">MILESTONE_ACHIEVED</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_milestone</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">event_bus</span><span class="o">.</span><span class="n">subscribe</span><span class="p">(</span>
+            <span class="n">EventType</span><span class="o">.</span><span class="n">THERAPEUTIC_MOMENT</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_therapeutic_moment</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_safety_concern</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">NarrativeEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle safety concern events.&quot;&quot;&quot;</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">session_id</span>
+        <span class="k">if</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+            <span class="c1"># Pause session for safety review</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">pause_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;safety_interventions&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_crisis</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">NarrativeEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle crisis intervention events.&quot;&quot;&quot;</span>
+        <span class="n">session_id</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">session_id</span>
+        <span class="k">if</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">:</span>
+            <span class="c1"># Switch to crisis mode</span>
+            <span class="n">session_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">[</span><span class="n">session_id</span><span class="p">]</span>
+            <span class="n">session_state</span><span class="o">.</span><span class="n">safety_level</span> <span class="o">=</span> <span class="s2">&quot;crisis&quot;</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_manager</span><span class="o">.</span><span class="n">update_session</span><span class="p">(</span><span class="n">session_state</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_milestone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">NarrativeEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle milestone achievement events.&quot;&quot;&quot;</span>
+        <span class="c1"># Log milestone achievement</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Milestone achieved in session </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">event</span><span class="o">.</span><span class="n">data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_handle_therapeutic_moment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">:</span> <span class="n">NarrativeEvent</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle therapeutic moment events.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;therapeutic_moments&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_safety_monitoring_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background safety monitoring loop.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">EngineState</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">,</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">ERROR</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">session_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_integrator</span><span class="o">.</span><span class="n">monitor_session_safety</span><span class="p">(</span>
+                        <span class="n">session_state</span>
+                    <span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">safety_check_interval</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">())</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in safety monitoring loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># Wait before retrying</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background cleanup loop.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="n">EngineState</span><span class="o">.</span><span class="n">SHUTDOWN</span><span class="p">,</span> <span class="n">EngineState</span><span class="o">.</span><span class="n">ERROR</span><span class="p">]:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Clean up expired sessions</span>
+                <span class="n">expired_sessions</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">session_state</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">session_state</span><span class="o">.</span><span class="n">is_expired</span><span class="p">():</span>
+                        <span class="n">expired_sessions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">session_id</span><span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">session_id</span> <span class="ow">in</span> <span class="n">expired_sessions</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_session</span><span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="s2">&quot;expired&quot;</span><span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>  <span class="c1"># Run every 5 minutes</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">300</span><span class="p">)</span>
+
+<div class="viewcode-block" id="NarrativeEngine.get_metrics">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.narrative.engine.html#src.components.gameplay_loop.narrative.engine.NarrativeEngine.get_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get engine metrics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">metrics</span><span class="p">,</span>
+            <span class="s2">&quot;active_sessions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_sessions</span><span class="p">),</span>
+            <span class="s2">&quot;engine_state&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="s2">&quot;uptime&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+            <span class="o">-</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_start_time&quot;</span><span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

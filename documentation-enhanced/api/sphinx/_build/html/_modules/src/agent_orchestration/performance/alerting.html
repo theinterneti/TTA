@@ -1,0 +1,788 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.performance.alerting &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.performance.alerting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.performance.alerting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Response time alerting system with configurable thresholds and escalation.</span>
+
+<span class="sd">This module provides comprehensive alerting for response time violations,</span>
+<span class="sd">performance degradation, and SLA breaches with escalation workflows.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">deque</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.analytics</span><span class="w"> </span><span class="kn">import</span> <span class="n">BottleneckIdentification</span><span class="p">,</span> <span class="n">PerformanceTrend</span><span class="p">,</span> <span class="n">TrendDirection</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.response_time_monitor</span><span class="w"> </span><span class="kn">import</span> <span class="n">OperationType</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="AlertSeverity">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.AlertSeverity">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AlertSeverity</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alert severity levels.&quot;&quot;&quot;</span>
+
+    <span class="n">INFO</span> <span class="o">=</span> <span class="s2">&quot;info&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;warning&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">CRITICAL</span> <span class="o">=</span> <span class="s2">&quot;critical&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="AlertType">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.AlertType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AlertType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of performance alerts.&quot;&quot;&quot;</span>
+
+    <span class="n">RESPONSE_TIME_VIOLATION</span> <span class="o">=</span> <span class="s2">&quot;response_time_violation&quot;</span>
+    <span class="n">SLA_BREACH</span> <span class="o">=</span> <span class="s2">&quot;sla_breach&quot;</span>
+    <span class="n">PERFORMANCE_DEGRADATION</span> <span class="o">=</span> <span class="s2">&quot;performance_degradation&quot;</span>
+    <span class="n">BOTTLENECK_DETECTED</span> <span class="o">=</span> <span class="s2">&quot;bottleneck_detected&quot;</span>
+    <span class="n">TREND_ALERT</span> <span class="o">=</span> <span class="s2">&quot;trend_alert&quot;</span>
+    <span class="n">SYSTEM_OVERLOAD</span> <span class="o">=</span> <span class="s2">&quot;system_overload&quot;</span>
+    <span class="n">RECOVERY_NOTIFICATION</span> <span class="o">=</span> <span class="s2">&quot;recovery_notification&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="EscalationLevel">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.EscalationLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EscalationLevel</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Escalation levels for alerts.&quot;&quot;&quot;</span>
+
+    <span class="n">LEVEL_1</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># Initial alert</span>
+    <span class="n">LEVEL_2</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># First escalation</span>
+    <span class="n">LEVEL_3</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># Second escalation</span>
+    <span class="n">LEVEL_4</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># Critical escalation</span></div>
+
+
+
+<div class="viewcode-block" id="AlertThreshold">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.AlertThreshold">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AlertThreshold</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configurable alert threshold.&quot;&quot;&quot;</span>
+
+    <span class="n">operation_type</span><span class="p">:</span> <span class="n">OperationType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># None for global</span>
+    <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;response_time&quot;</span>
+    <span class="n">warning_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">error_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span>
+    <span class="n">critical_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span>
+    <span class="n">evaluation_window_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">min_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+
+<div class="viewcode-block" id="Alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.Alert">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Alert</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performance alert.&quot;&quot;&quot;</span>
+
+    <span class="n">alert_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">alert_type</span><span class="p">:</span> <span class="n">AlertType</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">AlertSeverity</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">operation_type</span><span class="p">:</span> <span class="n">OperationType</span> <span class="o">|</span> <span class="kc">None</span>
+    <span class="n">metric_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">threshold_value</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">timestamp</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Escalation tracking</span>
+    <span class="n">escalation_level</span><span class="p">:</span> <span class="n">EscalationLevel</span> <span class="o">=</span> <span class="n">EscalationLevel</span><span class="o">.</span><span class="n">LEVEL_1</span>
+    <span class="n">escalation_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">last_escalation_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="n">acknowledged</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">resolved</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">resolution_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="EscalationRule">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.EscalationRule">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EscalationRule</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Alert escalation rule.&quot;&quot;&quot;</span>
+
+    <span class="n">alert_type</span><span class="p">:</span> <span class="n">AlertType</span>
+    <span class="n">severity</span><span class="p">:</span> <span class="n">AlertSeverity</span>
+    <span class="n">escalation_delay_minutes</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">max_escalations</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">escalation_targets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># Target identifiers</span>
+    <span class="n">auto_resolve_minutes</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+
+
+<div class="viewcode-block" id="PerformanceAlerting">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PerformanceAlerting</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive performance alerting system.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">default_thresholds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AlertThreshold</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">escalation_rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EscalationRule</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Alert configuration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AlertThreshold</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">default_thresholds</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_default_thresholds</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_rules</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="n">EscalationRule</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">escalation_rules</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">escalation_rules</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">alert_type</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">severity</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">escalation_rules</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_default_escalation_rules</span><span class="p">()</span>
+
+        <span class="c1"># Alert state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Alert</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_history</span><span class="p">:</span> <span class="n">deque</span><span class="p">[</span><span class="n">Alert</span><span class="p">]</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">maxlen</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">suppressed_alerts</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Alert IDs to suppress</span>
+
+        <span class="c1"># Alert handlers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_handlers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_handlers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># target -&gt; handler</span>
+
+        <span class="c1"># Background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Alert statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">AlertType</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_counts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EscalationLevel</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PerformanceAlerting initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PerformanceAlerting.start">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.start">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start the alerting system.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># Start background tasks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_escalation_loop</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_loop</span><span class="p">())</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PerformanceAlerting started&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.stop">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.stop">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stop the alerting system.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Cancel background tasks</span>
+        <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">escalation_task</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleanup_task</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">task</span><span class="p">:</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">task</span>
+                <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;PerformanceAlerting stopped&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.evaluate_thresholds">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.evaluate_thresholds">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">evaluate_thresholds</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_type</span><span class="p">:</span> <span class="n">OperationType</span><span class="p">,</span>
+        <span class="n">metric_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;response_time&quot;</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Alert</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate metric against thresholds and generate alert if needed.&quot;&quot;&quot;</span>
+        <span class="c1"># Find applicable threshold</span>
+        <span class="n">threshold</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_threshold</span><span class="p">(</span><span class="n">operation_type</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">threshold</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">threshold</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Determine severity</span>
+        <span class="n">severity</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">threshold_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="n">metric_value</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">critical_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">CRITICAL</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">critical_threshold</span>
+        <span class="k">elif</span> <span class="n">metric_value</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">error_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">ERROR</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">error_threshold</span>
+        <span class="k">elif</span> <span class="n">metric_value</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">warning_threshold</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">WARNING</span>
+            <span class="n">threshold_value</span> <span class="o">=</span> <span class="n">threshold</span><span class="o">.</span><span class="n">warning_threshold</span>
+
+        <span class="k">if</span> <span class="n">severity</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Create alert</span>
+        <span class="n">alert_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">AlertType</span><span class="o">.</span><span class="n">RESPONSE_TIME_VIOLATION</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">alert</span> <span class="o">=</span> <span class="n">Alert</span><span class="p">(</span>
+            <span class="n">alert_id</span><span class="o">=</span><span class="n">alert_id</span><span class="p">,</span>
+            <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">RESPONSE_TIME_VIOLATION</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Response Time Violation - </span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> response time (</span><span class="si">{</span><span class="n">metric_value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s) exceeded </span><span class="si">{</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> threshold (</span><span class="si">{</span><span class="n">threshold_value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="n">metric_value</span><span class="o">=</span><span class="n">metric_value</span><span class="p">,</span>
+            <span class="n">threshold_value</span><span class="o">=</span><span class="n">threshold_value</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alert</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.create_sla_breach_alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.create_sla_breach_alert">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_sla_breach_alert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">operation_type</span><span class="p">:</span> <span class="n">OperationType</span><span class="p">,</span>
+        <span class="n">p95_duration</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">sla_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Alert</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create SLA breach alert.&quot;&quot;&quot;</span>
+        <span class="n">alert_id</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">AlertType</span><span class="o">.</span><span class="n">SLA_BREACH</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="n">alert</span> <span class="o">=</span> <span class="n">Alert</span><span class="p">(</span>
+            <span class="n">alert_id</span><span class="o">=</span><span class="n">alert_id</span><span class="p">,</span>
+            <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">SLA_BREACH</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">AlertSeverity</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SLA Breach - </span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> P95 response time (</span><span class="si">{</span><span class="n">p95_duration</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s) breached SLA threshold (</span><span class="si">{</span><span class="n">sla_threshold</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="n">metric_value</span><span class="o">=</span><span class="n">p95_duration</span><span class="p">,</span>
+            <span class="n">threshold_value</span><span class="o">=</span><span class="n">sla_threshold</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alert</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.create_bottleneck_alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.create_bottleneck_alert">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_bottleneck_alert</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">bottleneck</span><span class="p">:</span> <span class="n">BottleneckIdentification</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Alert</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create bottleneck detection alert.&quot;&quot;&quot;</span>
+        <span class="n">alert_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">AlertType</span><span class="o">.</span><span class="n">BOTTLENECK_DETECTED</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">bottleneck</span><span class="o">.</span><span class="n">bottleneck_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Determine severity based on bottleneck severity</span>
+        <span class="k">if</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">severity</span> <span class="o">&gt;=</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">CRITICAL</span>
+        <span class="k">elif</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">severity</span> <span class="o">&gt;=</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="k">elif</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">severity</span> <span class="o">&gt;=</span> <span class="mf">0.3</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">WARNING</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">INFO</span>
+
+        <span class="n">alert</span> <span class="o">=</span> <span class="n">Alert</span><span class="p">(</span>
+            <span class="n">alert_id</span><span class="o">=</span><span class="n">alert_id</span><span class="p">,</span>
+            <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">BOTTLENECK_DETECTED</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Performance Bottleneck Detected - </span><span class="si">{</span><span class="n">bottleneck</span><span class="o">.</span><span class="n">bottleneck_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">bottleneck</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">bottleneck</span><span class="o">.</span><span class="n">affected_operations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">affected_operations</span>
+                <span class="k">else</span> <span class="kc">None</span>
+            <span class="p">),</span>
+            <span class="n">metric_value</span><span class="o">=</span><span class="n">bottleneck</span><span class="o">.</span><span class="n">severity</span><span class="p">,</span>
+            <span class="n">threshold_value</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>  <span class="c1"># Minimum severity for alerting</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;bottleneck_type&quot;</span><span class="p">:</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">bottleneck_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;affected_operations&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="n">op</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">op</span> <span class="ow">in</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">affected_operations</span>
+                <span class="p">],</span>
+                <span class="s2">&quot;evidence&quot;</span><span class="p">:</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">evidence</span><span class="p">,</span>
+                <span class="s2">&quot;recommendations&quot;</span><span class="p">:</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">recommendations</span><span class="p">,</span>
+                <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">bottleneck</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alert</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.create_trend_alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.create_trend_alert">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_trend_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trend</span><span class="p">:</span> <span class="n">PerformanceTrend</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Alert</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create trend-based alert.&quot;&quot;&quot;</span>
+        <span class="c1"># Only alert on degrading trends with high confidence</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">trend</span><span class="o">.</span><span class="n">trend_direction</span> <span class="o">!=</span> <span class="n">TrendDirection</span><span class="o">.</span><span class="n">DEGRADING</span>
+            <span class="ow">or</span> <span class="n">trend</span><span class="o">.</span><span class="n">confidence</span> <span class="o">&lt;</span> <span class="mf">0.7</span>
+            <span class="ow">or</span> <span class="n">trend</span><span class="o">.</span><span class="n">trend_strength</span> <span class="o">&lt;</span> <span class="mf">0.5</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">alert_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">AlertType</span><span class="o">.</span><span class="n">TREND_ALERT</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">trend</span><span class="o">.</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># Determine severity based on predicted performance</span>
+        <span class="k">if</span> <span class="n">trend</span><span class="o">.</span><span class="n">predicted_performance</span> <span class="o">&gt;</span> <span class="mf">5.0</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">CRITICAL</span>
+        <span class="k">elif</span> <span class="n">trend</span><span class="o">.</span><span class="n">predicted_performance</span> <span class="o">&gt;</span> <span class="mf">2.0</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">AlertSeverity</span><span class="o">.</span><span class="n">WARNING</span>
+
+        <span class="n">alert</span> <span class="o">=</span> <span class="n">Alert</span><span class="p">(</span>
+            <span class="n">alert_id</span><span class="o">=</span><span class="n">alert_id</span><span class="p">,</span>
+            <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">TREND_ALERT</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">severity</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Performance Degradation Trend - </span><span class="si">{</span><span class="n">trend</span><span class="o">.</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">trend</span><span class="o">.</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> showing degrading performance trend. Predicted performance: </span><span class="si">{</span><span class="n">trend</span><span class="o">.</span><span class="n">predicted_performance</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="n">trend</span><span class="o">.</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="n">metric_value</span><span class="o">=</span><span class="n">trend</span><span class="o">.</span><span class="n">current_performance</span><span class="p">,</span>
+            <span class="n">threshold_value</span><span class="o">=</span><span class="n">trend</span><span class="o">.</span><span class="n">predicted_performance</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;trend_direction&quot;</span><span class="p">:</span> <span class="n">trend</span><span class="o">.</span><span class="n">trend_direction</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;trend_strength&quot;</span><span class="p">:</span> <span class="n">trend</span><span class="o">.</span><span class="n">trend_strength</span><span class="p">,</span>
+                <span class="s2">&quot;time_horizon_minutes&quot;</span><span class="p">:</span> <span class="n">trend</span><span class="o">.</span><span class="n">time_horizon_minutes</span><span class="p">,</span>
+                <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">trend</span><span class="o">.</span><span class="n">confidence</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alert</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.create_recovery_notification">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.create_recovery_notification">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create_recovery_notification</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">original_alert_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">current_metric_value</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Alert</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create recovery notification for resolved performance issue.&quot;&quot;&quot;</span>
+        <span class="c1"># Find original alert</span>
+        <span class="n">original_alert</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alert_history</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">alert</span><span class="o">.</span><span class="n">alert_id</span> <span class="o">==</span> <span class="n">original_alert_id</span><span class="p">:</span>
+                <span class="n">original_alert</span> <span class="o">=</span> <span class="n">alert</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">original_alert</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">alert_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">AlertType</span><span class="o">.</span><span class="n">RECOVERY_NOTIFICATION</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">original_alert_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">alert</span> <span class="o">=</span> <span class="n">Alert</span><span class="p">(</span>
+            <span class="n">alert_id</span><span class="o">=</span><span class="n">alert_id</span><span class="p">,</span>
+            <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">RECOVERY_NOTIFICATION</span><span class="p">,</span>
+            <span class="n">severity</span><span class="o">=</span><span class="n">AlertSeverity</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+            <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Performance Recovery - </span><span class="si">{</span><span class="n">original_alert</span><span class="o">.</span><span class="n">operation_type</span><span class="o">.</span><span class="n">value</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">original_alert</span><span class="o">.</span><span class="n">operation_type</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;System&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Performance has recovered. Current metric: </span><span class="si">{</span><span class="n">current_metric_value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s (was </span><span class="si">{</span><span class="n">original_alert</span><span class="o">.</span><span class="n">metric_value</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">,</span>
+            <span class="n">operation_type</span><span class="o">=</span><span class="n">original_alert</span><span class="o">.</span><span class="n">operation_type</span><span class="p">,</span>
+            <span class="n">metric_value</span><span class="o">=</span><span class="n">current_metric_value</span><span class="p">,</span>
+            <span class="n">threshold_value</span><span class="o">=</span><span class="n">original_alert</span><span class="o">.</span><span class="n">threshold_value</span><span class="p">,</span>
+            <span class="n">timestamp</span><span class="o">=</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;original_alert_id&quot;</span><span class="p">:</span> <span class="n">original_alert_id</span><span class="p">,</span>
+                <span class="s2">&quot;recovery_time_minutes&quot;</span><span class="p">:</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">original_alert</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span><span class="p">,</span>
+                <span class="o">**</span><span class="p">(</span><span class="n">metadata</span> <span class="ow">or</span> <span class="p">{}),</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">alert</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alert</span><span class="p">:</span> <span class="n">Alert</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a new alert.&quot;&quot;&quot;</span>
+        <span class="c1"># Check if alert should be suppressed</span>
+        <span class="k">if</span> <span class="n">alert</span><span class="o">.</span><span class="n">alert_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">suppressed_alerts</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Add to active alerts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">[</span><span class="n">alert</span><span class="o">.</span><span class="n">alert_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">alert</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+
+        <span class="c1"># Update statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_counts</span><span class="p">[</span><span class="n">alert</span><span class="o">.</span><span class="n">alert_type</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Send to handlers</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_alert</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Alert generated: </span><span class="si">{</span><span class="n">alert</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> (Severity: </span><span class="si">{</span><span class="n">alert</span><span class="o">.</span><span class="n">severity</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_send_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alert</span><span class="p">:</span> <span class="n">Alert</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send alert to all registered handlers.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">alert_handlers</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">alert</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alert handler failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_escalation_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task for alert escalation.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+                <span class="k">for</span> <span class="n">alert</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">alert</span><span class="o">.</span><span class="n">acknowledged</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">alert</span><span class="o">.</span><span class="n">resolved</span><span class="p">:</span>
+                        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_escalation</span><span class="p">(</span><span class="n">alert</span><span class="p">,</span> <span class="n">current_time</span><span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># Check every minute</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in escalation loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_check_escalation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alert</span><span class="p">:</span> <span class="n">Alert</span><span class="p">,</span> <span class="n">current_time</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if alert needs escalation.&quot;&quot;&quot;</span>
+        <span class="n">escalation_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">alert</span><span class="o">.</span><span class="n">alert_type</span><span class="p">,</span> <span class="n">alert</span><span class="o">.</span><span class="n">severity</span><span class="p">)</span>
+        <span class="n">escalation_rule</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalation_rules</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">escalation_key</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">escalation_rule</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check if enough time has passed for escalation</span>
+        <span class="n">time_since_last</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="p">(</span><span class="n">alert</span><span class="o">.</span><span class="n">last_escalation_time</span> <span class="ow">or</span> <span class="n">alert</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time_since_last</span> <span class="o">&lt;</span> <span class="n">escalation_rule</span><span class="o">.</span><span class="n">escalation_delay_minutes</span> <span class="o">*</span> <span class="mi">60</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check if we&#39;ve reached max escalations</span>
+        <span class="k">if</span> <span class="n">alert</span><span class="o">.</span><span class="n">escalation_count</span> <span class="o">&gt;=</span> <span class="n">escalation_rule</span><span class="o">.</span><span class="n">max_escalations</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Escalate</span>
+        <span class="n">alert</span><span class="o">.</span><span class="n">escalation_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">alert</span><span class="o">.</span><span class="n">escalation_level</span> <span class="o">=</span> <span class="n">EscalationLevel</span><span class="p">(</span>
+            <span class="nb">min</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">alert</span><span class="o">.</span><span class="n">escalation_level</span><span class="o">.</span><span class="n">value</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">alert</span><span class="o">.</span><span class="n">last_escalation_time</span> <span class="o">=</span> <span class="n">current_time</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_counts</span><span class="p">[</span><span class="n">alert</span><span class="o">.</span><span class="n">escalation_level</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Send escalation notifications</span>
+        <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_send_escalation</span><span class="p">(</span><span class="n">alert</span><span class="p">,</span> <span class="n">escalation_rule</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Alert escalated: </span><span class="si">{</span><span class="n">alert</span><span class="o">.</span><span class="n">alert_id</span><span class="si">}</span><span class="s2"> to level </span><span class="si">{</span><span class="n">alert</span><span class="o">.</span><span class="n">escalation_level</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_send_escalation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">alert</span><span class="p">:</span> <span class="n">Alert</span><span class="p">,</span> <span class="n">escalation_rule</span><span class="p">:</span> <span class="n">EscalationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Send escalation notifications.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">escalation_rule</span><span class="o">.</span><span class="n">escalation_targets</span><span class="p">:</span>
+            <span class="n">handler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">escalation_handlers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">handler</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">await</span> <span class="n">handler</span><span class="p">(</span><span class="n">alert</span><span class="p">,</span> <span class="n">escalation_rule</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Escalation handler failed for target </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_loop</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Background task for cleaning up old alerts.&quot;&quot;&quot;</span>
+        <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_running</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">cutoff_time</span> <span class="o">=</span> <span class="n">current_time</span> <span class="o">-</span> <span class="p">(</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">3600</span><span class="p">)</span>  <span class="c1"># 24 hours</span>
+
+                <span class="c1"># Remove old resolved alerts</span>
+                <span class="n">resolved_alerts</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">alert_id</span>
+                    <span class="k">for</span> <span class="n">alert_id</span><span class="p">,</span> <span class="n">alert</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">alert</span><span class="o">.</span><span class="n">resolved</span> <span class="ow">and</span> <span class="p">(</span><span class="n">alert</span><span class="o">.</span><span class="n">resolution_time</span> <span class="ow">or</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cutoff_time</span>
+                <span class="p">]</span>
+
+                <span class="k">for</span> <span class="n">alert_id</span> <span class="ow">in</span> <span class="n">resolved_alerts</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">alert_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>  <span class="c1"># Clean up every hour</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">CancelledError</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in cleanup loop: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">3600</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_threshold</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">operation_type</span><span class="p">:</span> <span class="n">OperationType</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">AlertThreshold</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find applicable threshold for operation type and metric.&quot;&quot;&quot;</span>
+        <span class="c1"># Look for specific threshold first</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">threshold</span><span class="o">.</span><span class="n">operation_type</span> <span class="o">==</span> <span class="n">operation_type</span>
+                <span class="ow">and</span> <span class="n">threshold</span><span class="o">.</span><span class="n">metric_name</span> <span class="o">==</span> <span class="n">metric_name</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">threshold</span>
+
+        <span class="c1"># Look for global threshold</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">threshold</span><span class="o">.</span><span class="n">operation_type</span> <span class="ow">is</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="n">threshold</span><span class="o">.</span><span class="n">metric_name</span> <span class="o">==</span> <span class="n">metric_name</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="n">threshold</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_default_thresholds</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">AlertThreshold</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get default alert thresholds.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Global response time thresholds</span>
+            <span class="n">AlertThreshold</span><span class="p">(</span>
+                <span class="n">operation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;response_time&quot;</span><span class="p">,</span>
+                <span class="n">warning_threshold</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                <span class="n">error_threshold</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                <span class="n">critical_threshold</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="c1"># Agent-specific thresholds</span>
+            <span class="n">AlertThreshold</span><span class="p">(</span>
+                <span class="n">operation_type</span><span class="o">=</span><span class="n">OperationType</span><span class="o">.</span><span class="n">AGENT_PROCESSING</span><span class="p">,</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;response_time&quot;</span><span class="p">,</span>
+                <span class="n">warning_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+                <span class="n">error_threshold</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                <span class="n">critical_threshold</span><span class="o">=</span><span class="mf">3.0</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="c1"># Workflow-specific thresholds</span>
+            <span class="n">AlertThreshold</span><span class="p">(</span>
+                <span class="n">operation_type</span><span class="o">=</span><span class="n">OperationType</span><span class="o">.</span><span class="n">WORKFLOW_EXECUTION</span><span class="p">,</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;response_time&quot;</span><span class="p">,</span>
+                <span class="n">warning_threshold</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+                <span class="n">error_threshold</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                <span class="n">critical_threshold</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_setup_default_escalation_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set up default escalation rules.&quot;&quot;&quot;</span>
+        <span class="n">default_rules</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">EscalationRule</span><span class="p">(</span>
+                <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">RESPONSE_TIME_VIOLATION</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">AlertSeverity</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span>
+                <span class="n">escalation_delay_minutes</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">max_escalations</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="n">escalation_targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ops_team&quot;</span><span class="p">,</span> <span class="s2">&quot;engineering_lead&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">EscalationRule</span><span class="p">(</span>
+                <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">SLA_BREACH</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">AlertSeverity</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+                <span class="n">escalation_delay_minutes</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">max_escalations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">escalation_targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;ops_team&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">EscalationRule</span><span class="p">(</span>
+                <span class="n">alert_type</span><span class="o">=</span><span class="n">AlertType</span><span class="o">.</span><span class="n">BOTTLENECK_DETECTED</span><span class="p">,</span>
+                <span class="n">severity</span><span class="o">=</span><span class="n">AlertSeverity</span><span class="o">.</span><span class="n">CRITICAL</span><span class="p">,</span>
+                <span class="n">escalation_delay_minutes</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                <span class="n">max_escalations</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">escalation_targets</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;engineering_team&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">default_rules</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">alert_type</span><span class="p">,</span> <span class="n">rule</span><span class="o">.</span><span class="n">severity</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">escalation_rules</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span>
+
+<div class="viewcode-block" id="PerformanceAlerting.add_alert_handler">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.add_alert_handler">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_alert_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add alert handler.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alert_handlers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">handler</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.add_escalation_handler">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.add_escalation_handler">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_escalation_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">handler</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add escalation handler for specific target.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">escalation_handlers</span><span class="p">[</span><span class="n">target</span><span class="p">]</span> <span class="o">=</span> <span class="n">handler</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.acknowledge_alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.acknowledge_alert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">acknowledge_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alert_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Acknowledge an alert.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">alert_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">[</span><span class="n">alert_id</span><span class="p">]</span><span class="o">.</span><span class="n">acknowledged</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alert </span><span class="si">{</span><span class="n">alert_id</span><span class="si">}</span><span class="s2"> acknowledged by </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.resolve_alert">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.resolve_alert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_alert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">alert_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;system&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve an alert.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">alert_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">:</span>
+            <span class="n">alert</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">[</span><span class="n">alert_id</span><span class="p">]</span>
+            <span class="n">alert</span><span class="o">.</span><span class="n">resolved</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">alert</span><span class="o">.</span><span class="n">resolution_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Alert </span><span class="si">{</span><span class="n">alert_id</span><span class="si">}</span><span class="s2"> resolved by </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="PerformanceAlerting.get_alert_statistics">
+<a class="viewcode-back" href="../../../../api/src.agent_orchestration.performance.alerting.html#src.agent_orchestration.performance.PerformanceAlerting.get_alert_statistics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_alert_statistics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get alerting statistics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;active_alerts&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">active_alerts</span><span class="p">),</span>
+            <span class="s2">&quot;total_alerts&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alert_history</span><span class="p">),</span>
+            <span class="s2">&quot;alerts_by_type&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">alert_counts</span><span class="p">),</span>
+            <span class="s2">&quot;escalations_by_level&quot;</span><span class="p">:</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">escalation_counts</span><span class="p">),</span>
+            <span class="s2">&quot;suppressed_alerts&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">suppressed_alerts</span><span class="p">),</span>
+            <span class="s2">&quot;configured_thresholds&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">thresholds</span><span class="p">),</span>
+            <span class="s2">&quot;escalation_rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">escalation_rules</span><span class="p">),</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

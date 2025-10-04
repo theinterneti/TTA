@@ -1,0 +1,1107 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>agent_orchestration.service &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">agent_orchestration.service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for agent_orchestration.service</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">AgentOrchestrationService - Main API for multi-agent coordination (Task 16.1).</span>
+
+<span class="sd">This service provides the primary interface for processing user input and coordinating</span>
+<span class="sd">agents through sophisticated workflows, integrating therapeutic safety validation,</span>
+<span class="sd">session context management, and tying together all orchestration components.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.agents</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.interfaces</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageCoordinator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AgentId</span><span class="p">,</span>
+    <span class="n">AgentType</span><span class="p">,</span>
+    <span class="n">OrchestrationRequest</span><span class="p">,</span>
+    <span class="n">OrchestrationResponse</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.state</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentContext</span><span class="p">,</span> <span class="n">SessionContext</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentStep</span><span class="p">,</span> <span class="n">ErrorHandlingStrategy</span><span class="p">,</span> <span class="n">WorkflowDefinition</span><span class="p">,</span> <span class="n">WorkflowType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.workflow_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">WorkflowManager</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Type aliases for clarity</span>
+<span class="n">WorkflowResult</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">OrchestrationResponse</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Base exception for AgentOrchestrationService errors.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticSafetyError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when therapeutic safety validation fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">WorkflowExecutionError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when workflow execution fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">SessionContextError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when session context management fails.&quot;&quot;&quot;</span>
+
+    <span class="k">pass</span>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">AgentOrchestrationService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Main orchestration service providing the primary API for multi-agent coordination.</span>
+
+<span class="sd">    This service serves as the central coordination layer for TTA&#39;s multi-agent architecture,</span>
+<span class="sd">    managing the World Builder Agent (WBA), Input Processor Agent (IPA), and Narrative</span>
+<span class="sd">    Generator Agent (NGA) through sophisticated workflow management.</span>
+
+<span class="sd">    Key Responsibilities:</span>
+<span class="sd">    - Route incoming requests to appropriate workflows</span>
+<span class="sd">    - Coordinate agent execution sequences</span>
+<span class="sd">    - Manage session state and context</span>
+<span class="sd">    - Ensure therapeutic safety validation</span>
+<span class="sd">    - Handle error recovery and fallback strategies</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workflow_manager</span><span class="p">:</span> <span class="n">WorkflowManager</span><span class="p">,</span>
+        <span class="n">message_coordinator</span><span class="p">:</span> <span class="n">MessageCoordinator</span><span class="p">,</span>
+        <span class="n">agent_registry</span><span class="p">:</span> <span class="n">AgentRegistry</span><span class="p">,</span>
+        <span class="n">therapeutic_validator</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">resource_manager</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimization_engine</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">neo4j_manager</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">crisis_intervention_manager</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">emergency_protocol_engine</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">human_oversight_escalation</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">safety_monitoring_dashboard</span><span class="p">:</span> <span class="n">Any</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the AgentOrchestrationService.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            workflow_manager: Manager for workflow registration and execution</span>
+<span class="sd">            message_coordinator: Coordinator for agent message passing</span>
+<span class="sd">            agent_registry: Registry for agent discovery and management</span>
+<span class="sd">            therapeutic_validator: Optional validator for therapeutic content safety</span>
+<span class="sd">            resource_manager: Optional manager for resource allocation and monitoring</span>
+<span class="sd">            optimization_engine: Optional engine for performance optimization</span>
+<span class="sd">            neo4j_manager: Optional manager for Neo4j state persistence</span>
+<span class="sd">            crisis_intervention_manager: Optional manager for crisis interventions</span>
+<span class="sd">            emergency_protocol_engine: Optional engine for emergency protocols</span>
+<span class="sd">            human_oversight_escalation: Optional system for human oversight escalation</span>
+<span class="sd">            safety_monitoring_dashboard: Optional dashboard for safety monitoring</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span> <span class="o">=</span> <span class="n">workflow_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">message_coordinator</span> <span class="o">=</span> <span class="n">message_coordinator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span> <span class="o">=</span> <span class="n">agent_registry</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span> <span class="o">=</span> <span class="n">therapeutic_validator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="o">=</span> <span class="n">resource_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimization_engine</span> <span class="o">=</span> <span class="n">optimization_engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">neo4j_manager</span> <span class="o">=</span> <span class="n">neo4j_manager</span>
+
+        <span class="c1"># Crisis intervention system components</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span> <span class="o">=</span> <span class="n">crisis_intervention_manager</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span> <span class="o">=</span> <span class="n">emergency_protocol_engine</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span> <span class="o">=</span> <span class="n">human_oversight_escalation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span> <span class="o">=</span> <span class="n">safety_monitoring_dashboard</span>
+
+        <span class="c1"># Service state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_session_contexts</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">SessionContext</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># session_id -&gt; workflow_run_id</span>
+
+        <span class="c1"># Performance metrics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_error_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_total_processing_time</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;AgentOrchestrationService initialized&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AgentOrchestrationService.initialize">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.initialize">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the service and register default workflows.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if initialization successful, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Register default workflows</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_register_default_workflows</span><span class="p">()</span>
+
+            <span class="c1"># Validate component availability</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_components</span><span class="p">()</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;AgentOrchestrationService initialization complete&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initialize AgentOrchestrationService: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.process_user_input">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.process_user_input">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_user_input</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">,</span>
+        <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrchestrationResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process user input through the multi-agent orchestration system.</span>
+
+<span class="sd">        This is the main entry point for processing user input. It handles therapeutic</span>
+<span class="sd">        safety validation, determines the appropriate workflow type, and coordinates</span>
+<span class="sd">        agent execution to generate a comprehensive response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_input: The user&#39;s input text to process</span>
+<span class="sd">            session_context: Current session context and state</span>
+<span class="sd">            workflow_type: Optional specific workflow type to use</span>
+<span class="sd">            metadata: Optional additional metadata for processing</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            OrchestrationResponse: Comprehensive response with generated content,</span>
+<span class="sd">                                 updated context, and workflow metadata</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TherapeuticSafetyError: If therapeutic safety validation fails</span>
+<span class="sd">            WorkflowExecutionError: If workflow execution fails</span>
+<span class="sd">            SessionContextError: If session context management fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="s2">&quot;Service not initialized. Call initialize() first.&quot;</span><span class="p">)</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_request_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Store/update session context</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session_contexts</span><span class="p">[</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session_context</span>
+
+            <span class="c1"># Perform therapeutic safety validation</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_therapeutic_safety</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="n">session_context</span><span class="p">)</span>
+
+            <span class="c1"># Determine workflow type if not specified</span>
+            <span class="k">if</span> <span class="n">workflow_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">workflow_type</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_workflow_type</span><span class="p">(</span>
+                    <span class="n">user_input</span><span class="p">,</span> <span class="n">session_context</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Create orchestration request</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">OrchestrationRequest</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">entrypoint</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span>
+                <span class="nb">input</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">user_input</span><span class="p">,</span>
+                    <span class="s2">&quot;session_context&quot;</span><span class="p">:</span> <span class="n">session_context</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+                    <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="n">metadata</span> <span class="ow">or</span> <span class="p">{},</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Execute workflow</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_workflow_with_context</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">session_context</span><span class="p">,</span> <span class="n">metadata</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Update session context with results</span>
+            <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_update_session_context</span><span class="p">(</span><span class="n">session_context</span><span class="p">,</span> <span class="n">response</span><span class="p">)</span>
+
+            <span class="c1"># Record performance metrics</span>
+            <span class="n">processing_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_total_processing_time</span> <span class="o">+=</span> <span class="n">processing_time</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Processed user input for session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;in </span><span class="si">{</span><span class="n">processing_time</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">s using </span><span class="si">{</span><span class="n">workflow_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> workflow&quot;</span>
+            <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_error_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing user input: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">e</span><span class="p">,</span> <span class="p">(</span><span class="n">TherapeuticSafetyError</span><span class="p">,</span> <span class="n">WorkflowExecutionError</span><span class="p">,</span> <span class="n">SessionContextError</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error during processing: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.coordinate_agents">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.coordinate_agents">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">coordinate_agents</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span><span class="p">,</span>
+        <span class="n">context</span><span class="p">:</span> <span class="n">AgentContext</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Coordinate agent execution for a specific workflow type.</span>
+
+<span class="sd">        This method handles the actual agent coordination, managing workflow execution</span>
+<span class="sd">        through the WorkflowManager, resource allocation, and agent communication.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            workflow_type: Type of workflow to execute</span>
+<span class="sd">            context: Agent context for workflow execution</span>
+<span class="sd">            metadata: Optional metadata for workflow execution</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            WorkflowResult: Tuple of (response, run_id, error) from workflow execution</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            WorkflowExecutionError: If workflow execution fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="s2">&quot;Service not initialized. Call initialize() first.&quot;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create orchestration request from context</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">OrchestrationRequest</span><span class="p">(</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">entrypoint</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span>
+                <span class="nb">input</span><span class="o">=</span><span class="n">context</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Get workflow name for the type</span>
+            <span class="n">workflow_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_workflow_name</span><span class="p">(</span><span class="n">workflow_type</span><span class="p">)</span>
+
+            <span class="c1"># Allocate resources if resource manager available</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_allocate_workflow_resources</span><span class="p">(</span><span class="n">workflow_type</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+
+            <span class="c1"># Execute workflow through WorkflowManager</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="o">.</span><span class="n">execute_workflow</span><span class="p">(</span>
+                <span class="n">workflow_name</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">metadata</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Workflow execution failed: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">WorkflowExecutionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Workflow execution failed: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Successfully coordinated agents for </span><span class="si">{</span><span class="n">workflow_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> workflow&quot;</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">error</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error coordinating agents: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">WorkflowExecutionError</span><span class="p">):</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorkflowExecutionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent coordination failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.get_therapeutic_safety_metrics">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.get_therapeutic_safety_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_therapeutic_safety_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get therapeutic safety metrics from the validator.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span><span class="p">,</span> <span class="s2">&quot;get_monitoring_metrics&quot;</span><span class="p">):</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span><span class="o">.</span><span class="n">get_monitoring_metrics</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Therapeutic validator does not support metrics&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;validator_available&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="p">}</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting therapeutic safety metrics: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.get_crisis_intervention_metrics">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.get_crisis_intervention_metrics">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_crisis_intervention_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get crisis intervention metrics from all crisis management components.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;crisis_manager&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;emergency_protocols&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;human_oversight&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;safety_dashboard&quot;</span><span class="p">:</span> <span class="p">{},</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;crisis_manager&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span><span class="o">.</span><span class="n">get_crisis_metrics</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;emergency_protocols&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span><span class="o">.</span><span class="n">get_protocol_metrics</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;human_oversight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span><span class="o">.</span><span class="n">get_escalation_metrics</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="p">:</span>
+                <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;safety_dashboard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="o">.</span><span class="n">get_real_time_status</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">metrics</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting crisis intervention metrics: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.get_crisis_dashboard">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.get_crisis_dashboard">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_crisis_dashboard</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get comprehensive crisis intervention dashboard.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="o">.</span><span class="n">get_crisis_dashboard</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Safety monitoring dashboard not available&quot;</span><span class="p">}</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error getting crisis dashboard: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.get_safety_report">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.get_safety_report">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_safety_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_range_hours</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">24</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate comprehensive safety report.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="o">.</span><span class="n">get_safety_report</span><span class="p">(</span>
+                    <span class="n">time_range_hours</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;Safety monitoring dashboard not available&quot;</span><span class="p">}</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error generating safety report: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.get_service_status">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.get_service_status">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_service_status</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get current service status and metrics.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict containing service status, metrics, and component health</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;initialized&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span><span class="p">,</span>
+            <span class="s2">&quot;active_sessions&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_contexts</span><span class="p">),</span>
+            <span class="s2">&quot;active_workflows&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">),</span>
+            <span class="s2">&quot;metrics&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;request_count&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_request_count</span><span class="p">,</span>
+                <span class="s2">&quot;error_count&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_count</span><span class="p">,</span>
+                <span class="s2">&quot;error_rate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_error_count</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_count</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+                <span class="s2">&quot;avg_processing_time&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_total_processing_time</span>
+                <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_request_count</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;components&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;workflow_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;message_coordinator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_coordinator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;agent_registry&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_validator&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;resource_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;optimization_engine&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimization_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;neo4j_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">neo4j_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_intervention_manager&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span>
+                <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;emergency_protocol_engine&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;human_oversight_escalation&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span>
+                <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;safety_monitoring_dashboard&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span>
+                <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="AgentOrchestrationService.shutdown">
+<a class="viewcode-back" href="../../index.html#agent_orchestration.AgentOrchestrationService.shutdown">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">shutdown</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Gracefully shutdown the service.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if shutdown successful, False otherwise</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Cancel active workflows</span>
+            <span class="k">for</span> <span class="n">session_id</span><span class="p">,</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cancelling active workflow </span><span class="si">{</span><span class="n">run_id</span><span class="si">}</span><span class="s2"> for session </span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+                <span class="c1"># Note: Actual cancellation would depend on WorkflowManager implementation</span>
+
+            <span class="c1"># Clear state</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session_contexts</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialized</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;AgentOrchestrationService shutdown complete&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during service shutdown: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="c1"># ============================================================================</span>
+    <span class="c1"># Private Helper Methods</span>
+    <span class="c1"># ============================================================================</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_register_default_workflows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register default workflows for common use cases.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Standard collaborative workflow (IPA -&gt; WBA -&gt; NGA)</span>
+            <span class="n">collaborative_workflow</span> <span class="o">=</span> <span class="n">WorkflowDefinition</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="o">=</span><span class="n">WorkflowType</span><span class="o">.</span><span class="n">COLLABORATIVE</span><span class="p">,</span>
+                <span class="n">agent_sequence</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;input_processing&quot;</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">10</span>
+                    <span class="p">),</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;world_building&quot;</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">15</span>
+                    <span class="p">),</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;narrative_generation&quot;</span><span class="p">,</span>
+                        <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">error_handling</span><span class="o">=</span><span class="n">ErrorHandlingStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="o">.</span><span class="n">register_workflow</span><span class="p">(</span>
+                <span class="s2">&quot;collaborative&quot;</span><span class="p">,</span> <span class="n">collaborative_workflow</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register collaborative workflow: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Input processing only workflow</span>
+            <span class="n">input_workflow</span> <span class="o">=</span> <span class="n">WorkflowDefinition</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="o">=</span><span class="n">WorkflowType</span><span class="o">.</span><span class="n">INPUT_PROCESSING</span><span class="p">,</span>
+                <span class="n">agent_sequence</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;input_processing&quot;</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">10</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">error_handling</span><span class="o">=</span><span class="n">ErrorHandlingStrategy</span><span class="o">.</span><span class="n">FAIL_FAST</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="o">.</span><span class="n">register_workflow</span><span class="p">(</span>
+                <span class="s2">&quot;input_processing&quot;</span><span class="p">,</span> <span class="n">input_workflow</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register input processing workflow: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># World building workflow</span>
+            <span class="n">world_building_workflow</span> <span class="o">=</span> <span class="n">WorkflowDefinition</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="o">=</span><span class="n">WorkflowType</span><span class="o">.</span><span class="n">WORLD_BUILDING</span><span class="p">,</span>
+                <span class="n">agent_sequence</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;world_building&quot;</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">15</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">error_handling</span><span class="o">=</span><span class="n">ErrorHandlingStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="o">.</span><span class="n">register_workflow</span><span class="p">(</span>
+                <span class="s2">&quot;world_building&quot;</span><span class="p">,</span> <span class="n">world_building_workflow</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register world building workflow: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Narrative generation workflow</span>
+            <span class="n">narrative_workflow</span> <span class="o">=</span> <span class="n">WorkflowDefinition</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="o">=</span><span class="n">WorkflowType</span><span class="o">.</span><span class="n">NARRATIVE_GENERATION</span><span class="p">,</span>
+                <span class="n">agent_sequence</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">AgentStep</span><span class="p">(</span>
+                        <span class="n">agent</span><span class="o">=</span><span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;narrative_generation&quot;</span><span class="p">,</span>
+                        <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                    <span class="p">),</span>
+                <span class="p">],</span>
+                <span class="n">error_handling</span><span class="o">=</span><span class="n">ErrorHandlingStrategy</span><span class="o">.</span><span class="n">RETRY</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">success</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="o">.</span><span class="n">register_workflow</span><span class="p">(</span>
+                <span class="s2">&quot;narrative_generation&quot;</span><span class="p">,</span> <span class="n">narrative_workflow</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">success</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to register narrative generation workflow: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Default workflows registered successfully&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error registering default workflows: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to register default workflows: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_validate_components</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate that required components are available and functional.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Check workflow manager</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">workflow_manager</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="s2">&quot;WorkflowManager is required but not provided&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Check message coordinator</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_coordinator</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="s2">&quot;MessageCoordinator is required but not provided&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Check agent registry</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="s2">&quot;AgentRegistry is required but not provided&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Validate agent availability</span>
+            <span class="n">required_agents</span> <span class="o">=</span> <span class="p">[</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">agent_type</span> <span class="ow">in</span> <span class="n">required_agents</span><span class="p">:</span>
+                <span class="n">agent_id</span> <span class="o">=</span> <span class="n">AgentId</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">agent_type</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+                <span class="n">agent</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">agent_registry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">agent_id</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">agent</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Agent </span><span class="si">{</span><span class="n">agent_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> not found in registry&quot;</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Component validation completed successfully&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Component validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Component validation failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_validate_therapeutic_safety</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate therapeutic safety of user input.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_input: User input to validate</span>
+<span class="sd">            session_context: Current session context</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TherapeuticSafetyError: If validation fails</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span><span class="p">:</span>
+                <span class="c1"># Use the therapeutic validator if available</span>
+                <span class="n">validation_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_therapeutic_validator</span><span class="p">(</span>
+                    <span class="n">user_input</span><span class="p">,</span> <span class="n">session_context</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;safe&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                    <span class="n">safety_level</span> <span class="o">=</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;level&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+                    <span class="n">reason</span> <span class="o">=</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reason&quot;</span><span class="p">,</span> <span class="s2">&quot;Safety validation failed&quot;</span><span class="p">)</span>
+                    <span class="n">crisis_detected</span> <span class="o">=</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;crisis_detected&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+                    <span class="n">escalation_recommended</span> <span class="o">=</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                        <span class="s2">&quot;escalation_recommended&quot;</span><span class="p">,</span> <span class="kc">False</span>
+                    <span class="p">)</span>
+                    <span class="n">alternative_content</span> <span class="o">=</span> <span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;alternative_content&quot;</span><span class="p">)</span>
+
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Therapeutic safety validation failed for session &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2"> (level: </span><span class="si">{</span><span class="n">safety_level</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="p">)</span>
+
+                    <span class="c1"># For blocked content or crisis situations, raise an error with alternative</span>
+                    <span class="k">if</span> <span class="n">safety_level</span> <span class="o">==</span> <span class="s2">&quot;blocked&quot;</span> <span class="ow">or</span> <span class="n">crisis_detected</span><span class="p">:</span>
+                        <span class="n">error_message</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Content blocked due to safety concerns: </span><span class="si">{</span><span class="n">reason</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">alternative_content</span><span class="p">:</span>
+                            <span class="n">error_message</span> <span class="o">+=</span> <span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">Suggested response: </span><span class="si">{</span><span class="n">alternative_content</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="p">)</span>
+
+                        <span class="k">raise</span> <span class="n">TherapeuticSafetyError</span><span class="p">(</span><span class="n">error_message</span><span class="p">)</span>
+
+                    <span class="c1"># For escalation cases, log but don&#39;t block (allow human oversight)</span>
+                    <span class="k">if</span> <span class="n">escalation_recommended</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Escalation recommended for session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;crisis_types=</span><span class="si">{</span><span class="n">validation_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;crisis_types&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[])</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Basic safety checks if no validator available</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basic_safety_checks</span><span class="p">(</span><span class="n">user_input</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">TherapeuticSafetyError</span><span class="p">:</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during therapeutic safety validation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Don&#39;t block processing for validation errors, but log them</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Proceeding with processing despite validation error&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_call_therapeutic_validator</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Call the enhanced therapeutic validator.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Import here to avoid circular imports</span>
+            <span class="kn">from</span><span class="w"> </span><span class="nn">.therapeutic_safety</span><span class="w"> </span><span class="kn">import</span> <span class="n">SafetyLevel</span><span class="p">,</span> <span class="n">TherapeuticValidator</span>
+
+            <span class="c1"># Use the provided validator or create a default one</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span><span class="p">,</span> <span class="s2">&quot;validate_text&quot;</span><span class="p">):</span>
+                <span class="n">validator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_validator</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Fallback to default validator</span>
+                <span class="n">validator</span> <span class="o">=</span> <span class="n">TherapeuticValidator</span><span class="p">()</span>
+
+            <span class="c1"># Prepare context for validation</span>
+            <span class="n">validation_context</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="n">session_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="s2">&quot;session_count&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;session_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;previous_violations&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;safety_violations&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="s2">&quot;therapeutic_session&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;previous_crisis_indicators&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+                    <span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">,</span> <span class="kc">False</span>
+                <span class="p">),</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Perform comprehensive validation</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">validator</span><span class="o">.</span><span class="n">validate_text</span><span class="p">(</span><span class="n">user_input</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">validation_context</span><span class="p">)</span>
+
+            <span class="c1"># Check if we should alert on this result</span>
+            <span class="n">should_alert</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">validator</span><span class="o">.</span><span class="n">should_alert</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="s2">&quot;should_alert&quot;</span><span class="p">)</span>
+                <span class="k">else</span> <span class="kc">False</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Convert to expected format</span>
+            <span class="n">validation_result</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;safe&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">level</span> <span class="o">==</span> <span class="n">SafetyLevel</span><span class="o">.</span><span class="n">SAFE</span><span class="p">,</span>
+                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">score</span><span class="p">,</span>
+                <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Therapeutic validation: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_detected&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">crisis_detected</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_types&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">ct</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">crisis_types</span><span class="p">],</span>
+                <span class="s2">&quot;escalation_recommended&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">escalation_recommended</span><span class="p">,</span>
+                <span class="s2">&quot;alternative_content&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">alternative_content</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_appropriateness&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">therapeutic_appropriateness</span><span class="p">,</span>
+                <span class="s2">&quot;monitoring_flags&quot;</span><span class="p">:</span> <span class="n">result</span><span class="o">.</span><span class="n">monitoring_flags</span><span class="p">,</span>
+                <span class="s2">&quot;should_alert&quot;</span><span class="p">:</span> <span class="n">should_alert</span><span class="p">,</span>
+                <span class="s2">&quot;findings_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">findings</span><span class="p">),</span>
+            <span class="p">}</span>
+
+            <span class="c1"># Log important events</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">crisis_detected</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Crisis detected in session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;types=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">crisis_types</span><span class="si">}</span><span class="s2">, escalation=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">escalation_recommended</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Initiate crisis intervention if crisis manager is available</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="c1"># Create session context for crisis assessment</span>
+                        <span class="n">crisis_context</span> <span class="o">=</span> <span class="p">{</span>
+                            <span class="s2">&quot;session_id&quot;</span><span class="p">:</span> <span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                            <span class="s2">&quot;user_id&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+                            <span class="s2">&quot;session_count&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+                                <span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;interaction_count&quot;</span><span class="p">,</span> <span class="mi">0</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;previous_violations&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span>
+                                <span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;safety_violations&quot;</span><span class="p">,</span> <span class="mi">0</span>
+                            <span class="p">),</span>
+                            <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">session_context</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">),</span>
+                        <span class="p">}</span>
+
+                        <span class="c1"># Assess crisis and initiate intervention</span>
+                        <span class="n">assessment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span><span class="o">.</span><span class="n">assess_crisis</span><span class="p">(</span>
+                            <span class="n">result</span><span class="p">,</span> <span class="n">crisis_context</span>
+                        <span class="p">)</span>
+                        <span class="n">intervention</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">crisis_intervention_manager</span><span class="o">.</span><span class="n">initiate_intervention</span><span class="p">(</span>
+                                <span class="n">assessment</span><span class="p">,</span>
+                                <span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                                <span class="n">crisis_context</span><span class="p">[</span><span class="s2">&quot;user_id&quot;</span><span class="p">],</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                        <span class="c1"># Handle escalation if required</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">assessment</span><span class="o">.</span><span class="n">escalation_required</span>
+                            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span>
+                        <span class="p">):</span>
+                            <span class="k">if</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_level</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span><span class="o">.</span><span class="n">escalate_to_emergency_services</span><span class="p">(</span>
+                                    <span class="n">intervention</span><span class="p">,</span> <span class="s2">&quot;mental_health&quot;</span>
+                                <span class="p">)</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">human_oversight_escalation</span><span class="o">.</span><span class="n">escalate_to_human</span><span class="p">(</span>
+                                    <span class="n">intervention</span><span class="p">,</span> <span class="s2">&quot;crisis_intervention&quot;</span>
+                                <span class="p">)</span>
+
+                        <span class="c1"># Execute emergency protocol if available</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span> <span class="ow">and</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_types</span><span class="p">:</span>
+                            <span class="k">for</span> <span class="n">crisis_type</span> <span class="ow">in</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_types</span><span class="p">:</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">emergency_protocol_engine</span><span class="o">.</span><span class="n">execute_protocol</span><span class="p">(</span>
+                                    <span class="n">crisis_type</span><span class="p">,</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_level</span><span class="p">,</span> <span class="n">crisis_context</span>
+                                <span class="p">)</span>
+
+                        <span class="c1"># Add alert to monitoring dashboard</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">safety_monitoring_dashboard</span><span class="o">.</span><span class="n">add_alert</span><span class="p">(</span>
+                                <span class="s2">&quot;crisis_intervention&quot;</span><span class="p">,</span>
+                                <span class="sa">f</span><span class="s2">&quot;Crisis intervention initiated for session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                                <span class="p">(</span>
+                                    <span class="s2">&quot;critical&quot;</span>
+                                    <span class="k">if</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_level</span><span class="o">.</span><span class="n">value</span> <span class="o">==</span> <span class="s2">&quot;critical&quot;</span>
+                                    <span class="k">else</span> <span class="s2">&quot;high&quot;</span>
+                                <span class="p">),</span>
+                                <span class="p">{</span>
+                                    <span class="s2">&quot;intervention_id&quot;</span><span class="p">:</span> <span class="n">intervention</span><span class="o">.</span><span class="n">intervention_id</span><span class="p">,</span>
+                                    <span class="s2">&quot;crisis_types&quot;</span><span class="p">:</span> <span class="p">[</span>
+                                        <span class="n">ct</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">ct</span> <span class="ow">in</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_types</span>
+                                    <span class="p">],</span>
+                                    <span class="s2">&quot;crisis_level&quot;</span><span class="p">:</span> <span class="n">assessment</span><span class="o">.</span><span class="n">crisis_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                <span class="p">},</span>
+                            <span class="p">)</span>
+
+                        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Crisis intervention system activated for session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+
+                    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to initiate crisis intervention: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">should_alert</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Therapeutic safety alert for session </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;level=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">level</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">, score=</span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">score</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">validation_result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Enhanced therapeutic validator call failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="s2">&quot;safe&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;unknown&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;reason&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Validation error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_detected&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;escalation_recommended&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_basic_safety_checks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Perform basic safety checks on user input.&quot;&quot;&quot;</span>
+        <span class="c1"># Basic keyword-based safety checks</span>
+        <span class="n">high_risk_keywords</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;suicide&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;kill myself&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;end it all&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;hurt myself&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;self-harm&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;cutting&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;overdose&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="n">user_input_lower</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">high_risk_keywords</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">user_input_lower</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;High-risk keyword detected: </span><span class="si">{</span><span class="n">keyword</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">TherapeuticSafetyError</span><span class="p">(</span>
+                    <span class="s2">&quot;Content contains potentially harmful language. &quot;</span>
+                    <span class="s2">&quot;Please contact a mental health professional if you&#39;re in crisis.&quot;</span>
+                <span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_determine_workflow_type</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">user_input</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">WorkflowType</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine the appropriate workflow type based on user input and context.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            user_input: User input to analyze</span>
+<span class="sd">            session_context: Current session context</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            WorkflowType: Determined workflow type</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Simple heuristics for workflow type determination</span>
+            <span class="c1"># In a production system, this could use ML models or more sophisticated analysis</span>
+
+            <span class="n">user_input_lower</span> <span class="o">=</span> <span class="n">user_input</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="c1"># Check for simple commands that only need input processing</span>
+            <span class="n">simple_commands</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;help&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;quit&quot;</span><span class="p">,</span> <span class="s2">&quot;exit&quot;</span><span class="p">,</span> <span class="s2">&quot;save&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">cmd</span> <span class="ow">in</span> <span class="n">user_input_lower</span> <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">simple_commands</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">WorkflowType</span><span class="o">.</span><span class="n">INPUT_PROCESSING</span>
+
+            <span class="c1"># Check for world-building focused inputs</span>
+            <span class="n">world_keywords</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="s2">&quot;look&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;examine&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;describe&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;where am i&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;surroundings&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">user_input_lower</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">world_keywords</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">WorkflowType</span><span class="o">.</span><span class="n">WORLD_BUILDING</span>
+
+            <span class="c1"># Check for narrative-focused inputs</span>
+            <span class="n">narrative_keywords</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tell me&quot;</span><span class="p">,</span> <span class="s2">&quot;story&quot;</span><span class="p">,</span> <span class="s2">&quot;what happens&quot;</span><span class="p">,</span> <span class="s2">&quot;continue&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">keyword</span> <span class="ow">in</span> <span class="n">user_input_lower</span> <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="n">narrative_keywords</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">WorkflowType</span><span class="o">.</span><span class="n">NARRATIVE_GENERATION</span>
+
+            <span class="c1"># Default to collaborative workflow for complex interactions</span>
+            <span class="k">return</span> <span class="n">WorkflowType</span><span class="o">.</span><span class="n">COLLABORATIVE</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error determining workflow type: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Default to collaborative workflow on error</span>
+            <span class="k">return</span> <span class="n">WorkflowType</span><span class="o">.</span><span class="n">COLLABORATIVE</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_workflow_with_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">OrchestrationRequest</span><span class="p">,</span>
+        <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">,</span>
+        <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OrchestrationResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Execute workflow with full context management.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            workflow_type: Type of workflow to execute</span>
+<span class="sd">            request: Orchestration request</span>
+<span class="sd">            session_context: Session context</span>
+<span class="sd">            metadata: Optional metadata</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            OrchestrationResponse: Workflow execution response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Create agent context from session context</span>
+            <span class="n">agent_context</span> <span class="o">=</span> <span class="n">AgentContext</span><span class="p">(</span>
+                <span class="n">user_id</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">user_id</span><span class="p">,</span>
+                <span class="n">session_id</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">memory</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">memory</span><span class="p">,</span>
+                <span class="n">world_state</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">world_state</span><span class="p">,</span>
+                <span class="n">metadata</span><span class="o">=</span><span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Execute workflow</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">coordinate_agents</span><span class="p">(</span>
+                <span class="n">workflow_type</span><span class="p">,</span> <span class="n">agent_context</span><span class="p">,</span> <span class="n">metadata</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">error</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">response</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorkflowExecutionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Workflow execution failed: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Track active workflow</span>
+            <span class="k">if</span> <span class="n">run_id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">run_id</span>
+
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error executing workflow with context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">WorkflowExecutionError</span><span class="p">):</span>
+                <span class="k">raise</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">WorkflowExecutionError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Workflow execution failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_update_session_context</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">,</span> <span class="n">response</span><span class="p">:</span> <span class="n">OrchestrationResponse</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Update session context with workflow response.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            session_context: Session context to update</span>
+<span class="sd">            response: Workflow response containing updates</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Update context with response data</span>
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">updated_context</span><span class="p">:</span>
+                <span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">memory</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">updated_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;memory&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="p">)</span>
+                <span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">world_state</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">updated_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_state&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="p">)</span>
+                <span class="n">session_context</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                    <span class="n">response</span><span class="o">.</span><span class="n">updated_context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metadata&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Persist to Neo4j if available</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">neo4j_manager</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_persist_session_context</span><span class="p">(</span><span class="n">session_context</span><span class="p">)</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updated session context for </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error updating session context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Don&#39;t raise error for context update failures</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_persist_session_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_context</span><span class="p">:</span> <span class="n">SessionContext</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Persist session context to Neo4j.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># This would integrate with the Neo4j manager</span>
+            <span class="c1"># For now, just log the action</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Persisting session context for </span><span class="si">{</span><span class="n">session_context</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error persisting session context: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_workflow_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get workflow name for a given workflow type.&quot;&quot;&quot;</span>
+        <span class="n">workflow_names</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">WorkflowType</span><span class="o">.</span><span class="n">COLLABORATIVE</span><span class="p">:</span> <span class="s2">&quot;collaborative&quot;</span><span class="p">,</span>
+            <span class="n">WorkflowType</span><span class="o">.</span><span class="n">INPUT_PROCESSING</span><span class="p">:</span> <span class="s2">&quot;input_processing&quot;</span><span class="p">,</span>
+            <span class="n">WorkflowType</span><span class="o">.</span><span class="n">WORLD_BUILDING</span><span class="p">:</span> <span class="s2">&quot;world_building&quot;</span><span class="p">,</span>
+            <span class="n">WorkflowType</span><span class="o">.</span><span class="n">NARRATIVE_GENERATION</span><span class="p">:</span> <span class="s2">&quot;narrative_generation&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">workflow_names</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">workflow_type</span><span class="p">,</span> <span class="s2">&quot;collaborative&quot;</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_allocate_workflow_resources</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">workflow_type</span><span class="p">:</span> <span class="n">WorkflowType</span><span class="p">,</span> <span class="n">context</span><span class="p">:</span> <span class="n">AgentContext</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Allocate resources for workflow execution.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">resource_manager</span><span class="p">:</span>
+                <span class="c1"># This would integrate with the resource manager</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Allocating resources for </span><span class="si">{</span><span class="n">workflow_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2"> workflow&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error allocating workflow resources: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+            <span class="c1"># Don&#39;t fail workflow execution for resource allocation errors</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

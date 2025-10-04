@@ -119,7 +119,7 @@ const Login: React.FC = () => {
             <h3 className="text-sm font-medium text-blue-900 mb-2">Demo Credentials</h3>
             <p className="text-xs text-blue-800">
               Username: demo_user<br />
-              Password: demo_password
+              Password: DemoPassword123!
             </p>
           </div>
         </div>

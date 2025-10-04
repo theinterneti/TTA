@@ -4,21 +4,24 @@ Progress tracking and analytics data models.
 
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Any, Tuple
-from .enums import TherapeuticApproach, ProgressMarkerType
+from typing import Any
 
+from .enums import TherapeuticApproach
 
 
 @dataclass
 class ProgressVizSeries:
     """Visualization-friendly time series for progress charts."""
-    time_buckets: List[str] = field(default_factory=list)
-    series: Dict[str, List[float]] = field(default_factory=dict)
-    meta: Dict[str, Any] = field(default_factory=dict)
+
+    time_buckets: list[str] = field(default_factory=list)
+    series: dict[str, list[float]] = field(default_factory=dict)
+    meta: dict[str, Any] = field(default_factory=dict)
+
 
 @dataclass
 class TherapeuticMetric:
     """Individual therapeutic effectiveness metric."""
+
     metric_name: str
     value: float
     unit: str
@@ -34,13 +37,14 @@ class TherapeuticMetric:
 @dataclass
 class ProgressHighlight:
     """Significant progress achievement or insight."""
+
     highlight_id: str
     title: str
     description: str
     highlight_type: str  # breakthrough, milestone, insight, skill_development
     achieved_at: datetime
-    related_character_id: Optional[str] = None
-    related_world_id: Optional[str] = None
+    related_character_id: str | None = None
+    related_world_id: str | None = None
     therapeutic_value: float = 0.0  # 0.0 to 1.0
     celebration_shown: bool = False
 
@@ -53,15 +57,18 @@ class ProgressHighlight:
 @dataclass
 class Milestone:
     """Therapeutic milestone with progress tracking."""
+
     milestone_id: str
     title: str
     description: str
-    target_date: Optional[datetime] = None
-    achieved_date: Optional[datetime] = None
+    target_date: datetime | None = None
+    achieved_date: datetime | None = None
     progress_percentage: float = 0.0
-    required_actions: List[str] = field(default_factory=list)
-    completed_actions: List[str] = field(default_factory=list)
-    therapeutic_approaches_involved: List[TherapeuticApproach] = field(default_factory=list)
+    required_actions: list[str] = field(default_factory=list)
+    completed_actions: list[str] = field(default_factory=list)
+    therapeutic_approaches_involved: list[TherapeuticApproach] = field(
+        default_factory=list
+    )
     reward_description: str = ""
     is_achieved: bool = False
 
@@ -82,7 +89,9 @@ class Milestone:
     def _update_progress(self) -> None:
         """Update progress percentage based on completed actions."""
         if self.required_actions:
-            self.progress_percentage = (len(self.completed_actions) / len(self.required_actions)) * 100.0
+            self.progress_percentage = (
+                len(self.completed_actions) / len(self.required_actions)
+            ) * 100.0
 
             if self.progress_percentage >= 100.0 and not self.is_achieved:
                 self.is_achieved = True
@@ -92,6 +101,7 @@ class Milestone:
 @dataclass
 class EngagementMetrics:
     """Player engagement and participation metrics."""
+
     total_sessions: int = 0
     total_time_minutes: int = 0
     average_session_length: float = 0.0
@@ -99,8 +109,8 @@ class EngagementMetrics:
     sessions_this_month: int = 0
     current_streak_days: int = 0
     longest_streak_days: int = 0
-    last_session_date: Optional[datetime] = None
-    preferred_session_times: List[str] = field(default_factory=list)  # hour ranges
+    last_session_date: datetime | None = None
+    preferred_session_times: list[str] = field(default_factory=list)  # hour ranges
     dropout_risk_score: float = 0.0  # 0.0 to 1.0, higher = more risk
 
     def __post_init__(self):
@@ -120,7 +130,9 @@ class EngagementMetrics:
             days_since_last = (datetime.now() - self.last_session_date).days
             if days_since_last <= 1:
                 self.current_streak_days += 1
-                self.longest_streak_days = max(self.longest_streak_days, self.current_streak_days)
+                self.longest_streak_days = max(
+                    self.longest_streak_days, self.current_streak_days
+                )
             else:
                 self.current_streak_days = 1
 
@@ -128,16 +140,19 @@ class EngagementMetrics:
 @dataclass
 class TherapeuticEffectivenessReport:
     """Report on therapeutic effectiveness for a player."""
+
     player_id: str
-    character_id: Optional[str] = None
-    report_period_start: datetime = field(default_factory=lambda: datetime.now() - timedelta(days=30))
+    character_id: str | None = None
+    report_period_start: datetime = field(
+        default_factory=lambda: datetime.now() - timedelta(days=30)
+    )
     report_period_end: datetime = field(default_factory=datetime.now)
 
     # Effectiveness metrics
     overall_effectiveness_score: float = 0.0  # 0.0 to 1.0
-    therapeutic_metrics: List[TherapeuticMetric] = field(default_factory=list)
-    most_effective_approaches: List[TherapeuticApproach] = field(default_factory=list)
-    least_effective_approaches: List[TherapeuticApproach] = field(default_factory=list)
+    therapeutic_metrics: list[TherapeuticMetric] = field(default_factory=list)
+    most_effective_approaches: list[TherapeuticApproach] = field(default_factory=list)
+    least_effective_approaches: list[TherapeuticApproach] = field(default_factory=list)
 
     # Progress indicators
     goals_achieved: int = 0
@@ -151,8 +166,8 @@ class TherapeuticEffectivenessReport:
     self_awareness_growth: float = 0.0  # -1.0 to 1.0
 
     # Recommendations
-    recommended_adjustments: List[str] = field(default_factory=list)
-    suggested_next_steps: List[str] = field(default_factory=list)
+    recommended_adjustments: list[str] = field(default_factory=list)
+    suggested_next_steps: list[str] = field(default_factory=list)
 
     generated_at: datetime = field(default_factory=datetime.now)
 
@@ -161,9 +176,11 @@ class TherapeuticEffectivenessReport:
         if not 0.0 <= self.overall_effectiveness_score <= 1.0:
             raise ValueError("Overall effectiveness score must be between 0.0 and 1.0")
 
-        for improvement in [self.emotional_regulation_improvement,
-                          self.coping_skills_development,
-                          self.self_awareness_growth]:
+        for improvement in [
+            self.emotional_regulation_improvement,
+            self.coping_skills_development,
+            self.self_awareness_growth,
+        ]:
             if not -1.0 <= improvement <= 1.0:
                 raise ValueError("Improvement scores must be between -1.0 and 1.0")
 
@@ -171,31 +188,32 @@ class TherapeuticEffectivenessReport:
 @dataclass
 class ProgressSummary:
     """Comprehensive progress summary for a player."""
+
     player_id: str
 
     # Basic statistics
     engagement_metrics: EngagementMetrics = field(default_factory=EngagementMetrics)
 
     # Progress tracking
-    milestones_achieved: List[Milestone] = field(default_factory=list)
-    active_milestones: List[Milestone] = field(default_factory=list)
-    recent_highlights: List[ProgressHighlight] = field(default_factory=list)
+    milestones_achieved: list[Milestone] = field(default_factory=list)
+    active_milestones: list[Milestone] = field(default_factory=list)
+    recent_highlights: list[ProgressHighlight] = field(default_factory=list)
 
     # Therapeutic insights
-    favorite_therapeutic_approach: Optional[TherapeuticApproach] = None
-    most_effective_world_type: Optional[str] = None
+    favorite_therapeutic_approach: TherapeuticApproach | None = None
+    most_effective_world_type: str | None = None
     therapeutic_momentum: float = 0.5  # 0.0 to 1.0
     readiness_for_advancement: float = 0.5  # 0.0 to 1.0
 
     # Trends and patterns
     progress_trend: str = "stable"  # improving, stable, declining
     engagement_trend: str = "stable"  # increasing, stable, decreasing
-    challenge_areas: List[str] = field(default_factory=list)
-    strength_areas: List[str] = field(default_factory=list)
+    challenge_areas: list[str] = field(default_factory=list)
+    strength_areas: list[str] = field(default_factory=list)
 
     # Future planning
-    next_recommended_goals: List[str] = field(default_factory=list)
-    suggested_therapeutic_adjustments: List[str] = field(default_factory=list)
+    next_recommended_goals: list[str] = field(default_factory=list)
+    suggested_therapeutic_adjustments: list[str] = field(default_factory=list)
 
     last_updated: datetime = field(default_factory=datetime.now)
 
@@ -213,7 +231,9 @@ class ProgressSummary:
 
         valid_engagement_trends = ["increasing", "stable", "decreasing"]
         if self.engagement_trend not in valid_engagement_trends:
-            raise ValueError(f"Engagement trend must be one of: {valid_engagement_trends}")
+            raise ValueError(
+                f"Engagement trend must be one of: {valid_engagement_trends}"
+            )
 
     def add_milestone(self, milestone: Milestone) -> None:
         """Add a milestone to tracking."""
@@ -238,9 +258,7 @@ class ProgressSummary:
 
         # Keep only the most recent 10 highlights
         self.recent_highlights = sorted(
-            self.recent_highlights,
-            key=lambda h: h.achieved_at,
-            reverse=True
+            self.recent_highlights, key=lambda h: h.achieved_at, reverse=True
         )[:10]
 
     def calculate_overall_progress_score(self) -> float:

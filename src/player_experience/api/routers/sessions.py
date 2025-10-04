@@ -1,11 +1,12 @@
 """
 Sessions router: minimal endpoints to support test workflows.
 """
+
 from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any, Dict, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -15,7 +16,7 @@ from ..auth import TokenData, get_current_active_player
 router = APIRouter()
 
 # In-memory session store for tests (non-persistent)
-_SESSIONS: Dict[str, Dict[str, Any]] = {}
+_SESSIONS: dict[str, dict[str, Any]] = {}
 
 
 class TherapeuticSettings(BaseModel):
@@ -32,14 +33,14 @@ class CreateSessionRequest(BaseModel):
 
 
 class UpdateSessionRequest(BaseModel):
-    therapeutic_settings: Optional[TherapeuticSettings] = None
+    therapeutic_settings: TherapeuticSettings | None = None
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_session(
     request: CreateSessionRequest,
     current_player: TokenData = Depends(get_current_active_player),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     session_id = str(uuid.uuid4())
     now = datetime.utcnow().isoformat()
     _SESSIONS[session_id] = {
@@ -65,12 +66,24 @@ async def create_session(
 async def get_session(
     session_id: str,
     current_player: TokenData = Depends(get_current_active_player),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
+        )
     return {
-        k: v for k, v in s.items() if k in {"session_id", "character_id", "world_id", "status", "created_at", "updated_at"}
+        k: v
+        for k, v in s.items()
+        if k
+        in {
+            "session_id",
+            "character_id",
+            "world_id",
+            "status",
+            "created_at",
+            "updated_at",
+        }
     }
 
 
@@ -79,15 +92,27 @@ async def update_session(
     session_id: str,
     request: UpdateSessionRequest,
     current_player: TokenData = Depends(get_current_active_player),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
+        )
     if request.therapeutic_settings is not None:
         s["therapeutic_settings"] = request.therapeutic_settings.model_dump()
     s["updated_at"] = datetime.utcnow().isoformat()
     return {
-        k: v for k, v in s.items() if k in {"session_id", "character_id", "world_id", "status", "created_at", "updated_at"}
+        k: v
+        for k, v in s.items()
+        if k
+        in {
+            "session_id",
+            "character_id",
+            "world_id",
+            "status",
+            "created_at",
+            "updated_at",
+        }
     }
 
 
@@ -95,10 +120,12 @@ async def update_session(
 async def get_session_progress(
     session_id: str,
     current_player: TokenData = Depends(get_current_active_player),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     s = _SESSIONS.get(session_id)
     if not s:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Session not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Session not found"
+        )
     # Minimal placeholder progress structure compatible with tests' basic checks
     return {
         "session_id": session_id,
@@ -109,4 +136,3 @@ async def get_session_progress(
             "total_steps": 1,
         },
     }
-

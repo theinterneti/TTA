@@ -5,10 +5,9 @@ import pytest
 
 from src.agent_orchestration import (
     AgentId,
-    AgentType,
     AgentMessage,
+    AgentType,
     MessageType,
-    MessagePriority,
 )
 from src.agent_orchestration.coordinators import RedisMessageCoordinator
 
@@ -24,7 +23,12 @@ async def test_metrics_counters_and_gauges(redis_client):
     recipient = AgentId(type=AgentType.WBA, instance="metrics")
 
     # Send one message successfully
-    m1 = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.EVENT)
+    m1 = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.EVENT,
+    )
     assert (await coord.send_message(sender, recipient, m1)).delivered
 
     # Verify delivered_ok incremented
@@ -55,7 +59,12 @@ async def test_auto_recovery_on_startup_simulation(redis_client):
     sender = AgentId(type=AgentType.IPA)
     recipient = AgentId(type=AgentType.NGA, instance="autorecover")
 
-    m = AgentMessage(message_id=uuid.uuid4().hex, sender=sender, recipient=recipient, message_type=MessageType.REQUEST)
+    m = AgentMessage(
+        message_id=uuid.uuid4().hex,
+        sender=sender,
+        recipient=recipient,
+        message_type=MessageType.REQUEST,
+    )
     assert (await coord.send_message(sender, recipient, m)).delivered
 
     # Reserve but do not ack
@@ -71,4 +80,3 @@ async def test_auto_recovery_on_startup_simulation(redis_client):
     r2 = await coord.receive(recipient, visibility_timeout=0.05)
     assert r2 is not None
     await coord.ack(recipient, r2.token)
-

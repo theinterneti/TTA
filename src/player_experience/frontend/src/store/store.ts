@@ -5,6 +5,10 @@ import characterReducer from './slices/characterSlice';
 import worldReducer from './slices/worldSlice';
 import chatReducer from './slices/chatSlice';
 import settingsReducer from './slices/settingsSlice';
+import modelManagementReducer from './slices/modelManagementSlice';
+import openRouterAuthReducer from './slices/openRouterAuthSlice';
+import playerPreferencesReducer from './slices/playerPreferencesSlice';
+import realTimeMonitoringReducer from './slices/realTimeMonitoringSlice';
 
 export const store = configureStore({
   reducer: {
@@ -14,6 +18,10 @@ export const store = configureStore({
     world: worldReducer,
     chat: chatReducer,
     settings: settingsReducer,
+    modelManagement: modelManagementReducer,
+    openRouterAuth: openRouterAuthReducer,
+    playerPreferences: playerPreferencesReducer,
+    realTimeMonitoring: realTimeMonitoringReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

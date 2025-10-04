@@ -1,0 +1,1180 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.managers.progress_tracking_service &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.player_experience.managers.progress_tracking_service</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.player_experience.managers.progress_tracking_service</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Progress Tracking Service.</span>
+
+<span class="sd">Aggregates session data and progress markers to compute summaries, detect milestones,</span>
+<span class="sd">produce insights/recommendations, and provide visualization-friendly series.</span>
+
+<span class="sd">Enhanced with therapeutic component integration, sophisticated milestone detection,</span>
+<span class="sd">and comprehensive progress insight generation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..database.session_repository</span><span class="w"> </span><span class="kn">import</span> <span class="n">SessionRepository</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.enums</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProgressMarkerType</span><span class="p">,</span> <span class="n">TherapeuticApproach</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.progress</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EngagementMetrics</span><span class="p">,</span>
+    <span class="n">Milestone</span><span class="p">,</span>
+    <span class="n">ProgressHighlight</span><span class="p">,</span>
+    <span class="n">ProgressSummary</span><span class="p">,</span>
+    <span class="n">ProgressVizSeries</span><span class="p">,</span>
+    <span class="n">TherapeuticEffectivenessReport</span><span class="p">,</span>
+    <span class="n">TherapeuticMetric</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Recommendation</span><span class="p">,</span> <span class="n">SessionContext</span><span class="p">,</span> <span class="n">SessionSummary</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ProgressTrackingService">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressTrackingService</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Service for progress tracking and analytics.</span>
+
+<span class="sd">    Enhanced with therapeutic component integration, sophisticated milestone detection,</span>
+<span class="sd">    achievement celebration, and comprehensive progress insight generation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_repository</span><span class="p">:</span> <span class="n">SessionRepository</span><span class="p">,</span> <span class="n">therapeutic_engine</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span> <span class="o">=</span> <span class="n">session_repository</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_engine</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">therapeutic_engine</span>  <span class="c1"># Optional integration with therapeutic components</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Milestone thresholds for achievement detection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;engagement_streak&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">60</span><span class="p">],</span>  <span class="c1"># days</span>
+            <span class="s2">&quot;session_count&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span>
+            <span class="s2">&quot;total_time&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">60</span><span class="p">,</span> <span class="mi">180</span><span class="p">,</span> <span class="mi">360</span><span class="p">,</span> <span class="mi">720</span><span class="p">,</span> <span class="mi">1440</span><span class="p">],</span>  <span class="c1"># minutes</span>
+            <span class="s2">&quot;skills_acquired&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">35</span><span class="p">],</span>
+            <span class="s2">&quot;breakthroughs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">15</span><span class="p">],</span>
+            <span class="s2">&quot;therapeutic_goals&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Therapeutic effectiveness thresholds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">effectiveness_thresholds</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;high_effectiveness&quot;</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+            <span class="s2">&quot;moderate_effectiveness&quot;</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="s2">&quot;improvement_needed&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="ProgressTrackingService.compute_progress_summary">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.compute_progress_summary">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">compute_progress_summary</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">summaries_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProgressSummary</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute a comprehensive ProgressSummary for a player by aggregating sessions and markers.</span>
+<span class="sd">        Enhanced with therapeutic component integration and sophisticated analytics.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Gather recent session summaries and active sessions</span>
+        <span class="n">summaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">SessionSummary</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session_summaries</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">summaries_limit</span>
+        <span class="p">)</span>
+        <span class="n">active_sessions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">SessionContext</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_player_active_sessions</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="c1"># Initialize metrics and collections</span>
+        <span class="n">engagement</span> <span class="o">=</span> <span class="n">EngagementMetrics</span><span class="p">()</span>
+        <span class="n">milestones_achieved</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">active_milestones</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">highlights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressHighlight</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Enhanced engagement metrics calculation</span>
+        <span class="n">total_minutes</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">therapeutic_approaches_used</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">()</span>
+        <span class="n">session_dates</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">:</span>
+            <span class="n">engagement</span><span class="o">.</span><span class="n">total_sessions</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">total_minutes</span> <span class="o">+=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">duration_minutes</span><span class="p">)</span>
+            <span class="n">session_dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+
+            <span class="c1"># Track therapeutic approaches if available</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s2">&quot;therapeutic_approaches_used&quot;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">approach</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">therapeutic_approaches_used</span><span class="p">:</span>
+                    <span class="n">therapeutic_approaches_used</span><span class="p">[</span><span class="n">approach</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Enhanced highlight collection with therapeutic value assessment</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">key_achievements</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">title</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">key_achievements</span><span class="p">:</span>
+                    <span class="n">therapeutic_value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assess_therapeutic_value</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+                    <span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">ProgressHighlight</span><span class="p">(</span>
+                            <span class="n">highlight_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;hl_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">title</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">title</span><span class="o">=</span><span class="n">title</span><span class="p">,</span>
+                            <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_enhance_achievement_description</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">s</span><span class="p">),</span>
+                            <span class="n">highlight_type</span><span class="o">=</span><span class="s2">&quot;achievement&quot;</span><span class="p">,</span>
+                            <span class="n">achieved_at</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">end_time</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">start_time</span><span class="p">,</span>
+                            <span class="n">therapeutic_value</span><span class="o">=</span><span class="n">therapeutic_value</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Calculate engagement metrics</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">total_time_minutes</span> <span class="o">=</span> <span class="n">total_minutes</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">total_minutes</span> <span class="o">/</span> <span class="n">engagement</span><span class="o">.</span><span class="n">total_sessions</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">total_sessions</span>
+            <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="p">)</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">last_session_date</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">session_dates</span><span class="p">)</span> <span class="k">if</span> <span class="n">session_dates</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Enhanced streak calculation</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_current_streak</span><span class="p">(</span><span class="n">session_dates</span><span class="p">)</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">longest_streak_days</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_longest_streak</span><span class="p">(</span><span class="n">session_dates</span><span class="p">)</span>
+
+        <span class="c1"># Calculate weekly and monthly sessions</span>
+        <span class="n">now_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">week_ago</span> <span class="o">=</span> <span class="n">now_date</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+        <span class="n">month_ago</span> <span class="o">=</span> <span class="n">now_date</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+        <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">session_dates</span> <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;=</span> <span class="n">week_ago</span>
+        <span class="p">)</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_month</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">session_dates</span> <span class="k">if</span> <span class="n">date</span> <span class="o">&gt;=</span> <span class="n">month_ago</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate dropout risk</span>
+        <span class="n">engagement</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_dropout_risk</span><span class="p">(</span>
+            <span class="n">engagement</span><span class="p">,</span> <span class="n">session_dates</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Analyze progress markers from active sessions</span>
+        <span class="n">marker_analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_progress_markers</span><span class="p">(</span><span class="n">active_sessions</span><span class="p">)</span>
+        <span class="n">skill_markers</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span>
+        <span class="n">breakthrough_markers</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span>
+        <span class="n">goal_markers</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;therapeutic_goals&quot;</span><span class="p">]</span>
+
+        <span class="c1"># Detect and create milestones</span>
+        <span class="p">(</span>
+            <span class="n">new_milestones</span><span class="p">,</span>
+            <span class="n">milestone_highlights</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_comprehensive_milestones</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">engagement</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">summaries</span>
+        <span class="p">)</span>
+        <span class="n">milestones_achieved</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">new_milestones</span><span class="p">)</span>
+        <span class="n">highlights</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">milestone_highlights</span><span class="p">)</span>
+
+        <span class="c1"># Build comprehensive summary</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">ProgressSummary</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">engagement_metrics</span><span class="o">=</span><span class="n">engagement</span><span class="p">,</span>
+            <span class="n">milestones_achieved</span><span class="o">=</span><span class="n">milestones_achieved</span><span class="p">,</span>
+            <span class="n">active_milestones</span><span class="o">=</span><span class="n">active_milestones</span><span class="p">,</span>
+            <span class="n">recent_highlights</span><span class="o">=</span><span class="n">highlights</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Enhanced trend analysis</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">progress_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_progress_trend</span><span class="p">(</span>
+            <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">engagement</span>
+        <span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">engagement_trend</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_engagement_trend</span><span class="p">(</span>
+            <span class="n">session_dates</span><span class="p">,</span> <span class="n">engagement</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Therapeutic insights</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">favorite_therapeutic_approach</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">therapeutic_approaches_used</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">therapeutic_approaches_used</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_therapeutic_momentum</span><span class="p">(</span>
+            <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">engagement</span>
+        <span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">readiness_for_advancement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_readiness_for_advancement</span><span class="p">(</span>
+            <span class="n">summary</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Identify strengths and challenges</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">strength_areas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identify_strength_areas</span><span class="p">(</span>
+            <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">engagement</span>
+        <span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">challenge_areas</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_identify_challenge_areas</span><span class="p">(</span>
+            <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">engagement</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Generate future planning recommendations</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">next_recommended_goals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_next_goals</span><span class="p">(</span>
+            <span class="n">summary</span><span class="p">,</span> <span class="n">marker_analysis</span>
+        <span class="p">)</span>
+        <span class="n">summary</span><span class="o">.</span><span class="n">suggested_therapeutic_adjustments</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_suggest_therapeutic_adjustments</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">summary</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">summary</span></div>
+
+
+<div class="viewcode-block" id="ProgressTrackingService.detect_and_update_milestones">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.detect_and_update_milestones">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">detect_and_update_milestones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressHighlight</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detect milestones from current activity and return new milestones and highlights.</span>
+<span class="sd">        Enhanced with comprehensive milestone detection and achievement celebration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">summaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">SessionSummary</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session_summaries</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
+        <span class="n">active_sessions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">SessionContext</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_player_active_sessions</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+
+        <span class="c1"># Calculate engagement metrics</span>
+        <span class="n">session_dates</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">]</span>
+        <span class="n">current_streak_days</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_current_streak</span><span class="p">(</span><span class="n">session_dates</span><span class="p">)</span>
+        <span class="n">total_sessions</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">summaries</span><span class="p">)</span>
+        <span class="n">total_time</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">duration_minutes</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">)</span>
+
+        <span class="c1"># Analyze progress markers</span>
+        <span class="n">marker_analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_progress_markers</span><span class="p">(</span><span class="n">active_sessions</span><span class="p">)</span>
+
+        <span class="c1"># Use the comprehensive milestone detection</span>
+        <span class="n">engagement_metrics</span> <span class="o">=</span> <span class="n">EngagementMetrics</span><span class="p">(</span>
+            <span class="n">total_sessions</span><span class="o">=</span><span class="n">total_sessions</span><span class="p">,</span>
+            <span class="n">total_time_minutes</span><span class="o">=</span><span class="n">total_time</span><span class="p">,</span>
+            <span class="n">current_streak_days</span><span class="o">=</span><span class="n">current_streak_days</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">new_milestones</span><span class="p">,</span> <span class="n">highlights</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_detect_comprehensive_milestones</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="p">,</span> <span class="n">engagement_metrics</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">,</span> <span class="n">summaries</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Add achievement celebration enhancements</span>
+        <span class="k">for</span> <span class="n">highlight</span> <span class="ow">in</span> <span class="n">highlights</span><span class="p">:</span>
+            <span class="n">highlight</span><span class="o">.</span><span class="n">celebration_shown</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Mark for celebration display</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Detected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_milestones</span><span class="p">)</span><span class="si">}</span><span class="s2"> new milestones and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">highlights</span><span class="p">)</span><span class="si">}</span><span class="s2"> highlights for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_milestones</span><span class="p">,</span> <span class="n">highlights</span></div>
+
+
+<div class="viewcode-block" id="ProgressTrackingService.generate_progress_insights">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.generate_progress_insights">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_progress_insights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate comprehensive recommendations based on engagement, skill development,</span>
+<span class="sd">        and therapeutic progress patterns.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_progress_summary</span><span class="p">(</span><span class="n">player_id</span><span class="p">)</span>
+        <span class="n">recs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Recommendation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># High momentum recommendations</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">7</span>
+            <span class="ow">and</span> <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">&gt;=</span> <span class="mf">0.7</span>
+        <span class="p">):</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_advanced_techniques&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Ready for advanced therapeutic techniques&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Your consistent progress shows you&#39;re ready for more challenging therapeutic work. Consider exploring deeper techniques.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;therapeutic_advancement&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Maintain momentum for good progress</span>
+        <span class="k">elif</span> <span class="p">(</span>
+            <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+            <span class="ow">and</span> <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">&gt;=</span> <span class="mf">0.6</span>
+        <span class="p">):</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_maintain_momentum&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Maintain your excellent pace&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Your engagement and momentum look strong. Keep going with your current routine to build on this progress.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;therapeutic_approach&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Dropout risk interventions</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_engagement_support&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Let&#39;s reconnect with your therapeutic journey&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;It looks like engagement has been challenging lately. Consider shorter, more manageable sessions to rebuild momentum.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;engagement_support&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.4</span><span class="p">:</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_flexible_schedule&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Try a more flexible approach&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Consider adjusting your session schedule or length to better fit your current needs and availability.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;therapeutic_approach&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Skill development recommendations</span>
+        <span class="k">if</span> <span class="s2">&quot;Skill Development&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">strength_areas</span><span class="p">:</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_skill_mastery&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Focus on skill mastery&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;You&#39;re excelling at learning new skills. Consider practicing advanced applications of your acquired techniques.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;skill_building&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="s2">&quot;Skill Acquisition&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">challenge_areas</span><span class="p">:</span>
+            <span class="n">recs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">Recommendation</span><span class="p">(</span>
+                    <span class="n">recommendation_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;rec_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_skill_focus&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Strengthen skill-building foundation&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Focus on completing guided exercises and practicing therapeutic techniques to build your toolkit.&quot;</span><span class="p">,</span>
+                    <span class="n">recommendation_type</span><span class="o">=</span><span class="s2">&quot;skill_building&quot;</span><span class="p">,</span>
+                    <span class="n">priority</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Sort by priority and return top recommendations</span>
+        <span class="n">recs</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">recs</span><span class="p">[:</span><span class="mi">6</span><span class="p">]</span>  <span class="c1"># Return top 6 recommendations</span></div>
+
+
+<div class="viewcode-block" id="ProgressTrackingService.generate_therapeutic_effectiveness_report">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.generate_therapeutic_effectiveness_report">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">generate_therapeutic_effectiveness_report</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">character_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TherapeuticEffectivenessReport</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate a comprehensive therapeutic effectiveness report for a player.</span>
+<span class="sd">        This integrates with therapeutic components to assess treatment outcomes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="n">report_start</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+
+        <span class="c1"># Get session data for analysis</span>
+        <span class="n">summaries</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session_summaries</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="n">active_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_player_active_sessions</span><span class="p">(</span>
+            <span class="n">player_id</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate therapeutic metrics</span>
+        <span class="n">therapeutic_metrics</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Engagement effectiveness</span>
+        <span class="n">engagement_score</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="mf">1.0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summaries</span><span class="p">)</span> <span class="o">/</span> <span class="mf">20.0</span>
+        <span class="p">)</span>  <span class="c1"># Target: 20 sessions per month</span>
+        <span class="n">therapeutic_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">TherapeuticMetric</span><span class="p">(</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;engagement_consistency&quot;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">engagement_score</span><span class="p">,</span>
+                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span>
+                <span class="n">measured_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Skill acquisition rate</span>
+        <span class="n">marker_analysis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analyze_progress_markers</span><span class="p">(</span><span class="n">active_sessions</span><span class="p">)</span>
+        <span class="n">skill_rate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="mf">1.0</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">10.0</span>
+        <span class="p">)</span>  <span class="c1"># Target: 10 skills</span>
+        <span class="n">therapeutic_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">TherapeuticMetric</span><span class="p">(</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;skill_acquisition_rate&quot;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">skill_rate</span><span class="p">,</span>
+                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;rate&quot;</span><span class="p">,</span>
+                <span class="n">measured_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Breakthrough frequency</span>
+        <span class="n">breakthrough_rate</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="mf">1.0</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">/</span> <span class="mf">3.0</span>
+        <span class="p">)</span>  <span class="c1"># Target: 3 breakthroughs</span>
+        <span class="n">therapeutic_metrics</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">TherapeuticMetric</span><span class="p">(</span>
+                <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;breakthrough_frequency&quot;</span><span class="p">,</span>
+                <span class="n">value</span><span class="o">=</span><span class="n">breakthrough_rate</span><span class="p">,</span>
+                <span class="n">unit</span><span class="o">=</span><span class="s2">&quot;frequency&quot;</span><span class="p">,</span>
+                <span class="n">measured_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                <span class="n">confidence_level</span><span class="o">=</span><span class="mf">0.7</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Calculate overall effectiveness</span>
+        <span class="n">overall_score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">value</span> <span class="o">*</span> <span class="n">metric</span><span class="o">.</span><span class="n">confidence_level</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">therapeutic_metrics</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">therapeutic_metrics</span><span class="p">)</span>
+
+        <span class="c1"># Determine most/least effective approaches</span>
+        <span class="n">approach_effectiveness</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">summary</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="s2">&quot;therapeutic_approaches_used&quot;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">approach</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_approaches_used</span><span class="p">:</span>
+                    <span class="c1"># Use session duration as proxy for effectiveness</span>
+                    <span class="n">effectiveness</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">summary</span><span class="o">.</span><span class="n">duration_minutes</span> <span class="o">/</span> <span class="mf">30.0</span><span class="p">)</span>
+                    <span class="n">approach_effectiveness</span><span class="p">[</span><span class="n">approach</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">effectiveness</span><span class="p">)</span>
+
+        <span class="n">most_effective</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">least_effective</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">approach</span><span class="p">,</span> <span class="n">scores</span> <span class="ow">in</span> <span class="n">approach_effectiveness</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">avg_score</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">avg_score</span> <span class="o">&gt;=</span> <span class="mf">0.7</span><span class="p">:</span>
+                <span class="n">most_effective</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">approach</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">avg_score</span> <span class="o">&lt;=</span> <span class="mf">0.4</span><span class="p">:</span>
+                <span class="n">least_effective</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">approach</span><span class="p">)</span>
+
+        <span class="c1"># Generate recommendations</span>
+        <span class="n">recommendations</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">overall_score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">effectiveness_thresholds</span><span class="p">[</span><span class="s2">&quot;improvement_needed&quot;</span><span class="p">]:</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Consider adjusting therapeutic intensity or approach&quot;</span>
+            <span class="p">)</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Focus on engagement-building activities&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">overall_score</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">effectiveness_thresholds</span><span class="p">[</span><span class="s2">&quot;high_effectiveness&quot;</span><span class="p">]:</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Maintain current therapeutic approach&quot;</span><span class="p">)</span>
+            <span class="n">recommendations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Consider advancing to more complex interventions&quot;</span><span class="p">)</span>
+
+        <span class="n">suggested_steps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">suggested_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Increase focus on skill-building exercises&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">suggested_steps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Incorporate more insight-oriented activities&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">TherapeuticEffectivenessReport</span><span class="p">(</span>
+            <span class="n">player_id</span><span class="o">=</span><span class="n">player_id</span><span class="p">,</span>
+            <span class="n">character_id</span><span class="o">=</span><span class="n">character_id</span><span class="p">,</span>
+            <span class="n">report_period_start</span><span class="o">=</span><span class="n">report_start</span><span class="p">,</span>
+            <span class="n">report_period_end</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+            <span class="n">overall_effectiveness_score</span><span class="o">=</span><span class="n">overall_score</span><span class="p">,</span>
+            <span class="n">therapeutic_metrics</span><span class="o">=</span><span class="n">therapeutic_metrics</span><span class="p">,</span>
+            <span class="n">most_effective_approaches</span><span class="o">=</span><span class="n">most_effective</span><span class="p">,</span>
+            <span class="n">least_effective_approaches</span><span class="o">=</span><span class="n">least_effective</span><span class="p">,</span>
+            <span class="n">goals_achieved</span><span class="o">=</span><span class="nb">len</span><span class="p">([</span><span class="n">m</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">marker_analysis</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]),</span>
+            <span class="n">goals_in_progress</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">active_sessions</span><span class="p">),</span>
+            <span class="n">milestones_reached</span><span class="o">=</span><span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;milestones&quot;</span><span class="p">],</span>
+            <span class="n">breakthrough_moments</span><span class="o">=</span><span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">],</span>
+            <span class="n">emotional_regulation_improvement</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span>
+                <span class="mf">1.0</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.1</span>
+            <span class="p">),</span>
+            <span class="n">coping_skills_development</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span>
+                <span class="mf">1.0</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.15</span>
+            <span class="p">),</span>
+            <span class="n">self_awareness_growth</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;insights&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.2</span><span class="p">),</span>
+            <span class="n">recommended_adjustments</span><span class="o">=</span><span class="n">recommendations</span><span class="p">,</span>
+            <span class="n">suggested_next_steps</span><span class="o">=</span><span class="n">suggested_steps</span><span class="p">,</span>
+            <span class="n">generated_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ProgressTrackingService.celebrate_milestone_achievement">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.celebrate_milestone_achievement">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">celebrate_milestone_achievement</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">milestone</span><span class="p">:</span> <span class="n">Milestone</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a celebration response for milestone achievement.</span>
+<span class="sd">        This can be used to trigger UI celebrations or notifications.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">celebration_data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;milestone_id&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">milestone_id</span><span class="p">,</span>
+            <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+            <span class="s2">&quot;celebration_message&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_celebration_message</span><span class="p">(</span><span class="n">milestone</span><span class="p">),</span>
+            <span class="s2">&quot;reward_unlocked&quot;</span><span class="p">:</span> <span class="n">milestone</span><span class="o">.</span><span class="n">reward_description</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_value&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_milestone_therapeutic_value</span><span class="p">(</span><span class="n">milestone</span><span class="p">),</span>
+            <span class="s2">&quot;suggested_next_milestone&quot;</span><span class="p">:</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_suggest_next_milestone</span><span class="p">(</span>
+                <span class="n">player_id</span><span class="p">,</span> <span class="n">milestone</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;celebration_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_celebration_type</span><span class="p">(</span><span class="n">milestone</span><span class="p">),</span>
+            <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Celebrating milestone achievement for player </span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">celebration_data</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_celebration_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">milestone</span><span class="p">:</span> <span class="n">Milestone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate a personalized celebration message for a milestone.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;streak&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;🔥 Amazing consistency! </span><span class="si">{</span><span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> shows your dedication to growth!&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;skill&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;🎯 Excellent progress! </span><span class="si">{</span><span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> demonstrates your commitment to learning!&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;breakthrough&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;💡 Incredible insight! </span><span class="si">{</span><span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> marks a significant therapeutic achievement!&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;🌟 Congratulations! </span><span class="si">{</span><span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2"> is a meaningful step in your journey!&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_milestone_therapeutic_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">milestone</span><span class="p">:</span> <span class="n">Milestone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the therapeutic value of achieving a milestone.&quot;&quot;&quot;</span>
+        <span class="n">base_value</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+        <span class="c1"># Increase value based on milestone type</span>
+        <span class="k">if</span> <span class="s2">&quot;breakthrough&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.4</span>
+        <span class="k">elif</span> <span class="s2">&quot;skill&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.3</span>
+        <span class="k">elif</span> <span class="s2">&quot;streak&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.2</span>
+
+        <span class="c1"># Adjust based on therapeutic approaches involved</span>
+        <span class="k">if</span> <span class="n">milestone</span><span class="o">.</span><span class="n">therapeutic_approaches_involved</span><span class="p">:</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">milestone</span><span class="o">.</span><span class="n">therapeutic_approaches_involved</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">base_value</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_suggest_next_milestone</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">achieved_milestone</span><span class="p">:</span> <span class="n">Milestone</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Suggest the next logical milestone based on what was just achieved.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;streak&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;7&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;14-Day Engagement Streak&quot;</span>
+            <span class="k">elif</span> <span class="s2">&quot;14&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;30-Day Engagement Streak&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;skill&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">if</span> <span class="s2">&quot;Level 1&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;Skill Builder Level 2&quot;</span>
+            <span class="k">elif</span> <span class="s2">&quot;Level 2&quot;</span> <span class="ow">in</span> <span class="n">achieved_milestone</span><span class="o">.</span><span class="n">title</span><span class="p">:</span>
+                <span class="k">return</span> <span class="s2">&quot;Skill Builder Level 3&quot;</span>
+
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_determine_celebration_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">milestone</span><span class="p">:</span> <span class="n">Milestone</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Determine the type of celebration appropriate for the milestone.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;breakthrough&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s2">&quot;major_achievement&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;streak&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">num</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;30&quot;</span><span class="p">,</span> <span class="s2">&quot;60&quot;</span><span class="p">,</span> <span class="s2">&quot;90&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;major_achievement&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;skill&quot;</span> <span class="ow">in</span> <span class="n">milestone</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+            <span class="k">return</span> <span class="s2">&quot;skill_mastery&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;progress_milestone&quot;</span>
+
+<div class="viewcode-block" id="ProgressTrackingService.get_visualization_data">
+<a class="viewcode-back" href="../../../../api/src.player_experience.managers.progress_tracking_service.html#src.player_experience.managers.ProgressTrackingService.get_visualization_data">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_visualization_data</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">14</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ProgressVizSeries</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return daily buckets for counts and durations for the last `days` days.&quot;&quot;&quot;</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
+        <span class="n">summaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span>
+            <span class="n">SessionSummary</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_repository</span><span class="o">.</span><span class="n">get_session_summaries</span><span class="p">(</span><span class="n">player_id</span><span class="p">,</span> <span class="n">days</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="c1"># Build bucket keys YYYY-MM-DD</span>
+        <span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">bucket_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">today</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">i</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">days</span><span class="p">)</span>
+        <span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">counts</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">bucket_keys</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">durations</span> <span class="o">=</span> <span class="nb">dict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">bucket_keys</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">summaries</span><span class="p">:</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">end_time</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">counts</span><span class="p">:</span>
+                <span class="n">counts</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">durations</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">duration_minutes</span><span class="p">)</span>
+
+        <span class="n">series</span> <span class="o">=</span> <span class="n">ProgressVizSeries</span><span class="p">(</span>
+            <span class="n">time_buckets</span><span class="o">=</span><span class="n">bucket_keys</span><span class="p">,</span>
+            <span class="n">series</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;sessions&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">counts</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">bucket_keys</span><span class="p">],</span>
+                <span class="s2">&quot;duration_minutes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">durations</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">bucket_keys</span><span class="p">],</span>
+            <span class="p">},</span>
+            <span class="n">meta</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;period_days&quot;</span><span class="p">:</span> <span class="n">days</span><span class="p">,</span> <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;duration_minutes&quot;</span><span class="p">:</span> <span class="s2">&quot;minutes&quot;</span><span class="p">}},</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">series</span></div>
+
+
+    <span class="c1"># Enhanced helper methods for therapeutic integration</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assess_therapeutic_value</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">achievement_title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_summary</span><span class="p">:</span> <span class="n">SessionSummary</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Assess the therapeutic value of an achievement based on context.&quot;&quot;&quot;</span>
+        <span class="c1"># Base therapeutic value</span>
+        <span class="n">base_value</span> <span class="o">=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># Increase value based on achievement type</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">keyword</span> <span class="ow">in</span> <span class="n">achievement_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;breakthrough&quot;</span><span class="p">,</span> <span class="s2">&quot;insight&quot;</span><span class="p">,</span> <span class="s2">&quot;realization&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.3</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">keyword</span> <span class="ow">in</span> <span class="n">achievement_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;skill&quot;</span><span class="p">,</span> <span class="s2">&quot;technique&quot;</span><span class="p">,</span> <span class="s2">&quot;coping&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.2</span>
+        <span class="k">elif</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="n">keyword</span> <span class="ow">in</span> <span class="n">achievement_title</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">keyword</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;goal&quot;</span><span class="p">,</span> <span class="s2">&quot;milestone&quot;</span><span class="p">,</span> <span class="s2">&quot;progress&quot;</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.15</span>
+
+        <span class="c1"># Adjust based on session therapeutic interventions</span>
+        <span class="k">if</span> <span class="n">session_summary</span><span class="o">.</span><span class="n">therapeutic_interventions_count</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">base_value</span> <span class="o">+=</span> <span class="mf">0.1</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">base_value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_enhance_achievement_description</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">session_summary</span><span class="p">:</span> <span class="n">SessionSummary</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Enhance achievement description with therapeutic context.&quot;&quot;&quot;</span>
+        <span class="n">base_description</span> <span class="o">=</span> <span class="n">title</span>
+
+        <span class="c1"># Add context based on session data</span>
+        <span class="k">if</span> <span class="n">session_summary</span><span class="o">.</span><span class="n">therapeutic_interventions_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">base_description</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (achieved through </span><span class="si">{</span><span class="n">session_summary</span><span class="o">.</span><span class="n">therapeutic_interventions_count</span><span class="si">}</span><span class="s2"> therapeutic interventions)&quot;</span>
+
+        <span class="k">return</span> <span class="n">base_description</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_current_streak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate current consecutive days with sessions (timezone-robust).&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">session_dates</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="c1"># Normalize inputs to date objects</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_dt</span>
+
+        <span class="kn">from</span><span class="w"> </span><span class="nn">src.common.time_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+            <span class="n">consecutive_streak_ending_today</span><span class="p">,</span>
+            <span class="n">pick_reference_today</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">dates</span> <span class="o">=</span> <span class="p">[(</span><span class="n">d</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">session_dates</span><span class="p">]</span>
+        <span class="n">ref_today</span> <span class="o">=</span> <span class="n">pick_reference_today</span><span class="p">(</span><span class="n">dates</span><span class="p">)</span>
+        <span class="c1"># Guard: if ref_today is not today (local or UTC), there is no current streak</span>
+        <span class="n">today_local</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">today_utc</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">ref_today</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">today_local</span><span class="p">,</span> <span class="n">today_utc</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">return</span> <span class="n">consecutive_streak_ending_today</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">ref_today</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_longest_streak</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate the longest consecutive streak in session history.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">session_dates</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">sorted_dates</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">session_dates</span><span class="p">))</span>
+        <span class="n">longest_streak</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">current_streak</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_dates</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">sorted_dates</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">sorted_dates</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">days</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">current_streak</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">longest_streak</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">longest_streak</span><span class="p">,</span> <span class="n">current_streak</span><span class="p">)</span>
+                <span class="n">current_streak</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">longest_streak</span><span class="p">,</span> <span class="n">current_streak</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_dropout_risk</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span><span class="p">,</span> <span class="n">session_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate dropout risk based on engagement patterns.&quot;&quot;&quot;</span>
+        <span class="n">risk_score</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Risk increases with time since last session</span>
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">last_session_date</span><span class="p">:</span>
+            <span class="n">days_since_last</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">-</span> <span class="n">engagement</span><span class="o">.</span><span class="n">last_session_date</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">days</span>
+            <span class="k">if</span> <span class="n">days_since_last</span> <span class="o">&gt;</span> <span class="mi">7</span><span class="p">:</span>
+                <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.3</span>
+            <span class="k">elif</span> <span class="n">days_since_last</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.5</span>
+
+        <span class="c1"># Risk increases with low session frequency</span>
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.2</span>
+        <span class="k">elif</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># Risk decreases with consistent engagement</span>
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">-=</span> <span class="mf">0.2</span>
+        <span class="k">elif</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">-=</span> <span class="mf">0.1</span>
+
+        <span class="c1"># Risk increases with very short sessions</span>
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">risk_score</span> <span class="o">+=</span> <span class="mf">0.1</span>
+
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">risk_score</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_progress_markers</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">active_sessions</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionContext</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze progress markers across active sessions.&quot;&quot;&quot;</span>
+        <span class="n">analysis</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;skills_acquired&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;breakthroughs&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;therapeutic_goals&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;milestones&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;insights&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;total_markers&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">active_sessions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="n">session</span><span class="o">.</span><span class="n">progress_markers</span><span class="p">:</span>
+                <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;total_markers&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="n">marker</span><span class="o">.</span><span class="n">marker_type</span> <span class="o">==</span> <span class="n">ProgressMarkerType</span><span class="o">.</span><span class="n">SKILL_ACQUIRED</span><span class="p">:</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">marker</span><span class="o">.</span><span class="n">marker_type</span> <span class="o">==</span> <span class="n">ProgressMarkerType</span><span class="o">.</span><span class="n">BREAKTHROUGH</span><span class="p">:</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">marker</span><span class="o">.</span><span class="n">marker_type</span> <span class="o">==</span> <span class="n">ProgressMarkerType</span><span class="o">.</span><span class="n">MILESTONE</span><span class="p">:</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;milestones&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">marker</span><span class="o">.</span><span class="n">marker_type</span> <span class="o">==</span> <span class="n">ProgressMarkerType</span><span class="o">.</span><span class="n">INSIGHT</span><span class="p">:</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;insights&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">marker</span><span class="o">.</span><span class="n">marker_type</span> <span class="o">==</span> <span class="n">ProgressMarkerType</span><span class="o">.</span><span class="n">THERAPEUTIC_GOAL</span><span class="p">:</span>
+                    <span class="n">analysis</span><span class="p">[</span><span class="s2">&quot;therapeutic_goals&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">analysis</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_detect_comprehensive_milestones</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">player_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span><span class="p">,</span>
+        <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span>
+        <span class="n">summaries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SessionSummary</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">],</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressHighlight</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Detect milestones with comprehensive criteria and create celebration highlights.&quot;&quot;&quot;</span>
+        <span class="n">new_milestones</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Milestone</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">highlights</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressHighlight</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+        <span class="c1"># Engagement-based milestones</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span><span class="p">[</span><span class="s2">&quot;engagement_streak&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">milestone_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ms_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_streak_</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">milestone</span> <span class="o">=</span> <span class="n">Milestone</span><span class="p">(</span>
+                    <span class="n">milestone_id</span><span class="o">=</span><span class="n">milestone_id</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">-Day Engagement Streak&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Maintained consistent therapeutic engagement for </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> consecutive days&quot;</span><span class="p">,</span>
+                    <span class="n">is_achieved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">achieved_date</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">therapeutic_approaches_involved</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">BEHAVIORAL_ACTIVATION</span>
+                    <span class="p">],</span>
+                    <span class="n">reward_description</span><span class="o">=</span><span class="s2">&quot;Unlocked advanced therapeutic techniques and personalized content&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">new_milestones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+
+                <span class="c1"># Create celebration highlight</span>
+                <span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">ProgressHighlight</span><span class="p">(</span>
+                        <span class="n">highlight_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;hl_</span><span class="si">{</span><span class="n">milestone_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;🔥 </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">-Day Streak Achievement!&quot;</span><span class="p">,</span>
+                        <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Incredible consistency! You&#39;ve maintained therapeutic engagement for </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> days straight.&quot;</span><span class="p">,</span>
+                        <span class="n">highlight_type</span><span class="o">=</span><span class="s2">&quot;milestone&quot;</span><span class="p">,</span>
+                        <span class="n">achieved_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                        <span class="n">therapeutic_value</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.2</span> <span class="o">+</span> <span class="p">(</span><span class="n">threshold</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)),</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="c1"># If a significant streak milestone was achieved, add a celebration highlight</span>
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">threshold</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+                <span class="n">t</span>
+                <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span><span class="p">[</span><span class="s2">&quot;engagement_streak&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span>
+            <span class="p">)</span>
+            <span class="n">milestone_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ms_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_streak_</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ProgressHighlight</span><span class="p">(</span>
+                    <span class="n">highlight_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;hl_</span><span class="si">{</span><span class="n">milestone_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;🔥 </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">-Day Streak Achievement!&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Incredible consistency! You&#39;ve maintained therapeutic engagement for </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> days straight.&quot;</span><span class="p">,</span>
+                    <span class="n">highlight_type</span><span class="o">=</span><span class="s2">&quot;milestone&quot;</span><span class="p">,</span>
+                    <span class="n">achieved_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">therapeutic_value</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.2</span> <span class="o">+</span> <span class="p">(</span><span class="n">threshold</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Session count milestones</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span><span class="p">[</span><span class="s2">&quot;session_count&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">total_sessions</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">milestone_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ms_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_sessions_</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">milestone</span> <span class="o">=</span> <span class="n">Milestone</span><span class="p">(</span>
+                    <span class="n">milestone_id</span><span class="o">=</span><span class="n">milestone_id</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> Sessions Completed&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> therapeutic sessions, showing strong commitment to growth&quot;</span><span class="p">,</span>
+                    <span class="n">is_achieved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">achieved_date</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">reward_description</span><span class="o">=</span><span class="s2">&quot;Unlocked advanced progress tracking and insights&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">new_milestones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+
+        <span class="c1"># Also add a small highlight for achieving any session count milestone</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">title</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;Sessions Completed&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">new_milestones</span><span class="p">):</span>
+            <span class="n">highlights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">ProgressHighlight</span><span class="p">(</span>
+                    <span class="n">highlight_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;hl_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_sessions_milestone&quot;</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="s2">&quot;👏 Session Milestone Achieved&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Great job maintaining your practice!&quot;</span><span class="p">,</span>
+                    <span class="n">highlight_type</span><span class="o">=</span><span class="s2">&quot;milestone&quot;</span><span class="p">,</span>
+                    <span class="n">achieved_at</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">therapeutic_value</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Skill acquisition milestones</span>
+        <span class="n">skills_count</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">skills_count</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">milestone_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ms_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_skills_</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">milestone</span> <span class="o">=</span> <span class="n">Milestone</span><span class="p">(</span>
+                    <span class="n">milestone_id</span><span class="o">=</span><span class="n">milestone_id</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Skill Builder Level </span><span class="si">{</span><span class="n">threshold</span><span class="w"> </span><span class="o">//</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Acquired </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> therapeutic skills through guided exercises and practice&quot;</span><span class="p">,</span>
+                    <span class="n">is_achieved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">achieved_date</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">therapeutic_approaches_involved</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">CBT</span><span class="p">,</span>
+                        <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">SKILL_BUILDING</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="n">reward_description</span><span class="o">=</span><span class="s2">&quot;Unlocked advanced skill-building exercises&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">new_milestones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+
+        <span class="c1"># Breakthrough milestones</span>
+        <span class="n">breakthroughs_count</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">threshold</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestone_thresholds</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">breakthroughs_count</span> <span class="o">&gt;=</span> <span class="n">threshold</span><span class="p">:</span>
+                <span class="n">milestone_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;ms_</span><span class="si">{</span><span class="n">player_id</span><span class="si">}</span><span class="s2">_breakthroughs_</span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">milestone</span> <span class="o">=</span> <span class="n">Milestone</span><span class="p">(</span>
+                    <span class="n">milestone_id</span><span class="o">=</span><span class="n">milestone_id</span><span class="p">,</span>
+                    <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Breakthrough Explorer Level </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Achieved </span><span class="si">{</span><span class="n">threshold</span><span class="si">}</span><span class="s2"> significant therapeutic breakthroughs&quot;</span><span class="p">,</span>
+                    <span class="n">is_achieved</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">achieved_date</span><span class="o">=</span><span class="n">now</span><span class="p">,</span>
+                    <span class="n">therapeutic_approaches_involved</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">TherapeuticApproach</span><span class="o">.</span><span class="n">INSIGHT_ORIENTED</span>
+                    <span class="p">],</span>
+                    <span class="n">reward_description</span><span class="o">=</span><span class="s2">&quot;Unlocked deeper therapeutic exploration content&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">new_milestones</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">milestone</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_milestones</span><span class="p">,</span> <span class="n">highlights</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_progress_trend</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze overall progress trend based on multiple factors.&quot;&quot;&quot;</span>
+        <span class="c1"># Calculate progress indicators</span>
+        <span class="n">total_progress_markers</span> <span class="o">=</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;total_markers&quot;</span><span class="p">]</span>
+        <span class="n">recent_engagement</span> <span class="o">=</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span>
+        <span class="n">streak</span> <span class="o">=</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span>
+
+        <span class="c1"># Determine trend</span>
+        <span class="k">if</span> <span class="n">total_progress_markers</span> <span class="o">&gt;=</span> <span class="mi">10</span> <span class="ow">and</span> <span class="n">recent_engagement</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">streak</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;improving&quot;</span>
+        <span class="k">elif</span> <span class="n">total_progress_markers</span> <span class="o">&gt;=</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">recent_engagement</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">streak</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+        <span class="k">elif</span> <span class="n">recent_engagement</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">engagement</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;declining&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_analyze_engagement_trend</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">session_dates</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">datetime</span><span class="p">],</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Analyze engagement trend over time.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">session_dates</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+
+        <span class="c1"># Compare recent vs older engagement</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">date</span><span class="p">()</span>
+        <span class="n">recent_week</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">session_dates</span> <span class="k">if</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;=</span> <span class="mi">7</span><span class="p">)</span>
+        <span class="n">previous_week</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">session_dates</span> <span class="k">if</span> <span class="mi">7</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">now</span> <span class="o">-</span> <span class="n">date</span><span class="p">)</span><span class="o">.</span><span class="n">days</span> <span class="o">&lt;=</span> <span class="mi">14</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">recent_week</span> <span class="o">&gt;</span> <span class="n">previous_week</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;increasing&quot;</span>
+        <span class="k">elif</span> <span class="n">recent_week</span> <span class="o">&lt;</span> <span class="n">previous_week</span> <span class="ow">and</span> <span class="n">engagement</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.4</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;decreasing&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;stable&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_therapeutic_momentum</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate therapeutic momentum based on progress and engagement.&quot;&quot;&quot;</span>
+        <span class="n">base_momentum</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+        <span class="c1"># Add momentum from progress markers</span>
+        <span class="n">base_momentum</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;total_markers&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.02</span><span class="p">)</span>
+
+        <span class="c1"># Add momentum from consistent engagement</span>
+        <span class="n">base_momentum</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
+
+        <span class="c1"># Add momentum from recent activity</span>
+        <span class="n">base_momentum</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">base_momentum</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_readiness_for_advancement</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">ProgressSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate readiness for therapeutic advancement.&quot;&quot;&quot;</span>
+        <span class="n">readiness</span> <span class="o">=</span> <span class="mf">0.2</span>
+
+        <span class="c1"># Factor in therapeutic momentum</span>
+        <span class="n">readiness</span> <span class="o">+=</span> <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">*</span> <span class="mf">0.3</span>
+
+        <span class="c1"># Factor in milestone achievements</span>
+        <span class="n">readiness</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">summary</span><span class="o">.</span><span class="n">milestones_achieved</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.05</span><span class="p">)</span>
+
+        <span class="c1"># Factor in engagement consistency</span>
+        <span class="n">readiness</span> <span class="o">+=</span> <span class="nb">min</span><span class="p">(</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">*</span> <span class="mf">0.01</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">readiness</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_identify_strength_areas</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify areas where the player shows strength.&quot;&quot;&quot;</span>
+        <span class="n">strengths</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Consistent Engagement&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Skill Development&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Insight Generation&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">&gt;=</span> <span class="mi">30</span><span class="p">:</span>
+            <span class="n">strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Deep Therapeutic Work&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">strengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;High Engagement Frequency&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">strengths</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_identify_challenge_areas</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">engagement</span><span class="p">:</span> <span class="n">EngagementMetrics</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Identify areas that need attention or improvement.&quot;&quot;&quot;</span>
+        <span class="n">challenges</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="n">challenges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Engagement Consistency&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">challenges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Skill Acquisition&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">challenges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Session Depth&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">challenges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Breakthrough Achievement&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">engagement</span><span class="o">.</span><span class="n">sessions_this_week</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">challenges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Recent Activity&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">challenges</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_generate_next_goals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">ProgressSummary</span><span class="p">,</span> <span class="n">marker_analysis</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate recommended next goals based on current progress.&quot;&quot;&quot;</span>
+        <span class="n">goals</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Engagement goals</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&lt;</span> <span class="mi">7</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Maintain a 7-day engagement streak&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">current_streak_days</span> <span class="o">&lt;</span> <span class="mi">14</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Extend engagement streak to 14 days&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Skill development goals</span>
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Complete 5 skill-building exercises&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;skills_acquired&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Master 10 therapeutic techniques&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Breakthrough goals</span>
+        <span class="k">if</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Achieve your first therapeutic breakthrough&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">marker_analysis</span><span class="p">[</span><span class="s2">&quot;breakthroughs&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Explore deeper insights and breakthroughs&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Session quality goals</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">&lt;</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">goals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Engage in longer, more focused sessions&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">goals</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>  <span class="c1"># Return top 3 goals</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_suggest_therapeutic_adjustments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">:</span> <span class="n">ProgressSummary</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Suggest therapeutic adjustments based on progress analysis.&quot;&quot;&quot;</span>
+        <span class="n">adjustments</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Engagement-based adjustments</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">dropout_risk_score</span> <span class="o">&gt;</span> <span class="mf">0.6</span><span class="p">:</span>
+            <span class="n">adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Consider shorter, more frequent sessions to maintain engagement&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">engagement_metrics</span><span class="o">.</span><span class="n">average_session_length</span> <span class="o">&lt;</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Gradually increase session length for deeper therapeutic work&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Progress-based adjustments</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">&lt;</span> <span class="mf">0.5</span><span class="p">:</span>
+            <span class="n">adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Focus on skill-building exercises to build momentum&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="s2">&quot;Breakthrough Achievement&quot;</span> <span class="ow">in</span> <span class="n">summary</span><span class="o">.</span><span class="n">challenge_areas</span><span class="p">:</span>
+            <span class="n">adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Incorporate more insight-oriented therapeutic approaches&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Readiness-based adjustments</span>
+        <span class="k">if</span> <span class="n">summary</span><span class="o">.</span><span class="n">readiness_for_advancement</span> <span class="o">&gt;</span> <span class="mf">0.7</span><span class="p">:</span>
+            <span class="n">adjustments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;Ready for more advanced therapeutic techniques and challenges&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">adjustments</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -8,22 +8,21 @@ for the player experience web interface.
 from .app import app, create_app
 from .auth import (
     AuthService,
-    Token,
-    TokenData,
     LoginRequest,
     RefreshTokenRequest,
-    get_current_player,
+    Token,
+    TokenData,
     get_current_active_player,
+    get_current_player,
     require_player_access,
 )
-from .config import settings, get_settings
+from .config import get_settings
 from .main import run_server
 
 __all__ = [
     "app",
     "create_app",
     "run_server",
-    "settings",
     "get_settings",
     "AuthService",
     "Token",

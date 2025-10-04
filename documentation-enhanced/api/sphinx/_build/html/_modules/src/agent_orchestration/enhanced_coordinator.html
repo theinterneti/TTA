@@ -1,0 +1,860 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.enhanced_coordinator &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.enhanced_coordinator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.enhanced_coordinator</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Enhanced message coordinator that integrates real agent communication with Redis infrastructure.</span>
+
+<span class="sd">This module extends the existing RedisMessageCoordinator to support real agent communication</span>
+<span class="sd">through the protocol bridge and adapter system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">redis.asyncio</span><span class="w"> </span><span class="kn">import</span> <span class="n">Redis</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.adapters</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentAdapterFactory</span><span class="p">,</span> <span class="n">RetryConfig</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.coordinators.redis_message_coordinator</span><span class="w"> </span><span class="kn">import</span> <span class="n">RedisMessageCoordinator</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.messaging</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageResult</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">AgentMessage</span><span class="p">,</span> <span class="n">AgentType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.protocol_bridge</span><span class="w"> </span><span class="kn">import</span> <span class="n">MessageRouter</span><span class="p">,</span> <span class="n">ProtocolTranslator</span><span class="p">,</span> <span class="n">ProtocolType</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EnhancedRedisMessageCoordinator</span><span class="p">(</span><span class="n">RedisMessageCoordinator</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Enhanced Redis message coordinator with real agent communication support.</span>
+
+<span class="sd">    Extends the base RedisMessageCoordinator to support routing messages to real</span>
+<span class="sd">    agent implementations through the protocol bridge system.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">redis</span><span class="p">:</span> <span class="n">Redis</span><span class="p">,</span>
+        <span class="n">key_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;ao&quot;</span><span class="p">,</span>
+        <span class="n">queue_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+        <span class="n">retry_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">backoff_base</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">backoff_factor</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">backoff_max</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">,</span>
+        <span class="n">neo4j_manager</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">tools</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">enable_real_agents</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">fallback_to_mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Initialize base coordinator</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">redis</span><span class="o">=</span><span class="n">redis</span><span class="p">,</span>
+            <span class="n">key_prefix</span><span class="o">=</span><span class="n">key_prefix</span><span class="p">,</span>
+            <span class="n">queue_size</span><span class="o">=</span><span class="n">queue_size</span><span class="p">,</span>
+            <span class="n">retry_attempts</span><span class="o">=</span><span class="n">retry_attempts</span><span class="p">,</span>
+            <span class="n">backoff_base</span><span class="o">=</span><span class="n">backoff_base</span><span class="p">,</span>
+            <span class="n">backoff_factor</span><span class="o">=</span><span class="n">backoff_factor</span><span class="p">,</span>
+            <span class="n">backoff_max</span><span class="o">=</span><span class="n">backoff_max</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Real agent communication setup</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span> <span class="o">=</span> <span class="n">enable_real_agents</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span> <span class="o">=</span> <span class="n">fallback_to_mock</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span><span class="p">:</span>
+            <span class="c1"># Create adapter factory</span>
+            <span class="n">retry_config</span> <span class="o">=</span> <span class="n">RetryConfig</span><span class="p">(</span>
+                <span class="n">max_retries</span><span class="o">=</span><span class="n">retry_attempts</span><span class="p">,</span>
+                <span class="n">base_delay</span><span class="o">=</span><span class="n">backoff_base</span><span class="p">,</span>
+                <span class="n">exponential_base</span><span class="o">=</span><span class="n">backoff_factor</span><span class="p">,</span>
+                <span class="n">max_delay</span><span class="o">=</span><span class="n">backoff_max</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span> <span class="o">=</span> <span class="n">AgentAdapterFactory</span><span class="p">(</span>
+                <span class="n">neo4j_manager</span><span class="o">=</span><span class="n">neo4j_manager</span><span class="p">,</span>
+                <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
+                <span class="n">fallback_to_mock</span><span class="o">=</span><span class="n">fallback_to_mock</span><span class="p">,</span>
+                <span class="n">retry_config</span><span class="o">=</span><span class="n">retry_config</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Create adapters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_ipa_adapter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_wba_adapter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_nga_adapter</span><span class="p">()</span>
+
+            <span class="c1"># Create message router</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span> <span class="o">=</span> <span class="n">MessageRouter</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Protocol translator</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">protocol_translator</span> <span class="o">=</span> <span class="n">ProtocolTranslator</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">protocol_translator</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.send_message_to_real_agent">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.send_message_to_real_agent">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message_to_real_agent</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">recipient</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">AgentMessage</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MessageResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a message directly to a real agent implementation.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            sender: Sender agent ID</span>
+<span class="sd">            recipient: Recipient agent ID</span>
+<span class="sd">            message: Message to send</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            MessageResult indicating delivery outcome</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span>
+                <span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span>
+                <span class="n">delivered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="s2">&quot;Real agent communication not enabled&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Route message to appropriate real agent</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span><span class="o">.</span><span class="n">route_message</span><span class="p">(</span><span class="n">recipient</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+            <span class="c1"># If successful, also store in Redis for audit/monitoring</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">delivered</span><span class="p">:</span>
+                <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">result</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to send message to real agent </span><span class="si">{</span><span class="n">recipient</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Fallback to standard Redis delivery if enabled</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Falling back to standard Redis message delivery&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span>
+                    <span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">delivered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.send_message">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.send_message">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">send_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sender</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">recipient</span><span class="p">:</span> <span class="n">AgentId</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="n">AgentMessage</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">MessageResult</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Send a message with automatic routing to real agents when available.</span>
+
+<span class="sd">        This method automatically determines whether to route to real agents</span>
+<span class="sd">        or use standard Redis message queuing based on configuration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check if we should route to real agent</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span>
+            <span class="ow">and</span> <span class="n">recipient</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">[</span><span class="n">AgentType</span><span class="o">.</span><span class="n">IPA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">WBA</span><span class="p">,</span> <span class="n">AgentType</span><span class="o">.</span><span class="n">NGA</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_message_to_real_agent</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Real agent routing failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Falling back to standard Redis delivery&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">MessageResult</span><span class="p">(</span>
+                        <span class="n">message_id</span><span class="o">=</span><span class="n">message</span><span class="o">.</span><span class="n">message_id</span><span class="p">,</span> <span class="n">delivered</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Use standard Redis message delivery</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">sender</span><span class="p">,</span> <span class="n">recipient</span><span class="p">,</span> <span class="n">message</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.process_agent_response">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.process_agent_response">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">process_agent_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">agent_type</span><span class="p">:</span> <span class="n">AgentType</span><span class="p">,</span>
+        <span class="n">response</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+        <span class="n">original_message</span><span class="p">:</span> <span class="n">AgentMessage</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Process a response from a real agent and translate it back to orchestration format.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            agent_type: Type of agent that generated the response</span>
+<span class="sd">            response: Raw response from the agent</span>
+<span class="sd">            original_message: Original message that triggered the response</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Processed response in orchestration format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_translator</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Translate response back to orchestration format</span>
+            <span class="n">translation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol_translator</span><span class="o">.</span><span class="n">translate_message</span><span class="p">(</span>
+                <span class="n">response</span><span class="p">,</span>
+                <span class="n">ProtocolType</span><span class="o">.</span><span class="n">REAL_AGENT</span><span class="p">,</span>
+                <span class="n">ProtocolType</span><span class="o">.</span><span class="n">ORCHESTRATION</span><span class="p">,</span>
+                <span class="n">agent_type</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">translation</span><span class="o">.</span><span class="n">success</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">translation</span><span class="o">.</span><span class="n">translated_message</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response translation failed: </span><span class="si">{</span><span class="n">translation</span><span class="o">.</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error processing agent response: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response</span></div>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.health_check_real_agents">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.health_check_real_agents">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">health_check_real_agents</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform health checks on real agent adapters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict mapping agent types to health status</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">health_status</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># Check IPA adapter</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">test_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="o">.</span><span class="n">process_input</span><span class="p">(</span><span class="s2">&quot;health check&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;ipa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;mock_fallback&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;IPA health check failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;ipa&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Check WBA adapter</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">test_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span><span class="s2">&quot;health_check&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;wba&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;mock_fallback&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;WBA health check failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;wba&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Check NGA adapter</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">test_result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span><span class="o">.</span><span class="n">generate_narrative</span><span class="p">(</span><span class="s2">&quot;health check&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;nga&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">test_result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;mock_fallback&quot;</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;NGA health check failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">health_status</span><span class="p">[</span><span class="s2">&quot;nga&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="n">health_status</span></div>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.get_real_agent_metrics">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.get_real_agent_metrics">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_real_agent_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get metrics from real agent adapters.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict containing real agent communication metrics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;real_agents_enabled&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;fallback_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span><span class="p">,</span>
+            <span class="s2">&quot;adapters_available&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;ipa&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="o">.</span><span class="n">_available</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;wba&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">_available</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+                <span class="s2">&quot;nga&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span><span class="o">.</span><span class="n">_available</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Add health check results</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">health_status</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">health_check_real_agents</span><span class="p">()</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;health_status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">health_status</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get health status: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;health_status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">return</span> <span class="n">metrics</span></div>
+
+
+<div class="viewcode-block" id="EnhancedRedisMessageCoordinator.configure_real_agents">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.EnhancedRedisMessageCoordinator.configure_real_agents">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">configure_real_agents</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">enable_real_agents</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">fallback_to_mock</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retry_config</span><span class="p">:</span> <span class="n">RetryConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Configure real agent communication settings at runtime.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            enable_real_agents: Whether to enable real agent communication</span>
+<span class="sd">            fallback_to_mock: Whether to fallback to mock implementations</span>
+<span class="sd">            retry_config: Retry configuration for agent communication</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">enable_real_agents</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enable_real_agents</span> <span class="o">=</span> <span class="n">enable_real_agents</span>
+
+        <span class="k">if</span> <span class="n">fallback_to_mock</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fallback_to_mock</span> <span class="o">=</span> <span class="n">fallback_to_mock</span>
+
+        <span class="k">if</span> <span class="n">retry_config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="p">:</span>
+            <span class="c1"># Update retry configuration in adapters</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">retry_config</span> <span class="o">=</span> <span class="n">retry_config</span>
+
+            <span class="c1"># Recreate adapters with new config</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_ipa_adapter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_wba_adapter</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adapter_factory</span><span class="o">.</span><span class="n">create_nga_adapter</span><span class="p">()</span>
+
+            <span class="c1"># Recreate message router</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">message_router</span> <span class="o">=</span> <span class="n">MessageRouter</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">wba_adapter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">nga_adapter</span>
+            <span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BatchedMessageProcessor">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.BatchedMessageProcessor">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BatchedMessageProcessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Efficient batched message processing for agent coordination.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">batch_timeout_ms</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">max_concurrent_batches</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_timeout_ms</span> <span class="o">=</span> <span class="n">batch_timeout_ms</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent_batches</span> <span class="o">=</span> <span class="n">max_concurrent_batches</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batch_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processing_semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="n">max_concurrent_batches</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_batch_timer</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="BatchedMessageProcessor.add_message">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.BatchedMessageProcessor.add_message">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">add_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">processor_func</span><span class="p">:</span> <span class="n">Callable</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add message to batch for processing.&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_lock</span><span class="p">:</span>
+            <span class="c1"># Add message to pending batch</span>
+            <span class="n">message_entry</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="n">message</span><span class="p">,</span>
+                <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="n">processor_func</span><span class="p">,</span>
+                <span class="s2">&quot;future&quot;</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Future</span><span class="p">(),</span>
+                <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+            <span class="p">}</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">message_entry</span><span class="p">)</span>
+
+            <span class="c1"># Start batch timer if not already running</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_timer</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_timer</span><span class="o">.</span><span class="n">done</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_batch_timer</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_batch_timeout_handler</span><span class="p">())</span>
+
+            <span class="c1"># Process batch if it&#39;s full</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_current_batch</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="k">await</span> <span class="n">message_entry</span><span class="p">[</span><span class="s2">&quot;future&quot;</span><span class="p">]</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_batch_timeout_handler</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Handle batch timeout to process partial batches.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_timeout_ms</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="p">:</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_current_batch</span><span class="p">()</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_current_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process the current batch of messages.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Extract current batch</span>
+        <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pending_messages</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+
+        <span class="c1"># Process batch asynchronously</span>
+        <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_execute_batch</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute a batch of messages.&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processing_semaphore</span><span class="p">:</span>
+            <span class="c1"># Group messages by processor type for efficiency</span>
+            <span class="n">processor_groups</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">batch</span><span class="p">:</span>
+                <span class="n">processor_key</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;processor&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">processor_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">processor_groups</span><span class="p">:</span>
+                    <span class="n">processor_groups</span><span class="p">[</span><span class="n">processor_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;processor&quot;</span><span class="p">:</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;processor&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;entries&quot;</span><span class="p">:</span> <span class="p">[],</span>
+                    <span class="p">}</span>
+                <span class="n">processor_groups</span><span class="p">[</span><span class="n">processor_key</span><span class="p">][</span><span class="s2">&quot;entries&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry</span><span class="p">)</span>
+
+            <span class="c1"># Process each group</span>
+            <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">processor_groups</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_group</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="s2">&quot;processor&quot;</span><span class="p">],</span> <span class="n">group</span><span class="p">[</span><span class="s2">&quot;entries&quot;</span><span class="p">])</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_group</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">processor_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a group of messages with the same processor.&quot;&quot;&quot;</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+            <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_process_single_message</span><span class="p">(</span><span class="n">processor_func</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+        <span class="c1"># Wait for all messages in the group to complete</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_process_single_message</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">processor_func</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">entry</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Process a single message and set its future result.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">processor_func</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;message&quot;</span><span class="p">])</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;future&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_result</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;future&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">set_exception</span><span class="p">(</span><span class="n">e</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="ScalableWorkflowCoordinator">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.ScalableWorkflowCoordinator">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ScalableWorkflowCoordinator</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Scalable coordinator for managing multiple simultaneous workflows.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">enhanced_coordinator</span><span class="p">:</span> <span class="n">EnhancedRedisMessageCoordinator</span><span class="p">,</span>
+        <span class="n">max_concurrent_workflows</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+        <span class="n">workflow_timeout_s</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">300.0</span><span class="p">,</span>
+        <span class="n">enable_batching</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span> <span class="o">=</span> <span class="n">enhanced_coordinator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_concurrent_workflows</span> <span class="o">=</span> <span class="n">max_concurrent_workflows</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workflow_timeout_s</span> <span class="o">=</span> <span class="n">workflow_timeout_s</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_batching</span> <span class="o">=</span> <span class="n">enable_batching</span>
+
+        <span class="c1"># Workflow management</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="n">max_concurrent_workflows</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Lock</span><span class="p">()</span>
+
+        <span class="c1"># Batching support</span>
+        <span class="k">if</span> <span class="n">enable_batching</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span> <span class="o">=</span> <span class="n">BatchedMessageProcessor</span><span class="p">(</span>
+                <span class="n">batch_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">batch_timeout_ms</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">max_concurrent_batches</span><span class="o">=</span><span class="mi">10</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Monitoring integration</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">.monitoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_system_monitor</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_system_monitor</span> <span class="o">=</span> <span class="n">get_system_monitor</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ScalableWorkflowCoordinator.execute_workflow">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.ScalableWorkflowCoordinator.execute_workflow">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_workflow</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">workflow_steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span>
+        <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute a complete workflow with scalable coordination.&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_semaphore</span><span class="p">:</span>
+            <span class="c1"># Record workflow start</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_system_monitor</span><span class="o">.</span><span class="n">start_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span>
+                        <span class="s2">&quot;steps&quot;</span><span class="p">:</span> <span class="n">workflow_steps</span><span class="p">,</span>
+                        <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">context</span> <span class="ow">or</span> <span class="p">{},</span>
+                        <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="s2">&quot;running&quot;</span><span class="p">,</span>
+                    <span class="p">}</span>
+
+                <span class="c1"># Execute workflow with timeout</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">wait_for</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_execute_workflow_steps</span><span class="p">(</span>
+                        <span class="n">workflow_id</span><span class="p">,</span> <span class="n">workflow_steps</span><span class="p">,</span> <span class="n">context</span> <span class="ow">or</span> <span class="p">{}</span>
+                    <span class="p">),</span>
+                    <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow_timeout_s</span><span class="p">,</span>
+                <span class="p">)</span>
+
+                <span class="c1"># Record successful completion</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_system_monitor</span><span class="o">.</span><span class="n">end_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">workflow_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;completed&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;result&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+                <span class="k">return</span> <span class="n">result</span>
+
+            <span class="k">except</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">TimeoutError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Workflow </span><span class="si">{</span><span class="n">workflow_id</span><span class="si">}</span><span class="s2"> timed out after </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">workflow_timeout_s</span><span class="si">}</span><span class="s2">s&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_system_monitor</span><span class="o">.</span><span class="n">end_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">workflow_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;timeout&quot;</span>
+
+                <span class="k">raise</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Workflow </span><span class="si">{</span><span class="n">workflow_id</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_system_monitor</span><span class="o">.</span><span class="n">end_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="n">success</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+                <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">workflow_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;failed&quot;</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;error&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+                <span class="k">raise</span>
+
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="c1"># Cleanup workflow after delay</span>
+                <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_cleanup_workflow</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">60.0</span><span class="p">))</span></div>
+
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_workflow_steps</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute individual workflow steps.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">accumulated_context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+            <span class="n">step_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">workflow_id</span><span class="si">}</span><span class="s2">_step_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">step_type</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="n">step_config</span> <span class="o">=</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{})</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing step </span><span class="si">{</span><span class="n">step_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">step_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">step_type</span> <span class="o">==</span> <span class="s2">&quot;ipa&quot;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_ipa_step</span><span class="p">(</span>
+                        <span class="n">step_config</span><span class="p">,</span> <span class="n">accumulated_context</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">step_type</span> <span class="o">==</span> <span class="s2">&quot;wba&quot;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_wba_step</span><span class="p">(</span>
+                        <span class="n">step_config</span><span class="p">,</span> <span class="n">accumulated_context</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">step_type</span> <span class="o">==</span> <span class="s2">&quot;nga&quot;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_nga_step</span><span class="p">(</span>
+                        <span class="n">step_config</span><span class="p">,</span> <span class="n">accumulated_context</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">step_type</span> <span class="o">==</span> <span class="s2">&quot;parallel&quot;</span><span class="p">:</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_parallel_steps</span><span class="p">(</span>
+                        <span class="n">step_config</span><span class="p">,</span> <span class="n">accumulated_context</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown step type: </span><span class="si">{</span><span class="n">step_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+                <span class="n">results</span><span class="p">[</span><span class="n">step_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
+
+                <span class="c1"># Update context with step results</span>
+                <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;update_context&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
+                    <span class="n">accumulated_context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">step_id</span><span class="si">}</span><span class="s2"> failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">step_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span> <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+
+                <span class="c1"># Check if workflow should continue on error</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;continue_on_error&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                    <span class="k">raise</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;workflow_id&quot;</span><span class="p">:</span> <span class="n">workflow_id</span><span class="p">,</span>
+            <span class="s2">&quot;steps_results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+            <span class="s2">&quot;final_context&quot;</span><span class="p">:</span> <span class="n">accumulated_context</span><span class="p">,</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_ipa_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute IPA step with batching support.&quot;&quot;&quot;</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;player_input&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="p">:</span>
+            <span class="c1"># Use batched processing</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">ipa_processor</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="o">.</span><span class="n">process_input</span><span class="p">(</span>
+                    <span class="n">message</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">},</span> <span class="n">ipa_processor</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Direct processing</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">ipa_adapter</span><span class="o">.</span><span class="n">process_input</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;ipa_result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span> <span class="s2">&quot;step_type&quot;</span><span class="p">:</span> <span class="s2">&quot;ipa&quot;</span><span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_wba_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute WBA step with batching support.&quot;&quot;&quot;</span>
+        <span class="n">world_id</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_id&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">)</span>
+        <span class="n">updates</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;updates&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;world_updates&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="p">:</span>
+            <span class="c1"># Use batched processing</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">wba_processor</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">return</span> <span class="p">(</span>
+                    <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span>
+                        <span class="n">message</span><span class="p">[</span><span class="s2">&quot;world_id&quot;</span><span class="p">],</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;updates&quot;</span><span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;world_id&quot;</span><span class="p">:</span> <span class="n">world_id</span><span class="p">,</span> <span class="s2">&quot;updates&quot;</span><span class="p">:</span> <span class="n">updates</span><span class="p">},</span> <span class="n">wba_processor</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Direct processing</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">wba_adapter</span><span class="o">.</span><span class="n">process_world_request</span><span class="p">(</span>
+                <span class="n">world_id</span><span class="p">,</span> <span class="n">updates</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;wba_result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span> <span class="s2">&quot;step_type&quot;</span><span class="p">:</span> <span class="s2">&quot;wba&quot;</span><span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_nga_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute NGA step with batching support.&quot;&quot;&quot;</span>
+        <span class="n">prompt</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;prompt&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;narrative_prompt&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">narrative_context</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">narrative_context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="p">:</span>
+            <span class="c1"># Use batched processing</span>
+            <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">nga_processor</span><span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">return</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">nga_adapter</span><span class="o">.</span><span class="n">generate_narrative</span><span class="p">(</span>
+                    <span class="n">message</span><span class="p">[</span><span class="s2">&quot;prompt&quot;</span><span class="p">],</span> <span class="n">message</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">,</span> <span class="p">{})</span>
+                <span class="p">)</span>
+
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_batch_processor</span><span class="o">.</span><span class="n">add_message</span><span class="p">(</span>
+                <span class="p">{</span><span class="s2">&quot;prompt&quot;</span><span class="p">:</span> <span class="n">prompt</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">narrative_context</span><span class="p">},</span> <span class="n">nga_processor</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Direct processing</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">enhanced_coordinator</span><span class="o">.</span><span class="n">nga_adapter</span><span class="o">.</span><span class="n">generate_narrative</span><span class="p">(</span>
+                <span class="n">prompt</span><span class="p">,</span> <span class="n">narrative_context</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;nga_result&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">,</span> <span class="s2">&quot;step_type&quot;</span><span class="p">:</span> <span class="s2">&quot;nga&quot;</span><span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_execute_parallel_steps</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">context</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Execute multiple steps in parallel.&quot;&quot;&quot;</span>
+        <span class="n">parallel_steps</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span> <span class="p">[])</span>
+
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">parallel_steps</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;ipa&quot;</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_ipa_step</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;wba&quot;</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_wba_step</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">context</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;nga&quot;</span><span class="p">:</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_execute_nga_step</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="p">{}),</span> <span class="n">context</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">,</span> <span class="n">return_exceptions</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;parallel_results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span>
+            <span class="s2">&quot;step_type&quot;</span><span class="p">:</span> <span class="s2">&quot;parallel&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;success&quot;</span><span class="p">:</span> <span class="nb">all</span><span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_cleanup_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">delay</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Clean up workflow data after delay.&quot;&quot;&quot;</span>
+        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">delay</span><span class="p">)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">workflow_id</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ScalableWorkflowCoordinator.get_active_workflows">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.ScalableWorkflowCoordinator.get_active_workflows">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">get_active_workflows</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information about currently active workflows.&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">workflow_id</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="n">workflow_data</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;start_time&quot;</span><span class="p">:</span> <span class="n">workflow_data</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;duration&quot;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">workflow_data</span><span class="p">[</span><span class="s2">&quot;start_time&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;steps_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">workflow_data</span><span class="p">[</span><span class="s2">&quot;steps&quot;</span><span class="p">]),</span>
+                <span class="p">}</span>
+                <span class="k">for</span> <span class="n">workflow_id</span><span class="p">,</span> <span class="n">workflow_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="ScalableWorkflowCoordinator.cancel_workflow">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.enhanced_coordinator.html#src.agent_orchestration.enhanced_coordinator.ScalableWorkflowCoordinator.cancel_workflow">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">cancel_workflow</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workflow_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Cancel an active workflow.&quot;&quot;&quot;</span>
+        <span class="k">async</span> <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_workflow_lock</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">workflow_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_active_workflows</span><span class="p">[</span><span class="n">workflow_id</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;cancelled&quot;</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

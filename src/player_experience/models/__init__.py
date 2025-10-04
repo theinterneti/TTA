@@ -5,35 +5,84 @@ This module contains all data models used in the player experience system,
 including player profiles, characters, worlds, and session management.
 """
 
-from .player import PlayerProfile, TherapeuticPreferences, PrivacySettings, CrisisContactInfo, ProgressSummary as PlayerProgressSummary
-from .character import Character, CharacterAppearance, CharacterBackground, TherapeuticProfile, TherapeuticGoal, CharacterCreationData, CharacterUpdates
-from .world import WorldSummary, WorldDetails, WorldParameters, CompatibilityReport, CompatibilityFactor, WorldPrerequisite, CustomizedWorld
-from .session import SessionContext, PlayerDashboard, SessionSummary, TherapeuticSettings, ProgressMarker, Recommendation
-from .therapeutic_settings import (
-    EnhancedTherapeuticSettings, TherapeuticBoundary, SettingsConflict, 
-    TherapeuticSettingsVersion, TherapeuticPreferencesValidator, SettingsMigrationManager,
-    SettingsConflictType, SettingsValidationLevel
+from .character import (
+    Character,
+    CharacterAppearance,
+    CharacterBackground,
+    CharacterCreationData,
+    CharacterUpdates,
+    TherapeuticGoal,
+    TherapeuticProfile,
 )
-from .progress import ProgressSummary, ProgressHighlight, Milestone, EngagementMetrics, TherapeuticMetric, TherapeuticEffectivenessReport, ProgressVizSeries
-from .enums import IntensityLevel, TherapeuticApproach, DifficultyLevel, CrisisType, SessionStatus, ProgressMarkerType
+from .enums import (
+    CrisisType,
+    DifficultyLevel,
+    IntensityLevel,
+    ProgressMarkerType,
+    SessionStatus,
+    TherapeuticApproach,
+)
+from .player import (
+    CrisisContactInfo,
+    PlayerProfile,
+    PrivacySettings,
+)
+from .player import ProgressSummary as PlayerProgressSummary
+from .player import (
+    TherapeuticPreferences,
+)
+from .progress import (
+    EngagementMetrics,
+    Milestone,
+    ProgressHighlight,
+    ProgressSummary,
+    ProgressVizSeries,
+    TherapeuticEffectivenessReport,
+    TherapeuticMetric,
+)
+from .session import (
+    PlayerDashboard,
+    ProgressMarker,
+    Recommendation,
+    SessionContext,
+    SessionSummary,
+    TherapeuticSettings,
+)
+from .therapeutic_settings import (
+    EnhancedTherapeuticSettings,
+    SettingsConflict,
+    SettingsConflictType,
+    SettingsMigrationManager,
+    SettingsValidationLevel,
+    TherapeuticBoundary,
+    TherapeuticPreferencesValidator,
+    TherapeuticSettingsVersion,
+)
+from .world import (
+    CompatibilityFactor,
+    CompatibilityReport,
+    CustomizedWorld,
+    WorldDetails,
+    WorldParameters,
+    WorldPrerequisite,
+    WorldSummary,
+)
 
 __all__ = [
     # Player models
     "PlayerProfile",
-    "TherapeuticPreferences", 
+    "TherapeuticPreferences",
     "PrivacySettings",
     "CrisisContactInfo",
     "PlayerProgressSummary",
-    
     # Character models
     "Character",
     "CharacterAppearance",
-    "CharacterBackground", 
+    "CharacterBackground",
     "TherapeuticProfile",
     "TherapeuticGoal",
     "CharacterCreationData",
     "CharacterUpdates",
-    
     # World models
     "WorldSummary",
     "WorldDetails",
@@ -42,7 +91,6 @@ __all__ = [
     "CompatibilityFactor",
     "WorldPrerequisite",
     "CustomizedWorld",
-    
     # Session models
     "SessionContext",
     "PlayerDashboard",
@@ -50,7 +98,6 @@ __all__ = [
     "TherapeuticSettings",
     "ProgressMarker",
     "Recommendation",
-    
     # Enhanced therapeutic settings models
     "EnhancedTherapeuticSettings",
     "TherapeuticBoundary",
@@ -60,7 +107,6 @@ __all__ = [
     "SettingsMigrationManager",
     "SettingsConflictType",
     "SettingsValidationLevel",
-    
     # Progress models
     "ProgressSummary",
     "ProgressHighlight",
@@ -69,7 +115,6 @@ __all__ = [
     "TherapeuticMetric",
     "TherapeuticEffectivenessReport",
     "ProgressVizSeries",
-    
     # Enums
     "IntensityLevel",
     "TherapeuticApproach",

@@ -1,0 +1,28 @@
+# Test Dockerfile for import validation
+FROM python:3.11-slim
+
+# Create user and directories
+RUN groupadd -r tta && useradd -r -g tta tta
+RUN mkdir -p /app && chown tta:tta /app
+
+# Set working directory
+WORKDIR /app
+USER tta
+
+# Copy application files
+COPY --chown=tta:tta src/player_experience/api/ ./
+COPY --chown=tta:tta src/player_experience/utils/ ./utils/
+COPY --chown=tta:tta src/player_experience/models/ ./models/
+COPY --chown=tta:tta src/player_experience/services/ ./services/
+COPY --chown=tta:tta src/player_experience/database/ ./database/
+COPY --chown=tta:tta src/player_experience/security/ ./security/
+COPY --chown=tta:tta src/player_experience/managers/ ./managers/
+COPY --chown=tta:tta src/monitoring/ ./monitoring/
+
+# Install minimal dependencies
+USER root
+RUN pip install fastapi uvicorn pydantic python-multipart
+USER tta
+
+# Test command
+CMD ["python", "-c", "from app import app; print('✅ SUCCESS: App imported successfully!', app)"]

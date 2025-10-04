@@ -1,10 +1,12 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store/store';
 import { fetchPlayerDashboard } from '../../store/slices/playerSlice';
 
 const Dashboard: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { profile, dashboard, isLoading } = useSelector((state: RootState) => state.player);
   const { characters } = useSelector((state: RootState) => state.character);
 
@@ -125,25 +127,31 @@ const Dashboard: React.FC = () => {
       {/* Quick Actions */}
       <div className="bg-white rounded-lg shadow-md p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <button 
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <button
             className="btn-primary text-center py-4"
-            onClick={() => window.location.href = '/characters'}
+            onClick={() => navigate('/characters')}
           >
             {characters.length === 0 ? 'Create First Character' : 'Manage Characters'}
           </button>
-          <button 
+          <button
             className="btn-secondary text-center py-4"
-            onClick={() => window.location.href = '/worlds'}
+            onClick={() => navigate('/worlds')}
           >
             Explore Worlds
           </button>
-          <button 
+          <button
             className="btn-secondary text-center py-4"
-            onClick={() => window.location.href = '/chat'}
+            onClick={() => navigate('/chat')}
             disabled={characters.length === 0}
           >
             {characters.length === 0 ? 'Create Character First' : 'Continue Last Session'}
+          </button>
+          <button
+            className="btn-secondary text-center py-4 bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100"
+            onClick={() => navigate('/analytics')}
+          >
+            View Analytics
           </button>
         </div>
       </div>

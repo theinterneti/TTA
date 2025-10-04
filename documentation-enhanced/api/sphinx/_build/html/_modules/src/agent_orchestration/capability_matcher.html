@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.agent_orchestration.capability_matcher &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.agent_orchestration.capability_matcher</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.agent_orchestration.capability_matcher</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Capability matching algorithms for agent discovery.</span>
+
+<span class="sd">This module provides sophisticated algorithms for matching agent capabilities</span>
+<span class="sd">against request criteria, supporting various matching strategies and scoring methods.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AgentCapability</span><span class="p">,</span>
+    <span class="n">AgentCapabilitySet</span><span class="p">,</span>
+    <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="n">CapabilityMatchResult</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="MatchingStrategy">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.capability_matcher.html#src.agent_orchestration.capability_matcher.MatchingStrategy">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MatchingStrategy</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Available capability matching strategies.&quot;&quot;&quot;</span>
+
+    <span class="n">EXACT_MATCH</span> <span class="o">=</span> <span class="s2">&quot;exact_match&quot;</span>  <span class="c1"># Exact name and version matching</span>
+    <span class="n">WEIGHTED_SCORE</span> <span class="o">=</span> <span class="s2">&quot;weighted_score&quot;</span>  <span class="c1"># Weighted scoring algorithm</span>
+    <span class="n">FUZZY_MATCH</span> <span class="o">=</span> <span class="s2">&quot;fuzzy_match&quot;</span>  <span class="c1"># Fuzzy string matching</span>
+    <span class="n">PRIORITY_BASED</span> <span class="o">=</span> <span class="s2">&quot;priority_based&quot;</span>  <span class="c1"># Priority-based selection</span>
+    <span class="n">SEMANTIC_MATCH</span> <span class="o">=</span> <span class="s2">&quot;semantic_match&quot;</span>  <span class="c1"># Semantic similarity matching</span></div>
+
+
+
+<div class="viewcode-block" id="CapabilityMatcher">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.capability_matcher.html#src.agent_orchestration.capability_matcher.CapabilityMatcher">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">CapabilityMatcher</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Advanced capability matching engine with multiple algorithms.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">default_strategy</span><span class="p">:</span> <span class="n">MatchingStrategy</span> <span class="o">=</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">WEIGHTED_SCORE</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_strategy</span> <span class="o">=</span> <span class="n">default_strategy</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strategy_weights</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name_match&quot;</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+            <span class="s2">&quot;type_match&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;version_match&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;performance_match&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="p">}</span>
+
+<div class="viewcode-block" id="CapabilityMatcher.match_capabilities">
+<a class="viewcode-back" href="../../../api/src.agent_orchestration.capability_matcher.html#src.agent_orchestration.capability_matcher.CapabilityMatcher.match_capabilities">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">match_capabilities</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+        <span class="n">strategy</span><span class="p">:</span> <span class="n">MatchingStrategy</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_results</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Match capabilities against criteria using specified strategy.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            capability_sets: List of agent capability sets to search</span>
+<span class="sd">            criteria: Matching criteria</span>
+<span class="sd">            strategy: Matching strategy to use (defaults to instance default)</span>
+<span class="sd">            max_results: Maximum number of results to return</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List of capability match results, sorted by score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="n">strategy</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_strategy</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">EXACT_MATCH</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_exact_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">WEIGHTED_SCORE</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_score_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">FUZZY_MATCH</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuzzy_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">PRIORITY_BASED</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_priority_based_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">strategy</span> <span class="o">==</span> <span class="n">MatchingStrategy</span><span class="o">.</span><span class="n">SEMANTIC_MATCH</span><span class="p">:</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_semantic_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Unknown matching strategy: </span><span class="si">{</span><span class="n">strategy</span><span class="si">}</span><span class="s2">, falling back to weighted_score&quot;</span>
+                <span class="p">)</span>
+                <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_weighted_score_match</span><span class="p">(</span><span class="n">capability_sets</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+
+            <span class="c1"># Sort by match score (descending) and limit results</span>
+            <span class="n">matches</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">match_score</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">matches</span><span class="p">[:</span><span class="n">max_results</span><span class="p">]</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Capability matching failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_exact_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Exact matching strategy - requires perfect matches.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cap_set</span> <span class="ow">in</span> <span class="n">capability_sets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_agent_availability</span><span class="p">(</span><span class="n">cap_set</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">get_active_capabilities</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_exact_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                    <span class="n">match_result</span> <span class="o">=</span> <span class="n">CapabilityMatchResult</span><span class="p">(</span>
+                        <span class="n">agent_id</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                        <span class="n">capability</span><span class="o">=</span><span class="n">capability</span><span class="p">,</span>
+                        <span class="n">match_score</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+                        <span class="n">exact_match</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">version_match</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">performance_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_performance_match</span><span class="p">(</span>
+                            <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+                        <span class="p">),</span>
+                        <span class="n">agent_load_factor</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span><span class="p">,</span>
+                        <span class="n">agent_availability</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_weighted_score_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Weighted scoring strategy - calculates scores based on multiple factors.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cap_set</span> <span class="ow">in</span> <span class="n">capability_sets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_agent_availability</span><span class="p">(</span><span class="n">cap_set</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">get_active_capabilities</span><span class="p">():</span>
+                <span class="n">score_components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_score_components</span><span class="p">(</span>
+                    <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">score_components</span><span class="p">[</span><span class="s2">&quot;total_score&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">final_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_weighted_score</span><span class="p">(</span><span class="n">score_components</span><span class="p">)</span>
+
+                    <span class="n">match_result</span> <span class="o">=</span> <span class="n">CapabilityMatchResult</span><span class="p">(</span>
+                        <span class="n">agent_id</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                        <span class="n">capability</span><span class="o">=</span><span class="n">capability</span><span class="p">,</span>
+                        <span class="n">match_score</span><span class="o">=</span><span class="n">final_score</span><span class="p">,</span>
+                        <span class="n">exact_match</span><span class="o">=</span><span class="n">score_components</span><span class="p">[</span><span class="s2">&quot;exact_match&quot;</span><span class="p">],</span>
+                        <span class="n">version_match</span><span class="o">=</span><span class="n">score_components</span><span class="p">[</span><span class="s2">&quot;version_match&quot;</span><span class="p">],</span>
+                        <span class="n">performance_match</span><span class="o">=</span><span class="n">score_components</span><span class="p">[</span><span class="s2">&quot;performance_match&quot;</span><span class="p">],</span>
+                        <span class="n">agent_load_factor</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span><span class="p">,</span>
+                        <span class="n">agent_availability</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fuzzy_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fuzzy matching strategy - allows partial string matches.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cap_set</span> <span class="ow">in</span> <span class="n">capability_sets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_agent_availability</span><span class="p">(</span><span class="n">cap_set</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">get_active_capabilities</span><span class="p">():</span>
+                <span class="n">fuzzy_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_fuzzy_score</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">fuzzy_score</span> <span class="o">&gt;</span> <span class="mf">0.3</span><span class="p">:</span>  <span class="c1"># Minimum fuzzy threshold</span>
+                    <span class="n">match_result</span> <span class="o">=</span> <span class="n">CapabilityMatchResult</span><span class="p">(</span>
+                        <span class="n">agent_id</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                        <span class="n">capability</span><span class="o">=</span><span class="n">capability</span><span class="p">,</span>
+                        <span class="n">match_score</span><span class="o">=</span><span class="n">fuzzy_score</span><span class="p">,</span>
+                        <span class="n">exact_match</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">version_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_version_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">),</span>
+                        <span class="n">performance_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_performance_match</span><span class="p">(</span>
+                            <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+                        <span class="p">),</span>
+                        <span class="n">agent_load_factor</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span><span class="p">,</span>
+                        <span class="n">agent_availability</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_priority_based_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Priority-based matching - uses agent and capability priorities.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cap_set</span> <span class="ow">in</span> <span class="n">capability_sets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_agent_availability</span><span class="p">(</span><span class="n">cap_set</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">get_active_capabilities</span><span class="p">():</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meets_basic_criteria</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                    <span class="c1"># Score based on agent priority and load factor</span>
+                    <span class="n">priority_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">cap_set</span><span class="o">.</span><span class="n">priority</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                        <span class="mf">1.0</span> <span class="o">-</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span>
+                    <span class="p">)</span>
+
+                    <span class="n">match_result</span> <span class="o">=</span> <span class="n">CapabilityMatchResult</span><span class="p">(</span>
+                        <span class="n">agent_id</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                        <span class="n">capability</span><span class="o">=</span><span class="n">capability</span><span class="p">,</span>
+                        <span class="n">match_score</span><span class="o">=</span><span class="n">priority_score</span><span class="p">,</span>
+                        <span class="n">exact_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_is_exact_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">),</span>
+                        <span class="n">version_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_version_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">),</span>
+                        <span class="n">performance_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_performance_match</span><span class="p">(</span>
+                            <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+                        <span class="p">),</span>
+                        <span class="n">agent_load_factor</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span><span class="p">,</span>
+                        <span class="n">agent_availability</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_semantic_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">capability_sets</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">AgentCapabilitySet</span><span class="p">],</span>
+        <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">CapabilityMatchResult</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Semantic matching - uses description and tag similarity.&quot;&quot;&quot;</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">cap_set</span> <span class="ow">in</span> <span class="n">capability_sets</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_agent_availability</span><span class="p">(</span><span class="n">cap_set</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+                <span class="k">continue</span>
+
+            <span class="k">for</span> <span class="n">capability</span> <span class="ow">in</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">get_active_capabilities</span><span class="p">():</span>
+                <span class="n">semantic_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_calculate_semantic_score</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">semantic_score</span> <span class="o">&gt;</span> <span class="mf">0.2</span><span class="p">:</span>  <span class="c1"># Minimum semantic threshold</span>
+                    <span class="n">match_result</span> <span class="o">=</span> <span class="n">CapabilityMatchResult</span><span class="p">(</span>
+                        <span class="n">agent_id</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">agent_id</span><span class="p">,</span>
+                        <span class="n">capability</span><span class="o">=</span><span class="n">capability</span><span class="p">,</span>
+                        <span class="n">match_score</span><span class="o">=</span><span class="n">semantic_score</span><span class="p">,</span>
+                        <span class="n">exact_match</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">version_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_version_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">),</span>
+                        <span class="n">performance_match</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_performance_match</span><span class="p">(</span>
+                            <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+                        <span class="p">),</span>
+                        <span class="n">agent_load_factor</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span><span class="p">,</span>
+                        <span class="n">agent_availability</span><span class="o">=</span><span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">matches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match_result</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span>
+
+    <span class="c1"># Helper methods for matching logic</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_agent_availability</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">cap_set</span><span class="p">:</span> <span class="n">AgentCapabilitySet</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if agent meets availability criteria.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">require_available</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">availability</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">cap_set</span><span class="o">.</span><span class="n">load_factor</span> <span class="o">&gt;</span> <span class="n">criteria</span><span class="o">.</span><span class="n">max_load_factor</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_is_exact_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if capability is an exact match for criteria.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_version_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">required_inputs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">criteria</span><span class="o">.</span><span class="n">required_inputs</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+            <span class="n">capability</span><span class="o">.</span><span class="n">required_inputs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">capability</span><span class="o">.</span><span class="n">optional_inputs</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_meets_basic_criteria</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if capability meets basic matching criteria.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">required_inputs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">criteria</span><span class="o">.</span><span class="n">required_inputs</span><span class="o">.</span><span class="n">issubset</span><span class="p">(</span>
+            <span class="n">capability</span><span class="o">.</span><span class="n">required_inputs</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="n">capability</span><span class="o">.</span><span class="n">optional_inputs</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_version_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if capability version matches criteria.&quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">min_version</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">version</span> <span class="o">&lt;</span> <span class="n">criteria</span><span class="o">.</span><span class="n">min_version</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">max_version</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">version</span> <span class="o">&gt;</span> <span class="n">criteria</span><span class="o">.</span><span class="n">max_version</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>  <span class="c1"># If version comparison fails, assume compatible</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_performance_match</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if capability meets performance criteria.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">max_duration_ms</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">estimated_duration_ms</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">capability</span><span class="o">.</span><span class="n">estimated_duration_ms</span> <span class="o">&lt;=</span> <span class="n">criteria</span><span class="o">.</span><span class="n">max_duration_ms</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_score_components</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate individual score components for weighted matching.&quot;&quot;&quot;</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;name_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;type_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;version_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;performance_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;total_score&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;exact_match&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;version_match&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+            <span class="s2">&quot;performance_match&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Name matching</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">capability</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span><span class="p">:</span>
+                <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">elif</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">capability</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.7</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">components</span>  <span class="c1"># No name match, skip this capability</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># No name requirement</span>
+
+        <span class="c1"># Type matching</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">capability</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span><span class="p">:</span>
+                <span class="n">components</span><span class="p">[</span><span class="s2">&quot;type_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">components</span>  <span class="c1"># Type mismatch, skip this capability</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;type_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># No type requirement</span>
+
+        <span class="c1"># Version matching</span>
+        <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_match&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_version_match</span><span class="p">(</span><span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_match&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">criteria</span><span class="o">.</span><span class="n">preferred_version</span>
+                <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">version</span> <span class="o">==</span> <span class="n">criteria</span><span class="o">.</span><span class="n">preferred_version</span>
+            <span class="p">):</span>
+                <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.8</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">components</span>  <span class="c1"># Version mismatch, skip this capability</span>
+
+        <span class="c1"># Performance matching</span>
+        <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_match&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_check_performance_match</span><span class="p">(</span>
+            <span class="n">capability</span><span class="p">,</span> <span class="n">criteria</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_match&quot;</span><span class="p">]:</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="mf">0.5</span>  <span class="c1"># Partial score for performance issues</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Check for exact match</span>
+        <span class="n">components</span><span class="p">[</span><span class="s2">&quot;exact_match&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span>
+            <span class="ow">and</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;type_score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span>
+            <span class="ow">and</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span>
+            <span class="ow">and</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_score&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mf">1.0</span>
+        <span class="p">)</span>
+
+        <span class="c1"># At least one component must score</span>
+        <span class="n">score_values</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">],</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;type_score&quot;</span><span class="p">],</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_score&quot;</span><span class="p">],</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_score&quot;</span><span class="p">],</span>
+        <span class="p">]</span>
+        <span class="n">components</span><span class="p">[</span><span class="s2">&quot;total_score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">score_values</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">components</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_weighted_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">components</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate final weighted score from components.&quot;&quot;&quot;</span>
+        <span class="n">weighted_score</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">components</span><span class="p">[</span><span class="s2">&quot;name_score&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy_weights</span><span class="p">[</span><span class="s2">&quot;name_match&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;type_score&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy_weights</span><span class="p">[</span><span class="s2">&quot;type_match&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;version_score&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy_weights</span><span class="p">[</span><span class="s2">&quot;version_match&quot;</span><span class="p">]</span>
+            <span class="o">+</span> <span class="n">components</span><span class="p">[</span><span class="s2">&quot;performance_score&quot;</span><span class="p">]</span>
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strategy_weights</span><span class="p">[</span><span class="s2">&quot;performance_match&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">weighted_score</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_fuzzy_score</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate fuzzy matching score based on string similarity.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.5</span>  <span class="c1"># No name criteria, moderate score</span>
+
+        <span class="c1"># Simple fuzzy matching using common subsequences</span>
+        <span class="n">name_similarity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_string_similarity</span><span class="p">(</span>
+            <span class="n">capability</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Boost score if type matches</span>
+        <span class="n">type_boost</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_type</span><span class="p">:</span>
+            <span class="n">type_boost</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">name_similarity</span> <span class="o">+</span> <span class="n">type_boost</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_calculate_semantic_score</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">capability</span><span class="p">:</span> <span class="n">AgentCapability</span><span class="p">,</span> <span class="n">criteria</span><span class="p">:</span> <span class="n">CapabilityMatchCriteria</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate semantic similarity score.&quot;&quot;&quot;</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Tag overlap</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">required_tags</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
+            <span class="n">tag_overlap</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">criteria</span><span class="o">.</span><span class="n">required_tags</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">capability</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+            <span class="n">tag_score</span> <span class="o">=</span> <span class="n">tag_overlap</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">criteria</span><span class="o">.</span><span class="n">required_tags</span><span class="p">)</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">tag_score</span> <span class="o">*</span> <span class="mf">0.6</span>
+
+        <span class="c1"># Description similarity (simple keyword matching)</span>
+        <span class="k">if</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span> <span class="ow">and</span> <span class="n">capability</span><span class="o">.</span><span class="n">description</span><span class="p">:</span>
+            <span class="n">desc_similarity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_keyword_similarity</span><span class="p">(</span>
+                <span class="n">capability</span><span class="o">.</span><span class="n">description</span><span class="p">,</span> <span class="n">criteria</span><span class="o">.</span><span class="n">capability_name</span>
+            <span class="p">)</span>
+            <span class="n">score</span> <span class="o">+=</span> <span class="n">desc_similarity</span> <span class="o">*</span> <span class="mf">0.4</span>
+
+        <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">score</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_string_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">str1</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">str2</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate string similarity using longest common subsequence.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">str1</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">str2</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="c1"># Simple similarity based on common characters</span>
+        <span class="n">str1_lower</span> <span class="o">=</span> <span class="n">str1</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">str2_lower</span> <span class="o">=</span> <span class="n">str2</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">str1_lower</span> <span class="o">==</span> <span class="n">str2_lower</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+
+        <span class="c1"># Count common characters</span>
+        <span class="n">common_chars</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">str1_lower</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">str2_lower</span><span class="p">)</span>
+        <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">str1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">str2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">common_chars</span> <span class="o">/</span> <span class="n">max_len</span> <span class="k">if</span> <span class="n">max_len</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_keyword_similarity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">keyword</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate keyword similarity in text.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">keyword</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">text_lower</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">keyword_lower</span> <span class="o">=</span> <span class="n">keyword</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">keyword_lower</span> <span class="ow">in</span> <span class="n">text_lower</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+
+        <span class="c1"># Check for partial matches</span>
+        <span class="n">keyword_words</span> <span class="o">=</span> <span class="n">keyword_lower</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="mi">1</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">keyword_words</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">text_lower</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">matches</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">keyword_words</span><span class="p">)</span> <span class="k">if</span> <span class="n">keyword_words</span> <span class="k">else</span> <span class="mf">0.0</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -62,9 +62,30 @@ docker-compose up
 
 ## Documentation
 
+## Environment Setup
+
+The TTA project uses a secure, consolidated environment configuration structure. To get started:
+
+```bash
+# 1. Copy the environment template
+cp .env.example .env
+
+# 2. Get a free OpenRouter API key at https://openrouter.ai
+# 3. Edit .env and set your API key:
+OPENROUTER_API_KEY=your_actual_key_here
+
+# 4. Validate your setup
+python scripts/validate_environment.py
+```
+
+For detailed setup instructions, see: [ENVIRONMENT_SETUP.md](ENVIRONMENT_SETUP.md)
+
+## Documentation
+
 For more information, see the documentation in the `Documentation` directory:
 
-- [Environment Structure](Documentation/ENV_STRUCTURE.md)
+- [Environment Structure](Documentation/ENV_STRUCTURE.md) - **Updated with new consolidated structure**
+- [Environment Setup Guide](ENVIRONMENT_SETUP.md) - **Comprehensive setup instructions**
 - [GitHub Setup](Documentation/GITHUB_SETUP.md)
 - [Docker Setup Guide](Documentation/docker/docker_setup_guide.md)
 - [DevContainer Troubleshooting Guide](Documentation/docker/devcontainer_troubleshooting_guide.md)
@@ -81,10 +102,55 @@ The repository includes several scripts to help organize the codebase:
 
 ## Testing
 
-To run the tests for the TTA project, use the following command:
+The TTA project includes comprehensive testing infrastructure with multiple layers of validation:
+
+### Comprehensive Test Battery 🧪
+
+The TTA Comprehensive Test Battery provides robust, multi-dimensional testing with automatic mock fallback:
 
 ```bash
+# Quick validation (standard tests)
+python tests/comprehensive_battery/run_comprehensive_tests.py --categories standard
+
+# Full test battery (all categories)
+python tests/comprehensive_battery/run_comprehensive_tests.py --all --detailed-report
+
+# Force mock mode (no external dependencies)
+python tests/comprehensive_battery/run_comprehensive_tests.py --all --force-mock
+
+# Using Makefile shortcuts
+make test-all
+make test-standard
+make test-adversarial
+```
+
+**Test Categories:**
+- **Standard Tests**: Normal user interactions and story generation flows
+- **Adversarial Tests**: Security vulnerabilities and edge cases
+- **Load/Stress Tests**: Performance under concurrent load
+- **Data Pipeline Tests**: End-to-end data flow validation
+- **Dashboard Tests**: Real-time monitoring functionality
+
+**Key Features:**
+- ✅ **Mock/Real Service Support**: Automatic fallback when services unavailable
+- ✅ **CI/CD Integration**: GitHub Actions workflows included
+- ✅ **Developer Dashboard**: Real-time monitoring and results visualization
+- ✅ **Flexible Execution**: Run individual categories or full battery
+- ✅ **Comprehensive Reporting**: JSON, HTML, CSV, and TXT formats
+
+See [Comprehensive Test Battery Documentation](docs/testing/comprehensive-test-battery.md) for detailed usage.
+
+### Traditional Testing
+
+```bash
+# Run traditional unit tests
 python -m unittest discover tests
+
+# Run with pytest (if available)
+pytest
+
+# Integration with comprehensive test battery
+COMPREHENSIVE_TEST_MODE=true pytest tests/test_comprehensive_integration.py
 ```
 
 ## Agent Orchestration Diagnostics (Local)

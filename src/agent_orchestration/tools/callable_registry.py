@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import threading
-from typing import Any, Callable, Dict, Optional, Tuple
+from collections.abc import Callable
+from typing import Any
 
 from .models import ToolSpec
 
@@ -16,13 +17,17 @@ class CallableRegistry:
     def __init__(self) -> None:
         self._lock = threading.RLock()
         # map: name -> { version -> callable }
-        self._map: Dict[str, Dict[str, Callable[..., Any]]] = {}
+        self._map: dict[str, dict[str, Callable[..., Any]]] = {}
 
-    def register_callable(self, tool_name: str, version: str, callable_fn: Callable[..., Any]) -> None:
+    def register_callable(
+        self, tool_name: str, version: str, callable_fn: Callable[..., Any]
+    ) -> None:
         with self._lock:
             self._map.setdefault(tool_name, {})[version] = callable_fn
 
-    def _latest_version(self, versions: Dict[str, Callable[..., Any]]) -> Optional[Tuple[str, Callable[..., Any]]]:
+    def _latest_version(
+        self, versions: dict[str, Callable[..., Any]]
+    ) -> tuple[str, Callable[..., Any]] | None:
         if not versions:
             return None
         # naive: lexicographic max; can be improved with semver parsing
@@ -43,10 +48,12 @@ class CallableRegistry:
             return latest[1]
 
     # Extension points for distributed backends
-    def get_registered(self) -> Dict[str, Dict[str, str]]:
+    def get_registered(self) -> dict[str, dict[str, str]]:
         """Return a snapshot of registered entries with dotted paths if possible.
         Default returns function repr (not importable). Override for richer data.
         """
         with self._lock:
-            return {n: {v: repr(fn) for v, fn in versions.items()} for n, versions in self._map.items()}
-
+            return {
+                n: {v: repr(fn) for v, fn in versions.items()}
+                for n, versions in self._map.items()
+            }

@@ -1,11 +1,11 @@
 from src.agent_orchestration import (
+    AgentId,
+    AgentMessage,
+    AgentType,
     MessageResult,
     MessageSubscription,
-    QueueMessage,
-    AgentId,
-    AgentType,
-    AgentMessage,
     MessageType,
+    QueueMessage,
 )
 
 
@@ -35,4 +35,3 @@ def test_queue_message_defaults():
     )
     assert isinstance(qm.delivery_attempts, int)
     assert qm.enqueued_at is None
-

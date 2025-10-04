@@ -5,8 +5,8 @@ This module sets up the FastAPI application with middleware, error handling,
 authentication, and CORS configuration.
 """
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -14,19 +14,77 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.responses import PlainTextResponse
 
-from ..utils.validation import ValidationError
-from .auth import AuthenticationError, AuthorizationError
-from .middleware import (
-    AuthenticationMiddleware,
-    LoggingMiddleware,
-    RateLimitMiddleware,
-    SecurityHeadersMiddleware,
-    TherapeuticSafetyMiddleware,
-)
-from .routers import auth, characters, players, worlds, chat, sessions, progress
-from .routers import metrics as metrics_router
+# Try relative import first, fall back to absolute import
+try:
+    from ..utils.validation import ValidationError
+except ImportError:
+    from src.player_experience.utils.validation import ValidationError
 
+try:
+    from .auth import AuthenticationError, AuthorizationError
+except ImportError:
+    from src.player_experience.api.auth import AuthenticationError, AuthorizationError
+
+try:
+    from .middleware import (
+        AuthenticationMiddleware,
+        LoggingMiddleware,
+        RateLimitMiddleware,
+        SecurityHeadersMiddleware,
+        TherapeuticSafetyMiddleware,
+    )
+except ImportError:
+    from src.player_experience.api.middleware import (
+        AuthenticationMiddleware,
+        LoggingMiddleware,
+        RateLimitMiddleware,
+        SecurityHeadersMiddleware,
+        TherapeuticSafetyMiddleware,
+    )
+
+try:
+    from .routers import (
+        auth,
+        characters,
+        chat,
+        conversation,
+        gameplay,
+    )
+    from .routers import metrics as metrics_router
+    from .routers import (
+        openrouter_auth,
+        players,
+        progress,
+        sessions,
+        settings,
+        worlds,
+    )
+except ImportError:
+    from src.player_experience.api.routers import (
+        auth,
+        characters,
+        chat,
+        conversation,
+        gameplay,
+    )
+    from src.player_experience.api.routers import metrics as metrics_router
+    from src.player_experience.api.routers import (
+        openrouter_auth,
+        players,
+        progress,
+        sessions,
+        settings,
+        worlds,
+    )
+
+try:
+    from .config import get_settings
+    from .sentry_config import init_sentry
+except ImportError:
+    from src.player_experience.api.config import get_settings
+    from src.player_experience.api.sentry_config import init_sentry
 
 
 @asynccontextmanager
@@ -38,6 +96,10 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # Startup
     print("Starting Player Experience Interface API...")
+
+    # Initialize Sentry for error monitoring and performance tracking
+    settings = get_settings()
+    init_sentry(settings)
 
     # Initialize any required services here
     # e.g., database connections, cache connections, etc.
@@ -97,13 +159,59 @@ def create_app() -> FastAPI:
     app.add_middleware(LoggingMiddleware)
     app.add_middleware(AuthenticationMiddleware)
 
+    # Add Prometheus metrics middleware
+    try:
+        from monitoring.metrics_middleware import setup_monitoring_middleware
+
+        setup_monitoring_middleware(app, service_name="player-experience")
+    except ImportError:
+        # Fallback if monitoring module not available
+        pass
+
     # Include routers
     app.include_router(auth.router, prefix="/api/v1/auth", tags=["authentication"])
+    app.include_router(
+        openrouter_auth.router, prefix="/api/v1", tags=["openrouter-auth"]
+    )
     app.include_router(players.router, prefix="/api/v1/players", tags=["players"])
-    app.include_router(characters.router, prefix="/api/v1/characters", tags=["characters"])
+    app.include_router(
+        characters.router, prefix="/api/v1/characters", tags=["characters"]
+    )
     app.include_router(worlds.router, prefix="/api/v1/worlds", tags=["worlds"])
     app.include_router(sessions.router, prefix="/api/v1/sessions", tags=["sessions"])
-    # Metrics (gated by settings.debug)
+    app.include_router(
+        conversation.router, prefix="/api/v1/conversation", tags=["conversation"]
+    )
+    app.include_router(settings.router, prefix="/api/v1/players", tags=["settings"])
+
+    # Add Prometheus metrics endpoint (no authentication required) - BEFORE routers
+    @app.get("/metrics", response_class=PlainTextResponse, include_in_schema=False)
+    async def prometheus_metrics():
+        """Prometheus metrics endpoint for monitoring (no auth required)."""
+        try:
+            import prometheus_client
+            from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
+
+            # Generate basic metrics for the TTA Player API
+            metrics_output = generate_latest()
+            return PlainTextResponse(
+                content=metrics_output.decode("utf-8"), media_type=CONTENT_TYPE_LATEST
+            )
+        except ImportError:
+            # Fallback to basic metrics if prometheus_client not available
+            return PlainTextResponse(
+                content="# Prometheus metrics not available\n# Install prometheus-client package\n",
+                media_type="text/plain",
+            )
+        except Exception as e:
+            return PlainTextResponse(
+                content=f"# Error generating Prometheus metrics: {e}\n",
+                status_code=500,
+                media_type="text/plain",
+            )
+
+    app.include_router(gameplay.router, prefix="/api/v1/gameplay", tags=["gameplay"])
+    # Metrics (gated by settings.debug) - now includes /metrics-prom endpoint
     app.include_router(metrics_router.router, tags=["metrics"])
     app.include_router(progress.router, prefix="/api/v1", tags=["progress"])
 
@@ -141,7 +249,9 @@ def register_exception_handlers(app: FastAPI) -> None:
     """
 
     @app.exception_handler(StarletteHTTPException)
-    async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
+    async def http_exception_handler(
+        request: Request, exc: StarletteHTTPException
+    ) -> JSONResponse:
         """Handle HTTP exceptions."""
         return JSONResponse(
             status_code=exc.status_code,
@@ -153,9 +263,12 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(RequestValidationError)
-    async def validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    async def validation_exception_handler(
+        request: Request, exc: RequestValidationError
+    ) -> JSONResponse:
         """Handle request validation errors."""
         from fastapi.encoders import jsonable_encoder
+
         errs = jsonable_encoder(exc.errors())
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -168,7 +281,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(ValidationError)
-    async def custom_validation_exception_handler(request: Request, exc: ValidationError) -> JSONResponse:
+    async def custom_validation_exception_handler(
+        request: Request, exc: ValidationError
+    ) -> JSONResponse:
         """Handle custom validation errors."""
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -179,7 +294,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(AuthenticationError)
-    async def authentication_exception_handler(request: Request, exc: AuthenticationError) -> JSONResponse:
+    async def authentication_exception_handler(
+        request: Request, exc: AuthenticationError
+    ) -> JSONResponse:
         """Handle authentication errors."""
         return JSONResponse(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -191,7 +308,9 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(AuthorizationError)
-    async def authorization_exception_handler(request: Request, exc: AuthorizationError) -> JSONResponse:
+    async def authorization_exception_handler(
+        request: Request, exc: AuthorizationError
+    ) -> JSONResponse:
         """Handle authorization errors."""
         return JSONResponse(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -202,12 +321,27 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def general_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    async def general_exception_handler(
+        request: Request, exc: Exception
+    ) -> JSONResponse:
         """Handle unexpected exceptions."""
         # Log and include a minimal detail for easier test debugging
         try:
             import logging
+
             logging.getLogger(__name__).error("Unhandled exception", exc_info=exc)
+
+            # Capture exception in Sentry with therapeutic context
+            from sentry_config import capture_therapeutic_error
+
+            capture_therapeutic_error(
+                exc,
+                context={
+                    "request_method": request.method,
+                    "request_url": str(request.url),
+                    "request_headers": dict(request.headers),
+                },
+            )
         except Exception:
             pass
         return JSONResponse(

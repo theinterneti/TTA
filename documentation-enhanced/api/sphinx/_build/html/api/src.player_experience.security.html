@@ -1,0 +1,838 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.player_experience.security package &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.player_experience.security.input_validator module" href="src.player_experience.security.input_validator.html" />
+    <link rel="prev" title="src.player_experience.monitoring.performance_monitor module" href="src.player_experience.monitoring.performance_monitor.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.player_experience.html">src.player_experience package</a></li>
+      <li class="breadcrumb-item active">src.player_experience.security package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.player_experience.security.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.player_experience.security">
+<span id="src-player-experience-security-package"></span><h1>src.player_experience.security package<a class="headerlink" href="#module-src.player_experience.security" title="Link to this heading"></a></h1>
+<p>Security hardening and compliance features for the Player Experience Interface.</p>
+<p>This module provides comprehensive security measures including:
+- Rate limiting and DDoS protection
+- Input validation and sanitization
+- Audit logging for therapeutic data access
+- Security testing and vulnerability assessment
+- GDPR and HIPAA compliance features</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.AttackDetector">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">AttackDetector</span></span><a class="headerlink" href="#src.player_experience.security.AttackDetector" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.AuditEvent">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">AuditEvent</span></span><a class="headerlink" href="#src.player_experience.security.AuditEvent" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.AuditEventType">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">AuditEventType</span></span><a class="headerlink" href="#src.player_experience.security.AuditEventType" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.AuditLogger">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">AuditLogger</span></span><a class="headerlink" href="#src.player_experience.security.AuditLogger" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ComplianceAuditor">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">ComplianceAuditor</span></span><a class="headerlink" href="#src.player_experience.security.ComplianceAuditor" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ComplianceChecker">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">ComplianceChecker</span></span><a class="headerlink" href="#src.player_experience.security.ComplianceChecker" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.DDoSProtection">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">DDoSProtection</span></span><a class="headerlink" href="#src.player_experience.security.DDoSProtection" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.DataClassification">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">DataClassification</span></span><a class="headerlink" href="#src.player_experience.security.DataClassification" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.EncryptionConfig">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">EncryptionConfig</span></span><a class="headerlink" href="#src.player_experience.security.EncryptionConfig" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.EncryptionService">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">EncryptionService</span></span><a class="headerlink" href="#src.player_experience.security.EncryptionService" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.InputValidator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">InputValidator</span></span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#InputValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.InputValidator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Main input validation and sanitization class.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.InputValidator.add_custom_rule">
+<span class="sig-name descname"><span class="pre">add_custom_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#InputValidator.add_custom_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.InputValidator.add_custom_rule" title="Link to this definition"></a></dt>
+<dd><p>Add a custom validation rule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType" title="src.player_experience.security.input_validator.InputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputType</span></code></a></span>)</p></li>
+<li><p><strong>rule</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule" title="src.player_experience.security.input_validator.ValidationRule"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationRule</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.InputValidator.remove_rule">
+<span class="sig-name descname"><span class="pre">remove_rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rule_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#InputValidator.remove_rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.InputValidator.remove_rule" title="Link to this definition"></a></dt>
+<dd><p>Remove a validation rule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType" title="src.player_experience.security.input_validator.InputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputType</span></code></a></span>)</p></li>
+<li><p><strong>rule_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.InputValidator.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#InputValidator.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.InputValidator.validate" title="Link to this definition"></a></dt>
+<dd><p>Validate input data against rules for the specified type.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – The input data to validate</p></li>
+<li><p><strong>input_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType" title="src.player_experience.security.input_validator.InputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputType</span></code></a></span>) – Type of input data</p></li>
+<li><p><strong>field_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Name of the field being validated</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – Additional context for validation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult" title="src.player_experience.security.input_validator.ValidationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationResult</span></code></a></span></p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ValidationResult with validation status and sanitized input</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.KeyManager">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">KeyManager</span></span><a class="headerlink" href="#src.player_experience.security.KeyManager" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">RateLimitConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">requests_per_minute=60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requests_per_hour=1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">requests_per_day=10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">burst_capacity=10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strategy=RateLimitStrategy.TOKEN_BUCKET</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scope=RateLimitScope.IP_ADDRESS</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">whitelist=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blacklist=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_adaptive=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">adaptive_threshold=0.8</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimitConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimitConfig" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Configuration for rate limiting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>requests_per_minute</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>requests_per_hour</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>requests_per_day</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>burst_capacity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>strategy</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy" title="src.player_experience.security.rate_limiter.RateLimitStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitStrategy</span></code></a></span>)</p></li>
+<li><p><strong>scope</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope" title="src.player_experience.security.rate_limiter.RateLimitScope"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitScope</span></code></a></span>)</p></li>
+<li><p><strong>whitelist</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>blacklist</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>enable_adaptive</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>adaptive_threshold</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.adaptive_threshold">
+<span class="sig-name descname"><span class="pre">adaptive_threshold</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.8</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.adaptive_threshold" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.blacklist">
+<span class="sig-name descname"><span class="pre">blacklist</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.blacklist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.burst_capacity">
+<span class="sig-name descname"><span class="pre">burst_capacity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.burst_capacity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.enable_adaptive">
+<span class="sig-name descname"><span class="pre">enable_adaptive</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.enable_adaptive" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.requests_per_day">
+<span class="sig-name descname"><span class="pre">requests_per_day</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">10000</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.requests_per_day" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.requests_per_hour">
+<span class="sig-name descname"><span class="pre">requests_per_hour</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.requests_per_hour" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.requests_per_minute">
+<span class="sig-name descname"><span class="pre">requests_per_minute</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">60</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.requests_per_minute" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.scope">
+<span class="sig-name descname"><span class="pre">scope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope" title="src.player_experience.security.rate_limiter.RateLimitScope"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitScope</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ip_address'</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.scope" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.strategy">
+<span class="sig-name descname"><span class="pre">strategy</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy" title="src.player_experience.security.rate_limiter.RateLimitStrategy"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitStrategy</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'token_bucket'</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.strategy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitConfig.whitelist">
+<span class="sig-name descname"><span class="pre">whitelist</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.player_experience.security.RateLimitConfig.whitelist" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimitExceeded">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">RateLimitExceeded</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_after</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimitExceeded"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimitExceeded" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception raised when rate limit is exceeded.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>retry_after</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>limit_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">RateLimiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
+<p>Abstract base class for rate limiters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig" title="src.player_experience.security.rate_limiter.RateLimitConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitConfig</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter.check_limit">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">check_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter.check_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter.check_limit" title="Link to this definition"></a></dt>
+<dd><p>Check if request is within rate limit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>endpoint</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult" title="src.player_experience.security.rate_limiter.RateLimitResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter.get_identifier">
+<span class="sig-name descname"><span class="pre">get_identifier</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ip_address</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">api_key</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter.get_identifier"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter.get_identifier" title="Link to this definition"></a></dt>
+<dd><p>Get rate limit identifier based on scope.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ip_address</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>user_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>api_key</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>endpoint</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter.is_blacklisted">
+<span class="sig-name descname"><span class="pre">is_blacklisted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter.is_blacklisted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter.is_blacklisted" title="Link to this definition"></a></dt>
+<dd><p>Check if identifier is blacklisted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter.is_whitelisted">
+<span class="sig-name descname"><span class="pre">is_whitelisted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter.is_whitelisted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter.is_whitelisted" title="Link to this definition"></a></dt>
+<dd><p>Check if identifier is whitelisted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.RateLimiter.reset_limit">
+<em class="property"><span class="k"><span class="pre">abstractmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reset_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#RateLimiter.reset_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.RateLimiter.reset_limit" title="Link to this definition"></a></dt>
+<dd><p>Reset rate limit for identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.player_experience.security.SanitizationError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SanitizationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">original_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#SanitizationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SanitizationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception raised when input sanitization fails.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>original_input</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.SecurityIncident">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SecurityIncident</span></span><a class="headerlink" href="#src.player_experience.security.SecurityIncident" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.SecurityTest">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SecurityTest</span></span><a class="headerlink" href="#src.player_experience.security.SecurityTest" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.SecurityTestResult">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SecurityTestResult</span></span><a class="headerlink" href="#src.player_experience.security.SecurityTestResult" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.SecurityValidator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SecurityValidator</span></span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#SecurityValidator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SecurityValidator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>High-level security validator with threat detection.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.SecurityValidator.validate_and_sanitize">
+<span class="sig-name descname"><span class="pre">validate_and_sanitize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#SecurityValidator.validate_and_sanitize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SecurityValidator.validate_and_sanitize" title="Link to this definition"></a></dt>
+<dd><p>Validate and sanitize input with comprehensive security checks.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>input_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType" title="src.player_experience.security.input_validator.InputType"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputType</span></code></a></span>)</p></li>
+<li><p><strong>field_name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult" title="src.player_experience.security.input_validator.ValidationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.SlidingWindowRateLimiter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">SlidingWindowRateLimiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#SlidingWindowRateLimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SlidingWindowRateLimiter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter" title="src.player_experience.security.rate_limiter.RateLimiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimiter</span></code></a></p>
+<p>Sliding window rate limiter implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig" title="src.player_experience.security.rate_limiter.RateLimitConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitConfig</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.SlidingWindowRateLimiter.check_limit">
+<span class="sig-name descname"><span class="pre">check_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#SlidingWindowRateLimiter.check_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SlidingWindowRateLimiter.check_limit" title="Link to this definition"></a></dt>
+<dd><p>Check sliding window rate limit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>endpoint</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult" title="src.player_experience.security.rate_limiter.RateLimitResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.SlidingWindowRateLimiter.reset_limit">
+<span class="sig-name descname"><span class="pre">reset_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#SlidingWindowRateLimiter.reset_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.SlidingWindowRateLimiter.reset_limit" title="Link to this definition"></a></dt>
+<dd><p>Reset sliding window for identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.TherapeuticDataAuditor">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">TherapeuticDataAuditor</span></span><a class="headerlink" href="#src.player_experience.security.TherapeuticDataAuditor" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.TokenBucketRateLimiter">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">TokenBucketRateLimiter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#TokenBucketRateLimiter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.TokenBucketRateLimiter" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter" title="src.player_experience.security.rate_limiter.RateLimiter"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimiter</span></code></a></p>
+<p>Token bucket rate limiter implementation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig" title="src.player_experience.security.rate_limiter.RateLimitConfig"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitConfig</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.TokenBucketRateLimiter.check_limit">
+<span class="sig-name descname"><span class="pre">check_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#TokenBucketRateLimiter.check_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.TokenBucketRateLimiter.check_limit" title="Link to this definition"></a></dt>
+<dd><p>Check token bucket rate limit.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>endpoint</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult" title="src.player_experience.security.rate_limiter.RateLimitResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimitResult</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="src.player_experience.security.TokenBucketRateLimiter.reset_limit">
+<span class="sig-name descname"><span class="pre">reset_limit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/rate_limiter.html#TokenBucketRateLimiter.reset_limit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.TokenBucketRateLimiter.reset_limit" title="Link to this definition"></a></dt>
+<dd><p>Reset token bucket for identifier.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>identifier</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.TrafficAnalyzer">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">TrafficAnalyzer</span></span><a class="headerlink" href="#src.player_experience.security.TrafficAnalyzer" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationError">
+<em class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">ValidationError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">message</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ValidationSeverity.MEDIUM</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#ValidationError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.ValidationError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/exceptions.html#Exception" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception raised when input validation fails.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>field</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>severity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity" title="src.player_experience.security.input_validator.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">ValidationRule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allowed_chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forbidden_chars</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">custom_validator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sanitizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">ValidationSeverity.MEDIUM</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">error_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Input</span> <span class="pre">validation</span> <span class="pre">failed'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/player_experience/security/input_validator.html#ValidationRule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.player_experience.security.ValidationRule" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Configuration for input validation rule.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>pattern</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/re.html#re.Pattern" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>min_length</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>max_length</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>allowed_chars</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>forbidden_chars</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>custom_validator</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>sanitizer</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a>[[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>], <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>] | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>severity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity" title="src.player_experience.security.input_validator.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></span>)</p></li>
+<li><p><strong>error_message</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.allowed_chars">
+<span class="sig-name descname"><span class="pre">allowed_chars</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.allowed_chars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.custom_validator">
+<span class="sig-name descname"><span class="pre">custom_validator</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a><span class="pre">[[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">],</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">]</span> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.custom_validator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.error_message">
+<span class="sig-name descname"><span class="pre">error_message</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Input</span> <span class="pre">validation</span> <span class="pre">failed'</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.error_message" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.forbidden_chars">
+<span class="sig-name descname"><span class="pre">forbidden_chars</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.forbidden_chars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.max_length">
+<span class="sig-name descname"><span class="pre">max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.max_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.min_length">
+<span class="sig-name descname"><span class="pre">min_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.min_length" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.pattern">
+<span class="sig-name descname"><span class="pre">pattern</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/re.html#re.Pattern" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Pattern</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.pattern" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.sanitizer">
+<span class="sig-name descname"><span class="pre">sanitizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/collections.abc.html#collections.abc.Callable" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Callable</span></code></a><span class="pre">[[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">],</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.sanitizer" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.ValidationRule.severity">
+<span class="sig-name descname"><span class="pre">severity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity" title="src.player_experience.security.input_validator.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'medium'</span></em><a class="headerlink" href="#src.player_experience.security.ValidationRule.severity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.player_experience.security.VulnerabilityScanner">
+<span class="sig-prename descclassname"><span class="pre">src.player_experience.security.</span></span><span class="sig-name descname"><span class="pre">VulnerabilityScanner</span></span><a class="headerlink" href="#src.player_experience.security.VulnerabilityScanner" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.player_experience.security.input_validator.html">src.player_experience.security.input_validator module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType"><code class="docutils literal notranslate"><span class="pre">InputType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.EMAIL"><code class="docutils literal notranslate"><span class="pre">InputType.EMAIL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.FILE_PATH"><code class="docutils literal notranslate"><span class="pre">InputType.FILE_PATH</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.HTML"><code class="docutils literal notranslate"><span class="pre">InputType.HTML</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.JSON"><code class="docutils literal notranslate"><span class="pre">InputType.JSON</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.PASSWORD"><code class="docutils literal notranslate"><span class="pre">InputType.PASSWORD</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.PHONE"><code class="docutils literal notranslate"><span class="pre">InputType.PHONE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.SEARCH_QUERY"><code class="docutils literal notranslate"><span class="pre">InputType.SEARCH_QUERY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.SQL_QUERY"><code class="docutils literal notranslate"><span class="pre">InputType.SQL_QUERY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.TEXT"><code class="docutils literal notranslate"><span class="pre">InputType.TEXT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.THERAPEUTIC_CONTENT"><code class="docutils literal notranslate"><span class="pre">InputType.THERAPEUTIC_CONTENT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.URL"><code class="docutils literal notranslate"><span class="pre">InputType.URL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.USERNAME"><code class="docutils literal notranslate"><span class="pre">InputType.USERNAME</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputType.USER_MESSAGE"><code class="docutils literal notranslate"><span class="pre">InputType.USER_MESSAGE</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputValidator"><code class="docutils literal notranslate"><span class="pre">InputValidator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputValidator.add_custom_rule"><code class="docutils literal notranslate"><span class="pre">InputValidator.add_custom_rule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputValidator.remove_rule"><code class="docutils literal notranslate"><span class="pre">InputValidator.remove_rule()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.InputValidator.validate"><code class="docutils literal notranslate"><span class="pre">InputValidator.validate()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SanitizationError"><code class="docutils literal notranslate"><span class="pre">SanitizationError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns.COMMAND_INJECTION_PATTERNS"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns.COMMAND_INJECTION_PATTERNS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns.LDAP_INJECTION_PATTERNS"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns.LDAP_INJECTION_PATTERNS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns.PATH_TRAVERSAL_PATTERNS"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns.PATH_TRAVERSAL_PATTERNS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns.SQL_INJECTION_PATTERNS"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns.SQL_INJECTION_PATTERNS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityPatterns.XSS_PATTERNS"><code class="docutils literal notranslate"><span class="pre">SecurityPatterns.XSS_PATTERNS</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityValidator"><code class="docutils literal notranslate"><span class="pre">SecurityValidator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.SecurityValidator.validate_and_sanitize"><code class="docutils literal notranslate"><span class="pre">SecurityValidator.validate_and_sanitize()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationError"><code class="docutils literal notranslate"><span class="pre">ValidationError</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult"><code class="docutils literal notranslate"><span class="pre">ValidationResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult.add_violation"><code class="docutils literal notranslate"><span class="pre">ValidationResult.add_violation()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult.is_valid"><code class="docutils literal notranslate"><span class="pre">ValidationResult.is_valid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult.sanitized_input"><code class="docutils literal notranslate"><span class="pre">ValidationResult.sanitized_input</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult.severity"><code class="docutils literal notranslate"><span class="pre">ValidationResult.severity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationResult.violations"><code class="docutils literal notranslate"><span class="pre">ValidationResult.violations</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule"><code class="docutils literal notranslate"><span class="pre">ValidationRule</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.allowed_chars"><code class="docutils literal notranslate"><span class="pre">ValidationRule.allowed_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.custom_validator"><code class="docutils literal notranslate"><span class="pre">ValidationRule.custom_validator</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.error_message"><code class="docutils literal notranslate"><span class="pre">ValidationRule.error_message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.forbidden_chars"><code class="docutils literal notranslate"><span class="pre">ValidationRule.forbidden_chars</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.max_length"><code class="docutils literal notranslate"><span class="pre">ValidationRule.max_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.min_length"><code class="docutils literal notranslate"><span class="pre">ValidationRule.min_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.name"><code class="docutils literal notranslate"><span class="pre">ValidationRule.name</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.pattern"><code class="docutils literal notranslate"><span class="pre">ValidationRule.pattern</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.sanitizer"><code class="docutils literal notranslate"><span class="pre">ValidationRule.sanitizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationRule.severity"><code class="docutils literal notranslate"><span class="pre">ValidationRule.severity</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity.CRITICAL"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.CRITICAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity.HIGH"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.HIGH</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity.LOW"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.LOW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.ValidationSeverity.MEDIUM"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.MEDIUM</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.input_validator.html#src.player_experience.security.input_validator.get_security_validator"><code class="docutils literal notranslate"><span class="pre">get_security_validator()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.player_experience.security.rate_limiter.html">src.player_experience.security.rate_limiter module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.AdaptiveRateLimiter"><code class="docutils literal notranslate"><span class="pre">AdaptiveRateLimiter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.AdaptiveRateLimiter.check_limit"><code class="docutils literal notranslate"><span class="pre">AdaptiveRateLimiter.check_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.AdaptiveRateLimiter.reset_limit"><code class="docutils literal notranslate"><span class="pre">AdaptiveRateLimiter.reset_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.AdaptiveRateLimiter.update_system_metrics"><code class="docutils literal notranslate"><span class="pre">AdaptiveRateLimiter.update_system_metrics()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.adaptive_threshold"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.adaptive_threshold</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.blacklist"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.blacklist</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.burst_capacity"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.burst_capacity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.enable_adaptive"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.enable_adaptive</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.requests_per_day"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.requests_per_day</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.requests_per_hour"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.requests_per_hour</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.requests_per_minute"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.requests_per_minute</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.scope"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.scope</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.strategy"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.strategy</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitConfig.whitelist"><code class="docutils literal notranslate"><span class="pre">RateLimitConfig.whitelist</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitExceeded"><code class="docutils literal notranslate"><span class="pre">RateLimitExceeded</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitMiddleware"><code class="docutils literal notranslate"><span class="pre">RateLimitMiddleware</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitMiddleware.__call__"><code class="docutils literal notranslate"><span class="pre">RateLimitMiddleware.__call__()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult"><code class="docutils literal notranslate"><span class="pre">RateLimitResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult.allowed"><code class="docutils literal notranslate"><span class="pre">RateLimitResult.allowed</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult.limit_type"><code class="docutils literal notranslate"><span class="pre">RateLimitResult.limit_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult.remaining"><code class="docutils literal notranslate"><span class="pre">RateLimitResult.remaining</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult.reset_time"><code class="docutils literal notranslate"><span class="pre">RateLimitResult.reset_time</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitResult.retry_after"><code class="docutils literal notranslate"><span class="pre">RateLimitResult.retry_after</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope"><code class="docutils literal notranslate"><span class="pre">RateLimitScope</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope.API_KEY"><code class="docutils literal notranslate"><span class="pre">RateLimitScope.API_KEY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope.ENDPOINT"><code class="docutils literal notranslate"><span class="pre">RateLimitScope.ENDPOINT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope.GLOBAL"><code class="docutils literal notranslate"><span class="pre">RateLimitScope.GLOBAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope.IP_ADDRESS"><code class="docutils literal notranslate"><span class="pre">RateLimitScope.IP_ADDRESS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitScope.USER"><code class="docutils literal notranslate"><span class="pre">RateLimitScope.USER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy"><code class="docutils literal notranslate"><span class="pre">RateLimitStrategy</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy.FIXED_WINDOW"><code class="docutils literal notranslate"><span class="pre">RateLimitStrategy.FIXED_WINDOW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy.LEAKY_BUCKET"><code class="docutils literal notranslate"><span class="pre">RateLimitStrategy.LEAKY_BUCKET</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy.SLIDING_WINDOW"><code class="docutils literal notranslate"><span class="pre">RateLimitStrategy.SLIDING_WINDOW</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimitStrategy.TOKEN_BUCKET"><code class="docutils literal notranslate"><span class="pre">RateLimitStrategy.TOKEN_BUCKET</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter"><code class="docutils literal notranslate"><span class="pre">RateLimiter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter.check_limit"><code class="docutils literal notranslate"><span class="pre">RateLimiter.check_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter.get_identifier"><code class="docutils literal notranslate"><span class="pre">RateLimiter.get_identifier()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter.is_blacklisted"><code class="docutils literal notranslate"><span class="pre">RateLimiter.is_blacklisted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter.is_whitelisted"><code class="docutils literal notranslate"><span class="pre">RateLimiter.is_whitelisted()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RateLimiter.reset_limit"><code class="docutils literal notranslate"><span class="pre">RateLimiter.reset_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RedisRateLimiter"><code class="docutils literal notranslate"><span class="pre">RedisRateLimiter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RedisRateLimiter.check_limit"><code class="docutils literal notranslate"><span class="pre">RedisRateLimiter.check_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.RedisRateLimiter.reset_limit"><code class="docutils literal notranslate"><span class="pre">RedisRateLimiter.reset_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.SlidingWindowRateLimiter"><code class="docutils literal notranslate"><span class="pre">SlidingWindowRateLimiter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.SlidingWindowRateLimiter.check_limit"><code class="docutils literal notranslate"><span class="pre">SlidingWindowRateLimiter.check_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.SlidingWindowRateLimiter.reset_limit"><code class="docutils literal notranslate"><span class="pre">SlidingWindowRateLimiter.reset_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.TokenBucketRateLimiter"><code class="docutils literal notranslate"><span class="pre">TokenBucketRateLimiter</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.TokenBucketRateLimiter.check_limit"><code class="docutils literal notranslate"><span class="pre">TokenBucketRateLimiter.check_limit()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.TokenBucketRateLimiter.reset_limit"><code class="docutils literal notranslate"><span class="pre">TokenBucketRateLimiter.reset_limit()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.create_rate_limiter"><code class="docutils literal notranslate"><span class="pre">create_rate_limiter()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="src.player_experience.security.rate_limiter.html#src.player_experience.security.rate_limiter.get_security_validator"><code class="docutils literal notranslate"><span class="pre">get_security_validator()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.player_experience.monitoring.performance_monitor.html" class="btn btn-neutral float-left" title="src.player_experience.monitoring.performance_monitor module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.player_experience.security.input_validator.html" class="btn btn-neutral float-right" title="src.player_experience.security.input_validator module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

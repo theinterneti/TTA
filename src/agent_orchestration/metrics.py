@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Dict, Tuple
 import time
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -22,9 +21,9 @@ class DeliveryStats:
 @dataclass
 class QueueGauges:
     # Gauges keyed by (agent_key, priority)
-    queue_lengths: Dict[Tuple[str, int], int] = field(default_factory=dict)
+    queue_lengths: dict[tuple[str, int], int] = field(default_factory=dict)
     # DLQ lengths per agent_key
-    dlq_lengths: Dict[str, int] = field(default_factory=dict)
+    dlq_lengths: dict[str, int] = field(default_factory=dict)
 
 
 class MessageMetrics:
@@ -52,7 +51,9 @@ class MessageMetrics:
     def inc_permanent(self, n: int = 1) -> None:
         self.retry.total_permanent_failures += n
 
-    def inc_retries_scheduled(self, n: int = 1, last_backoff_seconds: float = 0.0) -> None:
+    def inc_retries_scheduled(
+        self, n: int = 1, last_backoff_seconds: float = 0.0
+    ) -> None:
         self.retry.total_retries_scheduled += n
         self.retry.last_backoff_seconds = last_backoff_seconds
 
@@ -64,15 +65,16 @@ class MessageMetrics:
         self.gauges.dlq_lengths[agent_key] = length
 
     # --- Snapshot ---
-    def snapshot(self) -> Dict:
+    def snapshot(self) -> dict:
         self._last_update = time.time()
         return {
             "retry": self.retry.__dict__,
             "delivery": self.delivery.__dict__,
             "gauges": {
-                "queue_lengths": {f"{k[0]}|{k[1]}": v for k, v in self.gauges.queue_lengths.items()},
+                "queue_lengths": {
+                    f"{k[0]}|{k[1]}": v for k, v in self.gauges.queue_lengths.items()
+                },
                 "dlq_lengths": self.gauges.dlq_lengths,
             },
             "last_update": self._last_update,
         }
-

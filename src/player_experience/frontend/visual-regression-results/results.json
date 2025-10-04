@@ -1,0 +1,353 @@
+{
+  "config": {
+    "configFile": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/playwright-visual.config.ts",
+    "rootDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 3
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        {
+          "outputFolder": "visual-regression-report"
+        }
+      ],
+      [
+        "json",
+        {
+          "outputFile": "visual-regression-results/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Desktop Chrome",
+        "name": "Desktop Chrome",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Desktop Firefox",
+        "name": "Desktop Firefox",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Desktop Safari",
+        "name": "Desktop Safari",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/visual-regression-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 3
+        },
+        "id": "Tablet",
+        "name": "Tablet",
+        "testDir": "/home/thein/recovered-tta-storytelling/src/player_experience/frontend/tests/visual-regression",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.55.0",
+    "workers": 3,
+    "webServer": {
+      "command": "npm run storybook",
+      "url": "http://localhost:6007",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "TherapeuticGoalsSelector.visual.spec.ts",
+      "file": "TherapeuticGoalsSelector.visual.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "TherapeuticGoalsSelector - Visual Regression Tests",
+          "file": "TherapeuticGoalsSelector.visual.spec.ts",
+          "line": 45,
+          "column": 6,
+          "specs": [],
+          "suites": [
+            {
+              "title": "Component States",
+              "file": "TherapeuticGoalsSelector.visual.spec.ts",
+              "line": 47,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "should render default state consistently",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 4133,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-09-20T04:29:45.035Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3774a0cf488a4b3b53ba-b8e68a5a3243ac01091a",
+                  "file": "TherapeuticGoalsSelector.visual.spec.ts",
+                  "line": 49,
+                  "column": 9
+                },
+                {
+                  "title": "should render with selected goals consistently",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 1,
+                          "parallelIndex": 1,
+                          "status": "passed",
+                          "duration": 4184,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-09-20T04:29:45.078Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3774a0cf488a4b3b53ba-8b24fc50a51a216eead2",
+                  "file": "TherapeuticGoalsSelector.visual.spec.ts",
+                  "line": 57,
+                  "column": 9
+                },
+                {
+                  "title": "should render with selected concerns consistently",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 3585,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-09-20T04:29:45.033Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3774a0cf488a4b3b53ba-2b979a027a9e8efe24c7",
+                  "file": "TherapeuticGoalsSelector.visual.spec.ts",
+                  "line": 65,
+                  "column": 9
+                },
+                {
+                  "title": "should render with custom entries consistently",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 2,
+                          "parallelIndex": 2,
+                          "status": "passed",
+                          "duration": 3482,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-09-20T04:29:48.823Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3774a0cf488a4b3b53ba-227d59141f9e0ee140a9",
+                  "file": "TherapeuticGoalsSelector.visual.spec.ts",
+                  "line": 73,
+                  "column": 9
+                },
+                {
+                  "title": "should render maximum selections consistently",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 30000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "Desktop Chrome",
+                      "projectName": "Desktop Chrome",
+                      "results": [
+                        {
+                          "workerIndex": 0,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3249,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2025-09-20T04:29:47.039Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
+                    }
+                  ],
+                  "id": "3774a0cf488a4b3b53ba-14eb52cb6575d90869c3",
+                  "file": "TherapeuticGoalsSelector.visual.spec.ts",
+                  "line": 81,
+                  "column": 9
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-09-20T04:29:41.088Z",
+    "duration": 11623.277,
+    "expected": 5,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

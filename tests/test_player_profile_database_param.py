@@ -1,13 +1,20 @@
-import pytest
 from datetime import datetime
-from unittest.mock import Mock, MagicMock
+from unittest.mock import MagicMock, Mock
 
-from src.player_experience.database.player_profile_schema import PlayerProfileSchemaManager
-from src.player_experience.database.player_profile_repository import PlayerProfileRepository
+import pytest
+
+from src.player_experience.database.player_profile_repository import (
+    PlayerProfileRepository,
+)
+from src.player_experience.database.player_profile_schema import (
+    PlayerProfileSchemaManager,
+)
 from src.player_experience.models.player import PlayerProfile
 
 
-@pytest.mark.parametrize("mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)])
+@pytest.mark.parametrize(
+    "mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)]
+)
 def test_schema_manager_setup_parametrized(mode, neo4j_container, request):
     if mode == "mock":
         mgr = PlayerProfileSchemaManager()
@@ -36,7 +43,9 @@ def test_schema_manager_setup_parametrized(mode, neo4j_container, request):
             assert mgr.is_connected() is True
 
 
-@pytest.mark.parametrize("mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)])
+@pytest.mark.parametrize(
+    "mode", ["mock", pytest.param("container", marks=pytest.mark.neo4j)]
+)
 def test_repository_crud_parametrized(mode, neo4j_container, request):
     if mode == "mock":
         repo = PlayerProfileRepository()
@@ -78,4 +87,3 @@ def test_repository_crud_parametrized(mode, neo4j_container, request):
             assert repo.delete_player_profile("it_param_player") is True
         finally:
             repo.disconnect()
-

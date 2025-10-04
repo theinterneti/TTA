@@ -1,14 +1,24 @@
-import unittest
 import asyncio
+import unittest
 from datetime import datetime, timedelta
 
-from src.player_experience.managers.player_experience_manager import PlayerExperienceManager
-from src.player_experience.managers.progress_tracking_service import ProgressTrackingService
-from src.player_experience.managers.personalization_service_manager import PersonalizationServiceManager, PlayerFeedback
-from src.player_experience.database.session_repository import SessionRepository
 from src.player_experience.database.character_repository import CharacterRepository
-from src.player_experience.models.session import SessionSummary, Recommendation, SessionContext, TherapeuticSettings
+from src.player_experience.database.session_repository import SessionRepository
+from src.player_experience.managers.personalization_service_manager import (
+    PersonalizationServiceManager,
+    PlayerFeedback,
+)
+from src.player_experience.managers.player_experience_manager import (
+    PlayerExperienceManager,
+)
+from src.player_experience.managers.progress_tracking_service import (
+    ProgressTrackingService,
+)
 from src.player_experience.models.enums import SessionStatus
+from src.player_experience.models.session import (
+    Recommendation,
+    SessionSummary,
+)
 
 
 class MockSessionRepository(SessionRepository):
@@ -28,11 +38,14 @@ class MockProgressService(ProgressTrackingService):
     def __init__(self):
         pass
 
-    async def compute_progress_summary(self, player_id: str, *, summaries_limit: int = 30):
+    async def compute_progress_summary(
+        self, player_id: str, *, summaries_limit: int = 30
+    ):
         class Dummy:
             therapeutic_momentum = 0.7
             engagement_metrics = type("E", (), {"current_streak_days": 3})()
             recent_highlights = []
+
         return Dummy()
 
     async def generate_progress_insights(self, player_id: str):
@@ -69,6 +82,7 @@ class MockPersonalizationManager(PersonalizationServiceManager):
             confidence_score = 0.8
             requires_player_approval = False
             reasoning = "Based on rating"
+
         return Dummy()
 
 
@@ -108,6 +122,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
             self.assertEqual(dashboard.player_id, self.player_id)
             self.assertEqual(len(dashboard.recent_sessions), 3)
             self.assertGreaterEqual(dashboard.therapeutic_momentum, 0.7)
+
         asyncio.run(run())
 
     def test_recommendations_combined(self):
@@ -116,6 +131,7 @@ class TestPlayerExperienceManager(unittest.TestCase):
             titles = [r.title for r in recs]
             self.assertIn("Mindfulness practice", titles)
             self.assertIn("Stress Management Focus", titles)
+
         asyncio.run(run())
 
     def test_feedback_processing(self):
@@ -130,7 +146,9 @@ class TestPlayerExperienceManager(unittest.TestCase):
             result = await self.mgr.process_player_feedback(self.player_id, fb)
             self.assertEqual(result["adaptation_id"], "a1")
             self.assertIn("reduce_intensity", result["changes_made"])
+
         asyncio.run(run())
+
     def test_crisis_detection_integration(self):
         async def run():
             from src.player_experience.models.enums import CrisisType
@@ -150,7 +168,9 @@ class TestPlayerExperienceManager(unittest.TestCase):
             # Patch the personalization manager's crisis detection
             self.mgr.personalization_manager.detect_crisis_situation = fake_detect
 
-            out = await self.mgr.detect_crisis_and_get_resources(self.player_id, "I want to end it all.")
+            out = await self.mgr.detect_crisis_and_get_resources(
+                self.player_id, "I want to end it all."
+            )
             self.assertTrue(out["crisis_detected"])
             self.assertIn("suicidal_ideation", out["crisis_types"])  # enum value
             self.assertEqual(len(out["resources"]), 1)
@@ -158,10 +178,9 @@ class TestPlayerExperienceManager(unittest.TestCase):
             self.assertEqual(r["resource_id"], "res1")
             self.assertEqual(r["contact"], "988")
             self.assertTrue(r["emergency"])
-        asyncio.run(run())
 
+        asyncio.run(run())
 
 
 if __name__ == "__main__":
     unittest.main()
-

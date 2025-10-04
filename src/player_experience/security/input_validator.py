@@ -7,27 +7,24 @@ and other malicious inputs.
 """
 
 import re
-import html
-import json
-import base64
 import urllib.parse
-from abc import ABC, abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union, Callable, Pattern
-import bleach
-from markupsafe import Markup
-
 from datetime import datetime
+from enum import Enum
+from re import Pattern
+from typing import Any
 
-from ..monitoring.logging_config import get_logger, LogCategory, LogContext
+import bleach
 
+from ..monitoring.logging_config import LogCategory, LogContext, get_logger
 
 logger = get_logger(__name__)
 
 
 class ValidationSeverity(str, Enum):
     """Severity levels for validation violations."""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -36,6 +33,7 @@ class ValidationSeverity(str, Enum):
 
 class InputType(str, Enum):
     """Types of input data."""
+
     TEXT = "text"
     HTML = "html"
     JSON = "json"
@@ -54,7 +52,12 @@ class InputType(str, Enum):
 class ValidationError(Exception):
     """Exception raised when input validation fails."""
 
-    def __init__(self, message: str, field: str = None, severity: ValidationSeverity = ValidationSeverity.MEDIUM):
+    def __init__(
+        self,
+        message: str,
+        field: str | None = None,
+        severity: ValidationSeverity = ValidationSeverity.MEDIUM,
+    ):
         super().__init__(message)
         self.field = field
         self.severity = severity
@@ -63,7 +66,7 @@ class ValidationError(Exception):
 class SanitizationError(Exception):
     """Exception raised when input sanitization fails."""
 
-    def __init__(self, message: str, original_input: str = None):
+    def __init__(self, message: str, original_input: str | None = None):
         super().__init__(message)
         self.original_input = original_input
 
@@ -71,14 +74,15 @@ class SanitizationError(Exception):
 @dataclass
 class ValidationRule:
     """Configuration for input validation rule."""
+
     name: str
-    pattern: Optional[Pattern] = None
-    min_length: Optional[int] = None
-    max_length: Optional[int] = None
-    allowed_chars: Optional[str] = None
-    forbidden_chars: Optional[str] = None
-    custom_validator: Optional[Callable[[str], bool]] = None
-    sanitizer: Optional[Callable[[str], str]] = None
+    pattern: Pattern | None = None
+    min_length: int | None = None
+    max_length: int | None = None
+    allowed_chars: str | None = None
+    forbidden_chars: str | None = None
+    custom_validator: Callable[[str], bool] | None = None
+    sanitizer: Callable[[str], str] | None = None
     severity: ValidationSeverity = ValidationSeverity.MEDIUM
     error_message: str = "Input validation failed"
 
@@ -86,22 +90,27 @@ class ValidationRule:
 @dataclass
 class ValidationResult:
     """Result of input validation."""
+
     is_valid: bool
-    sanitized_input: Optional[str] = None
-    violations: List[Dict[str, Any]] = field(default_factory=list)
+    sanitized_input: str | None = None
+    violations: list[dict[str, Any]] = field(default_factory=list)
     severity: ValidationSeverity = ValidationSeverity.LOW
 
     def add_violation(self, rule_name: str, message: str, severity: ValidationSeverity):
         """Add a validation violation."""
-        self.violations.append({
-            "rule": rule_name,
-            "message": message,
-            "severity": severity.value,
-            "timestamp": str(datetime.utcnow())
-        })
+        self.violations.append(
+            {
+                "rule": rule_name,
+                "message": message,
+                "severity": severity.value,
+                "timestamp": str(datetime.utcnow()),
+            }
+        )
 
         # Update overall severity
-        if severity.value == "critical" or (severity.value == "high" and self.severity.value != "critical"):
+        if severity.value == "critical" or (
+            severity.value == "high" and self.severity.value != "critical"
+        ):
             self.severity = severity
         elif severity.value == "medium" and self.severity.value == "low":
             self.severity = severity
@@ -112,19 +121,22 @@ class SecurityPatterns:
 
     # XSS patterns
     XSS_PATTERNS = [
-        re.compile(r'<script[^>]*>.*?</script>', re.IGNORECASE | re.DOTALL),
-        re.compile(r'javascript:', re.IGNORECASE),
-        re.compile(r'on\w+\s*=', re.IGNORECASE),
-        re.compile(r'<iframe[^>]*>', re.IGNORECASE),
-        re.compile(r'<object[^>]*>', re.IGNORECASE),
-        re.compile(r'<embed[^>]*>', re.IGNORECASE),
-        re.compile(r'<link[^>]*>', re.IGNORECASE),
-        re.compile(r'<meta[^>]*>', re.IGNORECASE),
+        re.compile(r"<script[^>]*>.*?</script>", re.IGNORECASE | re.DOTALL),
+        re.compile(r"javascript:", re.IGNORECASE),
+        re.compile(r"on\w+\s*=", re.IGNORECASE),
+        re.compile(r"<iframe[^>]*>", re.IGNORECASE),
+        re.compile(r"<object[^>]*>", re.IGNORECASE),
+        re.compile(r"<embed[^>]*>", re.IGNORECASE),
+        re.compile(r"<link[^>]*>", re.IGNORECASE),
+        re.compile(r"<meta[^>]*>", re.IGNORECASE),
     ]
 
     # SQL injection patterns
     SQL_INJECTION_PATTERNS = [
-        re.compile(r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)", re.IGNORECASE),
+        re.compile(
+            r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)",
+            re.IGNORECASE,
+        ),
         re.compile(r"(\b(OR|AND)\s+\d+\s*=\s*\d+)", re.IGNORECASE),
         re.compile(r"'.*?'", re.IGNORECASE),
         re.compile(r"--.*$", re.MULTILINE),
@@ -135,7 +147,9 @@ class SecurityPatterns:
     # Command injection patterns
     COMMAND_INJECTION_PATTERNS = [
         re.compile(r"[;&|`$(){}[\]<>]"),
-        re.compile(r"\b(cat|ls|pwd|whoami|id|uname|ps|netstat|ifconfig)\b", re.IGNORECASE),
+        re.compile(
+            r"\b(cat|ls|pwd|whoami|id|uname|ps|netstat|ifconfig)\b", re.IGNORECASE
+        ),
         re.compile(r"\.\.\/"),
         re.compile(r"\/etc\/passwd"),
         re.compile(r"\/proc\/"),
@@ -163,7 +177,7 @@ class InputValidator:
     """Main input validation and sanitization class."""
 
     def __init__(self):
-        self.rules: Dict[InputType, List[ValidationRule]] = {}
+        self.rules: dict[InputType, list[ValidationRule]] = {}
         self.security_patterns = SecurityPatterns()
         self._setup_default_rules()
 
@@ -176,19 +190,19 @@ class InputValidator:
                 name="length_check",
                 min_length=1,
                 max_length=10000,
-                error_message="Text length must be between 1 and 10000 characters"
+                error_message="Text length must be between 1 and 10000 characters",
             ),
             ValidationRule(
                 name="xss_check",
                 custom_validator=self._check_xss,
                 severity=ValidationSeverity.HIGH,
-                error_message="Potential XSS attack detected"
+                error_message="Potential XSS attack detected",
             ),
             ValidationRule(
                 name="sql_injection_check",
                 custom_validator=self._check_sql_injection,
                 severity=ValidationSeverity.CRITICAL,
-                error_message="Potential SQL injection detected"
+                error_message="Potential SQL injection detected",
             ),
         ]
 
@@ -197,13 +211,13 @@ class InputValidator:
             ValidationRule(
                 name="html_sanitization",
                 sanitizer=self._sanitize_html,
-                error_message="HTML content sanitized"
+                error_message="HTML content sanitized",
             ),
             ValidationRule(
                 name="malicious_html_check",
                 custom_validator=self._check_malicious_html,
                 severity=ValidationSeverity.HIGH,
-                error_message="Malicious HTML content detected"
+                error_message="Malicious HTML content detected",
             ),
         ]
 
@@ -211,13 +225,13 @@ class InputValidator:
         self.rules[InputType.EMAIL] = [
             ValidationRule(
                 name="email_format",
-                pattern=re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'),
-                error_message="Invalid email format"
+                pattern=re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"),
+                error_message="Invalid email format",
             ),
             ValidationRule(
                 name="email_length",
                 max_length=254,
-                error_message="Email address too long"
+                error_message="Email address too long",
             ),
         ]
 
@@ -225,14 +239,14 @@ class InputValidator:
         self.rules[InputType.URL] = [
             ValidationRule(
                 name="url_format",
-                pattern=re.compile(r'^https?://[^\s/$.?#].[^\s]*$', re.IGNORECASE),
-                error_message="Invalid URL format"
+                pattern=re.compile(r"^https?://[^\s/$.?#].[^\s]*$", re.IGNORECASE),
+                error_message="Invalid URL format",
             ),
             ValidationRule(
                 name="url_scheme_check",
                 custom_validator=self._check_url_scheme,
                 severity=ValidationSeverity.MEDIUM,
-                error_message="Unsafe URL scheme detected"
+                error_message="Unsafe URL scheme detected",
             ),
         ]
 
@@ -240,13 +254,13 @@ class InputValidator:
         self.rules[InputType.USERNAME] = [
             ValidationRule(
                 name="username_format",
-                pattern=re.compile(r'^[a-zA-Z0-9_-]{3,30}$'),
-                error_message="Username must be 3-30 characters, alphanumeric, underscore, or hyphen only"
+                pattern=re.compile(r"^[a-zA-Z0-9_-]{3,30}$"),
+                error_message="Username must be 3-30 characters, alphanumeric, underscore, or hyphen only",
             ),
             ValidationRule(
                 name="username_reserved_check",
                 custom_validator=self._check_reserved_username,
-                error_message="Username is reserved"
+                error_message="Username is reserved",
             ),
         ]
 
@@ -255,13 +269,13 @@ class InputValidator:
             ValidationRule(
                 name="password_strength",
                 custom_validator=self._check_password_strength,
-                error_message="Password does not meet strength requirements"
+                error_message="Password does not meet strength requirements",
             ),
             ValidationRule(
                 name="password_length",
                 min_length=8,
                 max_length=128,
-                error_message="Password must be 8-128 characters long"
+                error_message="Password must be 8-128 characters long",
             ),
         ]
 
@@ -271,33 +285,31 @@ class InputValidator:
                 name="therapeutic_safety",
                 custom_validator=self._check_therapeutic_safety,
                 severity=ValidationSeverity.HIGH,
-                error_message="Potentially harmful therapeutic content detected"
+                error_message="Potentially harmful therapeutic content detected",
             ),
             ValidationRule(
                 name="content_length",
                 max_length=50000,
-                error_message="Therapeutic content too long"
+                error_message="Therapeutic content too long",
             ),
         ]
 
         # User message rules
         self.rules[InputType.USER_MESSAGE] = [
             ValidationRule(
-                name="message_length",
-                max_length=5000,
-                error_message="Message too long"
+                name="message_length", max_length=5000, error_message="Message too long"
             ),
             ValidationRule(
                 name="spam_check",
                 custom_validator=self._check_spam,
                 severity=ValidationSeverity.MEDIUM,
-                error_message="Potential spam detected"
+                error_message="Potential spam detected",
             ),
             ValidationRule(
                 name="profanity_check",
                 custom_validator=self._check_profanity,
                 sanitizer=self._sanitize_profanity,
-                error_message="Inappropriate language detected"
+                error_message="Inappropriate language detected",
             ),
         ]
 
@@ -307,17 +319,22 @@ class InputValidator:
                 name="path_traversal_check",
                 custom_validator=self._check_path_traversal,
                 severity=ValidationSeverity.CRITICAL,
-                error_message="Path traversal attack detected"
+                error_message="Path traversal attack detected",
             ),
             ValidationRule(
                 name="allowed_extensions",
                 custom_validator=self._check_file_extension,
-                error_message="File extension not allowed"
+                error_message="File extension not allowed",
             ),
         ]
 
-    def validate(self, input_data: str, input_type: InputType,
-                field_name: str = None, context: Dict[str, Any] = None) -> ValidationResult:
+    def validate(
+        self,
+        input_data: str,
+        input_type: InputType,
+        field_name: str | None = None,
+        context: dict[str, Any] | None = None,
+    ) -> ValidationResult:
         """
         Validate input data against rules for the specified type.
 
@@ -346,10 +363,15 @@ class InputValidator:
 
                 if not rule_result["is_valid"]:
                     result.is_valid = False
-                    result.add_violation(rule.name, rule_result["message"], rule.severity)
+                    result.add_violation(
+                        rule.name, rule_result["message"], rule.severity
+                    )
 
                     # Log security violation
-                    if rule.severity in [ValidationSeverity.HIGH, ValidationSeverity.CRITICAL]:
+                    if rule.severity in [
+                        ValidationSeverity.HIGH,
+                        ValidationSeverity.CRITICAL,
+                    ]:
                         logger.warning(
                             f"Security validation violation: {rule_result['message']}",
                             category=LogCategory.SECURITY,
@@ -359,8 +381,12 @@ class InputValidator:
                                 "rule": rule.name,
                                 "severity": rule.severity.value,
                                 "input_type": input_type.value,
-                                "input_preview": input_data[:100] if len(input_data) > 100 else input_data
-                            }
+                                "input_preview": (
+                                    input_data[:100]
+                                    if len(input_data) > 100
+                                    else input_data
+                                ),
+                            },
                         )
 
                 # Apply sanitization if available
@@ -372,22 +398,31 @@ class InputValidator:
                 logger.error(
                     f"Error applying validation rule {rule.name}: {e}",
                     category=LogCategory.ERROR,
-                    exc_info=True
+                    exc_info=True,
                 )
                 result.is_valid = False
-                result.add_violation(rule.name, f"Validation error: {str(e)}", ValidationSeverity.HIGH)
+                result.add_violation(
+                    rule.name, f"Validation error: {str(e)}", ValidationSeverity.HIGH
+                )
 
         return result
 
-    def _apply_rule(self, input_data: str, rule: ValidationRule,
-                   field_name: str = None, context: Dict[str, Any] = None) -> Dict[str, Any]:
+    def _apply_rule(
+        self,
+        input_data: str,
+        rule: ValidationRule,
+        field_name: str | None = None,
+        context: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Apply a single validation rule."""
         result = {"is_valid": True, "message": "", "sanitized": None}
 
         # Length checks
         if rule.min_length is not None and len(input_data) < rule.min_length:
             result["is_valid"] = False
-            result["message"] = f"Input too short (minimum {rule.min_length} characters)"
+            result["message"] = (
+                f"Input too short (minimum {rule.min_length} characters)"
+            )
             return result
 
         if rule.max_length is not None and len(input_data) > rule.max_length:
@@ -405,13 +440,13 @@ class InputValidator:
         if rule.allowed_chars:
             if not all(c in rule.allowed_chars for c in input_data):
                 result["is_valid"] = False
-                result["message"] = f"Input contains forbidden characters"
+                result["message"] = "Input contains forbidden characters"
                 return result
 
         if rule.forbidden_chars:
             if any(c in rule.forbidden_chars for c in input_data):
                 result["is_valid"] = False
-                result["message"] = f"Input contains forbidden characters"
+                result["message"] = "Input contains forbidden characters"
                 return result
 
         # Custom validation
@@ -455,13 +490,21 @@ class InputValidator:
     def _check_malicious_html(self, input_data: str) -> bool:
         """Check for malicious HTML content."""
         # Check for dangerous tags and attributes
-        dangerous_tags = ['script', 'iframe', 'object', 'embed', 'link', 'meta', 'style']
-        dangerous_attrs = ['onload', 'onerror', 'onclick', 'onmouseover', 'onfocus']
+        dangerous_tags = [
+            "script",
+            "iframe",
+            "object",
+            "embed",
+            "link",
+            "meta",
+            "style",
+        ]
+        dangerous_attrs = ["onload", "onerror", "onclick", "onmouseover", "onfocus"]
 
         input_lower = input_data.lower()
 
         for tag in dangerous_tags:
-            if f'<{tag}' in input_lower:
+            if f"<{tag}" in input_lower:
                 return False
 
         for attr in dangerous_attrs:
@@ -472,7 +515,7 @@ class InputValidator:
 
     def _check_url_scheme(self, url: str) -> bool:
         """Check URL scheme for safety."""
-        safe_schemes = ['http', 'https', 'ftp', 'ftps']
+        safe_schemes = ["http", "https", "ftp", "ftps"]
         try:
             parsed = urllib.parse.urlparse(url)
             return parsed.scheme.lower() in safe_schemes
@@ -482,9 +525,24 @@ class InputValidator:
     def _check_reserved_username(self, username: str) -> bool:
         """Check if username is reserved."""
         reserved_usernames = [
-            'admin', 'administrator', 'root', 'system', 'api', 'www',
-            'mail', 'email', 'support', 'help', 'info', 'contact',
-            'test', 'demo', 'guest', 'anonymous', 'null', 'undefined'
+            "admin",
+            "administrator",
+            "root",
+            "system",
+            "api",
+            "www",
+            "mail",
+            "email",
+            "support",
+            "help",
+            "info",
+            "contact",
+            "test",
+            "demo",
+            "guest",
+            "anonymous",
+            "null",
+            "undefined",
         ]
         return username.lower() not in reserved_usernames
 
@@ -504,9 +562,9 @@ class InputValidator:
         """Check therapeutic content for safety concerns."""
         # Check for harmful content patterns
         harmful_patterns = [
-            r'\b(kill|die|suicide|hurt|harm|cut|overdose)\b',
-            r'\b(worthless|hopeless|useless|failure)\b',
-            r'\b(hate myself|want to die|end it all)\b'
+            r"\b(kill|die|suicide|hurt|harm|cut|overdose)\b",
+            r"\b(worthless|hopeless|useless|failure)\b",
+            r"\b(hate myself|want to die|end it all)\b",
         ]
 
         content_lower = content.lower()
@@ -519,10 +577,10 @@ class InputValidator:
     def _check_spam(self, message: str) -> bool:
         """Check for spam patterns."""
         spam_indicators = [
-            r'(buy now|click here|free money|guaranteed)',
-            r'(viagra|cialis|pharmacy)',
-            r'(lottery|winner|congratulations)',
-            r'(\$\d+|\d+\$)',  # Money amounts
+            r"(buy now|click here|free money|guaranteed)",
+            r"(viagra|cialis|pharmacy)",
+            r"(lottery|winner|congratulations)",
+            r"(\$\d+|\d+\$)",  # Money amounts
         ]
 
         message_lower = message.lower()
@@ -544,9 +602,7 @@ class InputValidator:
         """Check for profanity (simplified implementation)."""
         # This is a simplified implementation
         # In production, use a comprehensive profanity filter library
-        profanity_words = [
-            'damn', 'hell', 'shit', 'fuck', 'bitch', 'ass', 'bastard'
-        ]
+        profanity_words = ["damn", "hell", "shit", "fuck", "bitch", "ass", "bastard"]
 
         text_lower = text.lower()
         for word in profanity_words:
@@ -564,9 +620,10 @@ class InputValidator:
 
     def _check_file_extension(self, filename: str) -> bool:
         """Check if file extension is allowed."""
-        allowed_extensions = ['.txt', '.pdf', '.doc', '.docx', '.jpg', '.png', '.gif']
+        allowed_extensions = [".txt", ".pdf", ".doc", ".docx", ".jpg", ".png", ".gif"]
 
         import os
+
         _, ext = os.path.splitext(filename.lower())
         return ext in allowed_extensions
 
@@ -574,27 +631,36 @@ class InputValidator:
 
     def _sanitize_html(self, html_content: str) -> str:
         """Sanitize HTML content."""
-        allowed_tags = ['p', 'br', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'h1', 'h2', 'h3']
+        allowed_tags = [
+            "p",
+            "br",
+            "strong",
+            "em",
+            "u",
+            "ol",
+            "ul",
+            "li",
+            "h1",
+            "h2",
+            "h3",
+        ]
         allowed_attributes = {}
 
         return bleach.clean(
-            html_content,
-            tags=allowed_tags,
-            attributes=allowed_attributes,
-            strip=True
+            html_content, tags=allowed_tags, attributes=allowed_attributes, strip=True
         )
 
     def _sanitize_profanity(self, text: str) -> str:
         """Sanitize profanity from text."""
-        profanity_words = [
-            'damn', 'hell', 'shit', 'fuck', 'bitch', 'ass', 'bastard'
-        ]
+        profanity_words = ["damn", "hell", "shit", "fuck", "bitch", "ass", "bastard"]
 
         sanitized = text
         for word in profanity_words:
             # Replace with asterisks, keeping first letter
-            replacement = word[0] + '*' * (len(word) - 1)
-            sanitized = re.sub(rf'\b{re.escape(word)}\b', replacement, sanitized, flags=re.IGNORECASE)
+            replacement = word[0] + "*" * (len(word) - 1)
+            sanitized = re.sub(
+                rf"\b{re.escape(word)}\b", replacement, sanitized, flags=re.IGNORECASE
+            )
 
         return sanitized
 
@@ -609,8 +675,7 @@ class InputValidator:
         """Remove a validation rule."""
         if input_type in self.rules:
             self.rules[input_type] = [
-                rule for rule in self.rules[input_type]
-                if rule.name != rule_name
+                rule for rule in self.rules[input_type] if rule.name != rule_name
             ]
 
 
@@ -621,7 +686,7 @@ class SecurityValidator:
         self.input_validator = InputValidator()
         self.threat_patterns = self._load_threat_patterns()
 
-    def _load_threat_patterns(self) -> Dict[str, List[Pattern]]:
+    def _load_threat_patterns(self) -> dict[str, list[Pattern]]:
         """Load threat detection patterns."""
         return {
             "xss": SecurityPatterns.XSS_PATTERNS,
@@ -631,8 +696,9 @@ class SecurityValidator:
             "ldap_injection": SecurityPatterns.LDAP_INJECTION_PATTERNS,
         }
 
-    def validate_and_sanitize(self, input_data: str, input_type: InputType,
-                            field_name: str = None) -> ValidationResult:
+    def validate_and_sanitize(
+        self, input_data: str, input_type: InputType, field_name: str | None = None
+    ) -> ValidationResult:
         """Validate and sanitize input with comprehensive security checks."""
         # First, run standard validation
         result = self.input_validator.validate(input_data, input_type, field_name)
@@ -647,33 +713,32 @@ class SecurityValidator:
                 result.add_violation(
                     f"security_{threat['type']}",
                     f"Security threat detected: {threat['description']}",
-                    ValidationSeverity.CRITICAL
+                    ValidationSeverity.CRITICAL,
                 )
 
         return result
 
-    def _run_security_checks(self, input_data: str) -> Dict[str, Any]:
+    def _run_security_checks(self, input_data: str) -> dict[str, Any]:
         """Run comprehensive security checks."""
         threats = []
 
         for threat_type, patterns in self.threat_patterns.items():
             for pattern in patterns:
                 if pattern.search(input_data):
-                    threats.append({
-                        "type": threat_type,
-                        "description": f"Potential {threat_type.replace('_', ' ')} attack",
-                        "pattern": pattern.pattern,
-                        "severity": "critical"
-                    })
+                    threats.append(
+                        {
+                            "type": threat_type,
+                            "description": f"Potential {threat_type.replace('_', ' ')} attack",
+                            "pattern": pattern.pattern,
+                            "severity": "critical",
+                        }
+                    )
 
-        return {
-            "is_secure": len(threats) == 0,
-            "threats": threats
-        }
+        return {"is_secure": len(threats) == 0, "threats": threats}
 
 
 # Global validator instance
-_global_validator: Optional[SecurityValidator] = None
+_global_validator: SecurityValidator | None = None
 
 
 def get_security_validator() -> SecurityValidator:

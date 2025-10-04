@@ -2,36 +2,39 @@
 CausalValidator extracted from narrative_coherence_engine.
 Ensures logical cause-and-effect across narrative branches.
 """
+
 from __future__ import annotations
 
 import logging
 import uuid
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from .models import (
+    ConsistencyIssue,
+    ConsistencyIssueType,
     NarrativeContent,
     ValidationResult,
-    ConsistencyIssue,
     ValidationSeverity,
-    ConsistencyIssueType,
 )
 
 logger = logging.getLogger(__name__)
 
 
 class CausalValidator:
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: dict[str, Any]):
         self.config = config
-        self.causal_rules: Dict[str, Dict[str, Any]] = {}
-        self.logical_operators: List[str] = []
-        self.consequence_patterns: Dict[str, List[str]] = {}
+        self.causal_rules: dict[str, dict[str, Any]] = {}
+        self.logical_operators: list[str] = []
+        self.consequence_patterns: dict[str, list[str]] = {}
         self._load_causal_rules()
         self._load_logical_operators()
         self._load_consequence_patterns()
         logger.info("CausalValidator initialized")
 
-    async def validate_causal_logic(self, narrative_branch: List[NarrativeContent]) -> ValidationResult:
+    async def validate_causal_logic(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> ValidationResult:
         try:
             logger.debug(
                 f"Validating causal logic for branch with {len(narrative_branch)} elements"
@@ -52,7 +55,9 @@ class CausalValidator:
             result.is_valid = result.causal_consistency >= self.config.get(
                 "causal_threshold", 0.7
             )
-            result.suggested_corrections = await self._generate_causal_corrections(issues)
+            result.suggested_corrections = await self._generate_causal_corrections(
+                issues
+            )
             logger.debug(
                 f"Causal validation completed: score={result.causal_consistency:.2f}"
             )
@@ -117,10 +122,14 @@ class CausalValidator:
             "sudden": ["suddenly", "abruptly", "all at once", "without warning"],
         }
 
-    async def _validate_causal_chains(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
-        issues: List[ConsistencyIssue] = []
+    async def _validate_causal_chains(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
+        issues: list[ConsistencyIssue] = []
         try:
-            causal_relationships = await self._extract_causal_relationships(narrative_branch)
+            causal_relationships = await self._extract_causal_relationships(
+                narrative_branch
+            )
             for relationship in causal_relationships:
                 issues.extend(await self._validate_causal_relationship(relationship))
             return issues
@@ -135,8 +144,10 @@ class CausalValidator:
                 )
             ]
 
-    async def _validate_logical_consistency(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
-        issues: List[ConsistencyIssue] = []
+    async def _validate_logical_consistency(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
+        issues: list[ConsistencyIssue] = []
         try:
             issues.extend(await self._check_logical_fallacies(narrative_branch))
             issues.extend(await self._check_impossible_scenarios(narrative_branch))
@@ -153,10 +164,14 @@ class CausalValidator:
                 )
             ]
 
-    async def _validate_consequences(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
-        issues: List[ConsistencyIssue] = []
+    async def _validate_consequences(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
+        issues: list[ConsistencyIssue] = []
         try:
-            issues.extend(await self._check_consequence_proportionality(narrative_branch))
+            issues.extend(
+                await self._check_consequence_proportionality(narrative_branch)
+            )
             issues.extend(await self._check_consequence_timing(narrative_branch))
             issues.extend(await self._check_consequence_believability(narrative_branch))
             return issues
@@ -171,7 +186,9 @@ class CausalValidator:
                 )
             ]
 
-    def _calculate_causal_consistency_score(self, issues: List[ConsistencyIssue]) -> float:
+    def _calculate_causal_consistency_score(
+        self, issues: list[ConsistencyIssue]
+    ) -> float:
         if not issues:
             return 1.0
         total_penalty = 0.0
@@ -186,37 +203,54 @@ class CausalValidator:
         max_penalty = len(issues) * 1.0
         return max(0.0, 1.0 - (total_penalty / max_penalty))
 
-    async def _generate_causal_corrections(self, issues: List[ConsistencyIssue]) -> List[str]:
-        corrections: List[str] = []
+    async def _generate_causal_corrections(
+        self, issues: list[ConsistencyIssue]
+    ) -> list[str]:
+        corrections: list[str] = []
         for issue in issues:
             corrections.append(f"Review causal relationship: {issue.description}")
         return corrections
 
     # Placeholders for detailed causal analysis
-    async def _extract_causal_relationships(self, narrative_branch: List[NarrativeContent]) -> List[Dict[str, Any]]:
+    async def _extract_causal_relationships(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[dict[str, Any]]:
         return []
 
-    async def _validate_causal_relationship(self, relationship: Dict[str, Any]) -> List[ConsistencyIssue]:
+    async def _validate_causal_relationship(
+        self, relationship: dict[str, Any]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_logical_fallacies(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_logical_fallacies(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_impossible_scenarios(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_impossible_scenarios(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_circular_reasoning(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_circular_reasoning(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_consequence_proportionality(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_consequence_proportionality(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_consequence_timing(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_consequence_timing(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
-    async def _check_consequence_believability(self, narrative_branch: List[NarrativeContent]) -> List[ConsistencyIssue]:
+    async def _check_consequence_believability(
+        self, narrative_branch: list[NarrativeContent]
+    ) -> list[ConsistencyIssue]:
         return []
 
 
 __all__ = ["CausalValidator"]
-

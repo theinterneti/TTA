@@ -2,10 +2,10 @@ import pytest
 
 from src.agent_orchestration import (
     AgentId,
-    AgentType,
-    MessageType,
-    MessagePriority,
     AgentMessage,
+    AgentType,
+    MessagePriority,
+    MessageType,
 )
 from src.agent_orchestration.validators import validate_agent_message
 
@@ -25,6 +25,7 @@ def test_agent_message_valid():
 
 
 from pydantic import ValidationError
+
 
 def test_agent_message_min_length_invalid():
     # Construction itself should raise due to min_length constraint
@@ -47,4 +48,3 @@ def test_routing_defaults():
     assert msg.routing is not None
     assert msg.routing.topic is None
     assert isinstance(msg.routing.tags, list)
-

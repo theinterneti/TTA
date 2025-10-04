@@ -6,58 +6,60 @@ agents through sophisticated workflows, integrating therapeutic safety validatio
 session context management, and tying together all orchestration components.
 """
 
-import asyncio
 import logging
 import time
-from typing import Any, Dict, List, Optional, Tuple, Union
-from uuid import uuid4
+from typing import Any
 
-from pydantic import BaseModel, Field
-
-from .models import (
-    AgentType, OrchestrationRequest, OrchestrationResponse,
-    AgentId, MessageType, MessagePriority
-)
-from .state import AgentContext, SessionContext, AgentRuntimeStatus
-from .workflow import WorkflowType, WorkflowDefinition, AgentStep, ErrorHandlingStrategy
-from .workflow_manager import WorkflowManager
-from .interfaces import MessageCoordinator, AgentProxy
 from .agents import AgentRegistry
+from .interfaces import MessageCoordinator
+from .models import (
+    AgentId,
+    AgentType,
+    OrchestrationRequest,
+    OrchestrationResponse,
+)
+from .state import AgentContext, SessionContext
+from .workflow import AgentStep, ErrorHandlingStrategy, WorkflowDefinition, WorkflowType
+from .workflow_manager import WorkflowManager
 
 logger = logging.getLogger(__name__)
 
 # Type aliases for clarity
-WorkflowResult = Tuple[Optional[OrchestrationResponse], Optional[str], Optional[str]]
+WorkflowResult = tuple[OrchestrationResponse | None, str | None, str | None]
 
 
 class ServiceError(Exception):
     """Base exception for AgentOrchestrationService errors."""
+
     pass
 
 
 class TherapeuticSafetyError(ServiceError):
     """Raised when therapeutic safety validation fails."""
+
     pass
 
 
 class WorkflowExecutionError(ServiceError):
     """Raised when workflow execution fails."""
+
     pass
 
 
 class SessionContextError(ServiceError):
     """Raised when session context management fails."""
+
     pass
 
 
 class AgentOrchestrationService:
     """
     Main orchestration service providing the primary API for multi-agent coordination.
-    
+
     This service serves as the central coordination layer for TTA's multi-agent architecture,
-    managing the World Builder Agent (WBA), Input Processor Agent (IPA), and Narrative 
+    managing the World Builder Agent (WBA), Input Processor Agent (IPA), and Narrative
     Generator Agent (NGA) through sophisticated workflow management.
-    
+
     Key Responsibilities:
     - Route incoming requests to appropriate workflows
     - Coordinate agent execution sequences
@@ -65,20 +67,20 @@ class AgentOrchestrationService:
     - Ensure therapeutic safety validation
     - Handle error recovery and fallback strategies
     """
-    
+
     def __init__(
         self,
         workflow_manager: WorkflowManager,
         message_coordinator: MessageCoordinator,
         agent_registry: AgentRegistry,
-        therapeutic_validator: Optional[Any] = None,
-        resource_manager: Optional[Any] = None,
-        optimization_engine: Optional[Any] = None,
-        neo4j_manager: Optional[Any] = None,
-        crisis_intervention_manager: Optional[Any] = None,
-        emergency_protocol_engine: Optional[Any] = None,
-        human_oversight_escalation: Optional[Any] = None,
-        safety_monitoring_dashboard: Optional[Any] = None
+        therapeutic_validator: Any | None = None,
+        resource_manager: Any | None = None,
+        optimization_engine: Any | None = None,
+        neo4j_manager: Any | None = None,
+        crisis_intervention_manager: Any | None = None,
+        emergency_protocol_engine: Any | None = None,
+        human_oversight_escalation: Any | None = None,
+        safety_monitoring_dashboard: Any | None = None,
     ):
         """
         Initialize the AgentOrchestrationService.
@@ -109,65 +111,65 @@ class AgentOrchestrationService:
         self.emergency_protocol_engine = emergency_protocol_engine
         self.human_oversight_escalation = human_oversight_escalation
         self.safety_monitoring_dashboard = safety_monitoring_dashboard
-        
+
         # Service state
         self._initialized = False
-        self._session_contexts: Dict[str, SessionContext] = {}
-        self._active_workflows: Dict[str, str] = {}  # session_id -> workflow_run_id
-        
+        self._session_contexts: dict[str, SessionContext] = {}
+        self._active_workflows: dict[str, str] = {}  # session_id -> workflow_run_id
+
         # Performance metrics
         self._request_count = 0
         self._error_count = 0
         self._total_processing_time = 0.0
-        
+
         logger.info("AgentOrchestrationService initialized")
-    
+
     async def initialize(self) -> bool:
         """
         Initialize the service and register default workflows.
-        
+
         Returns:
             bool: True if initialization successful, False otherwise
         """
         try:
             # Register default workflows
             await self._register_default_workflows()
-            
+
             # Validate component availability
             await self._validate_components()
-            
+
             self._initialized = True
             logger.info("AgentOrchestrationService initialization complete")
             return True
-            
+
         except Exception as e:
             logger.error(f"Failed to initialize AgentOrchestrationService: {e}")
             return False
-    
+
     async def process_user_input(
         self,
         user_input: str,
         session_context: SessionContext,
-        workflow_type: Optional[WorkflowType] = None,
-        metadata: Optional[Dict[str, Any]] = None
+        workflow_type: WorkflowType | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> OrchestrationResponse:
         """
         Process user input through the multi-agent orchestration system.
-        
+
         This is the main entry point for processing user input. It handles therapeutic
         safety validation, determines the appropriate workflow type, and coordinates
         agent execution to generate a comprehensive response.
-        
+
         Args:
             user_input: The user's input text to process
             session_context: Current session context and state
             workflow_type: Optional specific workflow type to use
             metadata: Optional additional metadata for processing
-            
+
         Returns:
             OrchestrationResponse: Comprehensive response with generated content,
                                  updated context, and workflow metadata
-                                 
+
         Raises:
             TherapeuticSafetyError: If therapeutic safety validation fails
             WorkflowExecutionError: If workflow execution fails
@@ -175,21 +177,23 @@ class AgentOrchestrationService:
         """
         if not self._initialized:
             raise ServiceError("Service not initialized. Call initialize() first.")
-        
+
         start_time = time.time()
         self._request_count += 1
-        
+
         try:
             # Store/update session context
             self._session_contexts[session_context.session_id] = session_context
-            
+
             # Perform therapeutic safety validation
             await self._validate_therapeutic_safety(user_input, session_context)
-            
+
             # Determine workflow type if not specified
             if workflow_type is None:
-                workflow_type = await self._determine_workflow_type(user_input, session_context)
-            
+                workflow_type = await self._determine_workflow_type(
+                    user_input, session_context
+                )
+
             # Create orchestration request
             request = OrchestrationRequest(
                 session_id=session_context.session_id,
@@ -197,133 +201,145 @@ class AgentOrchestrationService:
                 input={
                     "text": user_input,
                     "session_context": session_context.model_dump(),
-                    "metadata": metadata or {}
-                }
+                    "metadata": metadata or {},
+                },
             )
-            
+
             # Execute workflow
             response = await self._execute_workflow_with_context(
                 workflow_type, request, session_context, metadata
             )
-            
+
             # Update session context with results
             await self._update_session_context(session_context, response)
-            
+
             # Record performance metrics
             processing_time = time.time() - start_time
             self._total_processing_time += processing_time
-            
+
             logger.info(
                 f"Processed user input for session {session_context.session_id} "
                 f"in {processing_time:.2f}s using {workflow_type.value} workflow"
             )
-            
+
             return response
-            
+
         except Exception as e:
             self._error_count += 1
             logger.error(f"Error processing user input: {e}")
-            
-            if isinstance(e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)):
+
+            if isinstance(
+                e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)
+            ):
                 raise
             else:
-                raise ServiceError(f"Unexpected error during processing: {e}")
-    
+                raise ServiceError(f"Unexpected error during processing: {e}") from e
+
     async def coordinate_agents(
         self,
         workflow_type: WorkflowType,
         context: AgentContext,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any] | None = None,
     ) -> WorkflowResult:
         """
         Coordinate agent execution for a specific workflow type.
-        
+
         This method handles the actual agent coordination, managing workflow execution
         through the WorkflowManager, resource allocation, and agent communication.
-        
+
         Args:
             workflow_type: Type of workflow to execute
             context: Agent context for workflow execution
             metadata: Optional metadata for workflow execution
-            
+
         Returns:
             WorkflowResult: Tuple of (response, run_id, error) from workflow execution
-            
+
         Raises:
             WorkflowExecutionError: If workflow execution fails
         """
         if not self._initialized:
             raise ServiceError("Service not initialized. Call initialize() first.")
-        
+
         try:
             # Create orchestration request from context
             request = OrchestrationRequest(
                 session_id=context.session_id,
                 entrypoint=AgentType.IPA,
-                input=context.model_dump()
+                input=context.model_dump(),
             )
-            
+
             # Get workflow name for the type
             workflow_name = self._get_workflow_name(workflow_type)
-            
+
             # Allocate resources if resource manager available
             if self.resource_manager:
                 await self._allocate_workflow_resources(workflow_type, context)
-            
+
             # Execute workflow through WorkflowManager
             response, run_id, error = self.workflow_manager.execute_workflow(
                 workflow_name, request, context, metadata
             )
-            
+
             if error:
                 logger.error(f"Workflow execution failed: {error}")
                 raise WorkflowExecutionError(f"Workflow execution failed: {error}")
-            
-            logger.info(f"Successfully coordinated agents for {workflow_type.value} workflow")
+
+            logger.info(
+                f"Successfully coordinated agents for {workflow_type.value} workflow"
+            )
             return response, run_id, error
-            
+
         except Exception as e:
             logger.error(f"Error coordinating agents: {e}")
             if isinstance(e, WorkflowExecutionError):
                 raise
             else:
-                raise WorkflowExecutionError(f"Agent coordination failed: {e}")
+                raise WorkflowExecutionError(f"Agent coordination failed: {e}") from e
 
-    def get_therapeutic_safety_metrics(self) -> Dict[str, Any]:
+    def get_therapeutic_safety_metrics(self) -> dict[str, Any]:
         """Get therapeutic safety metrics from the validator."""
         try:
-            if hasattr(self.therapeutic_validator, 'get_monitoring_metrics'):
+            if hasattr(self.therapeutic_validator, "get_monitoring_metrics"):
                 return self.therapeutic_validator.get_monitoring_metrics()
             else:
                 return {
                     "error": "Therapeutic validator does not support metrics",
-                    "validator_available": self.therapeutic_validator is not None
+                    "validator_available": self.therapeutic_validator is not None,
                 }
         except Exception as e:
             logger.error(f"Error getting therapeutic safety metrics: {e}")
             return {"error": str(e)}
 
-    def get_crisis_intervention_metrics(self) -> Dict[str, Any]:
+    def get_crisis_intervention_metrics(self) -> dict[str, Any]:
         """Get crisis intervention metrics from all crisis management components."""
         try:
             metrics = {
                 "crisis_manager": {},
                 "emergency_protocols": {},
                 "human_oversight": {},
-                "safety_dashboard": {}
+                "safety_dashboard": {},
             }
 
             if self.crisis_intervention_manager:
-                metrics["crisis_manager"] = self.crisis_intervention_manager.get_crisis_metrics()
+                metrics["crisis_manager"] = (
+                    self.crisis_intervention_manager.get_crisis_metrics()
+                )
 
             if self.emergency_protocol_engine:
-                metrics["emergency_protocols"] = self.emergency_protocol_engine.get_protocol_metrics()
+                metrics["emergency_protocols"] = (
+                    self.emergency_protocol_engine.get_protocol_metrics()
+                )
 
             if self.human_oversight_escalation:
-                metrics["human_oversight"] = self.human_oversight_escalation.get_escalation_metrics()
+                metrics["human_oversight"] = (
+                    self.human_oversight_escalation.get_escalation_metrics()
+                )
 
             if self.safety_monitoring_dashboard:
-                metrics["safety_dashboard"] = self.safety_monitoring_dashboard.get_real_time_status()
+                metrics["safety_dashboard"] = (
+                    self.safety_monitoring_dashboard.get_real_time_status()
+                )
 
             return metrics
 
@@ -331,7 +347,7 @@ class AgentOrchestrationService:
             logger.error(f"Error getting crisis intervention metrics: {e}")
             return {"error": str(e)}
 
-    def get_crisis_dashboard(self) -> Dict[str, Any]:
+    def get_crisis_dashboard(self) -> dict[str, Any]:
         """Get comprehensive crisis intervention dashboard."""
         try:
             if self.safety_monitoring_dashboard:
@@ -342,21 +358,23 @@ class AgentOrchestrationService:
             logger.error(f"Error getting crisis dashboard: {e}")
             return {"error": str(e)}
 
-    def get_safety_report(self, time_range_hours: int = 24) -> Dict[str, Any]:
+    def get_safety_report(self, time_range_hours: int = 24) -> dict[str, Any]:
         """Generate comprehensive safety report."""
         try:
             if self.safety_monitoring_dashboard:
-                return self.safety_monitoring_dashboard.get_safety_report(time_range_hours)
+                return self.safety_monitoring_dashboard.get_safety_report(
+                    time_range_hours
+                )
             else:
                 return {"error": "Safety monitoring dashboard not available"}
         except Exception as e:
             logger.error(f"Error generating safety report: {e}")
             return {"error": str(e)}
 
-    def get_service_status(self) -> Dict[str, Any]:
+    def get_service_status(self) -> dict[str, Any]:
         """
         Get current service status and metrics.
-        
+
         Returns:
             Dict containing service status, metrics, and component health
         """
@@ -368,7 +386,8 @@ class AgentOrchestrationService:
                 "request_count": self._request_count,
                 "error_count": self._error_count,
                 "error_rate": self._error_count / max(self._request_count, 1),
-                "avg_processing_time": self._total_processing_time / max(self._request_count, 1)
+                "avg_processing_time": self._total_processing_time
+                / max(self._request_count, 1),
             },
             "components": {
                 "workflow_manager": self.workflow_manager is not None,
@@ -378,34 +397,39 @@ class AgentOrchestrationService:
                 "resource_manager": self.resource_manager is not None,
                 "optimization_engine": self.optimization_engine is not None,
                 "neo4j_manager": self.neo4j_manager is not None,
-                "crisis_intervention_manager": self.crisis_intervention_manager is not None,
+                "crisis_intervention_manager": self.crisis_intervention_manager
+                is not None,
                 "emergency_protocol_engine": self.emergency_protocol_engine is not None,
-                "human_oversight_escalation": self.human_oversight_escalation is not None,
-                "safety_monitoring_dashboard": self.safety_monitoring_dashboard is not None
-            }
+                "human_oversight_escalation": self.human_oversight_escalation
+                is not None,
+                "safety_monitoring_dashboard": self.safety_monitoring_dashboard
+                is not None,
+            },
         }
-    
+
     async def shutdown(self) -> bool:
         """
         Gracefully shutdown the service.
-        
+
         Returns:
             bool: True if shutdown successful, False otherwise
         """
         try:
             # Cancel active workflows
             for session_id, run_id in self._active_workflows.items():
-                logger.info(f"Cancelling active workflow {run_id} for session {session_id}")
+                logger.info(
+                    f"Cancelling active workflow {run_id} for session {session_id}"
+                )
                 # Note: Actual cancellation would depend on WorkflowManager implementation
-            
+
             # Clear state
             self._session_contexts.clear()
             self._active_workflows.clear()
             self._initialized = False
-            
+
             logger.info("AgentOrchestrationService shutdown complete")
             return True
-            
+
         except Exception as e:
             logger.error(f"Error during service shutdown: {e}")
             return False
@@ -421,11 +445,19 @@ class AgentOrchestrationService:
             collaborative_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.COLLABORATIVE,
                 agent_sequence=[
-                    AgentStep(agent=AgentType.IPA, name="input_processing", timeout_seconds=10),
-                    AgentStep(agent=AgentType.WBA, name="world_building", timeout_seconds=15),
-                    AgentStep(agent=AgentType.NGA, name="narrative_generation", timeout_seconds=20),
+                    AgentStep(
+                        agent=AgentType.IPA, name="input_processing", timeout_seconds=10
+                    ),
+                    AgentStep(
+                        agent=AgentType.WBA, name="world_building", timeout_seconds=15
+                    ),
+                    AgentStep(
+                        agent=AgentType.NGA,
+                        name="narrative_generation",
+                        timeout_seconds=20,
+                    ),
                 ],
-                error_handling=ErrorHandlingStrategy.RETRY
+                error_handling=ErrorHandlingStrategy.RETRY,
             )
 
             success, error = self.workflow_manager.register_workflow(
@@ -438,9 +470,11 @@ class AgentOrchestrationService:
             input_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.INPUT_PROCESSING,
                 agent_sequence=[
-                    AgentStep(agent=AgentType.IPA, name="input_processing", timeout_seconds=10),
+                    AgentStep(
+                        agent=AgentType.IPA, name="input_processing", timeout_seconds=10
+                    ),
                 ],
-                error_handling=ErrorHandlingStrategy.FAIL_FAST
+                error_handling=ErrorHandlingStrategy.FAIL_FAST,
             )
 
             success, error = self.workflow_manager.register_workflow(
@@ -453,9 +487,11 @@ class AgentOrchestrationService:
             world_building_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.WORLD_BUILDING,
                 agent_sequence=[
-                    AgentStep(agent=AgentType.WBA, name="world_building", timeout_seconds=15),
+                    AgentStep(
+                        agent=AgentType.WBA, name="world_building", timeout_seconds=15
+                    ),
                 ],
-                error_handling=ErrorHandlingStrategy.RETRY
+                error_handling=ErrorHandlingStrategy.RETRY,
             )
 
             success, error = self.workflow_manager.register_workflow(
@@ -468,22 +504,28 @@ class AgentOrchestrationService:
             narrative_workflow = WorkflowDefinition(
                 workflow_type=WorkflowType.NARRATIVE_GENERATION,
                 agent_sequence=[
-                    AgentStep(agent=AgentType.NGA, name="narrative_generation", timeout_seconds=20),
+                    AgentStep(
+                        agent=AgentType.NGA,
+                        name="narrative_generation",
+                        timeout_seconds=20,
+                    ),
                 ],
-                error_handling=ErrorHandlingStrategy.RETRY
+                error_handling=ErrorHandlingStrategy.RETRY,
             )
 
             success, error = self.workflow_manager.register_workflow(
                 "narrative_generation", narrative_workflow
             )
             if not success:
-                logger.warning(f"Failed to register narrative generation workflow: {error}")
+                logger.warning(
+                    f"Failed to register narrative generation workflow: {error}"
+                )
 
             logger.info("Default workflows registered successfully")
 
         except Exception as e:
             logger.error(f"Error registering default workflows: {e}")
-            raise ServiceError(f"Failed to register default workflows: {e}")
+            raise ServiceError(f"Failed to register default workflows: {e}") from e
 
     async def _validate_components(self) -> None:
         """Validate that required components are available and functional."""
@@ -512,12 +554,10 @@ class AgentOrchestrationService:
 
         except Exception as e:
             logger.error(f"Component validation failed: {e}")
-            raise ServiceError(f"Component validation failed: {e}")
+            raise ServiceError(f"Component validation failed: {e}") from e
 
     async def _validate_therapeutic_safety(
-        self,
-        user_input: str,
-        session_context: SessionContext
+        self, user_input: str, session_context: SessionContext
     ) -> None:
         """
         Validate therapeutic safety of user input.
@@ -540,7 +580,9 @@ class AgentOrchestrationService:
                     safety_level = validation_result.get("level", "unknown")
                     reason = validation_result.get("reason", "Safety validation failed")
                     crisis_detected = validation_result.get("crisis_detected", False)
-                    escalation_recommended = validation_result.get("escalation_recommended", False)
+                    escalation_recommended = validation_result.get(
+                        "escalation_recommended", False
+                    )
                     alternative_content = validation_result.get("alternative_content")
 
                     logger.warning(
@@ -550,9 +592,13 @@ class AgentOrchestrationService:
 
                     # For blocked content or crisis situations, raise an error with alternative
                     if safety_level == "blocked" or crisis_detected:
-                        error_message = f"Content blocked due to safety concerns: {reason}"
+                        error_message = (
+                            f"Content blocked due to safety concerns: {reason}"
+                        )
                         if alternative_content:
-                            error_message += f"\n\nSuggested response: {alternative_content}"
+                            error_message += (
+                                f"\n\nSuggested response: {alternative_content}"
+                            )
 
                         raise TherapeuticSafetyError(error_message)
 
@@ -574,17 +620,15 @@ class AgentOrchestrationService:
             logger.warning("Proceeding with processing despite validation error")
 
     async def _call_therapeutic_validator(
-        self,
-        user_input: str,
-        session_context: SessionContext
-    ) -> Dict[str, Any]:
+        self, user_input: str, session_context: SessionContext
+    ) -> dict[str, Any]:
         """Call the enhanced therapeutic validator."""
         try:
             # Import here to avoid circular imports
-            from .therapeutic_safety import TherapeuticValidator, SafetyLevel
+            from .therapeutic_safety import SafetyLevel, TherapeuticValidator
 
             # Use the provided validator or create a default one
-            if hasattr(self.therapeutic_validator, 'validate_text'):
+            if hasattr(self.therapeutic_validator, "validate_text"):
                 validator = self.therapeutic_validator
             else:
                 # Fallback to default validator
@@ -594,17 +638,23 @@ class AgentOrchestrationService:
             validation_context = {
                 "session_id": session_context.session_id,
                 "user_id": session_context.user_id,
-                "session_count": getattr(session_context, 'session_count', 0),
-                "previous_violations": getattr(session_context, 'safety_violations', 0),
+                "session_count": getattr(session_context, "session_count", 0),
+                "previous_violations": getattr(session_context, "safety_violations", 0),
                 "therapeutic_session": True,
-                "previous_crisis_indicators": getattr(session_context, 'crisis_indicators', False)
+                "previous_crisis_indicators": getattr(
+                    session_context, "crisis_indicators", False
+                ),
             }
 
             # Perform comprehensive validation
             result = validator.validate_text(user_input, context=validation_context)
 
             # Check if we should alert on this result
-            should_alert = validator.should_alert(result) if hasattr(validator, 'should_alert') else False
+            should_alert = (
+                validator.should_alert(result)
+                if hasattr(validator, "should_alert")
+                else False
+            )
 
             # Convert to expected format
             validation_result = {
@@ -619,7 +669,7 @@ class AgentOrchestrationService:
                 "therapeutic_appropriateness": result.therapeutic_appropriateness,
                 "monitoring_flags": result.monitoring_flags,
                 "should_alert": should_alert,
-                "findings_count": len(result.findings)
+                "findings_count": len(result.findings),
             }
 
             # Log important events
@@ -635,22 +685,33 @@ class AgentOrchestrationService:
                         # Create session context for crisis assessment
                         crisis_context = {
                             "session_id": session_context.session_id,
-                            "user_id": getattr(session_context, 'user_id', 'unknown'),
-                            "session_count": getattr(session_context, 'interaction_count', 0),
-                            "previous_violations": getattr(session_context, 'safety_violations', 0),
-                            "location": getattr(session_context, 'location', 'unknown')
+                            "user_id": getattr(session_context, "user_id", "unknown"),
+                            "session_count": getattr(
+                                session_context, "interaction_count", 0
+                            ),
+                            "previous_violations": getattr(
+                                session_context, "safety_violations", 0
+                            ),
+                            "location": getattr(session_context, "location", "unknown"),
                         }
 
                         # Assess crisis and initiate intervention
-                        assessment = self.crisis_intervention_manager.assess_crisis(result, crisis_context)
-                        intervention = self.crisis_intervention_manager.initiate_intervention(
-                            assessment,
-                            session_context.session_id,
-                            crisis_context["user_id"]
+                        assessment = self.crisis_intervention_manager.assess_crisis(
+                            result, crisis_context
+                        )
+                        intervention = (
+                            self.crisis_intervention_manager.initiate_intervention(
+                                assessment,
+                                session_context.session_id,
+                                crisis_context["user_id"],
+                            )
                         )
 
                         # Handle escalation if required
-                        if assessment.escalation_required and self.human_oversight_escalation:
+                        if (
+                            assessment.escalation_required
+                            and self.human_oversight_escalation
+                        ):
                             if assessment.crisis_level.value == "critical":
                                 self.human_oversight_escalation.escalate_to_emergency_services(
                                     intervention, "mental_health"
@@ -672,15 +733,23 @@ class AgentOrchestrationService:
                             self.safety_monitoring_dashboard.add_alert(
                                 "crisis_intervention",
                                 f"Crisis intervention initiated for session {session_context.session_id}",
-                                "critical" if assessment.crisis_level.value == "critical" else "high",
+                                (
+                                    "critical"
+                                    if assessment.crisis_level.value == "critical"
+                                    else "high"
+                                ),
                                 {
                                     "intervention_id": intervention.intervention_id,
-                                    "crisis_types": [ct.value for ct in assessment.crisis_types],
-                                    "crisis_level": assessment.crisis_level.value
-                                }
+                                    "crisis_types": [
+                                        ct.value for ct in assessment.crisis_types
+                                    ],
+                                    "crisis_level": assessment.crisis_level.value,
+                                },
                             )
 
-                        logger.info(f"Crisis intervention system activated for session {session_context.session_id}")
+                        logger.info(
+                            f"Crisis intervention system activated for session {session_context.session_id}"
+                        )
 
                     except Exception as e:
                         logger.error(f"Failed to initiate crisis intervention: {e}")
@@ -700,15 +769,20 @@ class AgentOrchestrationService:
                 "level": "unknown",
                 "reason": f"Validation error: {str(e)}",
                 "crisis_detected": False,
-                "escalation_recommended": False
+                "escalation_recommended": False,
             }
 
     async def _basic_safety_checks(self, user_input: str) -> None:
         """Perform basic safety checks on user input."""
         # Basic keyword-based safety checks
         high_risk_keywords = [
-            "suicide", "kill myself", "end it all", "hurt myself",
-            "self-harm", "cutting", "overdose"
+            "suicide",
+            "kill myself",
+            "end it all",
+            "hurt myself",
+            "self-harm",
+            "cutting",
+            "overdose",
         ]
 
         user_input_lower = user_input.lower()
@@ -721,9 +795,7 @@ class AgentOrchestrationService:
                 )
 
     async def _determine_workflow_type(
-        self,
-        user_input: str,
-        session_context: SessionContext
+        self, user_input: str, session_context: SessionContext
     ) -> WorkflowType:
         """
         Determine the appropriate workflow type based on user input and context.
@@ -747,7 +819,13 @@ class AgentOrchestrationService:
                 return WorkflowType.INPUT_PROCESSING
 
             # Check for world-building focused inputs
-            world_keywords = ["look", "examine", "describe", "where am i", "surroundings"]
+            world_keywords = [
+                "look",
+                "examine",
+                "describe",
+                "where am i",
+                "surroundings",
+            ]
             if any(keyword in user_input_lower for keyword in world_keywords):
                 return WorkflowType.WORLD_BUILDING
 
@@ -769,7 +847,7 @@ class AgentOrchestrationService:
         workflow_type: WorkflowType,
         request: OrchestrationRequest,
         session_context: SessionContext,
-        metadata: Optional[Dict[str, Any]] = None
+        metadata: dict[str, Any] | None = None,
     ) -> OrchestrationResponse:
         """
         Execute workflow with full context management.
@@ -790,7 +868,7 @@ class AgentOrchestrationService:
                 session_id=session_context.session_id,
                 memory=session_context.context.memory,
                 world_state=session_context.context.world_state,
-                metadata=session_context.context.metadata
+                metadata=session_context.context.metadata,
             )
 
             # Execute workflow
@@ -812,12 +890,10 @@ class AgentOrchestrationService:
             if isinstance(e, WorkflowExecutionError):
                 raise
             else:
-                raise WorkflowExecutionError(f"Workflow execution failed: {e}")
+                raise WorkflowExecutionError(f"Workflow execution failed: {e}") from e
 
     async def _update_session_context(
-        self,
-        session_context: SessionContext,
-        response: OrchestrationResponse
+        self, session_context: SessionContext, response: OrchestrationResponse
     ) -> None:
         """
         Update session context with workflow response.
@@ -864,14 +940,12 @@ class AgentOrchestrationService:
             WorkflowType.COLLABORATIVE: "collaborative",
             WorkflowType.INPUT_PROCESSING: "input_processing",
             WorkflowType.WORLD_BUILDING: "world_building",
-            WorkflowType.NARRATIVE_GENERATION: "narrative_generation"
+            WorkflowType.NARRATIVE_GENERATION: "narrative_generation",
         }
         return workflow_names.get(workflow_type, "collaborative")
 
     async def _allocate_workflow_resources(
-        self,
-        workflow_type: WorkflowType,
-        context: AgentContext
+        self, workflow_type: WorkflowType, context: AgentContext
     ) -> None:
         """Allocate resources for workflow execution."""
         try:

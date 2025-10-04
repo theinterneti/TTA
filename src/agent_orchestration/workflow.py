@@ -1,10 +1,12 @@
 """
 Workflow definitions and orchestration responses (Task 2.1).
 """
+
 from __future__ import annotations
 
 from enum import Enum
-from typing import Any, Dict, List, Optional
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 from .models import AgentType
@@ -25,27 +27,26 @@ class ErrorHandlingStrategy(str, Enum):
 
 class AgentStep(BaseModel):
     agent: AgentType
-    name: Optional[str] = None
-    timeout_seconds: Optional[int] = None
+    name: str | None = None
+    timeout_seconds: int | None = None
 
 
 class TimeoutConfiguration(BaseModel):
-    per_step_seconds: Optional[int] = None
-    total_seconds: Optional[int] = None
+    per_step_seconds: int | None = None
+    total_seconds: int | None = None
 
 
 class WorkflowDefinition(BaseModel):
     workflow_type: WorkflowType
-    agent_sequence: List[AgentStep] = Field(default_factory=list)
-    parallel_steps: List[List[AgentStep]] = Field(default_factory=list)
+    agent_sequence: list[AgentStep] = Field(default_factory=list)
+    parallel_steps: list[list[AgentStep]] = Field(default_factory=list)
     error_handling: ErrorHandlingStrategy = ErrorHandlingStrategy.FAIL_FAST
     timeout_config: TimeoutConfiguration = Field(default_factory=TimeoutConfiguration)
 
 
 class OrchestrationResponse(BaseModel):
     response_text: str
-    updated_context: Dict[str, Any] = Field(default_factory=dict)
-    workflow_metadata: Dict[str, Any] = Field(default_factory=dict)
-    performance_metrics: Dict[str, Any] = Field(default_factory=dict)
-    therapeutic_validation: Optional[Dict[str, Any]] = None
-
+    updated_context: dict[str, Any] = Field(default_factory=dict)
+    workflow_metadata: dict[str, Any] = Field(default_factory=dict)
+    performance_metrics: dict[str, Any] = Field(default_factory=dict)
+    therapeutic_validation: dict[str, Any] | None = None

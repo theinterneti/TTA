@@ -1,0 +1,527 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.models.progress &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.models.progress</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.models.progress</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Progress Tracking Models</span>
+
+<span class="sd">This module defines data structures for tracking therapeutic progress,</span>
+<span class="sd">skill development, emotional growth, and behavioral changes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">uuid4</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">field_validator</span>
+
+
+<div class="viewcode-block" id="ProgressType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of therapeutic progress.&quot;&quot;&quot;</span>
+
+    <span class="n">SKILL_DEVELOPMENT</span> <span class="o">=</span> <span class="s2">&quot;skill_development&quot;</span>
+    <span class="n">EMOTIONAL_GROWTH</span> <span class="o">=</span> <span class="s2">&quot;emotional_growth&quot;</span>
+    <span class="n">BEHAVIORAL_CHANGE</span> <span class="o">=</span> <span class="s2">&quot;behavioral_change&quot;</span>
+    <span class="n">COGNITIVE_INSIGHT</span> <span class="o">=</span> <span class="s2">&quot;cognitive_insight&quot;</span>
+    <span class="n">RELATIONSHIP_IMPROVEMENT</span> <span class="o">=</span> <span class="s2">&quot;relationship_improvement&quot;</span>
+    <span class="n">COPING_STRATEGY</span> <span class="o">=</span> <span class="s2">&quot;coping_strategy&quot;</span>
+    <span class="n">SELF_AWARENESS</span> <span class="o">=</span> <span class="s2">&quot;self_awareness&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="MilestoneType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.MilestoneType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MilestoneType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of progress milestones.&quot;&quot;&quot;</span>
+
+    <span class="n">BREAKTHROUGH</span> <span class="o">=</span> <span class="s2">&quot;breakthrough&quot;</span>
+    <span class="n">SKILL_MASTERY</span> <span class="o">=</span> <span class="s2">&quot;skill_mastery&quot;</span>
+    <span class="n">EMOTIONAL_REGULATION</span> <span class="o">=</span> <span class="s2">&quot;emotional_regulation&quot;</span>
+    <span class="n">BEHAVIORAL_PATTERN</span> <span class="o">=</span> <span class="s2">&quot;behavioral_pattern&quot;</span>
+    <span class="n">THERAPEUTIC_GOAL</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_goal&quot;</span>
+    <span class="n">CRISIS_MANAGEMENT</span> <span class="o">=</span> <span class="s2">&quot;crisis_management&quot;</span>
+    <span class="n">RELATIONSHIP_MILESTONE</span> <span class="o">=</span> <span class="s2">&quot;relationship_milestone&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SkillLevel">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.SkillLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SkillLevel</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Levels of skill development.&quot;&quot;&quot;</span>
+
+    <span class="n">NOVICE</span> <span class="o">=</span> <span class="s2">&quot;novice&quot;</span>
+    <span class="n">DEVELOPING</span> <span class="o">=</span> <span class="s2">&quot;developing&quot;</span>
+    <span class="n">COMPETENT</span> <span class="o">=</span> <span class="s2">&quot;competent&quot;</span>
+    <span class="n">PROFICIENT</span> <span class="o">=</span> <span class="s2">&quot;proficient&quot;</span>
+    <span class="n">EXPERT</span> <span class="o">=</span> <span class="s2">&quot;expert&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="ProgressMetric">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMetric">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressMetric</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Individual progress metric tracking.&quot;&quot;&quot;</span>
+
+    <span class="n">metric_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the progress metric&quot;</span><span class="p">)</span>
+    <span class="n">progress_type</span><span class="p">:</span> <span class="n">ProgressType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of progress being tracked&quot;</span>
+    <span class="p">)</span>
+    <span class="n">current_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current progress value (0.0-1.0)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">baseline_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Starting baseline value&quot;</span>
+    <span class="p">)</span>
+    <span class="n">target_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target progress value&quot;</span>
+    <span class="p">)</span>
+    <span class="n">measurement_unit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;score&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unit of measurement&quot;</span><span class="p">)</span>
+    <span class="n">measurement_method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;How this metric is measured&quot;</span><span class="p">)</span>
+    <span class="n">confidence_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Confidence in measurement&quot;</span>
+    <span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">update_frequency</span><span class="p">:</span> <span class="n">timedelta</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">7</span><span class="p">),</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;How often to update&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressMetric.validate_scores">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMetric.validate_scores">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span>
+        <span class="s2">&quot;current_value&quot;</span><span class="p">,</span> <span class="s2">&quot;baseline_value&quot;</span><span class="p">,</span> <span class="s2">&quot;target_value&quot;</span><span class="p">,</span> <span class="s2">&quot;confidence_level&quot;</span>
+    <span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_scores</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Score must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="ProgressMetric.calculate_progress_percentage">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMetric.calculate_progress_percentage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_progress_percentage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate progress as percentage from baseline to target.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_value</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="n">progress</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_value</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">target_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_value</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">progress</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="ProgressMetric.is_improving">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMetric.is_improving">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_improving</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if metric shows improvement from baseline.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_value</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_value</span></div>
+
+
+<div class="viewcode-block" id="ProgressMetric.needs_update">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMetric.needs_update">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">needs_update</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if metric needs updating based on frequency.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_frequency</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="SkillDevelopment">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.SkillDevelopment">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SkillDevelopment</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracking of specific skill development.&quot;&quot;&quot;</span>
+
+    <span class="n">skill_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">skill_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the skill&quot;</span><span class="p">)</span>
+    <span class="n">skill_category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Category of the skill&quot;</span><span class="p">)</span>
+    <span class="n">current_level</span><span class="p">:</span> <span class="n">SkillLevel</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">SkillLevel</span><span class="o">.</span><span class="n">NOVICE</span><span class="p">)</span>
+    <span class="n">proficiency_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">practice_sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of practice sessions&quot;</span><span class="p">)</span>
+    <span class="n">successful_applications</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Successful real-world applications&quot;</span>
+    <span class="p">)</span>
+    <span class="n">learning_objectives</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">completed_objectives</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">practice_opportunities</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">mastery_indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">development_notes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">last_practiced</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SkillDevelopment.validate_proficiency_score">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.SkillDevelopment.validate_proficiency_score">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;proficiency_score&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_proficiency_score</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Proficiency score must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="SkillDevelopment.advance_level">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.SkillDevelopment.advance_level">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">advance_level</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Advance skill level if criteria are met.&quot;&quot;&quot;</span>
+        <span class="n">level_requirements</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">SkillLevel</span><span class="o">.</span><span class="n">NOVICE</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="n">SkillLevel</span><span class="o">.</span><span class="n">DEVELOPING</span><span class="p">:</span> <span class="mf">0.4</span><span class="p">,</span>
+            <span class="n">SkillLevel</span><span class="o">.</span><span class="n">COMPETENT</span><span class="p">:</span> <span class="mf">0.6</span><span class="p">,</span>
+            <span class="n">SkillLevel</span><span class="o">.</span><span class="n">PROFICIENT</span><span class="p">:</span> <span class="mf">0.8</span><span class="p">,</span>
+            <span class="n">SkillLevel</span><span class="o">.</span><span class="n">EXPERT</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="n">current_threshold</span> <span class="o">=</span> <span class="n">level_requirements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_level</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">proficiency_score</span> <span class="o">&gt;=</span> <span class="n">current_threshold</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">practice_sessions</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">levels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">SkillLevel</span><span class="p">)</span>
+            <span class="n">current_index</span> <span class="o">=</span> <span class="n">levels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_level</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">current_level</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[</span><span class="n">current_index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="EmotionalGrowth">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.EmotionalGrowth">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EmotionalGrowth</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracking of emotional growth and regulation.&quot;&quot;&quot;</span>
+
+    <span class="n">growth_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">emotion_category</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Category of emotion (e.g., anxiety, anger)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">regulation_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Emotional regulation ability&quot;</span>
+    <span class="p">)</span>
+    <span class="n">awareness_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Emotional awareness level&quot;</span>
+    <span class="p">)</span>
+    <span class="n">expression_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Healthy expression ability&quot;</span>
+    <span class="p">)</span>
+    <span class="n">coping_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">effective_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">trigger_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">growth_indicators</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">emotional_incidents</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of emotional incidents&quot;</span>
+    <span class="p">)</span>
+    <span class="n">successful_regulations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Successful regulation instances&quot;</span>
+    <span class="p">)</span>
+    <span class="n">breakthrough_moments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">last_incident</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EmotionalGrowth.validate_scores">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.EmotionalGrowth.validate_scores">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;regulation_score&quot;</span><span class="p">,</span> <span class="s2">&quot;awareness_score&quot;</span><span class="p">,</span> <span class="s2">&quot;expression_score&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_scores</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Score must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="EmotionalGrowth.calculate_overall_growth">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.EmotionalGrowth.calculate_overall_growth">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_overall_growth</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate overall emotional growth score.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">regulation_score</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">awareness_score</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">expression_score</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span></div>
+
+
+<div class="viewcode-block" id="EmotionalGrowth.add_successful_regulation">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.EmotionalGrowth.add_successful_regulation">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_successful_regulation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">strategy</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Record a successful emotional regulation.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">successful_regulations</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">effective_strategies</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">effective_strategies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">strategy</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="BehavioralChange">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.BehavioralChange">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BehavioralChange</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Tracking of behavioral changes and patterns.&quot;&quot;&quot;</span>
+
+    <span class="n">change_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">behavior_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Name of the behavior being tracked&quot;</span><span class="p">)</span>
+    <span class="n">change_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of change (increase, decrease, modify)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">target_behavior</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Desired behavior outcome&quot;</span><span class="p">)</span>
+    <span class="n">baseline_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Baseline frequency of behavior&quot;</span>
+    <span class="p">)</span>
+    <span class="n">current_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current frequency of behavior&quot;</span>
+    <span class="p">)</span>
+    <span class="n">target_frequency</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Target frequency of behavior&quot;</span><span class="p">)</span>
+    <span class="n">measurement_period</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;weekly&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Measurement period&quot;</span><span class="p">)</span>
+    <span class="n">behavior_triggers</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">intervention_strategies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">successful_interventions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">behavior_incidents</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">pattern_observations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">environmental_factors</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">last_occurrence</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BehavioralChange.calculate_change_percentage">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.BehavioralChange.calculate_change_percentage">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_change_percentage</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate percentage change from baseline.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_frequency</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="mf">0.0</span>
+
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">current_frequency</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span></div>
+
+
+<div class="viewcode-block" id="BehavioralChange.is_improving">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.BehavioralChange.is_improving">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_improving</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if behavior is improving toward target.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_type</span> <span class="o">==</span> <span class="s2">&quot;increase&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_frequency</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">change_type</span> <span class="o">==</span> <span class="s2">&quot;decrease&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_frequency</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># modify</span>
+            <span class="n">target_diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_frequency</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span><span class="p">)</span>
+            <span class="n">current_diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_frequency</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_frequency</span><span class="p">)</span>
+            <span class="n">baseline_diff</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseline_frequency</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_frequency</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">current_diff</span> <span class="o">&lt;</span> <span class="n">baseline_diff</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="ProgressMilestone">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMilestone">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">ProgressMilestone</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Significant milestone in therapeutic progress.&quot;&quot;&quot;</span>
+
+    <span class="n">milestone_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">milestone_type</span><span class="p">:</span> <span class="n">MilestoneType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of milestone&quot;</span><span class="p">)</span>
+    <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Title of the milestone&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Detailed description&quot;</span><span class="p">)</span>
+    <span class="n">achievement_criteria</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">evidence</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">therapeutic_significance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic significance&quot;</span>
+    <span class="p">)</span>
+    <span class="n">celebration_content</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Content for celebrating milestone&quot;</span>
+    <span class="p">)</span>
+    <span class="n">related_skills</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">related_goals</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">next_steps</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">achieved_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ProgressMilestone.validate_therapeutic_significance">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.ProgressMilestone.validate_therapeutic_significance">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span><span class="s2">&quot;therapeutic_significance&quot;</span><span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_therapeutic_significance</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Therapeutic significance must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TherapeuticProgress">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.TherapeuticProgress">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticProgress</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive therapeutic progress tracking.&quot;&quot;&quot;</span>
+
+    <span class="n">progress_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">()))</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;ID of the user&quot;</span><span class="p">)</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Associated session ID&quot;</span><span class="p">)</span>
+    <span class="n">progress_metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressMetric</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">skill_developments</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SkillDevelopment</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">emotional_growth</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">EmotionalGrowth</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">behavioral_changes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">BehavioralChange</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">milestones</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressMilestone</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">overall_progress_score</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">therapeutic_momentum</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">engagement_level</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">progress_notes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">recommendations</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+    <span class="n">last_updated</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticProgress.validate_scores">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.TherapeuticProgress.validate_scores">[docs]</a>
+    <span class="nd">@field_validator</span><span class="p">(</span>
+        <span class="s2">&quot;overall_progress_score&quot;</span><span class="p">,</span> <span class="s2">&quot;therapeutic_momentum&quot;</span><span class="p">,</span> <span class="s2">&quot;engagement_level&quot;</span>
+    <span class="p">)</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_scores</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">v</span> <span class="o">&lt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Score must be between 0.0 and 1.0&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticProgress.calculate_overall_progress">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.TherapeuticProgress.calculate_overall_progress">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_overall_progress</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Calculate overall progress score from all metrics.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_metrics</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">total_progress</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">metric</span><span class="o">.</span><span class="n">calculate_progress_percentage</span><span class="p">()</span> <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">progress_metrics</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">total_progress</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">progress_metrics</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticProgress.get_recent_milestones">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.TherapeuticProgress.get_recent_milestones">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_recent_milestones</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">days</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ProgressMilestone</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get milestones achieved in the last N days.&quot;&quot;&quot;</span>
+        <span class="n">cutoff_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">days</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">milestone</span>
+            <span class="k">for</span> <span class="n">milestone</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">milestones</span>
+            <span class="k">if</span> <span class="n">milestone</span><span class="o">.</span><span class="n">achieved_at</span> <span class="o">&gt;=</span> <span class="n">cutoff_date</span>
+        <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticProgress.needs_attention">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.models.progress.html#src.components.gameplay_loop.models.TherapeuticProgress.needs_attention">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">needs_attention</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if progress needs therapeutic attention.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">overall_progress_score</span> <span class="o">&lt;</span> <span class="mf">0.3</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">therapeutic_momentum</span> <span class="o">&lt;</span> <span class="mf">0.3</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">engagement_level</span> <span class="o">&lt;</span> <span class="mf">0.4</span>
+        <span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

@@ -53,6 +53,9 @@ htmlcov/
 coverage.xml
 junit*.xml
 .tox/
+# Test result files that may contain sensitive data (JWT tokens, etc.)
+*_test_results_*.json
+phase*_integration_test_results_*.json
 
 # -------------------------------------------------
 # 5) Tool caches (linters/type checkers/etc.)
@@ -103,10 +106,27 @@ dump.rdb
 # -------------------------------------------------
 # 8) Environment & secrets (do NOT commit secrets)
 # -------------------------------------------------
+# Environment files with actual secrets (NEVER commit these)
 .env
+.env.local
+.env.development
+.env.staging
+.env.production
+.env.test.local
+
+# Legacy environment files (keep ignoring)
 .env.*
 *.env
 *.env.*
+
+# Exception: Allow .example files to be committed (they're templates)
+!.env.example
+!.env.local.example
+!.env.production.example
+!.env.staging.example
+!src/player_experience/frontend/.env.example
+
+# Secrets and certificates
 .secrets/
 *.pem
 *.key
@@ -164,4 +184,4 @@ huggingface-cache/
 /tta.dev/*
 # Corrected prototype ignore (case-sensitive fix); keep the old line for safety below
 /tta.prototype/*
-/TTA.prototype/*
+/TTA.prototype/*config/neo4j-staging.conf

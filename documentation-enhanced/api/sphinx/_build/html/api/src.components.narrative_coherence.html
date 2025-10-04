@@ -1,0 +1,984 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.narrative_coherence package &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=30646c52"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="src.components.narrative_coherence.causal_validator module" href="src.components.narrative_coherence.causal_validator.html" />
+    <link rel="prev" title="src.components.gameplay_loop.base module" href="src.components.gameplay_loop.base.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">src</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="src.html">src package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="src.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="src.agent_orchestration.html">src.agent_orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.api_gateway.html">src.api_gateway package</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="src.components.html">src.components package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.orchestration.html">src.orchestration package</a></li>
+<li class="toctree-l4"><a class="reference internal" href="src.player_experience.html">src.player_experience package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="src.html#submodules">Submodules</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">src</a></li>
+          <li class="breadcrumb-item"><a href="src.html">src package</a></li>
+          <li class="breadcrumb-item"><a href="src.components.html">src.components package</a></li>
+      <li class="breadcrumb-item active">src.components.narrative_coherence package</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/src.components.narrative_coherence.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-src.components.narrative_coherence">
+<span id="src-components-narrative-coherence-package"></span><h1>src.components.narrative_coherence package<a class="headerlink" href="#module-src.components.narrative_coherence" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">ConsistencyIssue</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">issue_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">issue_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_content_ids=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_score=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#ConsistencyIssue"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>issue_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>issue_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType" title="src.components.narrative_coherence.models.ConsistencyIssueType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConsistencyIssueType</span></code></a></span>)</p></li>
+<li><p><strong>severity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity" title="src.components.narrative_coherence.models.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>related_content_ids</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>confidence_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.confidence_score">
+<span class="sig-name descname"><span class="pre">confidence_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.confidence_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.issue_id">
+<span class="sig-name descname"><span class="pre">issue_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.issue_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.issue_type">
+<span class="sig-name descname"><span class="pre">issue_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType" title="src.components.narrative_coherence.models.ConsistencyIssueType"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConsistencyIssueType</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.issue_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.related_content_ids">
+<span class="sig-name descname"><span class="pre">related_content_ids</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.related_content_ids" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.severity">
+<span class="sig-name descname"><span class="pre">severity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity" title="src.components.narrative_coherence.models.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.severity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssue.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssue.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">ConsistencyIssueType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#ConsistencyIssueType"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.CAUSAL_INCONSISTENCY">
+<span class="sig-name descname"><span class="pre">CAUSAL_INCONSISTENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'causal_inconsistency'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.CAUSAL_INCONSISTENCY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.CHARACTER_INCONSISTENCY">
+<span class="sig-name descname"><span class="pre">CHARACTER_INCONSISTENCY</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'character_inconsistency'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.CHARACTER_INCONSISTENCY" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.LORE_VIOLATION">
+<span class="sig-name descname"><span class="pre">LORE_VIOLATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'lore_violation'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.LORE_VIOLATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.TEMPORAL_PARADOX">
+<span class="sig-name descname"><span class="pre">TEMPORAL_PARADOX</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'temporal_paradox'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.TEMPORAL_PARADOX" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.THEMATIC_CONFLICT">
+<span class="sig-name descname"><span class="pre">THEMATIC_CONFLICT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'thematic_conflict'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.THEMATIC_CONFLICT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT">
+<span class="sig-name descname"><span class="pre">THERAPEUTIC_MISALIGNMENT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'therapeutic_misalignment'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConsistencyIssueType.WORLD_RULE_VIOLATION">
+<span class="sig-name descname"><span class="pre">WORLD_RULE_VIOLATION</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'world_rule_violation'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConsistencyIssueType.WORLD_RULE_VIOLATION" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">Contradiction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">contradiction_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">severity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_issues=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution_suggestions=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">confidence_score=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_at=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#Contradiction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.Contradiction" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>contradiction_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>severity</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity" title="src.components.narrative_coherence.models.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>related_issues</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>resolution_suggestions</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>confidence_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>detected_at</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.confidence_score">
+<span class="sig-name descname"><span class="pre">confidence_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.confidence_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.contradiction_id">
+<span class="sig-name descname"><span class="pre">contradiction_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.contradiction_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.detected_at">
+<span class="sig-name descname"><span class="pre">detected_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.detected_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.related_issues">
+<span class="sig-name descname"><span class="pre">related_issues</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.related_issues" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.resolution_suggestions">
+<span class="sig-name descname"><span class="pre">resolution_suggestions</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.resolution_suggestions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.severity">
+<span class="sig-name descname"><span class="pre">severity</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity" title="src.components.narrative_coherence.models.ValidationSeverity"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.severity" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.Contradiction.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.Contradiction.type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">ConvergenceValidation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">storyline_count</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_convergent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strong_connections=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weak_connections=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recommendations=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_score=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#ConvergenceValidation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>storyline_count</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>)</p></li>
+<li><p><strong>is_convergent</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>strong_connections</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>weak_connections</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>recommendations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>convergence_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.convergence_score">
+<span class="sig-name descname"><span class="pre">convergence_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.convergence_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.is_convergent">
+<span class="sig-name descname"><span class="pre">is_convergent</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.is_convergent" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.recommendations">
+<span class="sig-name descname"><span class="pre">recommendations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.recommendations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.session_id">
+<span class="sig-name descname"><span class="pre">session_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.session_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.storyline_count">
+<span class="sig-name descname"><span class="pre">storyline_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.storyline_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.strong_connections">
+<span class="sig-name descname"><span class="pre">strong_connections</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.strong_connections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ConvergenceValidation.weak_connections">
+<span class="sig-name descname"><span class="pre">weak_connections</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ConvergenceValidation.weak_connections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">CreativeSolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">solution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benefits=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tradeoffs=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">narrative_cost=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">player_impact=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">required_changes=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#CreativeSolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>solution_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>solution_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>benefits</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>tradeoffs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>narrative_cost</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>player_impact</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>required_changes</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.benefits">
+<span class="sig-name descname"><span class="pre">benefits</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.benefits" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.narrative_cost">
+<span class="sig-name descname"><span class="pre">narrative_cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.narrative_cost" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.player_impact">
+<span class="sig-name descname"><span class="pre">player_impact</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.player_impact" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.required_changes">
+<span class="sig-name descname"><span class="pre">required_changes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.required_changes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.solution_id">
+<span class="sig-name descname"><span class="pre">solution_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.solution_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.solution_type">
+<span class="sig-name descname"><span class="pre">solution_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.solution_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.CreativeSolution.tradeoffs">
+<span class="sig-name descname"><span class="pre">tradeoffs</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.CreativeSolution.tradeoffs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">LoreEntry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lore_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">category</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canonical=True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_entries=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">importance_weight=1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#LoreEntry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lore_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>category</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>canonical</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>related_entries</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>importance_weight</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>last_updated</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.canonical">
+<span class="sig-name descname"><span class="pre">canonical</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.canonical" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.category">
+<span class="sig-name descname"><span class="pre">category</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.category" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.importance_weight">
+<span class="sig-name descname"><span class="pre">importance_weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.importance_weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.last_updated">
+<span class="sig-name descname"><span class="pre">last_updated</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.last_updated" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.lore_id">
+<span class="sig-name descname"><span class="pre">lore_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.lore_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.related_entries">
+<span class="sig-name descname"><span class="pre">related_entries</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.related_entries" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.LoreEntry.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.LoreEntry.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">NarrativeContent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">content_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">content_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_characters=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_locations=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_events=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">themes=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_concepts=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#NarrativeContent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>content_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>content_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>text</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>related_characters</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>related_locations</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>related_events</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>themes</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>therapeutic_concepts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.content_id">
+<span class="sig-name descname"><span class="pre">content_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.content_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.content_type">
+<span class="sig-name descname"><span class="pre">content_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.content_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.related_characters">
+<span class="sig-name descname"><span class="pre">related_characters</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.related_characters" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.related_events">
+<span class="sig-name descname"><span class="pre">related_events</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.related_events" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.related_locations">
+<span class="sig-name descname"><span class="pre">related_locations</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.related_locations" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.text">
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.text" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.themes">
+<span class="sig-name descname"><span class="pre">themes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.themes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.therapeutic_concepts">
+<span class="sig-name descname"><span class="pre">therapeutic_concepts</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.therapeutic_concepts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeContent.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeContent.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">NarrativeResolution</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resolution_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conflict_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solution_used</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outcome_description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_successful</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution_timestamp=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">effectiveness_rating=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#NarrativeResolution"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resolution_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>conflict_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>solution_used</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution" title="src.components.narrative_coherence.models.CreativeSolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreativeSolution</span></code></a></span>)</p></li>
+<li><p><strong>outcome_description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>is_successful</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>resolution_timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+<li><p><strong>effectiveness_rating</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.conflict_id">
+<span class="sig-name descname"><span class="pre">conflict_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.conflict_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.effectiveness_rating">
+<span class="sig-name descname"><span class="pre">effectiveness_rating</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.effectiveness_rating" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.is_successful">
+<span class="sig-name descname"><span class="pre">is_successful</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.is_successful" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.outcome_description">
+<span class="sig-name descname"><span class="pre">outcome_description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.outcome_description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.resolution_id">
+<span class="sig-name descname"><span class="pre">resolution_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.resolution_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.resolution_timestamp">
+<span class="sig-name descname"><span class="pre">resolution_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.resolution_timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.NarrativeResolution.solution_used">
+<span class="sig-name descname"><span class="pre">solution_used</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution" title="src.components.narrative_coherence.models.CreativeSolution"><code class="xref py py-class docutils literal notranslate"><span class="pre">CreativeSolution</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.NarrativeResolution.solution_used" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">RetroactiveChange</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_content_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">change_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">justification=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">in_world_explanation=''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impact_scope=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#RetroactiveChange"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>change_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>target_content_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>change_type</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>description</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>justification</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>in_world_explanation</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>impact_scope</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.change_id">
+<span class="sig-name descname"><span class="pre">change_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.change_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.change_type">
+<span class="sig-name descname"><span class="pre">change_type</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.change_type" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.impact_scope">
+<span class="sig-name descname"><span class="pre">impact_scope</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.impact_scope" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.in_world_explanation">
+<span class="sig-name descname"><span class="pre">in_world_explanation</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.in_world_explanation" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.justification">
+<span class="sig-name descname"><span class="pre">justification</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">''</span></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.justification" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.target_content_id">
+<span class="sig-name descname"><span class="pre">target_content_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.target_content_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.RetroactiveChange.timestamp">
+<span class="sig-name descname"><span class="pre">timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.RetroactiveChange.timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">StorylineThread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thread_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">participants=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">related_events=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">convergence_points=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resolution_target=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dependencies=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#StorylineThread"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>thread_id</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>title</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>)</p></li>
+<li><p><strong>participants</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>related_events</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>convergence_points</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>resolution_target</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>)</p></li>
+<li><p><strong>dependencies</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>)</p></li>
+<li><p><strong>metadata</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.convergence_points">
+<span class="sig-name descname"><span class="pre">convergence_points</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.convergence_points" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.dependencies">
+<span class="sig-name descname"><span class="pre">dependencies</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.dependencies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.metadata">
+<span class="sig-name descname"><span class="pre">metadata</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.metadata" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.participants">
+<span class="sig-name descname"><span class="pre">participants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.participants" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.related_events">
+<span class="sig-name descname"><span class="pre">related_events</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.related_events" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.resolution_target">
+<span class="sig-name descname"><span class="pre">resolution_target</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.resolution_target" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.thread_id">
+<span class="sig-name descname"><span class="pre">thread_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.thread_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.StorylineThread.title">
+<span class="sig-name descname"><span class="pre">title</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.StorylineThread.title" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">ValidationResult</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">is_valid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">consistency_score</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">detected_issues=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lore_consistency=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">character_consistency=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">world_rule_consistency=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">causal_consistency=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">therapeutic_alignment=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_timestamp=&lt;factory&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#ValidationResult"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>is_valid</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>)</p></li>
+<li><p><strong>consistency_score</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>detected_issues</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a>[<a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue" title="src.components.narrative_coherence.models.ConsistencyIssue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConsistencyIssue</span></code></a>]</span>)</p></li>
+<li><p><strong>lore_consistency</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>character_consistency</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>world_rule_consistency</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>causal_consistency</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>therapeutic_alignment</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span>)</p></li>
+<li><p><strong>validation_timestamp</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></span>)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.causal_consistency">
+<span class="sig-name descname"><span class="pre">causal_consistency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.causal_consistency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.character_consistency">
+<span class="sig-name descname"><span class="pre">character_consistency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.character_consistency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.consistency_score">
+<span class="sig-name descname"><span class="pre">consistency_score</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.consistency_score" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.detected_issues">
+<span class="sig-name descname"><span class="pre">detected_issues</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">list</span></code></a><span class="pre">[</span><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue" title="src.components.narrative_coherence.models.ConsistencyIssue"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConsistencyIssue</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.detected_issues" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.is_valid" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.lore_consistency">
+<span class="sig-name descname"><span class="pre">lore_consistency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.lore_consistency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.therapeutic_alignment">
+<span class="sig-name descname"><span class="pre">therapeutic_alignment</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.therapeutic_alignment" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.validation_timestamp">
+<span class="sig-name descname"><span class="pre">validation_timestamp</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/datetime.html#datetime.datetime" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.validation_timestamp" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationResult.world_rule_consistency">
+<span class="sig-name descname"><span class="pre">world_rule_consistency</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0.0</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationResult.world_rule_consistency" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationSeverity">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">src.components.narrative_coherence.</span></span><span class="sig-name descname"><span class="pre">ValidationSeverity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/src/components/narrative_coherence/models.html#ValidationSeverity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#src.components.narrative_coherence.ValidationSeverity" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationSeverity.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'critical'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationSeverity.CRITICAL" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationSeverity.ERROR">
+<span class="sig-name descname"><span class="pre">ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'error'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationSeverity.ERROR" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationSeverity.INFO">
+<span class="sig-name descname"><span class="pre">INFO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'info'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationSeverity.INFO" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="src.components.narrative_coherence.ValidationSeverity.WARNING">
+<span class="sig-name descname"><span class="pre">WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'warning'</span></em><a class="headerlink" href="#src.components.narrative_coherence.ValidationSeverity.WARNING" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="src.components.narrative_coherence.causal_validator.html">src.components.narrative_coherence.causal_validator module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.causal_validator.html#src.components.narrative_coherence.causal_validator.CausalValidator"><code class="docutils literal notranslate"><span class="pre">CausalValidator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.causal_validator.html#src.components.narrative_coherence.causal_validator.CausalValidator.validate_causal_logic"><code class="docutils literal notranslate"><span class="pre">CausalValidator.validate_causal_logic()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.components.narrative_coherence.coherence_validator.html">src.components.narrative_coherence.coherence_validator module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.coherence_validator.html#src.components.narrative_coherence.coherence_validator.CoherenceValidator"><code class="docutils literal notranslate"><span class="pre">CoherenceValidator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.coherence_validator.html#src.components.narrative_coherence.coherence_validator.CoherenceValidator.validate_narrative_consistency"><code class="docutils literal notranslate"><span class="pre">CoherenceValidator.validate_narrative_consistency()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.components.narrative_coherence.contradiction_detector.html">src.components.narrative_coherence.contradiction_detector module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.contradiction_detector.html#src.components.narrative_coherence.contradiction_detector.ContradictionDetector"><code class="docutils literal notranslate"><span class="pre">ContradictionDetector</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.contradiction_detector.html#src.components.narrative_coherence.contradiction_detector.ContradictionDetector.detect_contradictions"><code class="docutils literal notranslate"><span class="pre">ContradictionDetector.detect_contradictions()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.components.narrative_coherence.models.html">src.components.narrative_coherence.models module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.confidence_score"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.confidence_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.description"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.issue_id"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.issue_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.issue_type"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.issue_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.metadata"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.related_content_ids"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.related_content_ids</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.severity"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.severity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssue.timestamp"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssue.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.CAUSAL_INCONSISTENCY"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.CAUSAL_INCONSISTENCY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.CHARACTER_INCONSISTENCY"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.CHARACTER_INCONSISTENCY</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.LORE_VIOLATION"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.LORE_VIOLATION</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.TEMPORAL_PARADOX"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.TEMPORAL_PARADOX</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.THEMATIC_CONFLICT"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.THEMATIC_CONFLICT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConsistencyIssueType.WORLD_RULE_VIOLATION"><code class="docutils literal notranslate"><span class="pre">ConsistencyIssueType.WORLD_RULE_VIOLATION</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction"><code class="docutils literal notranslate"><span class="pre">Contradiction</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.confidence_score"><code class="docutils literal notranslate"><span class="pre">Contradiction.confidence_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.contradiction_id"><code class="docutils literal notranslate"><span class="pre">Contradiction.contradiction_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.description"><code class="docutils literal notranslate"><span class="pre">Contradiction.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.detected_at"><code class="docutils literal notranslate"><span class="pre">Contradiction.detected_at</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.related_issues"><code class="docutils literal notranslate"><span class="pre">Contradiction.related_issues</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.resolution_suggestions"><code class="docutils literal notranslate"><span class="pre">Contradiction.resolution_suggestions</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.severity"><code class="docutils literal notranslate"><span class="pre">Contradiction.severity</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.Contradiction.type"><code class="docutils literal notranslate"><span class="pre">Contradiction.type</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.convergence_score"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.convergence_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.is_convergent"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.is_convergent</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.recommendations"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.recommendations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.session_id"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.session_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.storyline_count"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.storyline_count</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.strong_connections"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.strong_connections</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ConvergenceValidation.weak_connections"><code class="docutils literal notranslate"><span class="pre">ConvergenceValidation.weak_connections</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution"><code class="docutils literal notranslate"><span class="pre">CreativeSolution</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.benefits"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.benefits</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.description"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.metadata"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.narrative_cost"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.narrative_cost</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.player_impact"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.player_impact</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.required_changes"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.required_changes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.solution_id"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.solution_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.solution_type"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.solution_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.CreativeSolution.tradeoffs"><code class="docutils literal notranslate"><span class="pre">CreativeSolution.tradeoffs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry"><code class="docutils literal notranslate"><span class="pre">LoreEntry</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.canonical"><code class="docutils literal notranslate"><span class="pre">LoreEntry.canonical</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.category"><code class="docutils literal notranslate"><span class="pre">LoreEntry.category</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.description"><code class="docutils literal notranslate"><span class="pre">LoreEntry.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.importance_weight"><code class="docutils literal notranslate"><span class="pre">LoreEntry.importance_weight</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.last_updated"><code class="docutils literal notranslate"><span class="pre">LoreEntry.last_updated</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.lore_id"><code class="docutils literal notranslate"><span class="pre">LoreEntry.lore_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.related_entries"><code class="docutils literal notranslate"><span class="pre">LoreEntry.related_entries</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.LoreEntry.title"><code class="docutils literal notranslate"><span class="pre">LoreEntry.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent"><code class="docutils literal notranslate"><span class="pre">NarrativeContent</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.content_id"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.content_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.content_type"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.content_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.metadata"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.related_characters"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.related_characters</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.related_events"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.related_events</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.related_locations"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.related_locations</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.text"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.text</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.themes"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.themes</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.therapeutic_concepts"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.therapeutic_concepts</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeContent.timestamp"><code class="docutils literal notranslate"><span class="pre">NarrativeContent.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.conflict_id"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.conflict_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.effectiveness_rating"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.effectiveness_rating</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.is_successful"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.is_successful</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.metadata"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.outcome_description"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.outcome_description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.resolution_id"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.resolution_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.resolution_timestamp"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.resolution_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.NarrativeResolution.solution_used"><code class="docutils literal notranslate"><span class="pre">NarrativeResolution.solution_used</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.change_id"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.change_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.change_type"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.change_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.description"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.description</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.impact_scope"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.impact_scope</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.in_world_explanation"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.in_world_explanation</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.justification"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.justification</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.target_content_id"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.target_content_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.RetroactiveChange.timestamp"><code class="docutils literal notranslate"><span class="pre">RetroactiveChange.timestamp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread"><code class="docutils literal notranslate"><span class="pre">StorylineThread</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.convergence_points"><code class="docutils literal notranslate"><span class="pre">StorylineThread.convergence_points</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.dependencies"><code class="docutils literal notranslate"><span class="pre">StorylineThread.dependencies</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.metadata"><code class="docutils literal notranslate"><span class="pre">StorylineThread.metadata</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.participants"><code class="docutils literal notranslate"><span class="pre">StorylineThread.participants</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.related_events"><code class="docutils literal notranslate"><span class="pre">StorylineThread.related_events</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.resolution_target"><code class="docutils literal notranslate"><span class="pre">StorylineThread.resolution_target</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.thread_id"><code class="docutils literal notranslate"><span class="pre">StorylineThread.thread_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.StorylineThread.title"><code class="docutils literal notranslate"><span class="pre">StorylineThread.title</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult"><code class="docutils literal notranslate"><span class="pre">ValidationResult</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.causal_consistency"><code class="docutils literal notranslate"><span class="pre">ValidationResult.causal_consistency</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.character_consistency"><code class="docutils literal notranslate"><span class="pre">ValidationResult.character_consistency</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.consistency_score"><code class="docutils literal notranslate"><span class="pre">ValidationResult.consistency_score</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.detected_issues"><code class="docutils literal notranslate"><span class="pre">ValidationResult.detected_issues</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.is_valid"><code class="docutils literal notranslate"><span class="pre">ValidationResult.is_valid</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.lore_consistency"><code class="docutils literal notranslate"><span class="pre">ValidationResult.lore_consistency</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.therapeutic_alignment"><code class="docutils literal notranslate"><span class="pre">ValidationResult.therapeutic_alignment</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.validation_timestamp"><code class="docutils literal notranslate"><span class="pre">ValidationResult.validation_timestamp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationResult.world_rule_consistency"><code class="docutils literal notranslate"><span class="pre">ValidationResult.world_rule_consistency</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity.CRITICAL"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.CRITICAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity.ERROR"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity.INFO"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.INFO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="src.components.narrative_coherence.models.html#src.components.narrative_coherence.models.ValidationSeverity.WARNING"><code class="docutils literal notranslate"><span class="pre">ValidationSeverity.WARNING</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="src.components.narrative_coherence.rules.html">src.components.narrative_coherence.rules module</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="src.components.gameplay_loop.base.html" class="btn btn-neutral float-left" title="src.components.gameplay_loop.base module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="src.components.narrative_coherence.causal_validator.html" class="btn btn-neutral float-right" title="src.components.narrative_coherence.causal_validator module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

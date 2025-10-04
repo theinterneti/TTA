@@ -1,0 +1,553 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.components.gameplay_loop.database.schema &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.components.gameplay_loop.database.schema</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.components.gameplay_loop.database.schema</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Neo4j Graph Database Schema</span>
+
+<span class="sd">This module defines the comprehensive graph database schema for the therapeutic</span>
+<span class="sd">gameplay loop, including node types, relationships, constraints, and indexes.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+
+
+<div class="viewcode-block" id="NodeType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.NodeType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Node types in the therapeutic gameplay graph.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Core gameplay nodes</span>
+    <span class="n">SESSION</span> <span class="o">=</span> <span class="s2">&quot;Session&quot;</span>
+    <span class="n">SCENE</span> <span class="o">=</span> <span class="s2">&quot;Scene&quot;</span>
+    <span class="n">CHOICE</span> <span class="o">=</span> <span class="s2">&quot;Choice&quot;</span>
+    <span class="n">CONSEQUENCE</span> <span class="o">=</span> <span class="s2">&quot;Consequence&quot;</span>
+
+    <span class="c1"># User and character nodes</span>
+    <span class="n">USER</span> <span class="o">=</span> <span class="s2">&quot;User&quot;</span>
+    <span class="n">CHARACTER</span> <span class="o">=</span> <span class="s2">&quot;Character&quot;</span>
+    <span class="n">WORLD</span> <span class="o">=</span> <span class="s2">&quot;World&quot;</span>
+
+    <span class="c1"># Therapeutic nodes</span>
+    <span class="n">THERAPEUTIC_GOAL</span> <span class="o">=</span> <span class="s2">&quot;TherapeuticGoal&quot;</span>
+    <span class="n">SKILL</span> <span class="o">=</span> <span class="s2">&quot;Skill&quot;</span>
+    <span class="n">EMOTION</span> <span class="o">=</span> <span class="s2">&quot;Emotion&quot;</span>
+    <span class="n">BEHAVIOR</span> <span class="o">=</span> <span class="s2">&quot;Behavior&quot;</span>
+    <span class="n">MILESTONE</span> <span class="o">=</span> <span class="s2">&quot;Milestone&quot;</span>
+
+    <span class="c1"># Progress tracking nodes</span>
+    <span class="n">PROGRESS_METRIC</span> <span class="o">=</span> <span class="s2">&quot;ProgressMetric&quot;</span>
+    <span class="n">SKILL_DEVELOPMENT</span> <span class="o">=</span> <span class="s2">&quot;SkillDevelopment&quot;</span>
+    <span class="n">EMOTIONAL_GROWTH</span> <span class="o">=</span> <span class="s2">&quot;EmotionalGrowth&quot;</span>
+    <span class="n">BEHAVIORAL_CHANGE</span> <span class="o">=</span> <span class="s2">&quot;BehavioralChange&quot;</span>
+
+    <span class="c1"># Narrative nodes</span>
+    <span class="n">NARRATIVE_ARC</span> <span class="o">=</span> <span class="s2">&quot;NarrativeArc&quot;</span>
+    <span class="n">STORY_BEAT</span> <span class="o">=</span> <span class="s2">&quot;StoryBeat&quot;</span>
+    <span class="n">THEME</span> <span class="o">=</span> <span class="s2">&quot;Theme&quot;</span>
+
+    <span class="c1"># Validation and safety nodes</span>
+    <span class="n">SAFETY_CHECK</span> <span class="o">=</span> <span class="s2">&quot;SafetyCheck&quot;</span>
+    <span class="n">VALIDATION_RULE</span> <span class="o">=</span> <span class="s2">&quot;ValidationRule&quot;</span>
+    <span class="n">THERAPEUTIC_ALIGNMENT</span> <span class="o">=</span> <span class="s2">&quot;TherapeuticAlignment&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RelationshipType">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.RelationshipType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RelationshipType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Relationship types in the therapeutic gameplay graph.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Session relationships</span>
+    <span class="n">HAS_SESSION</span> <span class="o">=</span> <span class="s2">&quot;HAS_SESSION&quot;</span>
+    <span class="n">CURRENT_SCENE</span> <span class="o">=</span> <span class="s2">&quot;CURRENT_SCENE&quot;</span>
+    <span class="n">COMPLETED_SCENE</span> <span class="o">=</span> <span class="s2">&quot;COMPLETED_SCENE&quot;</span>
+    <span class="n">MADE_CHOICE</span> <span class="o">=</span> <span class="s2">&quot;MADE_CHOICE&quot;</span>
+
+    <span class="c1"># Narrative flow relationships</span>
+    <span class="n">LEADS_TO</span> <span class="o">=</span> <span class="s2">&quot;LEADS_TO&quot;</span>
+    <span class="n">BRANCHES_TO</span> <span class="o">=</span> <span class="s2">&quot;BRANCHES_TO&quot;</span>
+    <span class="n">RETURNS_TO</span> <span class="o">=</span> <span class="s2">&quot;RETURNS_TO&quot;</span>
+    <span class="n">UNLOCKS</span> <span class="o">=</span> <span class="s2">&quot;UNLOCKS&quot;</span>
+    <span class="n">REQUIRES</span> <span class="o">=</span> <span class="s2">&quot;REQUIRES&quot;</span>
+
+    <span class="c1"># Choice and consequence relationships</span>
+    <span class="n">HAS_CHOICE</span> <span class="o">=</span> <span class="s2">&quot;HAS_CHOICE&quot;</span>
+    <span class="n">RESULTS_IN</span> <span class="o">=</span> <span class="s2">&quot;RESULTS_IN&quot;</span>
+    <span class="n">TRIGGERS</span> <span class="o">=</span> <span class="s2">&quot;TRIGGERS&quot;</span>
+    <span class="n">INFLUENCES</span> <span class="o">=</span> <span class="s2">&quot;INFLUENCES&quot;</span>
+
+    <span class="c1"># Therapeutic relationships</span>
+    <span class="n">ADDRESSES_GOAL</span> <span class="o">=</span> <span class="s2">&quot;ADDRESSES_GOAL&quot;</span>
+    <span class="n">PRACTICES_SKILL</span> <span class="o">=</span> <span class="s2">&quot;PRACTICES_SKILL&quot;</span>
+    <span class="n">DEVELOPS_SKILL</span> <span class="o">=</span> <span class="s2">&quot;DEVELOPS_SKILL&quot;</span>
+    <span class="n">REGULATES_EMOTION</span> <span class="o">=</span> <span class="s2">&quot;REGULATES_EMOTION&quot;</span>
+    <span class="n">CHANGES_BEHAVIOR</span> <span class="o">=</span> <span class="s2">&quot;CHANGES_BEHAVIOR&quot;</span>
+    <span class="n">ACHIEVES_MILESTONE</span> <span class="o">=</span> <span class="s2">&quot;ACHIEVES_MILESTONE&quot;</span>
+
+    <span class="c1"># Progress relationships</span>
+    <span class="n">TRACKS_PROGRESS</span> <span class="o">=</span> <span class="s2">&quot;TRACKS_PROGRESS&quot;</span>
+    <span class="n">IMPROVES</span> <span class="o">=</span> <span class="s2">&quot;IMPROVES&quot;</span>
+    <span class="n">MEASURES</span> <span class="o">=</span> <span class="s2">&quot;MEASURES&quot;</span>
+    <span class="n">CORRELATES_WITH</span> <span class="o">=</span> <span class="s2">&quot;CORRELATES_WITH&quot;</span>
+
+    <span class="c1"># Character and world relationships</span>
+    <span class="n">PLAYS_AS</span> <span class="o">=</span> <span class="s2">&quot;PLAYS_AS&quot;</span>
+    <span class="n">INTERACTS_WITH</span> <span class="o">=</span> <span class="s2">&quot;INTERACTS_WITH&quot;</span>
+    <span class="n">LOCATED_IN</span> <span class="o">=</span> <span class="s2">&quot;LOCATED_IN&quot;</span>
+    <span class="n">BELONGS_TO</span> <span class="o">=</span> <span class="s2">&quot;BELONGS_TO&quot;</span>
+
+    <span class="c1"># Validation relationships</span>
+    <span class="n">VALIDATES</span> <span class="o">=</span> <span class="s2">&quot;VALIDATES&quot;</span>
+    <span class="n">PASSES_CHECK</span> <span class="o">=</span> <span class="s2">&quot;PASSES_CHECK&quot;</span>
+    <span class="n">FAILS_CHECK</span> <span class="o">=</span> <span class="s2">&quot;FAILS_CHECK&quot;</span>
+    <span class="n">ALIGNS_WITH</span> <span class="o">=</span> <span class="s2">&quot;ALIGNS_WITH&quot;</span>
+
+    <span class="c1"># Temporal relationships</span>
+    <span class="n">PRECEDES</span> <span class="o">=</span> <span class="s2">&quot;PRECEDES&quot;</span>
+    <span class="n">FOLLOWS</span> <span class="o">=</span> <span class="s2">&quot;FOLLOWS&quot;</span>
+    <span class="n">CONCURRENT_WITH</span> <span class="o">=</span> <span class="s2">&quot;CONCURRENT_WITH&quot;</span>
+
+    <span class="c1"># Similarity and clustering relationships</span>
+    <span class="n">SIMILAR_TO</span> <span class="o">=</span> <span class="s2">&quot;SIMILAR_TO&quot;</span>
+    <span class="n">PART_OF</span> <span class="o">=</span> <span class="s2">&quot;PART_OF&quot;</span>
+    <span class="n">CONTAINS</span> <span class="o">=</span> <span class="s2">&quot;CONTAINS&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="NodeProperties">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.NodeProperties">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">NodeProperties</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard properties for different node types.&quot;&quot;&quot;</span>
+
+    <span class="n">required</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">optional</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">indexed</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">unique</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="RelationshipProperties">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.RelationshipProperties">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">RelationshipProperties</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Standard properties for different relationship types.&quot;&quot;&quot;</span>
+
+    <span class="n">required</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">optional</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">indexed</span><span class="p">:</span> <span class="nb">set</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="GraphSchema">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphSchema">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphSchema</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Comprehensive graph schema definition for therapeutic gameplay.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Node property definitions</span>
+    <span class="n">NODE_PROPERTIES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">NodeType</span><span class="p">,</span> <span class="n">NodeProperties</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">SESSION</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;session_state&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;character_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;world_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_goals&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;safety_level&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;completed_at&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;last_activity&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;session_metrics&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">,</span> <span class="s2">&quot;session_state&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;session_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">SCENE</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;scene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_type&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;narrative_content&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_focus&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_tone&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;completion_criteria&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;completed_at&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;scene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;session_id&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_type&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;scene_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">CHOICE</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;choice_id&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;choice_text&quot;</span><span class="p">,</span> <span class="s2">&quot;choice_type&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;therapeutic_relevance&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;emotional_weight&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;difficulty_level&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prerequisites&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;metadata&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;choice_id&quot;</span><span class="p">,</span> <span class="s2">&quot;scene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;choice_type&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;choice_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">USER</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;therapeutic_preferences&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_summary&quot;</span><span class="p">,</span> <span class="s2">&quot;safety_settings&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">,</span> <span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;user_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">THERAPEUTIC_GOAL</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;goal_id&quot;</span><span class="p">,</span> <span class="s2">&quot;goal_name&quot;</span><span class="p">,</span> <span class="s2">&quot;goal_type&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;target_metrics&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;completion_criteria&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;priority&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;goal_id&quot;</span><span class="p">,</span> <span class="s2">&quot;goal_name&quot;</span><span class="p">,</span> <span class="s2">&quot;goal_type&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;goal_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">SKILL</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;skill_id&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_name&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_category&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;learning_objectives&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;mastery_indicators&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;practice_opportunities&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;skill_id&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_name&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_category&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;skill_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">PROGRESS_METRIC</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;metric_id&quot;</span><span class="p">,</span> <span class="s2">&quot;metric_name&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_type&quot;</span><span class="p">,</span> <span class="s2">&quot;current_value&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;baseline_value&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;target_value&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;measurement_method&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;confidence_level&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;last_updated&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;metric_id&quot;</span><span class="p">,</span> <span class="s2">&quot;metric_name&quot;</span><span class="p">,</span> <span class="s2">&quot;progress_type&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;metric_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">MILESTONE</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;milestone_id&quot;</span><span class="p">,</span> <span class="s2">&quot;milestone_type&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">,</span> <span class="s2">&quot;achieved_at&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;description&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;achievement_criteria&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_significance&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;celebration_content&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;related_skills&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;milestone_id&quot;</span><span class="p">,</span> <span class="s2">&quot;milestone_type&quot;</span><span class="p">,</span> <span class="s2">&quot;achieved_at&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;milestone_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">NodeType</span><span class="o">.</span><span class="n">SAFETY_CHECK</span><span class="p">:</span> <span class="n">NodeProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;check_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;content_id&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;safety_level&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;safety_score&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;checked_at&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;risk_factors&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;protective_factors&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;crisis_indicators&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;intervention_recommendations&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;requires_human_review&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_id&quot;</span><span class="p">,</span> <span class="s2">&quot;content_id&quot;</span><span class="p">,</span> <span class="s2">&quot;safety_level&quot;</span><span class="p">,</span> <span class="s2">&quot;checked_at&quot;</span><span class="p">},</span>
+            <span class="n">unique</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;check_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Relationship property definitions</span>
+    <span class="n">RELATIONSHIP_PROPERTIES</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">RelationshipType</span><span class="p">,</span> <span class="n">RelationshipProperties</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">RelationshipType</span><span class="o">.</span><span class="n">LEADS_TO</span><span class="p">:</span> <span class="n">RelationshipProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;probability&quot;</span><span class="p">,</span> <span class="s2">&quot;conditions&quot;</span><span class="p">,</span> <span class="s2">&quot;narrative_weight&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;created_at&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">RelationshipType</span><span class="o">.</span><span class="n">MADE_CHOICE</span><span class="p">:</span> <span class="n">RelationshipProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;choice_id&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;processing_time&quot;</span><span class="p">,</span> <span class="s2">&quot;confidence_level&quot;</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;choice_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">RelationshipType</span><span class="o">.</span><span class="n">PRACTICES_SKILL</span><span class="p">:</span> <span class="n">RelationshipProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;practice_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_id&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;proficiency_demonstrated&quot;</span><span class="p">,</span> <span class="s2">&quot;success_level&quot;</span><span class="p">,</span> <span class="s2">&quot;context&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;practice_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;skill_id&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">RelationshipType</span><span class="o">.</span><span class="n">TRACKS_PROGRESS</span><span class="p">:</span> <span class="n">RelationshipProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;measurement_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;metric_value&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;measurement_method&quot;</span><span class="p">,</span> <span class="s2">&quot;confidence_level&quot;</span><span class="p">,</span> <span class="s2">&quot;notes&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;measurement_timestamp&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+        <span class="n">RelationshipType</span><span class="o">.</span><span class="n">VALIDATES</span><span class="p">:</span> <span class="n">RelationshipProperties</span><span class="p">(</span>
+            <span class="n">required</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;validation_timestamp&quot;</span><span class="p">,</span> <span class="s2">&quot;validation_result&quot;</span><span class="p">},</span>
+            <span class="n">optional</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;validation_score&quot;</span><span class="p">,</span> <span class="s2">&quot;validation_notes&quot;</span><span class="p">,</span> <span class="s2">&quot;validator_id&quot;</span><span class="p">},</span>
+            <span class="n">indexed</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;validation_timestamp&quot;</span><span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">}</span>
+
+<div class="viewcode-block" id="GraphSchema.get_node_constraints">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphSchema.get_node_constraints">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_constraints</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Neo4j constraint statements for all node types.&quot;&quot;&quot;</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NODE_PROPERTIES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Unique constraints</span>
+            <span class="k">for</span> <span class="n">unique_prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">unique</span><span class="p">:</span>
+                <span class="n">constraint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE CONSTRAINT </span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">unique_prop</span><span class="si">}</span><span class="s2">_unique IF NOT EXISTS FOR (n:</span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">) REQUIRE n.</span><span class="si">{</span><span class="n">unique_prop</span><span class="si">}</span><span class="s2"> IS UNIQUE&quot;</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+            <span class="c1"># Required property constraints</span>
+            <span class="k">for</span> <span class="n">required_prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
+                <span class="n">constraint</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE CONSTRAINT </span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">required_prop</span><span class="si">}</span><span class="s2">_exists IF NOT EXISTS FOR (n:</span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">) REQUIRE n.</span><span class="si">{</span><span class="n">required_prop</span><span class="si">}</span><span class="s2"> IS NOT NULL&quot;</span>
+                <span class="n">constraints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">constraints</span></div>
+
+
+<div class="viewcode-block" id="GraphSchema.get_node_indexes">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphSchema.get_node_indexes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_node_indexes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Neo4j index statements for all node types.&quot;&quot;&quot;</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">node_type</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">NODE_PROPERTIES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Single property indexes</span>
+            <span class="k">for</span> <span class="n">indexed_prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">indexed</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">indexed_prop</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">unique</span>
+                <span class="p">):</span>  <span class="c1"># Unique constraints create indexes automatically</span>
+                    <span class="n">index</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE INDEX </span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">indexed_prop</span><span class="si">}</span><span class="s2">_index IF NOT EXISTS FOR (n:</span><span class="si">{</span><span class="n">node_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">) ON (n.</span><span class="si">{</span><span class="n">indexed_prop</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+            <span class="c1"># Composite indexes for common query patterns</span>
+            <span class="k">if</span> <span class="n">node_type</span> <span class="o">==</span> <span class="n">NodeType</span><span class="o">.</span><span class="n">SESSION</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;CREATE INDEX session_user_state_index IF NOT EXISTS FOR (n:Session) ON (n.user_id, n.session_state)&quot;</span>
+                <span class="p">)</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;CREATE INDEX session_created_state_index IF NOT EXISTS FOR (n:Session) ON (n.created_at, n.session_state)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node_type</span> <span class="o">==</span> <span class="n">NodeType</span><span class="o">.</span><span class="n">SCENE</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;CREATE INDEX scene_session_type_index IF NOT EXISTS FOR (n:Scene) ON (n.session_id, n.scene_type)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">elif</span> <span class="n">node_type</span> <span class="o">==</span> <span class="n">NodeType</span><span class="o">.</span><span class="n">PROGRESS_METRIC</span><span class="p">:</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="s2">&quot;CREATE INDEX metric_type_updated_index IF NOT EXISTS FOR (n:ProgressMetric) ON (n.progress_type, n.last_updated)&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">indexes</span></div>
+
+
+<div class="viewcode-block" id="GraphSchema.get_relationship_indexes">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphSchema.get_relationship_indexes">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_relationship_indexes</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate Neo4j relationship index statements.&quot;&quot;&quot;</span>
+        <span class="n">indexes</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">rel_type</span><span class="p">,</span> <span class="n">properties</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">RELATIONSHIP_PROPERTIES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">indexed_prop</span> <span class="ow">in</span> <span class="n">properties</span><span class="o">.</span><span class="n">indexed</span><span class="p">:</span>
+                <span class="n">index</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;CREATE INDEX </span><span class="si">{</span><span class="n">rel_type</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">indexed_prop</span><span class="si">}</span><span class="s2">_rel_index IF NOT EXISTS FOR ()-[r:</span><span class="si">{</span><span class="n">rel_type</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">]-() ON (r.</span><span class="si">{</span><span class="n">indexed_prop</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="n">indexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">indexes</span></div>
+
+
+<div class="viewcode-block" id="GraphSchema.get_all_schema_statements">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphSchema.get_all_schema_statements">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_all_schema_statements</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get all schema creation statements in proper order.&quot;&quot;&quot;</span>
+        <span class="n">statements</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># First create constraints (these also create indexes for unique properties)</span>
+        <span class="n">statements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_node_constraints</span><span class="p">())</span>
+
+        <span class="c1"># Then create additional indexes</span>
+        <span class="n">statements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_node_indexes</span><span class="p">())</span>
+        <span class="n">statements</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">get_relationship_indexes</span><span class="p">())</span>
+
+        <span class="k">return</span> <span class="n">statements</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GraphConstraints">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphConstraints">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphConstraints</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Additional graph constraints and validation rules.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphConstraints.get_business_logic_constraints">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphConstraints.get_business_logic_constraints">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_business_logic_constraints</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get business logic constraints for the therapeutic gameplay graph.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Session constraints</span>
+            <span class="s2">&quot;// Ensure sessions have valid state transitions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure completed sessions have completion timestamps&quot;</span><span class="p">,</span>
+            <span class="c1"># Narrative flow constraints</span>
+            <span class="s2">&quot;// Ensure scenes belong to valid sessions&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure choices belong to valid scenes&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure narrative flow is acyclic (no infinite loops)&quot;</span><span class="p">,</span>
+            <span class="c1"># Therapeutic constraints</span>
+            <span class="s2">&quot;// Ensure therapeutic goals are measurable&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure progress metrics have valid ranges&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure safety checks are current&quot;</span><span class="p">,</span>
+            <span class="c1"># Temporal constraints</span>
+            <span class="s2">&quot;// Ensure timestamps are chronologically consistent&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;// Ensure session activities occur within session timeframe&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="GraphIndexes">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphIndexes">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphIndexes</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Performance optimization indexes for common query patterns.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphIndexes.get_performance_indexes">
+<a class="viewcode-back" href="../../../../../api/src.components.gameplay_loop.database.schema.html#src.components.gameplay_loop.database.GraphIndexes.get_performance_indexes">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_performance_indexes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get performance optimization indexes.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Full-text search indexes</span>
+            <span class="s2">&quot;CREATE FULLTEXT INDEX scene_content_fulltext IF NOT EXISTS FOR (n:Scene) ON EACH [n.title, n.description, n.narrative_content]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CREATE FULLTEXT INDEX choice_content_fulltext IF NOT EXISTS FOR (n:Choice) ON EACH [n.choice_text]&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CREATE FULLTEXT INDEX skill_content_fulltext IF NOT EXISTS FOR (n:Skill) ON EACH [n.skill_name, n.description]&quot;</span><span class="p">,</span>
+            <span class="c1"># Range indexes for numerical queries</span>
+            <span class="s2">&quot;CREATE RANGE INDEX therapeutic_relevance_range IF NOT EXISTS FOR (n:Choice) ON (n.therapeutic_relevance)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CREATE RANGE INDEX safety_score_range IF NOT EXISTS FOR (n:SafetyCheck) ON (n.safety_score)&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;CREATE RANGE INDEX progress_value_range IF NOT EXISTS FOR (n:ProgressMetric) ON (n.current_value)&quot;</span><span class="p">,</span>
+            <span class="c1"># Point indexes for exact matches</span>
+            <span class="s2">&quot;CREATE POINT INDEX session_location IF NOT EXISTS FOR (n:Session) ON (n.location) OPTIONS {indexConfig: {`spatial.cartesian.min`: [-100.0, -100.0], `spatial.cartesian.max`: [100.0, 100.0]}}&quot;</span><span class="p">,</span>
+        <span class="p">]</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

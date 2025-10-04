@@ -1,0 +1,121 @@
+name: Test Integration
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v1
+
+    - name: Cache uv dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cache/uv
+          .venv
+        key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-uv-
+
+    - name: Install dependencies
+      run: uv sync --all-extras --dev
+        
+    - name: Run existing tests
+      run: |
+        # Run existing test suites first
+        if [ -f "pytest.ini" ] || [ -f "pyproject.toml" ]; then
+          uv run pytest -v --cov=src --cov-report=xml --cov-report=term-missing
+        else
+          echo "No pytest configuration found, running basic tests"
+          uv run pytest tests/ -v || echo "No standard tests found"
+        fi
+        
+    - name: Run comprehensive test battery (quick validation)
+      run: |
+        python tests/comprehensive_battery/run_comprehensive_tests.py \
+          --categories standard \
+          --max-concurrent 2 \
+          --timeout 300 \
+          --log-level INFO \
+          --output-dir ./test-results/integration
+      env:
+        REDIS_URL: redis://localhost:6379
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-integration-results
+        path: |
+          ./test-results/
+          coverage.xml
+        retention-days: 7
+        
+    - name: Comment PR with test results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const path = './test-results/integration/test_summary.json';
+          
+          if (fs.existsSync(path)) {
+            const results = JSON.parse(fs.readFileSync(path, 'utf8'));
+            
+            const comment = `## 🧪 Test Results Summary
+            
+            **Comprehensive Test Battery Results:**
+            - **Total Tests:** ${results.total_tests || 0}
+            - **Passed:** ${results.passed_tests || 0}
+            - **Failed:** ${results.failed_tests || 0}
+            - **Success Rate:** ${(results.success_rate || 0).toFixed(1)}%
+            - **Duration:** ${(results.duration_seconds || 0).toFixed(1)}s
+            - **Mock Mode:** ${results.mock_mode ? 'Yes' : 'No'}
+            
+            ${results.failed_tests > 0 ? '❌ Some tests failed. Please check the logs for details.' : '✅ All tests passed!'}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+          } else {
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '## 🧪 Test Results\n\n❌ Test results not found. Please check the workflow logs.'
+            });
+          }

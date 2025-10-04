@@ -1,0 +1,58 @@
+# TTA Franchise World API Dockerfile
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    curl \
+    gcc \
+    g++ \
+    make \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js for bridge script execution
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+COPY deployment/requirements-prod.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements-prod.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/config /app/data
+
+# Install Node.js dependencies for bridge scripts
+WORKDIR /app/scripts
+RUN npm init -y && npm install
+
+# Return to app directory
+WORKDIR /app
+
+# Create non-root user for security
+RUN groupadd -r tta && useradd -r -g tta tta
+RUN chown -R tta:tta /app
+USER tta
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=production
+
+# Start command
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

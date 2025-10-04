@@ -1,0 +1,113 @@
+name: Visual Regression Testing
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/player_experience/frontend/**'
+      - '.github/workflows/visual-regression.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/player_experience/frontend/**'
+      - '.github/workflows/visual-regression.yml'
+
+jobs:
+  visual-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+        
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+          cache: 'npm'
+          cache-dependency-path: src/player_experience/frontend/package-lock.json
+          
+      - name: Install dependencies
+        run: |
+          cd src/player_experience/frontend
+          npm ci --legacy-peer-deps
+          
+      - name: Install Playwright browsers
+        run: |
+          cd src/player_experience/frontend
+          npx playwright install ${{ matrix.browser }}
+          
+      - name: Build Storybook
+        run: |
+          cd src/player_experience/frontend
+          npm run build-storybook
+          
+      - name: Start Storybook server
+        run: |
+          cd src/player_experience/frontend
+          npx http-server storybook-static -p 6007 &
+          sleep 10
+          curl -f http://localhost:6007 || exit 1
+          
+      - name: Run visual regression tests
+        run: |
+          cd src/player_experience/frontend
+          npx playwright test tests/visual-regression/TherapeuticGoalsSelector.visual.spec.ts \
+            --config=playwright-visual.config.ts \
+            --project="${{ matrix.browser }}" \
+            --reporter=html,json
+            
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-regression-results-${{ matrix.browser }}
+          path: |
+            src/player_experience/frontend/visual-regression-report/
+            src/player_experience/frontend/visual-regression-results/
+            src/player_experience/frontend/tests/visual-regression/TherapeuticGoalsSelector.visual.spec.ts-snapshots/
+          retention-days: 30
+          
+      - name: Upload baseline screenshots
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        with:
+          name: visual-baselines-${{ matrix.browser }}
+          path: src/player_experience/frontend/tests/visual-regression/TherapeuticGoalsSelector.visual.spec.ts-snapshots/
+          retention-days: 90
+
+  chromatic-visual-testing:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+          cache: 'npm'
+          cache-dependency-path: src/player_experience/frontend/package-lock.json
+          
+      - name: Install dependencies
+        run: |
+          cd src/player_experience/frontend
+          npm ci --legacy-peer-deps
+          
+      - name: Run Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          workingDir: src/player_experience/frontend
+          buildScriptName: build-storybook
+          exitZeroOnChanges: true
+          onlyChanged: true

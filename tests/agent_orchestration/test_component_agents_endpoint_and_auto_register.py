@@ -1,4 +1,5 @@
 import os
+
 import pytest
 
 from src.components.agent_orchestration_component import AgentOrchestrationComponent
@@ -8,18 +9,20 @@ from src.components.agent_orchestration_component import AgentOrchestrationCompo
 @pytest.mark.asyncio
 async def test_agents_endpoint_and_auto_register(redis_client):
     url = os.environ.get("TEST_REDIS_URI") or "redis://localhost:6379/0"
-    comp = AgentOrchestrationComponent({
-        "player_experience.api.redis_url": url,
-        "agent_orchestration.port": 8610,
-        "agent_orchestration.diagnostics.enabled": True,
-        "agent_orchestration.agents.auto_register": True,
-        "agent_orchestration.agents.heartbeat_ttl": 2.0,
-        "agent_orchestration.agents.heartbeat_interval": 0.5,
-        "agent_orchestration.agents.ipa.enabled": True,
-        "agent_orchestration.agents.ipa.instance": "worker-1",
-        "agent_orchestration.agents.wba.enabled": True,
-        "agent_orchestration.agents.nga.enabled": True,
-    })
+    comp = AgentOrchestrationComponent(
+        {
+            "player_experience.api.redis_url": url,
+            "agent_orchestration.port": 8610,
+            "agent_orchestration.diagnostics.enabled": True,
+            "agent_orchestration.agents.auto_register": True,
+            "agent_orchestration.agents.heartbeat_ttl": 2.0,
+            "agent_orchestration.agents.heartbeat_interval": 0.5,
+            "agent_orchestration.agents.ipa.enabled": True,
+            "agent_orchestration.agents.ipa.instance": "worker-1",
+            "agent_orchestration.agents.wba.enabled": True,
+            "agent_orchestration.agents.nga.enabled": True,
+        }
+    )
     assert comp._start_impl() is True
 
     # Build ASGI app directly
@@ -27,6 +30,7 @@ async def test_agents_endpoint_and_auto_register(redis_client):
     assert app is not None
 
     from starlette.testclient import TestClient
+
     client = TestClient(app)
 
     res = client.get("/agents")
@@ -43,7 +47,7 @@ async def test_agents_endpoint_and_auto_register(redis_client):
     assert comp._stop_impl() is True
     # After stop, agent key should be deleted or expire shortly; we check direct key for ipa instance
     import asyncio
+
     await asyncio.sleep(0.1)
     key = "ao:agents:input_processor:worker-1"
     assert (await redis_client.get(key)) in (None,)
-

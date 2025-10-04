@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.models.rate_limiting &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.models.rate_limiting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.models.rate_limiting</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rate limiting data models for the API Gateway.</span>
+
+<span class="sd">This module contains models for rate limiting configuration,</span>
+<span class="sd">traffic management, and therapeutic session prioritization.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">uuid</span><span class="w"> </span><span class="kn">import</span> <span class="n">UUID</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">validator</span>
+
+
+<div class="viewcode-block" id="RateLimitType">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitType</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rate limit type enumeration.&quot;&quot;&quot;</span>
+
+    <span class="n">REQUESTS_PER_MINUTE</span> <span class="o">=</span> <span class="s2">&quot;requests_per_minute&quot;</span>
+    <span class="n">REQUESTS_PER_HOUR</span> <span class="o">=</span> <span class="s2">&quot;requests_per_hour&quot;</span>
+    <span class="n">REQUESTS_PER_DAY</span> <span class="o">=</span> <span class="s2">&quot;requests_per_day&quot;</span>
+    <span class="n">BANDWIDTH_PER_SECOND</span> <span class="o">=</span> <span class="s2">&quot;bandwidth_per_second&quot;</span>
+    <span class="n">CONCURRENT_CONNECTIONS</span> <span class="o">=</span> <span class="s2">&quot;concurrent_connections&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitScope">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitScope">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitScope</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rate limit scope enumeration.&quot;&quot;&quot;</span>
+
+    <span class="n">GLOBAL</span> <span class="o">=</span> <span class="s2">&quot;global&quot;</span>
+    <span class="n">PER_IP</span> <span class="o">=</span> <span class="s2">&quot;per_ip&quot;</span>
+    <span class="n">PER_USER</span> <span class="o">=</span> <span class="s2">&quot;per_user&quot;</span>
+    <span class="n">PER_SERVICE</span> <span class="o">=</span> <span class="s2">&quot;per_service&quot;</span>
+    <span class="n">PER_ENDPOINT</span> <span class="o">=</span> <span class="s2">&quot;per_endpoint&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="TrafficPriority">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.TrafficPriority">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TrafficPriority</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Traffic priority enumeration.&quot;&quot;&quot;</span>
+
+    <span class="n">LOW</span> <span class="o">=</span> <span class="s2">&quot;low&quot;</span>
+    <span class="n">NORMAL</span> <span class="o">=</span> <span class="s2">&quot;normal&quot;</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>
+    <span class="n">THERAPEUTIC</span> <span class="o">=</span> <span class="s2">&quot;therapeutic&quot;</span>
+    <span class="n">CRISIS</span> <span class="o">=</span> <span class="s2">&quot;crisis&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="RateLimitRule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitRule">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitRule</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Rate limiting rule configuration.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Rule identification</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule name&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule description&quot;</span><span class="p">)</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule enabled status&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Rate limit configuration</span>
+    <span class="n">limit_type</span><span class="p">:</span> <span class="n">RateLimitType</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of rate limit&quot;</span><span class="p">)</span>
+    <span class="n">limit_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit value&quot;</span><span class="p">)</span>
+    <span class="n">window_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Time window in seconds&quot;</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="n">RateLimitScope</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit scope&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Matching criteria</span>
+    <span class="n">path_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Path patterns to match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;HTTP methods to match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">user_roles</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;User roles to match&quot;</span>
+    <span class="p">)</span>
+    <span class="n">service_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Service names to match&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Priority and exceptions</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="n">TrafficPriority</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="n">TrafficPriority</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Traffic priority&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bypass_therapeutic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Bypass for therapeutic sessions&quot;</span>
+    <span class="p">)</span>
+    <span class="n">bypass_crisis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Bypass for crisis situations&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Actions</span>
+    <span class="n">block_on_exceed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Block requests when limit exceeded&quot;</span>
+    <span class="p">)</span>
+    <span class="n">delay_on_exceed</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Delay in seconds when limit exceeded&quot;</span>
+    <span class="p">)</span>
+    <span class="n">custom_response</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Custom response when limit exceeded&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">created_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule creation timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">updated_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rule update timestamp&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RateLimitRule.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitRule.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">use_enum_values</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="RateLimitRule.validate_path_patterns">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitRule.validate_path_patterns">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;path_patterns&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_path_patterns</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate path patterns.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>  <span class="c1"># Default to match all paths</span>
+        <span class="k">return</span> <span class="n">v</span></div>
+
+
+<div class="viewcode-block" id="RateLimitRule.validate_methods">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitRule.validate_methods">[docs]</a>
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;methods&quot;</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">validate_methods</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Validate HTTP methods.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">v</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span>  <span class="c1"># Default to match all methods</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RateLimitRule.matches_request">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitRule.matches_request">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">matches_request</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_role</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if rule matches a request.&quot;&quot;&quot;</span>
+        <span class="c1"># Check path patterns</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_patterns</span> <span class="ow">and</span> <span class="s2">&quot;*&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_patterns</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">fnmatch</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+                <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">pattern</span><span class="p">)</span> <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">path_patterns</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check methods</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span> <span class="ow">and</span> <span class="s2">&quot;*&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check user roles</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_roles</span> <span class="ow">and</span> <span class="n">user_role</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">user_role</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_roles</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Check service names</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_names</span> <span class="ow">and</span> <span class="n">service_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">service_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_names</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="k">return</span> <span class="kc">True</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RateLimitConfig">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitConfig">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitConfig</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Complete rate limiting configuration.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Global configuration</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limiting enabled&quot;</span><span class="p">)</span>
+    <span class="n">default_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Default requests per minute&quot;</span>
+    <span class="p">)</span>
+    <span class="n">burst_limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Burst limit for short periods&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Therapeutic-specific configuration</span>
+    <span class="n">therapeutic_multiplier</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+        <span class="n">ge</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit multiplier for therapeutic sessions&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">crisis_bypass</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Bypass rate limits for crisis situations&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Rules and policies</span>
+    <span class="n">rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">RateLimitRule</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limiting rules&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Storage configuration</span>
+    <span class="n">storage_backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;redis&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Storage backend for rate limit data&quot;</span>
+    <span class="p">)</span>
+    <span class="n">key_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;tta:gateway:ratelimit&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Key prefix for storage&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Monitoring</span>
+    <span class="n">log_violations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Log rate limit violations&quot;</span><span class="p">)</span>
+    <span class="n">alert_on_violations</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Alert on rate limit violations&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RateLimitConfig.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitConfig.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()}</span></div>
+
+
+<div class="viewcode-block" id="RateLimitConfig.get_applicable_rules">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitConfig.get_applicable_rules">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_applicable_rules</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">user_role</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">service_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">RateLimitRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get applicable rate limiting rules for a request.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">rule</span>
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">rules</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span>
+            <span class="ow">and</span> <span class="n">rule</span><span class="o">.</span><span class="n">matches_request</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="n">user_role</span><span class="p">,</span> <span class="n">service_name</span><span class="p">)</span>
+        <span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="RateLimitStatus">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitStatus">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimitStatus</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Current rate limit status for a client.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Identification</span>
+    <span class="n">client_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client identifier (IP, user ID, etc.)&quot;</span><span class="p">)</span>
+    <span class="n">scope</span><span class="p">:</span> <span class="n">RateLimitScope</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit scope&quot;</span><span class="p">)</span>
+    <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Applied rule name&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Current status</span>
+    <span class="n">current_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current request count in window&quot;</span><span class="p">)</span>
+    <span class="n">limit_value</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit value&quot;</span><span class="p">)</span>
+    <span class="n">window_start</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current window start time&quot;</span><span class="p">)</span>
+    <span class="n">window_end</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Current window end time&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Status flags</span>
+    <span class="n">is_exceeded</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Rate limit exceeded&quot;</span><span class="p">)</span>
+    <span class="n">is_blocked</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Client is blocked&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">first_request</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;First request in window&quot;</span>
+    <span class="p">)</span>
+    <span class="n">last_request</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Last request timestamp&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="RateLimitStatus.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitStatus.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()}</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remaining_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get remaining requests in current window.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit_value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_count</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset_time</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get time when rate limit resets.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">window_end</span>
+
+<div class="viewcode-block" id="RateLimitStatus.increment">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.RateLimitStatus.increment">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Increment request count.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">current_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_request</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_exceeded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">limit_value</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="TherapeuticEvent">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.TherapeuticEvent">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TherapeuticEvent</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Therapeutic event for priority handling.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Event identification</span>
+    <span class="n">event_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Unique event identifier&quot;</span><span class="p">)</span>
+    <span class="n">user_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;User identifier&quot;</span><span class="p">)</span>
+    <span class="n">session_id</span><span class="p">:</span> <span class="n">UUID</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Therapeutic session identifier&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Event details</span>
+    <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Type of therapeutic event&quot;</span><span class="p">)</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="n">TrafficPriority</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Event priority level&quot;</span><span class="p">)</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Event description&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Crisis information</span>
+    <span class="n">is_crisis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Crisis event flag&quot;</span><span class="p">)</span>
+    <span class="n">crisis_level</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Crisis severity level (1-5)&quot;</span>
+    <span class="p">)</span>
+    <span class="n">intervention_required</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Requires immediate intervention&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Timestamps</span>
+    <span class="n">occurred_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Event occurrence timestamp&quot;</span>
+    <span class="p">)</span>
+    <span class="n">expires_at</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Event expiration timestamp&quot;</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Metadata</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Additional event metadata&quot;</span>
+    <span class="p">)</span>
+
+<div class="viewcode-block" id="TherapeuticEvent.Config">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.TherapeuticEvent.Config">[docs]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Pydantic configuration.&quot;&quot;&quot;</span>
+
+        <span class="n">json_encoders</span> <span class="o">=</span> <span class="p">{</span><span class="n">datetime</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span> <span class="n">UUID</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)}</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticEvent.is_active">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.TherapeuticEvent.is_active">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">is_active</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if event is still active.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">expires_at</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="TherapeuticEvent.get_priority_multiplier">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.models.rate_limiting.html#src.api_gateway.models.TherapeuticEvent.get_priority_multiplier">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_priority_multiplier</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get rate limit multiplier based on event priority.&quot;&quot;&quot;</span>
+        <span class="n">multipliers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">TrafficPriority</span><span class="o">.</span><span class="n">LOW</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="n">TrafficPriority</span><span class="o">.</span><span class="n">NORMAL</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="n">TrafficPriority</span><span class="o">.</span><span class="n">HIGH</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="n">TrafficPriority</span><span class="o">.</span><span class="n">THERAPEUTIC</span><span class="p">:</span> <span class="mf">3.0</span><span class="p">,</span>
+            <span class="n">TrafficPriority</span><span class="o">.</span><span class="n">CRISIS</span><span class="p">:</span> <span class="mf">10.0</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">multipliers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">priority</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>

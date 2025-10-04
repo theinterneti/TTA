@@ -1,27 +1,31 @@
 """
 Progress router exposing minimal endpoints for progress visualization and summaries.
 """
+
 from __future__ import annotations
 
-from typing import Any, Dict
+from typing import Any
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, Query
 
-from ..auth import TokenData, get_current_active_player
 from ...database.session_repository import SessionRepository
 from ...managers.progress_tracking_service import ProgressTrackingService
+from ..auth import TokenData, get_current_active_player
 
 router = APIRouter()
 
 
 # Dependency providers
 
+
 def get_session_repository() -> SessionRepository:
     # For tests, return a fresh repository instance (no external DB by default)
     return SessionRepository()
 
 
-def get_progress_service(repo: SessionRepository = Depends(get_session_repository)) -> ProgressTrackingService:
+def get_progress_service(
+    repo: SessionRepository = Depends(get_session_repository),
+) -> ProgressTrackingService:
     return ProgressTrackingService(repo)
 
 
@@ -31,7 +35,7 @@ async def get_player_progress_viz(
     days: int = Query(14, ge=1, le=60),
     current_player: TokenData = Depends(get_current_active_player),
     service: ProgressTrackingService = Depends(get_progress_service),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     # Future: authorize player_id matches current_player.player_id
     viz = await service.get_visualization_data(player_id, days=days)
     return {
@@ -39,4 +43,3 @@ async def get_player_progress_viz(
         "series": viz.series,
         "meta": viz.meta,
     }
-

@@ -1,0 +1,929 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>src.api_gateway.middleware.sanitization_middleware &mdash; TTA - Therapeutic Text Adventure 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/custom.css?v=c5250a58" />
+
+
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../../../_static/copybutton.js?v=30646c52"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"></script>
+      <script type="module" src="https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk@0.1.4/dist/mermaid-layout-elk.esm.min.mjs"></script>
+      <script type="module">mermaid.initialize({startOnLoad:true});</script>
+      <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+      <script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs";
+window.addEventListener("load", () => mermaid.run());
+</script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search"  style="background: #2980B9" >
+
+
+
+          <a href="../../../../index.html" class="icon icon-home">
+            TTA - Therapeutic Text Adventure
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../overview.html">Platform Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting-started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api/modules.html">src</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../development/index.html">Development Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../testing/index.html">Testing Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../deployment/index.html">Deployment Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing to TTA</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu"  style="background: #2980B9" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">TTA - Therapeutic Text Adventure</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">src.api_gateway.middleware.sanitization_middleware</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <h1>Source code for src.api_gateway.middleware.sanitization_middleware</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sanitization middleware for the API Gateway.</span>
+
+<span class="sd">This module provides comprehensive data sanitization, PII masking,</span>
+<span class="sd">content filtering, and data privacy protection.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">..config</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_gateway_settings</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..models</span><span class="w"> </span><span class="kn">import</span> <span class="n">GatewayRequest</span><span class="p">,</span> <span class="n">GatewayResponse</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SanitizationType">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SanitizationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Types of sanitization to perform.&quot;&quot;&quot;</span>
+
+    <span class="n">PII_MASKING</span> <span class="o">=</span> <span class="s2">&quot;pii_masking&quot;</span>
+    <span class="n">CONTENT_FILTERING</span> <span class="o">=</span> <span class="s2">&quot;content_filtering&quot;</span>
+    <span class="n">DATA_REDACTION</span> <span class="o">=</span> <span class="s2">&quot;data_redaction&quot;</span>
+    <span class="n">FORMAT_NORMALIZATION</span> <span class="o">=</span> <span class="s2">&quot;format_normalization&quot;</span>
+    <span class="n">THERAPEUTIC_PRIVACY</span> <span class="o">=</span> <span class="s2">&quot;therapeutic_privacy&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="PrivacyLevel">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.PrivacyLevel">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PrivacyLevel</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Privacy protection levels.&quot;&quot;&quot;</span>
+
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;none&quot;</span>
+    <span class="n">BASIC</span> <span class="o">=</span> <span class="s2">&quot;basic&quot;</span>
+    <span class="n">STANDARD</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span>
+    <span class="n">HIGH</span> <span class="o">=</span> <span class="s2">&quot;high&quot;</span>
+    <span class="n">MAXIMUM</span> <span class="o">=</span> <span class="s2">&quot;maximum&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="SanitizationRule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationRule">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SanitizationRule</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Individual sanitization rule configuration.&quot;&quot;&quot;</span>
+
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">sanitization_type</span><span class="p">:</span> <span class="n">SanitizationType</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Lower numbers execute first</span>
+    <span class="n">path_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">methods</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">])</span>
+
+    <span class="c1"># PII masking configuration</span>
+    <span class="n">mask_email</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mask_phone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mask_ssn</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mask_credit_card</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mask_medical_id</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">mask_custom_patterns</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="c1"># Content filtering</span>
+    <span class="n">filter_profanity</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">filter_sensitive_terms</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">blocked_terms</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">replacement_text</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;[FILTERED]&quot;</span>
+
+    <span class="c1"># Data redaction</span>
+    <span class="n">redact_fields</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">redact_patterns</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">redaction_replacement</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;[REDACTED]&quot;</span>
+
+    <span class="c1"># Format normalization</span>
+    <span class="n">normalize_whitespace</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">normalize_case</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">normalize_unicode</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="c1"># Therapeutic privacy</span>
+    <span class="n">therapeutic_content_masking</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">session_data_protection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="n">privacy_level</span><span class="p">:</span> <span class="n">PrivacyLevel</span> <span class="o">=</span> <span class="n">PrivacyLevel</span><span class="o">.</span><span class="n">STANDARD</span></div>
+
+
+
+<div class="viewcode-block" id="SanitizationConfig">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationConfig">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SanitizationConfig</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for sanitization middleware.&quot;&quot;&quot;</span>
+
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">preserve_data_structure</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">log_sanitization_actions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="c1"># Default privacy settings</span>
+    <span class="n">default_privacy_level</span><span class="p">:</span> <span class="n">PrivacyLevel</span> <span class="o">=</span> <span class="n">PrivacyLevel</span><span class="o">.</span><span class="n">STANDARD</span>
+    <span class="n">therapeutic_privacy_level</span><span class="p">:</span> <span class="n">PrivacyLevel</span> <span class="o">=</span> <span class="n">PrivacyLevel</span><span class="o">.</span><span class="n">HIGH</span>
+
+    <span class="c1"># PII detection patterns</span>
+    <span class="n">enable_pii_detection</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">pii_confidence_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.8</span>
+
+    <span class="c1"># Content filtering</span>
+    <span class="n">enable_content_filtering</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">profanity_filtering</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>  <span class="c1"># Disabled by default for therapeutic content</span>
+
+    <span class="c1"># Compliance settings</span>
+    <span class="n">hipaa_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">gdpr_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">coppa_compliance</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="SanitizationMiddleware">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">SanitizationMiddleware</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sanitization middleware for comprehensive data privacy protection.</span>
+
+<span class="sd">    Provides PII masking, content filtering, data redaction,</span>
+<span class="sd">    and therapeutic privacy protection.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SanitizationConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize sanitization middleware.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config: Sanitization configuration</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">SanitizationConfig</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings</span> <span class="o">=</span> <span class="n">get_gateway_settings</span><span class="p">()</span>
+
+        <span class="c1"># Sanitization rules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">SanitizationRule</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_load_default_rules</span><span class="p">()</span>
+
+        <span class="c1"># PII detection patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_pii_patterns</span><span class="p">()</span>
+
+        <span class="c1"># Content filtering patterns</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">profanity_patterns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_profanity_patterns</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sensitive_terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_load_sensitive_terms</span><span class="p">()</span>
+
+        <span class="c1"># Custom sanitization functions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_sanitizers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_register_default_sanitizers</span><span class="p">()</span>
+
+        <span class="c1"># Sanitization statistics</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;total_requests_processed&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;content_filtered&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s2">&quot;data_redacted&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_default_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load default sanitization rules.&quot;&quot;&quot;</span>
+        <span class="c1"># PII masking rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SanitizationRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pii_masking&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Mask personally identifiable information&quot;</span><span class="p">,</span>
+                <span class="n">sanitization_type</span><span class="o">=</span><span class="n">SanitizationType</span><span class="o">.</span><span class="n">PII_MASKING</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+                <span class="n">mask_email</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">mask_phone</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">mask_ssn</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">mask_credit_card</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">mask_medical_id</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Therapeutic privacy rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SanitizationRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;therapeutic_privacy&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Enhanced privacy protection for therapeutic content&quot;</span><span class="p">,</span>
+                <span class="n">sanitization_type</span><span class="o">=</span><span class="n">SanitizationType</span><span class="o">.</span><span class="n">THERAPEUTIC_PRIVACY</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/api/therapeutic/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/sessions/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/api/chat/*&quot;</span><span class="p">],</span>
+                <span class="n">therapeutic_content_masking</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">session_data_protection</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">privacy_level</span><span class="o">=</span><span class="n">PrivacyLevel</span><span class="o">.</span><span class="n">HIGH</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Content filtering rule (disabled by default for therapeutic content)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SanitizationRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;content_filtering&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Filter inappropriate content&quot;</span><span class="p">,</span>
+                <span class="n">sanitization_type</span><span class="o">=</span><span class="n">SanitizationType</span><span class="o">.</span><span class="n">CONTENT_FILTERING</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+                <span class="n">enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>  <span class="c1"># Disabled by default</span>
+                <span class="n">filter_profanity</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">filter_sensitive_terms</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Data redaction rule</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">SanitizationRule</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="s2">&quot;sensitive_data_redaction&quot;</span><span class="p">,</span>
+                <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Redact sensitive data fields&quot;</span><span class="p">,</span>
+                <span class="n">sanitization_type</span><span class="o">=</span><span class="n">SanitizationType</span><span class="o">.</span><span class="n">DATA_REDACTION</span><span class="p">,</span>
+                <span class="n">priority</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+                <span class="n">path_patterns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+                <span class="n">redact_fields</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;password&quot;</span><span class="p">,</span> <span class="s2">&quot;secret&quot;</span><span class="p">,</span> <span class="s2">&quot;token&quot;</span><span class="p">,</span> <span class="s2">&quot;api_key&quot;</span><span class="p">,</span> <span class="s2">&quot;private_key&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_pii_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load PII detection patterns.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;phone&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;\b(?:\+?1[-.\s]?)?\(?([0-9]</span><span class="si">{3}</span><span class="s2">)\)?[-.\s]?([0-9]</span><span class="si">{3}</span><span class="s2">)[-.\s]?([0-9]</span><span class="si">{4}</span><span class="s2">)\b&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;ssn&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{3}</span><span class="s2">-\d</span><span class="si">{2}</span><span class="s2">-\d</span><span class="si">{4}</span><span class="s2">\b|\b\d</span><span class="si">{9}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;credit_card&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">[-\s]?\d</span><span class="si">{4}</span><span class="s2">\b&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;medical_id&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                <span class="sa">r</span><span class="s2">&quot;\b(MRN|MR|MEDICAL|PATIENT)[-:\s]?\d+\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;ip_address&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b(?:[0-9]{1,3}\.)</span><span class="si">{3}</span><span class="s2">[0-9]{1,3}\b&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;mac_address&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\b([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">[:-])</span><span class="si">{5}</span><span class="s2">([0-9A-Fa-f]</span><span class="si">{2}</span><span class="s2">)\b&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_profanity_patterns</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load profanity detection patterns.&quot;&quot;&quot;</span>
+        <span class="c1"># Basic profanity patterns - in a real implementation, this would be more comprehensive</span>
+        <span class="n">profanity_words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># This is a minimal set for demonstration</span>
+            <span class="c1"># In production, use a comprehensive profanity filter library</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">rf</span><span class="s2">&quot;\b</span><span class="si">{</span><span class="n">word</span><span class="si">}</span><span class="s2">\b&quot;</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">profanity_words</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_load_sensitive_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load sensitive terms that should be filtered.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="c1"># Sensitive terms that might need filtering in certain contexts</span>
+            <span class="c1"># This would be customizable based on therapeutic requirements</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_register_default_sanitizers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register default sanitization functions.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_sanitizers</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;mask_email&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_email</span><span class="p">,</span>
+                <span class="s2">&quot;mask_phone&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_phone</span><span class="p">,</span>
+                <span class="s2">&quot;mask_ssn&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_ssn</span><span class="p">,</span>
+                <span class="s2">&quot;mask_credit_card&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_credit_card</span><span class="p">,</span>
+                <span class="s2">&quot;redact_field&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redact_field</span><span class="p">,</span>
+                <span class="s2">&quot;normalize_whitespace&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normalize_whitespace</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_content_mask&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_therapeutic_content_mask</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SanitizationMiddleware.sanitize_request">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.sanitize_request">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sanitize_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayRequest</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitize incoming request data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_request: Request to sanitize</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GatewayRequest: Sanitized request</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;total_requests_processed&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="c1"># Find applicable sanitization rules</span>
+            <span class="n">applicable_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_applicable_rules</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sort rules by priority</span>
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+            <span class="c1"># Apply sanitization rules</span>
+            <span class="n">sanitized_request</span> <span class="o">=</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">applicable_rules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sanitized_request</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_sanitization_rule</span><span class="p">(</span>
+                        <span class="n">sanitized_request</span><span class="p">,</span> <span class="n">rule</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error applying sanitization rule &#39;</span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="c1"># Continue with other rules</span>
+
+            <span class="k">return</span> <span class="n">sanitized_request</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during request sanitization: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_request</span></div>
+
+
+<div class="viewcode-block" id="SanitizationMiddleware.sanitize_response">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.sanitize_response">[docs]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">sanitize_response</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">gateway_response</span><span class="p">:</span> <span class="n">GatewayResponse</span><span class="p">,</span> <span class="n">gateway_request</span><span class="p">:</span> <span class="n">GatewayRequest</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GatewayResponse</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sanitize outgoing response data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gateway_response: Response to sanitize</span>
+<span class="sd">            gateway_request: Original request for context</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            GatewayResponse: Sanitized response</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Find applicable sanitization rules</span>
+            <span class="n">applicable_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_applicable_rules</span><span class="p">(</span>
+                <span class="n">gateway_request</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">gateway_request</span><span class="o">.</span><span class="n">method</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Sort rules by priority</span>
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="n">r</span><span class="o">.</span><span class="n">priority</span><span class="p">)</span>
+
+            <span class="c1"># Apply sanitization rules to response</span>
+            <span class="n">sanitized_response</span> <span class="o">=</span> <span class="n">gateway_response</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+            <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="n">applicable_rules</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">rule</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">sanitized_response</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_sanitization_rule</span><span class="p">(</span>
+                        <span class="n">sanitized_response</span><span class="p">,</span> <span class="n">rule</span><span class="p">,</span> <span class="n">is_response</span><span class="o">=</span><span class="kc">True</span>
+                    <span class="p">)</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Error applying sanitization rule &#39;</span><span class="si">{</span><span class="n">rule</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; to response: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                    <span class="c1"># Continue with other rules</span>
+
+            <span class="k">return</span> <span class="n">sanitized_response</span>
+
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error during response sanitization: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">gateway_response</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_find_applicable_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">SanitizationRule</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Find sanitization rules applicable to the request.&quot;&quot;&quot;</span>
+        <span class="n">applicable_rules</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">rule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="p">:</span>
+            <span class="c1"># Check method match</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span> <span class="o">!=</span> <span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">method</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Check path pattern match</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">path_patterns</span><span class="p">:</span>
+                <span class="n">path_match</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">path_patterns</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pattern</span> <span class="o">==</span> <span class="s2">&quot;*&quot;</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="s2">&quot;.*&quot;</span><span class="p">),</span> <span class="n">path</span><span class="p">):</span>
+                        <span class="n">path_match</span> <span class="o">=</span> <span class="kc">True</span>
+                        <span class="k">break</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">path_match</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+            <span class="n">applicable_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">applicable_rules</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_sanitization_rule</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">,</span> <span class="n">is_response</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply a single sanitization rule to request or response.&quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">SanitizationType</span><span class="o">.</span><span class="n">PII_MASKING</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pii_masking</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">SanitizationType</span><span class="o">.</span><span class="n">CONTENT_FILTERING</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_content_filtering</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">SanitizationType</span><span class="o">.</span><span class="n">DATA_REDACTION</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_data_redaction</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">SanitizationType</span><span class="o">.</span><span class="n">FORMAT_NORMALIZATION</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_format_normalization</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">rule</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">SanitizationType</span><span class="o">.</span><span class="n">THERAPEUTIC_PRIVACY</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_therapeutic_privacy</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_pii_masking</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply PII masking to target data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">target</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse body data</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span>
+                <span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Apply PII masking</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_dict</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_text</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+            <span class="c1"># Update target body</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">body_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">body_is_string</span> <span class="k">else</span> <span class="n">body_data</span>
+
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+            <span class="c1"># Handle non-JSON content</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_text</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error applying PII masking: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_pii_in_dict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively mask PII in dictionary data.&quot;&quot;&quot;</span>
+        <span class="n">masked_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_dict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="n">rule</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="n">item</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span>
+                <span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mask_pii_in_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">masked_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">masked_data</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_pii_in_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask PII patterns in text content.&quot;&quot;&quot;</span>
+        <span class="n">masked_text</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="c1"># Apply PII masking based on rule configuration</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_email</span> <span class="ow">and</span> <span class="s2">&quot;email&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_mask_email</span><span class="p">,</span> <span class="n">masked_text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;email&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_phone</span> <span class="ow">and</span> <span class="s2">&quot;phone&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;phone&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_mask_phone_match</span><span class="p">,</span> <span class="n">masked_text</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;phone&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_ssn</span> <span class="ow">and</span> <span class="s2">&quot;ssn&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;ssn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;***-**-****&quot;</span><span class="p">,</span> <span class="n">masked_text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;ssn&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_credit_card</span> <span class="ow">and</span> <span class="s2">&quot;credit_card&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;credit_card&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="s2">&quot;****-****-****-****&quot;</span><span class="p">,</span> <span class="n">masked_text</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;credit_card&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_medical_id</span> <span class="ow">and</span> <span class="s2">&quot;medical_id&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+            <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;medical_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;MRN: ****&quot;</span><span class="p">,</span> <span class="n">masked_text</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;pii_instances_masked&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="s2">&quot;medical_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Apply custom pattern masking</span>
+        <span class="k">for</span> <span class="n">pattern_name</span><span class="p">,</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">mask_custom_patterns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">pattern_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">:</span>
+                <span class="n">masked_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pii_patterns</span><span class="p">[</span><span class="n">pattern_name</span><span class="p">]</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                    <span class="n">replacement</span><span class="p">,</span> <span class="n">masked_text</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">masked_text</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_content_filtering</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply content filtering to target data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">target</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse body data</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span>
+                <span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Apply content filtering</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_dict</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_text</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+            <span class="c1"># Update target body</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">body_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">body_is_string</span> <span class="k">else</span> <span class="n">body_data</span>
+
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+            <span class="c1"># Handle non-JSON content</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">target</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_text</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error applying content filtering: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_content_in_dict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively filter content in dictionary data.&quot;&quot;&quot;</span>
+        <span class="n">filtered_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_dict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">),</span> <span class="n">rule</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                            <span class="k">else</span> <span class="n">item</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span>
+                <span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_content_in_text</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filtered_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">filtered_data</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_content_in_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Filter inappropriate content in text.&quot;&quot;&quot;</span>
+        <span class="n">filtered_text</span> <span class="o">=</span> <span class="n">text</span>
+
+        <span class="c1"># Filter profanity</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">filter_profanity</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">profanity_patterns</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">filtered_text</span><span class="p">):</span>
+                    <span class="n">filtered_text</span> <span class="o">=</span> <span class="n">pattern</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">replacement_text</span><span class="p">,</span> <span class="n">filtered_text</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;content_filtered&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Filter blocked terms</span>
+        <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">blocked_terms</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">filtered_text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="n">filtered_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                    <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">term</span><span class="p">),</span>
+                    <span class="n">rule</span><span class="o">.</span><span class="n">replacement_text</span><span class="p">,</span>
+                    <span class="n">filtered_text</span><span class="p">,</span>
+                    <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;content_filtered&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="c1"># Filter sensitive terms</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">filter_sensitive_terms</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sensitive_terms</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">term</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">filtered_text</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">filtered_text</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                        <span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">term</span><span class="p">),</span>
+                        <span class="n">rule</span><span class="o">.</span><span class="n">replacement_text</span><span class="p">,</span>
+                        <span class="n">filtered_text</span><span class="p">,</span>
+                        <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;content_filtered&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">filtered_text</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_data_redaction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply data redaction to target data.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;body&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">target</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Parse body data</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">target</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">target</span><span class="o">.</span><span class="n">body</span>
+                <span class="p">)</span>
+                <span class="n">body_is_string</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Apply data redaction</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">body_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redact_data_in_dict</span><span class="p">(</span><span class="n">body_data</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+            <span class="c1"># Update target body</span>
+            <span class="n">target</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">body_data</span><span class="p">)</span> <span class="k">if</span> <span class="n">body_is_string</span> <span class="k">else</span> <span class="n">body_data</span>
+
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+            <span class="k">pass</span>  <span class="c1"># Skip redaction for non-JSON content</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error applying data redaction: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_redact_data_in_dict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Recursively redact sensitive data in dictionary.&quot;&quot;&quot;</span>
+        <span class="n">redacted_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Check if field should be redacted</span>
+            <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="n">field</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">redact_fields</span><span class="p">]:</span>
+                <span class="n">redacted_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">redaction_replacement</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;data_redacted&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">redacted_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_redact_data_in_dict</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">redacted_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_redact_data_in_dict</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">item</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">value</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Check redaction patterns</span>
+                <span class="n">redacted_value</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">pattern</span> <span class="ow">in</span> <span class="n">rule</span><span class="o">.</span><span class="n">redact_patterns</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span><span class="p">):</span>
+                            <span class="n">redacted_value</span> <span class="o">=</span> <span class="n">rule</span><span class="o">.</span><span class="n">redaction_replacement</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="p">[</span><span class="s2">&quot;data_redacted&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                            <span class="k">break</span>
+
+                <span class="n">redacted_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">redacted_value</span>
+
+        <span class="k">return</span> <span class="n">redacted_data</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_format_normalization</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply format normalization to target data.&quot;&quot;&quot;</span>
+        <span class="c1"># Implementation for format normalization</span>
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">_apply_therapeutic_privacy</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply therapeutic privacy protection.&quot;&quot;&quot;</span>
+        <span class="c1"># Enhanced privacy protection for therapeutic content</span>
+        <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">therapeutic_content_masking</span><span class="p">:</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">_apply_pii_masking</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">rule</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">target</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_email</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask email address.&quot;&quot;&quot;</span>
+        <span class="n">email</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;@&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">email</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">email</span>
+
+        <span class="n">local</span><span class="p">,</span> <span class="n">domain</span> <span class="o">=</span> <span class="n">email</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">masked_local</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">local</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">masked_local</span> <span class="o">=</span> <span class="n">local</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">local</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">local</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">masked_local</span><span class="si">}</span><span class="s2">@</span><span class="si">{</span><span class="n">domain</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_phone_match</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">match</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask phone number from regex match.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;***-***-****&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_phone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phone</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask phone number.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;***-***-****&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_ssn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ssn</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask Social Security Number.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;***-**-****&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_mask_credit_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cc</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Mask credit card number.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;****-****-****-****&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_redact_field</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Redact sensitive field value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;[REDACTED]&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_normalize_whitespace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize whitespace in text.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_therapeutic_content_mask</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">content</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Apply therapeutic-specific content masking.&quot;&quot;&quot;</span>
+        <span class="c1"># Apply enhanced masking for therapeutic content</span>
+        <span class="n">masked_content</span> <span class="o">=</span> <span class="n">content</span>
+
+        <span class="c1"># Mask potential therapeutic identifiers</span>
+        <span class="n">therapeutic_patterns</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sa">r</span><span class="s2">&quot;\bsession[-_]?\d+\b&quot;</span><span class="p">:</span> <span class="s2">&quot;SESSION-***&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;\btherapist[-_]?\w+\b&quot;</span><span class="p">:</span> <span class="s2">&quot;THERAPIST-***&quot;</span><span class="p">,</span>
+            <span class="sa">r</span><span class="s2">&quot;\bcounselor[-_]?\w+\b&quot;</span><span class="p">:</span> <span class="s2">&quot;COUNSELOR-***&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span> <span class="ow">in</span> <span class="n">therapeutic_patterns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">masked_content</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span>
+                <span class="n">pattern</span><span class="p">,</span> <span class="n">replacement</span><span class="p">,</span> <span class="n">masked_content</span><span class="p">,</span> <span class="n">flags</span><span class="o">=</span><span class="n">re</span><span class="o">.</span><span class="n">IGNORECASE</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">masked_content</span>
+
+<div class="viewcode-block" id="SanitizationMiddleware.add_sanitization_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.add_sanitization_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_sanitization_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule</span><span class="p">:</span> <span class="n">SanitizationRule</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a custom sanitization rule.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rule</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SanitizationMiddleware.remove_sanitization_rule">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.remove_sanitization_rule">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">remove_sanitization_rule</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Remove a sanitization rule by name.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rule</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">rule_name</span><span class="p">:</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="SanitizationMiddleware.register_custom_sanitizer">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.register_custom_sanitizer">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">register_custom_sanitizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">function</span><span class="p">:</span> <span class="n">Callable</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Register a custom sanitization function.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custom_sanitizers</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">function</span></div>
+
+
+<div class="viewcode-block" id="SanitizationMiddleware.get_sanitization_stats">
+<a class="viewcode-back" href="../../../../api/src.api_gateway.middleware.sanitization_middleware.html#src.api_gateway.middleware.SanitizationMiddleware.get_sanitization_stats">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_sanitization_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get sanitization statistics.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;total_rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span><span class="p">),</span>
+            <span class="s2">&quot;enabled_rules&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">([</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">enabled</span><span class="p">]),</span>
+            <span class="s2">&quot;rules_by_type&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">stype</span><span class="o">.</span><span class="n">value</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_rules</span> <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">sanitization_type</span> <span class="o">==</span> <span class="n">stype</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">stype</span> <span class="ow">in</span> <span class="n">SanitizationType</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;processing_stats&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">sanitization_stats</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
+            <span class="s2">&quot;custom_sanitizers&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_sanitizers</span><span class="p">),</span>
+            <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;default_privacy_level&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_privacy_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;therapeutic_privacy_level&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">therapeutic_privacy_level</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="s2">&quot;pii_detection_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_pii_detection</span><span class="p">,</span>
+                <span class="s2">&quot;content_filtering_enabled&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">enable_content_filtering</span><span class="p">,</span>
+                <span class="s2">&quot;hipaa_compliance&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">hipaa_compliance</span><span class="p">,</span>
+                <span class="s2">&quot;gdpr_compliance&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">gdpr_compliance</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, TTA Development Team.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
