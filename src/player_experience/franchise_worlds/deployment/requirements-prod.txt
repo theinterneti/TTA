@@ -2,7 +2,7 @@
 
 # Web server and ASGI
 uvicorn[standard]==0.24.0
-gunicorn==21.2.0
+gunicorn==22.0.0
 
 # Database drivers
 redis==5.0.1
