@@ -2,9 +2,17 @@ name: Security Scan
 
 on:
   push:
-    branches: [ main, develop, integration/*, feat/production-deployment-infrastructure ]
+    branches:
+      - main
+      - staging
+      - development
+      - integration/*
+      - feat/production-deployment-infrastructure
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - staging
+      - development
   schedule:
     # Run security scan daily at 3 AM UTC
     - cron: '0 3 * * *'

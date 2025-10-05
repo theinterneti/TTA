@@ -2,9 +2,17 @@ name: E2E Tests
 
 on:
   push:
-    branches: [ main, develop, integration/*, feat/production-deployment-infrastructure ]
+    branches:
+      - main
+      - staging
+      - development
+      - integration/*
+      - feat/production-deployment-infrastructure
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - staging
+      - development
   schedule:
     # Run tests daily at 2 AM UTC
     - cron: '0 2 * * *'
@@ -59,12 +67,18 @@ jobs:
     name: E2E Tests (${{ matrix.browser }} - ${{ matrix.test-suite }})
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    # Skip E2E tests on development branch (unit tests only)
+    if: github.ref != 'refs/heads/development'
 
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox, webkit]
-        test-suite: [auth, dashboard, character-management, chat, settings, accessibility, responsive]
+        # Branch-specific test suites
+        # Development: Skip (unit tests only)
+        # Staging: Core flows only (auth, dashboard)
+        # Main: Full test suite
+        browser: ${{ github.ref == 'refs/heads/staging' && fromJSON('["chromium"]') || fromJSON('["chromium", "firefox", "webkit"]') }}
+        test-suite: ${{ github.ref == 'refs/heads/staging' && fromJSON('["auth", "dashboard"]') || fromJSON('["auth", "dashboard", "character-management", "chat", "settings", "accessibility", "responsive"]') }}
         exclude:
           # Reduce matrix size for faster CI - run accessibility and responsive only on chromium
           - browser: firefox
