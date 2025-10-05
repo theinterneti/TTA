@@ -1,8 +1,0 @@
-callable_allowlist: []
-allow_network_tools: true
-allow_filesystem_tools: true
-allow_process_tools: true
-default_timeout_ms: 2000
-max_concurrency: 8
-cpu_limit_percent: 80
-memory_limit_mb: 1024

@@ -1,0 +1,261 @@
+# GitHub Branch Protection Rules - Three-Tier Strategy
+# TTA Repository - Development → Staging → Main
+#
+# This configuration implements the three-tier branching strategy with quality gates
+# Updated: 2025-10-05
+# Version: 1.0.0
+
+# =============================================================================
+# PHILOSOPHY
+# =============================================================================
+# Three-tier strategy for solo developer:
+# - development: Fast feedback, minimal protection
+# - staging: Full test suite, auto-merge when green
+# - main: Production-ready, comprehensive tests + manual approval
+#
+# Quality gates ensure code quality increases as it moves up the hierarchy
+
+# =============================================================================
+# MAIN BRANCH PROTECTION (Production)
+# =============================================================================
+main:
+  description: "Production branch - highest protection, manual approval required"
+  
+  # Status Checks - Comprehensive test suite
+  required_status_checks:
+    strict: true  # Must be up to date before merging
+    contexts:
+      # Core tests (from tests.yml)
+      - "unit"
+      - "integration"
+      
+      # E2E tests (from e2e-tests.yml)
+      - "e2e-tests / E2E Tests (chromium - auth)"
+      - "e2e-tests / E2E Tests (chromium - dashboard)"
+      - "e2e-tests / E2E Tests (chromium - character-management)"
+      - "e2e-tests / E2E Tests (chromium - chat)"
+      
+      # Code quality (from code-quality.yml)
+      - "code-quality / Lint and Format"
+      - "code-quality / Type Check"
+      
+      # Security (from security-scan.yml)
+      - "security-scan / Security Scan"
+      
+      # Comprehensive tests (from comprehensive-test-battery.yml)
+      - "comprehensive-tests / Core Tests"
+      - "comprehensive-tests / Integration Tests"
+  
+  # Pull Request Reviews - Manual approval required
+  required_pull_request_reviews:
+    required_approving_review_count: 1  # Self-approval allowed for solo dev
+    dismiss_stale_reviews: true
+    require_code_owner_reviews: false
+    require_last_push_approval: false
+    bypass_pull_request_allowances:
+      users: ["theinterneti"]  # Emergency bypass
+  
+  # Additional Restrictions
+  restrictions: null  # No push restrictions for solo developer
+  
+  # Administrative Settings
+  enforce_admins: false  # Allow admin bypass for emergencies
+  allow_force_pushes: false  # Prevent accidental history rewriting
+  allow_deletions: false  # Prevent accidental branch deletion
+  required_linear_history: true  # Keep clean git history
+  allow_auto_merge: false  # Manual approval required for production
+  delete_branch_on_merge: true  # Clean up merged branches
+  required_conversation_resolution: true  # Ensure all comments addressed
+  lock_branch: false  # Don't lock the branch
+  allow_fork_syncing: true  # Allow syncing from forks
+
+# =============================================================================
+# STAGING BRANCH PROTECTION (Pre-Production)
+# =============================================================================
+staging:
+  description: "Staging branch - full test suite, auto-merge when green"
+  
+  # Status Checks - Full test suite (excluding comprehensive battery)
+  required_status_checks:
+    strict: true  # Must be up to date before merging
+    contexts:
+      # Core tests
+      - "unit"
+      - "integration"
+      
+      # E2E tests (core flows only)
+      - "e2e-tests / E2E Tests (chromium - auth)"
+      - "e2e-tests / E2E Tests (chromium - dashboard)"
+      - "e2e-tests / E2E Tests (chromium - chat)"
+      
+      # Code quality
+      - "code-quality / Lint and Format"
+      - "code-quality / Type Check"
+      
+      # Security
+      - "security-scan / Security Scan"
+  
+  # Pull Request Reviews - No approval required (auto-merge)
+  required_pull_request_reviews:
+    required_approving_review_count: 0  # Auto-merge when tests pass
+    dismiss_stale_reviews: false
+    require_code_owner_reviews: false
+    require_last_push_approval: false
+  
+  # Additional Restrictions
+  restrictions: null
+  
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: false  # Prevent force pushes
+  allow_deletions: false  # Prevent deletion
+  required_linear_history: true  # Keep clean history
+  allow_auto_merge: true  # Enable auto-merge
+  delete_branch_on_merge: false  # Keep staging branch
+  required_conversation_resolution: false  # Not required for auto-merge
+  lock_branch: false
+  allow_fork_syncing: true
+
+# =============================================================================
+# DEVELOPMENT BRANCH PROTECTION (Active Development)
+# =============================================================================
+development:
+  description: "Development branch - fast feedback, minimal protection"
+  
+  # Status Checks - Unit tests only for fast feedback
+  required_status_checks:
+    strict: false  # Allow merging without being up to date
+    contexts:
+      - "unit"  # Only unit tests required
+  
+  # Pull Request Reviews - No approval required
+  required_pull_request_reviews:
+    required_approving_review_count: 0  # No approval needed
+    dismiss_stale_reviews: false
+    require_code_owner_reviews: false
+    require_last_push_approval: false
+  
+  # Additional Restrictions
+  restrictions: null
+  
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: false  # Still prevent force pushes
+  allow_deletions: false  # Prevent deletion
+  required_linear_history: false  # Allow merge commits
+  allow_auto_merge: true  # Enable auto-merge
+  delete_branch_on_merge: true  # Clean up merged feature branches
+  required_conversation_resolution: false
+  lock_branch: false
+  allow_fork_syncing: true
+
+# =============================================================================
+# FEATURE BRANCHES (feature/*)
+# =============================================================================
+# Note: Wildcard patterns require GitHub Branch Rulesets
+# Configure manually via web UI or use rulesets API
+feature/*:
+  description: "Feature branches - minimal protection, allow experimentation"
+  
+  # Status Checks - None required
+  required_status_checks: null
+  
+  # Pull Request Reviews - None required
+  required_pull_request_reviews: null
+  
+  # Additional Restrictions
+  restrictions: null
+  
+  # Administrative Settings
+  enforce_admins: false
+  allow_force_pushes: true  # Allow force pushes for rebasing
+  allow_deletions: true  # Allow deletion after merge
+  required_linear_history: false
+  allow_auto_merge: false
+  delete_branch_on_merge: true
+
+# =============================================================================
+# QUALITY GATE SUMMARY
+# =============================================================================
+#
+# Level 1: development → staging
+# --------------------------------
+# Required:
+#   ✓ Unit tests pass
+#   ✓ Integration tests pass
+#   ✓ E2E tests pass (core flows)
+#   ✓ Code quality checks pass
+#   ✓ Security scan passes
+# Auto-merge: YES
+# Time: ~20-30 minutes
+#
+# Level 2: staging → main
+# -----------------------
+# Required:
+#   ✓ All Level 1 checks
+#   ✓ Additional E2E tests
+#   ✓ Comprehensive test battery
+#   ✓ Manual approval
+# Auto-merge: NO
+# Time: ~45-60 minutes
+#
+# =============================================================================
+# IMPLEMENTATION METHODS
+# =============================================================================
+
+# Method 1: Automated Script (Recommended)
+# Run the updated script:
+#   chmod +x .github/scripts/configure-branch-protection.sh
+#   .github/scripts/configure-branch-protection.sh
+
+# Method 2: GitHub CLI (Manual)
+# Configure each branch individually using gh api commands
+# See configure-branch-protection.sh for examples
+
+# Method 3: GitHub Web UI
+# 1. Go to: https://github.com/theinterneti/TTA/settings/branches
+# 2. Click "Add branch protection rule" for each branch
+# 3. Configure settings as specified above
+
+# Method 4: GitHub Branch Rulesets (Recommended for feature/*)
+# 1. Go to: https://github.com/theinterneti/TTA/settings/rules
+# 2. Create new ruleset for "feature/*" pattern
+# 3. Configure minimal protection settings
+
+# =============================================================================
+# VALIDATION CHECKLIST
+# =============================================================================
+
+# After configuration:
+# ✓ Verify protection rules in GitHub web UI
+# ✓ Test PR: feature → development (unit tests only)
+# ✓ Test PR: development → staging (full suite, auto-merge)
+# ✓ Test PR: staging → main (comprehensive + manual approval)
+# ✓ Verify auto-merge works on staging
+# ✓ Verify manual approval required on main
+# ✓ Test force push is blocked on protected branches
+# ✓ Test admin bypass (if needed)
+
+# =============================================================================
+# MAINTENANCE
+# =============================================================================
+
+# Regular tasks:
+# - Update required status checks as new workflows are added
+# - Review protection rules quarterly
+# - Adjust based on actual workflow performance
+# - Monitor CI/CD execution times and adjust quality gates if needed
+
+# Emergency bypass procedure:
+# 1. Use admin privileges to bypass protection
+# 2. Document reason in commit message
+# 3. Create follow-up issue to address properly
+# 4. Review bypass usage monthly
+
+# Evolution plan:
+# - Phase 1: Basic protection (current)
+# - Phase 2: Add performance benchmarks to staging
+# - Phase 3: Add accessibility tests to main
+# - Phase 4: Add visual regression tests to main
+# - Phase 5: Add simulation tests to main (if applicable)
+
