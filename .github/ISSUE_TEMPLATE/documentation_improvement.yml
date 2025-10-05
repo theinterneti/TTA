@@ -1,0 +1,208 @@
+name: 📚 Documentation Improvement
+description: Suggest improvements to documentation, guides, or examples
+title: "[DOCS]: "
+labels: ["documentation", "enhancement"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve our documentation! Clear, comprehensive documentation is essential for the TTA project.
+
+  - type: dropdown
+    id: doc-type
+    attributes:
+      label: Documentation Type
+      description: What type of documentation needs improvement?
+      options:
+        - README
+        - API Documentation
+        - User Guide / Tutorial
+        - Developer Guide
+        - Architecture Documentation
+        - Code Comments / Docstrings
+        - Configuration Guide
+        - Deployment Guide
+        - Testing Documentation
+        - Contributing Guide
+        - Security Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: issue-type
+    attributes:
+      label: Issue Type
+      description: What kind of documentation issue is this?
+      options:
+        - Missing Documentation
+        - Incorrect / Outdated Information
+        - Unclear / Confusing Explanation
+        - Missing Examples
+        - Broken Links
+        - Typo / Grammar
+        - Formatting Issue
+        - Translation Request
+        - New Feature Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: location
+    attributes:
+      label: Documentation Location
+      description: Where is the documentation that needs improvement?
+      placeholder: "e.g., Documentation/api/README.md, line 42"
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-content
+    attributes:
+      label: Current Documentation
+      description: What does the current documentation say? (copy/paste or quote)
+      placeholder: |
+        Paste the current documentation content here
+    validations:
+      required: false
+
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: What's Wrong or Missing?
+      description: Describe the documentation issue in detail
+      placeholder: |
+        Example: The API endpoint documentation doesn't explain the required authentication headers
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggested-improvement
+    attributes:
+      label: Suggested Improvement
+      description: How should the documentation be improved?
+      placeholder: |
+        Provide your suggested changes, additions, or clarifications
+    validations:
+      required: true
+
+  - type: textarea
+    id: examples
+    attributes:
+      label: Example Content (if applicable)
+      description: Provide example documentation content, code snippets, or diagrams
+      placeholder: |
+        ```python
+        # Example code snippet
+        ```
+        
+        Or provide example text, diagrams, etc.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: audience
+    attributes:
+      label: Target Audience
+      description: Who is the primary audience for this documentation?
+      multiple: true
+      options:
+        - End Users
+        - Developers / Contributors
+        - System Administrators
+        - Therapists / Practitioners
+        - API Consumers
+        - DevOps / SRE
+        - Security Researchers
+        - All Audiences
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this documentation improvement?
+      options:
+        - Critical - Blocking usage
+        - High - Significantly impacts understanding
+        - Medium - Would improve clarity
+        - Low - Nice to have
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: How will this improvement help users?
+      placeholder: |
+        Example: This will help new developers get started faster by providing clear setup instructions
+    validations:
+      required: true
+
+  - type: textarea
+    id: related-docs
+    attributes:
+      label: Related Documentation
+      description: Are there other related documentation sections that should be updated?
+      placeholder: |
+        - Documentation/api/authentication.md
+        - README.md (API section)
+    validations:
+      required: false
+
+  - type: textarea
+    id: references
+    attributes:
+      label: References
+      description: Include any helpful references, links, or resources
+      placeholder: |
+        - Similar documentation from other projects
+        - Relevant blog posts or articles
+        - Related GitHub issues or discussions
+    validations:
+      required: false
+
+  - type: dropdown
+    id: contribution
+    attributes:
+      label: Contribution Interest
+      description: Would you like to contribute this documentation improvement?
+      options:
+        - "Yes - I'd like to submit a PR"
+        - "Maybe - I need guidance first"
+        - "No - Just reporting the issue"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other context about the documentation improvement
+      placeholder: |
+        - User feedback that prompted this suggestion
+        - Common questions or confusion points
+        - Related feature requests
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm the following
+      options:
+        - label: I have searched existing issues to ensure this is not a duplicate
+          required: true
+        - label: I have checked the latest documentation to ensure this is still an issue
+          required: true
+        - label: I have provided specific suggestions for improvement
+          required: true
+        - label: I have considered the target audience for this documentation
+          required: false
+
