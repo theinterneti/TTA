@@ -265,9 +265,22 @@ TTA/
 
 ### Development Workflow
 
-1. **Create a feature branch**
+TTA uses a **three-tier branching strategy**: `development` → `staging` → `main`
+
+See [Branching Strategy Documentation](docs/development/BRANCHING_STRATEGY.md) for complete details.
+
+1. **Create a feature branch from development**
    ```bash
-   git checkout -b feat/your-feature-name
+   # Ensure you're on development and up to date
+   git checkout development
+   git pull origin development
+
+   # Use the helper script (recommended)
+   ./scripts/create-feature-branch.sh <domain> <description>
+   # Example: ./scripts/create-feature-branch.sh game player-inventory
+
+   # Or create manually
+   git checkout -b feature/<domain>-<description>
    ```
 
 2. **Make changes and test**
@@ -279,6 +292,9 @@ TTA/
 
    # Run tests
    uv run pytest -q
+
+   # Validate quality gates before pushing
+   ./scripts/validate-quality-gates.sh development
    ```
 
 3. **Commit with conventional commits**
@@ -287,11 +303,16 @@ TTA/
    # Types: feat, fix, docs, test, refactor, perf, ci, chore
    ```
 
-4. **Push and create PR**
+4. **Push and create PR targeting development**
    ```bash
-   git push origin feat/your-feature-name
-   gh pr create --fill
+   git push origin feature/<domain>-<description>
+   gh pr create --base development --fill
    ```
+
+**Branch Flow:**
+- Feature branches → `development` (auto-merge when tests pass)
+- `development` → `staging` (auto-merge when tests pass)
+- `staging` → `main` (manual approval required)
 
 ### Code Quality Standards
 

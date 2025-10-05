@@ -39,10 +39,10 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a wel
    ```bash
    # Python dependencies
    uv sync --all-extras --dev
-   
+
    # Node.js dependencies (for E2E tests)
    npm install
-   
+
    # Pre-commit hooks
    pre-commit install
    ```
@@ -51,7 +51,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a wel
    ```bash
    # Copy environment template
    cp .env.example .env
-   
+
    # Edit .env and add your API keys
    # Get free OpenRouter API key at https://openrouter.ai
    ```
@@ -60,7 +60,7 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a wel
    ```bash
    # Start Neo4j and Redis
    docker-compose up -d neo4j redis
-   
+
    # Verify services are running
    docker-compose ps
    ```
@@ -69,12 +69,16 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a wel
    ```bash
    # Unit tests
    uv run pytest -q
-   
+
    # Integration tests (requires services)
    uv run pytest -q --neo4j --redis
    ```
 
 ## 🔄 Development Workflow
+
+TTA uses a **three-tier branching strategy**: `development` → `staging` → `main`
+
+All feature branches should be created from and merged into the `development` branch. See [Branching Strategy Documentation](docs/development/BRANCHING_STRATEGY.md) for complete details.
 
 ### 1. Pick an Issue
 
@@ -82,15 +86,27 @@ Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md) to ensure a wel
 - Look for issues labeled `good first issue` for newcomers
 - Comment on the issue to let others know you're working on it
 
-### 2. Create a Branch
+### 2. Create a Feature Branch
 
 ```bash
-# Create a feature branch
-git checkout -b feat/your-feature-name
+# Ensure you're on development and up to date
+git checkout development
+git pull origin development
 
-# Or for bug fixes
-git checkout -b fix/bug-description
+# Use the helper script (recommended)
+./scripts/create-feature-branch.sh <domain> <description>
+# Domains: clinical, game, infra
+# Example: ./scripts/create-feature-branch.sh game player-inventory
+
+# Or create manually following the naming convention
+git checkout -b feature/<domain>-<description>
+# Example: git checkout -b feature/game-player-inventory
 ```
+
+**Branch Naming Convention:**
+- Features: `feature/<domain>-<description>`
+- Bug fixes: `fix/<domain>-<description>`
+- Domains: `clinical`, `game`, `infra`
 
 ### 3. Make Changes
 
@@ -110,6 +126,9 @@ uv run mypy src/
 
 # Run tests
 uv run pytest -q
+
+# Validate quality gates before pushing
+./scripts/validate-quality-gates.sh development
 
 # Run pre-commit hooks
 pre-commit run --all-files
@@ -143,11 +162,15 @@ git commit -m "chore(deps): update dependencies"
 
 ```bash
 # Push your branch
-git push origin feat/your-feature-name
+git push origin feature/<domain>-<description>
 
-# Create pull request
-gh pr create --fill
+# Create pull request targeting development branch
+gh pr create --base development --fill
+
+# Or use the GitHub web interface and ensure base branch is 'development'
 ```
+
+**Important:** Always target the `development` branch for your PRs, not `main` or `staging`.
 
 ## 📝 Code Standards
 
@@ -193,21 +216,21 @@ def calculate_therapeutic_score(
     baseline_score: float = 0.0
 ) -> Optional[float]:
     """Calculate therapeutic effectiveness score for a session.
-    
+
     Args:
         session_id: Unique identifier for the therapy session
         user_responses: List of user responses during the session
         baseline_score: Starting score for comparison (default: 0.0)
-    
+
     Returns:
         Calculated therapeutic score, or None if calculation fails
-        
+
     Raises:
         ValueError: If session_id is empty or user_responses is empty
     """
     if not session_id or not user_responses:
         raise ValueError("session_id and user_responses are required")
-    
+
     # Implementation here
     pass
 ```
@@ -278,7 +301,9 @@ uv run pytest -m "not slow"
 - [ ] New tests added for new functionality
 - [ ] Documentation updated
 - [ ] Commit messages follow conventional commits
-- [ ] Branch is up to date with main
+- [ ] Branch is up to date with `development`
+- [ ] Quality gates validated (`./scripts/validate-quality-gates.sh development`)
+- [ ] PR targets `development` branch (not `main` or `staging`)
 
 ### PR Template
 
@@ -291,22 +316,30 @@ When creating a PR, use the appropriate template:
 
 1. **Automated Checks:** CI/CD runs automatically
    - Code quality (ruff, black, isort, mypy)
-   - Tests (unit, integration, e2e)
+   - Tests (unit tests only for `development` branch)
    - Security scanning
 
-2. **Code Review:** Maintainer reviews your code
-   - Provides feedback and suggestions
-   - May request changes
+2. **Auto-Merge:** PRs to `development` auto-merge when tests pass
+   - No manual approval required for `development`
+   - Enables fast iteration for solo development
 
-3. **Approval:** Once approved, PR can be merged
-   - Squash and merge (default)
-   - Commit message follows conventional commits
+3. **Promotion Flow:**
+   - `development` → `staging`: Auto-merge with full test suite
+   - `staging` → `main`: Manual approval required
 
 ### After Merge
 
 - Your branch will be automatically deleted
-- Changes will be included in the next release
+- Changes flow through: `development` → `staging` → `main`
 - You'll be credited in the changelog
+
+### Branch-Specific Testing
+
+| Branch | Tests Run | Auto-Merge | Approval Required |
+|--------|-----------|------------|-------------------|
+| `development` | Unit tests (~5-10 min) | ✅ Yes | ❌ No |
+| `staging` | Full test suite (~20-30 min) | ✅ Yes | ❌ No |
+| `main` | Comprehensive tests (~45-60 min) | ❌ No | ✅ Yes |
 
 ## 👥 Community
 

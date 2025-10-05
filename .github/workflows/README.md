@@ -7,8 +7,8 @@ This directory contains all GitHub Actions workflows for the TTA repository. The
 ### Core Workflows
 
 #### 1. Code Quality (`code-quality.yml`) ⭐ NEW
-**Purpose:** Enforce code quality standards on all pull requests  
-**Triggers:** PRs, push to main/feat branches, manual  
+**Purpose:** Enforce code quality standards on all pull requests
+**Triggers:** PRs, push to main/feat branches, manual
 **Status:** ✅ Active
 
 **Jobs:**
@@ -39,13 +39,18 @@ uv run mypy src/
 ---
 
 #### 2. Tests (`tests.yml`)
-**Purpose:** Run unit and integration tests  
-**Triggers:** Push to main/feat branches, PRs to main  
+**Purpose:** Run unit and integration tests
+**Triggers:** Push to main/staging/development branches, PRs
 **Status:** ✅ Active
+
+**Branch-Specific Behavior:**
+- **development**: Unit tests only (~5-10 min)
+- **staging**: Full test suite (~20-30 min)
+- **main**: Comprehensive tests (~45-60 min)
 
 **Jobs:**
 - **Unit Tests** - Fast unit tests with coverage
-- **Integration Tests** - Tests with Neo4j and Redis
+- **Integration Tests** - Tests with Neo4j and Redis (skipped on development)
 - **Monitoring Validation** - Prometheus/Grafana checks
 
 **Services:**
@@ -55,8 +60,8 @@ uv run mypy src/
 ---
 
 #### 3. E2E Tests (`e2e-tests.yml`)
-**Purpose:** End-to-end testing with Playwright  
-**Triggers:** Push to branches, PRs, scheduled daily, manual  
+**Purpose:** End-to-end testing with Playwright
+**Triggers:** Push to branches, PRs, scheduled daily, manual
 **Status:** ✅ Active
 
 **Test Matrix:**
@@ -73,8 +78,8 @@ uv run mypy src/
 ---
 
 #### 4. Security Scan (`security-scan.yml`)
-**Purpose:** Security vulnerability scanning  
-**Triggers:** Push to branches, PRs, scheduled daily, manual  
+**Purpose:** Security vulnerability scanning
+**Triggers:** Push to branches, PRs, scheduled daily, manual
 **Status:** ⚠️ Needs update (conditional execution)
 
 **Tools:**
@@ -92,8 +97,8 @@ uv run mypy src/
 ---
 
 #### 5. Comprehensive Test Battery (`comprehensive-test-battery.yml`)
-**Purpose:** Multi-category comprehensive testing  
-**Triggers:** Push to branches, PRs, scheduled daily, manual  
+**Purpose:** Multi-category comprehensive testing
+**Triggers:** Push to branches, PRs, scheduled daily, manual
 **Status:** ⚠️ Needs update (uses pip instead of uv)
 
 **Test Categories:**
@@ -109,20 +114,21 @@ uv run mypy src/
 
 ---
 
-#### 6. Test Integration (`test-integration.yml`)
-**Purpose:** Basic integration testing  
-**Triggers:** Push to main/develop, PRs  
-**Status:** ⚠️ Redundant (will be consolidated into tests.yml)
+#### 6. Auto-Merge Workflows
+**Purpose:** Automatically enable auto-merge for PRs
+**Files:** `auto-merge-development.yml`, `auto-merge-staging.yml`
+**Status:** ✅ Active
 
-**Planned Changes:**
-- Consolidate into tests.yml
-- Remove this workflow
+**Behavior:**
+- **development**: Auto-merge enabled when unit tests pass
+- **staging**: Auto-merge enabled when full test suite passes
+- **main**: Manual approval required (no auto-merge)
 
 ---
 
 #### 7. Simulation Testing (`simulation-testing.yml`)
-**Purpose:** Simulation framework testing  
-**Triggers:** Push to paths, PRs, scheduled daily, manual  
+**Purpose:** Simulation framework testing
+**Triggers:** Push to paths, PRs, scheduled daily, manual
 **Status:** ⚠️ Incomplete implementation
 
 **Test Types:**
@@ -162,15 +168,15 @@ npm run test:e2e
 
 **On Pull Request:**
 - Code Quality ✅
-- Tests (unit, integration) ✅
+- Tests (branch-specific) ✅
 - E2E Tests ✅
 - Security Scan ✅
-- Comprehensive Test Battery (quick validation) ✅
+- Auto-merge (for development/staging) ✅
 
-**On Push to Main:**
-- All workflows run
-- Full test suite
-- Deployment workflows (when implemented)
+**On Push to Branches:**
+- **development**: Unit tests, code quality
+- **staging**: Full test suite, E2E tests
+- **main**: Comprehensive tests, security scans, deployment
 
 **Scheduled (Daily 2-3 AM UTC):**
 - Comprehensive Test Battery
@@ -182,29 +188,42 @@ npm run test:e2e
 - All workflows support manual triggering
 - Useful for testing and debugging
 
+### Three-Tier Branching Strategy
+
+TTA uses a three-tier branching strategy with branch-specific quality gates:
+
+| Branch | Purpose | Tests | Auto-Merge | Approval |
+|--------|---------|-------|------------|----------|
+| `development` | Active development | Unit tests (~5-10 min) | ✅ Yes | ❌ No |
+| `staging` | Pre-production | Full suite (~20-30 min) | ✅ Yes | ❌ No |
+| `main` | Production | Comprehensive (~45-60 min) | ❌ No | ✅ Yes |
+
+See [Branching Strategy Documentation](../../docs/development/BRANCHING_STRATEGY.md) for complete details.
+
 ---
 
 ## 📊 Status Checks
 
-### Required for Main Branch
+### Required Status Checks by Branch
 
-After Phase 1 completion, these checks will be required:
-
-**Code Quality:**
+**Development Branch:**
 - `lint / Lint with Ruff`
 - `format-check / Format Check`
 - `type-check / Type Check with mypy`
+- `unit` (unit tests)
 
-**Tests:**
-- `unit`
-- `integration`
+**Staging Branch:**
+- All development checks, plus:
+- `integration` (integration tests)
+- `E2E Tests (chromium - critical paths)`
 
-**Security:**
+**Main Branch:**
+- All staging checks, plus:
 - `security-scan / Security Scan`
+- `E2E Tests (all browsers)`
+- Manual approval required
 
-**E2E (Critical Paths):**
-- `E2E Tests (chromium - auth)`
-- `E2E Tests (chromium - dashboard)`
+See [Branch Protection Configuration](../repository-config/branch-protection-three-tier.yml) for complete configuration.
 
 ---
 
@@ -322,10 +341,11 @@ All workflows generate step summaries visible in the Actions UI:
 
 ## 📚 Related Documentation
 
-- [Branch Protection Configuration](../repository-config/branch-protection-solo-dev.yml)
-- [Secrets Configuration](../repository-config/secrets-configuration.yml)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
-- [Workflow Assessment Report](../../GITHUB_ACTIONS_ASSESSMENT_REPORT.md)
+- [Branching Strategy](../../docs/development/BRANCHING_STRATEGY.md) - Three-tier branching workflow
+- [Quality Gates](../../docs/development/QUALITY_GATES.md) - Quality gate definitions
+- [Branch Protection Configuration](../repository-config/branch-protection-three-tier.yml) - Branch protection rules
+- [Secrets Configuration](../repository-config/secrets-configuration.yml) - Required secrets
+- [GitHub Actions Documentation](https://docs.github.com/en/actions) - Official GitHub Actions docs
 
 ---
 
@@ -368,6 +388,6 @@ All workflows generate step summaries visible in the Actions UI:
 
 ---
 
-**Last Updated:** 2025-10-01  
+**Last Updated:** 2025-10-01
 **Maintained By:** @theinterneti
 
