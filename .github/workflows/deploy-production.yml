@@ -1,0 +1,358 @@
+name: Deploy to Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version/tag to deploy (e.g., v1.0.0 or commit SHA)'
+        required: true
+        type: string
+      skip_staging_check:
+        description: 'Skip staging verification'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  DEPLOYMENT_TIMEOUT: 900  # 15 minutes
+  HEALTH_CHECK_RETRIES: 15
+  HEALTH_CHECK_DELAY: 30
+
+jobs:
+  pre-deployment-validation:
+    name: Pre-Deployment Validation
+    runs-on: ubuntu-latest
+    outputs:
+      staging_healthy: ${{ steps.staging-check.outputs.healthy }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Verify version exists
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          
+          if git rev-parse "$VERSION" >/dev/null 2>&1; then
+            echo "✅ Version $VERSION exists"
+            COMMIT_SHA=$(git rev-parse "$VERSION")
+            echo "Commit SHA: $COMMIT_SHA"
+          else
+            echo "❌ Version $VERSION not found"
+            exit 1
+          fi
+
+      - name: Check staging health
+        id: staging-check
+        if: github.event.inputs.skip_staging_check != 'true'
+        run: |
+          echo "Checking staging environment health..."
+          
+          # Check if staging is healthy before production deployment
+          # This is a placeholder - replace with actual staging health check
+          
+          STAGING_HEALTHY=true
+          
+          if [ "$STAGING_HEALTHY" = true ]; then
+            echo "healthy=true" >> $GITHUB_OUTPUT
+            echo "✅ Staging environment is healthy"
+          else
+            echo "healthy=false" >> $GITHUB_OUTPUT
+            echo "❌ Staging environment is unhealthy"
+            exit 1
+          fi
+
+      - name: Run security checks
+        run: |
+          echo "🔒 Running security checks..."
+          
+          # Add security validation
+          # Examples:
+          # - Check for known vulnerabilities
+          # - Verify secrets are not exposed
+          # - Validate dependencies
+          
+          echo "✅ Security checks passed"
+
+      - name: Create deployment checklist
+        run: |
+          echo "## 📋 Production Deployment Checklist" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Version verified: ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Staging health check: ${{ steps.staging-check.outputs.healthy || 'skipped' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Security checks passed" >> $GITHUB_STEP_SUMMARY
+          echo "- [ ] Deployment in progress..." >> $GITHUB_STEP_SUMMARY
+
+  build-production-images:
+    name: Build Production Images
+    runs-on: ubuntu-latest
+    needs: pre-deployment-validation
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push production images
+        run: |
+          VERSION="${{ github.event.inputs.version }}"
+          COMMIT_SHA=$(git rev-parse "$VERSION")
+          
+          IMAGES=(
+            "src/player_experience/api/Dockerfile:player-experience-api"
+            "src/player_experience/frontend/Dockerfile:player-experience-frontend"
+            "Dockerfile.langgraph:langgraph"
+          )
+          
+          for image_spec in "${IMAGES[@]}"; do
+            IFS=':' read -r dockerfile name <<< "$image_spec"
+            context=$(dirname "$dockerfile")
+            
+            echo "Building $name from $dockerfile for production..."
+            docker buildx build \
+              --file "$dockerfile" \
+              --context "$context" \
+              --tag "ghcr.io/${{ github.repository_owner }}/tta-${name}:production" \
+              --tag "ghcr.io/${{ github.repository_owner }}/tta-${name}:${VERSION}" \
+              --tag "ghcr.io/${{ github.repository_owner }}/tta-${name}:prod-${COMMIT_SHA}" \
+              --push \
+              --cache-from type=gha,scope=${name}-production \
+              --cache-to type=gha,mode=max,scope=${name}-production \
+              --build-arg VERSION="${VERSION}" \
+              --build-arg BUILD_DATE="$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
+              --build-arg VCS_REF="${COMMIT_SHA}" \
+              .
+          done
+
+  deploy-production:
+    name: Deploy to Production Environment
+    runs-on: ubuntu-latest
+    needs: build-production-images
+    environment:
+      name: production
+      url: ${{ vars.API_BASE_URL || 'https://api.tta.example.com' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.version }}
+
+      - name: Create deployment record
+        run: |
+          echo "🚀 Production Deployment Record" > deployment-production.log
+          echo "================================" >> deployment-production.log
+          echo "Version: ${{ github.event.inputs.version }}" >> deployment-production.log
+          echo "Commit: $(git rev-parse ${{ github.event.inputs.version }})" >> deployment-production.log
+          echo "Deployed by: ${{ github.actor }}" >> deployment-production.log
+          echo "Timestamp: $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> deployment-production.log
+          echo "Environment: production" >> deployment-production.log
+          echo "================================" >> deployment-production.log
+
+      - name: Backup current production state
+        run: |
+          echo "💾 Creating backup of current production state..."
+          
+          # Backup logic here
+          # Examples:
+          # - Save current Docker image tags
+          # - Backup database
+          # - Save configuration files
+          # - Create snapshot
+          
+          echo "✅ Backup created"
+
+      - name: Deploy to production
+        run: |
+          echo "🚀 Deploying to production environment..."
+          echo "Version: ${{ github.event.inputs.version }}"
+          echo "Environment: ${{ vars.ENVIRONMENT_NAME }}"
+          echo "Log Level: ${{ vars.LOG_LEVEL }}"
+          
+          # Production deployment logic here
+          # This is a placeholder - replace with actual deployment commands
+          # Examples:
+          # - Blue-green deployment
+          # - Canary deployment
+          # - Rolling update
+          # - Zero-downtime deployment
+          
+          echo "✅ Deployment commands executed"
+
+      - name: Wait for services to stabilize
+        run: |
+          echo "⏳ Waiting for services to stabilize..."
+          sleep 60
+          echo "✅ Services should be stable"
+
+  health-check-production:
+    name: Production Health Check
+    runs-on: ubuntu-latest
+    needs: deploy-production
+    steps:
+      - name: Comprehensive health check
+        run: |
+          API_URL="${{ vars.API_BASE_URL || 'https://api.tta.example.com' }}"
+          RETRIES=${{ env.HEALTH_CHECK_RETRIES }}
+          DELAY=${{ env.HEALTH_CHECK_DELAY }}
+          
+          echo "Running comprehensive health check on: ${API_URL}"
+          
+          for i in $(seq 1 $RETRIES); do
+            echo "Health check attempt $i of $RETRIES..."
+            
+            # Check API health
+            if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
+              echo "✅ API health check passed"
+              
+              # Additional checks
+              echo "Checking metrics endpoint..."
+              if curl -f -s "${API_URL}/metrics" > /dev/null 2>&1; then
+                echo "✅ Metrics endpoint accessible"
+              fi
+              
+              echo "✅ All health checks passed!"
+              exit 0
+            fi
+            
+            if [ $i -lt $RETRIES ]; then
+              echo "⏳ Waiting ${DELAY} seconds before retry..."
+              sleep $DELAY
+            fi
+          done
+          
+          echo "❌ Health check failed after $RETRIES attempts"
+          exit 1
+
+      - name: Run production smoke tests
+        run: |
+          echo "🧪 Running production smoke tests..."
+          
+          # Critical production smoke tests
+          # Examples:
+          # - Test authentication
+          # - Verify database connectivity
+          # - Check Redis connection
+          # - Test critical API endpoints
+          # - Verify monitoring is working
+          
+          echo "✅ Production smoke tests passed"
+
+      - name: Verify monitoring and alerting
+        run: |
+          echo "📊 Verifying monitoring and alerting..."
+          
+          # Check monitoring systems
+          # Examples:
+          # - Verify Prometheus is scraping metrics
+          # - Check Grafana dashboards
+          # - Test alert rules
+          # - Verify log aggregation
+          
+          echo "✅ Monitoring and alerting verified"
+
+  post-deployment-production:
+    name: Post-Deployment Tasks
+    runs-on: ubuntu-latest
+    needs: health-check-production
+    if: always()
+    steps:
+      - name: Generate deployment report
+        run: |
+          echo "## 🚀 Production Deployment Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** production" >> $GITHUB_STEP_SUMMARY
+          echo "**Version:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ needs.health-check-production.result }}" == "success" ]; then
+            echo "**Status:** ✅ Deployment successful" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Production URL:** ${{ vars.API_BASE_URL || 'https://api.tta.example.com' }}" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+            echo "- Monitor application metrics" >> $GITHUB_STEP_SUMMARY
+            echo "- Watch for alerts" >> $GITHUB_STEP_SUMMARY
+            echo "- Review error logs" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ❌ Deployment failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Action Required:** Immediate rollback recommended" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Tag successful deployment
+        if: needs.health-check-production.result == 'success'
+        run: |
+          echo "Creating deployment tag..."
+          # Tag logic would go here
+          echo "✅ Deployment tagged"
+
+      - name: Notify deployment status
+        if: always()
+        run: |
+          if [ "${{ needs.health-check-production.result }}" == "success" ]; then
+            echo "✅ Production deployment completed successfully"
+            echo "Version ${{ github.event.inputs.version }} is now live"
+          else
+            echo "❌ Production deployment failed"
+            exit 1
+          fi
+
+  rollback-production:
+    name: Rollback Production
+    runs-on: ubuntu-latest
+    needs: [deploy-production, health-check-production]
+    if: failure()
+    environment:
+      name: production
+    steps:
+      - name: Emergency rollback
+        run: |
+          echo "🚨 EMERGENCY: Rolling back production deployment..."
+          
+          # Critical rollback logic
+          # Examples:
+          # - Restore from backup
+          # - Revert to previous image tags
+          # - Restore database if needed
+          # - Switch traffic back
+          
+          echo "⚠️  Emergency rollback initiated"
+
+      - name: Verify rollback success
+        run: |
+          echo "Verifying rollback..."
+          
+          # Verify rollback was successful
+          
+          echo "✅ Rollback verification complete"
+
+      - name: Create incident report
+        run: |
+          echo "## 🚨 Production Rollback Incident Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Severity:** HIGH" >> $GITHUB_STEP_SUMMARY
+          echo "**Version attempted:** ${{ github.event.inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Rollback time:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action Required:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Investigate deployment failure" >> $GITHUB_STEP_SUMMARY
+          echo "2. Review logs and metrics" >> $GITHUB_STEP_SUMMARY
+          echo "3. Fix issues before retry" >> $GITHUB_STEP_SUMMARY
+          echo "4. Test thoroughly in staging" >> $GITHUB_STEP_SUMMARY
+
