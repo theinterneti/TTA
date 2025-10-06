@@ -10,6 +10,7 @@ import json
 import time
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.performance.response_time_monitor import (
     OperationType,
@@ -31,7 +32,7 @@ from src.agent_orchestration.realtime.agent_event_integration import (
 class TestWorkflowChainValidation:
     """Detailed validation of the complete agent workflow chain."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_coordinator(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):
@@ -72,7 +73,7 @@ class TestWorkflowChainValidation:
 
         return coordinator
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def response_monitor(self):
         """Create response time monitor for workflow validation."""
         monitor = ResponseTimeMonitor(

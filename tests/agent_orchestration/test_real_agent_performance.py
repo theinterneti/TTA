@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration import (
     InputProcessorAgentProxy,
@@ -43,7 +44,7 @@ class PerformanceMetrics:
 class TestRealAgentPerformance:
     """Performance benchmarks for real agent communication."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def performance_coordinator(self, redis_client):
         """Create coordinator optimized for performance testing."""
         return EnhancedRedisMessageCoordinator(
@@ -55,7 +56,7 @@ class TestRealAgentPerformance:
             backoff_base=0.5,
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def performance_proxies(self, performance_coordinator):
         """Create proxies for performance testing."""
         return {

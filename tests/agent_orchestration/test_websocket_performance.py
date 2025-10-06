@@ -13,6 +13,7 @@ from unittest.mock import AsyncMock, Mock
 
 import psutil
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.realtime.event_publisher import EventPublisher
 from src.agent_orchestration.realtime.models import AgentStatus, AgentStatusEvent
@@ -58,7 +59,7 @@ class PerformanceMetrics:
 class TestWebSocketPerformance:
     """Test WebSocket performance and scalability."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def high_capacity_websocket_manager(self, redis_client):
         """Create WebSocket manager configured for high capacity."""
         config_dict = {
@@ -78,7 +79,7 @@ class TestWebSocketPerformance:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for performance testing."""
         publisher = EventPublisher(

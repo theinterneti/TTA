@@ -9,6 +9,7 @@ import asyncio
 import json
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.proxies import (
     InputProcessorAgentProxy,
@@ -28,7 +29,7 @@ from src.agent_orchestration.therapeutic_safety import (
 class TestSessionStateValidation:
     """Comprehensive session context and state management validation."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def orchestration_service(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):

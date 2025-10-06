@@ -8,6 +8,7 @@ test isolation and capability system validation.
 import asyncio
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.api.diagnostics import DiagnosticsAPI
 from src.agent_orchestration.capabilities.auto_discovery import (
@@ -28,7 +29,7 @@ from src.agent_orchestration.registries.redis_agent_registry import RedisAgentRe
 class TestCapabilitySystemIntegration:
     """Comprehensive Redis integration tests for capability system."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def redis_registry(self, redis_client):
         """Create Redis agent registry for testing."""
         registry = RedisAgentRegistry(redis_client=redis_client)
@@ -39,7 +40,7 @@ class TestCapabilitySystemIntegration:
         # Cleanup Redis keys
         await redis_client.flushdb()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def auto_discovery_manager(self, redis_registry):
         """Create auto-discovery manager for testing."""
         config = DiscoveryConfig(
@@ -55,7 +56,7 @@ class TestCapabilitySystemIntegration:
         yield manager
         await manager.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def diagnostics_api(self, redis_registry, auto_discovery_manager):
         """Create diagnostics API for testing."""
         api = DiagnosticsAPI(

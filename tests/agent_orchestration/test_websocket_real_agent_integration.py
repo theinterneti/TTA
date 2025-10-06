@@ -10,6 +10,7 @@ import json
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+import pytest_asyncio
 from fastapi.websockets import WebSocket
 
 from src.agent_orchestration.proxies import (
@@ -43,7 +44,7 @@ from src.agent_orchestration.realtime.websocket_manager import (
 class TestWebSocketRealAgentIntegration:
     """Test WebSocket integration with real agent communication."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def realtime_config(self):
         """Create real-time configuration for testing."""
         config = {
@@ -78,7 +79,7 @@ class TestWebSocketRealAgentIntegration:
         config_manager = get_realtime_config_manager(config)
         return config_manager.get_config()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client, realtime_config):
         """Create event publisher for testing."""
         publisher = EventPublisher(
@@ -92,7 +93,7 @@ class TestWebSocketRealAgentIntegration:
         )
         return publisher
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, realtime_config, redis_client):
         """Create WebSocket manager for testing."""
         config_dict = {
@@ -112,7 +113,7 @@ class TestWebSocketRealAgentIntegration:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def enhanced_agent_proxies(self, redis_coordinator, event_publisher):
         """Create enhanced agent proxies with real-time integration."""
         ipa_proxy = InputProcessorAgentProxy(
@@ -141,7 +142,7 @@ class TestWebSocketRealAgentIntegration:
 
         return ipa_proxy, wba_proxy, nga_proxy
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def workflow_coordinator(self, enhanced_agent_proxies, event_publisher):
         """Create workflow coordinator for testing."""
         ipa_proxy, wba_proxy, nga_proxy = enhanced_agent_proxies
@@ -155,7 +156,7 @@ class TestWebSocketRealAgentIntegration:
 
         return coordinator
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def mock_websocket(self):
         """Create mock WebSocket for testing."""
         websocket = Mock(spec=WebSocket)

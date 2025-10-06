@@ -8,6 +8,7 @@ and other orchestration components to validate end-to-end functionality.
 from unittest.mock import Mock, patch
 
 import pytest
+import pytest_asyncio
 import redis.asyncio as aioredis
 
 from src.agent_orchestration import (
@@ -32,7 +33,7 @@ from src.agent_orchestration.workflow_manager import WorkflowManager
 # ============================================================================
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def redis_client():
     """Redis client for integration testing."""
     client = aioredis.from_url("redis://localhost:6379/0")
@@ -51,7 +52,7 @@ def real_workflow_manager():
     return WorkflowManager()
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def real_message_coordinator(redis_client):
     """Real RedisMessageCoordinator for integration testing."""
     return RedisMessageCoordinator(redis_client, key_prefix="test_ao")
@@ -96,7 +97,7 @@ def sample_session_context():
     )
 
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def integration_service(
     real_workflow_manager,
     real_message_coordinator,

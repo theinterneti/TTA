@@ -10,6 +10,7 @@ import statistics
 import time
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.models import AgentType
 from src.agent_orchestration.performance.alerting import PerformanceAlerting
@@ -37,7 +38,7 @@ from src.agent_orchestration.therapeutic_safety import (
 class TestPerformanceValidation:
     """Comprehensive performance validation for 2-second response time requirements."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def performance_infrastructure(self, redis_client):
         """Create complete performance monitoring and optimization infrastructure."""
         # Create response time monitor
@@ -82,7 +83,7 @@ class TestPerformanceValidation:
         await monitor.stop()
         await alerting.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def optimized_orchestration_service(
         self,
         redis_coordinator,

@@ -11,6 +11,7 @@ import time
 from unittest.mock import patch
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration import (
     AgentStep,
@@ -40,7 +41,7 @@ from tests.agent_orchestration.test_multi_agent_workflow_integration import (
 class TestStatePersistenceIntegration:
     """Test Neo4j state persistence across agent handoffs."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def integration_helper(self, redis_client, neo4j_driver):
         """Create integration test helper."""
         return IntegrationTestHelper(redis_client, neo4j_driver)

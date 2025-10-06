@@ -10,6 +10,7 @@ import time
 from unittest.mock import patch
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration import (
     InputProcessorAgentProxy,
@@ -25,7 +26,7 @@ from src.agent_orchestration.enhanced_coordinator import EnhancedRedisMessageCoo
 class TestRealAgentErrorScenarios:
     """Test error scenarios and failure conditions with real agents."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def error_prone_coordinator(self, redis_client):
         """Create coordinator configured for error testing."""
         return EnhancedRedisMessageCoordinator(
@@ -37,7 +38,7 @@ class TestRealAgentErrorScenarios:
             backoff_base=0.1,  # Faster backoff for testing
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def no_fallback_ipa(self, error_prone_coordinator):
         """Create IPA proxy without fallback for testing failures."""
         return InputProcessorAgentProxy(
@@ -47,7 +48,7 @@ class TestRealAgentErrorScenarios:
             fallback_to_mock=False,  # No fallback to test error handling
         )
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def timeout_ipa(self, error_prone_coordinator):
         """Create IPA proxy with very short timeout."""
         return InputProcessorAgentProxy(

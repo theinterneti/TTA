@@ -11,6 +11,7 @@ import time
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.models import AgentType
 from src.agent_orchestration.performance.optimization import IntelligentAgentCoordinator
@@ -38,7 +39,7 @@ from src.agent_orchestration.therapeutic_safety import (
 class TestEndToEndValidation:
     """Comprehensive end-to-end system validation tests."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def orchestration_service(
         self, redis_coordinator, neo4j_driver, event_publisher
     ):
@@ -90,7 +91,7 @@ class TestEndToEndValidation:
         # Cleanup
         await crisis_manager.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def performance_monitor(self):
         """Create performance monitoring infrastructure."""
         monitor = get_response_time_monitor()
@@ -117,7 +118,7 @@ class TestEndToEndValidation:
         await coordinator.stop()
         await monitor.stop()
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, redis_client, event_publisher):
         """Create WebSocket manager for real-time testing."""
         config_dict = {

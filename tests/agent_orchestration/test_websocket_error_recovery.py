@@ -10,6 +10,7 @@ import json
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.realtime.error_reporting import (
     ErrorReportingManager,
@@ -27,7 +28,7 @@ from src.agent_orchestration.realtime.websocket_manager import (
 class TestWebSocketErrorRecovery:
     """Test WebSocket error handling and recovery scenarios."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def websocket_manager(self, redis_client):
         """Create WebSocket manager for testing."""
         config_dict = {
@@ -48,7 +49,7 @@ class TestWebSocketErrorRecovery:
 
         return manager
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for testing."""
         publisher = EventPublisher(
@@ -56,7 +57,7 @@ class TestWebSocketErrorRecovery:
         )
         return publisher
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def error_manager(self, event_publisher):
         """Create error reporting manager for testing."""
         manager = ErrorReportingManager(

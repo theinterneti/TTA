@@ -9,6 +9,7 @@ import asyncio
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+import pytest_asyncio
 
 from src.agent_orchestration.realtime.event_publisher import EventPublisher
 from src.agent_orchestration.realtime.event_subscriber import EventSubscriber
@@ -27,7 +28,7 @@ from src.agent_orchestration.realtime.models import (
 class TestRedisEventValidation:
     """Test Redis-based event publishing and subscription."""
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_publisher(self, redis_client):
         """Create event publisher for testing."""
         publisher = EventPublisher(
@@ -41,7 +42,7 @@ class TestRedisEventValidation:
         )
         return publisher
 
-    @pytest.fixture
+    @pytest_asyncio.fixture
     async def event_subscriber(self, redis_client):
         """Create event subscriber for testing."""
         subscriber = EventSubscriber(
