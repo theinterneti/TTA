@@ -219,19 +219,15 @@ dev-dependencies = [
 # Managed project environment (ensures UV manages the virtual environment)
 managed = true
 
-# Default dependency groups to install
-# "dev" is included by default for development workflow
-default-groups = ["dev"]
-
 # Python version preference
 # Prefer UV-managed Python installations for consistency
 python-preference = "managed"
 
 # Dependency resolution environments
 # Restrict to Linux (WSL2) and Python 3.10+ for faster resolution
+# Note: Environments must be disjoint, so we combine the conditions
 environments = [
-    "sys_platform == 'linux'",
-    "python_version >= '3.10'",
+    "sys_platform == 'linux' and python_version >= '3.10'",
 ]
 
 # Cache configuration for WSL2 optimization
