@@ -26,11 +26,9 @@ from .performance import get_step_aggregator
 from .state import AgentContext
 from .workflow import (
     AgentStep,
-)
-from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
-from .workflow import (
     WorkflowDefinition,
 )
+from .workflow import OrchestrationResponse as WorkflowOrchestrationResponse
 
 logger = logging.getLogger(__name__)
 

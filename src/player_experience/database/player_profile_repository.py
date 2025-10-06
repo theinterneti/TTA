@@ -71,7 +71,7 @@ class PlayerProfileRepository:
         self.uri = uri
         self.username = username
         self.password = password
-        self.driver: "Driver | None" = None  # type: ignore[name-defined]
+        self.driver: Driver | None = None  # type: ignore[name-defined]
 
     def connect(self) -> None:
         """Establish connection to Neo4j database with retry/backoff for readiness races."""
@@ -553,13 +553,9 @@ class PlayerProfileRepository:
                     # Restore authentication data if present (temporary solution)
                     # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        setattr(
-                            privacy_settings,
-                            "password_hash",
-                            privacy_settings_data["password_hash"],
-                        )
+                        privacy_settings.password_hash = privacy_settings_data["password_hash"]
                     if "role" in privacy_settings_data:
-                        setattr(privacy_settings, "role", privacy_settings_data["role"])
+                        privacy_settings.role = privacy_settings_data["role"]
 
                 # Reconstruct progress summary
                 progress_summary = ProgressSummary()
