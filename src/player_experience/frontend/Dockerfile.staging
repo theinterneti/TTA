@@ -43,8 +43,14 @@ RUN yarn install --frozen-lockfile --production=false
 # Copy source code
 COPY . .
 
+# Cache-busting: Use build timestamp to ensure fresh builds
+ARG CACHE_BUST=default_value
+RUN echo "Cache bust: ${CACHE_BUST}"
+
 # Build the application for staging
-RUN yarn build:staging
+# Note: Using 'yarn build' as there's no separate build:staging script
+# CRA builds to 'build/' directory by default
+RUN yarn build
 
 # =============================================================================
 # RUNTIME STAGE - Nginx serving static files
@@ -70,7 +76,8 @@ RUN apk add --no-cache \
     bash
 
 # Copy built application from builder stage
-COPY --from=builder /app/dist /usr/share/nginx/html
+# CRA builds to 'build/' directory, not 'dist/'
+COPY --from=builder /app/build /usr/share/nginx/html
 
 # Copy staging-specific nginx configuration
 COPY nginx.staging.conf /etc/nginx/nginx.conf
@@ -122,10 +129,18 @@ server {
         application/atom+xml
         image/svg+xml;
 
-    # Cache static assets
+    # Cache static assets (JS, CSS, images, fonts)
     location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
         expires 1y;
         add_header Cache-Control "public, immutable";
+        add_header X-Environment "staging" always;
+    }
+
+    # Never cache index.html to ensure fresh deployments
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+        add_header Pragma "no-cache";
+        add_header Expires "0";
         add_header X-Environment "staging" always;
     }
 

@@ -32,13 +32,13 @@ volumes:
     labels:
       - "com.tta.service=postgres"
       - "com.tta.environment=staging"
-  
+
   # Monitoring volumes
   grafana-staging-data:
     driver: local
   prometheus-staging-data:
     driver: local
-  
+
   # Application volumes
   app-staging-logs:
     driver: local
@@ -77,7 +77,7 @@ services:
   # =============================================================================
   # DATABASE SERVICES
   # =============================================================================
-  
+
   # Neo4j Knowledge Graph Database - Staging
   neo4j-staging:
     image: neo4j:5.13.0
@@ -104,11 +104,11 @@ services:
       - tta-staging
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_STAGING_PASSWORD:-staging_neo4j_secure_pass}", "RETURN 1"]
-      interval: 30s
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p $${NEO4J_STAGING_PASSWORD:-staging_neo4j_secure_pass} 'RETURN 1' || exit 1"]
+      interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 30s
     labels:
       - "com.tta.service=neo4j"
       - "com.tta.environment=staging"
@@ -171,7 +171,7 @@ services:
   # =============================================================================
   # APPLICATION SERVICES
   # =============================================================================
-  
+
   # TTA Player Experience API - Staging
   player-api-staging:
     build:
@@ -240,16 +240,18 @@ services:
         VITE_API_BASE_URL: http://localhost:8081
         VITE_WS_URL: ws://localhost:8081
         VITE_ENVIRONMENT: staging
+        CACHE_BUST: ${CACHE_BUST:-$(date +%s)}  # Cache-busting with timestamp
     container_name: tta-staging-player-frontend
     ports:
       - "3001:3000"  # Different port for staging
     environment:
-      - NODE_ENV=staging
-      - VITE_API_BASE_URL=http://localhost:8081
-      - VITE_WS_URL=ws://localhost:8081
-      - VITE_ENVIRONMENT=staging
-      - VITE_SENTRY_DSN=${SENTRY_STAGING_DSN}
-      - VITE_ANALYTICS_ENABLED=true
+      - NODE_ENV=development
+      - REACT_APP_API_URL=http://localhost:8081
+      - REACT_APP_WS_URL=ws://localhost:8081
+      - REACT_APP_ENVIRONMENT=staging
+      - REACT_APP_SENTRY_DSN=${SENTRY_STAGING_DSN}
+      - REACT_APP_ANALYTICS_ENABLED=true
+      - NODE_OPTIONS=--max-old-space-size=4096  # Increase Node.js memory limit to 4GB
     depends_on:
       - player-api-staging
     networks:
@@ -260,23 +262,23 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s  # Increased from 40s to 60s for webpack compilation
     labels:
       - "com.tta.service=player-frontend"
       - "com.tta.environment=staging"
     deploy:
       resources:
         limits:
-          cpus: '1.0'
-          memory: 512M
+          cpus: '2.0'
+          memory: 4G  # Increased from 512M to 4G for webpack-dev-server
         reservations:
-          cpus: '0.5'
-          memory: 256M
+          cpus: '1.0'
+          memory: 2G  # Increased from 256M to 2G
 
   # =============================================================================
   # MONITORING AND OBSERVABILITY
   # =============================================================================
-  
+
   # Prometheus Metrics Collection - Staging
   prometheus-staging:
     image: prom/prometheus:latest
@@ -350,7 +352,7 @@ services:
   # =============================================================================
   # LOAD BALANCER AND REVERSE PROXY
   # =============================================================================
-  
+
   # Nginx Load Balancer - Staging
   nginx-staging:
     image: nginx:alpine
@@ -383,7 +385,7 @@ services:
   # =============================================================================
   # TESTING AND VALIDATION SERVICES
   # =============================================================================
-  
+
   # Multi-User Testing Service
   testing-service-staging:
     build:
