@@ -12,6 +12,10 @@ from fastapi.security import HTTPAuthorizationCredentials
 from pydantic import BaseModel
 
 from ...database.user_repository import UserRepository
+from ...managers.player_profile_manager import (
+    PlayerProfileManager,
+    PlayerProfileManagerError,
+)
 from ...models.auth import (
     AuthenticatedUser,
     MFAChallenge,
@@ -25,6 +29,7 @@ from ...models.auth import (
     UserRegistration,
     UserRole,
 )
+from ...models.player import PlayerProfile
 from ...services.auth_service import (
     AuthenticationError,
     AuthorizationError,
@@ -32,6 +37,7 @@ from ...services.auth_service import (
     MFAError,
 )
 from ..auth import (
+    SECRET_KEY,
     AuthService,
     LoginRequest,
     RefreshTokenRequest,
@@ -151,8 +157,6 @@ except Exception as e:
 
 # Initialize enhanced auth service (in production, this would be dependency injected)
 # Use the same secret key as the middleware to ensure token compatibility
-from ..auth import SECRET_KEY
-
 _AUTH_SECRET = SECRET_KEY
 
 auth_service = EnhancedAuthService(
@@ -161,6 +165,60 @@ auth_service = EnhancedAuthService(
     security_settings=SecuritySettings(),
     mfa_config=MFAConfig(enabled=True, email_enabled=True),
 )
+
+
+# Dependency to get player profile manager
+def get_player_manager() -> PlayerProfileManager:
+    """
+    Get player profile manager instance for auto-creating player profiles.
+
+    Uses the same repository pattern as the players router to ensure consistency.
+    """
+    import os
+
+    # Prefer Neo4j repository if configured
+    use_neo4j = os.getenv("TTA_USE_NEO4J", "0") == "1"
+    if use_neo4j:
+        try:
+            from ...database.player_profile_repository import PlayerProfileRepository
+            from ...managers.player_profile_manager import create_player_profile_manager
+            from ..config import get_settings
+
+            settings = get_settings()
+            repository = PlayerProfileRepository(
+                uri=settings.neo4j_uri,
+                username=settings.neo4j_username,
+                password=settings.neo4j_password,
+            )
+            repository.connect()
+            return create_player_profile_manager(repository)
+        except Exception:
+            pass
+
+    # Fallback to in-memory repository for testing/development
+    from ...managers.player_profile_manager import create_player_profile_manager
+
+    class _InMemoryPlayerRepo:
+        """In-memory player profile repository for testing."""
+
+        def __init__(self):
+            self.profiles = {}
+
+        def username_exists(self, username: str) -> bool:
+            return any(p.username == username for p in self.profiles.values())
+
+        def email_exists(self, email: str) -> bool:
+            return any(p.email == email for p in self.profiles.values())
+
+        def create_player_profile(self, profile: PlayerProfile) -> bool:
+            self.profiles[profile.player_id] = profile
+            return True
+
+        def get_player_profile(self, player_id: str) -> PlayerProfile | None:
+            return self.profiles.get(player_id)
+
+    repository = _InMemoryPlayerRepo()  # type: ignore
+    return create_player_profile_manager(repository)  # type: ignore[arg-type]
 
 
 class LoginResponse(BaseModel):
@@ -282,13 +340,21 @@ async def register(registration: UserRegistration, request: Request) -> dict[str
 
 
 @router.post("/login", response_model=LoginResponse)
-async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
+async def login(
+    credentials: LoginRequest,
+    request: Request,
+    player_manager: PlayerProfileManager = Depends(get_player_manager),
+) -> LoginResponse:
     """
     Authenticate a user and return access tokens with MFA support.
+
+    Automatically creates a player profile for new users on first successful login.
+    The player_id is included in the JWT token for downstream authentication.
 
     Args:
         credentials: User login credentials
         request: HTTP request for IP tracking
+        player_manager: Player profile manager dependency
 
     Returns:
         LoginResponse: Access tokens and MFA challenge if required
@@ -315,6 +381,32 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
+        # Auto-create player profile if it doesn't exist (Issue #4 fix)
+        # This ensures every authenticated user has a player profile with a player_id
+        player_id = user.user_id  # Default: player_id matches user_id
+        try:
+            # Check if player profile already exists
+            existing_profile = player_manager.get_player_profile(user.user_id)
+            if existing_profile:
+                player_id = existing_profile.player_id
+            else:
+                # Create new player profile for first-time login
+                new_profile = player_manager.create_player_profile(
+                    username=user.username,
+                    email=user.email,
+                    player_id=user.user_id,  # Use user_id as player_id for consistency
+                )
+                player_id = new_profile.player_id
+                print(
+                    f"✅ Auto-created player profile for user {user.username} (player_id: {player_id})"
+                )
+        except PlayerProfileManagerError as profile_error:
+            # Log error but don't block login - player_id will default to user_id
+            print(
+                f"⚠️ Failed to auto-create player profile for {user.username}: {profile_error}"
+            )
+            # Continue with login using user_id as player_id
+
         # Create session
         session_id = auth_service.create_session(user, client_ip, user_agent)
 
@@ -338,8 +430,10 @@ async def login(credentials: LoginRequest, request: Request) -> LoginResponse:
                 },
             )
 
-        # Create access token
-        access_token = auth_service.create_access_token(user, session_id)
+        # Create access token with player_id (Issue #4 fix)
+        access_token = auth_service.create_access_token(
+            user, session_id, player_id=player_id
+        )
 
         return LoginResponse(
             access_token=access_token,

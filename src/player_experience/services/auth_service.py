@@ -18,8 +18,6 @@ import qrcode
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
-logger = logging.getLogger(__name__)
-
 from ..models.auth import (
     DEFAULT_ROLE_PERMISSIONS,
     AuthenticatedUser,
@@ -36,6 +34,8 @@ from ..models.auth import (
     UserRegistration,
     UserRole,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class AuthenticationError(Exception):
@@ -227,11 +227,10 @@ class MFAService:
         if is_valid:
             del self.active_challenges[verification.challenge_id]
             return True
-        else:
-            challenge.attempts_remaining -= 1
-            if challenge.attempts_remaining <= 0:
-                del self.active_challenges[verification.challenge_id]
-            return False
+        challenge.attempts_remaining -= 1
+        if challenge.attempts_remaining <= 0:
+            del self.active_challenges[verification.challenge_id]
+        return False
 
     def cleanup_expired_challenges(self):
         """Remove expired challenges from memory."""
@@ -482,10 +481,26 @@ class EnhancedAuthService:
         self.active_sessions[session_id] = session
         return session_id
 
-    def create_access_token(self, user: AuthenticatedUser, session_id: str) -> str:
-        """Create JWT access token for authenticated user."""
+    def create_access_token(
+        self, user: AuthenticatedUser, session_id: str, player_id: str | None = None
+    ) -> str:
+        """
+        Create JWT access token for authenticated user.
+
+        Args:
+            user: Authenticated user object
+            session_id: Session identifier
+            player_id: Optional player profile ID (defaults to user_id if not provided)
+
+        Returns:
+            str: Encoded JWT access token with player_id field
+        """
+        # Use provided player_id or fallback to user_id for backward compatibility
+        effective_player_id = player_id if player_id is not None else user.user_id
+
         data = {
             "sub": user.user_id,
+            "player_id": effective_player_id,  # Issue #4 fix: explicit player_id field
             "username": user.username,
             "email": user.email,
             "role": user.role.value,
@@ -633,7 +648,9 @@ class EnhancedAuthService:
 
             # Store encrypted secret (in production, encrypt before storing)
             mfa_secret = MFASecret(
-                user_id=user_id, method=method, secret=secret  # TODO: Encrypt this
+                user_id=user_id,
+                method=method,
+                secret=secret,  # TODO: Encrypt this
             )
 
             if user_id not in self.mfa_secrets:

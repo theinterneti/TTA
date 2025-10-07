@@ -21,39 +21,22 @@ repos:
       - id: name-tests-test
         args: ["--pytest-test-first"]
 
-  # Python code formatting
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-      - id: black
-        language_version: python3
-        args: ["--line-length=88"]
-
-  # Import sorting
-  - repo: https://github.com/pycqa/isort
-    rev: 6.0.1
-    hooks:
-      - id: isort
-        args: ["--profile", "black", "--line-length=88"]
-
-  # Linting with ruff (replaces flake8, pylint, etc.)
+  # Ruff: Combined linting, formatting, and import sorting (replaces Black, isort, flake8, pylint)
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.12.8
     hooks:
+      # Run linter with auto-fix
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        args: [--fix]
+        types_or: [python, pyi]
+      # Run formatter
       - id: ruff-format
+        types_or: [python, pyi]
 
-  # Type checking
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
-    hooks:
-      - id: mypy
-        additional_dependencies:
-          [types-requests, types-PyYAML, types-redis, types-setuptools]
-        args:
-          [--ignore-missing-imports, --no-strict-optional, --show-error-codes]
-        exclude: ^(tests/|docs/|scripts/|examples/|tta\.prototype/|tta\.dev/|tta\.prod/)
+  # Type checking - MOVED TO CI/CD ONLY for performance
+  # MyPy is too slow for pre-commit hooks in solo developer workflow
+  # Run manually with: uv run mypy src/
+  # Or in CI/CD pipeline for comprehensive type checking
 
   # Security scanning
   - repo: https://github.com/PyCQA/bandit
@@ -62,6 +45,21 @@ repos:
       - id: bandit
         args: ["-r", "src/", "-f", "json", "-o", "bandit-report.json"]
         exclude: ^(tests/|docs/|scripts/|examples/)
+
+  # Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: |
+          (?x)^(
+            \.secrets\.baseline|
+            uv\.lock|
+            package-lock\.json|
+            .*\.ipynb|
+            tests/.*
+          )$
 
   # Conventional commits
   - repo: https://github.com/compilerla/conventional-pre-commit
@@ -90,6 +88,18 @@ repos:
       - id: prettier
         types: [yaml]
         exclude: ^(.github/|docker-compose|\.codecarbon/|\.kiro/)
+
+  # Local custom hooks
+  - repo: local
+    hooks:
+      # Custom hook: Check pytest-asyncio fixture decorators
+      - id: check-pytest-asyncio-fixtures
+        name: Check pytest-asyncio fixture decorators
+        entry: python scripts/pre-commit/check-pytest-asyncio-fixtures.py
+        language: system
+        types: [python]
+        files: ^tests/.*\.py$
+        pass_filenames: true
 
 # Configuration for specific tools
 ci:
