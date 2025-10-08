@@ -49,9 +49,9 @@ run_gate() {
     local gate=$1
     local description=$2
     local command=$3
-    
+
     echo -e "${BLUE}Running: ${description}${NC}"
-    
+
     if eval "$command"; then
         echo -e "${GREEN}✓ ${description} passed${NC}"
         return 0
@@ -79,7 +79,7 @@ for gate in "${GATES[@]}"; do
             ;;
         code-quality)
             echo -e "${BLUE}Running: Code Quality Checks${NC}"
-            
+
             # Ruff linting
             if uv run ruff check src/ tests/ --output-format=text; then
                 echo -e "${GREEN}✓ Ruff linting passed${NC}"
@@ -87,7 +87,7 @@ for gate in "${GATES[@]}"; do
                 echo -e "${RED}✗ Ruff linting failed${NC}"
                 FAILED_GATES+=("Ruff linting")
             fi
-            
+
             # Black formatting check
             if uv run black --check src/ tests/; then
                 echo -e "${GREEN}✓ Black formatting passed${NC}"
@@ -95,7 +95,7 @@ for gate in "${GATES[@]}"; do
                 echo -e "${RED}✗ Black formatting failed${NC}"
                 FAILED_GATES+=("Black formatting")
             fi
-            
+
             # isort import sorting check
             if uv run isort --check-only src/ tests/; then
                 echo -e "${GREEN}✓ isort import sorting passed${NC}"
@@ -103,7 +103,7 @@ for gate in "${GATES[@]}"; do
                 echo -e "${RED}✗ isort import sorting failed${NC}"
                 FAILED_GATES+=("isort import sorting")
             fi
-            
+
             # mypy type checking
             if uv run mypy src/; then
                 echo -e "${GREEN}✓ mypy type checking passed${NC}"
@@ -114,7 +114,7 @@ for gate in "${GATES[@]}"; do
             ;;
         security)
             echo -e "${BLUE}Running: Security Scans${NC}"
-            
+
             # Bandit security scan
             if uv run bandit -r src/ -f json -o bandit-results.json; then
                 echo -e "${GREEN}✓ Bandit security scan passed${NC}"
@@ -145,4 +145,3 @@ else
     echo -e "${YELLOW}Please fix the issues before pushing${NC}"
     exit 1
 fi
-

@@ -39,7 +39,7 @@ else
         ls -la /var/run/docker.sock
         echo "Setting permissions..."
         chmod 666 /var/run/docker.sock
-        
+
         # Test again
         if docker ps &> /dev/null; then
             echo "Docker access is now working!"
