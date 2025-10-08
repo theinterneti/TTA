@@ -1,5 +1,5 @@
-"""
-CoherenceValidator extracted from narrative_coherence_engine.
+"""CoherenceValidator extracted from narrative_coherence_engine.
+
 Implements validation across lore, character, world rules, and therapeutic alignment.
 """
 
@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 class CoherenceValidator:
-    """
-    Core validation system for narrative consistency.
-    """
+    """Core validation system for narrative consistency."""
 
     def __init__(self, config: dict[str, Any]):
         self.config = config
@@ -260,7 +258,7 @@ class CoherenceValidator:
         issues: list[ConsistencyIssue] = []
         for constraint in lore.constraints:
             if not await self._check_constraint_compliance(content, constraint):
-                issues.append(
+                issues.append(  # noqa: PERF401
                     ConsistencyIssue(
                         issue_id=str(uuid.uuid4()),
                         issue_type=ConsistencyIssueType.LORE_VIOLATION,
@@ -278,7 +276,7 @@ class CoherenceValidator:
         issues: list[ConsistencyIssue] = []
         for constraint in lore.constraints:
             if not await self._check_constraint_compliance(content, constraint):
-                issues.append(
+                issues.append(  # noqa: PERF401
                     ConsistencyIssue(
                         issue_id=str(uuid.uuid4()),
                         issue_type=ConsistencyIssueType.LORE_VIOLATION,
@@ -296,7 +294,7 @@ class CoherenceValidator:
         issues: list[ConsistencyIssue] = []
         for constraint in lore.constraints:
             if not await self._check_constraint_compliance(content, constraint):
-                issues.append(
+                issues.append(  # noqa: PERF401
                     ConsistencyIssue(
                         issue_id=str(uuid.uuid4()),
                         issue_type=ConsistencyIssueType.LORE_VIOLATION,
@@ -327,59 +325,59 @@ class CoherenceValidator:
 
     # Character behavior checks (placeholders)
     async def _check_personality_consistency(
-        self, content: NarrativeContent, character: str, profile: dict[str, Any]
+        self, _content: NarrativeContent, _character: str, _profile: dict[str, Any]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_dialogue_consistency(
-        self, content: NarrativeContent, character: str, profile: dict[str, Any]
+        self, _content: NarrativeContent, _character: str, _profile: dict[str, Any]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_behavioral_consistency(
-        self, content: NarrativeContent, character: str, profile: dict[str, Any]
+        self, _content: NarrativeContent, _character: str, _profile: dict[str, Any]
     ) -> list[ConsistencyIssue]:
         return []
 
     # World rule checks (placeholders)
     async def _check_physics_rules(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_supernatural_rules(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_social_rules(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_technological_rules(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     # Therapeutic checks (placeholders)
     async def _check_harmful_content(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_therapeutic_concepts(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_emotional_safety(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_therapeutic_progression(
-        self, content: NarrativeContent
+        self, _content: NarrativeContent
     ) -> list[ConsistencyIssue]:
         return []
 
@@ -419,13 +417,12 @@ class CoherenceValidator:
 
     def _calculate_overall_consistency_score(self, result: ValidationResult) -> float:
         weights = OVERALL_WEIGHTS
-        score = (
+        return (
             weights["lore"] * result.lore_compliance
             + weights["character"] * result.character_consistency
             + weights["causal"] * result.causal_consistency
             + weights["therapeutic"] * result.therapeutic_alignment
         )
-        return score
 
     async def _generate_corrections(self, issues: list[ConsistencyIssue]) -> list[str]:
         corrections: list[str] = []
@@ -441,14 +438,13 @@ class CoherenceValidator:
     async def _generate_generic_correction(self, issue: ConsistencyIssue) -> str | None:
         if issue.issue_type == ConsistencyIssueType.LORE_VIOLATION:
             return f"Review and revise content to align with established lore for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
+        if issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
             return f"Adjust character behavior/dialogue to match established personality for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
+        if issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
             return f"Modify content to comply with world rules affecting {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
+        if issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
             return "Revise content to ensure therapeutic appropriateness and safety"
-        else:
-            return f"Address {issue.issue_type.value} issue: {issue.description}"
+        return f"Address {issue.issue_type.value} issue: {issue.description}"
 
 
 __all__ = ["CoherenceValidator"]

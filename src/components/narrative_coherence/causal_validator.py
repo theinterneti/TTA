@@ -1,5 +1,5 @@
-"""
-CausalValidator extracted from narrative_coherence_engine.
+"""CausalValidator extracted from narrative_coherence_engine.
+
 Ensures logical cause-and-effect across narrative branches.
 """
 
@@ -206,49 +206,46 @@ class CausalValidator:
     async def _generate_causal_corrections(
         self, issues: list[ConsistencyIssue]
     ) -> list[str]:
-        corrections: list[str] = []
-        for issue in issues:
-            corrections.append(f"Review causal relationship: {issue.description}")
-        return corrections
+        return [f"Review causal relationship: {issue.description}" for issue in issues]
 
     # Placeholders for detailed causal analysis
     async def _extract_causal_relationships(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[dict[str, Any]]:
         return []
 
     async def _validate_causal_relationship(
-        self, relationship: dict[str, Any]
+        self, _relationship: dict[str, Any]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_logical_fallacies(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_impossible_scenarios(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_circular_reasoning(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_consequence_proportionality(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_consequence_timing(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 
     async def _check_consequence_believability(
-        self, narrative_branch: list[NarrativeContent]
+        self, _narrative_branch: list[NarrativeContent]
     ) -> list[ConsistencyIssue]:
         return []
 

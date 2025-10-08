@@ -30,6 +30,8 @@ class ConsistencyIssue:
     severity: ValidationSeverity
     description: str
     related_content_ids: list[str] = field(default_factory=list)
+    affected_elements: list[str] = field(default_factory=list)
+    suggested_fix: str = ""
     confidence_score: float = 0.0
     metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
@@ -41,10 +43,12 @@ class ValidationResult:
     consistency_score: float
     detected_issues: list[ConsistencyIssue] = field(default_factory=list)
     lore_consistency: float = 0.0
+    lore_compliance: float = 0.0
     character_consistency: float = 0.0
     world_rule_consistency: float = 0.0
     causal_consistency: float = 0.0
     therapeutic_alignment: float = 0.0
+    suggested_corrections: list[str] = field(default_factory=list)
     validation_timestamp: datetime = field(default_factory=datetime.now)
 
 
@@ -61,6 +65,17 @@ class NarrativeContent:
     metadata: dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
 
+    # Aliases for backward compatibility
+    @property
+    def characters(self) -> list[str]:
+        """Alias for related_characters."""
+        return self.related_characters
+
+    @property
+    def locations(self) -> list[str]:
+        """Alias for related_locations."""
+        return self.related_locations
+
 
 @dataclass
 class LoreEntry:
@@ -70,6 +85,7 @@ class LoreEntry:
     description: str
     canonical: bool = True
     related_entries: list[str] = field(default_factory=list)
+    constraints: list[str] = field(default_factory=list)
     importance_weight: float = 1.0
     last_updated: datetime = field(default_factory=datetime.now)
 

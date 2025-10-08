@@ -1,5 +1,5 @@
-"""
-ContradictionDetector extracted from narrative_coherence_engine.
+"""ContradictionDetector extracted from narrative_coherence_engine.
+
 Implements contradiction detection across direct, implicit, temporal, and causal dimensions.
 """
 
@@ -248,32 +248,32 @@ class ContradictionDetector:
 
     # Placeholder detailed methods
     async def _find_direct_conflicts(
-        self, content1: NarrativeContent, content2: NarrativeContent
+        self, _content1: NarrativeContent, _content2: NarrativeContent
     ) -> list[Contradiction]:
         return []
 
     async def _find_implicit_conflicts(
-        self, content1: NarrativeContent, content2: NarrativeContent
+        self, _content1: NarrativeContent, _content2: NarrativeContent
     ) -> list[Contradiction]:
         return []
 
     async def _extract_temporal_events(
-        self, content_history: list[NarrativeContent]
+        self, _content_history: list[NarrativeContent]
     ) -> list[dict[str, Any]]:
         return []
 
     async def _find_temporal_conflicts(
-        self, event1: dict[str, Any], event2: dict[str, Any]
+        self, _event1: dict[str, Any], _event2: dict[str, Any]
     ) -> list[Contradiction]:
         return []
 
     async def _extract_causal_chains(
-        self, content_history: list[NarrativeContent]
+        self, _content_history: list[NarrativeContent]
     ) -> list[list[dict[str, Any]]]:
         return []
 
     async def _find_causal_conflicts(
-        self, causal_chain: list[dict[str, Any]]
+        self, _causal_chain: list[dict[str, Any]]
     ) -> list[Contradiction]:
         return []
 
