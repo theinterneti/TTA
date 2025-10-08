@@ -1,5 +1,5 @@
 """
-Ollama Provider Implementation
+Ollama Provider Implementation.
 
 This module provides integration with Ollama for containerized local model
 deployment and management.
@@ -13,11 +13,14 @@ from datetime import datetime
 from typing import Any
 
 import docker
+import docker.errors
+import docker.types
 import httpx
 
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -295,7 +298,7 @@ class OllamaProvider(BaseProvider):
 
         return OllamaModelInstance(model_id, self, self._client)
 
-    async def _unload_model_impl(self, instance: OllamaModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload an Ollama model instance."""
         # Ollama manages model loading/unloading automatically
         pass
@@ -362,14 +365,15 @@ class OllamaProvider(BaseProvider):
             except Exception:
                 pass
 
+            # Type ignore for docker-py API compatibility (restart_policy dict format)
             container = self._docker_client.containers.run(
                 self._docker_image,
                 name=self._container_name,
                 ports=ports,
                 volumes=volumes,
-                device_requests=device_requests,
+                device_requests=device_requests if device_requests else None,
                 detach=True,
-                restart_policy={"Name": "unless-stopped"},
+                restart_policy={"Name": "unless-stopped"},  # type: ignore
             )
 
             logger.info(f"Created and started Ollama container: {self._container_name}")

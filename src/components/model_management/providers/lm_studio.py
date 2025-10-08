@@ -1,5 +1,5 @@
 """
-LM Studio Provider Implementation
+LM Studio Provider Implementation.
 
 This module provides integration with LM Studio for local model hosting.
 """
@@ -14,6 +14,7 @@ import httpx
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -241,7 +242,7 @@ class LMStudioProvider(BaseProvider):
 
         return LMStudioModelInstance(model_id, self, self._client)
 
-    async def _unload_model_impl(self, instance: LMStudioModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload an LM Studio model instance."""
         # LM Studio manages model loading/unloading automatically
         pass

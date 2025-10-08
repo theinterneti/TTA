@@ -1,5 +1,5 @@
 """
-Custom API Provider Implementation
+Custom API Provider Implementation.
 
 This module provides support for custom API providers like OpenAI, Anthropic,
 and other compatible APIs.
@@ -15,6 +15,7 @@ import httpx
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -471,7 +472,7 @@ class CustomAPIProvider(BaseProvider):
 
         return CustomAPIModelInstance(model_id, self, client, api_config)
 
-    async def _unload_model_impl(self, instance: CustomAPIModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload a custom API model instance."""
         # API models don't need explicit unloading
         pass

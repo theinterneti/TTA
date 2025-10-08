@@ -1,5 +1,5 @@
 """
-OpenRouter Provider Implementation
+OpenRouter Provider Implementation.
 
 This module provides integration with OpenRouter API for accessing
 cloud-based AI models with free model filtering capabilities.
@@ -16,6 +16,7 @@ import httpx
 from ..interfaces import (
     GenerationRequest,
     GenerationResponse,
+    IModelInstance,
     ModelInfo,
     ModelStatus,
     ProviderType,
@@ -334,7 +335,7 @@ class OpenRouterProvider(BaseProvider):
 
         return OpenRouterModelInstance(model_id, self, self._client)
 
-    async def _unload_model_impl(self, instance: OpenRouterModelInstance) -> None:
+    async def _unload_model_impl(self, instance: IModelInstance) -> None:
         """Unload an OpenRouter model instance."""
         # OpenRouter models don't need explicit unloading
         pass
@@ -353,11 +354,11 @@ class OpenRouterProvider(BaseProvider):
             return False
 
     async def get_available_models(
-        self, force_refresh: bool = False
+        self, filters: dict[str, Any] | None = None
     ) -> list[ModelInfo]:
         """Get available models with optional free models filtering."""
         # Get all models from base implementation
-        all_models = await super().get_available_models(force_refresh)
+        all_models = await super().get_available_models(filters)
 
         # Apply free models filter if enabled
         if self._show_free_only:
@@ -418,12 +419,12 @@ class OpenRouterProvider(BaseProvider):
 
         return affordable_models
 
-    def set_free_models_filter(
+    async def set_free_models_filter(
         self,
         show_free_only: bool = False,
         prefer_free: bool = True,
         max_cost_per_token: float = 0.001,
-    ):
+    ) -> None:
         """Dynamically update free models filter settings."""
         self._show_free_only = show_free_only
         self._prefer_free_models = prefer_free
@@ -434,7 +435,7 @@ class OpenRouterProvider(BaseProvider):
             f"prefer_free={prefer_free}, max_cost={max_cost_per_token}"
         )
 
-    def get_filter_settings(self) -> dict[str, Any]:
+    async def get_filter_settings(self) -> dict[str, Any]:
         """Get current filter settings."""
         return {
             "show_free_only": self._show_free_only,
