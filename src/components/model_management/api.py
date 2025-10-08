@@ -1,5 +1,5 @@
 """
-Model Management API Endpoints
+Model Management API Endpoints.
 
 This module provides FastAPI endpoints for model management functionality.
 """
@@ -10,6 +10,8 @@ from typing import Any
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel
 
+# TODO: Implement component_registry module
+# from src.orchestration.component_registry import get_component
 from .interfaces import TaskType
 from .model_management_component import ModelManagementComponent
 
@@ -74,11 +76,11 @@ router = APIRouter(prefix="/api/v1/models", tags=["Model Management"])
 # Dependency to get model management component
 async def get_model_management() -> ModelManagementComponent:
     """Get the model management component instance."""
+    # TODO: Implement component_registry module and get_component function
     # This would typically be injected from the main application
-    # For now, we'll assume it's available as a global or from a registry
-    from src.orchestration.component_registry import get_component
-
-    component = get_component("model_management")
+    # For now, raise an error as the registry is not implemented
+    # component = get_component("model_management")
+    component = None  # Placeholder until component_registry is implemented
     if not component:
         raise HTTPException(
             status_code=503, detail="Model management component not available"
@@ -101,7 +103,7 @@ async def generate_text(
     try:
         response = await model_mgmt.generate_text(
             prompt=request.prompt,
-            task_type=request.task_type,
+            task_type=request.task_type or TaskType.GENERAL_CHAT,
             max_tokens=request.max_tokens,
             temperature=request.temperature,
             top_p=request.top_p,
@@ -113,13 +115,14 @@ async def generate_text(
         if not response:
             raise HTTPException(status_code=503, detail="No suitable model available")
 
+        metadata = response.metadata or {}
         return GenerationResponse(
             text=response.text,
             model_id=response.model_id,
-            provider=response.metadata.get("provider", "unknown"),
+            provider=metadata.get("provider", "unknown"),
             latency_ms=response.latency_ms or 0,
             usage=response.usage,
-            metadata=response.metadata,
+            metadata=metadata,
         )
 
     except Exception as e:
@@ -259,8 +262,7 @@ async def get_model_recommendations(
 ):
     """Get model recommendations for a specific task type."""
     try:
-        recommendations = await model_mgmt.get_model_recommendations(task_type)
-        return recommendations
+        return await model_mgmt.get_model_recommendations(task_type)
 
     except Exception as e:
         logger.error(f"Failed to get model recommendations: {e}")
@@ -361,11 +363,9 @@ async def get_model_performance(
                 status_code=503, detail="Performance monitoring not available"
             )
 
-        performance = await model_mgmt.performance_monitor.get_model_performance(
+        return await model_mgmt.performance_monitor.get_model_performance(
             model_id, timeframe_hours
         )
-
-        return performance
 
     except Exception as e:
         logger.error(f"Failed to get performance metrics for {model_id}: {e}")
@@ -383,8 +383,7 @@ async def get_system_performance(
                 status_code=503, detail="Performance monitoring not available"
             )
 
-        performance = await model_mgmt.performance_monitor.get_system_performance()
-        return performance
+        return await model_mgmt.performance_monitor.get_system_performance()
 
     except Exception as e:
         logger.error(f"Failed to get system performance: {e}")
@@ -402,8 +401,7 @@ async def get_fallback_statistics(
                 status_code=503, detail="Fallback handler not available"
             )
 
-        stats = model_mgmt.fallback_handler.get_failure_statistics()
-        return stats
+        return model_mgmt.fallback_handler.get_failure_statistics()
 
     except Exception as e:
         logger.error(f"Failed to get fallback statistics: {e}")
@@ -448,7 +446,7 @@ async def set_openrouter_filter(
 ):
     """Set OpenRouter free models filter settings."""
     try:
-        model_mgmt.set_openrouter_filter(
+        await model_mgmt.set_openrouter_filter(
             show_free_only, prefer_free, max_cost_per_token
         )
 
