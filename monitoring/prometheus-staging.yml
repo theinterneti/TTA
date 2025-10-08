@@ -1,0 +1,253 @@
+# Prometheus Configuration for TTA Staging Environment
+# Optimized for homelab staging monitoring and observability
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: "tta-staging-homelab"
+    environment: "staging"
+    deployment: "homelab"
+
+rule_files:
+  - "rules-staging/*.yml"
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - alertmanager-staging:9093
+
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: "prometheus-staging"
+    static_configs:
+      - targets: ["localhost:9090"]
+    scrape_interval: 30s
+    metrics_path: /metrics
+    honor_labels: true
+
+  # TTA Health Check Service - Centralized health monitoring
+  - job_name: "tta-health-check-staging"
+    static_configs:
+      - targets: ["tta-staging-health-check:8080"]
+        labels:
+          service: "health-check"
+          environment: "staging"
+          instance: "health-check-staging"
+    metrics_path: "/metrics"
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # TTA Player Experience API - Staging
+  - job_name: "tta-player-api-staging"
+    static_configs:
+      - targets: ["tta-staging-player-api:8080"]
+    metrics_path: "/metrics"
+    scrape_interval: 15s
+    scrape_timeout: 10s
+    honor_labels: true
+    params:
+      format: ["prometheus"]
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "player-api-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "player-api"
+
+  # TTA Player Frontend - Staging (if metrics enabled)
+  - job_name: "tta-player-frontend-staging"
+    static_configs:
+      - targets: ["player-frontend-staging:3000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "player-frontend-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "player-frontend"
+
+  # Neo4j Database - Staging
+  - job_name: "neo4j-staging"
+    static_configs:
+      - targets: ["neo4j-staging:2004"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "neo4j-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "neo4j"
+
+  # Redis Cache - Staging
+  - job_name: "redis-staging"
+    static_configs:
+      - targets: ["redis-staging:6379"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "redis-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "redis"
+
+  # PostgreSQL Database - Staging
+  - job_name: "postgres-staging"
+    static_configs:
+      - targets: ["postgres-staging:5432"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "postgres-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "postgres"
+
+  # Nginx Load Balancer - Staging
+  - job_name: "nginx-staging"
+    static_configs:
+      - targets: ["nginx-staging:80"]
+    metrics_path: "/nginx_status"
+    scrape_interval: 15s
+    scrape_timeout: 5s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "nginx-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "nginx"
+
+  # Grafana - Staging
+  - job_name: "grafana-staging"
+    static_configs:
+      - targets: ["grafana-staging:3000"]
+    metrics_path: "/metrics"
+    scrape_interval: 60s
+    scrape_timeout: 10s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "grafana-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "grafana"
+
+  # Testing Service - Staging
+  - job_name: "testing-service-staging"
+    static_configs:
+      - targets: ["testing-service-staging:8000"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 15s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "testing-service-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "testing"
+
+  # Docker Container Metrics (cAdvisor if available)
+  - job_name: "cadvisor-staging"
+    static_configs:
+      - targets: ["cadvisor:8080"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    relabel_configs:
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "cadvisor"
+
+  # Node Exporter (if available)
+  - job_name: "node-exporter-staging"
+    static_configs:
+      - targets: ["node-exporter:9100"]
+    metrics_path: "/metrics"
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    honor_labels: true
+    relabel_configs:
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "node-exporter"
+
+  # Custom QA Testing Metrics
+  - job_name: "qa-metrics-staging"
+    static_configs:
+      - targets: ["testing-service-staging:8000"]
+    metrics_path: "/qa-metrics"
+    scrape_interval: 60s
+    scrape_timeout: 30s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "qa-metrics-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "qa-testing"
+
+  # Load Testing Metrics (Locust if running)
+  - job_name: "load-testing-staging"
+    static_configs:
+      - targets: ["testing-service-staging:8089"]
+    metrics_path: "/stats/requests"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+    honor_labels: true
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: instance
+        replacement: "load-testing-staging"
+      - target_label: environment
+        replacement: "staging"
+      - target_label: service
+        replacement: "load-testing"
+# Remote write configuration (optional - for long-term storage)
+# remote_write:
+#   - url: "http://remote-storage:9090/api/v1/write"
+#     queue_config:
+#       max_samples_per_send: 1000
+#       max_shards: 200
+#       capacity: 2500
+
+# Storage configuration is handled via command line arguments in docker-compose
+# --storage.tsdb.path=/prometheus
+# --storage.tsdb.retention.time=30d
+# --storage.tsdb.retention.size=10GB
+# --storage.tsdb.wal-compression=true
