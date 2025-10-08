@@ -11,7 +11,7 @@ test.describe('Model Management', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     modelManagementPage = new ModelManagementPage(page);
-    
+
     // Mock API responses for model management
     await mockApiResponse(page, '**/models', [
       {
@@ -100,7 +100,7 @@ test.describe('Model Management', () => {
         success: true,
         authenticated: true,
       }, 200, 'POST');
-      
+
       await modelManagementPage.connectOpenRouter('test-api-key-123');
       await modelManagementPage.expectAuthenticationSuccess();
 
@@ -132,14 +132,14 @@ test.describe('Model Management', () => {
     test('should select different models', async () => {
       await modelManagementPage.selectModel('GPT-3.5 Turbo');
       await modelManagementPage.expectModelSelected('GPT-3.5 Turbo');
-      
+
       await modelManagementPage.selectModel('Claude 3 Sonnet');
       await modelManagementPage.expectModelSelected('Claude 3 Sonnet');
     });
 
     test('should search for models', async () => {
       await modelManagementPage.searchModels('GPT');
-      
+
       // Should show only GPT models
       await expect(modelManagementPage.modelOptions.locator('text=GPT')).toBeVisible();
       await expect(modelManagementPage.modelOptions.locator('text=Claude')).not.toBeVisible();
@@ -147,7 +147,7 @@ test.describe('Model Management', () => {
 
     test('should filter free models', async () => {
       await modelManagementPage.filterFreeModels();
-      
+
       // Should show only free models
       await expect(modelManagementPage.modelOptions.locator('text=Llama 2 7B')).toBeVisible();
       await expect(modelManagementPage.modelOptions.locator('text=GPT-3.5 Turbo')).not.toBeVisible();
@@ -155,7 +155,7 @@ test.describe('Model Management', () => {
 
     test('should filter paid models', async () => {
       await modelManagementPage.filterPaidModels();
-      
+
       // Should show only paid models
       await expect(modelManagementPage.modelOptions.locator('text=GPT-3.5 Turbo')).toBeVisible();
       await expect(modelManagementPage.modelOptions.locator('text=Llama 2 7B')).not.toBeVisible();
@@ -164,7 +164,7 @@ test.describe('Model Management', () => {
     test('should show all models', async () => {
       await modelManagementPage.filterFreeModels();
       await modelManagementPage.showAllModels();
-      
+
       // Should show all models again
       await expect(modelManagementPage.modelOptions.locator('text=GPT-3.5 Turbo')).toBeVisible();
       await expect(modelManagementPage.modelOptions.locator('text=Llama 2 7B')).toBeVisible();
@@ -173,7 +173,7 @@ test.describe('Model Management', () => {
     test('should display model information', async () => {
       await modelManagementPage.selectModel('Claude 3 Sonnet');
       await modelManagementPage.expectModelInfo('Claude 3 Sonnet');
-      
+
       await expect(modelManagementPage.modelDescription).toContainText('Advanced model');
       await expect(modelManagementPage.modelCostDisplay).toBeVisible();
     });
@@ -214,7 +214,7 @@ test.describe('Model Management', () => {
       // Temperature should be between 0 and 2
       await modelManagementPage.setTemperature(3);
       await modelManagementPage.expectTemperature(2); // Should clamp to max
-      
+
       await modelManagementPage.setTemperature(-1);
       await modelManagementPage.expectTemperature(0); // Should clamp to min
     });
@@ -266,7 +266,7 @@ test.describe('Model Management', () => {
 
       await modelManagementPage.testModel('Hello, how are you?');
       await modelManagementPage.expectTestResponse();
-      
+
       await expect(modelManagementPage.testResponseDisplay).toContainText('This is a test response');
     });
 
@@ -304,7 +304,7 @@ test.describe('Model Management', () => {
 
       await modelManagementPage.setTemperature(0.8);
       await modelManagementPage.setMaxTokens(1024);
-      
+
       await modelManagementPage.saveConfiguration();
       await modelManagementPage.expectConfigurationSaved();
     });
@@ -316,16 +316,16 @@ test.describe('Model Management', () => {
 
       await modelManagementPage.setTemperature(0.6);
       await modelManagementPage.applyChanges();
-      
+
       await expect(modelManagementPage.page.locator('text=Changes applied')).toBeVisible();
     });
 
     test('should reset to defaults', async () => {
       await modelManagementPage.setTemperature(0.9);
       await modelManagementPage.setMaxTokens(512);
-      
+
       await modelManagementPage.resetToDefaults();
-      
+
       // Should reset to default values
       await modelManagementPage.expectTemperature(0.7); // Assuming default
       await expect(modelManagementPage.maxTokensInput).toHaveValue('4096'); // Assuming default
@@ -343,7 +343,7 @@ test.describe('Model Management', () => {
 
       await modelManagementPage.setTemperature(0.8);
       await modelManagementPage.saveConfiguration();
-      
+
       await modelManagementPage.expectGeneralError('Failed to save configuration');
     });
   });
@@ -363,7 +363,7 @@ test.describe('Model Management', () => {
       await modelManagementPage.goto();
       await expect(modelManagementPage.modelDropdown).toBeVisible();
       const loadTime = Date.now() - startTime;
-      
+
       expect(loadTime).toBeLessThan(3000); // 3 seconds
     });
   });
@@ -392,7 +392,7 @@ test.describe('Model Management', () => {
       await page.setViewportSize({ width: 375, height: 667 });
       await modelManagementPage.goto();
       await modelManagementPage.expectPageLoaded();
-      
+
       // Test model selection on mobile
       await modelManagementPage.selectModel('GPT-3.5 Turbo');
       await modelManagementPage.expectModelSelected('GPT-3.5 Turbo');
@@ -402,7 +402,7 @@ test.describe('Model Management', () => {
       await page.setViewportSize({ width: 768, height: 1024 });
       await modelManagementPage.goto();
       await modelManagementPage.expectPageLoaded();
-      
+
       // Test configuration on tablet
       await modelManagementPage.selectModel('Claude 3 Sonnet');
       await modelManagementPage.setTemperature(0.8);

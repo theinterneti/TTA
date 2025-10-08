@@ -14,7 +14,7 @@ test.describe('World Selection', () => {
     loginPage = new LoginPage(page);
     worldSelectionPage = new WorldSelectionPage(page);
     characterPage = new CharacterManagementPage(page);
-    
+
     // Mock API responses for consistent testing
     await mockApiResponse(page, '**/worlds', [
       {
@@ -68,7 +68,7 @@ test.describe('World Selection', () => {
       await characterPage.goto();
       const testCharacter = generateRandomCharacter();
       await characterPage.createCharacter(testCharacter);
-      
+
       // Then go to world selection
       await worldSelectionPage.goto();
       await worldSelectionPage.expectWorldsDisplayed();
@@ -80,7 +80,7 @@ test.describe('World Selection', () => {
       await page.route('**/worlds', route => {
         setTimeout(() => route.continue(), 2000);
       });
-      
+
       await worldSelectionPage.goto();
       await worldSelectionPage.expectLoadingState();
     });
@@ -97,7 +97,7 @@ test.describe('World Selection', () => {
 
     test('should display world cards with correct information', async () => {
       await worldSelectionPage.expectWorldsDisplayed();
-      
+
       // Validate each world card has required information
       await worldSelectionPage.validateWorldCardData('Peaceful Garden');
       await worldSelectionPage.validateWorldCardData('Urban Challenge');
@@ -133,36 +133,36 @@ test.describe('World Selection', () => {
 
     test('should filter worlds by search term', async () => {
       await worldSelectionPage.searchWorlds('Garden');
-      
+
       const worldCount = await worldSelectionPage.getWorldCount();
       expect(worldCount).toBe(1);
-      
+
       const gardenWorld = await worldSelectionPage.getWorldByName('Peaceful Garden');
       await expect(gardenWorld).toBeVisible();
     });
 
     test('should filter worlds by difficulty level', async () => {
       await worldSelectionPage.filterByDifficulty('BEGINNER');
-      
+
       const worldCount = await worldSelectionPage.getWorldCount();
       expect(worldCount).toBe(1);
-      
+
       await worldSelectionPage.expectWorldDifficulty('Peaceful Garden', 'BEGINNER');
     });
 
     test('should filter worlds by therapeutic theme', async () => {
       await worldSelectionPage.filterByTheme('anxiety');
-      
+
       const worldCount = await worldSelectionPage.getWorldCount();
       expect(worldCount).toBeGreaterThanOrEqual(1);
     });
 
     test('should filter worlds by duration', async () => {
       await worldSelectionPage.filterByDuration('short');
-      
+
       const worldCount = await worldSelectionPage.getWorldCount();
       expect(worldCount).toBe(1);
-      
+
       await worldSelectionPage.expectWorldDuration('Peaceful Garden', '2 hours');
     });
 
@@ -170,10 +170,10 @@ test.describe('World Selection', () => {
       // Apply multiple filters
       await worldSelectionPage.searchWorlds('Garden');
       await worldSelectionPage.filterByDifficulty('BEGINNER');
-      
+
       // Clear filters
       await worldSelectionPage.clearAllFilters();
-      
+
       // Should show all worlds again
       const worldCount = await worldSelectionPage.getWorldCount();
       expect(worldCount).toBe(3);
@@ -217,19 +217,19 @@ test.describe('World Selection', () => {
 
     test('should handle world selection', async ({ page }) => {
       await mockApiResponse(page, '**/worlds/world-1/select', { success: true });
-      
+
       await worldSelectionPage.clickSelectWorld('Peaceful Garden');
-      
+
       // Should navigate to chat or next step
       await page.waitForURL(/chat|session/);
     });
 
     test('should close modals properly', async ({ page }) => {
       await mockApiResponse(page, '**/worlds/world-1', {});
-      
+
       await worldSelectionPage.clickViewDetails('Peaceful Garden');
       await worldSelectionPage.expectWorldDetailsModal();
-      
+
       await worldSelectionPage.closeModal();
       await expect(worldSelectionPage.worldDetailsModal).not.toBeVisible();
     });
@@ -262,12 +262,12 @@ test.describe('World Selection', () => {
         await page.setViewportSize(viewport);
         await worldSelectionPage.expectPageLoaded();
         await worldSelectionPage.expectWorldsDisplayed();
-        
+
         // Test search functionality
         await worldSelectionPage.searchWorlds('Garden');
         const worldCount = await worldSelectionPage.getWorldCount();
         expect(worldCount).toBe(1);
-        
+
         // Clear search for next iteration
         await worldSelectionPage.clearAllFilters();
       }
@@ -312,7 +312,7 @@ test.describe('World Selection', () => {
         // Simplified contrast check - in real implementation, use axe-core
         return { violations: [] };
       });
-      
+
       expect(accessibilityResults.violations).toHaveLength(0);
     });
   });
@@ -338,7 +338,7 @@ test.describe('World Selection', () => {
 
     test('should handle empty world list', async ({ page }) => {
       await mockApiResponse(page, '**/worlds', []);
-      
+
       await worldSelectionPage.goto();
       await worldSelectionPage.expectNoWorldsMessage();
     });

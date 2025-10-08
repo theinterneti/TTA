@@ -10,7 +10,7 @@ test.describe('Dashboard', () => {
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
     dashboardPage = new DashboardPage(page);
-    
+
     // Login before each test
     await loginPage.goto();
     await loginPage.login(testUsers.default);
@@ -51,7 +51,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.expectNewUserExperience();
     });
@@ -68,7 +68,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await expect(dashboardPage.createCharacterButton).toContainText(/create.*first|get started/i);
     });
@@ -85,7 +85,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await expect(dashboardPage.continueSessionButton).toBeDisabled();
     });
@@ -109,7 +109,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.expectReturningUserExperience();
     });
@@ -126,7 +126,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await expect(dashboardPage.continueSessionButton).toBeEnabled();
     });
@@ -161,7 +161,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.continueLastSession();
       await expect(dashboardPage.page).toHaveURL(/chat/);
@@ -184,7 +184,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.expectCharacterCount(2);
     });
@@ -203,7 +203,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.selectCharacter('Test Character');
       // Should navigate to character details or start session
@@ -226,7 +226,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.expectSessionCount(2);
     });
@@ -245,7 +245,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.selectRecentSession('Test Character');
       // Should navigate to chat session
@@ -273,10 +273,10 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.refreshDashboard();
-      
+
       expect(requestCount).toBeGreaterThan(1);
     });
   });
@@ -309,11 +309,11 @@ test.describe('Dashboard', () => {
     test('should stack sections vertically on mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 });
       await dashboardPage.expectDashboardLoaded();
-      
+
       // Check that sections are stacked
       const quickActions = await dashboardPage.quickActionsSection.boundingBox();
       const characters = await dashboardPage.charactersSection.boundingBox();
-      
+
       if (quickActions && characters) {
         expect(characters.y).toBeGreaterThan(quickActions.y + quickActions.height);
       }
@@ -339,14 +339,14 @@ test.describe('Dashboard', () => {
         name: `Character ${i}`,
         last_active: '2024-01-01',
       }));
-      
+
       const sessions = Array.from({ length: 100 }, (_, i) => ({
         id: `session-${i}`,
         character_name: `Character ${i % 10}`,
         world_name: `World ${i % 5}`,
         last_activity: '2024-01-01',
       }));
-      
+
       await page.route('**/players/*/dashboard', route => {
         route.fulfill({
           status: 200,
@@ -358,12 +358,12 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       const startTime = Date.now();
       await dashboardPage.goto();
       await dashboardPage.expectDashboardLoaded();
       const loadTime = Date.now() - startTime;
-      
+
       expect(loadTime).toBeLessThan(5000);
     });
   });
@@ -377,7 +377,7 @@ test.describe('Dashboard', () => {
           body: JSON.stringify({ error: 'Internal server error' }),
         });
       });
-      
+
       await dashboardPage.goto();
       const errorMessage = dashboardPage.page.locator('[data-testid="error"], .error');
       await expect(errorMessage).toBeVisible();
@@ -395,7 +395,7 @@ test.describe('Dashboard', () => {
           }),
         });
       });
-      
+
       await dashboardPage.goto();
       await dashboardPage.expectCharactersSection(false);
       await dashboardPage.expectRecentSessions(false);

@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 /**
  * Production Report Generator for TTA Simulation Framework
- * 
+ *
  * Generates comprehensive production validation reports from simulation results
  * including metrics, analysis, and readiness assessment.
  */
@@ -73,7 +73,7 @@ class ProductionReportGenerator {
   constructor() {
     this.resultsDir = path.join(__dirname, '..');
     this.outputDir = path.join(this.resultsDir, 'reports');
-    
+
     // Ensure output directory exists
     if (!fs.existsSync(this.outputDir)) {
       fs.mkdirSync(this.outputDir, { recursive: true });
@@ -88,7 +88,7 @@ class ProductionReportGenerator {
       .filter(f => f.startsWith('simulation-results-') && f.endsWith('.json'))
       .sort()
       .reverse();
-    
+
     return files.length > 0 ? path.join(this.resultsDir, files[0]) : null;
   }
 
@@ -106,7 +106,7 @@ class ProductionReportGenerator {
    */
   private calculateAverageMetrics(results: SimulationResult[]) {
     const successfulResults = results.filter(r => r.success);
-    
+
     if (successfulResults.length === 0) {
       return {
         narrativeCoherence: 0,
@@ -265,7 +265,7 @@ class ProductionReportGenerator {
    */
   public generateReport(): void {
     console.log('🔍 Searching for simulation results...');
-    
+
     const resultsFile = this.findLatestResultsFile();
     if (!resultsFile) {
       console.error('❌ No simulation results found');
@@ -361,7 +361,7 @@ class ProductionReportGenerator {
 
   private generateRecommendations(readiness: any, gates: any): string[] {
     const recommendations: string[] = [];
-    
+
     if (readiness.recommendation === 'NOT_READY') {
       recommendations.push('Address all blockers before production deployment');
       recommendations.push('Run additional validation tests');
@@ -372,7 +372,7 @@ class ProductionReportGenerator {
       recommendations.push('System ready for production deployment');
       recommendations.push('Continue monitoring metrics post-deployment');
     }
-    
+
     return recommendations;
   }
 }
@@ -380,4 +380,3 @@ class ProductionReportGenerator {
 // Run report generation
 const generator = new ProductionReportGenerator();
 generator.generateReport();
-

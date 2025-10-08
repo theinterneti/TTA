@@ -1,0 +1,67 @@
+{
+  "name": "tta-simulation-framework",
+  "version": "1.0.0",
+  "description": "Comprehensive simulation testing framework for TTA (Therapeutic Text Adventure) platform",
+  "main": "SimulationRunner.js",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node examples/runSimulation.ts",
+    "test": "npm run test:quick",
+    "test:quick": "ts-node examples/runSimulation.ts quick",
+    "test:comprehensive": "ts-node examples/runSimulation.ts comprehensive",
+    "test:custom": "ts-node examples/runSimulation.ts custom",
+    "test:persona": "ts-node examples/runSimulation.ts persona",
+    "test:world": "ts-node examples/runSimulation.ts world",
+    "test:all": "ts-node examples/runSimulation.ts all",
+    "simulate": "ts-node examples/runSimulation.ts",
+    "analyze": "ts-node scripts/analyzeResults.ts",
+    "report": "ts-node scripts/generateReport.ts",
+    "clean": "rm -rf dist/ *.log simulation-results-*.json",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"**/*.{ts,js,json,md}\"",
+    "type-check": "tsc --noEmit",
+    "start": "node dist/server.js",
+    "start:dev": "ts-node server.ts",
+    "docker:build": "docker build -t tta-simulation-framework .",
+    "docker:run": "docker run -p 3002:3002 tta-simulation-framework",
+    "validate": "ts-node validate-framework.ts"
+  },
+  "keywords": [
+    "simulation",
+    "testing",
+    "therapeutic",
+    "gaming",
+    "text-adventure",
+    "entertainment",
+    "world-building",
+    "immersion",
+    "user-experience"
+  ],
+  "author": "TTA Development Team",
+  "license": "MIT",
+  "dependencies": {
+    "events": "^3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theinterneti/TTA.git",
+    "directory": "testing/simulation"
+  },
+  "bugs": {
+    "url": "https://github.com/theinterneti/TTA/issues"
+  },
+  "homepage": "https://github.com/theinterneti/TTA#readme"
+}
