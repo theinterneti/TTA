@@ -32,16 +32,16 @@ import {
 } from '@mui/icons-material';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  fetchClinicalDashboard, 
-  acknowledgeAlert, 
-  triggerIntervention 
+import {
+  fetchClinicalDashboard,
+  acknowledgeAlert,
+  triggerIntervention
 } from '@tta/shared-components/store/therapeuticStore';
 import type { RootState, AppDispatch } from '@tta/shared-components/store/therapeuticStore';
-import type { 
-  ClinicalAlert, 
-  PatientSummary, 
-  ClinicalMetrics 
+import type {
+  ClinicalAlert,
+  PatientSummary,
+  ClinicalMetrics
 } from '@tta/shared-components/types/therapeutic';
 
 interface RealTimeMonitorProps {
@@ -51,12 +51,12 @@ interface RealTimeMonitorProps {
 const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
   const theme = useTheme();
   const dispatch = useDispatch<AppDispatch>();
-  
-  const { 
-    clinicalDashboard, 
-    alerts, 
-    loading, 
-    error 
+
+  const {
+    clinicalDashboard,
+    alerts,
+    loading,
+    error
   } = useSelector((state: RootState) => state.therapeutic);
 
   const [selectedAlert, setSelectedAlert] = useState<ClinicalAlert | null>(null);
@@ -67,7 +67,7 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
   // Fetch dashboard data on mount and set up real-time updates
   useEffect(() => {
     dispatch(fetchClinicalDashboard(clinicianId));
-    
+
     // Set up real-time updates every 30 seconds
     const interval = setInterval(() => {
       dispatch(fetchClinicalDashboard(clinicianId));
@@ -128,7 +128,7 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
       effectiveness: 0,
       timestamp: new Date(),
     }));
-    
+
     setShowInterventionDialog(false);
     setSelectedPatient(null);
   }, [dispatch]);
@@ -150,7 +150,7 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
     }
   };
 
-  const criticalAlerts = alerts.filter(alert => 
+  const criticalAlerts = alerts.filter(alert =>
     alert.severity === 'critical' && !alert.acknowledged
   );
 
@@ -158,8 +158,8 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
     <Box sx={{ p: 3 }}>
       {/* Critical Alerts Banner */}
       {criticalAlerts.length > 0 && (
-        <Alert 
-          severity="error" 
+        <Alert
+          severity="error"
           sx={{ mb: 3 }}
           action={
             <Button color="inherit" size="small">
@@ -250,19 +250,19 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
                   <XAxis dataKey="time" />
                   <YAxis />
                   <Tooltip />
-                  <Area 
-                    type="monotone" 
-                    dataKey="valence" 
-                    stackId="1" 
-                    stroke={theme.palette.primary.main} 
+                  <Area
+                    type="monotone"
+                    dataKey="valence"
+                    stackId="1"
+                    stroke={theme.palette.primary.main}
                     fill={theme.palette.primary.light}
                     name="Emotional Valence"
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="engagement" 
-                    stackId="2" 
-                    stroke={theme.palette.secondary.main} 
+                  <Area
+                    type="monotone"
+                    dataKey="engagement"
+                    stackId="2"
+                    stroke={theme.palette.secondary.main}
                     fill={theme.palette.secondary.light}
                     name="Engagement Level"
                   />
@@ -325,9 +325,9 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
               <Grid container spacing={2}>
                 {clinicalDashboard?.patients.map((patient) => (
                   <Grid item xs={12} sm={6} md={4} key={patient.patientId}>
-                    <Card 
+                    <Card
                       variant="outlined"
-                      sx={{ 
+                      sx={{
                         cursor: 'pointer',
                         '&:hover': { boxShadow: 2 }
                       }}
@@ -341,24 +341,24 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
                           <Chip
                             size="small"
                             label={patient.riskLevel}
-                            sx={{ 
+                            sx={{
                               backgroundColor: getRiskColor(patient.riskLevel),
                               color: 'white'
                             }}
                           />
                         </Box>
-                        
+
                         <Box display="flex" alignItems="center" mb={1}>
                           {getTrendIcon(patient.progressTrend)}
                           <Typography variant="body2" sx={{ ml: 1 }}>
                             {patient.progressTrend}
                           </Typography>
                         </Box>
-                        
+
                         <Typography variant="body2" color="text.secondary">
                           Last session: {patient.lastSession.toLocaleDateString()}
                         </Typography>
-                        
+
                         <Typography variant="body2" color="text.secondary">
                           Active interventions: {patient.activeInterventions}
                         </Typography>
@@ -405,7 +405,7 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
             Close
           </Button>
           {selectedAlert && !selectedAlert.acknowledged && (
-            <Button 
+            <Button
               variant="contained"
               onClick={() => handleAcknowledgeAlert(selectedAlert.id)}
             >
@@ -444,13 +444,13 @@ const RealTimeMonitor: React.FC<RealTimeMonitorProps> = ({ clinicianId }) => {
           <Button onClick={() => setShowInterventionDialog(false)}>
             Cancel
           </Button>
-          <Button 
+          <Button
             variant="outlined"
             onClick={() => selectedPatient && handleTriggerIntervention(selectedPatient.patientId, 'emotional_support')}
           >
             Emotional Support
           </Button>
-          <Button 
+          <Button
             variant="contained"
             color="error"
             onClick={() => selectedPatient && handleTriggerIntervention(selectedPatient.patientId, 'crisis_support')}
