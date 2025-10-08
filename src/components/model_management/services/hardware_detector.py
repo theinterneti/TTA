@@ -1,5 +1,5 @@
 """
-Hardware Detection Service
+Hardware Detection Service.
 
 This module provides comprehensive hardware detection capabilities to
 recommend appropriate AI models based on available system resources.
@@ -30,7 +30,7 @@ class HardwareDetector(IHardwareDetector):
         """Detect available system resources."""
         try:
             # CPU information
-            cpu_count = psutil.cpu_count(logical=True)
+            cpu_count = psutil.cpu_count(logical=True) or 1  # Default to 1 if None
             cpu_info = self._get_cpu_info()
 
             # Memory information
@@ -85,6 +85,9 @@ class HardwareDetector(IHardwareDetector):
             await self.detect_system_resources()
 
         resources = self._cached_resources
+        if not resources:
+            return []  # No resources detected
+
         recommendations = []
 
         # Base recommendations based on available RAM
@@ -230,7 +233,9 @@ class HardwareDetector(IHardwareDetector):
         # Default estimates for unknown models
         default_requirements = {"ram_gb": 8, "vram_gb": 4, "disk_gb": 8}
 
-        requirements = model_sizes.get(model_id, default_requirements).copy()
+        requirements: dict[str, Any] = model_sizes.get(
+            model_id, default_requirements
+        ).copy()
 
         # Add additional requirements
         requirements.update(
@@ -271,9 +276,14 @@ class HardwareDetector(IHardwareDetector):
 
             for i in range(device_count):
                 handle = pynvml.nvmlDeviceGetHandleByIndex(i)
-                name = pynvml.nvmlDeviceGetName(handle).decode("utf-8")
+                name_raw = pynvml.nvmlDeviceGetName(handle)
+                name = (
+                    name_raw.decode("utf-8")
+                    if isinstance(name_raw, bytes)
+                    else name_raw
+                )
                 memory_info = pynvml.nvmlDeviceGetMemoryInfo(handle)
-                memory_gb = memory_info.total / (1024**3)
+                memory_gb = float(memory_info.total) / (1024**3)
 
                 gpu_info.append(
                     {
@@ -311,6 +321,14 @@ class HardwareDetector(IHardwareDetector):
 
         requirements = await self.estimate_model_requirements(model_id)
         resources = self._cached_resources
+
+        if not resources:
+            return {
+                "compatible": False,
+                "warnings": ["System resources not detected"],
+                "requirements": requirements,
+                "available_resources": {},
+            }
 
         compatibility = {
             "compatible": True,

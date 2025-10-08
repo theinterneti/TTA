@@ -1,5 +1,5 @@
 """
-Performance Monitoring Service
+Performance Monitoring Service.
 
 This module provides real-time performance tracking and metrics collection
 for AI models in the TTA platform.
@@ -270,7 +270,7 @@ class PerformanceMonitor(IPerformanceMonitor):
             m.cpu_usage_percent for m in metrics if m.cpu_usage_percent is not None
         ]
 
-        stats = {
+        stats: dict[str, Any] = {
             "total_requests": len(metrics),
             "total_tokens": total_tokens,
             "total_errors": sum(error_counts),
@@ -377,15 +377,19 @@ class PerformanceMonitor(IPerformanceMonitor):
             }
 
             # Store as a list with expiration
-            await self.redis_client.lpush(key, json.dumps(value))
-            await self.redis_client.ltrim(key, 0, self.max_metrics_per_model - 1)
-            await self.redis_client.expire(key, self.retention_days * 24 * 3600)
+            if self.redis_client:
+                await self.redis_client.lpush(key, json.dumps(value))
+                await self.redis_client.ltrim(key, 0, self.max_metrics_per_model - 1)
+                await self.redis_client.expire(key, self.retention_days * 24 * 3600)
 
         except Exception as e:
             logger.error(f"Failed to store metrics in Redis: {e}")
 
     async def _store_metrics_neo4j(self, metrics: PerformanceMetrics):
         """Store metrics in Neo4j."""
+        if not self.neo4j_driver:
+            return
+
         try:
             async with self.neo4j_driver.session() as session:
                 query = """
@@ -424,6 +428,9 @@ class PerformanceMonitor(IPerformanceMonitor):
         self, model_id: str, cutoff_time: datetime
     ) -> list[PerformanceMetrics]:
         """Get metrics from Redis."""
+        if not self.redis_client:
+            return []
+
         try:
             key = f"metrics:{model_id}"
             raw_metrics = await self.redis_client.lrange(key, 0, -1)
