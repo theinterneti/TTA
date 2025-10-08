@@ -68,19 +68,8 @@ class ModelManagementComponent(Component):
 
     @log_entry_exit
     @timing_decorator
-    def _start_impl(self) -> bool:
-        """Start the model management component."""
-        # Run async startup in event loop
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        return loop.run_until_complete(self._start_impl_async())
-
-    async def _start_impl_async(self) -> bool:
-        """Async implementation of component startup."""
+    async def _start_impl(self) -> bool:  # type: ignore[override]
+        """Start the model management component (async implementation)."""
         try:
             logger.info("Starting Model Management Component")
 
@@ -113,19 +102,8 @@ class ModelManagementComponent(Component):
 
     @log_entry_exit
     @timing_decorator
-    def _stop_impl(self) -> bool:
-        """Stop the model management component."""
-        # Run async shutdown in event loop
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-
-        return loop.run_until_complete(self._stop_impl_async())
-
-    async def _stop_impl_async(self) -> bool:
-        """Async implementation of component shutdown."""
+    async def _stop_impl(self) -> bool:  # type: ignore[override]
+        """Stop the model management component (async implementation)."""
         try:
             logger.info("Stopping Model Management Component")
 
