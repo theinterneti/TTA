@@ -180,14 +180,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-          
+
       - name: Deploy to Lightsail
         run: |
           aws lightsail create-container-service-deployment \
@@ -206,17 +206,17 @@ security_requirements:
     - "TLS 1.3 for all connections"
     - "Database encryption at rest"
     - "Application-level encryption for PHI"
-    
+
   access_control:
     - "Multi-factor authentication"
     - "Role-based access control (RBAC)"
     - "VPN access for team members"
-    
+
   monitoring:
     - "CloudTrail audit logging"
     - "Sentry error monitoring"
     - "Security incident alerting"
-    
+
   compliance:
     - "Signed BAA with cloud provider"
     - "Regular security assessments"

@@ -138,32 +138,32 @@ services:
       - API_PORT=8080
       - API_DEBUG=false
       - API_LOG_LEVEL=INFO
-      
+
       # Staging URLs
       - STAGING_API_URL=https://api-staging.tta.theinterneti.com
       - STAGING_WEB_URL=https://staging-tta.theinterneti.com
       - STAGING_CLINICAL_URL=https://clinical-staging.tta.theinterneti.com
-      
+
       # CORS Configuration for staging
       - API_CORS_ORIGINS=https://staging-tta.theinterneti.com,https://clinical-staging.tta.theinterneti.com,https://admin-staging.tta.theinterneti.com
-      
+
       # Database connections
       - DATABASE_URL=${STAGING_DATABASE_URL}
       - REDIS_URL=${STAGING_REDIS_URL}
       - NEO4J_URL=${STAGING_NEO4J_URL}
       - NEO4J_PASSWORD=${STAGING_NEO4J_PASSWORD}
-      
+
       # Monitoring
       - SENTRY_DSN=${STAGING_SENTRY_DSN}
       - SENTRY_ENVIRONMENT=staging
       - SENTRY_TRACES_SAMPLE_RATE=0.2
-      
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.api-staging.rule=Host(`api-staging.tta.theinterneti.com`)"
       - "traefik.http.routers.api-staging.tls=true"
       - "traefik.http.routers.api-staging.tls.certresolver=letsencrypt"
-      
+
   # Web Interface - Staging
   web-interface:
     build:
@@ -178,7 +178,7 @@ services:
       - REACT_APP_WS_URL=wss://api-staging.tta.theinterneti.com
       - REACT_APP_SENTRY_DSN=${STAGING_SENTRY_DSN}
       - REACT_APP_ENVIRONMENT=staging
-      
+
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.web-staging.rule=Host(`staging-tta.theinterneti.com`)"
@@ -206,16 +206,16 @@ server {
 server {
     listen 443 ssl http2;
     server_name staging-tta.theinterneti.com;
-    
+
     ssl_certificate /etc/ssl/certs/staging.crt;
     ssl_certificate_key /etc/ssl/private/staging.key;
-    
+
     # Security headers
     add_header X-Frame-Options DENY;
     add_header X-Content-Type-Options nosniff;
     add_header X-XSS-Protection "1; mode=block";
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-    
+
     location / {
         proxy_pass http://web-interface:3000;
         proxy_set_header Host $host;
@@ -229,17 +229,17 @@ server {
 server {
     listen 443 ssl http2;
     server_name api-staging.tta.theinterneti.com;
-    
+
     ssl_certificate /etc/ssl/certs/staging.crt;
     ssl_certificate_key /etc/ssl/private/staging.key;
-    
+
     location / {
         proxy_pass http://player-experience-api:8080;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # WebSocket support
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -305,12 +305,12 @@ staging_endpoints:
     url: "https://staging-tta.theinterneti.com"
     expected_status: 200
     check_interval: 60s
-    
+
   - name: "Staging API Health"
     url: "https://api-staging.tta.theinterneti.com/health"
     expected_status: 200
     check_interval: 30s
-    
+
   - name: "Staging API Docs"
     url: "https://api-staging.tta.theinterneti.com/docs"
     expected_status: 200
