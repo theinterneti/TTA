@@ -1,5 +1,5 @@
 # Patient API Dockerfile - Optimized Multi-stage Build
-FROM python:3.11-slim as builder
+FROM python:3.14-slim as builder
 
 # Set build-time environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -30,7 +30,7 @@ RUN --mount=type=cache,target=/tmp/uv-cache \
     uv sync --frozen --no-dev --no-install-project
 
 # Production stage - Optimized Runtime Image
-FROM python:3.11-slim as production
+FROM python:3.14-slim as production
 
 # Set runtime environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
