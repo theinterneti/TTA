@@ -1,10 +1,11 @@
 """
-Model Management Component
+Model Management Component.
 
 This module provides the main component for comprehensive AI model management
 within the TTA platform, coordinating multiple providers and services.
 """
 
+import asyncio
 import logging
 from datetime import datetime
 from typing import Any
@@ -67,8 +68,19 @@ class ModelManagementComponent(Component):
 
     @log_entry_exit
     @timing_decorator
-    async def _start_impl(self) -> bool:
+    def _start_impl(self) -> bool:
         """Start the model management component."""
+        # Run async startup in event loop
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        return loop.run_until_complete(self._start_impl_async())
+
+    async def _start_impl_async(self) -> bool:
+        """Async implementation of component startup."""
         try:
             logger.info("Starting Model Management Component")
 
@@ -101,8 +113,19 @@ class ModelManagementComponent(Component):
 
     @log_entry_exit
     @timing_decorator
-    async def _stop_impl(self) -> bool:
+    def _stop_impl(self) -> bool:
         """Stop the model management component."""
+        # Run async shutdown in event loop
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        return loop.run_until_complete(self._stop_impl_async())
+
+    async def _stop_impl_async(self) -> bool:
+        """Async implementation of component shutdown."""
         try:
             logger.info("Stopping Model Management Component")
 
@@ -132,6 +155,8 @@ class ModelManagementComponent(Component):
 
         try:
             # Use model selector to find the best model
+            if not self.model_selector:
+                raise RuntimeError("Model selector not initialized")
             selected_model_info = await self.model_selector.select_model(requirements)
 
             if not selected_model_info:
@@ -300,12 +325,12 @@ class ModelManagementComponent(Component):
         )
         return affordable_models
 
-    def set_openrouter_filter(
+    async def set_openrouter_filter(
         self,
         show_free_only: bool = False,
         prefer_free: bool = True,
         max_cost_per_token: float = 0.001,
-    ):
+    ) -> None:
         """Set OpenRouter free models filter settings."""
         if "openrouter" not in self.providers:
             logger.warning("OpenRouter provider not available")
@@ -313,7 +338,7 @@ class ModelManagementComponent(Component):
 
         provider = self.providers["openrouter"]
         if hasattr(provider, "set_free_models_filter"):
-            provider.set_free_models_filter(
+            await provider.set_free_models_filter(
                 show_free_only, prefer_free, max_cost_per_token
             )
             logger.info(
@@ -322,14 +347,14 @@ class ModelManagementComponent(Component):
         else:
             logger.warning("OpenRouter provider does not support filter settings")
 
-    def get_openrouter_filter_settings(self) -> dict[str, Any] | None:
+    async def get_openrouter_filter_settings(self) -> dict[str, Any] | None:
         """Get current OpenRouter filter settings."""
         if "openrouter" not in self.providers:
             return None
 
         provider = self.providers["openrouter"]
         if hasattr(provider, "get_filter_settings"):
-            return provider.get_filter_settings()
+            return await provider.get_filter_settings()
 
         return None
 
