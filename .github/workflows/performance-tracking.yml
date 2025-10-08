@@ -462,5 +462,3 @@ jobs:
           name: performance-history
           path: .performance-history/
           retention-days: 90
-
-

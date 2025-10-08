@@ -199,13 +199,13 @@ jobs:
         run: |
           echo "## 🔍 CodeQL Security Analysis Results" > codeql-summary.md
           echo "" >> codeql-summary.md
-          
+
           # Process Python results
           if [ -f "sarif-results/python/python.sarif" ]; then
             echo "### Python Analysis" >> codeql-summary.md
             python_issues=$(jq '.runs[0].results | length' sarif-results/python/python.sarif 2>/dev/null || echo "0")
             echo "- **Total Issues Found**: $python_issues" >> codeql-summary.md
-            
+
             if [ "$python_issues" -gt 0 ]; then
               echo "- **Severity Breakdown**:" >> codeql-summary.md
               jq -r '.runs[0].results[] | "  - \(.level // "note"): \(.message.text)"' sarif-results/python/python.sarif | head -10 >> codeql-summary.md
@@ -214,13 +214,13 @@ jobs:
             fi
             echo "" >> codeql-summary.md
           fi
-          
+
           # Process JavaScript results
           if [ -f "sarif-results/javascript/javascript.sarif" ]; then
             echo "### JavaScript/TypeScript Analysis" >> codeql-summary.md
             js_issues=$(jq '.runs[0].results | length' sarif-results/javascript/javascript.sarif 2>/dev/null || echo "0")
             echo "- **Total Issues Found**: $js_issues" >> codeql-summary.md
-            
+
             if [ "$js_issues" -gt 0 ]; then
               echo "- **Severity Breakdown**:" >> codeql-summary.md
               jq -r '.runs[0].results[] | "  - \(.level // "note"): \(.message.text)"' sarif-results/javascript/javascript.sarif | head -10 >> codeql-summary.md
@@ -229,10 +229,10 @@ jobs:
             fi
             echo "" >> codeql-summary.md
           fi
-          
+
           echo "---" >> codeql-summary.md
           echo "*Full results available in GitHub Security tab*" >> codeql-summary.md
-          
+
           cat codeql-summary.md
 
       - name: Comment PR with CodeQL results
@@ -242,19 +242,19 @@ jobs:
           script: |
             const fs = require('fs');
             const summary = fs.readFileSync('codeql-summary.md', 'utf8');
-            
+
             // Find existing CodeQL comment
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
             });
-            
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && 
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
               comment.body.includes('CodeQL Security Analysis Results')
             );
-            
+
             if (botComment) {
               // Update existing comment
               await github.rest.issues.updateComment({
@@ -304,9 +304,9 @@ jobs:
       - name: Check for critical vulnerabilities
         run: |
           echo "Checking for critical security vulnerabilities..."
-          
+
           critical_found=false
-          
+
           # Check Python results for critical issues
           if [ -f "sarif-results/python/python.sarif" ]; then
             critical_count=$(jq '[.runs[0].results[] | select(.level == "error")] | length' sarif-results/python/python.sarif 2>/dev/null || echo "0")
@@ -315,7 +315,7 @@ jobs:
               critical_found=true
             fi
           fi
-          
+
           # Check JavaScript results for critical issues
           if [ -f "sarif-results/javascript/javascript.sarif" ]; then
             critical_count=$(jq '[.runs[0].results[] | select(.level == "error")] | length' sarif-results/javascript/javascript.sarif 2>/dev/null || echo "0")
@@ -324,7 +324,7 @@ jobs:
               critical_found=true
             fi
           fi
-          
+
           if [ "$critical_found" = true ]; then
             echo "❌ Critical security vulnerabilities detected!"
             echo "Please review and fix the issues before merging."
@@ -332,4 +332,3 @@ jobs:
           else
             echo "✅ No critical security vulnerabilities detected"
           fi
-

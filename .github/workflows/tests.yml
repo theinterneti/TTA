@@ -37,10 +37,10 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Sync deps
-        run: uv sync --all-extras --dev
+        run: uv sync --group test
       - name: Run unit tests with metrics collection
         run: |
-          uv run pytest -q --tb=short \
+          uvx pytest -q --tb=short \
             --junitxml=test-results/unit-tests.xml \
             --cov=src --cov-report=xml:coverage-unit.xml
         env:

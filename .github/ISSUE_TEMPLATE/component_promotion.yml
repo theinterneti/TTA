@@ -1,0 +1,203 @@
+name: 🚀 Component Promotion Request
+description: Request promotion of a component to the next maturity stage
+title: "[PROMOTION] <component-name>: <current-stage> → <target-stage>"
+labels: ["promotion:requested"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Component Promotion Request
+
+        Use this template to request promotion of a component from one maturity stage to the next.
+
+        **Promotion Path**: Development → Staging → Production
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component Name
+      description: Which component is being promoted?
+      options:
+        - Neo4j
+        - Redis
+        - Docker
+        - Postgres
+        - Agent Orchestration
+        - LLM
+        - Model Management
+        - Narrative Arc Orchestrator
+        - Player Experience API
+        - Player Experience Frontend
+        - Gameplay Loop
+        - Session Management
+        - Character Management
+        - Therapeutic Systems
+        - Narrative Coherence
+        - Emotional Safety
+        - Consequence System
+        - Monitoring
+        - Analytics
+        - Developer Dashboard
+    validations:
+      required: true
+
+  - type: dropdown
+    id: current_stage
+    attributes:
+      label: Current Stage
+      description: What stage is the component currently in?
+      options:
+        - Development
+        - Staging
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target_stage
+    attributes:
+      label: Target Stage
+      description: What stage are you promoting to?
+      options:
+        - Staging
+        - Production
+    validations:
+      required: true
+
+  - type: dropdown
+    id: functional_group
+    attributes:
+      label: Functional Group
+      description: Which functional group does this component belong to?
+      options:
+        - Core Infrastructure
+        - AI/Agent Systems
+        - Player Experience
+        - Therapeutic Content
+        - Monitoring & Operations
+    validations:
+      required: true
+
+  - type: textarea
+    id: promotion_justification
+    attributes:
+      label: Promotion Justification
+      description: Why is this component ready for promotion?
+      placeholder: |
+        - All core features implemented
+        - Test coverage meets requirements
+        - Performance validated
+        - Security review completed
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: dev_to_staging_criteria
+    attributes:
+      label: Development → Staging Criteria
+      description: Check all criteria that have been met (only if promoting from Development)
+      options:
+        - label: Core features complete (80%+ of planned functionality)
+        - label: Unit tests passing (≥70% coverage for core paths)
+        - label: API documented, no planned breaking changes
+        - label: Passes linting (ruff), type checking (pyright), security scan (bandit)
+        - label: Component README with usage examples
+        - label: All dependencies identified and stable
+        - label: Successfully integrates with dependent components in dev environment
+
+  - type: checkboxes
+    id: staging_to_production_criteria
+    attributes:
+      label: Staging → Production Criteria
+      description: Check all criteria that have been met (only if promoting from Staging)
+      options:
+        - label: Integration tests passing (≥80% coverage)
+        - label: Performance validated (meets defined SLAs)
+        - label: Security review completed, no critical vulnerabilities
+        - label: 7-day uptime in staging ≥99.5%
+        - label: Complete user documentation, API reference, troubleshooting guide
+        - label: Health checks, metrics, alerts configured
+        - label: Rollback procedure documented and tested
+        - label: Handles expected production load (if applicable)
+
+  - type: textarea
+    id: test_results
+    attributes:
+      label: Test Results
+      description: Provide evidence of test coverage and results
+      placeholder: |
+        **Unit Tests**: 85% coverage, 120/120 passing
+        **Integration Tests**: 82% coverage, 45/45 passing
+        **E2E Tests**: 15/15 passing
+
+        Test report: [link to test results]
+
+  - type: textarea
+    id: performance_metrics
+    attributes:
+      label: Performance Metrics
+      description: Provide performance validation results (if applicable)
+      placeholder: |
+        **Response Time**: p50: 50ms, p95: 150ms, p99: 300ms
+        **Throughput**: 1000 req/s
+        **Resource Usage**: CPU: 20%, Memory: 512MB
+
+        Performance report: [link to performance results]
+
+  - type: textarea
+    id: security_review
+    attributes:
+      label: Security Review
+      description: Provide security review results
+      placeholder: |
+        **Security Scan**: No critical vulnerabilities
+        **Dependency Audit**: All dependencies up-to-date
+        **Secrets Management**: All secrets properly managed
+
+        Security report: [link to security scan results]
+
+  - type: textarea
+    id: documentation_links
+    attributes:
+      label: Documentation Links
+      description: Provide links to relevant documentation
+      placeholder: |
+        - Component README: [link]
+        - API Documentation: [link]
+        - User Guide: [link]
+        - Troubleshooting Guide: [link]
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: List component dependencies and their current stages
+      placeholder: |
+        - Neo4j (Production)
+        - Redis (Production)
+        - LLM (Staging)
+
+  - type: textarea
+    id: blockers
+    attributes:
+      label: Known Blockers
+      description: List any known blockers or issues that need to be resolved
+      placeholder: |
+        - Issue #123: Performance optimization needed
+        - Issue #456: Documentation incomplete
+
+  - type: textarea
+    id: rollback_plan
+    attributes:
+      label: Rollback Plan
+      description: Describe the rollback procedure (required for Staging → Production)
+      placeholder: |
+        1. Revert to previous Docker image tag
+        2. Restore database backup (if schema changed)
+        3. Update environment variables
+        4. Verify health checks
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any additional information relevant to this promotion request

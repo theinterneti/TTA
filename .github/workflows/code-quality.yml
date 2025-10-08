@@ -46,76 +46,41 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --group lint
 
       - name: Run ruff linter
         run: |
           echo "Running ruff linter..."
-          uv run ruff check src/ tests/ --output-format=github
+          uvx ruff check src/ tests/ --output-format=github
+        continue-on-error: false
+
+      - name: Run ruff formatter check
+        run: |
+          echo "Checking code formatting with ruff..."
+          uvx ruff format --check --diff src/ tests/
         continue-on-error: false
 
       - name: Upload lint results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ruff-lint-results
+          name: ruff-results
           path: .ruff_cache/
           retention-days: 7
-
-  format-check:
-    name: Format Check
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ env.PYTHON_VERSION }}
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v1
-
-      - name: Cache uv dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/uv
-            .venv
-          key: ${{ runner.os }}-uv-${{ hashFiles('**/pyproject.toml', '**/uv.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-uv-
-
-      - name: Install dependencies
-        run: uv sync --all-extras --dev
-
-      - name: Check black formatting
-        run: |
-          echo "Checking code formatting with black..."
-          uv run black --check --diff src/ tests/
-        continue-on-error: false
-
-      - name: Check isort import sorting
-        run: |
-          echo "Checking import sorting with isort..."
-          uv run isort --check-only --diff src/ tests/
-        continue-on-error: false
 
       - name: Generate formatting report
         if: failure()
         run: |
-          echo "## Formatting Issues Found" >> $GITHUB_STEP_SUMMARY
+          echo "## Formatting/Linting Issues Found" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run the following commands to fix formatting:" >> $GITHUB_STEP_SUMMARY
+          echo "Run the following commands to fix issues:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uv run black src/ tests/" >> $GITHUB_STEP_SUMMARY
-          echo "uv run isort src/ tests/" >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff check --fix src/ tests/" >> $GITHUB_STEP_SUMMARY
+          echo "uv run ruff format src/ tests/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   type-check:
-    name: Type Check with mypy
+    name: Type Check with Pyright
     runs-on: ubuntu-latest
 
     steps:
@@ -141,20 +106,20 @@ jobs:
             ${{ runner.os }}-uv-
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --group type
 
-      - name: Run mypy type checker
+      - name: Run Pyright type checker
         run: |
-          echo "Running mypy type checker..."
-          uv run mypy src/ --no-error-summary --show-error-codes --pretty
+          echo "Running Pyright type checker (10-100x faster than MyPy)..."
+          uvx pyright src/
         continue-on-error: false
 
-      - name: Upload mypy results
+      - name: Upload Pyright results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mypy-results
-          path: .mypy_cache/
+          name: pyright-results
+          path: .pyright_cache/
           retention-days: 7
 
       - name: Generate type check report
@@ -164,7 +129,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Run the following command to see detailed type errors:" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "uv run mypy src/ --show-error-codes" >> $GITHUB_STEP_SUMMARY
+          echo "uvx pyright src/" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
 
   complexity:
@@ -304,4 +269,3 @@ jobs:
             exit 1
           fi
           echo "All code quality checks passed!"
-

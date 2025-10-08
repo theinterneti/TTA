@@ -78,11 +78,11 @@ jobs:
             "src/player_experience/frontend/Dockerfile:player-experience-frontend"
             "Dockerfile.langgraph:langgraph"
           )
-          
+
           for image_spec in "${IMAGES[@]}"; do
             IFS=':' read -r dockerfile name <<< "$image_spec"
             context=$(dirname "$dockerfile")
-            
+
             echo "Building $name from $dockerfile..."
             docker buildx build \
               --file "$dockerfile" \
@@ -118,7 +118,7 @@ jobs:
           echo "🚀 Deploying to staging environment..."
           echo "Environment: ${{ vars.ENVIRONMENT_NAME }}"
           echo "Log Level: ${{ vars.LOG_LEVEL }}"
-          
+
           # Deployment logic here
           # This is a placeholder - replace with actual deployment commands
           # Examples:
@@ -126,7 +126,7 @@ jobs:
           # - Use kubectl for Kubernetes deployment
           # - Use docker-compose for Docker Swarm
           # - Use Ansible/Terraform for infrastructure
-          
+
           echo "✅ Deployment commands executed"
 
       - name: Wait for services to start
@@ -145,37 +145,37 @@ jobs:
           API_URL="${{ vars.API_BASE_URL || 'https://staging-api.tta.example.com' }}"
           RETRIES=${{ env.HEALTH_CHECK_RETRIES }}
           DELAY=${{ env.HEALTH_CHECK_DELAY }}
-          
+
           echo "Checking health of: ${API_URL}/health"
-          
+
           for i in $(seq 1 $RETRIES); do
             echo "Attempt $i of $RETRIES..."
-            
+
             if curl -f -s "${API_URL}/health" > /dev/null 2>&1; then
               echo "✅ Health check passed!"
               exit 0
             fi
-            
+
             if [ $i -lt $RETRIES ]; then
               echo "⏳ Waiting ${DELAY} seconds before retry..."
               sleep $DELAY
             fi
           done
-          
+
           echo "❌ Health check failed after $RETRIES attempts"
           exit 1
 
       - name: Run smoke tests
         run: |
           echo "🧪 Running smoke tests..."
-          
+
           # Add smoke tests here
           # Examples:
           # - Test critical API endpoints
           # - Verify database connectivity
           # - Check Redis connection
           # - Test WebSocket connections
-          
+
           echo "✅ Smoke tests passed"
 
   post-deployment:
@@ -194,7 +194,7 @@ jobs:
           echo "**Deployed by:** ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY
           echo "**Timestamp:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ "${{ needs.health-check.result }}" == "success" ]; then
             echo "**Status:** ✅ Deployment successful" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
@@ -226,22 +226,22 @@ jobs:
       - name: Rollback deployment
         run: |
           echo "🔄 Rolling back staging deployment..."
-          
+
           # Rollback logic here
           # Examples:
           # - Revert to previous Docker image tags
           # - Restore previous configuration
           # - Use kubectl rollout undo
           # - Redeploy previous version
-          
+
           echo "⚠️  Rollback initiated"
 
       - name: Verify rollback
         run: |
           echo "Verifying rollback..."
-          
+
           # Add rollback verification
-          
+
           echo "✅ Rollback verification complete"
 
       - name: Create rollback summary
@@ -254,3 +254,21 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Action Required:** Investigate deployment failure before retrying" >> $GITHUB_STEP_SUMMARY
 
+  post-deployment-tests:
+    name: Post-Deployment Validation
+    needs: health-check
+    uses: ./.github/workflows/post-deployment-tests.yml
+    with:
+      environment: staging
+      api_base_url: ${{ vars.API_BASE_URL || 'http://localhost:8081' }}
+      frontend_base_url: ${{ vars.FRONTEND_BASE_URL || 'http://localhost:3001' }}
+    secrets:
+      NEO4J_URI: ${{ secrets.NEO4J_URI }}
+      NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
+      NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+      REDIS_HOST: ${{ secrets.REDIS_HOST }}
+      REDIS_PORT: ${{ secrets.REDIS_PORT }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      TEST_USER_USERNAME: ${{ secrets.TEST_USER_USERNAME }}
+      TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
+      TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
