@@ -64,13 +64,13 @@ print(f"Found {len(free_models)} free models")
 
 # Get affordable models (under $0.001 per token)
 affordable_models = await model_mgmt.get_affordable_models(
-    max_cost_per_token=0.001, 
+    max_cost_per_token=0.001,
     provider_name="openrouter"
 )
 
 # Get all models with free filter applied
 filtered_models = await model_mgmt.get_available_models(
-    provider_name="openrouter", 
+    provider_name="openrouter",
     free_only=True
 )
 

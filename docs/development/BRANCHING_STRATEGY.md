@@ -1,7 +1,7 @@
 # TTA Git Branching Strategy
 
-**Version:** 1.0.0  
-**Last Updated:** 2025-10-05  
+**Version:** 1.0.0
+**Last Updated:** 2025-10-05
 **Status:** Active
 
 ## Overview
@@ -48,7 +48,7 @@ feature/infra-*   ──┘
 - `feature/docs-*` - Documentation updates
 - `feature/fix-*` - Bug fixes
 
-**Protection Level:** None (allow force push, rebasing)  
+**Protection Level:** None (allow force push, rebasing)
 **Quality Gate:** None (local development)
 
 ## Quality Gates
@@ -117,7 +117,7 @@ git push origin feature/game-narrative-engine
 gh pr create --base development --fill
 ```
 
-**CI runs:** Unit tests (fast feedback ~5-10 min)  
+**CI runs:** Unit tests (fast feedback ~5-10 min)
 **Merge when:** Unit tests pass
 
 ### 4. Promote to Staging
@@ -127,7 +127,7 @@ gh pr create --base development --fill
 gh pr create --base staging --head development --fill
 ```
 
-**CI runs:** Full test suite (~20-30 min)  
+**CI runs:** Full test suite (~20-30 min)
 **Auto-merge:** Yes (when all tests pass)
 
 ### 5. Promote to Production
@@ -137,7 +137,7 @@ gh pr create --base staging --head development --fill
 gh pr create --base main --head staging --fill
 ```
 
-**CI runs:** Full test suite + comprehensive battery (~45-60 min)  
+**CI runs:** Full test suite + comprehensive battery (~45-60 min)
 **Auto-merge:** No (requires manual approval)
 
 ## Branch Protection Rules
@@ -342,4 +342,3 @@ git push
 - Feature branch naming conventions
 - Quality gate definitions
 - Branch protection rules
-
