@@ -21,7 +21,7 @@ The TTA monitoring stack provides comprehensive observability for the Therapeuti
 - **Image**: `grafana/grafana:10.0.0`
 - **Port**: 3001 (mapped from 3000)
 - **Purpose**: Metrics visualization and dashboarding
-- **Configuration**: 
+- **Configuration**:
   - Dashboards: `monitoring/grafana/dashboards/`
   - Datasources: `monitoring/grafana/datasources/`
 - **Health Check**: `wget http://localhost:3000/api/health`
@@ -292,4 +292,3 @@ docker exec tta-promtail cat /etc/promtail/config.yml
 - [Grafana Documentation](https://grafana.com/docs/)
 - [Loki Documentation](https://grafana.com/docs/loki/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
-

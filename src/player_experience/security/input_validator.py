@@ -108,11 +108,12 @@ class ValidationResult:
         )
 
         # Update overall severity
-        if severity.value == "critical" or (
-            severity.value == "high" and self.severity.value != "critical"
+        if (
+            severity.value == "critical"
+            or (severity.value == "high" and self.severity.value != "critical")
+            or severity.value == "medium"
+            and self.severity.value == "low"
         ):
-            self.severity = severity
-        elif severity.value == "medium" and self.severity.value == "low":
             self.severity = severity
 
 

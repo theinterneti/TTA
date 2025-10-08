@@ -1,9 +1,9 @@
 /**
  * Progress Tracking Service - Priority 3D Implementation
- * 
+ *
  * Comprehensive progress monitoring and analytics system for therapeutic goals.
  * Provides real-time progress tracking, outcome measurement, and therapeutic analytics.
- * 
+ *
  * Features:
  * - Real-time progress monitoring with milestone detection
  * - Evidence-based outcome measurement (PHQ-9, GAD-7, etc.)
@@ -266,7 +266,7 @@ export class ProgressTrackingService {
     const milestones = this.getMilestonesForUser(userId);
     const outcomeMeasurements = this.getOutcomeMeasurements(userId, timeframe);
     const therapeuticInsights = this.generateTherapeuticInsights(userId, goals, progressAnalytics);
-    
+
     const overallEffectiveness = this.calculateOverallEffectiveness(progressAnalytics, outcomeMeasurements);
     const riskAssessment = this.assessRisk(progressAnalytics, outcomeMeasurements);
     const recommendations = this.generateProgressRecommendations(progressAnalytics, riskAssessment);
@@ -332,7 +332,7 @@ export class ProgressTrackingService {
     const velocity = this.calculateVelocityScore(entries);
     const consistency = this.calculateConsistencyScore(entries);
     const effectiveness = this.calculateTherapeuticEffectiveness(goal, entries);
-    
+
     return {
       goalId: goal.id,
       overallProgress: currentProgress,
@@ -349,7 +349,7 @@ export class ProgressTrackingService {
 
   private calculateCurrentProgress(entries: ProgressEntry[]): number {
     if (entries.length === 0) return 0;
-    
+
     // Use the most recent entry as current progress
     const sortedEntries = entries.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
     return sortedEntries[0].progressValue;
@@ -357,16 +357,16 @@ export class ProgressTrackingService {
 
   private calculateProgressTrend(entries: ProgressEntry[]): ProgressTrend {
     if (entries.length < 2) return ProgressTrend.INSUFFICIENT_DATA;
-    
+
     const sortedEntries = entries.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     const recentEntries = sortedEntries.slice(-5); // Last 5 entries
-    
+
     if (recentEntries.length < 2) return ProgressTrend.INSUFFICIENT_DATA;
-    
+
     const firstValue = recentEntries[0].progressValue;
     const lastValue = recentEntries[recentEntries.length - 1].progressValue;
     const difference = lastValue - firstValue;
-    
+
     if (Math.abs(difference) < 5) return ProgressTrend.STABLE;
     if (difference > 0) return ProgressTrend.IMPROVING;
     return ProgressTrend.DECLINING;
@@ -374,15 +374,15 @@ export class ProgressTrackingService {
 
   private calculateVelocityScore(entries: ProgressEntry[]): number {
     if (entries.length < 2) return 0;
-    
+
     const sortedEntries = entries.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
     const timeSpan = sortedEntries[sortedEntries.length - 1].timestamp.getTime() - sortedEntries[0].timestamp.getTime();
     const progressChange = sortedEntries[sortedEntries.length - 1].progressValue - sortedEntries[0].progressValue;
-    
+
     // Calculate progress per day
     const daysSpan = timeSpan / (1000 * 60 * 60 * 24);
     const velocityPerDay = daysSpan > 0 ? progressChange / daysSpan : 0;
-    
+
     // Normalize to 0-100 scale (assuming 1 point per day is excellent)
     return Math.min(100, Math.max(0, velocityPerDay * 100));
   }
@@ -445,11 +445,11 @@ export class ProgressTrackingService {
 
   private identifyRiskFactors(goal: TherapeuticGoal, entries: ProgressEntry[]): RiskFactor[] {
     const riskFactors: RiskFactor[] = [];
-    
+
     const trend = this.calculateProgressTrend(entries);
     const consistency = this.calculateConsistencyScore(entries);
     const recentProgress = entries.length > 0 ? entries[entries.length - 1].progressValue : 0;
-    
+
     if (trend === ProgressTrend.DECLINING) {
       riskFactors.push({
         type: 'declining_progress',
@@ -458,7 +458,7 @@ export class ProgressTrackingService {
         recommendations: ['Review current strategies', 'Consider alternative approaches', 'Seek additional support']
       });
     }
-    
+
     if (consistency < 30) {
       riskFactors.push({
         type: 'inconsistent_engagement',
@@ -467,7 +467,7 @@ export class ProgressTrackingService {
         recommendations: ['Establish regular check-in schedule', 'Set up progress reminders', 'Identify engagement barriers']
       });
     }
-    
+
     if (recentProgress < 20) {
       riskFactors.push({
         type: 'low_progress',
@@ -476,7 +476,7 @@ export class ProgressTrackingService {
         recommendations: ['Reassess goal difficulty', 'Break down into smaller steps', 'Increase support resources']
       });
     }
-    
+
     return riskFactors;
   }
 
@@ -484,7 +484,7 @@ export class ProgressTrackingService {
     const recommendations: ProgressRecommendation[] = [];
     const trend = this.calculateProgressTrend(entries);
     const velocity = this.calculateVelocityScore(entries);
-    
+
     if (trend === ProgressTrend.IMPROVING && velocity > 70) {
       recommendations.push({
         id: this.generateId(),
@@ -495,7 +495,7 @@ export class ProgressTrackingService {
         actionable: true
       });
     }
-    
+
     if (trend === ProgressTrend.STABLE && velocity < 30) {
       recommendations.push({
         id: this.generateId(),
@@ -506,13 +506,13 @@ export class ProgressTrackingService {
         actionable: true
       });
     }
-    
+
     return recommendations;
   }
 
   private generateProgressInsights(goal: TherapeuticGoal, entries: ProgressEntry[]): ProgressInsight[] {
     const insights: ProgressInsight[] = [];
-    
+
     if (entries.length >= 5) {
       const consistency = this.calculateConsistencyScore(entries);
       if (consistency > 80) {
@@ -525,7 +525,7 @@ export class ProgressTrackingService {
         });
       }
     }
-    
+
     return insights;
   }
 
@@ -533,9 +533,9 @@ export class ProgressTrackingService {
   private getProgressEntriesForGoal(goalId: string, userId: string, timeframe: string): ProgressEntry[] {
     const userEntries = this.progressEntries.get(userId) || [];
     const cutoffDate = this.getTimeframeCutoff(timeframe);
-    
-    return userEntries.filter(entry => 
-      entry.goalId === goalId && 
+
+    return userEntries.filter(entry =>
+      entry.goalId === goalId &&
       entry.timestamp >= cutoffDate
     );
   }
@@ -543,7 +543,7 @@ export class ProgressTrackingService {
   private getRecentProgressEntries(userId: string, timeframe: string): ProgressEntry[] {
     const userEntries = this.progressEntries.get(userId) || [];
     const cutoffDate = this.getTimeframeCutoff(timeframe);
-    
+
     return userEntries
       .filter(entry => entry.timestamp >= cutoffDate)
       .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
@@ -557,17 +557,17 @@ export class ProgressTrackingService {
   private getOutcomeMeasurements(userId: string, timeframe: string): OutcomeMeasurement[] {
     const userMeasurements = this.outcomeMeasurements.get(userId) || [];
     const cutoffDate = this.getTimeframeCutoff(timeframe);
-    
+
     return userMeasurements.filter(measurement => measurement.timestamp >= cutoffDate);
   }
 
   private generateTherapeuticInsights(
-    userId: string, 
-    goals: TherapeuticGoal[], 
+    userId: string,
+    goals: TherapeuticGoal[],
     analytics: ProgressAnalytics[]
   ): TherapeuticInsight[] {
     const insights: TherapeuticInsight[] = [];
-    
+
     // Overall progress insight
     const avgEffectiveness = analytics.reduce((sum, a) => sum + a.therapeuticEffectiveness, 0) / analytics.length;
     if (avgEffectiveness > 75) {
@@ -584,28 +584,28 @@ export class ProgressTrackingService {
         generatedAt: new Date()
       });
     }
-    
+
     return insights;
   }
 
   private calculateOverallEffectiveness(analytics: ProgressAnalytics[], measurements: OutcomeMeasurement[]): number {
     if (analytics.length === 0) return 0;
-    
+
     const avgAnalyticsEffectiveness = analytics.reduce((sum, a) => sum + a.therapeuticEffectiveness, 0) / analytics.length;
-    
+
     // If we have outcome measurements, factor them in
     if (measurements.length > 0) {
       const avgMeasurementScore = measurements.reduce((sum, m) => sum + (m.score / m.maxScore) * 100, 0) / measurements.length;
       return (avgAnalyticsEffectiveness + avgMeasurementScore) / 2;
     }
-    
+
     return avgAnalyticsEffectiveness;
   }
 
   private assessRisk(analytics: ProgressAnalytics[], measurements: OutcomeMeasurement[]): RiskAssessment {
     const allRiskFactors = analytics.flatMap(a => a.riskFactors);
     const highRiskCount = allRiskFactors.filter(rf => rf.severity === SeverityLevel.MODERATE || rf.severity === SeverityLevel.SEVERE).length;
-    
+
     let overallRisk: SeverityLevel;
     if (highRiskCount === 0) {
       overallRisk = SeverityLevel.MINIMAL;
@@ -614,7 +614,7 @@ export class ProgressTrackingService {
     } else {
       overallRisk = SeverityLevel.MODERATE;
     }
-    
+
     return {
       overallRisk,
       riskFactors: allRiskFactors,
@@ -625,7 +625,7 @@ export class ProgressTrackingService {
 
   private generateProgressRecommendations(analytics: ProgressAnalytics[], riskAssessment: RiskAssessment): ProgressRecommendation[] {
     const recommendations = analytics.flatMap(a => a.recommendations);
-    
+
     // Add risk-based recommendations
     if (riskAssessment.overallRisk !== SeverityLevel.MINIMAL) {
       recommendations.push({
@@ -637,13 +637,13 @@ export class ProgressTrackingService {
         actionable: true
       });
     }
-    
+
     return recommendations;
   }
 
   private generateNextActions(analytics: ProgressAnalytics[], milestones: ProgressMilestone[]): NextAction[] {
     const actions: NextAction[] = [];
-    
+
     // Add milestone-based actions
     const upcomingMilestones = milestones.filter(m => !m.achievedAt);
     upcomingMilestones.forEach(milestone => {
@@ -655,7 +655,7 @@ export class ProgressTrackingService {
         category: 'milestone'
       });
     });
-    
+
     return actions.slice(0, 5); // Limit to top 5 actions
   }
 
@@ -697,7 +697,7 @@ export class ProgressTrackingService {
   private checkMilestoneAchievement(entry: ProgressEntry): void {
     const goalMilestones = this.milestones.get(entry.userId) || [];
     const unachievedMilestones = goalMilestones.filter(m => m.goalId === entry.goalId && !m.achievedAt);
-    
+
     unachievedMilestones.forEach(milestone => {
       if (entry.progressValue >= milestone.targetValue) {
         milestone.achievedAt = new Date();

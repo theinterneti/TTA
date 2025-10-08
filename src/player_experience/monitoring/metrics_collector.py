@@ -321,9 +321,9 @@ class MetricsCollector:
         with self.lock:
             if name in self.counters:
                 return self.counters[name]
-            elif name in self.gauges:
+            if name in self.gauges:
                 return self.gauges[name]
-            elif name in self.metrics and self.metrics[name]:
+            if name in self.metrics and self.metrics[name]:
                 return self.metrics[name][-1].value
             return None
 
@@ -475,8 +475,7 @@ class MetricsCollector:
 
             if format_type.lower() == "json":
                 return json.dumps(metrics_data, indent=2, default=str)
-            else:
-                return str(metrics_data)
+            return str(metrics_data)
 
     def reset_metrics(self):
         """Reset all metrics (useful for testing)."""

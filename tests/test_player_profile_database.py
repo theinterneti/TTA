@@ -222,7 +222,6 @@ class TestPlayerProfileSchemaManager(unittest.TestCase):
             patch.object(self.schema_manager, "connect") as mock_connect,
             patch.object(self.schema_manager, "disconnect") as mock_disconnect,
         ):
-
             with self.schema_manager:
                 pass
 
@@ -523,7 +522,6 @@ class TestPlayerProfileRepository(unittest.TestCase):
             patch.object(self.repository, "connect") as mock_connect,
             patch.object(self.repository, "disconnect") as mock_disconnect,
         ):
-
             with self.repository:
                 pass
 

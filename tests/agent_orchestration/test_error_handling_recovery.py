@@ -174,7 +174,7 @@ class TestAgentFailureScenarios:
                     )
 
                     # All should fail, but behavior should change after circuit opens
-                    assert error is not None, f"Expected failure on attempt {i+1}"
+                    assert error is not None, f"Expected failure on attempt {i + 1}"
 
                     if i >= 4:  # After 5 failures, circuit should be open
                         assert circuit_opened, "Circuit breaker should be open"
@@ -238,9 +238,9 @@ class TestNetworkFailureScenarios:
                     ), f"Error should indicate connection issue: {error}"
                 else:
                     # If workflow succeeded, verify fallback was used
-                    assert (
-                        response is not None
-                    ), "Response should exist if workflow succeeded"
+                    assert response is not None, (
+                        "Response should exist if workflow succeeded"
+                    )
                     metadata = response.workflow_metadata
                     assert (
                         "fallback" in str(metadata).lower()
@@ -370,15 +370,15 @@ class TestMessageValidationFailures:
                     ), f"Unexpected error type for malformed message: {e}"
 
             # Verify system handled malformed messages without crashing
-            assert (
-                errors_handled > 0
-            ), "Should have encountered errors with malformed messages"
+            assert errors_handled > 0, (
+                "Should have encountered errors with malformed messages"
+            )
 
             # Verify queue is cleaned up (malformed messages removed or handled)
             final_queue_length = await redis_client.llen(queue_key)
-            assert (
-                final_queue_length == 0
-            ), "Queue should be cleaned of malformed messages"
+            assert final_queue_length == 0, (
+                "Queue should be cleaned of malformed messages"
+            )
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -439,9 +439,9 @@ class TestTimeoutHandlingScenarios:
                 def get_agent(agent_id):
                     if agent_id.type == AgentType.WBA:
                         return SlowAgent(delay_seconds=5.0, instance="slow")
-                    elif agent_id.type == AgentType.IPA:
+                    if agent_id.type == AgentType.IPA:
                         return InputProcessorAgentProxy(instance="fast")
-                    elif agent_id.type == AgentType.NGA:
+                    if agent_id.type == AgentType.NGA:
                         return NarrativeGeneratorAgentProxy(instance="fast")
                     return None
 
@@ -461,20 +461,20 @@ class TestTimeoutHandlingScenarios:
                 # Verify timeout behavior
                 if error is not None:
                     # Should timeout and fail
-                    assert (
-                        "timeout" in str(error).lower()
-                    ), f"Expected timeout error, got: {error}"
-                    assert (
-                        execution_time < 10.0
-                    ), "Should have timed out before slow agent completed"
-                    assert (
-                        execution_time >= 3.0
-                    ), "Should have waited for timeout period"
+                    assert "timeout" in str(error).lower(), (
+                        f"Expected timeout error, got: {error}"
+                    )
+                    assert execution_time < 10.0, (
+                        "Should have timed out before slow agent completed"
+                    )
+                    assert execution_time >= 3.0, (
+                        "Should have waited for timeout period"
+                    )
                 else:
                     # If succeeded, should have used recovery mechanism
-                    assert (
-                        response is not None
-                    ), "Response should exist if workflow succeeded"
+                    assert response is not None, (
+                        "Response should exist if workflow succeeded"
+                    )
                     metadata = response.workflow_metadata
                     assert (
                         "timeout" in str(metadata).lower()

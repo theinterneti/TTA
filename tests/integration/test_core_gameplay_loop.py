@@ -95,17 +95,19 @@ class TestCoreGameplayLoopIntegration:
 
             # Process the choice
             start_time = datetime.utcnow()
-            next_scene, new_choices, consequences = (
-                await controller.process_user_choice(
-                    session.session_id, selected_choice.choice_id
-                )
+            (
+                next_scene,
+                new_choices,
+                consequences,
+            ) = await controller.process_user_choice(
+                session.session_id, selected_choice.choice_id
             )
             processing_time = (datetime.utcnow() - start_time).total_seconds()
 
             # Validate response time requirement (<2 seconds)
-            assert (
-                processing_time < 2.0
-            ), f"Processing took {processing_time:.2f}s (target: <2.0s)"
+            assert processing_time < 2.0, (
+                f"Processing took {processing_time:.2f}s (target: <2.0s)"
+            )
 
             # Validate scene progression
             assert next_scene is not None, "Next scene should be generated"
@@ -113,15 +115,15 @@ class TestCoreGameplayLoopIntegration:
             assert consequences is not None, "Consequences should be generated"
 
             # Validate therapeutic integration
-            assert (
-                consequences.therapeutic_value_realized > 0
-            ), "Should have therapeutic value"
-            assert (
-                len(consequences.therapeutic_insights) > 0
-            ), "Should have therapeutic insights"
-            assert (
-                len(consequences.learning_opportunities) > 0
-            ), "Should have learning opportunities"
+            assert consequences.therapeutic_value_realized > 0, (
+                "Should have therapeutic value"
+            )
+            assert len(consequences.therapeutic_insights) > 0, (
+                "Should have therapeutic insights"
+            )
+            assert len(consequences.learning_opportunities) > 0, (
+                "Should have learning opportunities"
+            )
 
             # Update session for next iteration
             session.current_scene = next_scene
@@ -189,10 +191,12 @@ class TestCoreGameplayLoopIntegration:
             selected_choice = therapeutic_choice or session.available_choices[0]
 
             # Process choice
-            next_scene, new_choices, consequences = (
-                await controller.process_user_choice(
-                    session.session_id, selected_choice.choice_id
-                )
+            (
+                next_scene,
+                new_choices,
+                consequences,
+            ) = await controller.process_user_choice(
+                session.session_id, selected_choice.choice_id
             )
 
             # Collect therapeutic data
@@ -206,9 +210,9 @@ class TestCoreGameplayLoopIntegration:
 
         # Validate therapeutic integration
         assert len(therapeutic_values) > 0, "Should have therapeutic values"
-        assert all(
-            value > 0 for value in therapeutic_values
-        ), "All choices should have therapeutic value"
+        assert all(value > 0 for value in therapeutic_values), (
+            "All choices should have therapeutic value"
+        )
         assert len(therapeutic_insights) > 0, "Should have therapeutic insights"
         assert len(learning_opportunities) > 0, "Should have learning opportunities"
 
@@ -216,9 +220,9 @@ class TestCoreGameplayLoopIntegration:
         if len(therapeutic_values) > 1:
             # Check for therapeutic engagement (not necessarily increasing, but present)
             avg_therapeutic_value = sum(therapeutic_values) / len(therapeutic_values)
-            assert (
-                avg_therapeutic_value > 0.3
-            ), "Should maintain meaningful therapeutic engagement"
+            assert avg_therapeutic_value > 0.3, (
+                "Should maintain meaningful therapeutic engagement"
+            )
 
         await controller.end_session(session.session_id)
 
@@ -252,10 +256,12 @@ class TestCoreGameplayLoopIntegration:
             # Process one choice to see adaptation
             if session.available_choices:
                 selected_choice = session.available_choices[0]
-                next_scene, new_choices, consequences = (
-                    await controller.process_user_choice(
-                        session.session_id, selected_choice.choice_id
-                    )
+                (
+                    next_scene,
+                    new_choices,
+                    consequences,
+                ) = await controller.process_user_choice(
+                    session.session_id, selected_choice.choice_id
                 )
 
                 # Validate emotional adaptation in consequences
@@ -345,10 +351,12 @@ if __name__ == "__main__":
             choice = session.available_choices[0]
             start_time = datetime.utcnow()
 
-            next_scene, new_choices, consequences = (
-                await controller.process_user_choice(
-                    session.session_id, choice.choice_id
-                )
+            (
+                next_scene,
+                new_choices,
+                consequences,
+            ) = await controller.process_user_choice(
+                session.session_id, choice.choice_id
             )
 
             processing_time = (datetime.utcnow() - start_time).total_seconds()

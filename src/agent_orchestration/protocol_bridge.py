@@ -103,13 +103,12 @@ class ProtocolTranslator:
                     translated_message=translated,
                     protocol_used=target_protocol,
                 )
-            else:
-                # No specific rule, pass through with minimal transformation
-                return MessageTranslationResult(
-                    success=True,
-                    translated_message=message_dict,
-                    protocol_used=ProtocolType.HYBRID,
-                )
+            # No specific rule, pass through with minimal transformation
+            return MessageTranslationResult(
+                success=True,
+                translated_message=message_dict,
+                protocol_used=ProtocolType.HYBRID,
+            )
 
         except Exception as e:
             logger.error(f"Message translation failed: {e}")
@@ -382,7 +381,6 @@ class MessageRouter:
         """Extract message ID from message."""
         if isinstance(message, AgentMessage):
             return message.message_id
-        elif isinstance(message, dict):
+        if isinstance(message, dict):
             return message.get("message_id", str(uuid.uuid4()))
-        else:
-            return str(uuid.uuid4())
+        return str(uuid.uuid4())

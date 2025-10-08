@@ -280,13 +280,12 @@ class WorkflowEventIntegrator:
         # Send workflow start event
         start_event = create_workflow_progress_event(
             workflow_id=workflow_id,
-            status=WorkflowStatus.IN_PROGRESS,
-            progress=0.0,
-            message=f"Started {workflow_type} workflow",
-            metadata={
-                "total_steps": total_steps,
-                **self.active_workflows[workflow_id]["metadata"],
-            },
+            workflow_type=workflow_type,
+            status=WorkflowStatus.RUNNING,
+            progress_percentage=0.0,
+            current_step=f"Started {workflow_type} workflow",
+            total_steps=total_steps,
+            completed_steps=0,
         )
         await self._publish_event(start_event)
 
@@ -297,7 +296,8 @@ class WorkflowEventIntegrator:
                 "advance_step": lambda message="": self._advance_workflow_step(
                     workflow_id, message
                 ),
-                "update_progress": lambda progress, message="": self._update_workflow_progress(
+                "update_progress": lambda progress,
+                message="": self._update_workflow_progress(
                     workflow_id, progress, message
                 ),
                 "add_metadata": lambda key, value: self._add_workflow_metadata(
@@ -309,31 +309,28 @@ class WorkflowEventIntegrator:
             duration = time.time() - start_time
             completion_event = create_workflow_progress_event(
                 workflow_id=workflow_id,
+                workflow_type=workflow_type,
                 status=WorkflowStatus.COMPLETED,
-                progress=1.0,
-                message=f"Completed {workflow_type} workflow",
-                metadata={
-                    "duration": duration,
-                    "total_steps": self.active_workflows[workflow_id]["total_steps"],
-                    **self.active_workflows[workflow_id]["metadata"],
-                },
+                progress_percentage=100.0,
+                current_step=f"Completed {workflow_type} workflow",
+                total_steps=self.active_workflows[workflow_id]["total_steps"],
+                completed_steps=self.active_workflows[workflow_id]["total_steps"],
             )
             await self._publish_event(completion_event)
 
         except Exception as e:
             # Send error event
             duration = time.time() - start_time
+            current_step = self.active_workflows[workflow_id]["current_step"]
+            total_steps = max(self.active_workflows[workflow_id]["total_steps"], 1)
             error_event = create_workflow_progress_event(
                 workflow_id=workflow_id,
+                workflow_type=workflow_type,
                 status=WorkflowStatus.FAILED,
-                progress=self.active_workflows[workflow_id]["current_step"]
-                / max(self.active_workflows[workflow_id]["total_steps"], 1),
-                message=f"Failed {workflow_type} workflow: {str(e)}",
-                metadata={
-                    "duration": duration,
-                    "error": str(e),
-                    **self.active_workflows[workflow_id]["metadata"],
-                },
+                progress_percentage=(current_step / total_steps) * 100.0,
+                current_step=f"Failed {workflow_type} workflow: {str(e)}",
+                total_steps=total_steps,
+                completed_steps=current_step,
             )
             await self._publish_event(error_event)
             raise
@@ -367,10 +364,12 @@ class WorkflowEventIntegrator:
         workflow = self.active_workflows[workflow_id]
         progress_event = create_workflow_progress_event(
             workflow_id=workflow_id,
-            status=WorkflowStatus.IN_PROGRESS,
-            progress=progress,
-            message=message or f"Progress: {progress:.1%}",
-            metadata=workflow["metadata"],
+            workflow_type=workflow.get("type", "unknown"),
+            status=WorkflowStatus.RUNNING,
+            progress_percentage=progress * 100.0,
+            current_step=message or f"Progress: {progress:.1%}",
+            total_steps=workflow.get("total_steps"),
+            completed_steps=workflow.get("current_step"),
         )
 
         return await self._publish_event(progress_event)
@@ -463,7 +462,6 @@ class AgentWorkflowCoordinator:
                 "user_input_length": len(user_input),
             },
         ) as workflow:
-
             # Step 1: Input Processing
             await workflow["advance_step"]("Processing user input with IPA")
             ipa_result = await self.ipa_proxy.process({"text": user_input})
@@ -544,12 +542,11 @@ class AgentWorkflowCoordinator:
 
         if workflow_type == "ipa_wba":
             return await self._execute_ipa_wba_workflow(workflow_id, input_data)
-        elif workflow_type == "wba_nga":
+        if workflow_type == "wba_nga":
             return await self._execute_wba_nga_workflow(workflow_id, input_data)
-        elif workflow_type == "ipa_nga":
+        if workflow_type == "ipa_nga":
             return await self._execute_ipa_nga_workflow(workflow_id, input_data)
-        else:
-            raise ValueError(f"Unknown workflow type: {workflow_type}")
+        raise ValueError(f"Unknown workflow type: {workflow_type}")
 
     async def _execute_ipa_wba_workflow(
         self, workflow_id: str, input_data: dict[str, Any]
@@ -561,7 +558,6 @@ class AgentWorkflowCoordinator:
             total_steps=2,
             metadata=input_data.get("metadata", {}),
         ) as workflow:
-
             # Step 1: Input Processing
             await workflow["advance_step"]("Processing input with IPA")
             ipa_result = await self.ipa_proxy.process(input_data.get("ipa_input", {}))
@@ -594,7 +590,6 @@ class AgentWorkflowCoordinator:
             total_steps=2,
             metadata=input_data.get("metadata", {}),
         ) as workflow:
-
             # Step 1: World Building
             await workflow["advance_step"]("Processing world updates with WBA")
             wba_result = await self.wba_proxy.process(input_data.get("wba_input", {}))
@@ -625,7 +620,6 @@ class AgentWorkflowCoordinator:
             total_steps=2,
             metadata=input_data.get("metadata", {}),
         ) as workflow:
-
             # Step 1: Input Processing
             await workflow["advance_step"]("Processing input with IPA")
             ipa_result = await self.ipa_proxy.process(input_data.get("ipa_input", {}))

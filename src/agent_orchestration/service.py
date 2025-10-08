@@ -232,8 +232,7 @@ class AgentOrchestrationService:
                 e, (TherapeuticSafetyError, WorkflowExecutionError, SessionContextError)
             ):
                 raise
-            else:
-                raise ServiceError(f"Unexpected error during processing: {e}") from e
+            raise ServiceError(f"Unexpected error during processing: {e}") from e
 
     async def coordinate_agents(
         self,
@@ -294,19 +293,17 @@ class AgentOrchestrationService:
             logger.error(f"Error coordinating agents: {e}")
             if isinstance(e, WorkflowExecutionError):
                 raise
-            else:
-                raise WorkflowExecutionError(f"Agent coordination failed: {e}") from e
+            raise WorkflowExecutionError(f"Agent coordination failed: {e}") from e
 
     def get_therapeutic_safety_metrics(self) -> dict[str, Any]:
         """Get therapeutic safety metrics from the validator."""
         try:
             if hasattr(self.therapeutic_validator, "get_monitoring_metrics"):
                 return self.therapeutic_validator.get_monitoring_metrics()
-            else:
-                return {
-                    "error": "Therapeutic validator does not support metrics",
-                    "validator_available": self.therapeutic_validator is not None,
-                }
+            return {
+                "error": "Therapeutic validator does not support metrics",
+                "validator_available": self.therapeutic_validator is not None,
+            }
         except Exception as e:
             logger.error(f"Error getting therapeutic safety metrics: {e}")
             return {"error": str(e)}
@@ -352,8 +349,7 @@ class AgentOrchestrationService:
         try:
             if self.safety_monitoring_dashboard:
                 return self.safety_monitoring_dashboard.get_crisis_dashboard()
-            else:
-                return {"error": "Safety monitoring dashboard not available"}
+            return {"error": "Safety monitoring dashboard not available"}
         except Exception as e:
             logger.error(f"Error getting crisis dashboard: {e}")
             return {"error": str(e)}
@@ -365,8 +361,7 @@ class AgentOrchestrationService:
                 return self.safety_monitoring_dashboard.get_safety_report(
                     time_range_hours
                 )
-            else:
-                return {"error": "Safety monitoring dashboard not available"}
+            return {"error": "Safety monitoring dashboard not available"}
         except Exception as e:
             logger.error(f"Error generating safety report: {e}")
             return {"error": str(e)}
@@ -889,8 +884,7 @@ class AgentOrchestrationService:
             logger.error(f"Error executing workflow with context: {e}")
             if isinstance(e, WorkflowExecutionError):
                 raise
-            else:
-                raise WorkflowExecutionError(f"Workflow execution failed: {e}") from e
+            raise WorkflowExecutionError(f"Workflow execution failed: {e}") from e
 
     async def _update_session_context(
         self, session_context: SessionContext, response: OrchestrationResponse

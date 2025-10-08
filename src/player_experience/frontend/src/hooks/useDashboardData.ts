@@ -124,7 +124,7 @@ export const useDashboardData = ({
   const fetchDashboardData = useCallback(async () => {
     try {
       setError(null);
-      
+
       // Fetch dashboard data from API
       const response = await fetch(`${API_BASE_URL}/api/players/${playerId}/dashboard`, {
         headers: {
@@ -155,7 +155,7 @@ export const useDashboardData = ({
   const dismissHighlight = useCallback((highlightId: string) => {
     setData(prevData => {
       if (!prevData) return prevData;
-      
+
       return {
         ...prevData,
         progress_highlights: prevData.progress_highlights.map(highlight =>
@@ -181,7 +181,7 @@ export const useDashboardData = ({
   const updateCharacterActivity = useCallback((characterId: string) => {
     setData(prevData => {
       if (!prevData) return prevData;
-      
+
       return {
         ...prevData,
         active_characters: prevData.active_characters.map(character =>

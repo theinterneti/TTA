@@ -374,5 +374,3 @@ CREATE (c)-[:HAS_TIMELINE]->(t);
 
 MATCH (t:Timeline {name: "Anya's Timeline"}), (e:Event:Concept {name: "Anya's Initial Perception of Ben"})
 CREATE (t)-[:CONTAINS_EVENT {impact_description: "Strengthened Anya's belief in Ben's kindness"}]->(e);
-
-

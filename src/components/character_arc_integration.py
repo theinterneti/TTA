@@ -648,9 +648,8 @@ class CharacterArcIntegration:
                 self.last_sync_times[character_id] = datetime.now()
                 logger.debug(f"Successfully synced character data for {character_id}")
                 return True
-            else:
-                logger.warning(f"Partial sync failure for character {character_id}")
-                return False
+            logger.warning(f"Partial sync failure for character {character_id}")
+            return False
 
         except Exception as e:
             logger.error(f"Error syncing character data for {character_id}: {e}")

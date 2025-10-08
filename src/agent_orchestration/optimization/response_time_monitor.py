@@ -400,10 +400,9 @@ class ResponseTimeCollector:
 
         if index.is_integer():
             return sorted_data[int(index)]
-        else:
-            lower = sorted_data[int(index)]
-            upper = sorted_data[int(index) + 1]
-            return lower + (upper - lower) * (index - int(index))
+        lower = sorted_data[int(index)]
+        upper = sorted_data[int(index) + 1]
+        return lower + (upper - lower) * (index - int(index))
 
     async def _cleanup_loop(self) -> None:
         """Background task to clean up old metrics."""

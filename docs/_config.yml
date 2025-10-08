@@ -31,7 +31,7 @@ kramdown:
   input: GFM
   syntax_highlighter: rouge
   syntax_highlighter_opts:
-    css_class: 'highlight'
+    css_class: "highlight"
     span:
       line_numbers: false
     block:
@@ -129,4 +129,3 @@ markdown_ext: "markdown,mkdown,mkdn,mkd,md"
 sass:
   sass_dir: _sass
   style: compressed
-

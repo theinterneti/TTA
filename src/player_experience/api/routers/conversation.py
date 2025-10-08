@@ -95,7 +95,9 @@ async def _persist_conversation_to_redis(
             "message_count": len(messages),
         }
         await redis_client.setex(
-            conversation_key, 86400 * 30, json.dumps(conversation_data)  # 30 days TTL
+            conversation_key,
+            86400 * 30,
+            json.dumps(conversation_data),  # 30 days TTL
         )
 
         # Store messages as a list
@@ -375,7 +377,7 @@ AI Response: "{ai_response}"
 
 Session Context:
 - Interaction Count: {interaction_count}
-- Current Emotional Themes: {', '.join(emotional_themes)}
+- Current Emotional Themes: {", ".join(emotional_themes)}
 
 Please provide a JSON analysis with these fields:
 {{

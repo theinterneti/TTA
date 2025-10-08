@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import {
-  fetchSettings,
-  updateTherapeuticLocal,
-  updatePrivacyLocal,
-  updateNotificationsLocal,
-  updateAccessibilityLocal,
-  updateTherapeuticSettings,
-  updatePrivacySettings,
-  updateNotificationSettings,
-  updateAccessibilitySettings,
-  exportPlayerData,
-  deletePlayerData,
-  markChangesSaved
-} from '../../store/slices/settingsSlice';
-import TherapeuticSettingsSection from '../../components/Settings/TherapeuticSettingsSection';
-import PrivacySettingsSection from '../../components/Settings/PrivacySettingsSection';
-import CrisisSupportSection from '../../components/Settings/CrisisSupportSection';
-import DataManagementSection from '../../components/Settings/DataManagementSection';
+import { useDispatch, useSelector } from 'react-redux';
 import { ModelManagementSection } from '../../components/ModelManagement';
+import CrisisSupportSection from '../../components/Settings/CrisisSupportSection';
+import PrivacySettingsSection from '../../components/Settings/PrivacySettingsSection';
+import TherapeuticSettingsSection from '../../components/Settings/TherapeuticSettingsSection';
+import {
+    exportPlayerData,
+    fetchSettings,
+    markChangesSaved,
+    updateAccessibilityLocal,
+    updateAccessibilitySettings,
+    updateNotificationSettings,
+    updateNotificationsLocal,
+    updatePrivacyLocal,
+    updatePrivacySettings,
+    updateTherapeuticLocal,
+    updateTherapeuticSettings
+} from '../../store/slices/settingsSlice';
+import { RootState } from '../../store/store';
 
 const Settings: React.FC = () => {
   const dispatch = useDispatch();
@@ -90,7 +88,7 @@ const Settings: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div data-testid="settings-loading" className="flex items-center justify-center h-64">
         <div className="spinner"></div>
         <span className="ml-2 text-gray-600">Loading settings...</span>
       </div>
@@ -98,17 +96,17 @@ const Settings: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-testid="settings-container" className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div data-testid="settings-header" className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 data-testid="settings-title" className="text-2xl font-bold text-gray-900">Settings</h1>
+          <p data-testid="settings-subtitle" className="text-gray-600 mt-1">
             Manage your therapeutic preferences, privacy settings, and account options
           </p>
         </div>
         {hasUnsavedChanges && (
-          <div className="flex items-center space-x-3">
+          <div data-testid="settings-unsaved-warning" className="flex items-center space-x-3">
             <span className="text-sm text-amber-600 flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
@@ -116,6 +114,7 @@ const Settings: React.FC = () => {
               Unsaved changes
             </span>
             <button
+              data-testid="settings-save-button"
               onClick={handleSaveSettings}
               className="btn-primary text-sm py-1 px-3"
             >
@@ -127,7 +126,7 @@ const Settings: React.FC = () => {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div data-testid="settings-error-message" className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
             <svg className="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -138,12 +137,13 @@ const Settings: React.FC = () => {
       )}
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-md">
+      <div data-testid="settings-tabs-container" className="bg-white rounded-lg shadow-md">
         <div className="border-b border-gray-200">
-          <nav className="flex space-x-8 px-6" aria-label="Settings tabs">
+          <nav data-testid="settings-tabs-nav" className="flex space-x-8 px-6" aria-label="Settings tabs">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
+                data-testid={`settings-tab-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
                   activeTab === tab.id
@@ -207,8 +207,8 @@ const Settings: React.FC = () => {
                         type="checkbox"
                         className="sr-only peer"
                         checked={notifications[setting.key as keyof typeof notifications]}
-                        onChange={(e) => dispatch(updateNotificationsLocal({ 
-                          [setting.key]: e.target.checked 
+                        onChange={(e) => dispatch(updateNotificationsLocal({
+                          [setting.key]: e.target.checked
                         }))}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
@@ -246,8 +246,8 @@ const Settings: React.FC = () => {
                         type="checkbox"
                         className="sr-only peer"
                         checked={accessibility[setting.key as keyof typeof accessibility]}
-                        onChange={(e) => dispatch(updateAccessibilityLocal({ 
-                          [setting.key]: e.target.checked 
+                        onChange={(e) => dispatch(updateAccessibilityLocal({
+                          [setting.key]: e.target.checked
                         }))}
                       />
                       <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>

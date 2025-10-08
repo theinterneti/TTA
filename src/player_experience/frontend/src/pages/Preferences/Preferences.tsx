@@ -3,11 +3,11 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { RootState } from '../../store/store';
 import { PlayerPreferencesConfiguration } from '../../components/PlayerPreferences';
-import { 
-  fetchPlayerPreferences, 
-  exportPreferences, 
+import {
+  fetchPlayerPreferences,
+  exportPreferences,
   importPreferences,
-  resetPreferences 
+  resetPreferences
 } from '../../store/slices/playerPreferencesSlice';
 import { PlayerPreferences } from '../../types/preferences';
 
@@ -55,12 +55,12 @@ const Preferences: React.FC = () => {
     try {
       const fileContent = await importFile.text();
       const preferencesData = JSON.parse(fileContent);
-      
-      await dispatch(importPreferences({ 
-        playerId: profile.player_id, 
-        preferencesData 
+
+      await dispatch(importPreferences({
+        playerId: profile.player_id,
+        preferencesData
       }) as any);
-      
+
       setShowImportModal(false);
       setImportFile(null);
     } catch (error) {
@@ -72,7 +72,7 @@ const Preferences: React.FC = () => {
   const handleResetPreferences = () => {
     dispatch(resetPreferences());
     setShowResetModal(false);
-    
+
     // Reload preferences to get defaults
     if (profile?.player_id) {
       dispatch(fetchPlayerPreferences(profile.player_id) as any);
@@ -126,7 +126,7 @@ const Preferences: React.FC = () => {
               </svg>
               Export
             </button>
-            
+
             <button
               onClick={() => setShowImportModal(true)}
               className="btn-outline flex items-center"
@@ -136,7 +136,7 @@ const Preferences: React.FC = () => {
               </svg>
               Import
             </button>
-            
+
             <button
               onClick={() => setShowResetModal(true)}
               className="btn-outline text-red-600 border-red-300 hover:bg-red-50 flex items-center"
@@ -187,7 +187,7 @@ const Preferences: React.FC = () => {
             <p className="text-gray-600 mb-4">
               Select a JSON file containing your exported preferences to import them.
             </p>
-            
+
             <div className="mb-4">
               <input
                 type="file"
@@ -235,10 +235,10 @@ const Preferences: React.FC = () => {
               Reset Preferences
             </h3>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to reset all preferences to their default values? 
+              Are you sure you want to reset all preferences to their default values?
               This action cannot be undone.
             </p>
-            
+
             <div className="flex justify-end space-x-3">
               <button
                 onClick={() => setShowResetModal(false)}

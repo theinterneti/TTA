@@ -14,7 +14,7 @@
    ```bash
    # Open in your default browser
    open examples/frontend_integration.html
-   
+
    # Or navigate manually to:
    file:///path/to/recovered-tta-storytelling/examples/frontend_integration.html
    ```
@@ -238,6 +238,6 @@ curl -H "Authorization: Bearer test_token_demo" \
 
 ---
 
-**Testing Guide Version:** 1.0  
-**Last Updated:** September 23, 2025  
+**Testing Guide Version:** 1.0
+**Last Updated:** September 23, 2025
 **Compatible With:** TTA Core Gameplay Loop Integration v1.0

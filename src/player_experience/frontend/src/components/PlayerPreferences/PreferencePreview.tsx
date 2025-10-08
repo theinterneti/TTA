@@ -13,7 +13,7 @@ const PreferencePreview: React.FC<PreferencePreviewProps> = ({ preferences }) =>
   const { previewContext, isPreviewLoading } = useSelector(
     (state: RootState) => state.playerPreferences
   );
-  
+
   const [testMessage, setTestMessage] = useState('I\'ve been feeling really anxious about work lately and I don\'t know how to handle it.');
   const [selectedScenario, setSelectedScenario] = useState('anxiety');
 
@@ -50,7 +50,7 @@ const PreferencePreview: React.FC<PreferencePreviewProps> = ({ preferences }) =>
       const timer = setTimeout(() => {
         dispatch(generatePreferencePreview({ preferences, testMessage }) as any);
       }, 500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [preferences, testMessage, dispatch]);
@@ -230,7 +230,7 @@ const PreferencePreview: React.FC<PreferencePreviewProps> = ({ preferences }) =>
               Show Default Response
             </button>
           </div>
-          
+
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex items-start">
               <svg className="w-5 h-5 text-amber-400 mr-3 mt-0.5" fill="currentColor" viewBox="0 0 20 20">

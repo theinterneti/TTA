@@ -6,7 +6,7 @@ export interface OpenRouterAuthState {
   // Authentication status
   isAuthenticated: boolean;
   authMethod: 'none' | 'api_key' | 'oauth';
-  
+
   // User info (from OAuth)
   user: {
     id?: string;
@@ -18,11 +18,11 @@ export interface OpenRouterAuthState {
       tokens: number;
     };
   } | null;
-  
+
   // API key validation
   apiKeyValid: boolean;
   apiKeyValidatedAt: string | null;
-  
+
   // OAuth state
   oauthState: {
     isLoading: boolean;
@@ -30,12 +30,12 @@ export interface OpenRouterAuthState {
     codeVerifier?: string;
     state?: string;
   };
-  
+
   // UI state
   isLoading: boolean;
   error: string | null;
   showAuthModal: boolean;
-  
+
   // Security
   sessionId: string | null;
   lastValidated: string | null;
@@ -196,7 +196,7 @@ const openRouterAuthSlice = createSlice({
     clearError: (state) => {
       state.error = null;
     },
-    
+
     // OAuth state management
     setOAuthState: (state, action: PayloadAction<{ codeVerifier: string; state: string }>) => {
       state.oauthState.codeVerifier = action.payload.codeVerifier;
@@ -205,7 +205,7 @@ const openRouterAuthSlice = createSlice({
     clearOAuthState: (state) => {
       state.oauthState = { isLoading: false };
     },
-    
+
     // Session management
     setSessionId: (state, action: PayloadAction<string>) => {
       state.sessionId = action.payload;
@@ -231,7 +231,7 @@ const openRouterAuthSlice = createSlice({
         state.isLoading = false;
         state.apiKeyValid = action.payload.valid;
         state.apiKeyValidatedAt = new Date().toISOString();
-        
+
         if (action.payload.valid) {
           state.isAuthenticated = true;
           state.authMethod = 'api_key';
@@ -272,7 +272,7 @@ const openRouterAuthSlice = createSlice({
       })
       .addCase(handleOAuthCallback.fulfilled, (state, action) => {
         state.isLoading = false;
-        
+
         if (action.payload.success) {
           state.isAuthenticated = true;
           state.authMethod = 'oauth';

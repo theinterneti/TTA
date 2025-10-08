@@ -520,28 +520,47 @@ class TestReportGenerator:
 
     <div class="summary">
         <h2>Executive Summary</h2>
-        <p><strong>Total Tests:</strong> {report_data['executive_summary']['total_tests']}</p>
-        <p><strong>Passed:</strong> <span class="pass">{report_data['executive_summary']['passed_tests']}</span></p>
-        <p><strong>Failed:</strong> <span class="fail">{report_data['executive_summary']['failed_tests']}</span></p>
-        <p><strong>Success Rate:</strong> {report_data['executive_summary']['success_rate']:.1f}%</p>
-        <p><strong>Duration:</strong> {report_data['executive_summary']['total_duration_minutes']:.1f} minutes</p>
+        <p><strong>Total Tests:</strong> {
+            report_data["executive_summary"]["total_tests"]
+        }</p>
+        <p><strong>Passed:</strong> <span class="pass">{
+            report_data["executive_summary"]["passed_tests"]
+        }</span></p>
+        <p><strong>Failed:</strong> <span class="fail">{
+            report_data["executive_summary"]["failed_tests"]
+        }</span></p>
+        <p><strong>Success Rate:</strong> {
+            report_data["executive_summary"]["success_rate"]:.1f}%</p>
+        <p><strong>Duration:</strong> {
+            report_data["executive_summary"]["total_duration_minutes"]:.1f} minutes</p>
     </div>
 
     <h2>Category Results</h2>
     <table>
         <tr><th>Category</th><th>Total</th><th>Passed</th><th>Failed</th><th>Success Rate</th></tr>
-        {''.join([
-            f"<tr><td>{cat}</td><td>{data['total_tests']}</td><td>{data['passed_tests']}</td><td>{data['failed_tests']}</td><td>{data['success_rate']:.1f}%</td></tr>"
-            for cat, data in report_data['category_results'].items()
-        ])}
+        {
+            "".join(
+                [
+                    f"<tr><td>{cat}</td><td>{data['total_tests']}</td><td>{data['passed_tests']}</td><td>{data['failed_tests']}</td><td>{data['success_rate']:.1f}%</td></tr>"
+                    for cat, data in report_data["category_results"].items()
+                ]
+            )
+        }
     </table>
 
     <h2>Recommendations</h2>
     <ul>
-        {''.join([f"<li><strong>{rec['title']}:</strong> {rec['description']}</li>" for rec in report_data['recommendations']])}
+        {
+            "".join(
+                [
+                    f"<li><strong>{rec['title']}:</strong> {rec['description']}</li>"
+                    for rec in report_data["recommendations"]
+                ]
+            )
+        }
     </ul>
 
-    <p><em>Generated at: {report_data['report_metadata']['generated_at']}</em></p>
+    <p><em>Generated at: {report_data["report_metadata"]["generated_at"]}</em></p>
 </body>
 </html>
         """
@@ -554,17 +573,17 @@ class TestReportGenerator:
 TTA COMPREHENSIVE TEST BATTERY - EXECUTIVE SUMMARY
 ================================================
 
-Generated: {report_data['report_metadata']['generated_at']}
-Test Period: {report_data['report_metadata']['test_execution_start']} to {report_data['report_metadata']['test_execution_end']}
+Generated: {report_data["report_metadata"]["generated_at"]}
+Test Period: {report_data["report_metadata"]["test_execution_start"]} to {report_data["report_metadata"]["test_execution_end"]}
 
 OVERALL RESULTS
 --------------
-Total Tests: {summary['total_tests']}
-Passed: {summary['passed_tests']}
-Failed: {summary['failed_tests']}
-Success Rate: {summary['success_rate']:.1f}%
-Total Duration: {summary['total_duration_minutes']:.1f} minutes
-Overall Status: {summary['overall_status']}
+Total Tests: {summary["total_tests"]}
+Passed: {summary["passed_tests"]}
+Failed: {summary["failed_tests"]}
+Success Rate: {summary["success_rate"]:.1f}%
+Total Duration: {summary["total_duration_minutes"]:.1f} minutes
+Overall Status: {summary["overall_status"]}
 
 CATEGORY BREAKDOWN
 -----------------
@@ -586,9 +605,9 @@ KEY RECOMMENDATIONS
 
 ISSUES IDENTIFIED
 ----------------
-Total Issues: {len(report_data['issues_identified'])}
-High Severity: {len([i for i in report_data['issues_identified'] if i['severity'] == 'high'])}
-Medium Severity: {len([i for i in report_data['issues_identified'] if i['severity'] == 'medium'])}
+Total Issues: {len(report_data["issues_identified"])}
+High Severity: {len([i for i in report_data["issues_identified"] if i["severity"] == "high"])}
+Medium Severity: {len([i for i in report_data["issues_identified"] if i["severity"] == "medium"])}
 
 For detailed results, see the comprehensive JSON and HTML reports.
         """

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { RootState } from '../../store/store';
-import { fetchCharacters } from '../../store/slices/characterSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import CharacterCard from '../../components/Character/CharacterCard';
 import CharacterCreationForm from '../../components/Character/CharacterCreationForm';
 import CharacterEditForm from '../../components/Character/CharacterEditForm';
-import CharacterCard from '../../components/Character/CharacterCard';
+import { fetchCharacters } from '../../store/slices/characterSlice';
+import { RootState } from '../../store/store';
 
 interface Character {
   character_id: string;
@@ -35,7 +35,7 @@ const CharacterManagement: React.FC = () => {
   const { characters, selectedCharacter, isLoading, error } = useSelector(
     (state: RootState) => state.character
   );
-  
+
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showEditForm, setShowEditForm] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(null);
@@ -72,7 +72,7 @@ const CharacterManagement: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div data-testid="character-loading" className="flex items-center justify-center h-64">
         <div className="spinner"></div>
         <span className="ml-2 text-gray-600">Loading characters...</span>
       </div>
@@ -80,21 +80,22 @@ const CharacterManagement: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div data-testid="character-management-container" className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div data-testid="character-header" className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Character Management</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 data-testid="character-title" className="text-2xl font-bold text-gray-900">Character Management</h1>
+          <p data-testid="character-subtitle" className="text-gray-600 mt-1">
             Create and manage your therapeutic adventure characters
           </p>
         </div>
-        
+
         <div className="flex items-center space-x-3">
           {/* View Toggle */}
           {characters.length > 0 && (
-            <div className="flex items-center bg-gray-100 rounded-lg p-1">
+            <div data-testid="character-view-toggle" className="flex items-center bg-gray-100 rounded-lg p-1">
               <button
+                data-testid="character-view-grid-button"
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-md transition-colors duration-200 ${
                   viewMode === 'grid'
@@ -107,6 +108,7 @@ const CharacterManagement: React.FC = () => {
                 </svg>
               </button>
               <button
+                data-testid="character-view-list-button"
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-md transition-colors duration-200 ${
                   viewMode === 'list'
@@ -120,8 +122,9 @@ const CharacterManagement: React.FC = () => {
               </button>
             </div>
           )}
-          
+
           <button
+            data-testid="character-create-button"
             onClick={handleCreateCharacter}
             disabled={characters.length >= 5}
             className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
@@ -135,12 +138,12 @@ const CharacterManagement: React.FC = () => {
       </div>
 
       {/* Character Limit Info */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+      <div data-testid="character-limit-info" className="bg-blue-50 border border-blue-200 rounded-lg p-4">
         <div className="flex items-center">
           <svg className="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <span className="text-blue-800">
+          <span data-testid="character-limit-text" className="text-blue-800">
             You have {characters.length} of 5 characters. Each character can have unique therapeutic preferences and goals.
           </span>
         </div>
@@ -148,7 +151,7 @@ const CharacterManagement: React.FC = () => {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div data-testid="character-error-message" className="bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex items-center">
             <svg className="w-5 h-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -160,7 +163,7 @@ const CharacterManagement: React.FC = () => {
 
       {/* Characters Display */}
       {characters.length > 0 ? (
-        <div className={
+        <div data-testid="character-list" className={
           viewMode === 'grid'
             ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
             : 'space-y-4'
@@ -175,15 +178,16 @@ const CharacterManagement: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
+        <div data-testid="character-empty-state" className="text-center py-12">
           <svg className="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No characters yet</h3>
-          <p className="text-gray-600 mb-6">
+          <h3 data-testid="character-empty-title" className="text-lg font-medium text-gray-900 mb-2">No characters yet</h3>
+          <p data-testid="character-empty-message" className="text-gray-600 mb-6">
             Create your first character to begin your therapeutic journey
           </p>
           <button
+            data-testid="character-create-first-button"
             onClick={handleCreateCharacter}
             className="btn-primary"
           >

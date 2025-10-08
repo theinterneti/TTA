@@ -1,6 +1,6 @@
 /**
  * Notification Provider Component
- * 
+ *
  * Provides a context for displaying toast notifications throughout the app.
  * Integrates with error handling utilities to show user-friendly error messages.
  */
@@ -190,7 +190,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
           {notification.message}
         </div>
       </div>
-      
+
       <div className="notification-actions">
         {notification.action && (
           <button
@@ -200,7 +200,7 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
             {notification.action.label}
           </button>
         )}
-        
+
         {notification.dismissible && (
           <button
             onClick={() => onDismiss(notification.id)}
@@ -218,4 +218,3 @@ const NotificationItem: React.FC<NotificationItemProps> = ({
 };
 
 export default NotificationProvider;
-

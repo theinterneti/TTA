@@ -228,9 +228,9 @@ class ScaleManager:
         }
 
         # Causal relationship tracking
-        self.causal_graph: dict[str, set[str]] = (
-            {}
-        )  # event_id -> set of caused event_ids
+        self.causal_graph: dict[
+            str, set[str]
+        ] = {}  # event_id -> set of caused event_ids
 
         # Conflict tracking
         self.active_conflicts: list[ScaleConflict] = []
@@ -404,11 +404,10 @@ class ScaleManager:
         """Get active events for a specific scale or all scales."""
         if scale:
             return self.active_events.get(scale, [])
-        else:
-            all_events = []
-            for events in self.active_events.values():
-                all_events.extend(events)
-            return all_events
+        all_events = []
+        for events in self.active_events.values():
+            all_events.extend(events)
+        return all_events
 
     # Private helper methods
 
@@ -1997,11 +1996,10 @@ class NarrativeArcOrchestratorComponent(Component):
                     f"Generated emergent event {event.event_id} for session {session_id}"
                 )
                 return event
-            else:
-                logger.debug(
-                    f"No emergent event triggered (probability: {probability:.2f})"
-                )
-                return None
+            logger.debug(
+                f"No emergent event triggered (probability: {probability:.2f})"
+            )
+            return None
 
         except Exception as e:
             logger.error(f"Error triggering emergent event: {e}")

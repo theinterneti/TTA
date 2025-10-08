@@ -30,7 +30,7 @@ I have successfully implemented comprehensive visual regression testing for the 
 **Component States Tested (5 tests)**
 - ✅ Default state (empty selections)
 - ✅ With selected therapeutic goals
-- ✅ With selected primary concerns  
+- ✅ With selected primary concerns
 - ✅ With custom entries
 - ✅ Maximum selections reached
 

@@ -508,7 +508,8 @@ async def test_session_context_update_error_handling(
     """Test session context update error handling."""
     # Create response with empty context data (valid but might cause issues in processing)
     response = OrchestrationResponse(
-        response_text="Test response", updated_context={}  # Empty dict instead of None
+        response_text="Test response",
+        updated_context={},  # Empty dict instead of None
     )
 
     # Should not raise exception even if update fails

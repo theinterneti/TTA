@@ -394,4 +394,3 @@ python testing/new_evaluation_framework.py
 **Status:** ✅ Analysis Complete
 **Conclusion:** Both directories are intentional, serve distinct purposes, and should be maintained separately.
 **Last Updated:** 2025-10-04
-

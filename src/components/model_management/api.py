@@ -339,10 +339,9 @@ async def unload_model(
                 "model_id": model_id,
                 "status": "unloaded",
             }
-        else:
-            raise HTTPException(
-                status_code=404, detail=f"Model {model_id} not found or not loaded"
-            )
+        raise HTTPException(
+            status_code=404, detail=f"Model {model_id} not found or not loaded"
+        )
 
     except Exception as e:
         logger.error(f"Failed to unload model {model_id}: {e}")
@@ -430,10 +429,9 @@ async def reset_model_failures(
                 "model_id": model_id,
                 "status": "reset",
             }
-        else:
-            raise HTTPException(
-                status_code=404, detail=f"Model {model_id} not found in failure records"
-            )
+        raise HTTPException(
+            status_code=404, detail=f"Model {model_id} not found in failure records"
+        )
 
     except Exception as e:
         logger.error(f"Failed to reset failures for model {model_id}: {e}")

@@ -18,15 +18,15 @@ graph TB
     Gateway --> Auth[Authentication Service]
     Gateway --> Profile[Profile Management Service]
     Gateway --> Session[Session Management Service]
-    
+
     Auth --> Redis[(Redis Cache)]
     Profile --> Neo4j[(Neo4j Database)]
     Session --> Redis
-    
+
     Auth --> Email[Email Service]
     Profile --> Audit[Audit Service]
     Session --> Monitor[Security Monitor]
-    
+
     subgraph "Therapeutic Integration"
         Profile --> TherapeuticEngine[Therapeutic Engine]
         Auth --> SafetyValidator[Safety Validator]
@@ -155,7 +155,7 @@ class User:
     account_status: AccountStatus
     failed_login_attempts: int
     locked_until: Optional[datetime]
-    
+
     # Privacy and preferences
     privacy_settings: PrivacySettings
     therapeutic_preferences: TherapeuticPreferences
@@ -296,14 +296,14 @@ tta:
         min_length: 8
         require_special_chars: true
         require_numbers: true
-    
+
     profile_management:
       enabled: true
       port: 8002
       max_characters_per_user: 5
       data_export_timeout: 2592000  # 30 days
       account_deletion_grace_period: 2592000  # 30 days
-    
+
     session_management:
       enabled: true
       redis_connection: "redis://localhost:6379"

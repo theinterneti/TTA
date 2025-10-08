@@ -22,9 +22,9 @@ const WorldDetailsModal: React.FC<WorldDetailsModalProps> = ({
 
   useEffect(() => {
     if (selectedCharacter && worldId) {
-      dispatch(checkWorldCompatibility({ 
-        characterId: selectedCharacter.character_id, 
-        worldId 
+      dispatch(checkWorldCompatibility({
+        characterId: selectedCharacter.character_id,
+        worldId
       }) as any);
     }
   }, [dispatch, selectedCharacter, worldId]);
@@ -91,8 +91,8 @@ const WorldDetailsModal: React.FC<WorldDetailsModalProps> = ({
           {/* World Preview */}
           <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
             {selectedWorld.preview_image ? (
-              <img 
-                src={selectedWorld.preview_image} 
+              <img
+                src={selectedWorld.preview_image}
                 alt={selectedWorld.name}
                 className="w-full h-full object-cover rounded-lg"
               />
@@ -191,7 +191,7 @@ const WorldDetailsModal: React.FC<WorldDetailsModalProps> = ({
                   </span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
+                  <div
                     className={`h-2 rounded-full ${
                       selectedWorld.compatibility_score >= 0.8 ? 'bg-green-500' :
                       selectedWorld.compatibility_score >= 0.6 ? 'bg-yellow-500' : 'bg-red-500'

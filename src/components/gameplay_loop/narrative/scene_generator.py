@@ -521,16 +521,15 @@ class SceneGenerator:
         # Add therapeutic context to title
         if "mindfulness" in therapeutic_focus:
             return f"Mindful Moments in the {base_name}"
-        elif "grounding" in therapeutic_focus:
+        if "grounding" in therapeutic_focus:
             return f"Grounding in the {base_name}"
-        elif "reflection" in therapeutic_focus:
+        if "reflection" in therapeutic_focus:
             return f"Reflection at the {base_name}"
-        elif scene_type == SceneType.INTRODUCTION:
+        if scene_type == SceneType.INTRODUCTION:
             return f"Welcome to the {base_name}"
-        elif scene_type == SceneType.THERAPEUTIC:
+        if scene_type == SceneType.THERAPEUTIC:
             return f"Healing in the {base_name}"
-        else:
-            return base_name
+        return base_name
 
     async def _generate_narrative_content(
         self,

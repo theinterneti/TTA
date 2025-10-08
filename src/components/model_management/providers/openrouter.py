@@ -410,9 +410,7 @@ class OpenRouterProvider(BaseProvider):
         affordable_models = []
 
         for model in all_models:
-            if model.is_free:
-                affordable_models.append(model)
-            elif (
+            if model.is_free or (
                 model.cost_per_token is not None
                 and model.cost_per_token <= max_cost_per_token
             ):

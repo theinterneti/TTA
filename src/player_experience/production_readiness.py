@@ -726,8 +726,7 @@ class ProductionReadinessValidator:
                     "total_requests": result.total_requests,
                     "successful_requests": result.successful_requests,
                 }
-            else:
-                return {"error": "No load test results"}
+            return {"error": "No load test results"}
 
         except Exception as e:
             return {"error": str(e)}
@@ -1263,9 +1262,9 @@ async def main():
     report = await validator.run_comprehensive_assessment()
 
     # Print summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("PRODUCTION READINESS ASSESSMENT SUMMARY")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Overall Level: {report.overall_level.value.upper()}")
     print(f"Overall Score: {report.overall_score:.1f}/100")
     print(f"Total Checks: {len(report.checks)}")
@@ -1287,7 +1286,7 @@ async def main():
             print(f"  ... and {len(report.recommendations) - 5} more")
 
     print("\nDetailed report saved to: ./production_readiness_reports/")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
 
 if __name__ == "__main__":

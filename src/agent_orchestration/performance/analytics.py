@@ -191,7 +191,6 @@ class PerformanceAnalytics:
             and stats.success_rate < 0.9
             and stats.total_operations > 10
         ):
-
             severity = min(1.0, (stats.average_duration - 2.0) / 3.0)
 
             bottleneck = BottleneckIdentification(
@@ -231,7 +230,6 @@ class PerformanceAnalytics:
             and stats.p95_duration > 4.0
             and stats.average_duration < 2.0
         ):
-
             severity = min(1.0, (stats.p95_duration - 2.0) / 8.0)
 
             bottleneck = BottleneckIdentification(
@@ -271,7 +269,6 @@ class PerformanceAnalytics:
             and stats.median_duration > 1.0
             and stats.min_duration > 0.5
         ):
-
             severity = min(1.0, stats.median_duration / 5.0)
 
             bottleneck = BottleneckIdentification(
@@ -497,14 +494,13 @@ class PerformanceAnalytics:
 
         if health_score >= 0.9:
             return "excellent"
-        elif health_score >= 0.7:
+        if health_score >= 0.7:
             return "good"
-        elif health_score >= 0.5:
+        if health_score >= 0.5:
             return "fair"
-        elif health_score >= 0.3:
+        if health_score >= 0.3:
             return "poor"
-        else:
-            return "critical"
+        return "critical"
 
     def _bottleneck_to_dict(
         self, bottleneck: BottleneckIdentification

@@ -113,7 +113,9 @@ class Agent(AgentProxy):
         status = (
             "healthy"
             if self._running and not self._degraded
-            else "degraded" if self._degraded else "stopped"
+            else "degraded"
+            if self._degraded
+            else "stopped"
         )
         return {
             "agent": self.name,
@@ -352,7 +354,7 @@ class Agent(AgentProxy):
         """Restore internal runtime state from a previously exported dict.
         Default is no-op; proxies may override.
         """
-        return None
+        return
 
     # ---- Capability Support ----
 

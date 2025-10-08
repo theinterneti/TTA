@@ -330,22 +330,21 @@ class TherapeuticStoryteller:
             or "present_moment_awareness" in primary_goals
         ):
             return TherapeuticApproach.MINDFULNESS
-        elif (
+        if (
             "cognitive_reframing" in primary_goals
             or "thought_patterns" in primary_goals
         ):
             return TherapeuticApproach.CBT
-        elif (
+        if (
             "emotional_regulation" in primary_goals
             or "distress_tolerance" in primary_goals
         ):
             return TherapeuticApproach.DBT
-        elif "values" in primary_goals or "acceptance" in primary_goals:
+        if "values" in primary_goals or "acceptance" in primary_goals:
             return TherapeuticApproach.ACT
-        elif "self_compassion" in primary_goals or "personal_growth" in primary_goals:
+        if "self_compassion" in primary_goals or "personal_growth" in primary_goals:
             return TherapeuticApproach.HUMANISTIC
-        else:
-            return TherapeuticApproach.CBT  # Default approach
+        return TherapeuticApproach.CBT  # Default approach
 
     async def _select_storytelling_techniques(
         self, approach: TherapeuticApproach, scene_type: str, goals: list[str]
@@ -382,16 +381,15 @@ class TherapeuticStoryteller:
         """Apply a specific storytelling technique to enhance the scene."""
         if technique == StorytellingTechnique.METAPHOR:
             return await self._apply_metaphor_technique(scene, therapeutic_context)
-        elif technique == StorytellingTechnique.CHARACTER_MODELING:
+        if technique == StorytellingTechnique.CHARACTER_MODELING:
             return await self._apply_character_modeling(scene, therapeutic_context)
-        elif technique == StorytellingTechnique.GUIDED_IMAGERY:
+        if technique == StorytellingTechnique.GUIDED_IMAGERY:
             return await self._apply_guided_imagery(scene, therapeutic_context)
-        elif technique == StorytellingTechnique.REFLECTIVE_DIALOGUE:
+        if technique == StorytellingTechnique.REFLECTIVE_DIALOGUE:
             return await self._apply_reflective_dialogue(scene, therapeutic_context)
-        elif technique == StorytellingTechnique.EXPERIENTIAL_LEARNING:
+        if technique == StorytellingTechnique.EXPERIENTIAL_LEARNING:
             return await self._apply_experiential_learning(scene, therapeutic_context)
-        else:
-            return scene
+        return scene
 
     async def _apply_metaphor_technique(
         self, scene: Scene, therapeutic_context: TherapeuticContext

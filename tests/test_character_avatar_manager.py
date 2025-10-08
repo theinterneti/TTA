@@ -375,7 +375,6 @@ class TestCharacterAvatarManagerIntegration(unittest.TestCase):
                 "src.player_experience.managers.character_avatar_manager.PersonalizationEngine"
             ) as mock_pe,
         ):
-
             self.mock_cds = mock_cds.return_value
             self.mock_pe = mock_pe.return_value
             self.manager = CharacterAvatarManager(self.repository)

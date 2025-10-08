@@ -2,7 +2,7 @@
 
 /**
  * Validate World Script
- * 
+ *
  * Node.js script to validate franchise worlds for simulation testing
  * and production readiness.
  */
@@ -12,7 +12,7 @@ const { getAllArchetypes } = require('./get-archetypes.js');
 
 function validateWorldForSimulation(worldId) {
   const world = getAllWorlds().find(w => w.franchiseId === worldId);
-  
+
   if (!world) {
     return {
       isValid: false,
@@ -22,7 +22,7 @@ function validateWorldForSimulation(worldId) {
       }
     };
   }
-  
+
   const validationResults = {
     worldExists: true,
     basicConfiguration: validateBasicConfiguration(world),
@@ -34,18 +34,18 @@ function validateWorldForSimulation(worldId) {
     sessionFlexibility: validateSessionFlexibility(world),
     accessibilityCompliance: validateAccessibilityCompliance(world)
   };
-  
+
   // Calculate overall validity
-  const validationChecks = Object.values(validationResults).filter(result => 
+  const validationChecks = Object.values(validationResults).filter(result =>
     typeof result === 'object' && result.hasOwnProperty('isValid')
   );
-  
+
   const passedChecks = validationChecks.filter(check => check.isValid).length;
   const totalChecks = validationChecks.length;
   const validationScore = passedChecks / totalChecks;
-  
+
   const isValid = validationScore >= 0.8; // 80% pass rate required
-  
+
   return {
     isValid,
     validationScore,
@@ -67,10 +67,10 @@ function validateBasicConfiguration(world) {
     hasEstimatedDuration: !!world.estimatedDuration && world.estimatedDuration.hours > 0,
     hasContentRatings: Array.isArray(world.contentRatings) && world.contentRatings.length > 0
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks === totalChecks,
     score: passedChecks / totalChecks,
@@ -83,32 +83,32 @@ function validateBasicConfiguration(world) {
 
 function validateTherapeuticIntegration(world) {
   const requiredApproaches = ['cognitive_behavioral_therapy', 'narrative_therapy', 'mindfulness'];
-  const hasRequiredApproaches = requiredApproaches.some(approach => 
+  const hasRequiredApproaches = requiredApproaches.some(approach =>
     world.therapeuticApproaches.includes(approach)
   );
-  
+
   const therapeuticThemeCategories = [
     'anxiety_management',
-    'relationship_building', 
+    'relationship_building',
     'confidence_building',
     'emotional_regulation',
     'social_skills'
   ];
-  
+
   const hasTherapeuticThemesCoverage = world.therapeuticThemes.some(theme =>
     therapeuticThemeCategories.some(category => theme.includes(category.split('_')[0]))
   );
-  
+
   const checks = {
     hasRequiredTherapeuticApproaches: hasRequiredApproaches,
     hasTherapeuticThemesCoverage: hasTherapeuticThemesCoverage,
     hasMinimumTherapeuticThemes: world.therapeuticThemes.length >= 3,
     hasMinimumTherapeuticApproaches: world.therapeuticApproaches.length >= 2
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks >= totalChecks * 0.75, // 75% pass rate for therapeutic integration
     score: passedChecks / totalChecks,
@@ -121,21 +121,21 @@ function validateTherapeuticIntegration(world) {
 function validateContentSafety(world) {
   const contentRating = world.contentRatings[0];
   const acceptableRatings = ['E', 'E10+', 'T', 'M'];
-  
+
   const checks = {
     hasContentRating: !!contentRating,
     hasAcceptableRating: contentRating && acceptableRatings.includes(contentRating.rating),
     hasContentDescriptors: contentRating && Array.isArray(contentRating.descriptors),
-    noExtremeContent: !contentRating?.descriptors?.some(desc => 
-      desc.toLowerCase().includes('extreme') || 
+    noExtremeContent: !contentRating?.descriptors?.some(desc =>
+      desc.toLowerCase().includes('extreme') ||
       desc.toLowerCase().includes('graphic') ||
       desc.toLowerCase().includes('intense')
     )
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks === totalChecks,
     score: passedChecks / totalChecks,
@@ -151,14 +151,14 @@ function validateTechnicalReadiness(world) {
     hasValidIdFormat: /^[a-z_]+$/.test(world.franchiseId),
     hasInspirationSource: !!world.inspirationSource,
     hasEstimatedDuration: world.estimatedDuration && world.estimatedDuration.hours > 0,
-    durationIsReasonable: world.estimatedDuration && 
-      world.estimatedDuration.hours >= 0.25 && 
+    durationIsReasonable: world.estimatedDuration &&
+      world.estimatedDuration.hours >= 0.25 &&
       world.estimatedDuration.hours <= 8
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks === totalChecks,
     score: passedChecks / totalChecks,
@@ -170,22 +170,22 @@ function validateTechnicalReadiness(world) {
 
 function validateCharacterSupport(world) {
   const archetypes = getAllArchetypes();
-  const supportedArchetypes = archetypes.filter(archetype => 
+  const supportedArchetypes = archetypes.filter(archetype =>
     archetype.worldAdaptations && archetype.worldAdaptations[world.genre]
   );
-  
+
   const checks = {
     hasArchetypeSupport: supportedArchetypes.length > 0,
     hasMinimumArchetypes: supportedArchetypes.length >= 3,
-    hasTherapeuticCharacters: supportedArchetypes.some(archetype => 
+    hasTherapeuticCharacters: supportedArchetypes.some(archetype =>
       archetype.therapeuticFunction && archetype.therapeuticFunction.length > 0
     ),
     hasVariedRoles: new Set(supportedArchetypes.map(a => a.role)).size >= 2
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks >= totalChecks * 0.75,
     score: passedChecks / totalChecks,
@@ -198,18 +198,18 @@ function validateCharacterSupport(world) {
 function validateNarrativeStructure(world) {
   // This would integrate with actual narrative structure validation
   // For now, we'll do basic checks based on world configuration
-  
+
   const checks = {
     hasGenreConsistency: !!world.genre,
     hasThematicCoherence: world.therapeuticThemes.length >= 3,
-    hasAppropriateComplexity: world.difficultyLevel && 
+    hasAppropriateComplexity: world.difficultyLevel &&
       ['beginner', 'intermediate', 'advanced'].includes(world.difficultyLevel),
     hasEngagementPotential: world.inspirationSource && world.inspirationSource.length > 10
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks >= totalChecks * 0.75,
     score: passedChecks / totalChecks,
@@ -221,7 +221,7 @@ function validateNarrativeStructure(world) {
 
 function validateSessionFlexibility(world) {
   const duration = world.estimatedDuration.hours;
-  
+
   const checks = {
     supportsShortSessions: duration >= 0.25, // 15 minutes
     supportsMediumSessions: duration >= 1.0,  // 1 hour
@@ -229,10 +229,10 @@ function validateSessionFlexibility(world) {
     hasReasonableDuration: duration >= 0.25 && duration <= 8.0,
     allowsFlexiblePacing: true // Assume all worlds support flexible pacing
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks >= totalChecks * 0.8,
     score: passedChecks / totalChecks,
@@ -246,16 +246,16 @@ function validateAccessibilityCompliance(world) {
   // Basic accessibility checks - would be expanded in production
   const checks = {
     hasContentWarnings: world.contentRatings && world.contentRatings.length > 0,
-    hasAppropriateRating: world.contentRatings && 
-      world.contentRatings[0] && 
+    hasAppropriateRating: world.contentRatings &&
+      world.contentRatings[0] &&
       ['E', 'E10+', 'T', 'M'].includes(world.contentRatings[0].rating),
     supportsDiverseThemes: world.therapeuticThemes.length >= 3,
     hasInclusiveDesign: true // Assume inclusive design - would check actual content
   };
-  
+
   const passedChecks = Object.values(checks).filter(Boolean).length;
   const totalChecks = Object.keys(checks).length;
-  
+
   return {
     isValid: passedChecks >= totalChecks * 0.75,
     score: passedChecks / totalChecks,
@@ -266,7 +266,7 @@ function validateAccessibilityCompliance(world) {
 
 function generateRecommendations(validationResults) {
   const recommendations = [];
-  
+
   Object.entries(validationResults).forEach(([category, result]) => {
     if (typeof result === 'object' && result.hasOwnProperty('isValid') && !result.isValid) {
       if (result.issues) {
@@ -276,11 +276,11 @@ function generateRecommendations(validationResults) {
       }
     }
   });
-  
+
   if (recommendations.length === 0) {
     recommendations.push('World passes all validation checks and is ready for simulation');
   }
-  
+
   return recommendations;
 }
 
@@ -295,7 +295,7 @@ function main() {
   try {
     // Parse command line arguments
     const args = process.argv.slice(2);
-    
+
     if (args.length === 0) {
       console.error(JSON.stringify({
         success: false,
@@ -303,7 +303,7 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     let requestData;
     try {
       requestData = JSON.parse(args[0]);
@@ -314,7 +314,7 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     const worldId = requestData.worldId;
     if (!worldId) {
       console.error(JSON.stringify({
@@ -323,19 +323,19 @@ function main() {
       }));
       process.exit(1);
     }
-    
+
     // Validate the world
     const validationResult = validateWorldForSimulation(worldId);
-    
+
     // Return results
     const response = {
       success: true,
       worldId: worldId,
       ...validationResult
     };
-    
+
     console.log(JSON.stringify(response, null, 2));
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

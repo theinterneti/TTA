@@ -53,9 +53,9 @@ class TestTherapeuticValidatorPerformance:
         max_time = max(times)
 
         print("\nSingle Validation Performance:")
-        print(f"  Average time: {avg_time*1000:.2f}ms")
-        print(f"  Maximum time: {max_time*1000:.2f}ms")
-        print(f"  Minimum time: {min(times)*1000:.2f}ms")
+        print(f"  Average time: {avg_time * 1000:.2f}ms")
+        print(f"  Maximum time: {max_time * 1000:.2f}ms")
+        print(f"  Minimum time: {min(times) * 1000:.2f}ms")
 
         # Should complete validations quickly
         assert avg_time < 0.050, f"Average validation time too slow: {avg_time:.3f}s"
@@ -97,16 +97,16 @@ class TestTherapeuticValidatorPerformance:
 
         print(f"\nBatch Validation Performance ({len(test_batch)} validations):")
         print(f"  Total time: {total_time:.3f}s")
-        print(f"  Average per validation: {avg_time_per_validation*1000:.2f}ms")
+        print(f"  Average per validation: {avg_time_per_validation * 1000:.2f}ms")
         print(f"  Validations per second: {validations_per_second:.1f}")
 
         # Performance requirements
-        assert (
-            avg_time_per_validation < 0.025
-        ), f"Batch validation too slow: {avg_time_per_validation:.3f}s per validation"
-        assert (
-            validations_per_second > 40
-        ), f"Throughput too low: {validations_per_second:.1f} validations/sec"
+        assert avg_time_per_validation < 0.025, (
+            f"Batch validation too slow: {avg_time_per_validation:.3f}s per validation"
+        )
+        assert validations_per_second > 40, (
+            f"Throughput too low: {validations_per_second:.1f} validations/sec"
+        )
 
     def test_concurrent_validation_performance(self):
         """Test performance under concurrent load."""
@@ -145,9 +145,9 @@ class TestTherapeuticValidatorPerformance:
         print(f"  Validations per second: {validations_per_second:.1f}")
 
         # Should handle concurrent load efficiently
-        assert (
-            validations_per_second > 30
-        ), f"Concurrent throughput too low: {validations_per_second:.1f} validations/sec"
+        assert validations_per_second > 30, (
+            f"Concurrent throughput too low: {validations_per_second:.1f} validations/sec"
+        )
 
     def test_large_content_performance(self):
         """Test performance with large content."""
@@ -169,19 +169,19 @@ class TestTherapeuticValidatorPerformance:
             validation_time = end_time - start_time
             times.append(validation_time)
 
-            print(f"  Text size {len(text):,} chars: {validation_time*1000:.2f}ms")
+            print(f"  Text size {len(text):,} chars: {validation_time * 1000:.2f}ms")
 
             # Ensure validation completed successfully
             assert isinstance(result, ValidationResult)
 
         print("\nLarge Content Performance:")
-        print(f"  Average time: {statistics.mean(times)*1000:.2f}ms")
-        print(f"  Maximum time: {max(times)*1000:.2f}ms")
+        print(f"  Average time: {statistics.mean(times) * 1000:.2f}ms")
+        print(f"  Maximum time: {max(times) * 1000:.2f}ms")
 
         # Should handle large content reasonably
-        assert (
-            max(times) < 0.500
-        ), f"Large content validation too slow: {max(times):.3f}s"
+        assert max(times) < 0.500, (
+            f"Large content validation too slow: {max(times):.3f}s"
+        )
 
     def test_memory_usage_stability(self):
         """Test memory usage stability over many validations."""
@@ -327,9 +327,9 @@ class TestTherapeuticValidatorAccuracy:
         print(f"  Accuracy: {accuracy:.2%}")
 
         # Should have high accuracy in appropriateness scoring
-        assert (
-            accuracy >= 0.85
-        ), f"Therapeutic appropriateness accuracy too low: {accuracy:.2%}"
+        assert accuracy >= 0.85, (
+            f"Therapeutic appropriateness accuracy too low: {accuracy:.2%}"
+        )
 
     def test_alternative_generation_quality(self):
         """Test quality of generated therapeutic alternatives."""
@@ -394,9 +394,9 @@ class TestTherapeuticValidatorAccuracy:
         )
 
         # Should generate high-quality alternatives
-        assert (
-            avg_quality >= 0.75
-        ), f"Alternative generation quality too low: {avg_quality:.2f}"
+        assert avg_quality >= 0.75, (
+            f"Alternative generation quality too low: {avg_quality:.2f}"
+        )
 
     def test_consistency_across_similar_inputs(self):
         """Test consistency of validation across similar inputs."""

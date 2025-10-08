@@ -388,10 +388,7 @@ class ProgressiveFeedbackManager:
 
                 for operation_id, operation in self.active_operations.items():
                     # Check for timeout
-                    if current_time - operation.start_time > self.operation_timeout:
-                        stale_operations.append(operation_id)
-                    # Check for stale updates
-                    elif (
+                    if current_time - operation.start_time > self.operation_timeout or (
                         current_time - operation.last_update > self.cleanup_interval * 2
                     ):
                         stale_operations.append(operation_id)

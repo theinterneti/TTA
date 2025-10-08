@@ -70,14 +70,14 @@ class ProgressTrackingService:
         Enhanced with therapeutic component integration and sophisticated analytics.
         """
         # Gather recent session summaries and active sessions
-        summaries: list[SessionSummary] = (
-            await self.session_repository.get_session_summaries(
-                player_id, summaries_limit
-            )
+        summaries: list[
+            SessionSummary
+        ] = await self.session_repository.get_session_summaries(
+            player_id, summaries_limit
         )
-        active_sessions: list[SessionContext] = (
-            await self.session_repository.get_player_active_sessions(player_id)
-        )
+        active_sessions: list[
+            SessionContext
+        ] = await self.session_repository.get_player_active_sessions(player_id)
 
         # Initialize metrics and collections
         engagement = EngagementMetrics()
@@ -152,10 +152,11 @@ class ProgressTrackingService:
         marker_analysis["therapeutic_goals"]
 
         # Detect and create milestones
-        new_milestones, milestone_highlights = (
-            await self._detect_comprehensive_milestones(
-                player_id, engagement, marker_analysis, summaries
-            )
+        (
+            new_milestones,
+            milestone_highlights,
+        ) = await self._detect_comprehensive_milestones(
+            player_id, engagement, marker_analysis, summaries
         )
         milestones_achieved.extend(new_milestones)
         highlights.extend(milestone_highlights)
@@ -216,12 +217,12 @@ class ProgressTrackingService:
         Detect milestones from current activity and return new milestones and highlights.
         Enhanced with comprehensive milestone detection and achievement celebration.
         """
-        summaries: list[SessionSummary] = (
-            await self.session_repository.get_session_summaries(player_id, 90)
-        )
-        active_sessions: list[SessionContext] = (
-            await self.session_repository.get_player_active_sessions(player_id)
-        )
+        summaries: list[
+            SessionSummary
+        ] = await self.session_repository.get_session_summaries(player_id, 90)
+        active_sessions: list[
+            SessionContext
+        ] = await self.session_repository.get_player_active_sessions(player_id)
 
         # Calculate engagement metrics
         session_dates = [s.start_time.date() for s in summaries]
@@ -496,12 +497,11 @@ class ProgressTrackingService:
         """Generate a personalized celebration message for a milestone."""
         if "streak" in milestone.title.lower():
             return f"🔥 Amazing consistency! {milestone.title} shows your dedication to growth!"
-        elif "skill" in milestone.title.lower():
+        if "skill" in milestone.title.lower():
             return f"🎯 Excellent progress! {milestone.title} demonstrates your commitment to learning!"
-        elif "breakthrough" in milestone.title.lower():
+        if "breakthrough" in milestone.title.lower():
             return f"💡 Incredible insight! {milestone.title} marks a significant therapeutic achievement!"
-        else:
-            return f"🌟 Congratulations! {milestone.title} is a meaningful step in your journey!"
+        return f"🌟 Congratulations! {milestone.title} is a meaningful step in your journey!"
 
     def _calculate_milestone_therapeutic_value(self, milestone: Milestone) -> float:
         """Calculate the therapeutic value of achieving a milestone."""
@@ -528,37 +528,36 @@ class ProgressTrackingService:
         if "streak" in achieved_milestone.title.lower():
             if "7" in achieved_milestone.title:
                 return "14-Day Engagement Streak"
-            elif "14" in achieved_milestone.title:
+            if "14" in achieved_milestone.title:
                 return "30-Day Engagement Streak"
         elif "skill" in achieved_milestone.title.lower():
             if "Level 1" in achieved_milestone.title:
                 return "Skill Builder Level 2"
-            elif "Level 2" in achieved_milestone.title:
+            if "Level 2" in achieved_milestone.title:
                 return "Skill Builder Level 3"
 
         return None
 
     def _determine_celebration_type(self, milestone: Milestone) -> str:
         """Determine the type of celebration appropriate for the milestone."""
-        if "breakthrough" in milestone.title.lower():
-            return "major_achievement"
-        elif "streak" in milestone.title.lower() and any(
-            num in milestone.title for num in ["30", "60", "90"]
+        if (
+            "breakthrough" in milestone.title.lower()
+            or "streak" in milestone.title.lower()
+            and any(num in milestone.title for num in ["30", "60", "90"])
         ):
             return "major_achievement"
-        elif "skill" in milestone.title.lower():
+        if "skill" in milestone.title.lower():
             return "skill_mastery"
-        else:
-            return "progress_milestone"
+        return "progress_milestone"
 
     async def get_visualization_data(
         self, player_id: str, *, days: int = 14
     ) -> ProgressVizSeries:
         """Return daily buckets for counts and durations for the last `days` days."""
         days = max(1, min(days, 60))
-        summaries: list[SessionSummary] = (
-            await self.session_repository.get_session_summaries(player_id, days * 2)
-        )
+        summaries: list[
+            SessionSummary
+        ] = await self.session_repository.get_session_summaries(player_id, days * 2)
 
         # Build bucket keys YYYY-MM-DD
         today = datetime.utcnow().date()
@@ -829,7 +828,7 @@ class ProgressTrackingService:
                 milestone_id = f"ms_{player_id}_skills_{threshold}"
                 milestone = Milestone(
                     milestone_id=milestone_id,
-                    title=f"Skill Builder Level {threshold//5 + 1}",
+                    title=f"Skill Builder Level {threshold // 5 + 1}",
                     description=f"Acquired {threshold} therapeutic skills through guided exercises and practice",
                     is_achieved=True,
                     achieved_date=now,
@@ -873,12 +872,11 @@ class ProgressTrackingService:
         # Determine trend
         if total_progress_markers >= 10 and recent_engagement >= 3 and streak >= 5:
             return "improving"
-        elif total_progress_markers >= 5 and recent_engagement >= 2 and streak >= 2:
+        if total_progress_markers >= 5 and recent_engagement >= 2 and streak >= 2:
             return "stable"
-        elif recent_engagement == 0 or engagement.dropout_risk_score > 0.6:
+        if recent_engagement == 0 or engagement.dropout_risk_score > 0.6:
             return "declining"
-        else:
-            return "stable"
+        return "stable"
 
     def _analyze_engagement_trend(
         self, session_dates: list[datetime], engagement: EngagementMetrics
@@ -894,10 +892,9 @@ class ProgressTrackingService:
 
         if recent_week > previous_week:
             return "increasing"
-        elif recent_week < previous_week and engagement.dropout_risk_score > 0.4:
+        if recent_week < previous_week and engagement.dropout_risk_score > 0.4:
             return "decreasing"
-        else:
-            return "stable"
+        return "stable"
 
     def _calculate_therapeutic_momentum(
         self, marker_analysis: dict[str, int], engagement: EngagementMetrics

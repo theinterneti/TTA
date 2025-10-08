@@ -9,6 +9,7 @@ import base64
 import io
 import logging
 import secrets
+import time
 from datetime import datetime, timedelta, timezone
 from typing import Any
 from uuid import uuid4
@@ -495,22 +496,38 @@ class EnhancedAuthService:
         Returns:
             str: Encoded JWT access token with player_id field
         """
-        # Use provided player_id or fallback to user_id for backward compatibility
-        effective_player_id = player_id if player_id is not None else user.user_id
+        # Record JWT token generation metrics
+        start_time = time.time()
+        success = False
 
-        data = {
-            "sub": user.user_id,
-            "player_id": effective_player_id,  # Issue #4 fix: explicit player_id field
-            "username": user.username,
-            "email": user.email,
-            "role": user.role.value,
-            "permissions": [perm.value for perm in user.permissions],
-            "session_id": session_id,
-            "mfa_verified": user.mfa_verified,
-            "exp": datetime.now(timezone.utc)
-            + timedelta(minutes=self.access_token_expire_minutes),
-        }
-        return jwt.encode(data, self.secret_key, algorithm=self.algorithm)
+        try:
+            # Use provided player_id or fallback to user_id for backward compatibility
+            effective_player_id = player_id if player_id is not None else user.user_id
+
+            data = {
+                "sub": user.user_id,
+                "player_id": effective_player_id,  # Issue #4 fix: explicit player_id field
+                "username": user.username,
+                "email": user.email,
+                "role": user.role.value,
+                "permissions": [perm.value for perm in user.permissions],
+                "session_id": session_id,
+                "mfa_verified": user.mfa_verified,
+                "exp": datetime.now(timezone.utc)
+                + timedelta(minutes=self.access_token_expire_minutes),
+            }
+            token = jwt.encode(data, self.secret_key, algorithm=self.algorithm)
+            success = True
+            return token
+        finally:
+            duration = time.time() - start_time
+            try:
+                from src.monitoring.prometheus_metrics import get_metrics_collector
+
+                collector = get_metrics_collector("player-experience")
+                collector.record_jwt_token_generation(success, duration)
+            except Exception as e:
+                logger.debug(f"Failed to record JWT generation metrics: {e}")
 
     def verify_access_token(self, token: str) -> AuthenticatedUser:
         """
@@ -525,6 +542,9 @@ class EnhancedAuthService:
         Raises:
             AuthenticationError: If token is invalid
         """
+        success = False
+        has_player_id = False
+
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
 
@@ -535,6 +555,9 @@ class EnhancedAuthService:
             permissions_str = payload.get("permissions", [])
             session_id = payload.get("session_id")
             mfa_verified = payload.get("mfa_verified", False)
+            player_id = payload.get("player_id")  # Track player_id presence
+
+            has_player_id = player_id is not None
 
             if not user_id or not username:
                 raise AuthenticationError("Invalid token payload")
@@ -557,6 +580,8 @@ class EnhancedAuthService:
             role = UserRole(role_str)
             permissions = [Permission(perm) for perm in permissions_str]
 
+            success = True
+
             return AuthenticatedUser(
                 user_id=user_id,
                 username=username,
@@ -570,6 +595,15 @@ class EnhancedAuthService:
 
         except JWTError as e:
             raise AuthenticationError(f"Invalid token: {str(e)}") from e
+        finally:
+            # Record JWT verification metrics
+            try:
+                from src.monitoring.prometheus_metrics import get_metrics_collector
+
+                collector = get_metrics_collector("player-experience")
+                collector.record_jwt_token_verification(success, has_player_id)
+            except Exception as e:
+                logger.debug(f"Failed to record JWT verification metrics: {e}")
 
     def require_permission(
         self, user: AuthenticatedUser, permission: Permission

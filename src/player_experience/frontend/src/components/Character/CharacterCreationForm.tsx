@@ -1,481 +1,367 @@
-# Security Findings - Accepted Risks
-
-This document tracks Semgrep security findings that have been reviewed and accepted as false positives or acceptable risks with proper justification.
-
-## ERROR Severity - Accepted Risks
-
-### 1. Insecure WebSocket Detection (1 finding)
-
-**Finding ID:** `javascript.lang.security.detect-insecure-websocket.detect-insecure-websocket`
-
-**Location:** `src/developer_dashboard/test_battery_integration.py:368`
-
-**Description:** Semgrep detects the string `'ws:'` in JavaScript code embedded in a Python file.
-
-**Justification:** This is a **FALSE POSITIVE**. The code properly implements secure WebSocket connections:
-- Uses `wss://` (secure) when page is loaded over HTTPS (production)
-- Only uses `ws://` (insecure) for local development over HTTP
-- The protocol is dynamically selected based on the page's protocol:
-  ```javascript
-const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-```
-
-**Risk Assessment:** **LOW** - The implementation is secure and follows best practices for WebSocket connections.
-
-**Mitigation:** Code review confirms proper implementation. No changes needed.
-
-**Date Reviewed:** 2025-01-XX
-
-**Reviewed By:** Security Remediation Task
-
----
-
-## WARNING Severity - Accepted Risks
-
-### 2. Docker Socket Exposure (2 findings)
-
-**Finding ID:** `yaml.docker-compose.security.exposing-docker-socket-volume.exposing-docker-socket-volume`
-
-**Locations:**
-- `templates/tta.dev/docker-compose.yml:29`
-- `templates/tta.prototype/docker-compose.yml:29`
-
-**Description:** Docker socket is mounted in development template containers.
-
-**Justification:** These are **DEVELOPMENT TEMPLATES** only, not used in production. The docker socket access is intentional for:
-- Container management during development
-- Testing Docker-based features
-- Development tooling that requires Docker API access
-
-**Risk Assessment:** **LOW** - These templates are only used in local development environments, never in production or staging.
-
-**Mitigation:**
-- Templates are clearly marked as development-only
-- Production deployments use different compose files without socket exposure
-- Documentation warns against using these templates in production
-
-### 3. Privileged Container (1 finding)
-
-**Finding ID:** `yaml.docker-compose.security.privileged-service.privileged-service`
-
-**Location:** `monitoring/docker-compose.monitoring.yml:138` (cadvisor service)
-
-**Description:** cAdvisor container runs in privileged mode.
-
-**Justification:** This is **REQUIRED** for cAdvisor to function properly. cAdvisor needs:
-- Access to `/dev/kmsg` for kernel messages
-- Read access to `/sys` and `/var/lib/docker` for container metrics
-- Privileged mode to collect comprehensive container statistics
-
-**Risk Assessment:** **MEDIUM** - Privileged mode is necessary for monitoring functionality. Risk is mitigated by:
-- Read-only filesystem (`read_only: true`)
-- No-new-privileges security option
-- Limited to monitoring network
-- Only used in monitoring stack, not exposed to public
-
-**Mitigation:**
-- Container has minimal attack surface with read-only filesystem
-- Security options applied (no-new-privileges)
-- Network isolation
-- Regular security updates for cAdvisor image
-
-### 4. Writable Filesystem Services (52 findings)
-
-**Finding ID:** `yaml.docker-compose.security.writable-filesystem-service.writable-filesystem-service`
-
-**Description:** Multiple services run with writable root filesystem.
-
-**Justification:** These services **REQUIRE** writable filesystem for normal operation:
-- **Databases** (Neo4j, Redis, PostgreSQL, Elasticsearch): Need to write data files
-- **Monitoring** (Prometheus, Grafana, Loki): Need to write metrics and logs
-- **Caches** (Redis Commander): Need to write temporary data
-- **Application Services**: Need to write logs, temporary files, and application data
-
-**Risk Assessment:** **LOW** - These are legitimate operational requirements. Risk is mitigated by:
-- All services have `no-new-privileges:true` security option
-- Services run with minimal necessary permissions
-- Data directories are properly isolated with volume mounts
-- Regular security updates applied
-
-**Mitigation:**
-- Security options applied to all services
-- Volume mounts isolate data directories
-- Services run as non-root users where possible
-- Regular security scanning and updates
-
----
-
-## Summary
-
-- **Total Accepted Risks:** 56
-- **ERROR Severity:** 1
-- **WARNING Severity:** 55
-- **INFO Severity:** 0
-
-All other findings have been remediated.
-
-
-# Check health
-curl http://localhost:8080/health
-
-# Expected response:
-# {
-#   "status": "healthy",
-#   "service": "player-experience-api",
-#   "version": "1.0.0"
-# }
-```
-
-### If Backend Stops, Restart Using:
-
-```bash
-# Method 1: Using the startup script (Recommended)
-./start_backend.sh
-
-# Method 2: Manual startup
-source .venv/bin/activate
-export PYTHONPATH=/home/thein/recovered-tta-storytelling
-uvicorn src.player_experience.api.app:app --host 0.0.0.0 --port 8080 --reload
-```
-
-**See `BACKEND_STARTUP_FIX.md` for detailed documentation on the fix.**
-
----
-
-## Option 2: Run Manual Validation (No Backend Required)
-
-### Follow the Manual Validation Checklist:
-
-**Document:** `VALIDATION_RESULTS.md`
-
-**Sections to Test:**
-1. Frontend Loading (✅ Already validated)
-2. Secure Token Storage (✅ Already validated)
-3. Error Handling Display (✅ Already validated)
-4. Responsive Design (✅ Already validated)
-5. Navigation (✅ Already validated)
-
-**Sections Requiring Backend:**
-1. Character Creation Flow
-2. Therapeutic AI Chat System
-3. Conversation History Persistence
-4. Session Persistence
-5. WebSocket Connection Stability
-
----
-
-## Option 3: Run Automated Tests (Requires Backend)
-
-### Once Backend is Running:
-
-```bash
-# Run comprehensive validation tests
-npx playwright test tests/e2e/comprehensive-validation.spec.ts --headed
-
-# Or run with specific browser
-npx playwright test tests/e2e/comprehensive-validation.spec.ts --project=chromium
-
-# View test report
-npx playwright show-report
-```
-
----
-
-## Troubleshooting Backend Startup
-
-### Issue: Import Errors
-
-**Error:**
-```
-ImportError: attempted relative import beyond top-level package
-```
-
-**Solution:**
-```bash
-# Set PYTHONPATH to project root
-export PYTHONPATH=/home/thein/recovered-tta-storytelling
-
-# Run from project root
-cd /home/thein/recovered-tta-storytelling
-python -m src.player_experience.api.main
-```
-
-### Issue: Missing Dependencies
-
-**Error:**
-```
-No module named 'uvicorn'
-```
-
-**Solution:**
-```bash
-# Activate virtual environment
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Or install specific package
-pip install uvicorn fastapi
-```
-
-### Issue: Port Already in Use
-
-**Error:**
-```
-Address already in use
-```
-
-**Solution:**
-```bash
-# Find process using port 8080
-lsof -i :8080
-
-# Kill the process
-kill -9 <PID>
-
-# Or use different port
-python -m uvicorn api.main:app --host 0.0.0.0 --port 8081 --reload
-```
-
----
-
-## Validation Test Files
-
-### Created Test Files:
-
-1. **`tests/e2e/comprehensive-validation.spec.ts`**
-   - Full E2E validation suite
-   - Requires backend API running
-   - Tests all critical features
-
-2. **`quick-validation.spec.ts`**
-   - Frontend-only validation
-   - No backend required
-   - Already executed successfully (10/10 passed)
-
-3. **`playwright.quick.config.ts`**
-   - Configuration for quick validation
-   - No global setup required
-
-### Run Quick Validation Again:
-
-```bash
-npx playwright test --config=playwright.quick.config.ts
-```
-
----
-
-## Validation Documentation
-
-### Generated Documents:
-
-1. **`VALIDATION_RESULTS.md`**
-   - Comprehensive validation checklist
-   - Manual validation steps
-   - Success criteria for each feature
-
-2. **`VALIDATION_TEST_RESULTS.md`**
-   - Automated test results
-   - Detailed test breakdown
-   - Evidence and significance
-
-3. **`COMPREHENSIVE_VALIDATION_SUMMARY.md`**
-   - Executive summary
-   - Overall validation status
-   - Recommendations
-
-4. **`NEXT_STEPS_GUIDE.md`** (this file)
-   - Quick start guide
-   - Troubleshooting tips
-   - Command reference
-
----
-
-## Backend API Endpoints to Test
-
-### Once Backend is Running:
-
-```bash
-# Health check
-curl http://localhost:8080/health
-
-# API documentation
-curl http://localhost:8080/docs
-
-# Character creation (requires auth)
-curl -X POST http://localhost:8080/api/v1/characters \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer <token>" \
-  -d '{
-    "name": "Test Character",
-    "appearance": {...},
-    "background": {...},
-    "personality_traits": ["brave", "compassionate"],
-    "therapeutic_profile": {...}
-  }'
-```
-
----
-
-## Manual Testing Workflow
-
-### Complete User Journey:
-
-1. **Open Application**
-   ```
-http://localhost:3000
-```
-
-2. **Login**
-   - Navigate to login page
-   - Enter credentials
-   - Verify successful login
-   - Check: No tokens in localStorage
-
-3. **Create Character**
-   - Navigate to character creation
-   - Fill in all required fields
-   - Submit form
-   - Verify: No 422 errors
-   - Verify: Character appears in list
-
-4. **Start Chat**
-   - Navigate to chat interface
-   - Send a message
-   - Verify: AI response (not echo)
-   - Verify: Progressive feedback indicators
-
-5. **Test Persistence**
-   - Refresh page (F5)
-   - Verify: Still logged in
-   - Verify: Conversation history loaded
-
-6. **Test Error Handling**
-   - Trigger an error (invalid input)
-   - Verify: User-friendly error message
-   - Verify: No "[object Object]" displays
-
-7. **Logout**
-   - Click logout
-   - Verify: Redirected to login
-   - Verify: Session cleared
-
----
-
-## Success Criteria
-
-### Frontend Validation: ✅ COMPLETE
-
-- [x] Application loads successfully
-- [x] No [object Object] errors
-- [x] Secure token storage
-- [x] ErrorBoundary integrated
-- [x] Responsive design works
-- [x] CSS loaded and applied
-- [x] React rendered successfully
-- [x] Navigation works
-- [x] No critical console errors
-- [x] Offline handling works
-
-### Backend Integration: 🔄 PENDING
-
-- [ ] Backend API starts successfully
-- [ ] Character creation works (no 422 errors)
-- [ ] AI chat responses (not echo)
-- [ ] Conversation history persists
-- [ ] Session persistence works
-- [ ] WebSocket connection stable
-- [ ] Neo4j integration works
-- [ ] Redis persistence works
-
----
-
-## Contact & Support
-
-### If You Encounter Issues:
-
-1. **Check Logs**
-   - Backend: Check terminal output
-   - Frontend: Check browser console
-   - Redis: `redis-cli monitor`
-   - Neo4j: Check Neo4j Browser
-
-2. **Review Documentation**
-   - `VALIDATION_RESULTS.md` - Manual validation steps
-   - `VALIDATION_TEST_RESULTS.md` - Test results
-   - `COMPREHENSIVE_VALIDATION_SUMMARY.md` - Overall summary
-
-3. **Common Issues**
-   - Import errors: Set PYTHONPATH
-   - Port conflicts: Kill existing processes
-   - Missing dependencies: Install from requirements.txt
-   - Database connections: Verify Redis and Neo4j running
-
----
-
-## Quick Command Reference
-
-```bash
-# Check services
-ps aux | grep -E "redis|neo4j|node|python" | grep -v grep
-
-# Start Redis
-redis-server
-
-# Start Neo4j
-neo4j start
-
-# Start Frontend (if not running)
-cd src/player_experience/frontend && npm start
-
-# Start Backend
-source .venv/bin/activate
-export PYTHONPATH=/home/thein/recovered-tta-storytelling
-cd src/player_experience
-python -m uvicorn api.main:app --host 0.0.0.0 --port 8080 --reload
-
-# Run Quick Validation
-npx playwright test --config=playwright.quick.config.ts
-
-# Run Full Validation (requires backend)
-npx playwright test tests/e2e/comprehensive-validation.spec.ts --headed
-```
-
----
-
-## Summary
-
-### Current Status:
-- ✅ Frontend validation complete (10/10 tests passed)
-- ✅ All critical fixes implemented and verified
-- ✅ Security improvements confirmed
-- ✅ Error handling working correctly
-- 🔄 Backend integration testing pending
-
-### Next Action:
-**Start backend API server to enable full E2E validation**
-
-### Estimated Time:
-- Backend startup: 5-10 minutes
-- Full E2E validation: 15-20 minutes
-- Manual validation: 30-45 minutes
-
----
-
-**Guide Created:** 2025-09-29  
-**Status:** Ready for Backend Integration Testing  
-**Priority:** HIGH - Complete validation before production deployment
-
-- Manual validation: 30-45 minutes
-
----
-
-**Guide Created:** 2025-09-29  
-**Status:** Ready for Backend Integration Testing  
-**Priority:** HIGH - Complete validation before production deployment
-
-rs.appearance ? 'border-red-500' : ''}`}
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { createCharacter } from '../../store/slices/characterSlice';
+import { RootState } from '../../store/store';
+import { IntensityLevel } from '../../types';
+import { parseAPIError, validateName } from '../../utils/characterValidation';
+
+interface CharacterCreationFormProps {
+  onClose: () => void;
+  onSuccess?: () => void;
+}
+
+interface TherapeuticGoal {
+  goal_id: string;
+  description: string;
+  target_date?: string;
+  progress_percentage: number;
+  is_active: boolean;
+  therapeutic_approaches: string[];
+}
+
+interface FormData {
+  name: string;
+  appearance: {
+    age_range: string;
+    gender_identity: string;
+    physical_description: string;
+    clothing_style: string;
+    distinctive_features: string[];
+    avatar_image_url?: string;
+  };
+  background: {
+    name: string;
+    backstory: string;
+    personality_traits: string[];
+    core_values: string[];
+    fears_and_anxieties: string[];
+    strengths_and_skills: string[];
+    life_goals: string[];
+    relationships: Record<string, string>;
+  };
+  therapeutic_profile: {
+    primary_concerns: string[];
+    therapeutic_goals: TherapeuticGoal[];
+    preferred_intensity: IntensityLevel;
+    comfort_zones: string[];
+    readiness_level: number;
+    therapeutic_approaches: string[];
+  };
+}
+
+const CharacterCreationForm: React.FC<CharacterCreationFormProps> = ({
+  onClose,
+  onSuccess,
+}) => {
+  const dispatch = useDispatch();
+  const { creationInProgress } = useSelector((state: RootState) => state.character);
+  const { profile } = useSelector((state: RootState) => state.player);
+
+  const [currentStep, setCurrentStep] = useState(1);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<FormData>({
+    name: '',
+    appearance: {
+      age_range: 'adult',
+      gender_identity: 'non-binary',
+      physical_description: '',
+      clothing_style: 'casual',
+      distinctive_features: [],
+      avatar_image_url: undefined,
+    },
+    background: {
+      name: '',
+      backstory: '',
+      personality_traits: [],
+      core_values: [],
+      fears_and_anxieties: [],
+      strengths_and_skills: [],
+      life_goals: [],
+      relationships: {},
+    },
+    therapeutic_profile: {
+      primary_concerns: [],
+      therapeutic_goals: [],
+      preferred_intensity: 'MEDIUM' as IntensityLevel,
+      comfort_zones: [],
+      readiness_level: 0.5,
+      therapeutic_approaches: [],
+    },
+  });
+
+  // State for adding array items
+  const [newTrait, setNewTrait] = useState('');
+  const [newGoal, setNewGoal] = useState('');
+  const [newValue, setNewValue] = useState('');
+  const [newFear, setNewFear] = useState('');
+  const [newSkill, setNewSkill] = useState('');
+  const [newConcern, setNewConcern] = useState('');
+  const [newComfortZone, setNewComfortZone] = useState('');
+  const [newTherapeuticGoal, setNewTherapeuticGoal] = useState('');
+
+  const handleInputChange = (field: string, value: any) => {
+    setFormData(prev => {
+      const keys = field.split('.');
+      if (keys.length === 1) {
+        return { ...prev, [field]: value };
+      } else if (keys.length === 2) {
+        const parentKey = keys[0] as keyof typeof formData;
+        const parentObj = prev[parentKey] as any;
+        return {
+          ...prev,
+          [keys[0]]: {
+            ...parentObj,
+            [keys[1]]: value,
+          },
+        };
+      }
+      return prev;
+    });
+
+    // Clear error when user starts typing
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
+  const addArrayItem = (field: string, value: string, setter: (val: string) => void) => {
+    if (!value.trim()) return;
+
+    setFormData(prev => {
+      const keys = field.split('.');
+      if (keys.length === 2) {
+        const parentKey = keys[0] as keyof typeof formData;
+        const childKey = keys[1];
+        const parentObj = prev[parentKey] as any;
+        const currentArray = parentObj[childKey] as string[];
+
+        return {
+          ...prev,
+          [parentKey]: {
+            ...parentObj,
+            [childKey]: [...currentArray, value.trim()],
+          },
+        };
+      }
+      return prev;
+    });
+
+    setter('');
+  };
+
+  const removeArrayItem = (field: string, index: number) => {
+    setFormData(prev => {
+      const keys = field.split('.');
+      if (keys.length === 2) {
+        const parentKey = keys[0] as keyof typeof formData;
+        const childKey = keys[1];
+        const parentObj = prev[parentKey] as any;
+        const currentArray = parentObj[childKey] as string[];
+
+        return {
+          ...prev,
+          [parentKey]: {
+            ...parentObj,
+            [childKey]: currentArray.filter((_, i) => i !== index),
+          },
+        };
+      }
+      return prev;
+    });
+  };
+
+  const addTherapeuticGoal = (description: string) => {
+    if (!description.trim()) return;
+
+    const newGoal: TherapeuticGoal = {
+      goal_id: `goal_${Date.now()}`,
+      description: description.trim(),
+      progress_percentage: 0,
+      is_active: true,
+      therapeutic_approaches: [],
+    };
+
+    setFormData(prev => ({
+      ...prev,
+      therapeutic_profile: {
+        ...prev.therapeutic_profile,
+        therapeutic_goals: [...prev.therapeutic_profile.therapeutic_goals, newGoal],
+      },
+    }));
+
+    setNewTherapeuticGoal('');
+  };
+
+  const removeTherapeuticGoal = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      therapeutic_profile: {
+        ...prev.therapeutic_profile,
+        therapeutic_goals: prev.therapeutic_profile.therapeutic_goals.filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  const validateStep1 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    const nameError = validateName(formData.name);
+    if (nameError) {
+      newErrors.name = nameError;
+    }
+
+    if (!formData.appearance.physical_description.trim()) {
+      newErrors.appearance = 'Physical description is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep2 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.background.backstory.trim()) {
+      newErrors.backstory = 'Background story is required';
+    }
+
+    if (formData.background.personality_traits.length === 0) {
+      newErrors.traits = 'At least one personality trait is required';
+    }
+
+    if (formData.background.life_goals.length === 0) {
+      newErrors.goals = 'At least one life goal is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateStep3 = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (formData.therapeutic_profile.primary_concerns.length === 0) {
+      newErrors.concerns = 'At least one primary concern is required';
+    }
+
+    if (formData.therapeutic_profile.therapeutic_goals.length === 0) {
+      newErrors.therapeuticGoals = 'At least one therapeutic goal is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleNext = () => {
+    let isValid = false;
+
+    if (currentStep === 1) {
+      isValid = validateStep1();
+    } else if (currentStep === 2) {
+      isValid = validateStep2();
+    }
+
+    if (isValid) {
+      setCurrentStep(prev => prev + 1);
+      setErrors({});
+    }
+  };
+
+  const handlePrevious = () => {
+    setCurrentStep(prev => prev - 1);
+    setErrors({});
+  };
+
+  const handleSubmit = async () => {
+    if (!validateStep3()) return;
+
+    if (!profile?.player_id) {
+      setError('Player ID not found. Please log in again.');
+      return;
+    }
+
+    try {
+      // Sync background name with character name
+      const characterData = {
+        ...formData,
+        background: {
+          ...formData.background,
+          name: formData.name,
+        },
+      };
+
+      await dispatch(createCharacter({
+        playerId: profile.player_id,
+        characterData,
+      }) as any).unwrap();
+
+      onSuccess?.();
+      onClose();
+    } catch (err: any) {
+      console.error('Failed to create character:', err);
+      setError(parseAPIError(err));
+    }
+  };
+
+  const renderStep1 = () => (
+    <div className="space-y-6">
+      <div>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Character Name *
+            </label>
+            <input
+              type="text"
+              className={`input-field ${errors.name ? 'border-red-500' : ''}`}
+              placeholder="Enter your character's name"
+              value={formData.name}
+              onChange={(e) => handleInputChange('name', e.target.value)}
+            />
+            {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Age Range
+              </label>
+              <select
+                className="input-field"
+                value={formData.appearance.age_range}
+                onChange={(e) => handleInputChange('appearance.age_range', e.target.value)}
+              >
+                <option value="child">Child</option>
+                <option value="teen">Teen</option>
+                <option value="adult">Adult</option>
+                <option value="elder">Elder</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Gender Identity
+              </label>
+              <input
+                type="text"
+                className="input-field"
+                placeholder="e.g., non-binary, male, female"
+                value={formData.appearance.gender_identity}
+                onChange={(e) => handleInputChange('appearance.gender_identity', e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Physical Description *
+            </label>
+            <textarea
+              className={`input-field ${errors.appearance ? 'border-red-500' : ''}`}
               rows={4}
               placeholder="Describe your character's physical appearance, style, and any distinctive features..."
               value={formData.appearance.physical_description}
@@ -526,7 +412,7 @@ rs.appearance ? 'border-red-500' : ''}`}
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Background & Personality</h3>
-        
+
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -569,25 +455,21 @@ rs.appearance ? 'border-red-500' : ''}`}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {Array.isArray(formData.background.personality_traits) && formData.background.personality_traits.map((trait, index) => {
-                // Ensure trait is a string
-                const traitText = typeof trait === 'string' ? trait : String(trait);
-                return (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+              {formData.background.personality_traits.map((trait, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                >
+                  {trait}
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem('background.personality_traits', index)}
+                    className="ml-2 text-blue-600 hover:text-blue-800"
                   >
-                    {traitText}
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('background.personality_traits', index)}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
+                    ×
+                  </button>
+                </span>
+              ))}
             </div>
             {errors.traits && <p className="text-red-600 text-sm mt-1">{errors.traits}</p>}
           </div>
@@ -619,25 +501,21 @@ rs.appearance ? 'border-red-500' : ''}`}
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {Array.isArray(formData.background.life_goals) && formData.background.life_goals.map((goal, index) => {
-                // Ensure goal is a string
-                const goalText = typeof goal === 'string' ? goal : String(goal);
-                return (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+              {formData.background.life_goals.map((goal, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full"
+                >
+                  {goal}
+                  <button
+                    type="button"
+                    onClick={() => removeArrayItem('background.life_goals', index)}
+                    className="ml-2 text-green-600 hover:text-green-800"
                   >
-                    {goalText}
-                    <button
-                      type="button"
-                      onClick={() => removeArrayItem('background.life_goals', index)}
-                      className="ml-2 text-green-600 hover:text-green-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
+                    ×
+                  </button>
+                </span>
+              ))}
             </div>
             {errors.goals && <p className="text-red-600 text-sm mt-1">{errors.goals}</p>}
           </div>
@@ -687,98 +565,6 @@ rs.appearance ? 'border-red-500' : ''}`}
               ))}
             </div>
           </div>
-
-          {/* Fears and Anxieties */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fears & Anxieties
-            </label>
-            <div className="flex space-x-2 mb-2">
-              <input
-                type="text"
-                className="input-field flex-1"
-                placeholder="Add a fear or anxiety"
-                value={newFear}
-                onChange={(e) => setNewFear(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addArrayItem('background.fears_and_anxieties', newFear, setNewFear);
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => addArrayItem('background.fears_and_anxieties', newFear, setNewFear)}
-                className="btn-primary px-3"
-              >
-                Add
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.background.fears_and_anxieties.map((fear, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full"
-                >
-                  {fear}
-                  <button
-                    type="button"
-                    onClick={() => removeArrayItem('background.fears_and_anxieties', index)}
-                    className="ml-2 text-red-600 hover:text-red-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Strengths and Skills */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Strengths & Skills
-            </label>
-            <div className="flex space-x-2 mb-2">
-              <input
-                type="text"
-                className="input-field flex-1"
-                placeholder="Add a strength or skill"
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    addArrayItem('background.strengths_and_skills', newSkill, setNewSkill);
-                  }
-                }}
-              />
-              <button
-                type="button"
-                onClick={() => addArrayItem('background.strengths_and_skills', newSkill, setNewSkill)}
-                className="btn-primary px-3"
-              >
-                Add
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {formData.background.strengths_and_skills.map((skill, index) => (
-                <span
-                  key={index}
-                  className="inline-flex items-center px-3 py-1 bg-yellow-100 text-yellow-800 text-sm rounded-full"
-                >
-                  {skill}
-                  <button
-                    type="button"
-                    onClick={() => removeArrayItem('background.strengths_and_skills', index)}
-                    className="ml-2 text-yellow-600 hover:text-yellow-800"
-                  >
-                    ×
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -788,7 +574,7 @@ rs.appearance ? 'border-red-500' : ''}`}
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold text-gray-900 mb-4">Therapeutic Profile</h3>
-        
+
         <div className="space-y-4">
           {/* Primary Concerns */}
           <div>
@@ -964,8 +750,7 @@ rs.appearance ? 'border-red-500' : ''}`}
                     ×
                   </button>
                 </span>
-                );
-              })}
+              ))}
             </div>
             {errors.therapeuticGoals && <p className="text-red-600 text-sm mt-1">{errors.therapeuticGoals}</p>}
           </div>
@@ -977,11 +762,11 @@ rs.appearance ? 'border-red-500' : ''}`}
         <h4 className="font-medium text-gray-900 mb-3">Character Summary</h4>
         <div className="space-y-2 text-sm">
           <p><span className="font-medium">Name:</span> {formData.name}</p>
-          <p><span className="font-medium">Comfort Level:</span> {formData.therapeutic_profile.comfort_level}/10</p>
+          <p><span className="font-medium">Readiness Level:</span> {formData.therapeutic_profile.readiness_level.toFixed(1)}</p>
           <p><span className="font-medium">Intensity:</span> {formData.therapeutic_profile.preferred_intensity}</p>
-          <p><span className="font-medium">Traits:</span> {Array.isArray(formData.background.personality_traits) ? formData.background.personality_traits.filter(t => typeof t === 'string').join(', ') : 'None'}</p>
-          <p><span className="font-medium">Goals:</span> {Array.isArray(formData.background.goals) ? formData.background.goals.filter(g => typeof g === 'string').join(', ') : 'None'}</p>
-          <p><span className="font-medium">Therapeutic Goals:</span> {Array.isArray(formData.therapeutic_profile.therapeutic_goals) ? formData.therapeutic_profile.therapeutic_goals.filter(g => typeof g === 'string').join(', ') : 'None'}</p>
+          <p><span className="font-medium">Traits:</span> {formData.background.personality_traits.join(', ') || 'None'}</p>
+          <p><span className="font-medium">Goals:</span> {formData.background.life_goals.join(', ') || 'None'}</p>
+          <p><span className="font-medium">Therapeutic Goals:</span> {formData.therapeutic_profile.therapeutic_goals.map(g => g.description).join(', ') || 'None'}</p>
         </div>
       </div>
     </div>
@@ -989,8 +774,7 @@ rs.appearance ? 'border-red-500' : ''}`}
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     // Only close if clicking on the backdrop itself, not the modal content
-    // Also ensure we're not interfering with button clicks
-    if (e.target === e.currentTarget && !(e.target as HTMLElement).closest('button')) {
+    if (e.target === e.currentTarget) {
       onClose();
     }
   };
@@ -1017,7 +801,7 @@ rs.appearance ? 'border-red-500' : ''}`}
               </svg>
             </button>
           </div>
-          
+
           {/* Progress Steps */}
           <div className="flex items-center mt-4">
             {[1, 2, 3].map((step) => (
@@ -1041,7 +825,7 @@ rs.appearance ? 'border-red-500' : ''}`}
               </React.Fragment>
             ))}
           </div>
-          
+
           <div className="flex justify-between text-sm text-gray-600 mt-2">
             <span>Basic Info</span>
             <span>Background</span>
@@ -1073,7 +857,7 @@ rs.appearance ? 'border-red-500' : ''}`}
           >
             {currentStep === 1 ? 'Cancel' : 'Previous'}
           </button>
-          
+
           {currentStep < 3 ? (
             <button onClick={handleNext} className="btn-primary">
               Next

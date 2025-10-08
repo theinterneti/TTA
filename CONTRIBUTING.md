@@ -158,6 +158,30 @@ git commit -m "chore(deps): update dependencies"
 - `ci`: CI/CD changes
 - `chore`: Maintenance tasks
 
+**Pre-commit Hooks:**
+
+Pre-commit hooks run automatically on every commit to ensure code quality. They will:
+- Format code with Black and isort
+- Lint with Ruff
+- Check for security issues with Bandit
+- Detect secrets and credentials
+- Validate YAML/JSON/TOML syntax
+- Check pytest-asyncio fixture decorators
+- Enforce conventional commit messages
+
+If hooks fail, they often auto-fix issues. Just re-stage and commit:
+```bash
+git add .
+git commit -m "feat: your message"
+```
+
+To bypass hooks temporarily (use sparingly):
+```bash
+git commit --no-verify -m "wip: work in progress"
+```
+
+For detailed information, see [Pre-Commit Hooks Guide](docs/PRE_COMMIT_HOOKS.md).
+
 ### 6. Push and Create PR
 
 ```bash
@@ -380,4 +404,3 @@ By contributing to TTA, you agree that your contributions will be licensed under
 **Thank you for contributing to TTA!** 🎉
 
 Your contributions help make therapeutic AI technology more accessible and effective.
-

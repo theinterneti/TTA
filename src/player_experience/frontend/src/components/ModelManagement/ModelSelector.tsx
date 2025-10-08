@@ -44,7 +44,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   const getModelsToShow = () => {
     let models: ModelInfo[] = [];
-    
+
     switch (filterType || activeFilter) {
       case 'free':
         models = freeModels;
@@ -82,7 +82,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
 
   const handleModelSelect = (model: ModelInfo) => {
     dispatch(setSelectedModel(model));
-    
+
     // Track the selection for analytics
     if (profile?.player_id) {
       dispatch(trackModelSelection({
@@ -150,7 +150,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
             </svg>
           </div>
         </div>
-        
+
         <div className="sm:w-48">
           <select
             value={sortBy}
@@ -192,7 +192,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                   {model.model_id}
                 </p>
               </div>
-              
+
               {/* Cost Badge */}
               <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getModelStatusColor(model)}`}>
                 {formatCost(model.cost_per_token)}
@@ -210,14 +210,14 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                 <span>Context Length</span>
                 <span>{model.context_length?.toLocaleString() || 'N/A'}</span>
               </div>
-              
+
               {showPerformanceMetrics && model.performance_score && (
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>Performance Score</span>
                   <span>{model.performance_score}/10</span>
                 </div>
               )}
-              
+
               {model.therapeutic_safety_score && (
                 <div className="flex items-center justify-between text-xs text-gray-500">
                   <span>Safety Score</span>
@@ -256,10 +256,10 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
               className="mt-3 text-xs text-primary-600 hover:text-primary-700 flex items-center"
             >
               {showDetails === model.model_id ? 'Hide Details' : 'Show Details'}
-              <svg 
+              <svg
                 className={`ml-1 h-3 w-3 transition-transform ${showDetails === model.model_id ? 'rotate-180' : ''}`}
-                fill="none" 
-                stroke="currentColor" 
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 24 24"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -273,7 +273,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
                   <span className="font-medium text-gray-700">Provider:</span>
                   <span className="ml-2 text-gray-600">{model.provider}</span>
                 </div>
-                
+
                 {model.capabilities && (
                   <div className="text-xs">
                     <span className="font-medium text-gray-700">All Capabilities:</span>
@@ -302,7 +302,7 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({
           </svg>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No models found</h3>
           <p className="text-gray-600">
-            {searchTerm 
+            {searchTerm
               ? `No models match your search "${searchTerm}"`
               : 'No models available with current filters'
             }

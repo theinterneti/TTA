@@ -267,18 +267,16 @@ class LMStudioProvider(BaseProvider):
         if "llama" in model_lower:
             if "3.1" in model_lower or "3.2" in model_lower:
                 return 128000  # Llama 3.1/3.2 has 128k context
-            else:
-                return 4096  # Older Llama models
-        elif "qwen" in model_lower:
+            return 4096  # Older Llama models
+        if "qwen" in model_lower:
             return 32768  # Qwen models typically have 32k context
-        elif "mistral" in model_lower:
+        if "mistral" in model_lower:
             return 32768  # Mistral models
-        elif "phi" in model_lower:
+        if "phi" in model_lower:
             return 4096  # Phi models
-        elif "gemma" in model_lower:
+        if "gemma" in model_lower:
             return 8192  # Gemma models
-        else:
-            return 4096  # Default assumption
+        return 4096  # Default assumption
 
     async def cleanup(self):
         """Cleanup resources."""

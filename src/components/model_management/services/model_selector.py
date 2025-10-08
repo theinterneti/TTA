@@ -136,7 +136,7 @@ class ModelSelector(IModelSelector):
                         ProviderType.OPENROUTER,
                         ProviderType.CUSTOM_API,
                     ]
-                elif (
+                if (
                     model_info.therapeutic_safety_score
                     < self.selection_criteria.min_therapeutic_safety_score
                 ):
@@ -218,15 +218,14 @@ class ModelSelector(IModelSelector):
                     model.therapeutic_safety_score
                     * self.selection_criteria.therapeutic_safety_weight
                 )
+            # Conservative default for unknown safety
+            elif model.provider_type in [
+                ProviderType.OPENROUTER,
+                ProviderType.CUSTOM_API,
+            ]:
+                score += 7.0 * self.selection_criteria.therapeutic_safety_weight
             else:
-                # Conservative default for unknown safety
-                if model.provider_type in [
-                    ProviderType.OPENROUTER,
-                    ProviderType.CUSTOM_API,
-                ]:
-                    score += 7.0 * self.selection_criteria.therapeutic_safety_weight
-                else:
-                    score += 5.0 * self.selection_criteria.therapeutic_safety_weight
+                score += 5.0 * self.selection_criteria.therapeutic_safety_weight
 
             # Cost score (lower cost = higher score)
             cost_score = 10.0  # Max score for free models

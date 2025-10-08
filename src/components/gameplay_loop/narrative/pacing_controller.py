@@ -57,15 +57,15 @@ class PacingController:
         self.config = config or {}
 
         # Pacing configuration
-        self.pacing_rules: dict[SessionPhase, dict[PacingDimension, PacingStrategy]] = (
-            {}
-        )
+        self.pacing_rules: dict[
+            SessionPhase, dict[PacingDimension, PacingStrategy]
+        ] = {}
         self.emotional_pacing_adjustments: dict[
             EmotionalState, dict[PacingDimension, PacingStrategy]
         ] = {}
-        self.optimal_durations: dict[SceneType, tuple[int, int]] = (
-            {}
-        )  # (min, max) seconds
+        self.optimal_durations: dict[
+            SceneType, tuple[int, int]
+        ] = {}  # (min, max) seconds
         self.fatigue_thresholds: dict[str, int] = {}
 
         logger.info("PacingController initialized")
@@ -343,14 +343,13 @@ class PacingController:
 
         if choice_count <= 2:
             return SessionPhase.OPENING
-        elif choice_count <= 5:
+        if choice_count <= 5:
             return SessionPhase.ENGAGEMENT
-        elif session_duration < 1200:  # Less than 20 minutes
+        if session_duration < 1200:  # Less than 20 minutes
             return SessionPhase.WORKING
-        elif session_duration < 1800:  # Less than 30 minutes
+        if session_duration < 1800:  # Less than 30 minutes
             return SessionPhase.INTEGRATION
-        else:
-            return SessionPhase.CLOSURE
+        return SessionPhase.CLOSURE
 
     async def _calculate_pacing_metrics(
         self, session_state: SessionState
@@ -456,13 +455,12 @@ class PacingController:
         # Adjust for emotional state
         if session_state.emotional_state == EmotionalState.ENGAGED:
             return min(base_intensity * 1.2, 1.0)
-        elif session_state.emotional_state in [
+        if session_state.emotional_state in [
             EmotionalState.ANXIOUS,
             EmotionalState.OVERWHELMED,
         ]:
             return base_intensity * 0.7
-        else:
-            return base_intensity
+        return base_intensity
 
     def _calculate_cognitive_load(self, session_state: SessionState) -> float:
         """Calculate current cognitive load level."""
@@ -507,10 +505,9 @@ class PacingController:
         # Normalize choice frequency to momentum score
         if choice_frequency > 0.3:  # More than 1 choice per 3 minutes
             return 0.8
-        elif choice_frequency > 0.2:  # More than 1 choice per 5 minutes
+        if choice_frequency > 0.2:  # More than 1 choice per 5 minutes
             return 0.6
-        else:
-            return 0.4
+        return 0.4
 
     # Adjustment Application Methods
     async def _apply_dimension_adjustment(
@@ -519,16 +516,15 @@ class PacingController:
         """Apply pacing adjustment for a specific dimension."""
         if dimension == PacingDimension.NARRATIVE_FLOW:
             return await self._adjust_narrative_flow(scene, strategy)
-        elif dimension == PacingDimension.THERAPEUTIC_INTENSITY:
+        if dimension == PacingDimension.THERAPEUTIC_INTENSITY:
             return await self._adjust_therapeutic_intensity(scene, strategy)
-        elif dimension == PacingDimension.COGNITIVE_LOAD:
+        if dimension == PacingDimension.COGNITIVE_LOAD:
             return await self._adjust_cognitive_load(scene, strategy)
-        elif dimension == PacingDimension.EMOTIONAL_PACING:
+        if dimension == PacingDimension.EMOTIONAL_PACING:
             return await self._adjust_emotional_pacing(scene, strategy)
-        elif dimension == PacingDimension.INTERACTION_FREQUENCY:
+        if dimension == PacingDimension.INTERACTION_FREQUENCY:
             return await self._adjust_interaction_frequency(scene, strategy)
-        else:
-            return scene
+        return scene
 
     async def _apply_overall_pacing_strategy(
         self, scene: Scene, strategy: PacingStrategy

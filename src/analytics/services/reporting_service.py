@@ -734,8 +734,7 @@ async def get_report(report_id: str, format: str = "json"):
     if format.lower() == "html":
         html_content = report_generator.render_html_report(report)
         return {"content": html_content, "content_type": "text/html"}
-    else:
-        return report.to_dict()
+    return report.to_dict()
 
 
 @app.get("/reports")

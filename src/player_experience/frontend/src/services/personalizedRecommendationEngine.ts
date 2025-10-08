@@ -1,6 +1,6 @@
 /**
  * Personalized Recommendation Engine for TherapeuticGoalsSelector
- * 
+ *
  * This service provides intelligent, contextual recommendations for therapeutic goals,
  * concerns, and approaches based on user profile, progress data, and clinical evidence.
  * Implements advanced personalization algorithms with evidence-based therapeutic principles.
@@ -50,21 +50,21 @@ export interface RecommendationResult {
 }
 
 // Supporting types
-export type RecommendationType = 
-  | 'goal_suggestion' 
-  | 'concern_identification' 
-  | 'approach_optimization' 
-  | 'progress_enhancement' 
+export type RecommendationType =
+  | 'goal_suggestion'
+  | 'concern_identification'
+  | 'approach_optimization'
+  | 'progress_enhancement'
   | 'conflict_resolution'
   | 'milestone_adjustment'
   | 'therapeutic_deepening'
   | 'integration_support';
 
-export type RecommendationCategory = 
-  | 'immediate_action' 
-  | 'short_term_planning' 
-  | 'long_term_development' 
-  | 'crisis_prevention' 
+export type RecommendationCategory =
+  | 'immediate_action'
+  | 'short_term_planning'
+  | 'long_term_development'
+  | 'crisis_prevention'
   | 'progress_optimization'
   | 'relationship_enhancement'
   | 'self_care'
@@ -197,7 +197,7 @@ const CLINICAL_EVIDENCE_MAPPINGS = {
       [TherapeuticApproach.CBT]: 0.6
     }
   },
-  
+
   // Goal progression patterns
   goalProgression: {
     'anxiety_reduction': ['mindfulness_development', 'coping_strategies', 'confidence_building'],
@@ -206,7 +206,7 @@ const CLINICAL_EVIDENCE_MAPPINGS = {
     'trauma_recovery': ['body_awareness', 'self_compassion', 'coping_strategies', 'boundary_setting'],
     'relationship_skills': ['communication_skills', 'boundary_setting', 'emotional_processing']
   },
-  
+
   // Intensity level appropriateness
   intensityAppropriate: {
     [IntensityLevel.LOW]: ['mindfulness_development', 'body_awareness', 'self_compassion'],
@@ -233,16 +233,16 @@ export function generatePersonalizedRecommendations(
 ): RecommendationResult {
   const recommendations: ContextualRecommendation[] = [];
   const adaptationHistory: AdaptationEntry[] = [];
-  
+
   // Analyze user context for personalization
   const personalizationProfile = analyzePersonalizationProfile(userContext);
-  
+
   // Generate different types of recommendations
   const goalRecommendations = generateGoalRecommendations(userContext, personalizationProfile);
   const approachRecommendations = generateApproachRecommendations(userContext, personalizationProfile);
   const progressRecommendations = generateProgressRecommendations(userContext, personalizationProfile);
   const integrationRecommendations = generateIntegrationRecommendations(userContext, personalizationProfile);
-  
+
   // Combine and prioritize recommendations
   const allRecommendations = [
     ...goalRecommendations,
@@ -250,21 +250,21 @@ export function generatePersonalizedRecommendations(
     ...progressRecommendations,
     ...integrationRecommendations
   ];
-  
+
   // Sort by priority and confidence, then limit to max recommendations
   const prioritizedRecommendations = prioritizeRecommendations(allRecommendations, userContext)
     .slice(0, maxRecommendations);
-  
+
   // Calculate personalization metrics
   const personalizationScore = calculatePersonalizationScore(prioritizedRecommendations, userContext);
   const confidenceLevel = determineConfidenceLevel(prioritizedRecommendations);
-  
+
   // Generate summary
   const recommendationSummary = generateRecommendationSummary(prioritizedRecommendations);
-  
+
   // Determine next review date
   const nextReviewDate = calculateNextReviewDate(userContext, prioritizedRecommendations);
-  
+
   return {
     recommendations: prioritizedRecommendations,
     totalRecommendations: prioritizedRecommendations.length,

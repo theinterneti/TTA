@@ -111,6 +111,34 @@ class TestComponents(unittest.TestCase):
                 "Carbon component status is incorrect after stopping",
             )
 
+    def test_carbon_decorator(self):
+        """Test the Carbon component decorator functionality."""
+        config = TTAConfig()
+        carbon = CarbonComponent(config)
+
+        # Test getting the carbon decorator
+        decorator = carbon.get_carbon_decorator()
+        self.assertIsNotNone(decorator, "Carbon decorator should not be None")
+
+        # Test that the decorator can be applied to a function
+        @decorator
+        def test_function():
+            return "decorated"
+
+        result = test_function()
+        self.assertEqual(result, "decorated", "Decorated function should work")
+
+    def test_carbon_without_codecarbon(self):
+        """Test Carbon component behavior when codecarbon is not available."""
+        config = TTAConfig()
+        carbon = CarbonComponent(config)
+
+        # Test that get_emissions_report handles missing codecarbon gracefully
+        # This test will pass regardless of whether codecarbon is installed
+        # because the component handles both cases
+        report = carbon.get_emissions_report()
+        self.assertIsNotNone(report, "Emissions report should not be None")
+
 
 if __name__ == "__main__":
     # Run the tests

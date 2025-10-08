@@ -66,7 +66,7 @@ const SessionManagementInterface: React.FC<SessionManagementInterfaceProps> = ({
   const handlePlanSession = async () => {
     setIsLoading(true);
     setError(null);
-    
+
     try {
       const planResult = await therapeuticSessionService.planSession(
         userId,
@@ -94,7 +94,7 @@ const SessionManagementInterface: React.FC<SessionManagementInterfaceProps> = ({
         new Date(),
         'individual'
       );
-      
+
       const newSession = therapeuticSessionService.getSession(sessionId);
       if (newSession) {
         setSessions(prev => [newSession, ...prev]);
@@ -138,13 +138,13 @@ const SessionManagementInterface: React.FC<SessionManagementInterfaceProps> = ({
         feedback,
         'Session completed successfully'
       );
-      
+
       const updatedSession = therapeuticSessionService.getSession(sessionId);
       if (updatedSession) {
         setSessions(prev => prev.map(s => s.id === sessionId ? updatedSession : s));
         setCurrentSession(null);
         onSessionUpdate?.(sessionId, updatedSession);
-        
+
         // Refresh journey analysis
         await loadJourneyAnalysis();
       }
@@ -294,7 +294,7 @@ const SessionManagementInterface: React.FC<SessionManagementInterfaceProps> = ({
       className="space-y-6"
     >
       <h3 className="text-lg font-semibold text-gray-900">Active Sessions</h3>
-      
+
       {currentSession ? (
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-4">
@@ -329,7 +329,7 @@ const SessionManagementInterface: React.FC<SessionManagementInterfaceProps> = ({
                   {isLoading ? 'Starting...' : 'Start Session'}
                 </button>
               )}
-              
+
               {currentSession.status === 'in-progress' && (
                 <button
                   onClick={() => {

@@ -106,8 +106,8 @@ const WorldCustomizationModal: React.FC<WorldCustomizationModalProps> = ({
   };
 
   const generatePreview = () => {
-    return `This world will be customized with ${parameters.therapeutic_intensity.toLowerCase()} therapeutic intensity, 
-    using a ${parameters.narrative_style.toLowerCase()} narrative approach at a ${parameters.pacing.toLowerCase()} pace 
+    return `This world will be customized with ${parameters.therapeutic_intensity.toLowerCase()} therapeutic intensity,
+    using a ${parameters.narrative_style.toLowerCase()} narrative approach at a ${parameters.pacing.toLowerCase()} pace
     with ${parameters.interaction_frequency.toLowerCase()} therapeutic interactions.`;
   };
 

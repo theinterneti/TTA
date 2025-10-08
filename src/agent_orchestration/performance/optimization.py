@@ -66,12 +66,11 @@ class AgentPerformanceProfile:
 
         if load_ratio >= 1.0:
             return AgentLoadLevel.OVERLOADED
-        elif load_ratio >= 0.8:
+        if load_ratio >= 0.8:
             return AgentLoadLevel.HIGH
-        elif load_ratio >= 0.5:
+        if load_ratio >= 0.5:
             return AgentLoadLevel.MEDIUM
-        else:
-            return AgentLoadLevel.LOW
+        return AgentLoadLevel.LOW
 
     @property
     def efficiency_score(self) -> float:
@@ -215,12 +214,12 @@ class IntelligentAgentCoordinator:
         """Make intelligent scheduling decision for a request."""
         if self.optimization_strategy == OptimizationStrategy.FASTEST_FIRST:
             return await self._schedule_fastest_first(request)
-        elif self.optimization_strategy == OptimizationStrategy.LOAD_BALANCED:
+        if self.optimization_strategy == OptimizationStrategy.LOAD_BALANCED:
             return await self._schedule_load_balanced(request)
-        elif self.optimization_strategy == OptimizationStrategy.PREDICTIVE:
+        if self.optimization_strategy == OptimizationStrategy.PREDICTIVE:
             return await self._schedule_predictive(request)
-        else:  # ADAPTIVE
-            return await self._schedule_adaptive(request)
+        # ADAPTIVE
+        return await self._schedule_adaptive(request)
 
     async def _schedule_fastest_first(
         self, request: WorkflowRequest
@@ -366,12 +365,12 @@ class IntelligentAgentCoordinator:
         # Choose strategy based on conditions
         if system_load < 0.3:  # Low load - prioritize speed
             return await self._schedule_fastest_first(request)
-        elif system_load > 0.8:  # High load - balance load
+        if system_load > 0.8:  # High load - balance load
             return await self._schedule_load_balanced(request)
-        elif performance_variance > 0.5:  # High variance - use prediction
+        if performance_variance > 0.5:  # High variance - use prediction
             return await self._schedule_predictive(request)
-        else:  # Balanced conditions - use load balancing
-            return await self._schedule_load_balanced(request)
+        # Balanced conditions - use load balancing
+        return await self._schedule_load_balanced(request)
 
     def _predict_agent_performance(
         self, agent: AgentPerformanceProfile, estimated_duration: float

@@ -99,7 +99,6 @@ class TestWorkflowChainValidation:
             workflow_id="complete_chain_test",
             user_id="workflow_test_user",
         ):
-
             start_time = time.time()
 
             # Execute complete workflow
@@ -292,8 +291,8 @@ class TestWorkflowChainValidation:
         ]
 
         for i, problematic_input in enumerate(problematic_inputs):
-            session_id = f"error_prop_session_{i+1:03d}"
-            world_id = f"error_prop_world_{i+1:03d}"
+            session_id = f"error_prop_session_{i + 1:03d}"
+            world_id = f"error_prop_world_{i + 1:03d}"
 
             try:
                 result = await workflow_coordinator.execute_complete_workflow(
@@ -344,8 +343,8 @@ class TestWorkflowChainValidation:
         results = []
 
         for i, test_input in enumerate(test_inputs):
-            session_id = f"perf_opt_session_{i+1:03d}"
-            world_id = f"perf_opt_world_{i+1:03d}"
+            session_id = f"perf_opt_session_{i + 1:03d}"
+            world_id = f"perf_opt_world_{i + 1:03d}"
 
             start_time = time.time()
 
@@ -397,9 +396,9 @@ class TestWorkflowChainValidation:
 
         # Create concurrent workflow tasks
         for i in range(num_concurrent):
-            user_input = f"I'm user {i+1} and I need help with anxiety management."
-            session_id = f"concurrent_workflow_session_{i+1:03d}"
-            world_id = f"concurrent_workflow_world_{i+1:03d}"
+            user_input = f"I'm user {i + 1} and I need help with anxiety management."
+            session_id = f"concurrent_workflow_session_{i + 1:03d}"
+            world_id = f"concurrent_workflow_world_{i + 1:03d}"
 
             task = asyncio.create_task(
                 workflow_coordinator.execute_complete_workflow(
@@ -474,8 +473,8 @@ class TestWorkflowChainValidation:
         ]
 
         for i, scenario in enumerate(therapeutic_inputs):
-            session_id = f"therapeutic_consistency_session_{i+1:03d}"
-            world_id = f"therapeutic_consistency_world_{i+1:03d}"
+            session_id = f"therapeutic_consistency_session_{i + 1:03d}"
+            world_id = f"therapeutic_consistency_world_{i + 1:03d}"
 
             result = await workflow_coordinator.execute_complete_workflow(
                 user_input=scenario["input"], session_id=session_id, world_id=world_id

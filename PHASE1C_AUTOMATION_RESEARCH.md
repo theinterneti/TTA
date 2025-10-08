@@ -1,6 +1,6 @@
 # Phase 1C: Type Annotation Automation Research
 
-**Date:** 2025-10-02  
+**Date:** 2025-10-02
 **Status:** 🔍 **RESEARCH COMPLETE**
 
 ---
@@ -19,7 +19,7 @@
 
 ### 1. MonkeyType (Instagram) ⭐ **MOST PROMISING**
 
-**Source:** https://github.com/Instagram/MonkeyType  
+**Source:** https://github.com/Instagram/MonkeyType
 **Status:** Active, 4.9k stars, maintained by Instagram/Meta
 
 **How it works:**
@@ -78,7 +78,7 @@ monkeytype apply some.module
 
 ### 2. autotyping ⭐ **COMPLEMENTARY TOOL**
 
-**Source:** https://pypi.org/project/autotyping/  
+**Source:** https://pypi.org/project/autotyping/
 **Status:** Active, recommended by mypy docs
 
 **How it works:**
@@ -129,7 +129,7 @@ autotyping src/
 
 ### 3. pytype (Google)
 
-**Source:** https://github.com/google/pytype  
+**Source:** https://github.com/google/pytype
 **Status:** Active, maintained by Google
 
 **How it works:**
@@ -374,19 +374,18 @@ git commit -m "feat(types): add type annotations to API modules (MonkeyType)"
 
 **Please choose:**
 
-**A) Proceed with MonkeyType-Assisted Phase 1C** ⭐ **RECOMMENDED**  
+**A) Proceed with MonkeyType-Assisted Phase 1C** ⭐ **RECOMMENDED**
    - 8-12 hours, 30-50% error reduction
    - Install MonkeyType and begin type collection
 
-**B) Quick Wins Only (No MonkeyType)**  
+**B) Quick Wins Only (No MonkeyType)**
    - 2-3 hours, 5-6% error reduction
    - Manual annotation of simple cases
 
-**C) Defer Phase 1C Entirely**  
+**C) Defer Phase 1C Entirely**
    - 0 hours, move to Phase 1D or Phase 2
    - Address type checking incrementally later
 
 ---
 
 **Awaiting your decision on Phase 1C approach!**
-

@@ -90,10 +90,10 @@ export const checkWorldCompatibility = createAsyncThunk(
 
 export const initializeCharacterInWorld = createAsyncThunk(
   'world/initializeCharacterInWorld',
-  async ({ characterId, worldId, parameters }: { 
-    characterId: string; 
-    worldId: string; 
-    parameters: WorldParameters 
+  async ({ characterId, worldId, parameters }: {
+    characterId: string;
+    worldId: string;
+    parameters: WorldParameters
   }) => {
     const response = await worldAPI.initializeCharacterInWorld(characterId, worldId, parameters);
     return response;
@@ -147,12 +147,12 @@ const worldSlice = createSlice({
       })
       .addCase(checkWorldCompatibility.fulfilled, (state, action) => {
         const { worldId, compatibility_score } = action.payload;
-        
+
         // Update the selected world if it matches
         if (state.selectedWorld && state.selectedWorld.world_id === worldId) {
           state.selectedWorld.compatibility_score = compatibility_score;
         }
-        
+
         // Update the world in the available worlds list
         const worldIndex = state.availableWorlds.findIndex(w => w.world_id === worldId);
         if (worldIndex !== -1) {
@@ -162,12 +162,12 @@ const worldSlice = createSlice({
   },
 });
 
-export const { 
-  clearError, 
-  setSelectedWorld, 
-  clearSelectedWorld, 
+export const {
+  clearError,
+  setSelectedWorld,
+  clearSelectedWorld,
   setWorldParameters,
   updateFilters,
-  clearFilters 
+  clearFilters
 } = worldSlice.actions;
 export default worldSlice.reducer;

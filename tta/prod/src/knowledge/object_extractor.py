@@ -6,15 +6,19 @@ This module provides utilities for extracting structured objects from text using
 
 import json
 import logging
-from typing import Dict, Any, List, Optional, Union, TypeVar, Type
 import re
-from pydantic import BaseModel, Field, create_model
+from typing import Any, TypeVar
+
+from pydantic import BaseModel
 
 try:
     from src.models.llm_client import LLMClient, get_llm_client
 except Exception:
     # Fallback to modernized client if llm_client not present
-    from tta.prod.src.models.client import UnifiedModelClient as LLMClient  # type: ignore
+    from tta.prod.src.models.client import (
+        UnifiedModelClient as LLMClient,  # type: ignore
+    )
+
     def get_llm_client():
         return LLMClient()
 
@@ -24,7 +28,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Type variable for generic object types
-T = TypeVar('T', bound=BaseModel)
+T = TypeVar("T", bound=BaseModel)
 
 
 class ObjectExtractor:
@@ -35,7 +39,7 @@ class ObjectExtractor:
     which can then be used to populate the knowledge graph.
     """
 
-    def __init__(self, llm_client: Optional[LLMClient] = None):
+    def __init__(self, llm_client: LLMClient | None = None):
         """
         Initialize the object extractor.
 
@@ -45,12 +49,8 @@ class ObjectExtractor:
         self.llm_client = llm_client or get_llm_client()
 
     def extract_objects(
-        self,
-        text: str,
-        object_type: str,
-        schema: Dict[str, Any],
-        max_objects: int = 10
-    ) -> List[Dict[str, Any]]:
+        self, text: str, object_type: str, schema: dict[str, Any], max_objects: int = 10
+    ) -> list[dict[str, Any]]:
         """
         Extract objects of a specific type from text.
 
@@ -91,7 +91,7 @@ class ObjectExtractor:
                 prompt=user_prompt,
                 system_prompt=system_prompt,
                 temperature=0.2,  # Low temperature for more deterministic extraction
-                expect_json=True
+                expect_json=True,
             )
 
             # Extract JSON from the response
@@ -122,11 +122,8 @@ class ObjectExtractor:
             return []
 
     def extract_typed_objects(
-        self,
-        text: str,
-        model_class: Type[T],
-        max_objects: int = 10
-    ) -> List[T]:
+        self, text: str, model_class: type[T], max_objects: int = 10
+    ) -> list[T]:
         """
         Extract objects of a specific Pydantic model type from text.
 
@@ -146,7 +143,7 @@ class ObjectExtractor:
             text=text,
             object_type=model_class.__name__,
             schema=schema,
-            max_objects=max_objects
+            max_objects=max_objects,
         )
 
         # Convert to Pydantic models
@@ -163,12 +160,12 @@ class ObjectExtractor:
     def extract_relationships(
         self,
         text: str,
-        source_objects: List[Dict[str, Any]],
-        target_objects: List[Dict[str, Any]],
+        source_objects: list[dict[str, Any]],
+        target_objects: list[dict[str, Any]],
         relationship_type: str,
-        relationship_schema: Optional[Dict[str, Any]] = None,
-        max_relationships: int = 20
-    ) -> List[Dict[str, Any]]:
+        relationship_schema: dict[str, Any] | None = None,
+        max_relationships: int = 20,
+    ) -> list[dict[str, Any]]:
         """
         Extract relationships between objects from text.
 
@@ -224,7 +221,7 @@ class ObjectExtractor:
                 prompt=user_prompt,
                 system_prompt=system_prompt,
                 temperature=0.2,  # Low temperature for more deterministic extraction
-                expect_json=True
+                expect_json=True,
             )
 
             # Extract JSON from the response
@@ -265,7 +262,9 @@ class ObjectExtractor:
             json_str: Extracted JSON string
         """
         # Remove markdown code blocks if present
-        code_block_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text, re.DOTALL)
+        code_block_match = re.search(
+            r"```(?:json)?\s*([\s\S]*?)\s*```", text, re.DOTALL
+        )
         if code_block_match:
             text = code_block_match.group(1).strip()
 
@@ -285,6 +284,7 @@ class ObjectExtractor:
 
 # Singleton instance
 _OBJECT_EXTRACTOR = None
+
 
 def get_object_extractor() -> ObjectExtractor:
     """

@@ -748,7 +748,7 @@ class TestWebSocketRealAgentIntegration:
             await feedback_manager.update_agent_operation(
                 operation_id=operation_id,
                 progress=progress,
-                stage=f"generating_part_{i+1}",
+                stage=f"generating_part_{i + 1}",
                 message=f"Generated {len(result['partial_story'])} characters",
                 intermediate_result=result,
             )

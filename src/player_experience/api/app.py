@@ -51,6 +51,7 @@ try:
         chat,
         conversation,
         gameplay,
+        health,
         openrouter_auth,
         players,
         progress,
@@ -66,6 +67,7 @@ except ImportError:
         chat,
         conversation,
         gameplay,
+        health,
         openrouter_auth,
         players,
         progress,
@@ -133,8 +135,10 @@ def create_app() -> FastAPI:
         CORSMiddleware,
         allow_origins=[
             "http://localhost:3000",  # React development server
+            "http://localhost:3001",  # Staging frontend
             "http://localhost:8080",  # Alternative frontend port
             "https://localhost:3000",  # HTTPS development
+            "https://localhost:3001",  # HTTPS staging
             "https://localhost:8080",  # HTTPS alternative
         ],
         allow_credentials=True,
@@ -210,6 +214,8 @@ def create_app() -> FastAPI:
     # Metrics (gated by settings.debug) - now includes /metrics-prom endpoint
     app.include_router(metrics_router.router, tags=["metrics"])
     app.include_router(progress.router, prefix="/api/v1", tags=["progress"])
+    # Health checks
+    app.include_router(health.router, prefix="/api/v1", tags=["health"])
 
     # WebSocket endpoints (mounted under /ws)
     app.include_router(chat.router, prefix="/ws", tags=["chat"])

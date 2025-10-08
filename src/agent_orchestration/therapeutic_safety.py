@@ -892,16 +892,15 @@ class TherapeuticValidator:
         # Generate context-aware alternatives
         if any(ct == CrisisType.SUICIDAL_IDEATION for ct in crisis_types):
             return self._crisis_intervention_alternative("suicidal_ideation")
-        elif any(ct == CrisisType.SELF_HARM for ct in crisis_types):
+        if any(ct == CrisisType.SELF_HARM for ct in crisis_types):
             return self._crisis_intervention_alternative("self_harm")
-        elif any(ct == CrisisType.SEVERE_DEPRESSION for ct in crisis_types):
+        if any(ct == CrisisType.SEVERE_DEPRESSION for ct in crisis_types):
             return self._crisis_intervention_alternative("severe_depression")
-        elif "professional_ethics" in categories:
+        if "professional_ethics" in categories:
             return self._professional_boundary_alternative()
-        elif "boundary_maintenance" in categories:
+        if "boundary_maintenance" in categories:
             return self._therapeutic_boundary_alternative()
-        else:
-            return self._general_therapeutic_alternative(level)
+        return self._general_therapeutic_alternative(level)
 
     def _crisis_intervention_alternative(self, crisis_type: str) -> str:
         """Generate crisis intervention alternatives."""
@@ -951,11 +950,11 @@ class TherapeuticValidator:
                 "Let's redirect our conversation to focus on your feelings and experiences. "
                 "What's really going on for you right now that we could explore together?"
             )
-        else:  # WARNING
-            return (
-                "I want to respond thoughtfully to what you've shared. Let's approach this topic in a way that's "
-                "supportive and constructive. What aspects of this situation are most important to you?"
-            )
+        # WARNING
+        return (
+            "I want to respond thoughtfully to what you've shared. Let's approach this topic in a way that's "
+            "supportive and constructive. What aspects of this situation are most important to you?"
+        )
 
     def _basic_alternative(self, level: SafetyLevel) -> str:
         """Basic alternative for fallback."""
@@ -1313,14 +1312,13 @@ class CrisisInterventionManager:
             ):
                 return CrisisLevel.CRITICAL
             # High: Low safety score OR escalation recommended
-            elif (
+            if (
                 validation_result.score < 0.25
                 or validation_result.escalation_recommended
             ):
                 return CrisisLevel.HIGH
             # Moderate: Crisis detected but not severe
-            else:
-                return CrisisLevel.MODERATE
+            return CrisisLevel.MODERATE
 
         # Severe depression with high confidence
         if CrisisType.SEVERE_DEPRESSION in validation_result.crisis_types:
@@ -1329,8 +1327,7 @@ class CrisisInterventionManager:
                 and validation_result.escalation_recommended
             ):
                 return CrisisLevel.HIGH
-            else:
-                return CrisisLevel.MODERATE
+            return CrisisLevel.MODERATE
 
         # Other crisis types - default to moderate
         if validation_result.crisis_detected:
@@ -1341,8 +1338,7 @@ class CrisisInterventionManager:
                 and validation_result.therapeutic_appropriateness < 0.2
             ):
                 return CrisisLevel.HIGH
-            else:
-                return CrisisLevel.MODERATE
+            return CrisisLevel.MODERATE
 
         return CrisisLevel.LOW
 
@@ -1410,12 +1406,11 @@ class CrisisInterventionManager:
         """Determine the appropriate intervention type."""
         if crisis_level == CrisisLevel.CRITICAL:
             return InterventionType.EMERGENCY_SERVICES
-        elif crisis_level == CrisisLevel.HIGH:
+        if crisis_level == CrisisLevel.HIGH:
             return InterventionType.HUMAN_OVERSIGHT
-        elif crisis_level == CrisisLevel.MODERATE:
+        if crisis_level == CrisisLevel.MODERATE:
             return InterventionType.THERAPEUTIC_REFERRAL
-        else:
-            return InterventionType.AUTOMATED_RESPONSE
+        return InterventionType.AUTOMATED_RESPONSE
 
     def _assess_immediate_risk(
         self, validation_result: ValidationResult, crisis_level: CrisisLevel
@@ -1620,12 +1615,11 @@ class CrisisInterventionManager:
             # Customize based on crisis level
             if assessment.crisis_level == CrisisLevel.CRITICAL:
                 return template["critical"]
-            elif assessment.crisis_level == CrisisLevel.HIGH:
+            if assessment.crisis_level == CrisisLevel.HIGH:
                 return template["high"]
-            elif assessment.crisis_level == CrisisLevel.MODERATE:
+            if assessment.crisis_level == CrisisLevel.MODERATE:
                 return template["moderate"]
-            else:
-                return template["low"]
+            return template["low"]
 
         # Fallback response
         return (
@@ -2106,7 +2100,7 @@ class EmergencyProtocolEngine:
 
         # Average response times by crisis type
         avg_response_times = {}
-        for crisis_type in protocol_types.keys():
+        for crisis_type in protocol_types:
             times = [
                 p["response_time_ms"]
                 for p in self.protocol_history
@@ -3350,11 +3344,10 @@ class SafetyMonitoringDashboard:
             import json
 
             return json.dumps(dashboard_data, indent=2, default=str)
-        elif format_type.lower() == "csv":
+        if format_type.lower() == "csv":
             # In a real implementation, this would convert to CSV format
             return "CSV export not implemented"
-        else:
-            raise ValueError(f"Unsupported export format: {format_type}")
+        raise ValueError(f"Unsupported export format: {format_type}")
 
 
 # ---- Redis-backed rules provider and SafetyService ----
@@ -3531,15 +3524,14 @@ def get_global_safety_service() -> SafetyService:
             _global_safety_service = SafetyService(
                 enabled=False, provider=SafetyRulesProvider(redis_client=None)
             )
-    else:
-        if not _global_safety_locked:
-            try:
-                enabled = str(
-                    os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")
-                ).lower() in ("1", "true", "yes")
-                _global_safety_service.set_enabled(enabled)
-            except Exception:
-                pass
+    elif not _global_safety_locked:
+        try:
+            enabled = str(
+                os.environ.get("AGENT_ORCHESTRATION_SAFETY_ENABLED", "false")
+            ).lower() in ("1", "true", "yes")
+            _global_safety_service.set_enabled(enabled)
+        except Exception:
+            pass
 
     return _global_safety_service
 

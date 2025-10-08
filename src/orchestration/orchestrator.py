@@ -18,7 +18,7 @@ Example:
     orchestrator.start_all()
 
     # Start a specific component
-    orchestrator.start_component('neo4j')
+    orchestrator.start_component("neo4j")
 
     # Stop all components
     orchestrator.stop_all()
@@ -190,7 +190,6 @@ class TTAOrchestrator:
                         and issubclass(attr, Component)
                         and attr is not Component
                     ):
-
                         # Create an instance of the component
                         component = attr(self.config)
                         self.components[component.name] = component

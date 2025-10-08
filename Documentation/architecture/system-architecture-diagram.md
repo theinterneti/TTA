@@ -81,15 +81,15 @@ graph TB
     PLAYER --> NEO4J
     PLAYER --> REDIS
     PLAYER -.-> POSTGRES
-    
+
     NARRATIVE --> NEO4J
     NARRATIVE --> REDIS
-    
+
     GAMEPLAY --> NEO4J
     GAMEPLAY --> REDIS
-    
+
     THERAPEUTIC --> REDIS
-    
+
     AGENT_ORCH --> NEO4J
     AGENT_ORCH --> REDIS
 
@@ -111,10 +111,10 @@ graph TB
     AGENT_ORCH -.->|Metrics| PROMETHEUS
     NARRATIVE -.->|Metrics| PROMETHEUS
     GAMEPLAY -.->|Metrics| PROMETHEUS
-    
+
     PROMETHEUS --> GRAFANA
     PROMETHEUS --> ALERTMANAGER
-    
+
     GATEWAY -.->|Logs| LOKI
     PLAYER -.->|Logs| LOKI
     AGENT_ORCH -.->|Logs| LOKI
@@ -236,4 +236,3 @@ The system supports multiple deployment configurations:
 - [Data Flow Diagram](data-flow-diagram.md)
 - [System Architecture Overview](README.md)
 - [Technical Specifications](../../docs/technical-specifications.md)
-

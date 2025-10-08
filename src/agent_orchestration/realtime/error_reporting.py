@@ -399,7 +399,6 @@ class ErrorReportingManager:
                         and error_report.severity
                         in [ErrorSeverity.HIGH, ErrorSeverity.CRITICAL]
                     ):
-
                         error_report.escalation_level = 1
                         await self._escalate_error(error_report)
 

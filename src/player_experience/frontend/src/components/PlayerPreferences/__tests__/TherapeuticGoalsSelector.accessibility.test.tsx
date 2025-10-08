@@ -184,14 +184,14 @@ describe('TherapeuticGoalsSelector - Accessibility Tests', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
 
       const firstCheckbox = screen.getAllByRole('checkbox')[0];
-      
+
       // Check initial state
       expect(firstCheckbox).not.toBeChecked();
       expect(firstCheckbox).toHaveAttribute('aria-checked', 'false');
 
       // Select checkbox
       await user.click(firstCheckbox);
-      
+
       // Verify ARIA state updates
       expect(mockProps.onChange).toHaveBeenCalled();
     });
@@ -332,7 +332,7 @@ describe('TherapeuticGoalsSelector - Accessibility Tests', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
 
       const firstCheckbox = screen.getAllByRole('checkbox')[0];
-      
+
       // Simulate touch interaction
       await user.click(firstCheckbox);
       expect(mockProps.onChange).toHaveBeenCalled();

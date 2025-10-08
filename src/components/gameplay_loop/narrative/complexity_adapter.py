@@ -172,39 +172,39 @@ class NarrativeComplexityAdapter:
             complexity_scores = {}
 
             # Assess cognitive load
-            complexity_scores[ComplexityDimension.COGNITIVE_LOAD] = (
-                await self._assess_cognitive_load(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.COGNITIVE_LOAD
+            ] = await self._assess_cognitive_load(scene)
 
             # Assess emotional intensity
-            complexity_scores[ComplexityDimension.EMOTIONAL_INTENSITY] = (
-                await self._assess_emotional_intensity(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.EMOTIONAL_INTENSITY
+            ] = await self._assess_emotional_intensity(scene)
 
             # Assess choice complexity
-            complexity_scores[ComplexityDimension.CHOICE_COMPLEXITY] = (
-                await self._assess_choice_complexity(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.CHOICE_COMPLEXITY
+            ] = await self._assess_choice_complexity(scene)
 
             # Assess therapeutic depth
-            complexity_scores[ComplexityDimension.THERAPEUTIC_DEPTH] = (
-                await self._assess_therapeutic_depth(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.THERAPEUTIC_DEPTH
+            ] = await self._assess_therapeutic_depth(scene)
 
             # Assess narrative length
-            complexity_scores[ComplexityDimension.NARRATIVE_LENGTH] = (
-                await self._assess_narrative_length(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.NARRATIVE_LENGTH
+            ] = await self._assess_narrative_length(scene)
 
             # Assess vocabulary level
-            complexity_scores[ComplexityDimension.VOCABULARY_LEVEL] = (
-                await self._assess_vocabulary_level(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.VOCABULARY_LEVEL
+            ] = await self._assess_vocabulary_level(scene)
 
             # Assess conceptual abstraction
-            complexity_scores[ComplexityDimension.CONCEPTUAL_ABSTRACTION] = (
-                await self._assess_conceptual_abstraction(scene)
-            )
+            complexity_scores[
+                ComplexityDimension.CONCEPTUAL_ABSTRACTION
+            ] = await self._assess_conceptual_abstraction(scene)
 
             return complexity_scores
 
@@ -408,20 +408,19 @@ class NarrativeComplexityAdapter:
         """Apply complexity adaptation for a specific dimension."""
         if dimension == ComplexityDimension.COGNITIVE_LOAD:
             return await self._adapt_cognitive_load(scene, strategy)
-        elif dimension == ComplexityDimension.EMOTIONAL_INTENSITY:
+        if dimension == ComplexityDimension.EMOTIONAL_INTENSITY:
             return await self._adapt_emotional_intensity(scene, strategy)
-        elif dimension == ComplexityDimension.CHOICE_COMPLEXITY:
+        if dimension == ComplexityDimension.CHOICE_COMPLEXITY:
             return await self._adapt_choice_complexity(scene, strategy)
-        elif dimension == ComplexityDimension.THERAPEUTIC_DEPTH:
+        if dimension == ComplexityDimension.THERAPEUTIC_DEPTH:
             return await self._adapt_therapeutic_depth(scene, strategy)
-        elif dimension == ComplexityDimension.NARRATIVE_LENGTH:
+        if dimension == ComplexityDimension.NARRATIVE_LENGTH:
             return await self._adapt_narrative_length(scene, strategy)
-        elif dimension == ComplexityDimension.VOCABULARY_LEVEL:
+        if dimension == ComplexityDimension.VOCABULARY_LEVEL:
             return await self._adapt_vocabulary_level(scene, strategy)
-        elif dimension == ComplexityDimension.CONCEPTUAL_ABSTRACTION:
+        if dimension == ComplexityDimension.CONCEPTUAL_ABSTRACTION:
             return await self._adapt_conceptual_abstraction(scene, strategy)
-        else:
-            return scene
+        return scene
 
     # Helper Methods
     def _analyze_recent_performance(self, session_state: SessionState) -> float:
@@ -654,10 +653,9 @@ class NarrativeComplexityAdapter:
 
         if high_count > 0:
             return 0.8
-        elif medium_count > low_count:
+        if medium_count > low_count:
             return 0.5
-        else:
-            return 0.2
+        return 0.2
 
     async def _assess_choice_complexity(self, scene: Scene) -> float:
         """Assess choice complexity (0.0-1.0)."""
@@ -716,14 +714,13 @@ class NarrativeComplexityAdapter:
 
         if word_count < 50:
             return 0.2
-        elif word_count < 100:
+        if word_count < 100:
             return 0.4
-        elif word_count < 200:
+        if word_count < 200:
             return 0.6
-        elif word_count < 300:
+        if word_count < 300:
             return 0.8
-        else:
-            return 1.0
+        return 1.0
 
     async def _assess_vocabulary_level(self, scene: Scene) -> float:
         """Assess vocabulary complexity (0.0-1.0)."""

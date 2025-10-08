@@ -371,9 +371,8 @@ class CustomAPIProvider(BaseProvider):
                     models.append(model_info)
 
                 return models
-            else:
-                # Fallback to predefined models for this provider
-                return self._get_predefined_models(provider_name, config)
+            # Fallback to predefined models for this provider
+            return self._get_predefined_models(provider_name, config)
 
         except Exception as e:
             logger.warning(
@@ -417,37 +416,36 @@ class CustomAPIProvider(BaseProvider):
                     therapeutic_safety_score=9.5,
                 ),
             ]
-        else:
-            # OpenAI-compatible
-            return [
-                ModelInfo(
-                    model_id="gpt-4o-mini",
-                    name="GPT-4o Mini",
-                    provider_type=ProviderType.CUSTOM_API,
-                    description="Efficient GPT-4 model",
-                    context_length=128000,
-                    cost_per_token=0.00000015,  # $0.15 per million tokens
-                    is_free=False,
-                    capabilities=["chat", "instruction_following", "analysis"],
-                    therapeutic_safety_score=8.0,
-                ),
-                ModelInfo(
-                    model_id="gpt-4o",
-                    name="GPT-4o",
-                    provider_type=ProviderType.CUSTOM_API,
-                    description="Advanced GPT-4 model",
-                    context_length=128000,
-                    cost_per_token=0.000005,  # $5 per million tokens
-                    is_free=False,
-                    capabilities=[
-                        "chat",
-                        "instruction_following",
-                        "analysis",
-                        "creative_writing",
-                    ],
-                    therapeutic_safety_score=8.5,
-                ),
-            ]
+        # OpenAI-compatible
+        return [
+            ModelInfo(
+                model_id="gpt-4o-mini",
+                name="GPT-4o Mini",
+                provider_type=ProviderType.CUSTOM_API,
+                description="Efficient GPT-4 model",
+                context_length=128000,
+                cost_per_token=0.00000015,  # $0.15 per million tokens
+                is_free=False,
+                capabilities=["chat", "instruction_following", "analysis"],
+                therapeutic_safety_score=8.0,
+            ),
+            ModelInfo(
+                model_id="gpt-4o",
+                name="GPT-4o",
+                provider_type=ProviderType.CUSTOM_API,
+                description="Advanced GPT-4 model",
+                context_length=128000,
+                cost_per_token=0.000005,  # $5 per million tokens
+                is_free=False,
+                capabilities=[
+                    "chat",
+                    "instruction_following",
+                    "analysis",
+                    "creative_writing",
+                ],
+                therapeutic_safety_score=8.5,
+            ),
+        ]
 
     async def _load_model_impl(
         self, model_id: str, config: dict[str, Any]
@@ -543,10 +541,9 @@ class CustomAPIProvider(BaseProvider):
         # Common context lengths
         if "gpt-4" in model_id.lower():
             return 128000
-        elif "claude-3" in model_id.lower():
+        if "claude-3" in model_id.lower():
             return 200000
-        else:
-            return 4096  # Default
+        return 4096  # Default
 
     def _get_therapeutic_safety_score(
         self, provider_name: str, model_id: str
@@ -554,10 +551,9 @@ class CustomAPIProvider(BaseProvider):
         """Get therapeutic safety score for a model."""
         if "claude" in model_id.lower():
             return 9.0  # Claude models are generally very safe
-        elif "gpt-4" in model_id.lower():
+        if "gpt-4" in model_id.lower():
             return 8.0  # GPT-4 models are quite safe
-        else:
-            return 7.0  # Default moderate safety score
+        return 7.0  # Default moderate safety score
 
     async def cleanup(self):
         """Cleanup resources."""

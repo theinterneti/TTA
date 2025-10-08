@@ -104,7 +104,7 @@ class PlayerProfileRepository:
                 last_exc = e
                 delay = min(base_delay * (2**attempt), 8.0)
                 logger.debug(
-                    f"Neo4j connect attempt {attempt+1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
+                    f"Neo4j connect attempt {attempt + 1}/{attempts} failed ({e!s}); retrying in {delay:.1f}s"
                 )
                 try:
                     if self.driver:
@@ -116,15 +116,10 @@ class PlayerProfileRepository:
 
                 if attempt < (attempts - 1):
                     _t.sleep(delay)
-                else:
-                    if isinstance(e, AuthError):
-                        raise PlayerProfileRepositoryError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
-                    elif isinstance(e, _ServiceUnavailable):
-                        raise PlayerProfileRepositoryError(
-                            f"Failed to connect to Neo4j after retries: {e}"
-                        ) from e
+                elif isinstance(e, AuthError) or isinstance(e, _ServiceUnavailable):
+                    raise PlayerProfileRepositoryError(
+                        f"Failed to connect to Neo4j after retries: {e}"
+                    ) from e
             except _ClientError as e:
                 emsg = str(e)
                 if ("AuthenticationRateLimit" in emsg) or (
@@ -133,7 +128,7 @@ class PlayerProfileRepository:
                     last_exc = e
                     delay = min(base_delay * (2**attempt), 8.0)
                     logger.debug(
-                        f"Neo4j connect attempt {attempt+1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
+                        f"Neo4j connect attempt {attempt + 1}/5 hit AuthenticationRateLimit; retrying in {delay:.1f}s"
                     )
                     try:
                         if self.driver:
@@ -404,11 +399,8 @@ class PlayerProfileRepository:
                 if record:
                     logger.info(f"Created player profile: {profile.player_id}")
                     return True
-                else:
-                    logger.error(
-                        f"Failed to create player profile: {profile.player_id}"
-                    )
-                    return False
+                logger.error(f"Failed to create player profile: {profile.player_id}")
+                return False
 
         except ClientError as e:
             if "already exists" in str(e).lower():
@@ -416,11 +408,10 @@ class PlayerProfileRepository:
                 raise PlayerProfileRepositoryError(
                     f"Player profile already exists: {profile.player_id}"
                 ) from e
-            else:
-                logger.error(f"Error creating player profile: {e}")
-                raise PlayerProfileRepositoryError(
-                    f"Error creating player profile: {e}"
-                ) from e
+            logger.error(f"Error creating player profile: {e}")
+            raise PlayerProfileRepositoryError(
+                f"Error creating player profile: {e}"
+            ) from e
         except Exception as e:
             logger.error(f"Unexpected error creating player profile: {e}")
             raise PlayerProfileRepositoryError(
@@ -553,7 +544,9 @@ class PlayerProfileRepository:
                     # Restore authentication data if present (temporary solution)
                     # Using setattr for dynamic attributes not in PrivacySettings dataclass
                     if "password_hash" in privacy_settings_data:
-                        privacy_settings.password_hash = privacy_settings_data["password_hash"]
+                        privacy_settings.password_hash = privacy_settings_data[
+                            "password_hash"
+                        ]
                     if "role" in privacy_settings_data:
                         privacy_settings.role = privacy_settings_data["role"]
 
@@ -752,11 +745,10 @@ class PlayerProfileRepository:
                 if record:
                     logger.info(f"Updated player profile: {profile.player_id}")
                     return True
-                else:
-                    logger.error(
-                        f"Player profile not found for update: {profile.player_id}"
-                    )
-                    return False
+                logger.error(
+                    f"Player profile not found for update: {profile.player_id}"
+                )
+                return False
 
         except Exception as e:
             logger.error(f"Error updating player profile {profile.player_id}: {e}")
@@ -794,11 +786,8 @@ class PlayerProfileRepository:
                 if record and record["deleted_count"] > 0:
                     logger.info(f"Deleted player profile: {player_id}")
                     return True
-                else:
-                    logger.warning(
-                        f"Player profile not found for deletion: {player_id}"
-                    )
-                    return False
+                logger.warning(f"Player profile not found for deletion: {player_id}")
+                return False
 
         except Exception as e:
             logger.error(f"Error deleting player profile {player_id}: {e}")
@@ -831,8 +820,7 @@ class PlayerProfileRepository:
 
                 if record:
                     return self.get_player_profile(record["player_id"])
-                else:
-                    return None
+                return None
 
         except Exception as e:
             logger.error(f"Error retrieving player by username {username}: {e}")
@@ -865,8 +853,7 @@ class PlayerProfileRepository:
 
                 if record:
                     return self.get_player_profile(record["player_id"])
-                else:
-                    return None
+                return None
 
         except Exception as e:
             logger.error(f"Error retrieving player by email {email}: {e}")

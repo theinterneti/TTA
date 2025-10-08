@@ -346,7 +346,7 @@ class TestWebSocketPerformance:
         print(f"  Total Connections: {total_connections}")
         print(f"  Duration: {duration:.2f}s")
         print(f"  Connections/Second: {connections_per_second:.1f}")
-        print(f"  Success Rate: {successful_connections/total_connections:.2%}")
+        print(f"  Success Rate: {successful_connections / total_connections:.2%}")
         print(f"  Memory Increase: {memory_increase:.1f} MB")
 
     async def test_large_message_handling(self, high_capacity_websocket_manager):

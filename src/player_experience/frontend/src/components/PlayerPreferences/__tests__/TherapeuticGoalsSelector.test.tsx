@@ -28,21 +28,21 @@ describe('TherapeuticGoalsSelector', () => {
   describe('Component Rendering', () => {
     test('renders component with title and description', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       expect(screen.getByText('Therapeutic Goals & Primary Concerns')).toBeInTheDocument();
       expect(screen.getByText(/Select your therapeutic goals and primary concerns/)).toBeInTheDocument();
     });
 
     test('renders tab navigation with correct labels and counts', () => {
       render(<TherapeuticGoalsSelector {...mockPropsWithData} />);
-      
+
       expect(screen.getByText('🎯 Therapeutic Goals (2)')).toBeInTheDocument();
       expect(screen.getByText('📝 Primary Concerns (2)')).toBeInTheDocument();
     });
 
     test('renders goals tab by default', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       expect(screen.getByText('Quick Selection:')).toBeInTheDocument();
       expect(screen.getByText('Emotional Wellbeing')).toBeInTheDocument();
       expect(screen.getByText('Self-Development')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('TherapeuticGoalsSelector', () => {
 
     test('renders all therapeutic goal categories', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const expectedCategories = [
         'Emotional Wellbeing',
         'Self-Development',
@@ -66,7 +66,7 @@ describe('TherapeuticGoalsSelector', () => {
 
     test('renders guidance section', () => {
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       expect(screen.getByText('💡 Setting Therapeutic Goals')).toBeInTheDocument();
       expect(screen.getByText(/Start with 3-5 goals/)).toBeInTheDocument();
     });
@@ -76,10 +76,10 @@ describe('TherapeuticGoalsSelector', () => {
     test('switches to concerns tab when clicked', async () => {
       const user = userEvent.setup();
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const concernsTab = screen.getByText(/📝 Primary Concerns/);
       await user.click(concernsTab);
-      
+
       expect(screen.getByText('Common Concerns')).toBeInTheDocument();
       expect(screen.getByText('Work stress')).toBeInTheDocument();
       expect(screen.getByText('Relationship issues')).toBeInTheDocument();
@@ -88,15 +88,15 @@ describe('TherapeuticGoalsSelector', () => {
     test('switches back to goals tab when clicked', async () => {
       const user = userEvent.setup();
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       // Switch to concerns tab first
       const concernsTab = screen.getByText(/📝 Primary Concerns/);
       await user.click(concernsTab);
-      
+
       // Switch back to goals tab
       const goalsTab = screen.getByText(/🎯 Therapeutic Goals/);
       await user.click(goalsTab);
-      
+
       expect(screen.getByText('Quick Selection:')).toBeInTheDocument();
       expect(screen.getByText('Emotional Wellbeing')).toBeInTheDocument();
     });
@@ -104,17 +104,17 @@ describe('TherapeuticGoalsSelector', () => {
     test('applies correct styling to active tab', async () => {
       const user = userEvent.setup();
       render(<TherapeuticGoalsSelector {...mockProps} />);
-      
+
       const goalsTab = screen.getByText(/🎯 Therapeutic Goals/).closest('button');
       const concernsTab = screen.getByText(/📝 Primary Concerns/).closest('button');
-      
+
       // Goals tab should be active by default
       expect(goalsTab).toHaveClass('border-primary-500', 'text-primary-600');
       expect(concernsTab).toHaveClass('border-transparent', 'text-gray-500');
-      
+
       // Switch to concerns tab
       await user.click(concernsTab!);
-      
+
       expect(concernsTab).toHaveClass('border-primary-500', 'text-primary-600');
       expect(goalsTab).toHaveClass('border-transparent', 'text-gray-500');
     });
@@ -125,10 +125,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const anxietyGoal = screen.getByLabelText(/Anxiety Reduction/);
       await user.click(anxietyGoal);
-      
+
       expect(onChange).toHaveBeenCalledWith(['anxiety_reduction'], []);
     });
 
@@ -136,30 +136,30 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockPropsWithData} onChange={onChange} />);
-      
+
       const anxietyGoal = screen.getByLabelText(/Anxiety Reduction/);
       await user.click(anxietyGoal);
-      
+
       expect(onChange).toHaveBeenCalledWith(['stress_management'], ['Work stress', 'Social anxiety']);
     });
 
     test('displays selected goals with correct styling', () => {
       render(<TherapeuticGoalsSelector {...mockPropsWithData} />);
-      
+
       const anxietyGoal = screen.getByLabelText(/Anxiety Reduction/).closest('label');
       const stressGoal = screen.getByLabelText(/Stress Management/).closest('label');
-      
+
       expect(anxietyGoal).toHaveClass('border-primary-500', 'bg-primary-50');
       expect(stressGoal).toHaveClass('border-primary-500', 'bg-primary-50');
     });
 
     test('shows correct checkbox states for selected goals', () => {
       render(<TherapeuticGoalsSelector {...mockPropsWithData} />);
-      
+
       const anxietyCheckbox = screen.getByLabelText(/Anxiety Reduction/);
       const stressCheckbox = screen.getByLabelText(/Stress Management/);
       const confidenceCheckbox = screen.getAllByLabelText(/Confidence Building/)[0];
-      
+
       expect(anxietyCheckbox).toBeChecked();
       expect(stressCheckbox).toBeChecked();
       expect(confidenceCheckbox).not.toBeChecked();
@@ -171,10 +171,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const stressAnxietyButton = screen.getByText(/Stress & Anxiety/);
       await user.click(stressAnxietyButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(
         ['anxiety_reduction', 'stress_management', 'mindfulness_development'],
         []
@@ -185,10 +185,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const selfEsteemButton = screen.getByText(/Self-Esteem & Growth/);
       await user.click(selfEsteemButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(
         ['confidence_building', 'self_compassion', 'personal_growth'],
         []
@@ -199,10 +199,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const relationshipsButton = screen.getByText(/🤝 Relationships/);
       await user.click(relationshipsButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(
         ['relationship_skills', 'communication_skills', 'boundary_setting'],
         []
@@ -213,10 +213,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const emotionalHealthButton = screen.getByText(/Emotional Health/);
       await user.click(emotionalHealthButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(
         ['emotional_processing', 'coping_strategies', 'mindfulness_development'],
         []
@@ -229,13 +229,13 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const customInput = screen.getByPlaceholderText('Add a custom therapeutic goal...');
       const addButton = screen.getByText('Add');
-      
+
       await user.type(customInput, 'Custom therapeutic goal');
       await user.click(addButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(['Custom therapeutic goal'], []);
     });
 
@@ -258,13 +258,13 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const customInput = screen.getByPlaceholderText('Add a custom therapeutic goal...');
       const addButton = screen.getByText('Add');
-      
+
       await user.type(customInput, '  Custom goal with spaces  ');
       await user.click(addButton);
-      
+
       expect(onChange).toHaveBeenCalledWith(['Custom goal with spaces'], []);
     });
 
@@ -272,10 +272,10 @@ describe('TherapeuticGoalsSelector', () => {
       const user = userEvent.setup();
       const onChange = jest.fn();
       render(<TherapeuticGoalsSelector {...mockProps} onChange={onChange} />);
-      
+
       const addButton = screen.getByText('Add');
       await user.click(addButton);
-      
+
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -288,13 +288,13 @@ describe('TherapeuticGoalsSelector', () => {
         onChange,
       };
       render(<TherapeuticGoalsSelector {...propsWithCustomGoal} />);
-      
+
       const customInput = screen.getByPlaceholderText('Add a custom therapeutic goal...');
       const addButton = screen.getByText('Add');
-      
+
       await user.type(customInput, 'Custom goal');
       await user.click(addButton);
-      
+
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -304,12 +304,12 @@ describe('TherapeuticGoalsSelector', () => {
         selected: ['anxiety_reduction', 'Custom therapeutic goal'],
       };
       render(<TherapeuticGoalsSelector {...propsWithCustomGoal} />);
-      
+
       expect(screen.getByText('Custom therapeutic goal')).toBeInTheDocument();
-      
+
       const removeButtons = screen.getAllByRole('button');
-      const customGoalRemoveButton = removeButtons.find(button => 
-        button.querySelector('svg') && 
+      const customGoalRemoveButton = removeButtons.find(button =>
+        button.querySelector('svg') &&
         button.closest('.bg-blue-50')
       );
       expect(customGoalRemoveButton).toBeInTheDocument();
@@ -324,15 +324,15 @@ describe('TherapeuticGoalsSelector', () => {
         onChange,
       };
       render(<TherapeuticGoalsSelector {...propsWithCustomGoal} />);
-      
+
       const removeButtons = screen.getAllByRole('button');
-      const customGoalRemoveButton = removeButtons.find(button => 
-        button.querySelector('svg') && 
+      const customGoalRemoveButton = removeButtons.find(button =>
+        button.querySelector('svg') &&
         button.closest('.bg-blue-50')
       );
-      
+
       await user.click(customGoalRemoveButton!);
-      
+
       expect(onChange).toHaveBeenCalledWith(['anxiety_reduction'], []);
     });
 

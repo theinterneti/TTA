@@ -604,12 +604,11 @@ class ChoiceGenerator:
         # Enhance description based on therapeutic tags
         if "mindfulness" in template.therapeutic_tags:
             return f"{base_description} through mindful awareness"
-        elif "grounding" in template.therapeutic_tags:
+        if "grounding" in template.therapeutic_tags:
             return f"{base_description} while staying grounded and centered"
-        elif "self_compassion" in template.therapeutic_tags:
+        if "self_compassion" in template.therapeutic_tags:
             return f"{base_description} with kindness toward yourself"
-        else:
-            return base_description
+        return base_description
 
     async def _calculate_therapeutic_value(
         self, template: ChoiceTemplate, scene: Scene, session_state: SessionState
@@ -693,11 +692,10 @@ class ChoiceGenerator:
         base_meaningfulness += therapeutic_relevance * 0.1
 
         # Therapeutic choices are inherently meaningful
-        if template.choice_type == ChoiceType.THERAPEUTIC:
-            base_meaningfulness += 0.1
-
-        # Skill building choices are meaningful for growth
-        elif template.choice_type == ChoiceType.SKILL_BUILDING:
+        if (
+            template.choice_type == ChoiceType.THERAPEUTIC
+            or template.choice_type == ChoiceType.SKILL_BUILDING
+        ):
             base_meaningfulness += 0.1
 
         # Adjust based on session context

@@ -40,20 +40,15 @@ Key Responsibilities:
 """
 
 import json
-from typing import Dict, List, Optional
 
-from settings import settings
 from langchain.prompts import PromptTemplate
 from langchain.schema.output_parser import StrOutputParser
 from langchain_openai import ChatOpenAI
-from schema import (
+from schema import (  # Import relevant schemas
     AgentState,
-    GetCharacterProfileInput,
-    GetCharacterProfileOutput,
-    QueryKnowledgeGraphInput,
-    QueryKnowledgeGraphOutput,
-)  # Import relevant schemas
-from utils.neo4j_utils import execute_query, get_node_by_id
+)
+from settings import settings
+from utils.neo4j_utils import get_node_by_id
 
 # --- LLM Setup (LM Studio) ---
 llm = ChatOpenAI(
@@ -128,7 +123,7 @@ def perform_corag(initial_response: str, state: AgentState) -> str:
 # --- Main NGA Logic ---
 
 
-def generate_narrative(state: AgentState) -> Dict[str, str]:
+def generate_narrative(state: AgentState) -> dict[str, str]:
     """
     Generates narrative text based on the current game state.
 

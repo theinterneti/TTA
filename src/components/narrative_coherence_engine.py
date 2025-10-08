@@ -796,14 +796,13 @@ class CoherenceValidator:
         """Generate a generic correction suggestion for an issue."""
         if issue.issue_type == ConsistencyIssueType.LORE_VIOLATION:
             return f"Review and revise content to align with established lore for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
+        if issue.issue_type == ConsistencyIssueType.CHARACTER_INCONSISTENCY:
             return f"Adjust character behavior/dialogue to match established personality for {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
+        if issue.issue_type == ConsistencyIssueType.WORLD_RULE_VIOLATION:
             return f"Modify content to comply with world rules affecting {', '.join(issue.affected_elements)}"
-        elif issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
+        if issue.issue_type == ConsistencyIssueType.THERAPEUTIC_MISALIGNMENT:
             return "Revise content to ensure therapeutic appropriateness and safety"
-        else:
-            return f"Address {issue.issue_type.value} issue: {issue.description}"
+        return f"Address {issue.issue_type.value} issue: {issue.description}"
 
     # Placeholder methods for detailed validation (to be implemented)
 
@@ -1824,9 +1823,8 @@ class NarrativeCoherenceEngine(Component):
             age = datetime.now() - cached_result.validation_timestamp
             if age.total_seconds() < self.cache_ttl:
                 return cached_result
-            else:
-                # Remove expired cache entry
-                del self.validation_cache[cache_key]
+            # Remove expired cache entry
+            del self.validation_cache[cache_key]
 
         return None
 
@@ -2503,25 +2501,32 @@ class NarrativeCoherenceEngine(Component):
 
         # Adjust based on solution type and conflict type compatibility
         compatibility_bonus = 0.0
-        if conflict.type == "direct" and solution.solution_type in [
-            "character_driven",
-            "perspective_based",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "temporal" and solution.solution_type in [
-            "temporal",
-            "memory_based",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "causal" and solution.solution_type in [
-            "causal_bridge",
-            "hidden_factor",
-        ]:
-            compatibility_bonus = 0.3
-        elif conflict.type == "implicit" and solution.solution_type in [
-            "recontextualization",
-            "subtext",
-        ]:
+        if (
+            conflict.type == "direct"
+            and solution.solution_type
+            in [
+                "character_driven",
+                "perspective_based",
+            ]
+            or conflict.type == "temporal"
+            and solution.solution_type
+            in [
+                "temporal",
+                "memory_based",
+            ]
+            or conflict.type == "causal"
+            and solution.solution_type
+            in [
+                "causal_bridge",
+                "hidden_factor",
+            ]
+            or conflict.type == "implicit"
+            and solution.solution_type
+            in [
+                "recontextualization",
+                "subtext",
+            ]
+        ):
             compatibility_bonus = 0.3
 
         # Universal solutions work for everything but with lower effectiveness
@@ -2687,9 +2692,9 @@ class NarrativeCoherenceEngine(Component):
         # Generate explanation based on change type
         if change.change_type == "modification":
             return f"Upon reflection, the situation was actually: {change.modified_content}"
-        elif change.change_type == "addition":
+        if change.change_type == "addition":
             return f"Additional details have come to light: {change.modified_content}"
-        elif change.change_type == "recontextualization":
+        if change.change_type == "recontextualization":
             return f"The context of the situation was: {change.modified_content}"
 
         return f"The situation has been clarified: {change.modified_content}"
@@ -3148,9 +3153,9 @@ class NarrativeCoherenceEngine(Component):
                             ].text += f"\n\n{change.modified_content}"
                         elif change.change_type == "recontextualization":
                             # Add context metadata
-                            simulated_history[i].metadata[
-                                "recontextualization"
-                            ] = change.modified_content
+                            simulated_history[i].metadata["recontextualization"] = (
+                                change.modified_content
+                            )
                         break
 
             return simulated_history

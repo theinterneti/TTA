@@ -92,10 +92,10 @@ This directory contains the complete testing strategy, analysis, and implementat
    ```bash
    # Install dependencies
    uv sync --all-extras --dev
-   
+
    # Start test databases
    docker-compose -f docker-compose.test.yml up -d neo4j redis
-   
+
    # Install Playwright browsers
    npx playwright install chromium firefox webkit --with-deps
    ```
@@ -104,10 +104,10 @@ This directory contains the complete testing strategy, analysis, and implementat
    ```bash
    # Unit tests (fast)
    uv run pytest -q
-   
+
    # Integration tests (with databases)
    uv run pytest -q --neo4j --redis
-   
+
    # E2E tests
    npx playwright test tests/e2e/specs/auth.spec.ts
    ```
@@ -158,8 +158,8 @@ npx playwright test tests/e2e/specs/auth.spec.ts
 
 ### Implementation Phases
 
-**Phase 1 (Weeks 1-2): Critical Path** - Authentication, story creation, database persistence, core gameplay  
-**Phase 2 (Weeks 3-4): User Experience** - Complete journeys, frontend UI/UX, error handling  
+**Phase 1 (Weeks 1-2): Critical Path** - Authentication, story creation, database persistence, core gameplay
+**Phase 2 (Weeks 3-4): User Experience** - Complete journeys, frontend UI/UX, error handling
 **Phase 3 (Weeks 5-6): Robustness** - Performance, failure scenarios, browser compatibility
 
 ### Quality Targets
@@ -330,9 +330,9 @@ This documentation is part of the TTA project and follows the same license as th
 
 ---
 
-**Documentation Version:** 1.0  
-**Last Updated:** 2025-10-03  
-**Maintained by:** The Augster (AI Development Assistant)  
+**Documentation Version:** 1.0
+**Last Updated:** 2025-10-03
+**Maintained by:** The Augster (AI Development Assistant)
 **Status:** Ready for Use
 
 ---

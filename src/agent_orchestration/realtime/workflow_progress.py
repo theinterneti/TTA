@@ -544,10 +544,7 @@ class WorkflowProgressTracker:
 
                 for workflow_id, workflow in self.active_workflows.items():
                     # Check for timeout
-                    if current_time - workflow.start_time > self.workflow_timeout:
-                        stale_workflows.append(workflow_id)
-                    # Check for stale updates
-                    elif (
+                    if current_time - workflow.start_time > self.workflow_timeout or (
                         current_time - workflow.last_update > self.cleanup_interval * 2
                     ):
                         stale_workflows.append(workflow_id)

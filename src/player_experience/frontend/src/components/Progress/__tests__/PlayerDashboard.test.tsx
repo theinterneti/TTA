@@ -201,7 +201,7 @@ describe('PlayerDashboard', () => {
 
     expect(screen.getByText('Your Therapeutic Journey')).toBeInTheDocument();
     expect(screen.getByText('Welcome back! Here\'s your progress overview and next steps.')).toBeInTheDocument();
-    
+
     // Quick stats
     expect(screen.getByText('2')).toBeInTheDocument(); // Active characters
     expect(screen.getByText('2')).toBeInTheDocument(); // Recent sessions (same number)
@@ -270,7 +270,7 @@ describe('PlayerDashboard', () => {
     expect(screen.getByText('Session in Peaceful Forest')).toBeInTheDocument();
     expect(screen.getByText('45 minutes • 3 interventions')).toBeInTheDocument();
     expect(screen.getByText('🎯 Completed breathing exercise +1 more')).toBeInTheDocument();
-    
+
     expect(screen.getByText('Session in Ancient Library')).toBeInTheDocument();
     expect(screen.getByText('30 minutes • 2 interventions')).toBeInTheDocument();
   });
@@ -399,7 +399,7 @@ describe('PlayerDashboard', () => {
 
   it('updates last refresh time', async () => {
     jest.useFakeTimers();
-    
+
     render(
       <PlayerDashboard
         dashboardData={mockDashboardData}

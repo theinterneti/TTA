@@ -329,11 +329,11 @@ class TestEndToEndValidation:
 
         for i in range(num_concurrent):
             user_input = (
-                f"Hello, I'm user {i+1} and I need help with stress management."
+                f"Hello, I'm user {i + 1} and I need help with stress management."
             )
-            session_id = f"e2e_concurrent_session_{i+1:03d}"
-            world_id = f"e2e_concurrent_world_{i+1:03d}"
-            user_id = f"e2e_concurrent_user_{i+1}"
+            session_id = f"e2e_concurrent_session_{i + 1:03d}"
+            world_id = f"e2e_concurrent_world_{i + 1:03d}"
+            user_id = f"e2e_concurrent_user_{i + 1}"
 
             task = asyncio.create_task(
                 orchestration_service.process_user_input(
@@ -392,9 +392,9 @@ class TestEndToEndValidation:
         ]
 
         for i, malformed_input in enumerate(malformed_inputs):
-            session_id = f"e2e_error_session_{i+1:03d}"
-            world_id = f"e2e_error_world_{i+1:03d}"
-            user_id = f"e2e_error_user_{i+1}"
+            session_id = f"e2e_error_session_{i + 1:03d}"
+            world_id = f"e2e_error_world_{i + 1:03d}"
+            user_id = f"e2e_error_user_{i + 1}"
 
             try:
                 result = await orchestration_service.process_user_input(
@@ -533,9 +533,9 @@ class TestEndToEndValidation:
         ]
 
         for i, scenario in enumerate(therapeutic_scenarios):
-            session_id = f"e2e_therapeutic_session_{i+1:03d}"
-            world_id = f"e2e_therapeutic_world_{i+1:03d}"
-            user_id = f"e2e_therapeutic_user_{i+1}"
+            session_id = f"e2e_therapeutic_session_{i + 1:03d}"
+            world_id = f"e2e_therapeutic_world_{i + 1:03d}"
+            user_id = f"e2e_therapeutic_user_{i + 1}"
 
             result = await orchestration_service.process_user_input(
                 user_input=scenario["input"],

@@ -45,32 +45,31 @@ class MockPrometheusClient:
             spike = 30 if random.random() < 0.1 else 0
             return min(95, base + spike + 5 * random.random())
 
-        elif "memory" in metric_name.lower():
+        if "memory" in metric_name.lower():
             # Memory usage: gradually increasing with some variation
             base = 40 + time_factor * 2  # Gradual increase
             return min(90, base + 10 * random.random())
 
-        elif "response_time" in metric_name.lower():
+        if "response_time" in metric_name.lower():
             # Response times: mostly fast with occasional slow responses
             base = 0.1 + 0.05 * random.random()
             slow = 2.0 if random.random() < 0.05 else 0
             return base + slow
 
-        elif "error_rate" in metric_name.lower():
+        if "error_rate" in metric_name.lower():
             # Error rate: mostly low with occasional spikes
             base = 1.0 + 2.0 * random.random()
             spike = 10.0 if random.random() < 0.02 else 0
             return min(20, base + spike)
 
-        elif "requests" in metric_name.lower():
+        if "requests" in metric_name.lower():
             # Request rate: varies throughout the day
             hour = (time.time() % 86400) / 3600  # Hour of day
             daily_pattern = 0.5 + 0.5 * abs(12 - hour) / 12  # Peak at noon
             return 10 + 40 * daily_pattern * (0.8 + 0.4 * random.random())
 
-        else:
-            # Default: some variation around base value
-            return base_value * (0.8 + 0.4 * random.random())
+        # Default: some variation around base value
+        return base_value * (0.8 + 0.4 * random.random())
 
     def query(self, query: str) -> dict[str, Any]:
         """Mock Prometheus query."""
@@ -306,6 +305,5 @@ def auto_configure_monitoring():
         env = get_mock_monitoring_environment()
         env.start()
         return env
-    else:
-        logger.info("Using real monitoring environment")
-        return None
+    logger.info("Using real monitoring environment")
+    return None

@@ -79,9 +79,9 @@ class RealtimeDashboardManager:
         }
 
         # Active dashboard subscriptions
-        self.active_subscriptions: dict[str, set[DashboardType]] = (
-            {}
-        )  # connection_id -> dashboard_types
+        self.active_subscriptions: dict[
+            str, set[DashboardType]
+        ] = {}  # connection_id -> dashboard_types
 
         # Alert manager integration
         self.alert_manager = None
@@ -422,10 +422,9 @@ class RealtimeDashboardManager:
 
         if cpu_usage > 90 or memory_usage > 90:
             return "critical"
-        elif cpu_usage > 70 or memory_usage > 70:
+        if cpu_usage > 70 or memory_usage > 70:
             return "warning"
-        else:
-            return "healthy"
+        return "healthy"
 
     def _calculate_performance_summary(
         self, agent_metrics: dict[str, dict[str, Any]]

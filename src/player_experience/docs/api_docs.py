@@ -425,31 +425,30 @@ class APIDocumentationGenerator:
 
             return example
 
-        elif schema_type == "array":
+        if schema_type == "array":
             items_schema = schema.get("items", {"type": "string"})
             return [self._generate_example_from_schema(items_schema)]
 
-        elif schema_type == "string":
+        if schema_type == "string":
             if "format" in schema:
                 if schema["format"] == "email":
                     return "user@example.com"
-                elif schema["format"] == "date-time":
+                if schema["format"] == "date-time":
                     return "2023-01-01T00:00:00Z"
-                elif schema["format"] == "uuid":
+                if schema["format"] == "uuid":
                     return "123e4567-e89b-12d3-a456-426614174000"
             return "string"
 
-        elif schema_type == "integer":
+        if schema_type == "integer":
             return 42
 
-        elif schema_type == "number":
+        if schema_type == "number":
             return 3.14
 
-        elif schema_type == "boolean":
+        if schema_type == "boolean":
             return True
 
-        else:
-            return None
+        return None
 
     def generate_html_docs(self) -> Path:
         """Generate HTML API documentation."""
@@ -473,7 +472,7 @@ class APIDocumentationGenerator:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{self.metadata['title']} - API Documentation</title>
+    <title>{self.metadata["title"]} - API Documentation</title>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;

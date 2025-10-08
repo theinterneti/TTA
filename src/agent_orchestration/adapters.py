@@ -86,8 +86,7 @@ async def retry_with_backoff(
         try:
             if asyncio.iscoroutinefunction(func):
                 return await func(*args, **kwargs)
-            else:
-                return func(*args, **kwargs)
+            return func(*args, **kwargs)
 
         except Exception as e:
             last_exception = e
@@ -147,8 +146,7 @@ class IPAAdapter:
                     "Real IPA not available, using fallback mock implementation"
                 )
                 return self._mock_process_input(text)
-            else:
-                raise AgentCommunicationError("Real IPA implementation not available")
+            raise AgentCommunicationError("Real IPA implementation not available")
 
         try:
             # Run the synchronous IPA function in a thread pool with retry logic
@@ -188,8 +186,7 @@ class IPAAdapter:
             if self.fallback_to_mock:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_process_input(text)
-            else:
-                raise AgentCommunicationError(f"IPA communication failed: {e}") from e
+            raise AgentCommunicationError(f"IPA communication failed: {e}") from e
 
     def _mock_process_input(self, text: str) -> dict[str, Any]:
         """Fallback mock implementation for IPA processing."""
@@ -247,8 +244,7 @@ class WBAAdapter:
                     "Real WBA not available, using fallback mock implementation"
                 )
                 return self._mock_process_world(world_id, updates)
-            else:
-                raise AgentCommunicationError("Real WBA implementation not available")
+            raise AgentCommunicationError("Real WBA implementation not available")
 
         try:
             # Prepare input for WBA
@@ -282,8 +278,7 @@ class WBAAdapter:
             if self.fallback_to_mock:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_process_world(world_id, updates)
-            else:
-                raise AgentCommunicationError(f"WBA communication failed: {e}") from e
+            raise AgentCommunicationError(f"WBA communication failed: {e}") from e
 
     def _mock_process_world(
         self, world_id: str, updates: dict[str, Any] | None = None
@@ -334,8 +329,7 @@ class NGAAdapter:
                     "Real NGA not available, using fallback mock implementation"
                 )
                 return self._mock_generate_narrative(prompt, context)
-            else:
-                raise AgentCommunicationError("Real NGA implementation not available")
+            raise AgentCommunicationError("Real NGA implementation not available")
 
         try:
             # Prepare input for NGA
@@ -373,8 +367,7 @@ class NGAAdapter:
             if self.fallback_to_mock:
                 logger.warning("Falling back to mock implementation")
                 return self._mock_generate_narrative(prompt, context)
-            else:
-                raise AgentCommunicationError(f"NGA communication failed: {e}") from e
+            raise AgentCommunicationError(f"NGA communication failed: {e}") from e
 
     def _mock_generate_narrative(
         self, prompt: str, context: dict[str, Any] | None = None

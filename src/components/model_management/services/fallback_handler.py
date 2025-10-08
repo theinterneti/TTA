@@ -41,7 +41,7 @@ class FallbackHandler(IFallbackHandler):
         self._fallback_rankings: dict[str, list[str]] = {}
 
         # Initialize provider health tracking
-        for provider_name in providers.keys():
+        for provider_name in providers:
             self._provider_health[provider_name] = True
 
     async def get_fallback_model(
@@ -232,13 +232,12 @@ class FallbackHandler(IFallbackHandler):
 
         if strategy == "performance_based":
             return self._select_by_performance(models, requirements)
-        elif strategy == "cost_based":
+        if strategy == "cost_based":
             return self._select_by_cost(models, requirements)
-        elif strategy == "availability_based":
+        if strategy == "availability_based":
             return self._select_by_availability(models, requirements)
-        else:
-            # Default to performance-based selection
-            return self._select_by_performance(models, requirements)
+        # Default to performance-based selection
+        return self._select_by_performance(models, requirements)
 
     def _select_by_performance(
         self, models: list[ModelInfo], requirements: ModelRequirements
@@ -366,12 +365,11 @@ class FallbackHandler(IFallbackHandler):
 
         if "gpt" in model_id.lower() or "openai" in model_id.lower():
             return "openai"
-        elif "claude" in model_id.lower():
+        if "claude" in model_id.lower():
             return "anthropic"
-        elif "llama" in model_id.lower() or "qwen" in model_id.lower():
+        if "llama" in model_id.lower() or "qwen" in model_id.lower():
             return "local"
-        else:
-            return "unknown"
+        return "unknown"
 
     def get_failure_statistics(self) -> dict[str, Any]:
         """Get failure statistics for monitoring."""
@@ -427,9 +425,8 @@ class FallbackHandler(IFallbackHandler):
                 self._provider_health[provider_name] = True
                 logger.info(f"Reset health status for provider: {provider_name}")
                 return True
-            else:
-                logger.warning(f"Provider {provider_name} not found")
-                return False
+            logger.warning(f"Provider {provider_name} not found")
+            return False
 
         except Exception as e:
             logger.error(f"Failed to reset health for provider {provider_name}: {e}")

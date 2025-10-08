@@ -422,11 +422,11 @@ class CircuitBreaker:
         async with self._lock:
             if self._state == CircuitBreakerState.CLOSED:
                 return True
-            elif self._state == CircuitBreakerState.OPEN:
+            if self._state == CircuitBreakerState.OPEN:
                 return (
                     time.time() - self._state_changed_at >= self._config.timeout_seconds
                 )
-            elif self._state == CircuitBreakerState.HALF_OPEN:
+            if self._state == CircuitBreakerState.HALF_OPEN:
                 return self._half_open_calls < self._config.half_open_max_calls
             return False
 

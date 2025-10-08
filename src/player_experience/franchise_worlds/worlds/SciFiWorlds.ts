@@ -1,6 +1,6 @@
 /**
  * Science Fiction World Configurations
- * 
+ *
  * Defines the 5 sci-fi worlds adapted from popular franchises while maintaining
  * legal distinctiveness and therapeutic value.
  */
@@ -43,7 +43,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
   name: 'Stellar Confederation',
   genre: 'sci-fi',
   inspirationSource: 'Optimistic space exploration with diverse alien cultures and diplomatic challenges',
-  
+
   worldSystems: {
     cultural: {
       complexity: 0.95,
@@ -174,7 +174,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
       ]
     }
   },
-  
+
   therapeuticThemes: [
     'cultural_understanding',
     'leadership_development',
@@ -183,14 +183,14 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
     'overcoming_prejudice',
     'finding_purpose_in_vastness'
   ],
-  
+
   therapeuticApproaches: [
     TherapeuticApproach.CBT,
     TherapeuticApproach.GROUP_THERAPY,
     TherapeuticApproach.SOLUTION_FOCUSED,
     TherapeuticApproach.NARRATIVE_THERAPY
   ],
-  
+
   therapeuticIntegrationPoints: [
     {
       trigger: 'first_contact_situation',
@@ -217,7 +217,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
       expectedOutcome: 'Strengthen personal ethical framework'
     }
   ],
-  
+
   narrativeFramework: {
     mainArcStructure: 'Exploration and diplomacy with personal growth through challenges',
     branchingPoints: [
@@ -254,7 +254,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
     ],
     adaptationStrategy: 'Transform space exploration into therapeutic journey of understanding and growth'
   },
-  
+
   characterArchetypes: [
     {
       archetypeId: 'diplomatic_captain',
@@ -280,7 +280,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
       adaptationNotes: 'Original character inspired by diplomatic captain archetypes'
     }
   ],
-  
+
   scenarioTemplates: [
     {
       templateId: 'diplomatic_crisis',
@@ -300,7 +300,7 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
       ]
     }
   ],
-  
+
   sessionLengthSupport: {
     short: {
       targetDuration: 25,
@@ -324,14 +324,14 @@ export const STELLAR_CONFEDERATION: FranchiseWorldConfig = {
       exitStrategies: ['galactic_peace', 'major_discovery', 'personal_transformation']
     }
   },
-  
+
   copyrightCompliance: {
     originalElements: 0.75,
     adaptationLevel: 'high',
     legalReview: 'pending',
     riskAssessment: 'low'
   },
-  
+
   contentRatings: [
     { system: 'ESRB', rating: 'T', descriptors: ['Sci-Fi Violence', 'Mild Language'] },
     { system: 'PEGI', rating: '12', descriptors: ['Violence'] }

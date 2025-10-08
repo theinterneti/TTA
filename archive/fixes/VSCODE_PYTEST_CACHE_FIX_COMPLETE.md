@@ -245,4 +245,3 @@ rm -rf list
 ---
 
 **Status:** ✅ All automated fixes complete. Awaiting user actions (close/reopen VS Code + manual interpreter selection).
-

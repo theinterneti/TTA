@@ -15,8 +15,8 @@ try:
     from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
         CONTENT_TYPE_LATEST,
     )
-    from ...monitoring.prometheus_metrics import (  # type: ignore[import-not-found]
-        get_metrics_collector as get_prometheus_collector,
+    from ...monitoring.prometheus_metrics import (
+        get_metrics_collector as get_prometheus_collector,  # type: ignore[import-not-found]
     )
 
     prometheus_available = True

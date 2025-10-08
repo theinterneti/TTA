@@ -195,7 +195,7 @@ class AIWorldGenerator:
         prompt = f"""Create a detailed therapeutic world for a mental health text adventure game.
 
 World Type: {world_type}
-Therapeutic Themes: {', '.join(therapeutic_themes)}
+Therapeutic Themes: {", ".join(therapeutic_themes)}
 
 Please generate a JSON response with the following structure:
 {{

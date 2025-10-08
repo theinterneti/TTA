@@ -83,7 +83,7 @@ class WebSocketConnection:
         # Check missed pongs
         if self.missed_pongs > 3:
             return "unhealthy"
-        elif self.missed_pongs > 1:
+        if self.missed_pongs > 1:
             return "degraded"
 
         # Check recent activity
@@ -144,9 +144,9 @@ class WebSocketConnectionManager:
         self.user_subscriptions: dict[str, set[str]] = {}  # user_id -> event_types
 
         # Connection recovery
-        self.connection_history: dict[str, dict[str, Any]] = (
-            {}
-        )  # user_id -> connection_info
+        self.connection_history: dict[
+            str, dict[str, Any]
+        ] = {}  # user_id -> connection_info
         self.recovery_enabled = bool(
             config.get("agent_orchestration.realtime.recovery.enabled", True)
         )
@@ -254,31 +254,28 @@ class WebSocketConnectionManager:
             if token:
                 # Direct token authentication (query param or header)
                 return await self._authenticate_with_token(connection, token)
-            else:
-                # Wait for authentication message
-                auth_timeout = 10.0  # 10 seconds to authenticate
-                auth_message = await asyncio.wait_for(
-                    connection.websocket.receive_text(), timeout=auth_timeout
+            # Wait for authentication message
+            auth_timeout = 10.0  # 10 seconds to authenticate
+            auth_message = await asyncio.wait_for(
+                connection.websocket.receive_text(), timeout=auth_timeout
+            )
+
+            # Parse authentication message
+            auth_data = json.loads(auth_message)
+
+            if auth_data.get("type") != "auth":
+                await self._send_error(
+                    connection, "AUTH_REQUIRED", "Authentication required"
                 )
+                return False
 
-                # Parse authentication message
-                auth_data = json.loads(auth_message)
+            # Extract token from message
+            token = auth_data.get("token")
+            if not token:
+                await self._send_error(connection, "INVALID_TOKEN", "Token required")
+                return False
 
-                if auth_data.get("type") != "auth":
-                    await self._send_error(
-                        connection, "AUTH_REQUIRED", "Authentication required"
-                    )
-                    return False
-
-                # Extract token from message
-                token = auth_data.get("token")
-                if not token:
-                    await self._send_error(
-                        connection, "INVALID_TOKEN", "Token required"
-                    )
-                    return False
-
-                return await self._authenticate_with_token(connection, token)
+            return await self._authenticate_with_token(connection, token)
 
         except asyncio.TimeoutError:
             await self._send_error(connection, "AUTH_TIMEOUT", "Authentication timeout")

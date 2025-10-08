@@ -19,6 +19,7 @@ def run_command(cmd, description):
     try:
         result = subprocess.run(
             cmd,
+            check=False,
             shell=True,
             capture_output=True,
             text=True,
@@ -34,11 +35,10 @@ def run_command(cmd, description):
                     if ".py:" in line and any(char.isdigit() for char in line):
                         print(f"   {line}")
             return True
-        else:
-            print(f"❌ FAILED: {description}")
-            if result.stderr:
-                print(f"Error: {result.stderr}")
-            return False
+        print(f"❌ FAILED: {description}")
+        if result.stderr:
+            print(f"Error: {result.stderr}")
+        return False
 
     except Exception as e:
         print(f"❌ ERROR: {description} - {e}")
@@ -110,7 +110,9 @@ def validate_test_discovery():
         else:
             # Try to extract test count
             try:
-                result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+                result = subprocess.run(
+                    cmd, check=False, shell=True, capture_output=True, text=True
+                )
                 for line in result.stdout.split("\n"):
                     if ".py:" in line and line.strip().split(":")[-1].strip().isdigit():
                         count = int(line.strip().split(":")[-1].strip())
@@ -188,9 +190,8 @@ def validate_ci_cd_compatibility():
                 all_good = False
 
         return all_good
-    else:
-        print("❌ GitHub Actions workflow not found")
-        return False
+    print("❌ GitHub Actions workflow not found")
+    return False
 
 
 def validate_pytest_markers():
@@ -281,10 +282,9 @@ def main():
         print("✅ Three-tier execution pattern is working")
         print("✅ All test infrastructure is properly configured")
         return 0
-    else:
-        print("❌ SOME VALIDATIONS FAILED")
-        print("Please review the failed validations above")
-        return 1
+    print("❌ SOME VALIDATIONS FAILED")
+    print("Please review the failed validations above")
+    return 1
 
 
 if __name__ == "__main__":

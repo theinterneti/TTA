@@ -29,7 +29,7 @@ class TestPhase2AIntegration:
         """Set up test environment with all Phase 2A services"""
         # Build Redis URL with password if provided
         redis_url = f"redis://{redis_config['host']}:{redis_config['port']}/{redis_config['db']}"
-        if redis_config.get('password'):
+        if redis_config.get("password"):
             redis_url = f"redis://:{redis_config['password']}@{redis_config['host']}:{redis_config['port']}/{redis_config['db']}"
 
         # Initialize test databases
@@ -67,7 +67,9 @@ class TestPhase2AIntegration:
 
     @pytest.mark.asyncio
     @pytest.mark.skip(reason="Patient interface API endpoints not yet implemented")
-    async def test_patient_interface_integration(self, setup_test_environment, api_base_url):
+    async def test_patient_interface_integration(
+        self, setup_test_environment, api_base_url
+    ):
         """Test patient interface integration with backend services"""
         patient_id = "test_patient_123"
 

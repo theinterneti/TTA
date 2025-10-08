@@ -2,7 +2,7 @@
 
 /**
  * Initialize System Script
- * 
+ *
  * Node.js script to initialize the franchise world system and verify
  * all components are working correctly.
  */
@@ -22,7 +22,7 @@ function initializeSystem() {
     systemHealth: {},
     readinessStatus: 'unknown'
   };
-  
+
   try {
     // Initialize and test each component
     initializationResults.components.worldSystem = initializeWorldSystem();
@@ -30,19 +30,19 @@ function initializeSystem() {
     initializationResults.components.validationSystem = initializeValidationSystem();
     initializationResults.components.parameterSystem = initializeParameterSystem();
     initializationResults.components.fileSystem = initializeFileSystem();
-    
+
     // Run system validation
     initializationResults.validationResults = runSystemValidation();
-    
+
     // Check system health
     initializationResults.systemHealth = checkSystemHealth(initializationResults.components);
-    
+
     // Determine overall readiness
     initializationResults.readinessStatus = determineSystemReadiness(initializationResults);
     initializationResults.systemStatus = initializationResults.readinessStatus === 'ready' ? 'operational' : 'needs_attention';
-    
+
     return initializationResults;
-    
+
   } catch (error) {
     initializationResults.systemStatus = 'failed';
     initializationResults.error = error.message;
@@ -54,7 +54,7 @@ function initializeSystem() {
 function initializeWorldSystem() {
   try {
     const worlds = getAllWorlds();
-    
+
     const worldStats = {
       totalWorlds: worlds.length,
       fantasyWorlds: worlds.filter(w => w.genre === 'fantasy').length,
@@ -63,34 +63,34 @@ function initializeWorldSystem() {
       therapeuticApproaches: new Set(),
       therapeuticThemes: new Set()
     };
-    
+
     // Analyze world distribution
     worlds.forEach(world => {
       // Count difficulty levels
-      worldStats.difficultyDistribution[world.difficultyLevel] = 
+      worldStats.difficultyDistribution[world.difficultyLevel] =
         (worldStats.difficultyDistribution[world.difficultyLevel] || 0) + 1;
-      
+
       // Collect therapeutic approaches
-      world.therapeuticApproaches.forEach(approach => 
+      world.therapeuticApproaches.forEach(approach =>
         worldStats.therapeuticApproaches.add(approach)
       );
-      
+
       // Collect therapeutic themes
-      world.therapeuticThemes.forEach(theme => 
+      world.therapeuticThemes.forEach(theme =>
         worldStats.therapeuticThemes.add(theme)
       );
     });
-    
+
     // Convert sets to arrays for JSON serialization
     worldStats.therapeuticApproaches = Array.from(worldStats.therapeuticApproaches);
     worldStats.therapeuticThemes = Array.from(worldStats.therapeuticThemes);
-    
+
     return {
       status: 'initialized',
       stats: worldStats,
       availableWorlds: worlds.map(w => ({ id: w.franchiseId, name: w.name, genre: w.genre }))
     };
-    
+
   } catch (error) {
     return {
       status: 'failed',
@@ -102,14 +102,14 @@ function initializeWorldSystem() {
 function initializeArchetypeSystem() {
   try {
     const archetypes = getAllArchetypes();
-    
+
     const archetypeStats = {
       totalArchetypes: archetypes.length,
       roles: [...new Set(archetypes.map(a => a.role))],
       therapeuticFunctions: archetypes.map(a => a.therapeuticFunction),
       worldAdaptations: {}
     };
-    
+
     // Analyze world adaptations
     archetypes.forEach(archetype => {
       if (archetype.worldAdaptations) {
@@ -121,17 +121,17 @@ function initializeArchetypeSystem() {
         });
       }
     });
-    
+
     return {
       status: 'initialized',
       stats: archetypeStats,
-      availableArchetypes: archetypes.map(a => ({ 
-        id: a.archetypeId, 
-        name: a.name, 
-        role: a.role 
+      availableArchetypes: archetypes.map(a => ({
+        id: a.archetypeId,
+        name: a.name,
+        role: a.role
       }))
     };
-    
+
   } catch (error) {
     return {
       status: 'failed',
@@ -145,7 +145,7 @@ function initializeValidationSystem() {
     const worlds = getAllWorlds();
     const validationResults = {};
     let totalValidWorlds = 0;
-    
+
     worlds.forEach(world => {
       try {
         const validation = validateWorldForSimulation(world.franchiseId);
@@ -154,7 +154,7 @@ function initializeValidationSystem() {
           score: validation.validationScore,
           readinessLevel: validation.readinessLevel
         };
-        
+
         if (validation.isValid) {
           totalValidWorlds++;
         }
@@ -165,7 +165,7 @@ function initializeValidationSystem() {
         };
       }
     });
-    
+
     return {
       status: 'initialized',
       stats: {
@@ -175,7 +175,7 @@ function initializeValidationSystem() {
       },
       validationResults: validationResults
     };
-    
+
   } catch (error) {
     return {
       status: 'failed',
@@ -193,10 +193,10 @@ function initializeParameterSystem() {
       challengePreference: 'intermediate',
       therapeuticGoals: ['anxiety_management', 'confidence_building']
     };
-    
+
     const worlds = getAllWorlds();
     let successfulParameterCreations = 0;
-    
+
     worlds.forEach(world => {
       try {
         // This would call create-parameters.js, but for initialization we'll just verify the structure
@@ -206,7 +206,7 @@ function initializeParameterSystem() {
           challengeLevel: world.difficultyLevel,
           focusAreas: world.therapeuticThemes.slice(0, 3)
         };
-        
+
         if (mockParameters.worldId && mockParameters.therapeuticIntensity !== undefined) {
           successfulParameterCreations++;
         }
@@ -214,7 +214,7 @@ function initializeParameterSystem() {
         // Parameter creation failed for this world
       }
     });
-    
+
     return {
       status: 'initialized',
       stats: {
@@ -223,7 +223,7 @@ function initializeParameterSystem() {
         parameterizationRate: successfulParameterCreations / worlds.length
       }
     };
-    
+
   } catch (error) {
     return {
       status: 'failed',
@@ -243,11 +243,11 @@ function initializeFileSystem() {
       'create-parameters.js',
       'initialize-system.js'
     ];
-    
+
     const scriptsDir = __dirname;
     const fileStatus = {};
     let existingFiles = 0;
-    
+
     requiredFiles.forEach(filename => {
       const filePath = path.join(scriptsDir, filename);
       const exists = fs.existsSync(filePath);
@@ -255,7 +255,7 @@ function initializeFileSystem() {
         exists: exists,
         path: filePath
       };
-      
+
       if (exists) {
         existingFiles++;
         // Check if file is readable
@@ -268,7 +268,7 @@ function initializeFileSystem() {
         }
       }
     });
-    
+
     return {
       status: existingFiles === requiredFiles.length ? 'initialized' : 'incomplete',
       stats: {
@@ -278,7 +278,7 @@ function initializeFileSystem() {
       },
       fileStatus: fileStatus
     };
-    
+
   } catch (error) {
     return {
       status: 'failed',
@@ -294,10 +294,10 @@ function runSystemValidation() {
     worldValidation: testWorldValidation(),
     systemIntegration: testSystemIntegration()
   };
-  
+
   const passedTests = Object.values(validationTests).filter(test => test.passed).length;
   const totalTests = Object.keys(validationTests).length;
-  
+
   return {
     tests: validationTests,
     passedTests: passedTests,
@@ -348,10 +348,10 @@ function testWorldValidation() {
         error: 'No worlds available for validation testing'
       };
     }
-    
+
     const testWorld = worlds[0];
     const validation = validateWorldForSimulation(testWorld.franchiseId);
-    
+
     return {
       passed: validation.hasOwnProperty('isValid'),
       details: `Validation test completed for ${testWorld.name}`,
@@ -370,25 +370,25 @@ function testSystemIntegration() {
     // Test that all major components can work together
     const worlds = getAllWorlds();
     const archetypes = getAllArchetypes();
-    
+
     if (worlds.length === 0 || archetypes.length === 0) {
       return {
         passed: false,
         error: 'Insufficient data for integration testing'
       };
     }
-    
+
     // Test that archetypes can be adapted for world genres
     const fantasyWorlds = worlds.filter(w => w.genre === 'fantasy');
     const scifiWorlds = worlds.filter(w => w.genre === 'sci-fi');
-    
-    const hasFantasyAdaptations = archetypes.some(a => 
+
+    const hasFantasyAdaptations = archetypes.some(a =>
       a.worldAdaptations && a.worldAdaptations.fantasy
     );
-    const hasScifiAdaptations = archetypes.some(a => 
+    const hasScifiAdaptations = archetypes.some(a =>
       a.worldAdaptations && a.worldAdaptations['sci-fi']
     );
-    
+
     return {
       passed: hasFantasyAdaptations && hasScifiAdaptations,
       details: 'System integration test completed',
@@ -411,10 +411,10 @@ function checkSystemHealth(components) {
     parameterSystemHealth: components.parameterSystem.status === 'initialized',
     fileSystemHealth: components.fileSystem.status === 'initialized'
   };
-  
+
   const healthyComponents = Object.values(healthChecks).filter(Boolean).length;
   const totalComponents = Object.keys(healthChecks).length;
-  
+
   return {
     checks: healthChecks,
     healthyComponents: healthyComponents,
@@ -426,11 +426,11 @@ function checkSystemHealth(components) {
 
 function determineSystemReadiness(initializationResults) {
   const { systemHealth, validationResults } = initializationResults;
-  
-  if (systemHealth.overallHealth === 'healthy' && 
+
+  if (systemHealth.overallHealth === 'healthy' &&
       validationResults.overallStatus === 'passed') {
     return 'ready';
-  } else if (systemHealth.healthScore >= 0.8 && 
+  } else if (systemHealth.healthScore >= 0.8 &&
              validationResults.passRate >= 0.75) {
     return 'mostly_ready';
   } else if (systemHealth.healthScore >= 0.6) {
@@ -443,15 +443,15 @@ function determineSystemReadiness(initializationResults) {
 function main() {
   try {
     console.log('🚀 Initializing TTA Franchise World System...\n');
-    
+
     const results = initializeSystem();
-    
+
     // Return results
     console.log(JSON.stringify(results, null, 2));
-    
+
     // Exit with appropriate code
     process.exit(results.readinessStatus === 'ready' ? 0 : 1);
-    
+
   } catch (error) {
     console.error(JSON.stringify({
       success: false,

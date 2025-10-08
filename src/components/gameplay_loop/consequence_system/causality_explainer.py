@@ -329,13 +329,12 @@ class CausalityExplainer:
 
         if tone == "immediate_support":
             return f"Right now, {explanation.lower()} This supports your immediate safety and wellbeing."
-        elif tone == "gentle_support":
+        if tone == "gentle_support":
             return f"Gently, {explanation.lower()} This offers comfort and support."
-        elif tone == "simplifying":
+        if tone == "simplifying":
             return f"Simply put, {explanation.lower()}"
-        elif tone == "reassuring":
+        if tone == "reassuring":
             return f"Reassuringly, {explanation.lower()} This creates stability."
-        elif tone == "encouraging":
+        if tone == "encouraging":
             return f"Encouragingly, {explanation.lower()} This supports your growth."
-        else:
-            return explanation
+        return explanation

@@ -127,7 +127,7 @@ const GoalRelationshipGraph: React.FC<GoalRelationshipGraphProps> = ({
     edges.forEach(edge => {
       const sourceNode = nodes.find(n => n.id === edge.source);
       const targetNode = nodes.find(n => n.id === edge.target);
-      
+
       if (!sourceNode || !targetNode) return;
 
       ctx.beginPath();
@@ -142,7 +142,7 @@ const GoalRelationshipGraph: React.FC<GoalRelationshipGraphProps> = ({
       // Draw relationship type indicator
       const midX = (sourceNode.x + targetNode.x) / 2;
       const midY = (sourceNode.y + targetNode.y) / 2;
-      
+
       ctx.fillStyle = edge.color;
       ctx.beginPath();
       ctx.arc(midX, midY, 3, 0, 2 * Math.PI);
@@ -239,7 +239,7 @@ const GoalRelationshipGraph: React.FC<GoalRelationshipGraphProps> = ({
         onClick={handleClick}
         style={{ width, height }}
       />
-      
+
       {/* Legend */}
       <div className="absolute top-2 right-2 bg-white bg-opacity-90 rounded-lg p-2 text-xs">
         <div className="space-y-1">

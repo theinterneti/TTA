@@ -672,7 +672,7 @@ class TestConcurrentUserScenarios:
                         "success": response.status_code == 200,
                     }
 
-                elif operation_id % 3 == 1:
+                if operation_id % 3 == 1:
                     # Update session settings
                     update_data = {
                         "therapeutic_settings": {
@@ -695,15 +695,14 @@ class TestConcurrentUserScenarios:
                         "success": response.status_code == 200,
                     }
 
-                else:
-                    # Get progress for session
-                    response = client.get(
-                        f"/api/v1/sessions/{session_id}/progress", headers=headers
-                    )
-                    return {
-                        "operation": "get_progress",
-                        "success": response.status_code == 200,
-                    }
+                # Get progress for session
+                response = client.get(
+                    f"/api/v1/sessions/{session_id}/progress", headers=headers
+                )
+                return {
+                    "operation": "get_progress",
+                    "success": response.status_code == 200,
+                }
 
             except Exception as e:
                 return {

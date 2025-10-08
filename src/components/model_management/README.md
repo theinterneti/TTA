@@ -112,7 +112,7 @@ Add to your `tta_config.yaml`:
 model_management:
   enabled: true
   default_provider: "openrouter"
-  
+
   providers:
     openrouter:
       enabled: true
@@ -121,23 +121,23 @@ model_management:
       preferred_models:
         - "meta-llama/llama-3.1-8b-instruct:free"
         - "microsoft/phi-3-mini-128k-instruct:free"
-    
+
     ollama:
       enabled: true
       base_url: "http://localhost:11434"
       docker_enabled: true
       auto_pull_models: true
-    
+
     local:
       enabled: false  # Resource intensive
       models_cache_dir: "./models"
       max_concurrent_models: 2
-  
+
   selection_strategy:
     algorithm: "performance_based"
     prefer_free_models: true
     therapeutic_safety_threshold: 7.0
-  
+
   fallback_config:
     enabled: true
     max_retries: 3

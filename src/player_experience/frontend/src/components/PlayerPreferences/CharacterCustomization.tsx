@@ -113,8 +113,8 @@ const CharacterCustomization: React.FC<CharacterCustomizationProps> = ({
           Character & Setting Customization
         </h3>
         <p className="text-gray-600 mb-6">
-          Personalize your therapeutic companion and choose the environment where your 
-          conversations will take place. These choices help create a more immersive and 
+          Personalize your therapeutic companion and choose the environment where your
+          conversations will take place. These choices help create a more immersive and
           comfortable experience.
         </p>
       </div>
@@ -123,10 +123,10 @@ const CharacterCustomization: React.FC<CharacterCustomizationProps> = ({
       <div className="space-y-4">
         <h4 className="text-lg font-semibold text-gray-900">Character Name</h4>
         <p className="text-gray-600 text-sm">
-          Choose a name for your therapeutic companion. This creates a more personal connection 
+          Choose a name for your therapeutic companion. This creates a more personal connection
           and helps you feel more comfortable during conversations.
         </p>
-        
+
         <div className="space-y-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -167,7 +167,7 @@ const CharacterCustomization: React.FC<CharacterCustomizationProps> = ({
       <div className="space-y-4">
         <h4 className="text-lg font-semibold text-gray-900">Preferred Setting</h4>
         <p className="text-gray-600 text-sm">
-          Choose the environment where you'd like your therapeutic conversations to take place. 
+          Choose the environment where you'd like your therapeutic conversations to take place.
           Different settings can evoke different feelings and support various types of work.
         </p>
 
@@ -190,11 +190,11 @@ const CharacterCustomization: React.FC<CharacterCustomizationProps> = ({
                 <span className="text-2xl mr-2">{setting.icon}</span>
                 <h5 className="font-semibold text-gray-900">{setting.name}</h5>
               </div>
-              
+
               <div className="text-2xl mb-2">{setting.image}</div>
-              
+
               <p className="text-sm text-gray-600 mb-2">{setting.atmosphere}</p>
-              
+
               <div className="space-y-2">
                 <div>
                   <p className="text-xs font-medium text-gray-700">Benefits:</p>

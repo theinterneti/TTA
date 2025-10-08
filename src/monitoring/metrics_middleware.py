@@ -348,9 +348,8 @@ def create_metrics_middleware(app, service_name: str = "tta", force_mock: bool =
     if use_mock:
         logger.info(f"Using mock metrics middleware for service: {service_name}")
         return MockMetricsMiddleware(app, service_name)
-    else:
-        logger.info(f"Using Prometheus metrics middleware for service: {service_name}")
-        return PrometheusMetricsMiddleware(app, service_name)
+    logger.info(f"Using Prometheus metrics middleware for service: {service_name}")
+    return PrometheusMetricsMiddleware(app, service_name)
 
 
 def get_monitoring_status() -> dict:

@@ -361,7 +361,7 @@ class CoordinationBenchmark:
                 "nga_result": nga_result,
             }
 
-        elif scenario_type == "parallel":
+        if scenario_type == "parallel":
             # Parallel execution
             tasks = []
 
@@ -395,8 +395,7 @@ class CoordinationBenchmark:
             results = await asyncio.gather(*tasks, return_exceptions=True)
             return {"parallel_results": results}
 
-        else:
-            raise ValueError(f"Unknown scenario type: {scenario_type}")
+        raise ValueError(f"Unknown scenario type: {scenario_type}")
 
     def _analyze_scalability(
         self, concurrency_results: dict[int, ConcurrencyMetrics]

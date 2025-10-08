@@ -29,7 +29,7 @@ flowchart TB
     subgraph "Agent Orchestration Layer"
         ORCHESTRATOR[LangGraph<br/>Orchestrator]
         WORKFLOW_STATE[(Workflow State)]
-        
+
         subgraph "AI Agents"
             IPA[Input Processor<br/>Agent]
             WBA[World Builder<br/>Agent]
@@ -145,11 +145,11 @@ flowchart TB
     GATEWAY -.->|Metrics| METRICS
     PLAYER_SVC -.->|Metrics| METRICS
     ORCHESTRATOR -.->|Metrics| METRICS
-    
+
     GATEWAY -.->|Logs| LOGS
     PLAYER_SVC -.->|Logs| LOGS
     ORCHESTRATOR -.->|Logs| LOGS
-    
+
     POSTGRES_DB -.->|Analytics Data| ANALYTICS
     NEO4J_DB -.->|Graph Analytics| ANALYTICS
 
@@ -431,4 +431,3 @@ CREATE TABLE analytics_events (
 - [Component Interaction Diagram](component-interaction-diagram.md)
 - [Database Schema Documentation](../../docs/technical/database-architecture.md)
 - [API Documentation](../../docs/api/README.md)
-

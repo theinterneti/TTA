@@ -1,6 +1,6 @@
 /**
  * Error Handling Utilities
- * 
+ *
  * Provides comprehensive error serialization, formatting, and user-friendly
  * message generation to replace '[object Object]' displays.
  */
@@ -27,7 +27,7 @@ export interface SerializedError {
  */
 export function serializeError(error: any, context?: string): SerializedError {
   const timestamp = new Date().toISOString();
-  
+
   // Handle null/undefined
   if (!error) {
     return {
@@ -56,7 +56,7 @@ export function serializeError(error: any, context?: string): SerializedError {
   if (error.response) {
     const status = error.response.status;
     const data = error.response.data;
-    
+
     return {
       message: data?.detail || data?.message || `HTTP ${status} error`,
       severity: getSeverityFromStatus(status),
@@ -137,7 +137,7 @@ function formatAPIErrorMessage(status: number, data: any, context?: string): str
     case 422:
       if (data?.detail) {
         if (Array.isArray(data.detail)) {
-          const errors = data.detail.map((err: any) => 
+          const errors = data.detail.map((err: any) =>
             `${err.loc?.join('.') || 'Field'}: ${err.msg}`
           ).join(', ');
           return `${contextPrefix}Validation error: ${errors}`;
@@ -172,15 +172,15 @@ function formatUserMessage(message: string, context?: string): string {
   if (message.toLowerCase().includes('network')) {
     return `${contextPrefix}Network error. Please check your connection and try again.`;
   }
-  
+
   if (message.toLowerCase().includes('timeout')) {
     return `${contextPrefix}Request timed out. Please try again.`;
   }
-  
+
   if (message.toLowerCase().includes('unauthorized') || message.toLowerCase().includes('authentication')) {
     return `${contextPrefix}Authentication failed. Please log in again.`;
   }
-  
+
   if (message.toLowerCase().includes('forbidden') || message.toLowerCase().includes('permission')) {
     return `${contextPrefix}You don't have permission to perform this action.`;
   }
@@ -199,7 +199,7 @@ function formatUserMessage(message: string, context?: string): string {
  */
 export function displayError(error: any, context?: string): SerializedError {
   const serialized = serializeError(error, context);
-  
+
   // Log to console with appropriate level
   switch (serialized.severity) {
     case ErrorSeverity.CRITICAL:
@@ -237,7 +237,7 @@ export function isNetworkError(error: any): boolean {
 
 export function isAuthError(error: any): boolean {
   const serialized = serializeError(error);
-  return serialized.code === '401' || 
+  return serialized.code === '401' ||
          serialized.code === '403' ||
          serialized.message.toLowerCase().includes('unauthorized') ||
          serialized.message.toLowerCase().includes('authentication');
@@ -273,7 +273,7 @@ export function createErrorNotification(
   }
 ): ErrorNotification {
   const serialized = serializeError(error, context);
-  
+
   return {
     id: `error-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
     message: serialized.userMessage,
@@ -285,4 +285,3 @@ export function createErrorNotification(
     action: options?.action,
   };
 }
-

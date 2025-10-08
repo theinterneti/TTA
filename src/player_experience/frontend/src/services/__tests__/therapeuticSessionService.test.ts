@@ -180,10 +180,10 @@ describe('TherapeuticSessionService', () => {
 
       const activities = result.sessionPlan.activities;
       expect(activities).toHaveLength(4); // Opening + 2 goals + closing
-      
+
       const totalDuration = activities.reduce((sum, activity) => sum + activity.duration, 0);
       expect(totalDuration).toBeLessThanOrEqual(60);
-      
+
       // Check for opening and closing activities
       expect(activities[0].name).toBe('Session Opening');
       expect(activities[activities.length - 1].name).toBe('Session Closing');

@@ -299,7 +299,7 @@ class TTAConfig:
 
             # Support compound repository keys like "tta.dev" or "tta.prototype"
             if i + 1 < len(keys):
-                compound = f"{keys[i]}.{keys[i+1]}"
+                compound = f"{keys[i]}.{keys[i + 1]}"
                 if compound in value:
                     value = value[compound]
                     i += 2
@@ -426,15 +426,15 @@ class TTAConfig:
             if expected_type is not None:
                 if expected_type == "dict" and not isinstance(value, dict):
                     raise ValueError(f"Key '{path}.{key}' must be a dictionary")
-                elif expected_type == "list" and not isinstance(value, list):
+                if expected_type == "list" and not isinstance(value, list):
                     raise ValueError(f"Key '{path}.{key}' must be a list")
-                elif expected_type == "str" and not isinstance(value, str):
+                if expected_type == "str" and not isinstance(value, str):
                     raise ValueError(f"Key '{path}.{key}' must be a string")
-                elif expected_type == "int" and not isinstance(value, int):
+                if expected_type == "int" and not isinstance(value, int):
                     raise ValueError(f"Key '{path}.{key}' must be an integer")
-                elif expected_type == "float" and not isinstance(value, (int, float)):
+                if expected_type == "float" and not isinstance(value, (int, float)):
                     raise ValueError(f"Key '{path}.{key}' must be a number")
-                elif expected_type == "bool" and not isinstance(value, bool):
+                if expected_type == "bool" and not isinstance(value, bool):
                     raise ValueError(f"Key '{path}.{key}' must be a boolean")
 
             # Check nested schema

@@ -17,4 +17,3 @@ test-redis:
 # Full integration (Neo4j + Redis)
 test-integration:
 	uv run pytest -q --neo4j --redis
-

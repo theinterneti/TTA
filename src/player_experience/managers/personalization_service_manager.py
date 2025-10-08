@@ -408,10 +408,9 @@ class PersonalizationServiceManager:
                                 f"Critical unresolvable conflicts found in settings for player {player_id}"
                             )
                             return False, remaining_conflicts
-                        else:
-                            # Non-critical conflicts remaining, but settings are usable
-                            settings = resolved_settings
-                            conflicts = remaining_conflicts
+                        # Non-critical conflicts remaining, but settings are usable
+                        settings = resolved_settings
+                        conflicts = remaining_conflicts
                 else:
                     # No conflicts were resolvable, check if any are critical
                     critical_conflicts = [

@@ -52,9 +52,23 @@ OPENROUTER_REDIRECT_URI = os.getenv(
     "http://localhost:8080/api/v1/openrouter/auth/oauth/callback",
 )
 
-# In-memory storage (in production, use Redis or database)
-user_sessions: dict[str, dict[str, Any]] = {}
-oauth_states: dict[str, dict[str, Any]] = {}
+# Redis-backed session manager (replaces in-memory storage)
+from ..session_manager import RedisSessionManager
+
+_session_manager: RedisSessionManager | None = None
+
+
+def get_session_manager() -> RedisSessionManager:
+    """Get or create Redis session manager."""
+    global _session_manager
+    if _session_manager is None:
+        # Get Redis client from app state or create new one
+        import redis.asyncio as aioredis
+
+        redis_url = os.getenv("REDIS_URL", "redis://localhost:6379")
+        redis_client = aioredis.from_url(redis_url, decode_responses=True)
+        _session_manager = RedisSessionManager(redis_client)
+    return _session_manager
 
 
 class ApiKeyValidationRequest(BaseModel):
@@ -140,8 +154,7 @@ async def validate_openrouter_api_key(api_key: str) -> dict[str, Any]:
                         },
                     },
                 }
-            else:
-                return {"valid": False, "error": "Invalid API key"}
+            return {"valid": False, "error": "Invalid API key"}
 
     except Exception as e:
         logger.error(f"API key validation failed: {e}")
@@ -153,19 +166,15 @@ def get_session_id(request: Request) -> str | None:
     return request.cookies.get("openrouter_session_id")
 
 
-def create_session(user_data: dict[str, Any], api_key: str | None = None) -> str:
-    """Create a new user session."""
-    session_id = secrets.token_urlsafe(32)
-    session_data = {
-        "user": user_data,
-        "created_at": secrets.token_hex(8),  # Simplified timestamp
-        "auth_method": "oauth" if not api_key else "api_key",
-    }
+async def create_session(user_data: dict[str, Any], api_key: str | None = None) -> str:
+    """Create a new user session using Redis."""
+    session_manager = get_session_manager()
+    auth_method = "oauth" if not api_key else "api_key"
+    encrypted_key = encrypt_api_key(api_key) if api_key else None
 
-    if api_key:
-        session_data["encrypted_api_key"] = encrypt_api_key(api_key)
-
-    user_sessions[session_id] = session_data
+    session_id = await session_manager.create_session(
+        user_data=user_data, auth_method=auth_method, encrypted_api_key=encrypted_key
+    )
     return session_id
 
 
@@ -179,7 +188,9 @@ async def validate_api_key(
 
         if validation_result["valid"] and not request.validate_only:
             # Store the API key securely in session
-            session_id = create_session(validation_result["user"], request.api_key)
+            session_id = await create_session(
+                validation_result["user"], request.api_key
+            )
 
             # Set secure session cookie
             response.set_cookie(
@@ -218,13 +229,10 @@ async def initiate_oauth():
         # Generate PKCE parameters
         code_verifier = generate_code_verifier()
         code_challenge = generate_code_challenge(code_verifier)
-        state = secrets.token_urlsafe(32)
 
-        # Store OAuth state
-        oauth_states[state] = {
-            "code_verifier": code_verifier,
-            "created_at": secrets.token_hex(8),  # Simplified timestamp
-        }
+        # Store OAuth state in Redis
+        session_manager = get_session_manager()
+        state = await session_manager.store_oauth_state(code_verifier)
 
         # Build authorization URL
         auth_params = {
@@ -255,14 +263,16 @@ async def initiate_oauth():
 async def oauth_callback(request: OAuthCallbackRequest, response: Response):
     """Handle OAuth callback from OpenRouter."""
     try:
-        # Validate state
-        if request.state not in oauth_states:
+        # Validate state from Redis
+        session_manager = get_session_manager()
+        oauth_state = await session_manager.get_oauth_state(request.state)
+
+        if not oauth_state:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OAuth state"
             )
 
-        stored_verifier = oauth_states[request.state]["code_verifier"]
-        if stored_verifier != request.code_verifier:
+        if oauth_state.code_verifier != request.code_verifier:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid code verifier"
             )
@@ -320,7 +330,7 @@ async def oauth_callback(request: OAuthCallbackRequest, response: Response):
             }
 
             # Create session
-            session_id = create_session(user_info)
+            session_id = await create_session(user_info)
 
             # Set secure session cookie
             response.set_cookie(
@@ -332,8 +342,8 @@ async def oauth_callback(request: OAuthCallbackRequest, response: Response):
                 max_age=86400,
             )
 
-            # Clean up OAuth state
-            del oauth_states[request.state]
+            # Clean up OAuth state from Redis
+            await session_manager.delete_oauth_state(request.state)
 
             return OAuthCallbackResponse(
                 success=True, user=user_info, session_id=session_id
@@ -348,21 +358,29 @@ async def oauth_callback(request: OAuthCallbackRequest, response: Response):
 async def get_user_info(request: Request):
     """Get current user information."""
     session_id = get_session_id(request)
-    if not session_id or session_id not in user_sessions:
+    if not session_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated"
         )
 
-    session_data = user_sessions[session_id]
-    return {"user": session_data["user"]}
+    session_manager = get_session_manager()
+    session = await session_manager.get_session(session_id)
+
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="Session expired"
+        )
+
+    return {"user": session.user_data, "auth_method": session.auth_method}
 
 
 @router.post("/logout")
 async def logout(request: Request, response: Response):
     """Logout and clear session."""
     session_id = get_session_id(request)
-    if session_id and session_id in user_sessions:
-        del user_sessions[session_id]
+    if session_id:
+        session_manager = get_session_manager()
+        await session_manager.delete_session(session_id)
 
     response.delete_cookie("openrouter_session_id")
     return {"message": "Logged out successfully"}
@@ -372,12 +390,17 @@ async def logout(request: Request, response: Response):
 async def auth_status(request: Request):
     """Get authentication status."""
     session_id = get_session_id(request)
-    if not session_id or session_id not in user_sessions:
+    if not session_id:
         return {"authenticated": False, "auth_method": None, "user": None}
 
-    session_data = user_sessions[session_id]
+    session_manager = get_session_manager()
+    session = await session_manager.get_session(session_id)
+
+    if not session:
+        return {"authenticated": False, "auth_method": None, "user": None}
+
     return {
         "authenticated": True,
-        "auth_method": session_data["auth_method"],
-        "user": session_data["user"],
+        "auth_method": session.auth_method,
+        "user": session.user_data,
     }

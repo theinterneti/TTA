@@ -400,7 +400,10 @@ class OllamaProvider(BaseProvider):
 
             # Make pull request (this can take a long time)
             async with self._client.stream(
-                "POST", "/api/pull", json=payload, timeout=1800.0  # 30 minutes timeout
+                "POST",
+                "/api/pull",
+                json=payload,
+                timeout=1800.0,  # 30 minutes timeout
             ) as response:
                 response.raise_for_status()
 
@@ -438,16 +441,14 @@ class OllamaProvider(BaseProvider):
         if "llama" in model_lower:
             if "3.1" in model_lower or "3.2" in model_lower:
                 return 128000  # Llama 3.1/3.2 has 128k context
-            else:
-                return 4096  # Older Llama models
-        elif "qwen" in model_lower:
+            return 4096  # Older Llama models
+        if "qwen" in model_lower:
             return 32768  # Qwen models typically have 32k context
-        elif "mistral" in model_lower:
+        if "mistral" in model_lower:
             return 32768  # Mistral models
-        elif "phi" in model_lower:
+        if "phi" in model_lower:
             return 4096  # Phi models
-        else:
-            return 4096  # Default assumption
+        return 4096  # Default assumption
 
     def _determine_capabilities(self, model_id: str) -> list[str]:
         """Determine model capabilities based on model name."""

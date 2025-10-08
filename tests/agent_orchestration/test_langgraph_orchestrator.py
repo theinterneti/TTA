@@ -4,9 +4,10 @@ Integration tests for the LangGraph Agent Orchestrator.
 Tests the LangGraph workflow integration with agent coordination.
 """
 
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
 import pytest_asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from src.agent_orchestration.langgraph_orchestrator import (
     AgentWorkflowState,
@@ -39,8 +40,9 @@ async def mock_llm():
 @pytest_asyncio.fixture
 async def orchestrator(mock_redis, mock_llm):
     """Create a LangGraph orchestrator with mocked dependencies."""
-    with patch("redis.asyncio.from_url", return_value=mock_redis), patch(
-        "langchain_openai.ChatOpenAI", return_value=mock_llm
+    with (
+        patch("redis.asyncio.from_url", return_value=mock_redis),
+        patch("langchain_openai.ChatOpenAI", return_value=mock_llm),
     ):
         orch = LangGraphAgentOrchestrator(
             openai_api_key="test-key",
@@ -58,8 +60,9 @@ class TestLangGraphAgentOrchestrator:
     @pytest.mark.asyncio
     async def test_initialization(self, mock_redis, mock_llm):
         """Test orchestrator initialization."""
-        with patch("redis.asyncio.from_url", return_value=mock_redis), patch(
-            "langchain_openai.ChatOpenAI", return_value=mock_llm
+        with (
+            patch("redis.asyncio.from_url", return_value=mock_redis),
+            patch("langchain_openai.ChatOpenAI", return_value=mock_llm),
         ):
             orch = LangGraphAgentOrchestrator(
                 openai_api_key="test-key", redis_url="redis://localhost:6379"
@@ -118,7 +121,12 @@ class TestLangGraphAgentOrchestrator:
         result_state = await orchestrator._safety_check_node(state)
 
         # Verify safety assessment
-        assert result_state["safety_level"] in ["safe", "concern", "high_risk", "crisis"]
+        assert result_state["safety_level"] in [
+            "safe",
+            "concern",
+            "high_risk",
+            "crisis",
+        ]
 
     @pytest.mark.asyncio
     async def test_coordinate_agents_node(self, orchestrator):
@@ -197,7 +205,10 @@ class TestLangGraphAgentOrchestrator:
 
         # Verify crisis response
         assert result_state["narrative_response"] != ""
-        assert "crisis" in result_state["narrative_response"].lower() or "988" in result_state["narrative_response"]
+        assert (
+            "crisis" in result_state["narrative_response"].lower()
+            or "988" in result_state["narrative_response"]
+        )
         assert "crisis_resources" in result_state["next_actions"]
 
     @pytest.mark.asyncio
@@ -293,4 +304,3 @@ class TestLangGraphAgentOrchestrator:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

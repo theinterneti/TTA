@@ -413,12 +413,11 @@ class NarrativeEngine:
         # Analyze narrative direction
         if narrative_direction["therapeutic_progress"] == "needs_support":
             return SceneType.THERAPEUTIC
-        elif narrative_direction["emotional_trajectory"] == "needs_support":
+        if narrative_direction["emotional_trajectory"] == "needs_support":
             return SceneType.REFLECTION
-        elif narrative_direction["narrative_momentum"] == "accelerated":
+        if narrative_direction["narrative_momentum"] == "accelerated":
             return SceneType.CHALLENGE
-        else:
-            return SceneType.EXPLORATION
+        return SceneType.EXPLORATION
 
     async def _determine_scene_parameters(
         self,

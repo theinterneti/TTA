@@ -342,16 +342,15 @@ class RealtimeConfigManager:
 
         if feature == "realtime":
             return config.enabled
-        elif feature == "websocket":
+        if feature == "websocket":
             return config.enabled and config.websocket.enabled
-        elif feature == "events":
+        if feature == "events":
             return config.enabled and config.events.enabled
-        elif feature == "progressive_feedback":
+        if feature == "progressive_feedback":
             return config.enabled and config.progressive_feedback.enabled
-        elif feature == "optimization":
+        if feature == "optimization":
             return config.enabled and config.optimization.enabled
-        else:
-            return False
+        return False
 
     def get_environment(self) -> RealtimeEnvironment:
         """Get the current environment."""

@@ -324,7 +324,7 @@ model_management:
         - "phi3:mini"
 
     local:
-      enabled: false  # Disabled by default due to resource requirements
+      enabled: false # Disabled by default due to resource requirements
       models_cache_dir: "./models"
       max_concurrent_models: 2
       auto_quantization: true
@@ -334,11 +334,11 @@ model_management:
         - "gpt2"
 
     lm_studio:
-      enabled: false  # Disabled by default, enable if LM Studio is running
+      enabled: false # Disabled by default, enable if LM Studio is running
       base_url: "http://localhost:1234"
 
     custom_api:
-      enabled: false  # Disabled by default, configure as needed
+      enabled: false # Disabled by default, configure as needed
       custom_providers:
         openai:
           enabled: false
@@ -353,7 +353,7 @@ model_management:
 
   # Model Selection Strategy
   selection_strategy:
-    algorithm: "performance_based"  # performance_based, cost_based, availability_based
+    algorithm: "performance_based" # performance_based, cost_based, availability_based
     prefer_free_models: true
     therapeutic_safety_threshold: 7.0
     max_latency_ms: 5000

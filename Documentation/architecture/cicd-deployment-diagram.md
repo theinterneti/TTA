@@ -74,17 +74,17 @@ flowchart TB
     PR -->|Trigger| TYPE
     PR -->|Trigger| TEST
     PR -->|Trigger| SECURITY
-    
+
     LINT --> GATE1
     TYPE --> GATE1
     TEST --> GATE1
     GATE1 -->|Pass| SECURITY
     GATE1 -->|Fail| PR
-    
+
     SECURITY --> GATE2
     GATE2 -->|Pass| DOCKER_BUILD
     GATE2 -->|Fail| PR
-    
+
     DOCKER_BUILD --> DOCKER_SCAN
     DOCKER_SCAN --> GATE3
     GATE3 -->|Pass| GHCR
@@ -93,11 +93,11 @@ flowchart TB
     %% Merge and Release Flow
     PR -->|Merge| MAIN
     MAIN -->|Tag| RELEASE
-    
+
     %% Container Registry Flow
     GHCR --> STAGING_IMG
     GHCR --> PROD_IMG
-    
+
     %% Staging Deployment Flow
     MAIN -->|Auto Deploy| STAGING_DEPLOY
     STAGING_IMG --> STAGING_DEPLOY
@@ -120,11 +120,11 @@ flowchart TB
     DEV_ENV -.->|Metrics| PROMETHEUS
     STAGING_ENV -.->|Metrics| PROMETHEUS
     PROD_ENV -.->|Metrics| PROMETHEUS
-    
+
     DEV_ENV -.->|Logs| LOKI
     STAGING_ENV -.->|Logs| LOKI
     PROD_ENV -.->|Logs| LOKI
-    
+
     PROMETHEUS --> GRAFANA
     PROMETHEUS --> ALERTS
     LOKI --> GRAFANA
@@ -313,4 +313,3 @@ flowchart TB
 - [Data Flow Diagram](data-flow-diagram.md)
 - [Deployment Guide](../../docs/staging-homelab/README.md)
 - [GitHub Actions Workflows](../../.github/workflows/)
-

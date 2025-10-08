@@ -151,9 +151,8 @@ class BaseProvider(IModelProvider, ABC):
             instance = self._loaded_models[model_id]
             if await instance.health_check():
                 return instance
-            else:
-                # Remove unhealthy instance
-                await self.unload_model(model_id)
+            # Remove unhealthy instance
+            await self.unload_model(model_id)
 
         # Load new model instance
         try:

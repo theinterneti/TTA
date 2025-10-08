@@ -71,7 +71,6 @@ class TestModelManagementComponent:
                         "detect_system_resources",
                         return_value={"total_ram_gb": 16, "gpu_count": 1},
                     ):
-
                         # Test start
                         success = await component._start_impl()
                         assert success
@@ -301,7 +300,6 @@ class TestIntegration:
                         "detect_system_resources",
                         return_value={"total_ram_gb": 16, "gpu_count": 1},
                     ):
-
                         # Start the system
                         await full_system._start_impl()
 
@@ -365,7 +363,6 @@ class TestErrorHandling:
                         "detect_system_resources",
                         return_value={"total_ram_gb": 16, "gpu_count": 1},
                     ):
-
                         await component._start_impl()
 
                         # Mock fallback handler

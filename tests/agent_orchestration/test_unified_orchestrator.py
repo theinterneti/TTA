@@ -6,7 +6,7 @@ Tests the complete IPA → WBA → NGA workflow with state persistence.
 
 import asyncio
 import json
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import pytest_asyncio
@@ -182,7 +182,9 @@ class TestUnifiedAgentOrchestrator:
             player_id="test-player",
             phase=OrchestrationPhase.NARRATIVE_GENERATION,
             user_input="examine the door",
-            ipa_result={"routing": {"intent": "examine", "entities": {"object": "door"}}},
+            ipa_result={
+                "routing": {"intent": "examine", "entities": {"object": "door"}}
+            },
             wba_result={"description": "The door is old and wooden"},
         )
 
@@ -223,7 +225,10 @@ class TestUnifiedAgentOrchestrator:
             # Verify safety intervention
             assert result["success"] is True
             assert result["safety_level"] in ["blocked", "warning"]
-            assert "safety_intervention" in result or "wellbeing" in result["narrative"].lower()
+            assert (
+                "safety_intervention" in result
+                or "wellbeing" in result["narrative"].lower()
+            )
 
     @pytest.mark.asyncio
     async def test_state_persistence(self, orchestrator, mock_redis):
@@ -248,7 +253,9 @@ class TestUnifiedAgentOrchestrator:
 
         # Check second call (session key)
         second_call_args = mock_redis.setex.call_args_list[1][0]
-        assert "orchestration:session:test-session-persist:latest" in second_call_args[0]
+        assert (
+            "orchestration:session:test-session-persist:latest" in second_call_args[0]
+        )
 
     @pytest.mark.asyncio
     async def test_get_workflow_state(self, orchestrator, mock_redis):
@@ -264,7 +271,9 @@ class TestUnifiedAgentOrchestrator:
 
         mock_redis.get = AsyncMock(return_value=json.dumps(test_state.to_dict()))
 
-        retrieved_state = await orchestrator.get_workflow_state("test-workflow-retrieve")
+        retrieved_state = await orchestrator.get_workflow_state(
+            "test-workflow-retrieve"
+        )
 
         assert retrieved_state is not None
         assert retrieved_state.workflow_id == "test-workflow-retrieve"
@@ -318,4 +327,3 @@ class TestUnifiedAgentOrchestrator:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
-

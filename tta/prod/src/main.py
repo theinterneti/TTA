@@ -9,21 +9,18 @@ This demonstrates the new architecture with:
 - Clean separation of concerns
 """
 
-import asyncio
 import logging
-from typing import Dict, Any, Optional
 
 try:
     from rich.console import Console
     from rich.panel import Panel
     from rich.text import Text
+
     RICH_AVAILABLE = True
 except ImportError:
     RICH_AVAILABLE = False
     print("Rich not available, using basic output")
 
-from .models import UnifiedModelClient, TaskType, model_config
-from .agents import BaseAgent
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +54,6 @@ development.
 """
 
 
-
 def main():
     """
     The main function for the TTA game.  This contains the core game loop.
@@ -69,7 +65,7 @@ def main():
     initial_game_state = GameState(
         current_location_id="village_square",
         nearby_characters=["npc_blacksmith"],
-        world_state={}
+        world_state={},
     )
 
     initial_character_states = {
@@ -79,7 +75,7 @@ def main():
             location_id="village_square",
             health=100,
             mood="neutral",
-            relationship_scores={}
+            relationship_scores={},
         )
     }
 
@@ -91,11 +87,15 @@ def main():
         metaconcepts=["Prioritize Player Agency", "Maintain Narrative Consistency"],
         memory=[],
         prompt_chain=[],
-        response=""
+        response="",
     )
 
-    print("You are standing in a small, quiet village square. Sunlight filters through the leaves of an ancient oak tree.")  # Initial description
-    print("Type 'look' to examine your surroundings, 'quit' to exit, 'go [direction]' to move, or 'examine [object]' to examine.")
+    print(
+        "You are standing in a small, quiet village square. Sunlight filters through the leaves of an ancient oak tree."
+    )  # Initial description
+    print(
+        "Type 'look' to examine your surroundings, 'quit' to exit, 'go [direction]' to move, or 'examine [object]' to examine."
+    )
 
     current_state = initial_agent_state  # Set the starting state.
 
@@ -113,7 +113,7 @@ def main():
 
         # --- Generate Narrative (NGA - Simplified) ---
         # In a full implementation, LangGraph would handle agent switching.
-        elif parsed_input["intent"] == "look":
+        if parsed_input["intent"] == "look":
             # Simplified handling of the "look" intent.
             current_state.current_agent = "nga"  # Pretend we switched to the NGA.
             nga_response = generate_narrative(current_state)
@@ -148,6 +148,7 @@ def main():
                 print("Talk to whom?")
         else:
             print("I don't understand that command.")
+
 
 if __name__ == "__main__":
     main()

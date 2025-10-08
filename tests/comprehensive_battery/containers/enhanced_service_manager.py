@@ -158,16 +158,15 @@ class EnhancedServiceManager:
                     uri=config.direct_uri,
                     health_check_result=health_result,
                 )
-            else:
-                logger.warning(
-                    f"⚠️  Direct connection to {config.name} failed: {health_result.message}"
-                )
-                return ServiceStatus(
-                    name=config.name,
-                    backend=ServiceBackend.MOCK,
-                    status="unhealthy",
-                    error_message=health_result.message,
-                )
+            logger.warning(
+                f"⚠️  Direct connection to {config.name} failed: {health_result.message}"
+            )
+            return ServiceStatus(
+                name=config.name,
+                backend=ServiceBackend.MOCK,
+                status="unhealthy",
+                error_message=health_result.message,
+            )
 
         except Exception as e:
             logger.warning(f"⚠️  Direct connection to {config.name} error: {e}")
@@ -276,11 +275,10 @@ class EnhancedServiceManager:
                     container_id=container_info.container_id,
                     health_check_result=health_result,
                 )
-            else:
-                logger.warning(
-                    f"⚠️  Container {config.name} health check failed: {health_result.message}"
-                )
-                return await self._initialize_mock_service(config)
+            logger.warning(
+                f"⚠️  Container {config.name} health check failed: {health_result.message}"
+            )
+            return await self._initialize_mock_service(config)
 
         except Exception as e:
             logger.warning(f"⚠️  Container connection to {config.name} error: {e}")
@@ -298,7 +296,7 @@ class EnhancedServiceManager:
                         return f"bolt://localhost:{host_port}"
                 return "bolt://localhost:7687"  # Default
 
-            elif config.name == "redis":
+            if config.name == "redis":
                 # Look for Redis port (6379)
                 for container_port, host_port in container_info.ports.items():
                     if container_port.startswith("6379"):
@@ -323,7 +321,7 @@ class EnhancedServiceManager:
                     status="mock_ready",
                     uri="mock://neo4j",
                 )
-            elif config.name == "redis":
+            if config.name == "redis":
                 await self.mock_manager.get_redis_client("redis://mock:6379")
                 return ServiceStatus(
                     name=config.name,
@@ -331,8 +329,7 @@ class EnhancedServiceManager:
                     status="mock_ready",
                     uri="mock://redis",
                 )
-            else:
-                raise ValueError(f"Unknown service: {config.name}")
+            raise ValueError(f"Unknown service: {config.name}")
 
         except Exception as e:
             logger.error(f"Failed to initialize mock {config.name}: {e}")
@@ -367,24 +364,22 @@ class EnhancedServiceManager:
         neo4j_status = self.services.get("neo4j")
         if not neo4j_status or neo4j_status.backend == ServiceBackend.MOCK:
             return await self.mock_manager.get_neo4j_driver("bolt://mock:7687")
-        else:
-            # Return real Neo4j driver
-            import neo4j
+        # Return real Neo4j driver
+        import neo4j
 
-            return neo4j.AsyncGraphDatabase.driver(
-                neo4j_status.uri, auth=("neo4j", "password")
-            )
+        return neo4j.AsyncGraphDatabase.driver(
+            neo4j_status.uri, auth=("neo4j", "password")
+        )
 
     async def get_redis_client(self):
         """Get Redis client (real or mock)."""
         redis_status = self.services.get("redis")
         if not redis_status or redis_status.backend == ServiceBackend.MOCK:
             return await self.mock_manager.get_redis_client("redis://mock:6379")
-        else:
-            # Return real Redis client
-            import redis.asyncio as aioredis
+        # Return real Redis client
+        import redis.asyncio as aioredis
 
-            return aioredis.from_url(redis_status.uri)
+        return aioredis.from_url(redis_status.uri)
 
     async def cleanup(self):
         """Clean up all services."""

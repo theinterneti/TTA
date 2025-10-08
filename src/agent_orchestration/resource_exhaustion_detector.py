@@ -315,7 +315,9 @@ class ResourceExhaustionDetector:
                 (
                     logging.ERROR
                     if severity == "exhaustion"
-                    else logging.WARNING if severity == "critical" else logging.INFO
+                    else logging.WARNING
+                    if severity == "critical"
+                    else logging.INFO
                 ),
                 f"Resource {severity}: {resource_type} at {current_value:.1f}% (threshold: {threshold_value:.1f}%)",
                 extra={
@@ -351,10 +353,9 @@ class ResourceExhaustionDetector:
         recent = history[-3:]
         if all(recent[i] > recent[i - 1] for i in range(1, len(recent))):
             return "increasing"
-        elif all(recent[i] < recent[i - 1] for i in range(1, len(recent))):
+        if all(recent[i] < recent[i - 1] for i in range(1, len(recent))):
             return "decreasing"
-        else:
-            return "stable"
+        return "stable"
 
     async def _handle_sustained_exhaustion(
         self, event: ResourceExhaustionEvent

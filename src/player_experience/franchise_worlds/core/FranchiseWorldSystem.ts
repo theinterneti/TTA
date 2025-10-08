@@ -1,6 +1,6 @@
 /**
  * Franchise World System - Core Framework
- * 
+ *
  * Provides the foundation for creating TTA-compatible adaptations of popular
  * fantasy and science fiction franchises while maintaining therapeutic value
  * and avoiding copyright issues through creative adaptation.
@@ -14,7 +14,7 @@ export interface FranchiseWorldConfig {
   name: string;
   genre: 'fantasy' | 'sci-fi';
   inspirationSource: string; // e.g., "Middle-earth-inspired epic fantasy"
-  
+
   // Core world systems (8 validated systems)
   worldSystems: {
     cultural: WorldSystemConfig;
@@ -26,24 +26,24 @@ export interface FranchiseWorldConfig {
     technological: WorldSystemConfig;
     religious: WorldSystemConfig;
   };
-  
+
   // Therapeutic integration
   therapeuticThemes: string[];
   therapeuticApproaches: TherapeuticApproach[];
   therapeuticIntegrationPoints: TherapeuticIntegrationPoint[];
-  
+
   // Narrative structure
   narrativeFramework: NarrativeFramework;
   characterArchetypes: CharacterArchetype[];
   scenarioTemplates: ScenarioTemplate[];
-  
+
   // Session support
   sessionLengthSupport: {
     short: SessionConfig; // 15-30 minutes
     medium: SessionConfig; // 30-90 minutes
     long: SessionConfig; // 90+ minutes
   };
-  
+
   // Legal and ethical
   copyrightCompliance: CopyrightCompliance;
   contentRatings: ContentRating[];
@@ -216,7 +216,7 @@ export class FranchiseWorldSystem {
    * Create a world instance for a player session
    */
   async createWorldInstance(
-    franchiseId: string, 
+    franchiseId: string,
     sessionId: string,
     parameters: WorldParameters
   ): Promise<FranchiseWorldInstance> {
@@ -227,7 +227,7 @@ export class FranchiseWorldSystem {
 
     const instance = new FranchiseWorldInstance(config, sessionId, parameters);
     await instance.initialize();
-    
+
     this.activeWorlds.set(sessionId, instance);
     return instance;
   }
@@ -252,12 +252,12 @@ export class FranchiseWorldSystem {
       therapeutic_approaches: config.therapeuticApproaches,
       difficulty_level: DifficultyLevel.INTERMEDIATE,
       estimated_duration: { hours: 2 }, // Default 2 hours
-      
+
       setting_description: this.generateSettingDescription(config),
       key_characters: this.generateKeyCharacters(config),
       main_storylines: this.generateMainStorylines(config),
       therapeutic_techniques_used: this.extractTherapeuticTechniques(config),
-      
+
       tags: [config.genre, 'franchise-inspired', ...config.therapeuticThemes],
       therapeutic_goals_addressed: config.therapeuticThemes,
       success_metrics: this.generateSuccessMetrics(config)
@@ -278,10 +278,10 @@ export class FranchiseWorldSystem {
 
   private generateSettingDescription(config: FranchiseWorldConfig): string {
     const systemDescriptions = Object.entries(config.worldSystems)
-      .map(([system, systemConfig]) => 
+      .map(([system, systemConfig]) =>
         `${system}: ${systemConfig.adaptationElements.join(', ')}`
       ).join('; ');
-    
+
     return `A ${config.genre} world featuring: ${systemDescriptions}`;
   }
 
@@ -294,7 +294,7 @@ export class FranchiseWorldSystem {
   }
 
   private generateMainStorylines(config: FranchiseWorldConfig): string[] {
-    return config.scenarioTemplates.map(template => 
+    return config.scenarioTemplates.map(template =>
       `${template.name}: ${template.description}`
     );
   }

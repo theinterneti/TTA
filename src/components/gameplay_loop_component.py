@@ -372,10 +372,12 @@ class GameplayLoopComponent(Component):
             return None
 
         try:
-            next_scene, new_choices, consequences = (
-                await self.gameplay_controller.process_user_choice(
-                    session_id, choice_id
-                )
+            (
+                next_scene,
+                new_choices,
+                consequences,
+            ) = await self.gameplay_controller.process_user_choice(
+                session_id, choice_id
             )
 
             return {

@@ -327,9 +327,8 @@ class WorkflowResourceManager:
         # Check if resources can be allocated immediately
         if self._can_allocate_resources(request):
             return await self._allocate_workflow_resources(request)
-        else:
-            # Queue for later scheduling
-            return self.scheduler.enqueue_workflow(request)
+        # Queue for later scheduling
+        return self.scheduler.enqueue_workflow(request)
 
     async def release_workflow_resources(self, workflow_id: str) -> bool:
         """Release resources allocated to a workflow."""

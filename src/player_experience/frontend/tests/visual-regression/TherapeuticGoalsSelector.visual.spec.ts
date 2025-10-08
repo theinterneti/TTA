@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 /**
  * Visual Regression Tests for TherapeuticGoalsSelector Component
- * 
+ *
  * These tests ensure visual consistency across different states, viewports,
  * and user interactions for the TherapeuticGoalsSelector component.
  */
@@ -37,19 +37,19 @@ async function preparePageForVisualTesting(page: any) {
 
   // Wait for fonts and images to load
   await page.waitForLoadState('networkidle');
-  
+
   // Additional stabilization wait
   await page.waitForTimeout(1000);
 }
 
 test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
-  
+
   test.describe('Component States', () => {
-    
+
     test('should render default state consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-default.png');
     });
@@ -57,7 +57,7 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render with selected goals consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.withSelectedGoals}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-with-selected-goals.png');
     });
@@ -65,7 +65,7 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render with selected concerns consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.withSelectedConcerns}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-with-selected-concerns.png');
     });
@@ -73,7 +73,7 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render with custom entries consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.withCustomEntries}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-with-custom-entries.png');
     });
@@ -81,22 +81,22 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render maximum selections consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.maximumSelections}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-maximum-selections.png');
     });
   });
 
   test.describe('Interactive States', () => {
-    
+
     test('should render hover states consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       // Hover over a goal checkbox
       const firstGoal = page.locator('input[type="checkbox"]').first();
       await firstGoal.hover();
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-hover-state.png');
     });
@@ -104,11 +104,11 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render focus states consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       // Focus on the first tab
       const goalsTab = page.locator('button[role="tab"]').first();
       await goalsTab.focus();
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-focus-state.png');
     });
@@ -116,24 +116,24 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
     test('should render concerns tab consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       // Click on concerns tab
       const concernsTab = page.locator('button[role="tab"]', { hasText: 'Primary Concerns' });
       await concernsTab.click();
       await page.waitForTimeout(500);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-concerns-tab.png');
     });
   });
 
   test.describe('Responsive Design', () => {
-    
+
     test('should render consistently on mobile viewport', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 }); // iPhone SE
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-mobile.png');
     });
@@ -142,7 +142,7 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
       await page.setViewportSize({ width: 768, height: 1024 }); // iPad
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-tablet.png');
     });
@@ -151,18 +151,18 @@ test.describe('TherapeuticGoalsSelector - Visual Regression Tests', () => {
       await page.setViewportSize({ width: 1920, height: 1080 }); // Large desktop
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.default}`);
       await preparePageForVisualTesting(page);
-      
+
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-large-desktop.png');
     });
   });
 
   test.describe('Error States and Edge Cases', () => {
-    
+
     test('should render empty state consistently', async ({ page }) => {
       await page.goto(`${STORYBOOK_BASE}${COMPONENT_STORIES.playground}`);
       await preparePageForVisualTesting(page);
-      
+
       // Clear all selections using Storybook controls if available
       const component = page.locator('#storybook-root');
       await expect(component).toHaveScreenshot('therapeutic-goals-selector-empty-state.png');

@@ -169,18 +169,17 @@ class TestPerformanceValidation:
         results = []
 
         for i, scenario in enumerate(test_scenarios):
-            session_id = f"perf_validation_session_{i+1:03d}"
-            world_id = f"perf_validation_world_{i+1:03d}"
-            user_id = f"perf_validation_user_{i+1}"
+            session_id = f"perf_validation_session_{i + 1:03d}"
+            world_id = f"perf_validation_world_{i + 1:03d}"
+            user_id = f"perf_validation_user_{i + 1}"
 
             # Track performance with monitoring infrastructure
             async with monitor.track_operation(
                 operation_type=OperationType.WORKFLOW_EXECUTION,
-                workflow_id=f"perf_test_{i+1}",
+                workflow_id=f"perf_test_{i + 1}",
                 user_id=user_id,
                 metadata={"complexity": scenario["complexity"]},
             ):
-
                 start_time = time.time()
 
                 result = await service.process_user_input(
@@ -202,9 +201,9 @@ class TestPerformanceValidation:
             assert len(result["story"]) > 0
 
             # Validate response time meets target
-            assert (
-                response_time <= scenario["target_time"]
-            ), f"Response time {response_time:.2f}s exceeded target {scenario['target_time']}s for {scenario['complexity']} query"
+            assert response_time <= scenario["target_time"], (
+                f"Response time {response_time:.2f}s exceeded target {scenario['target_time']}s for {scenario['complexity']} query"
+            )
 
             print(
                 f"{scenario['complexity'].capitalize()} query: {response_time:.2f}s (target: {scenario['target_time']}s)"
@@ -216,27 +215,27 @@ class TestPerformanceValidation:
         p95_response_time = sorted(response_times)[int(len(response_times) * 0.95)]
 
         # Performance assertions
-        assert (
-            avg_response_time < 1.5
-        ), f"Average response time {avg_response_time:.2f}s exceeds 1.5s"
-        assert (
-            max_response_time < 2.0
-        ), f"Maximum response time {max_response_time:.2f}s exceeds 2.0s SLA"
-        assert (
-            p95_response_time < 2.0
-        ), f"P95 response time {p95_response_time:.2f}s exceeds 2.0s SLA"
+        assert avg_response_time < 1.5, (
+            f"Average response time {avg_response_time:.2f}s exceeds 1.5s"
+        )
+        assert max_response_time < 2.0, (
+            f"Maximum response time {max_response_time:.2f}s exceeds 2.0s SLA"
+        )
+        assert p95_response_time < 2.0, (
+            f"P95 response time {p95_response_time:.2f}s exceeds 2.0s SLA"
+        )
 
         # Get performance statistics from monitor
         stats = monitor.get_statistics(time_window_minutes=5)
 
         if OperationType.WORKFLOW_EXECUTION in stats:
             workflow_stats = stats[OperationType.WORKFLOW_EXECUTION]
-            assert (
-                workflow_stats.meets_sla
-            ), "Workflow execution does not meet 2-second SLA"
-            assert (
-                workflow_stats.success_rate >= 1.0
-            ), "Not all workflows completed successfully"
+            assert workflow_stats.meets_sla, (
+                "Workflow execution does not meet 2-second SLA"
+            )
+            assert workflow_stats.success_rate >= 1.0, (
+                "Not all workflows completed successfully"
+            )
 
         print("Performance validation summary:")
         print(f"  Average response time: {avg_response_time:.2f}s")
@@ -259,9 +258,9 @@ class TestPerformanceValidation:
         response_times = []
 
         for i in range(iterations):
-            session_id = f"optimization_session_{i+1:03d}"
-            world_id = f"optimization_world_{i+1:03d}"
-            user_id = f"optimization_user_{i+1}"
+            session_id = f"optimization_session_{i + 1:03d}"
+            world_id = f"optimization_world_{i + 1:03d}"
+            user_id = f"optimization_user_{i + 1}"
 
             start_time = time.time()
 
@@ -295,9 +294,9 @@ class TestPerformanceValidation:
 
         # All response times should meet SLA
         max_response_time = max(response_times)
-        assert (
-            max_response_time < 2.5
-        ), f"Maximum response time {max_response_time:.2f}s exceeds acceptable limit"
+        assert max_response_time < 2.5, (
+            f"Maximum response time {max_response_time:.2f}s exceeds acceptable limit"
+        )
 
         # Get optimization statistics
         optimization_stats = coordinator.get_optimization_statistics()
@@ -333,9 +332,9 @@ class TestPerformanceValidation:
         start_time = time.time()
 
         for i in range(concurrent_requests):
-            session_id = f"load_test_session_{i+1:03d}"
-            world_id = f"load_test_world_{i+1:03d}"
-            user_id = f"load_test_user_{i+1}"
+            session_id = f"load_test_session_{i + 1:03d}"
+            world_id = f"load_test_world_{i + 1:03d}"
+            user_id = f"load_test_user_{i + 1}"
 
             task = asyncio.create_task(
                 service.process_user_input(
@@ -376,20 +375,20 @@ class TestPerformanceValidation:
         max_individual_time = max(individual_times)
         avg_individual_time = statistics.mean(individual_times)
 
-        assert (
-            max_individual_time < 3.0
-        ), f"Maximum individual response time {max_individual_time:.2f}s under load exceeds limit"
-        assert (
-            avg_individual_time < 2.5
-        ), f"Average individual response time {avg_individual_time:.2f}s under load exceeds limit"
+        assert max_individual_time < 3.0, (
+            f"Maximum individual response time {max_individual_time:.2f}s under load exceeds limit"
+        )
+        assert avg_individual_time < 2.5, (
+            f"Average individual response time {avg_individual_time:.2f}s under load exceeds limit"
+        )
 
         # Total time should be reasonable (not sequential)
         expected_sequential_time = sum(individual_times)
         concurrency_efficiency = expected_sequential_time / total_time
 
-        assert (
-            concurrency_efficiency > 2.0
-        ), f"Concurrency efficiency {concurrency_efficiency:.1f}x is too low"
+        assert concurrency_efficiency > 2.0, (
+            f"Concurrency efficiency {concurrency_efficiency:.1f}x is too low"
+        )
 
         print("Performance under load test:")
         print(f"  Concurrent requests: {concurrent_requests}")
@@ -422,10 +421,10 @@ class TestPerformanceValidation:
         for scenario_name, test_input in test_scenarios:
             for i in range(3):  # 3 iterations per scenario
                 session_id = (
-                    f"analytics_session_{scenario_name.replace(' ', '_')}_{i+1}"
+                    f"analytics_session_{scenario_name.replace(' ', '_')}_{i + 1}"
                 )
-                world_id = f"analytics_world_{i+1:03d}"
-                user_id = f"analytics_user_{i+1}"
+                world_id = f"analytics_world_{i + 1:03d}"
+                user_id = f"analytics_user_{i + 1}"
 
                 result = await service.process_user_input(
                     user_input=test_input,
@@ -465,9 +464,9 @@ class TestPerformanceValidation:
         critical_bottlenecks = [
             b for b in analysis_results["bottlenecks"] if b.get("severity", 0) > 0.8
         ]
-        assert (
-            len(critical_bottlenecks) == 0
-        ), f"Found critical bottlenecks: {critical_bottlenecks}"
+        assert len(critical_bottlenecks) == 0, (
+            f"Found critical bottlenecks: {critical_bottlenecks}"
+        )
 
         # Get performance summary
         performance_summary = monitor.get_performance_summary()
@@ -506,9 +505,9 @@ class TestPerformanceValidation:
         ]
 
         for i, test_input in enumerate(normal_inputs):
-            session_id = f"alert_test_session_{i+1:03d}"
-            world_id = f"alert_test_world_{i+1:03d}"
-            user_id = f"alert_test_user_{i+1}"
+            session_id = f"alert_test_session_{i + 1:03d}"
+            world_id = f"alert_test_world_{i + 1:03d}"
+            user_id = f"alert_test_user_{i + 1}"
 
             result = await service.process_user_input(
                 user_input=test_input,
@@ -535,9 +534,9 @@ class TestPerformanceValidation:
             for a in received_alerts
             if a.alert_type.value == "response_time_violation"
         ]
-        assert (
-            len(performance_alerts) == 0
-        ), f"Unexpected performance alerts: {performance_alerts}"
+        assert len(performance_alerts) == 0, (
+            f"Unexpected performance alerts: {performance_alerts}"
+        )
 
         # Test alert generation for slow operation
         slow_alert = await alerting.evaluate_thresholds(
@@ -584,7 +583,6 @@ class TestPerformanceValidation:
             user_id=user_id,
             metadata={"test_type": "end_to_end_validation"},
         ):
-
             start_time = time.time()
 
             result = await service.process_user_input(
@@ -611,9 +609,9 @@ class TestPerformanceValidation:
         assert result.get("safety_validated", False) is True
 
         # Validate performance meets SLA
-        assert (
-            total_response_time < 2.0
-        ), f"End-to-end response time {total_response_time:.2f}s exceeds 2.0s SLA"
+        assert total_response_time < 2.0, (
+            f"End-to-end response time {total_response_time:.2f}s exceeds 2.0s SLA"
+        )
 
         # Get comprehensive performance metrics
         performance_summary = monitor.get_performance_summary()

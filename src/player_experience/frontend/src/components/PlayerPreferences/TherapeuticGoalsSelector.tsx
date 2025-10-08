@@ -411,7 +411,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
     const updatedGoals = selected.includes(goalId)
       ? selected.filter(g => g !== goalId)
       : [...selected, goalId];
-    
+
     onChange(updatedGoals, primaryConcerns);
   };
 
@@ -419,7 +419,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
     const updatedConcerns = primaryConcerns.includes(concern)
       ? primaryConcerns.filter(c => c !== concern)
       : [...primaryConcerns, concern];
-    
+
     onChange(selected, updatedConcerns);
   };
 
@@ -596,7 +596,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
           Therapeutic Goals & Primary Concerns
         </h2>
         <p className="text-gray-600 mb-6">
-          Select your therapeutic goals and primary concerns to help personalize your experience. 
+          Select your therapeutic goals and primary concerns to help personalize your experience.
           This helps the AI understand what you want to work on and what's most important to you.
         </p>
       </div>
@@ -1169,7 +1169,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
           {/* Custom Goals */}
           <div className="space-y-3">
             <h3 className="font-semibold text-gray-900">Custom Goals</h3>
-            
+
             {/* Display custom goals */}
             {selected.filter(goal => !THERAPEUTIC_GOALS.includes(goal as TherapeuticGoalString)).map((customGoal) => (
               <div key={customGoal} className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
@@ -1258,7 +1258,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
           {/* Custom Concerns */}
           <div className="space-y-3">
             <h3 className="font-semibold text-gray-900">Custom Concerns</h3>
-            
+
             {/* Display custom concerns */}
             {primaryConcerns.filter(concern => !commonConcerns.includes(concern)).map((customConcern) => (
               <div key={customConcern} className="flex items-center justify-between p-3 bg-amber-50 rounded-lg">
@@ -1535,7 +1535,7 @@ const TherapeuticGoalsSelector: React.FC<TherapeuticGoalsSelectorProps> = ({
       {(selected.length > 0 || primaryConcerns.length > 0) && (
         <div className="bg-primary-50 border border-primary-200 rounded-lg p-4">
           <h3 className="font-medium text-primary-900 mb-3">Your Selections</h3>
-          
+
           {selected.length > 0 && (
             <div className="mb-3">
               <h4 className="text-sm font-medium text-primary-800 mb-2">

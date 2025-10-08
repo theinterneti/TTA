@@ -119,15 +119,15 @@ class TestStatePersistenceIntegration:
                     )
                 )
 
-                assert session_state[
-                    "session_exists"
-                ], f"Session lost after handoff {i}"
-                assert session_state[
-                    "player_relationship_exists"
-                ], f"Player relationship lost after handoff {i}"
-                assert session_state[
-                    "therapeutic_profile_persisted"
-                ], f"Therapeutic profile lost after handoff {i}"
+                assert session_state["session_exists"], (
+                    f"Session lost after handoff {i}"
+                )
+                assert session_state["player_relationship_exists"], (
+                    f"Player relationship lost after handoff {i}"
+                )
+                assert session_state["therapeutic_profile_persisted"], (
+                    f"Therapeutic profile lost after handoff {i}"
+                )
 
                 # Verify agent interaction history
                 interaction_state = (
@@ -139,12 +139,14 @@ class TestStatePersistenceIntegration:
                 expected_interactions = i + 1
                 assert (
                     interaction_state["interaction_count"] >= expected_interactions
-                ), f"Expected at least {expected_interactions} interactions, got {interaction_state['interaction_count']}"
+                ), (
+                    f"Expected at least {expected_interactions} interactions, got {interaction_state['interaction_count']}"
+                )
 
                 # Verify chronological order of interactions
-                assert interaction_state[
-                    "chronological_order"
-                ], "Interactions not in chronological order"
+                assert interaction_state["chronological_order"], (
+                    "Interactions not in chronological order"
+                )
 
             # Verify final state consistency
             final_session_state = (
@@ -154,9 +156,9 @@ class TestStatePersistenceIntegration:
             )
 
             assert final_session_state["session_exists"], "Final session state missing"
-            assert final_session_state[
-                "therapeutic_profile_persisted"
-            ], "Final therapeutic profile missing"
+            assert final_session_state["therapeutic_profile_persisted"], (
+                "Final therapeutic profile missing"
+            )
 
             # Verify all agent types interacted
             final_interactions = (
@@ -165,15 +167,15 @@ class TestStatePersistenceIntegration:
                 )
             )
 
-            assert final_interactions[
-                "has_ipa_interaction"
-            ], "IPA interactions not recorded"
-            assert final_interactions[
-                "has_wba_interaction"
-            ], "WBA interactions not recorded"
-            assert final_interactions[
-                "has_nga_interaction"
-            ], "NGA interactions not recorded"
+            assert final_interactions["has_ipa_interaction"], (
+                "IPA interactions not recorded"
+            )
+            assert final_interactions["has_wba_interaction"], (
+                "WBA interactions not recorded"
+            )
+            assert final_interactions["has_nga_interaction"], (
+                "NGA interactions not recorded"
+            )
 
         finally:
             await integration_helper.cleanup_test_data(
@@ -216,15 +218,15 @@ class TestStatePersistenceIntegration:
             )
 
             assert workflow_state["workflow_found"], "Workflow not found in Neo4j"
-            assert (
-                workflow_state["execution_count"] >= 1
-            ), "No workflow executions recorded"
-            assert (
-                workflow_state["steps_recorded"] >= 3
-            ), "Expected at least 3 workflow steps"
-            assert workflow_state[
-                "has_completion_time"
-            ], "Workflow completion time not recorded"
+            assert workflow_state["execution_count"] >= 1, (
+                "No workflow executions recorded"
+            )
+            assert workflow_state["steps_recorded"] >= 3, (
+                "Expected at least 3 workflow steps"
+            )
+            assert workflow_state["has_completion_time"], (
+                "Workflow completion time not recorded"
+            )
             assert workflow_state["status"] in [
                 "completed",
                 "success",
@@ -304,14 +306,14 @@ class TestStatePersistenceIntegration:
                 if isinstance(result, Exception):
                     pytest.fail(f"Concurrent execution failed: {result}")
                 else:
-                    assert (
-                        result["error"] is None
-                    ), f"Workflow failed: {result['error']}"
+                    assert result["error"] is None, (
+                        f"Workflow failed: {result['error']}"
+                    )
                     successful_results.append(result)
 
-            assert (
-                len(successful_results) == 3
-            ), "Not all concurrent workflows succeeded"
+            assert len(successful_results) == 3, (
+                "Not all concurrent workflows succeeded"
+            )
 
             # Allow time for all state updates to complete
             await asyncio.sleep(1.0)
@@ -324,19 +326,19 @@ class TestStatePersistenceIntegration:
                     )
                 )
 
-                assert session_state[
-                    "session_exists"
-                ], f"Session {result['session_id']} not persisted"
-                assert session_state[
-                    "player_relationship_exists"
-                ], f"Player relationship missing for {result['session_id']}"
+                assert session_state["session_exists"], (
+                    f"Session {result['session_id']} not persisted"
+                )
+                assert session_state["player_relationship_exists"], (
+                    f"Player relationship missing for {result['session_id']}"
+                )
 
             # Verify no data corruption or conflicts
             # Check that each session has distinct data
             session_ids = [result["session_id"] for result in successful_results]
-            assert len(set(session_ids)) == len(
-                session_ids
-            ), "Session ID conflicts detected"
+            assert len(set(session_ids)) == len(session_ids), (
+                "Session ID conflicts detected"
+            )
 
         finally:
             # Cleanup all concurrent sessions
@@ -395,9 +397,9 @@ class TestResponseAggregationIntegration:
                 def get_mock_agent(agent_id):
                     if agent_id.type == AgentType.IPA:
                         return MockIPAProxy(instance="test")
-                    elif agent_id.type == AgentType.WBA:
+                    if agent_id.type == AgentType.WBA:
                         return MockWBAProxy(instance="test")
-                    elif agent_id.type == AgentType.NGA:
+                    if agent_id.type == AgentType.NGA:
                         return MockNGAProxy(instance="test")
                     return None
 
@@ -430,18 +432,18 @@ class TestResponseAggregationIntegration:
                 assert response is not None, "No aggregated response received"
 
                 # Verify response structure
-                assert hasattr(
-                    response, "response_text"
-                ), "Missing response_text in aggregated response"
-                assert hasattr(
-                    response, "workflow_metadata"
-                ), "Missing workflow_metadata"
+                assert hasattr(response, "response_text"), (
+                    "Missing response_text in aggregated response"
+                )
+                assert hasattr(response, "workflow_metadata"), (
+                    "Missing workflow_metadata"
+                )
 
                 # Verify workflow metadata contains information from all agents
                 metadata = response.workflow_metadata
-                assert (
-                    metadata.get("steps_executed") == 3
-                ), "Expected 3 steps in aggregated response"
+                assert metadata.get("steps_executed") == 3, (
+                    "Expected 3 steps in aggregated response"
+                )
 
                 # Verify therapeutic elements are preserved in aggregation
                 response_text = response.response_text
@@ -449,9 +451,9 @@ class TestResponseAggregationIntegration:
                 therapeutic_elements_present = any(
                     keyword in response_text.lower() for keyword in therapeutic_keywords
                 )
-                assert (
-                    therapeutic_elements_present
-                ), "Therapeutic elements not preserved in aggregated response"
+                assert therapeutic_elements_present, (
+                    "Therapeutic elements not preserved in aggregated response"
+                )
 
                 # Verify response aggregation quality
                 verifier = WorkflowStateVerifier()
@@ -466,12 +468,12 @@ class TestResponseAggregationIntegration:
                 aggregation_checks = verifier.verify_response_aggregation(
                     mock_responses
                 )
-                assert aggregation_checks[
-                    "all_agents_responded"
-                ], "Not all agents contributed to aggregation"
-                assert aggregation_checks[
-                    "responses_have_content"
-                ], "Some responses lack content"
+                assert aggregation_checks["all_agents_responded"], (
+                    "Not all agents contributed to aggregation"
+                )
+                assert aggregation_checks["responses_have_content"], (
+                    "Some responses lack content"
+                )
 
         finally:
             await integration_helper.cleanup_test_data(

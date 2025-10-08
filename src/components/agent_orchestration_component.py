@@ -762,7 +762,14 @@ class AgentOrchestrationComponent(Component):
                 async def _fallback_route(unhealthy: Agent) -> bool:
                     try:
                         # choose any other healthy agent of same type
-                        backups = [a for a in self._agent_registry.all() if a.agent_id.type == unhealthy.agent_id.type and a is not unhealthy and a._running and not a._degraded]  # type: ignore
+                        backups = [
+                            a
+                            for a in self._agent_registry.all()
+                            if a.agent_id.type == unhealthy.agent_id.type
+                            and a is not unhealthy
+                            and a._running
+                            and not a._degraded
+                        ]  # type: ignore
                         if not backups:
                             return False
                         unhealthy.set_degraded(True)
@@ -794,7 +801,9 @@ class AgentOrchestrationComponent(Component):
                     except Exception:
                         return False
 
-                self._agent_registry.set_fallback_callback(lambda a, b=None: _fallback_route(a))  # type: ignore
+                self._agent_registry.set_fallback_callback(
+                    lambda a, b=None: _fallback_route(a)
+                )  # type: ignore
                 fd_enabled = bool(
                     self.config.get(
                         "agent_orchestration.monitoring.failure_detection_enabled", True
@@ -873,7 +882,11 @@ class AgentOrchestrationComponent(Component):
                                 )
 
                                 if isinstance(self._agent_registry, RedisAgentRegistry):  # type: ignore
-                                    await self._agent_registry.restore_state_if_available(agent)  # type: ignore
+                                    await (
+                                        self._agent_registry.restore_state_if_available(
+                                            agent
+                                        )
+                                    )  # type: ignore
                             except Exception:
                                 pass
                             # Record restart metric
@@ -948,7 +961,9 @@ class AgentOrchestrationComponent(Component):
                             return False
 
                     if isinstance(self._agent_registry, AgentRegistry):  # type: ignore
-                        self._agent_registry.set_fallback_callback(lambda a, b: _fallback_route(a))  # type: ignore
+                        self._agent_registry.set_fallback_callback(
+                            lambda a, b: _fallback_route(a)
+                        )  # type: ignore
 
                     # Periodic failure detection scheduling (configurable)
                     fd_enabled = bool(
@@ -1001,7 +1016,6 @@ class AgentOrchestrationComponent(Component):
                     )
 
                 if auto_register_enabled:
-
                     import os
                     import socket
                     import uuid
@@ -1042,21 +1056,20 @@ class AgentOrchestrationComponent(Component):
                             return self._validated_config.agents.is_auto_registration_enabled(
                                 agent_type
                             )
-                        else:
-                            # Fallback to raw config - both enabled and auto_register_enabled must be true
-                            enabled = bool(
-                                self.config.get(
-                                    f"agent_orchestration.agents.{agent_type}.enabled",
-                                    False,
-                                )
+                        # Fallback to raw config - both enabled and auto_register_enabled must be true
+                        enabled = bool(
+                            self.config.get(
+                                f"agent_orchestration.agents.{agent_type}.enabled",
+                                False,
                             )
-                            auto_reg = bool(
-                                self.config.get(
-                                    f"agent_orchestration.agents.{agent_type}.auto_register_enabled",
-                                    False,
-                                )
+                        )
+                        auto_reg = bool(
+                            self.config.get(
+                                f"agent_orchestration.agents.{agent_type}.auto_register_enabled",
+                                False,
                             )
-                            return enabled and auto_reg
+                        )
+                        return enabled and auto_reg
 
                     # Register Input Processor Agent
                     if _should_register_agent("input_processor"):
@@ -1238,13 +1251,17 @@ class AgentOrchestrationComponent(Component):
                                 for agent in agents_list:
                                     try:
                                         if loop.is_running():
-                                            fut = _asyncio.run_coroutine_threadsafe(reg._delete(agent.agent_id), loop)  # type: ignore[attr-defined]
+                                            fut = _asyncio.run_coroutine_threadsafe(
+                                                reg._delete(agent.agent_id), loop
+                                            )  # type: ignore[attr-defined]
                                             try:
                                                 fut.result(timeout=1.0)
                                             except Exception:
                                                 pass
                                         else:
-                                            loop.run_until_complete(reg._delete(agent.agent_id))  # type: ignore[attr-defined]
+                                            loop.run_until_complete(
+                                                reg._delete(agent.agent_id)
+                                            )  # type: ignore[attr-defined]
                                     except Exception:
                                         pass
                         except Exception:
@@ -2228,7 +2245,7 @@ class AgentOrchestrationComponent(Component):
 
         @app.post("/policy/reload")
         async def policy_reload(
-            x_ao_diag_key: str | None = Header(default=None, alias="X-AO-DIAG-KEY")
+            x_ao_diag_key: str | None = Header(default=None, alias="X-AO-DIAG-KEY"),
         ) -> dict:
             if not bool(
                 self.config.get("agent_orchestration.diagnostics.enabled", False)
@@ -2368,7 +2385,15 @@ class AgentOrchestrationComponent(Component):
                 # Record in audit
                 try:
                     if getattr(self, "_workflow_monitor", None):
-                        await self._workflow_monitor.record_rollback_audit(run_id, {"ts": time.time(), "event": "manual_rollback", "savepoint": sp, "result": res})  # type: ignore[attr-defined]
+                        await self._workflow_monitor.record_rollback_audit(
+                            run_id,
+                            {
+                                "ts": time.time(),
+                                "event": "manual_rollback",
+                                "savepoint": sp,
+                                "result": res,
+                            },
+                        )  # type: ignore[attr-defined]
                 except Exception:
                     pass
                 return res
@@ -2484,7 +2509,7 @@ class AgentOrchestrationComponent(Component):
 
             @app.post("/safety/reload")
             async def safety_reload(
-                x_ao_diag_key: str | None = Header(default=None, alias="X-AO-DIAG-KEY")
+                x_ao_diag_key: str | None = Header(default=None, alias="X-AO-DIAG-KEY"),
             ) -> dict:
                 if not bool(
                     self.config.get("agent_orchestration.diagnostics.enabled", False)

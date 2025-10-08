@@ -285,15 +285,14 @@ class ImmersionManager:
             EmotionalState.DISTRESSED,
         ]:
             return ImmersionLevel.MINIMAL  # Focus on safety, not immersion
-        elif session_state.emotional_state in [
+        if session_state.emotional_state in [
             EmotionalState.ANXIOUS,
             EmotionalState.OVERWHELMED,
         ]:
             return ImmersionLevel.MODERATE  # Gentle immersion
-        elif session_state.emotional_state == EmotionalState.ENGAGED:
+        if session_state.emotional_state == EmotionalState.ENGAGED:
             return ImmersionLevel.HIGH  # Full immersion
-        else:
-            return ImmersionLevel.MODERATE  # Default
+        return ImmersionLevel.MODERATE  # Default
 
     async def _select_immersion_techniques(
         self,
@@ -307,10 +306,9 @@ class ImmersionManager:
         # Adjust based on target level
         if target_level == ImmersionLevel.MINIMAL:
             return available_techniques[:1]  # Use only one technique
-        elif target_level == ImmersionLevel.MODERATE:
+        if target_level == ImmersionLevel.MODERATE:
             return available_techniques[:2]  # Use two techniques
-        else:
-            return available_techniques  # Use all available techniques
+        return available_techniques  # Use all available techniques
 
     async def _apply_immersion_technique(
         self, scene: Scene, technique: ImmersionTechnique, session_state: SessionState
@@ -318,20 +316,19 @@ class ImmersionManager:
         """Apply a specific immersion technique to the scene."""
         if technique == ImmersionTechnique.SENSORY_DETAIL:
             return await self._apply_sensory_detail(scene)
-        elif technique == ImmersionTechnique.ENVIRONMENTAL_ATMOSPHERE:
+        if technique == ImmersionTechnique.ENVIRONMENTAL_ATMOSPHERE:
             return await self._apply_environmental_atmosphere(scene)
-        elif technique == ImmersionTechnique.CHARACTER_PRESENCE:
+        if technique == ImmersionTechnique.CHARACTER_PRESENCE:
             return await self._apply_character_presence(scene)
-        elif technique == ImmersionTechnique.EMOTIONAL_RESONANCE:
+        if technique == ImmersionTechnique.EMOTIONAL_RESONANCE:
             return await self._apply_emotional_resonance(scene, session_state)
-        elif technique == ImmersionTechnique.INTERACTIVE_ELEMENTS:
+        if technique == ImmersionTechnique.INTERACTIVE_ELEMENTS:
             return await self._apply_interactive_elements(scene)
-        elif technique == ImmersionTechnique.CONTINUITY_WEAVING:
+        if technique == ImmersionTechnique.CONTINUITY_WEAVING:
             return await self._apply_continuity_weaving(scene, session_state)
-        elif technique == ImmersionTechnique.PERSONAL_CONNECTION:
+        if technique == ImmersionTechnique.PERSONAL_CONNECTION:
             return await self._apply_personal_connection(scene, session_state)
-        else:
-            return scene
+        return scene
 
     async def _apply_sensory_detail(self, scene: Scene) -> Scene:
         """Add rich sensory details to enhance immersion."""

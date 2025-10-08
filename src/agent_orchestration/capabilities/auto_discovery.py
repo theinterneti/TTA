@@ -120,14 +120,13 @@ class AutoDiscoveryManager:
         env = os.getenv("ENVIRONMENT", "development").lower()
         if env in ["dev", "develop", "development"]:
             return "development"
-        elif env in ["test", "testing"]:
+        if env in ["test", "testing"]:
             return "testing"
-        elif env in ["stage", "staging"]:
+        if env in ["stage", "staging"]:
             return "staging"
-        elif env in ["prod", "production"]:
+        if env in ["prod", "production"]:
             return "production"
-        else:
-            return "development"  # Default
+        return "development"  # Default
 
     def _is_enabled_for_environment(self) -> bool:
         """Check if auto-discovery is enabled for current environment."""
@@ -263,12 +262,9 @@ class AutoDiscoveryManager:
                 # Notify callbacks
                 await self._notify_discovery_callbacks(component, "registered")
                 return True
-            else:
-                component.discovery_status = DiscoveryStatus.FAILED
-                logger.error(
-                    f"Failed to register component with registry: {component_id}"
-                )
-                return False
+            component.discovery_status = DiscoveryStatus.FAILED
+            logger.error(f"Failed to register component with registry: {component_id}")
+            return False
 
         except Exception as e:
             component.discovery_status = DiscoveryStatus.FAILED

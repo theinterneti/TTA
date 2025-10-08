@@ -70,7 +70,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
             <div className="text-2xl">🎯</div>
           </div>
         </div>
-        
+
         <div className="bg-green-50 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -82,7 +82,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
             <div className="text-2xl">🤝</div>
           </div>
         </div>
-        
+
         <div className="bg-purple-50 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
@@ -94,12 +94,12 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
             <div className="text-2xl">⚡</div>
           </div>
         </div>
-        
+
         <div className="bg-orange-50 rounded-lg p-4">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-2xl font-bold text-orange-600">
-                {goalProgresses.length > 0 
+                {goalProgresses.length > 0
                   ? Math.round(goalProgresses.reduce((sum, gp) => sum + gp.progress, 0) / goalProgresses.length)
                   : 0}%
               </div>
@@ -118,7 +118,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
           height={350}
           onNodeClick={onGoalClick}
         />
-        
+
         <GoalProgressChart
           goalProgresses={goalProgresses}
           chartType="radar"
@@ -144,7 +144,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Goal Relationship Network</h3>
         <p className="text-gray-600">Explore connections, synergies, and conflicts between your therapeutic goals</p>
       </div>
-      
+
       <GoalRelationshipGraph
         relationshipMap={relationshipMap}
         width={800}
@@ -161,14 +161,14 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
             {relationshipMap.relationships.filter(r => r.relationshipType === 'synergistic').length} connections
           </div>
         </div>
-        
+
         <div className="bg-blue-50 rounded-lg p-4">
           <h4 className="font-semibold text-blue-900 mb-2">Complementary Goals</h4>
           <div className="text-sm text-blue-700">
             {relationshipMap.relationships.filter(r => r.relationshipType === 'complementary').length} connections
           </div>
         </div>
-        
+
         <div className="bg-red-50 rounded-lg p-4">
           <h4 className="font-semibold text-red-900 mb-2">Potential Conflicts</h4>
           <div className="text-sm text-red-700">
@@ -187,7 +187,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
           <h3 className="text-lg font-semibold text-gray-900">Progress Visualization</h3>
           <p className="text-gray-600">Track your therapeutic goal progress over time</p>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           {/* Chart type selector */}
           <div className="flex items-center space-x-2">
@@ -204,7 +204,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
               ))}
             </select>
           </div>
-          
+
           {/* Time range selector (for line/bar charts) */}
           {(chartType === 'line' || chartType === 'bar') && (
             <div className="flex items-center space-x-2">
@@ -243,7 +243,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
         <h3 className="text-lg font-semibold text-gray-900 mb-2">Therapeutic Journey</h3>
         <p className="text-gray-600">Your personalized path through therapeutic stages and milestones</p>
       </div>
-      
+
       <TherapeuticJourneyMap
         selectedGoals={selectedGoals}
         goalProgresses={goalProgresses}
@@ -269,7 +269,7 @@ const GoalVisualizationDashboard: React.FC<GoalVisualizationDashboardProps> = ({
         <div className="text-6xl mb-4">📊</div>
         <h3 className="text-xl font-semibold text-gray-900 mb-2">Goal Visualization Dashboard</h3>
         <p className="text-gray-600 mb-4">
-          Select therapeutic goals to unlock powerful visualizations that help you understand relationships, 
+          Select therapeutic goals to unlock powerful visualizations that help you understand relationships,
           track progress, and navigate your therapeutic journey.
         </p>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto">

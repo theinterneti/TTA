@@ -63,14 +63,13 @@ class ResponseTimeMetric:
         """Classify performance level based on duration."""
         if self.duration < 0.5:
             return PerformanceLevel.EXCELLENT
-        elif self.duration < 1.0:
+        if self.duration < 1.0:
             return PerformanceLevel.GOOD
-        elif self.duration < 2.0:
+        if self.duration < 2.0:
             return PerformanceLevel.ACCEPTABLE
-        elif self.duration < 5.0:
+        if self.duration < 5.0:
             return PerformanceLevel.SLOW
-        else:
-            return PerformanceLevel.CRITICAL
+        return PerformanceLevel.CRITICAL
 
 
 @dataclass
@@ -345,18 +344,16 @@ class ResponseTimeMonitor:
 
         if index.is_integer():
             return sorted_data[int(index)]
-        else:
-            lower_index = int(index)
-            upper_index = lower_index + 1
-            weight = index - lower_index
+        lower_index = int(index)
+        upper_index = lower_index + 1
+        weight = index - lower_index
 
-            if upper_index >= len(sorted_data):
-                return sorted_data[lower_index]
+        if upper_index >= len(sorted_data):
+            return sorted_data[lower_index]
 
-            return (
-                sorted_data[lower_index] * (1 - weight)
-                + sorted_data[upper_index] * weight
-            )
+        return (
+            sorted_data[lower_index] * (1 - weight) + sorted_data[upper_index] * weight
+        )
 
     async def _cleanup_loop(self) -> None:
         """Background task to clean up old metrics."""

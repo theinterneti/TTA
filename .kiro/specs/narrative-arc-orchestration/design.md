@@ -62,9 +62,9 @@ The system integrates with existing TTA components:
 ```python
 class NarrativeArcOrchestrator(Component):
     def __init__(self, config):
-        super().__init__(config, name="narrative_arc_orchestrator", 
+        super().__init__(config, name="narrative_arc_orchestrator",
                         dependencies=["neo4j", "redis", "interactive_narrative_engine"])
-    
+
     async def process_player_choice(self, session_id: str, choice: PlayerChoice) -> NarrativeResponse
     async def advance_narrative_scales(self, session_id: str) -> bool
     async def get_narrative_status(self, session_id: str) -> NarrativeStatus

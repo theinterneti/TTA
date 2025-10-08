@@ -1,7 +1,7 @@
 # TTA Testing Quick Reference Guide
 
-**For:** Solo Developer Daily Workflow  
-**Environment:** WSL2 (/dev/sdf)  
+**For:** Solo Developer Daily Workflow
+**Environment:** WSL2 (/dev/sdf)
 **Last Updated:** 2025-10-03
 
 ---
@@ -480,5 +480,5 @@ alias tta-type="uv run mypy src/"
 
 ---
 
-**Quick Reference Version:** 1.0  
+**Quick Reference Version:** 1.0
 **Last Updated:** 2025-10-03

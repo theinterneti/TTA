@@ -174,9 +174,8 @@ class ModelManagementComponent(Component):
             instance = self.active_models[cache_key]
             if await instance.health_check():
                 return instance
-            else:
-                # Remove unhealthy instance
-                del self.active_models[cache_key]
+            # Remove unhealthy instance
+            del self.active_models[cache_key]
 
         # Load model from provider
         if provider_name not in self.providers:
@@ -274,11 +273,10 @@ class ModelManagementComponent(Component):
             provider = self.providers["openrouter"]
             if hasattr(provider, "get_free_models"):
                 return await provider.get_free_models()
-            else:
-                # Fallback to general free filter
-                return await self.get_available_models(
-                    provider_name="openrouter", free_only=True
-                )
+            # Fallback to general free filter
+            return await self.get_available_models(
+                provider_name="openrouter", free_only=True
+            )
         except Exception as e:
             logger.error(f"Failed to get OpenRouter free models: {e}")
             return []
@@ -291,9 +289,7 @@ class ModelManagementComponent(Component):
 
         affordable_models = []
         for model in all_models:
-            if model.is_free:
-                affordable_models.append(model)
-            elif (
+            if model.is_free or (
                 model.cost_per_token is not None
                 and model.cost_per_token <= max_cost_per_token
             ):

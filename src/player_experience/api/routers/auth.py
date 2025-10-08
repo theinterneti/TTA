@@ -384,6 +384,10 @@ async def login(
         # Auto-create player profile if it doesn't exist (Issue #4 fix)
         # This ensures every authenticated user has a player profile with a player_id
         player_id = user.user_id  # Default: player_id matches user_id
+        autocreation_start_time = None
+        autocreation_success = False
+        autocreation_error_category = None
+
         try:
             # Check if player profile already exists
             existing_profile = player_manager.get_player_profile(user.user_id)
@@ -391,21 +395,46 @@ async def login(
                 player_id = existing_profile.player_id
             else:
                 # Create new player profile for first-time login
+                import time
+
+                autocreation_start_time = time.time()
+
                 new_profile = player_manager.create_player_profile(
                     username=user.username,
                     email=user.email,
                     player_id=user.user_id,  # Use user_id as player_id for consistency
                 )
                 player_id = new_profile.player_id
+                autocreation_success = True
                 print(
                     f"✅ Auto-created player profile for user {user.username} (player_id: {player_id})"
                 )
         except PlayerProfileManagerError as profile_error:
             # Log error but don't block login - player_id will default to user_id
+            autocreation_error_category = "profile_manager_error"
             print(
                 f"⚠️ Failed to auto-create player profile for {user.username}: {profile_error}"
             )
             # Continue with login using user_id as player_id
+        except Exception as e:
+            autocreation_error_category = "unexpected_error"
+            print(f"⚠️ Unexpected error during player profile auto-creation: {e}")
+        finally:
+            # Record player profile auto-creation metrics
+            if autocreation_start_time is not None:
+                duration = time.time() - autocreation_start_time
+                try:
+                    from src.monitoring.prometheus_metrics import get_metrics_collector
+
+                    collector = get_metrics_collector("player-experience")
+                    collector.record_player_profile_autocreation(
+                        trigger="first_login",
+                        success=autocreation_success,
+                        duration=duration,
+                        error_category=autocreation_error_category,
+                    )
+                except Exception as metrics_error:
+                    print(f"Failed to record auto-creation metrics: {metrics_error}")
 
         # Create session
         session_id = auth_service.create_session(user, client_ip, user_agent)

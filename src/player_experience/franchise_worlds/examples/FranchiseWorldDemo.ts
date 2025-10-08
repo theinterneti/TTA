@@ -1,6 +1,6 @@
 /**
  * Franchise World System Demo
- * 
+ *
  * Demonstrates the complete franchise world system with working examples
  * showing integration with TTA systems and therapeutic functionality.
  */
@@ -53,7 +53,7 @@ export class FranchiseWorldDemo {
     console.log('------------------------------');
 
     const allWorlds = await this.integration.getAllFranchiseWorlds();
-    
+
     allWorlds.forEach((world, index) => {
       console.log(`${index + 1}. ${world.name} (${world.world_id})`);
       console.log(`   Genre: ${world.world_id.includes('sci') ? 'Sci-Fi' : 'Fantasy'}`);
@@ -127,7 +127,7 @@ export class FranchiseWorldDemo {
     console.log('-----------------------------');
 
     const archetypes = ArchetypeTemplateManager.getAllArchetypes();
-    
+
     console.log(`📊 Available Archetypes: ${archetypes.length}`);
     console.log('');
 
@@ -145,13 +145,13 @@ export class FranchiseWorldDemo {
     const wiseMentor = ArchetypeTemplateManager.getArchetype('wise_mentor');
     if (wiseMentor) {
       const fantasyVersion = ArchetypeTemplateManager.adaptArchetypeForWorld(
-        wiseMentor, 
-        'fantasy', 
+        wiseMentor,
+        'fantasy',
         'Eldermere Realms'
       );
       const scifiVersion = ArchetypeTemplateManager.adaptArchetypeForWorld(
-        wiseMentor, 
-        'sci-fi', 
+        wiseMentor,
+        'sci-fi',
         'Stellar Confederation'
       );
 
@@ -199,10 +199,10 @@ export class FranchiseWorldDemo {
 
     // Demo therapeutic technique matching
     console.log('🔍 Therapeutic Technique Analysis:');
-    const cbtTechniques = world.therapeutic_techniques_used.filter(t => 
+    const cbtTechniques = world.therapeutic_techniques_used.filter(t =>
       t.includes('cognitive') || t.includes('restructuring') || t.includes('reframing')
     );
-    const mindfulnessTechniques = world.therapeutic_techniques_used.filter(t => 
+    const mindfulnessTechniques = world.therapeutic_techniques_used.filter(t =>
       t.includes('mindfulness') || t.includes('awareness') || t.includes('meditation')
     );
 
@@ -254,7 +254,7 @@ export class FranchiseWorldDemo {
 
     for (const profile of playerProfiles) {
       console.log(`👤 ${profile.name}:`);
-      
+
       // Get world configuration
       const world = await this.integration.getFranchiseWorld('eldermere_realms');
       if (!world) continue;
@@ -264,15 +264,15 @@ export class FranchiseWorldDemo {
       console.log(`   Therapeutic Intensity: ${(profile.preferences.therapeutic_intensity * 100).toFixed(0)}%`);
       console.log(`   Narrative Pace: ${profile.preferences.narrative_pace}`);
       console.log(`   Interaction Style: ${profile.preferences.interaction_frequency}`);
-      
+
       if (profile.preferences.focus_areas) {
         console.log(`   Focus Areas: ${profile.preferences.focus_areas.join(', ')}`);
       }
-      
+
       if (profile.preferences.avoid_topics) {
         console.log(`   Avoiding: ${profile.preferences.avoid_topics.join(', ')}`);
       }
-      
+
       console.log('');
     }
   }
@@ -292,7 +292,7 @@ export class FranchiseWorldDemo {
    */
   async runValidationTest(): Promise<boolean> {
     console.log('🔍 Running System Validation...');
-    
+
     try {
       // Test world loading
       const worlds = await this.integration.getAllFranchiseWorlds();
@@ -336,7 +336,7 @@ export class FranchiseWorldDemo {
  */
 export async function runFranchiseWorldDemo(): Promise<void> {
   const demo = new FranchiseWorldDemo();
-  
+
   // Run validation first
   const isValid = await demo.runValidationTest();
   if (!isValid) {
