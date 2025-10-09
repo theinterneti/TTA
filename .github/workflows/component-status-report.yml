@@ -64,8 +64,8 @@ jobs:
             path="${components[$component]}"
             echo "Testing $component..."
 
-            # Run tests with coverage
-            uvx pytest tests/ \
+            # Run tests with coverage (using project environment)
+            uv run pytest tests/ \
               --cov="$path" \
               --cov-report=json:component-reports/${component// /_}_coverage.json \
               --cov-report=term \
@@ -116,6 +116,18 @@ jobs:
                       "ready_for_staging": False,
                       "ready_for_production": False
                   }
+
+          # Validation: Ensure we collected some coverage data
+          if len(component_status) == 0:
+              print("WARNING: No coverage data collected!")
+              print("This likely means pytest failed to run properly.")
+              print("Check that 'uv run pytest' is being used (not 'uvx pytest').")
+
+          # Validation: Check if all components show 0% (likely indicates pytest issue)
+          if len(component_status) > 0 and all(s["coverage"] == 0.0 for s in component_status.values()):
+              print("WARNING: All components show 0% coverage!")
+              print("This likely means pytest is running in wrong environment.")
+              print("Verify 'uv run pytest' is being used to access project dependencies.")
 
           # Generate markdown report
           report = f"# TTA Component Status Report\n\n"
