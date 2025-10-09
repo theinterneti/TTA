@@ -28,6 +28,26 @@ tta.prototype:
       port: 8501
     narrative_arc_orchestrator:
       enabled: true
+
+tta.staging:
+  enabled: true
+  components:
+    neo4j:
+      enabled: true
+      port: 7689 # Unique port for staging (dev:7687, prototype:7688, staging:7689)
+      username: neo4j
+      password: staging_password_change_me # TODO: Use secure password from environment
+      database: tta-staging
+      # Resource limits for staging environment
+      memory:
+        heap_initial: 1G
+        heap_max: 4G
+        pagecache: 2G
+    app:
+      enabled: true
+      port: 8502 # Unique port for staging app
+    narrative_arc_orchestrator:
+      enabled: true
       port: 8502
       max_concurrent_sessions: 100
       narrative_scales:

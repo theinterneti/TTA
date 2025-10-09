@@ -40,6 +40,9 @@ env.bak/
 venv.bak/
 .python-version
 
+# GitHub Project configuration (contains sensitive IDs)
+.github/project-config.env
+
 # -------------------------------------------------
 # 4) Testing & coverage outputs
 # -------------------------------------------------

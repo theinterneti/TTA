@@ -248,4 +248,3 @@ jobs:
           blocker_count: ${{ steps.find_promotion.outputs.blocker_count }}
         secrets:
           GH_PROJECT_TOKEN: ${{ secrets.GH_PROJECT_TOKEN }}
-

@@ -406,6 +406,7 @@ unfixable = []
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "E402"]
 "tests/**/*.py" = ["S101", "ARG", "PLR2004"]  # Allow assert, unused args, magic values in tests
+"scripts/analyze-neo4j-staging-metrics.py" = ["T201", "PLR0912", "PLR0915", "ARG001", "F841", "PTH123"]  # Reporting script needs print statements
 
 # Import sorting configuration (replaces isort)
 [tool.ruff.lint.isort]
