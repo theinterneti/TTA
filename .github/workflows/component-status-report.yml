@@ -65,6 +65,33 @@ jobs:
         run: |
           mkdir -p component-reports
 
+          # Debug: Test with Neo4j first to verify coverage works
+          echo "=== Testing Neo4j with coverage (debug) ==="
+          uv run pytest tests/ \
+            --cov="src/components/neo4j_component.py" \
+            --cov-report=json:component-reports/Neo4j_coverage.json \
+            --cov-report=term \
+            -v || echo "Neo4j tests completed with errors (continuing)"
+
+          # Debug: Check if coverage file was created
+          echo ""
+          echo "=== Checking for coverage file ==="
+          ls -la component-reports/ || echo "component-reports directory is empty"
+
+          if [ -f "component-reports/Neo4j_coverage.json" ]; then
+            echo "✓ Coverage file created successfully!"
+            echo "File size: $(stat -c%s component-reports/Neo4j_coverage.json 2>/dev/null || stat -f%z component-reports/Neo4j_coverage.json)"
+            echo "First 500 characters:"
+            head -c 500 component-reports/Neo4j_coverage.json
+          else
+            echo "✗ ERROR: Coverage file not created!"
+            echo "Checking pytest-cov installation:"
+            uv pip show pytest-cov
+          fi
+
+          echo ""
+          echo "=== Running full component coverage collection ==="
+
           # Define components and their paths
           declare -A components=(
             ["Neo4j"]="src/components/neo4j_component.py"
@@ -92,7 +119,21 @@ jobs:
               --cov-report=json:component-reports/${component// /_}_coverage.json \
               --cov-report=term \
               -v || true
+
+            # Verify coverage file was created
+            coverage_file="component-reports/${component// /_}_coverage.json"
+            if [ -f "$coverage_file" ]; then
+              echo "  ✓ Coverage file created for $component"
+            else
+              echo "  ✗ WARNING: No coverage file for $component"
+            fi
           done
+
+          # Final summary
+          echo ""
+          echo "=== Coverage Collection Summary ==="
+          echo "Files created:"
+          ls -lh component-reports/ || echo "No files created"
 
       - name: Generate status report
         id: report
