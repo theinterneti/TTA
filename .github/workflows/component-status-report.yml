@@ -38,8 +38,9 @@ jobs:
 
       - name: Sync dependencies
         run: |
-          # Sync all dependencies including test group
-          uv sync --all-groups
+          # Sync project dependencies + dev group (includes pytest)
+          # UV automatically syncs the 'dev' group by default
+          uv sync
           echo "Verifying pytest installation..."
           uv pip list | grep pytest
 
