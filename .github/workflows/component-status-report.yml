@@ -37,7 +37,27 @@ jobs:
           enable-cache: true
 
       - name: Sync dependencies
-        run: uv sync --group test
+        run: |
+          uv sync --group test
+          echo "Verifying pytest installation..."
+          uv pip list | grep pytest
+
+      - name: Debug test environment
+        run: |
+          echo "UV version:"
+          uv --version
+          echo ""
+          echo "Python version:"
+          python --version
+          echo ""
+          echo "Installed packages (pytest-related):"
+          uv pip list | grep pytest || echo "No pytest packages found"
+          echo ""
+          echo "Pytest location check:"
+          uv run which pytest || echo "pytest not found via 'uv run which'"
+          echo ""
+          echo "Direct pytest check:"
+          uv run pytest --version || echo "pytest --version failed"
 
       - name: Run tests with coverage for all components
         run: |
