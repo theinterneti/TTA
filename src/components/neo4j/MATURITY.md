@@ -13,13 +13,26 @@
 ## ⚠️ CORRECTION NOTICE
 
 **Previous Assessment**: 0% test coverage (INCORRECT)
-**Corrected Assessment**: **27.2% test coverage**
+**Corrected Assessment**: **27.2% test coverage** (OUTDATED)
+**Current Assessment (2025-10-09)**: **0% test coverage**
 
-The initial analysis used the wrong tool (`uvx pytest` instead of `uv run pytest`), resulting in false 0% readings. After correction, Neo4j has **27.2% coverage** with a **42.8% gap** to the 70% threshold.
+The initial analysis used the wrong tool (`uvx pytest` instead of `uv run pytest`), resulting in false 0% readings. After correction, Neo4j appeared to have 27.2% coverage. However, further investigation revealed that the actual coverage is **0%** due to heavy mocking in tests.
 
-**New Priority**: P1 (not P0)
+**Root Cause**: Tests use extensive `@patch` decorators (20 total) that mock all functionality, preventing the actual `neo4j_component.py` module from being imported during test execution. Coverage.py cannot track code that is never imported.
 
-See: [Corrected Assessment Report](../../docs/development/COMPONENT_MATURITY_ASSESSMENT_CORRECTED.md) | [Correction Issue #18](https://github.com/theinterneti/TTA/issues/18)
+**Evidence**:
+```
+CoverageWarning: Module src/components/neo4j_component.py was never imported. (module-not-imported)
+CoverageWarning: No data was collected. (no-data-collected)
+```
+
+**Solution**: Refactor tests to reduce internal mocking and add integration tests with testcontainers. Estimated effort: 10-15 hours over 2-3 days.
+
+**Detailed Analysis**: See [NEO4J_COVERAGE_ANALYSIS.md](../../docs/component-promotion/NEO4J_COVERAGE_ANALYSIS.md)
+
+**New Priority**: P1 (requires test refactoring before staging promotion)
+
+See: [Corrected Assessment Report](../../docs/development/COMPONENT_MATURITY_ASSESSMENT_CORRECTED.md) | [Correction Issue #18](https://github.com/theinterneti/TTA/issues/18) | [Coverage Investigation](../../docs/component-promotion/COVERAGE_INVESTIGATION_SUMMARY.md)
 
 ---
 
@@ -27,9 +40,9 @@ See: [Corrected Assessment Report](../../docs/development/COMPONENT_MATURITY_ASS
 
 **Purpose**: Graph database management for TTA system, providing persistent storage for narrative state, character relationships, and world knowledge
 
-**Current Coverage**: **88%**
+**Current Coverage**: **0%** (tests exist but use heavy mocking)
 **Target Coverage**: 70%
-**Gap**: 0% (EXCEEDED by 18%)
+**Gap**: 70% (NEEDS TEST REFACTORING)
 
 **Key Features**:
 - Docker-based Neo4j deployment
@@ -47,7 +60,7 @@ See: [Corrected Assessment Report](../../docs/development/COMPONENT_MATURITY_ASS
 ### Development → Staging
 
 - [x] Core features complete (80%+ of planned functionality) ✅
-- [x] Unit tests passing (≥70% coverage) - **Currently 88%** ✅
+- [ ] Unit tests passing (≥70% coverage) - **Currently 0%** ❌
 - [x] API documented, no planned breaking changes ✅
 - [x] Passes security scan (bandit) ✅
 - [x] Passes type checking (pyright) ✅
@@ -56,12 +69,15 @@ See: [Corrected Assessment Report](../../docs/development/COMPONENT_MATURITY_ASS
 - [x] All dependencies identified and stable ✅
 - [x] Successfully integrates with dependent components in dev environment ✅
 
-**Status**: ✅ **9/9 criteria met - READY FOR STAGING PROMOTION**
+**Status**: ❌ **8/9 criteria met - NEEDS TEST REFACTORING**
 
-**Current Coverage**: **88%**
-**Gap to 70%**: 0% (EXCEEDED by 18%)
+**Current Coverage**: **0%** (tests exist but use heavy mocking)
+**Gap to 70%**: 70%
 
-**Blockers**: None
+**Blockers**:
+- Tests need refactoring to reduce mocking and allow actual code execution
+- Integration tests needed with testcontainers for real Neo4j instance
+- Estimated effort: 10-15 hours over 2-3 days
 
 ---
 
