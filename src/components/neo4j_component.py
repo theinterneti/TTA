@@ -1,10 +1,10 @@
 """
-Neo4j Component
+Neo4j Component.
 
 This module provides a component for managing Neo4j.
 
 Classes:
-    Neo4jComponent: Component for managing Neo4j
+    Neo4jComponent: Component for managing Neo4j.
 
 Example:
     ```python
@@ -201,7 +201,7 @@ class Neo4jComponent(Component):
         ] + command
         logger.info(f"Running Docker Compose command: {' '.join(full_command)}")
 
-        result = safe_run(
+        return safe_run(
             full_command,
             cwd=str(self.repo_dir),
             text=True,
@@ -209,8 +209,6 @@ class Neo4jComponent(Component):
             capture_output=True,
             check=False,
         )
-
-        return result
 
     def _is_neo4j_running(self) -> bool:
         """
