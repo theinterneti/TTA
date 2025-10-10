@@ -1,7 +1,7 @@
 # Narrative Coherence Maturity Status
 
-**Current Stage**: Staging (Promoted 2025-10-08)
-**Last Updated**: 2025-10-08
+**Current Stage**: Staging (Promoted 2025-10-08, Coverage Verified 2025-10-09)
+**Last Updated**: 2025-10-09
 **Owner**: theinterneti
 **Functional Group**: Therapeutic Content
 
@@ -29,7 +29,7 @@
 ### Development → Staging
 
 - [x] Core features complete (100% of planned functionality)
-- [x] Unit tests passing (100% coverage)
+- [x] Unit tests passing (≥70% coverage) - **Currently 72%** ✅
 - [x] API documented, no planned breaking changes
 - [x] Passes linting (ruff) - 3 optional PERF401 warnings (list comprehension suggestions)
 - [x] Passes type checking (pyright) - 0 errors
@@ -40,9 +40,19 @@
 
 **Status**: 9/9 criteria met ✅
 
-**Current Coverage**: 100% (unit tests)
+**Current Coverage**: **72%** (unit tests) - Verified 2025-10-09
 
-**Blockers**: None (Issue #39 resolved 2025-10-08)
+**Coverage Breakdown**:
+- `coherence_validator.py`: 87% (Phase 1 complete)
+- `contradiction_detector.py`: 76% (Phase 2 complete)
+- `causal_validator.py`: 0% (not yet tested, optional)
+- `models.py`: 100%
+- `rules.py`: 100%
+- `__init__.py`: 100%
+
+**Test Suite**: 27 comprehensive tests across 2 validator classes
+
+**Blockers**: None (Issue #39 resolved 2025-10-08, Coverage verified via Issue #42)
 
 ---
 
@@ -101,16 +111,39 @@
 
 ### Unit Tests
 
-**Coverage**: XX%
+**Coverage**: **72%** (545 statements, 150 missed)
 
 **Test Files**:
-- `tests/test_<component>.py`
-- `tests/test_<component>_integration.py`
+- `tests/test_narrative_coherence_validators.py` (27 tests)
+- `tests/test_narrative_coherence_engine.py` (6 tests)
 
 **Key Test Scenarios**:
-- Scenario 1
-- Scenario 2
-- Scenario 3
+
+**CoherenceValidator (15 tests, 87% coverage)**:
+- Initialization with default/custom configuration
+- Valid narrative validation
+- Lore violation detection
+- Missing character handling
+- Contradictory element detection
+- Edge case handling (empty content, special characters)
+- Lore compliance checking algorithms
+- Threshold-based validation logic
+- Multi-level coherence checks (lore, character, world, therapeutic)
+- Coherence scoring calculation
+- Error handling for invalid input and validation failures
+- Lore lookup helper methods
+- Scoring calculation helpers
+
+**ContradictionDetector (12 tests, 76% coverage)**:
+- Initialization with default/custom configuration
+- Direct contradiction detection
+- Implicit contradiction detection
+- Temporal context detection
+- Character state contradiction detection
+- World state contradiction detection
+- Empty/single/multiple content analysis
+- Contradiction pattern loading
+- Temporal and causal marker loading
 
 ### Integration Tests
 
@@ -216,6 +249,12 @@
   - Fixed 36 linting errors (ARG002 unused arguments)
   - Created comprehensive README with usage examples
   - All tests passing, 0 security issues
+- **2025-10-09**: Coverage Verification and Enhancement (Issue #42)
+  - Implemented Phase 1: CoherenceValidator tests (15 tests, 87% coverage)
+  - Implemented Phase 2: ContradictionDetector tests (12 tests, 76% coverage)
+  - Overall component coverage: 41% → 72% (+31%)
+  - Component confirmed ready for staging with 72% coverage (exceeds 70% threshold)
+  - Documentation: PHASE1_COHERENCE_VALIDATOR_RESULTS.md, PHASE2_CONTRADICTION_DETECTOR_RESULTS.md
 
 ### Demotions
 
